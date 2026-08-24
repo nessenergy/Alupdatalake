@@ -1,0 +1,45 @@
+name: "🔌 Novo Conector"
+description: "Conector de fonte de dados para o DataLake"
+labels: ["tipo/conector"]
+body:
+  - type: input
+    id: fonte
+    attributes:
+      label: "Fonte de dados"
+      placeholder: "Ex: CCEE, BBCE, ONS, FMB Oracle..."
+    validations:
+      required: true
+  - type: dropdown
+    id: onda
+    attributes:
+      label: "Onda de desenvolvimento"
+      options:
+        - "Onda 0"
+        - "Onda 1"
+        - "Onda 2"
+        - "Onda 3"
+        - "Onda 4"
+    validations:
+      required: true
+  - type: textarea
+    id: descricao
+    attributes:
+      label: "Descrição da fonte"
+      placeholder: "Tipo de API/banco, protocolo, frequência de atualização, URL de documentação..."
+  - type: textarea
+    id: dependencias
+    attributes:
+      label: "Dependências / Pré-requisitos"
+      placeholder: "Credenciais necessárias, VPN, tokens, issues bloqueantes (#XX)..."
+  - type: checkboxes
+    id: componentes
+    attributes:
+      label: "Checklist dos 7 Componentes (critério de aceitação)"
+      options:
+        - label: "01 — Conector Python (extrator em src/conectores/<fonte>/)"
+        - label: "02 — Tabela Bronze (DDL append-only em sql/bronze/)"
+        - label: "03 — View Silver (dados higienizados em sql/silver/)"
+        - label: "04 — View Gold (KPIs e regras de negócio em sql/gold/)"
+        - label: "05 — Testes pytest (unitários + integração em tests/)"
+        - label: "06 — Agendamento GCP (DAG ou Cloud Scheduler em dags/)"
+        - label: "07 — Documentação & Linhagem (README + dicionário de dados)"

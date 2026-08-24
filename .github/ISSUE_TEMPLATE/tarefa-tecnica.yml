@@ -1,0 +1,22 @@
+name: "⚙️ Tarefa Técnica"
+description: "Tarefa de infraestrutura, CI/CD, refactoring ou melhoria"
+labels: ["tipo/tarefa"]
+body:
+  - type: input
+    id: titulo
+    attributes:
+      label: "Objetivo"
+      placeholder: "Ex: Configurar Secret Manager, Setup Terraform modules..."
+    validations:
+      required: true
+  - type: textarea
+    id: descricao
+    attributes:
+      label: "Descrição detalhada"
+    validations:
+      required: true
+  - type: textarea
+    id: criterio
+    attributes:
+      label: "Critério de aceitação"
+      placeholder: "Como sabemos que está pronto?"

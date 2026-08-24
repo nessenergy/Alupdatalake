@@ -1,0 +1,27 @@
+name: "🐛 Bug Report"
+description: "Falha em conector, pipeline ou view"
+labels: ["tipo/bug"]
+body:
+  - type: input
+    id: componente
+    attributes:
+      label: "Componente afetado"
+      placeholder: "Ex: conector/ccee, view gold/pld_medio, dag_ons..."
+    validations:
+      required: true
+  - type: textarea
+    id: descricao
+    attributes:
+      label: "Descrição do bug"
+      placeholder: "O que aconteceu vs. o que era esperado?"
+    validations:
+      required: true
+  - type: textarea
+    id: reproduzir
+    attributes:
+      label: "Passos para reproduzir"
+  - type: textarea
+    id: logs
+    attributes:
+      label: "Logs / erro"
+      render: shell

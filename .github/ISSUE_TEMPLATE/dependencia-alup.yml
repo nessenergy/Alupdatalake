@@ -1,0 +1,35 @@
+name: "🚧 Dependência da Alup"
+description: "Ação pendente da Alup que bloqueia o progresso"
+labels: ["tipo/dependencia", "status/bloqueado"]
+body:
+  - type: input
+    id: item
+    attributes:
+      label: "O que está pendente?"
+      placeholder: "Ex: Credenciais CCEE, VPN Oracle FMB..."
+    validations:
+      required: true
+  - type: input
+    id: prazo-contratual
+    attributes:
+      label: "Prazo contratual (cláusula 3ª)"
+      placeholder: "Ex: Até início da Onda 2"
+  - type: textarea
+    id: impacto
+    attributes:
+      label: "Impacto se não resolvido"
+      placeholder: "Quais conectores/tarefas ficam bloqueados?"
+  - type: input
+    id: solicitado-em
+    attributes:
+      label: "Data da solicitação à Alup"
+      placeholder: "YYYY-MM-DD"
+  - type: textarea
+    id: clausula
+    attributes:
+      label: "Referência contratual"
+      value: |
+        Cláusula 3ª:
+        - Atraso > 5 dias úteis: cronograma postergado automaticamente
+        - Atraso > 5 dias úteis em VPN/credenciais: taxa de ociosidade 4h/dia (R$ 256/h)
+        - Atraso > 20 dias corridos: suspensão automática dos serviços

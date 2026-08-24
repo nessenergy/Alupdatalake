@@ -19,24 +19,24 @@
 
 ```mermaid
 graph LR
- subgraph Fontes
- A[APIs Públicas]
- B[APIs Credenciadas]
- C[Bancos Internos]
- D[Planilhas]
- end
- subgraph "Medallion (BigQuery)"
- E[" Bronze<br/>Dados brutos"]
- F[" Silver<br/>Higienizados"]
- G[" Gold<br/>KPIs & Regras"]
- end
- A --> E
- B --> E
- C --> E
- D --> E
- E --> F
- F --> G
- G --> H[" BI / Portal"]
+    subgraph Fontes
+        A[APIs Públicas]
+        B[APIs Credenciadas]
+        C[Bancos Internos]
+        D[Planilhas]
+    end
+    subgraph "Medallion (BigQuery)"
+        E["Bronze<br/>Dados brutos"]
+        F["Silver<br/>Higienizados"]
+        G["Gold<br/>KPIs & Regras"]
+    end
+    A --> E
+    B --> E
+    C --> E
+    D --> E
+    E --> F
+    F --> G
+    G --> H["BI / Portal"]
 ```
 
 ## Estrutura do Repositório

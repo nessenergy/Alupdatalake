@@ -1,0 +1,367 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AlupData — Kickoff Fase 1: DataLake</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --cyan:#00ADE8; --cyan-dark:#0090C4; --cyan-mist:#E5F6FD;
+  --ink:#0E1116; --graphite:#2B333B; --gray:#5A6473;
+  --line:#E4E8EC; --mist:#EEF3F8; --white:#fff;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  font-family:'Montserrat',-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;
+  color:var(--graphite); background:var(--mist);
+  -webkit-font-smoothing:antialiased;
+}
+.deck{display:flex;flex-direction:column;align-items:center;gap:24px;padding:24px}
+.slide{
+  position:relative; width:100%; max-width:1120px; aspect-ratio:16/9;
+  background:var(--white); border:1px solid var(--line);
+  padding:56px 64px 64px; overflow:hidden; display:flex; flex-direction:column;
+}
+.slide.dark{background:var(--ink); color:var(--white); border-color:var(--ink)}
+.wordmark{font-weight:500;font-size:20px;letter-spacing:-.02em;color:#000}
+.slide.dark .wordmark{color:#fff}
+.wordmark i{color:var(--cyan);font-style:normal}
+.topbar{display:flex;justify-content:space-between;align-items:baseline;
+  padding-bottom:14px;border-bottom:1px solid var(--line);margin-bottom:34px}
+.slide.dark .topbar{border-color:#2A3138}
+.topbar .kicker{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--gray)}
+h1{font-weight:600;font-size:46px;line-height:1.08;letter-spacing:-.02em;margin:0;color:var(--white)}
+h2{font-weight:600;font-size:30px;line-height:1.15;letter-spacing:-.02em;margin:0 0 6px;color:var(--ink)}
+.slide.dark h2{color:var(--white)}
+.num{font-weight:600;font-size:14px;letter-spacing:.16em;color:var(--cyan);margin-bottom:10px}
+.sub{font-weight:500;font-size:17px;color:var(--cyan-dark);margin:0 0 26px}
+.rule{width:64px;height:3px;background:var(--cyan);border:0;margin:0 0 28px}
+p,li{font-size:16px;line-height:1.55}
+.body{flex:1;min-height:0;overflow:hidden}
+.cols{display:grid;grid-template-columns:repeat(var(--c,3),1fr);gap:28px}
+.card{border-top:2px solid var(--cyan);padding-top:14px}
+.card h3{font-weight:600;font-size:17px;margin:0 0 6px;color:var(--ink)}
+.card p{font-size:14px;color:var(--gray);margin:0;line-height:1.5}
+ul{margin:0;padding-left:0;list-style:none}
+ul li{position:relative;padding-left:20px;margin-bottom:10px}
+ul li::before{content:'';position:absolute;left:0;top:.62em;width:7px;height:7px;background:var(--cyan)}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th{background:var(--ink);color:#fff;font-weight:500;text-align:left;padding:10px 12px;font-size:13px}
+td{padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+tbody tr:last-child td{border-bottom:0}
+td.num-col,th.num-col{text-align:right;white-space:nowrap}
+.callout{background:var(--cyan-mist);border-left:3px solid var(--cyan);padding:14px 18px;font-size:14px;line-height:1.5}
+.callout strong{color:var(--ink)}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;margin-bottom:30px}
+.kpi .v{font-weight:600;font-size:34px;color:var(--ink);letter-spacing:-.02em}
+.slide.dark .kpi .v{color:#fff}
+.kpi .l{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--gray);margin-top:4px}
+.foot{position:absolute;left:64px;right:64px;bottom:22px;display:flex;
+  justify-content:space-between;font-size:11px;color:var(--gray);
+  border-top:1px solid var(--line);padding-top:10px}
+.slide.dark .foot{border-color:#2A3138}
+.flow{display:flex;align-items:stretch;gap:12px;margin-bottom:26px}
+.flow .step{flex:1;border:1px solid var(--line);padding:16px 18px}
+.flow .step .t{font-weight:600;font-size:16px;color:var(--ink)}
+.flow .step .d{font-size:13px;color:var(--gray);margin-top:6px;line-height:1.45}
+.flow .arrow{align-self:center;color:var(--cyan);font-weight:600}
+.step.bronze{border-top:3px solid #B87333}
+.step.silver{border-top:3px solid #9AA6B2}
+.step.gold{border-top:3px solid #C9A227}
+.wave{display:grid;grid-template-columns:60px 1fr 92px 96px;gap:0;align-items:start;
+  border-bottom:1px solid var(--line);padding:11px 0;font-size:14px}
+.wave .w{font-weight:600;color:var(--cyan)}
+.wave .n{font-weight:500;color:var(--ink)}
+.wave .n span{display:block;font-weight:400;font-size:12.5px;color:var(--gray);margin-top:3px;line-height:1.4}
+.wave .m{text-align:right;color:var(--gray)}
+@media print{
+  body{background:#fff}
+  .deck{gap:0;padding:0}
+  .slide{max-width:none;width:100%;height:100vh;aspect-ratio:auto;border:0;page-break-after:always}
+  @page{size:A4 landscape;margin:0}
+}
+</style>
+</head>
+<body>
+<div class="deck">
+
+<!-- 1 — Capa -->
+<section class="slide dark">
+  <div class="topbar"><span class="wordmark">ness<i>.</i></span>
+    <span class="kicker">Kickoff · Contrato CPS-01025/2026</span></div>
+  <div class="body" style="display:flex;flex-direction:column;justify-content:center">
+    <hr class="rule">
+    <h1>AlupData<br>Fase 1 — DataLake</h1>
+    <p style="font-size:19px;color:#9AA6B2;margin-top:22px;max-width:640px">
+      Repositório centralizado de dados operacionais e de mercado do Grupo Alupar.
+      Arquitetura Medallion sobre Google Cloud Platform.</p>
+  </div>
+  <div class="foot"><span>Grupo Alupar · FGE · IJUI · FOZ · QUELUZ · LAVRINHAS · VERDE 08</span><span>01</span></div>
+</section>
+
+<!-- 2 — Agenda -->
+<section class="slide">
+  <div class="topbar"><span class="wordmark">ness<i>.</i></span><span class="kicker">Kickoff AlupData</span></div>
+  <div class="body">
+    <div class="num">00</div><h2>Agenda</h2><hr class="rule">
+    <div class="cols" style="--c:2">
+      <ul>
+        <li>Por que o AlupData — objetivo e resultado esperado</li>
+        <li>Escopo da Fase 1 e o que fica de fora</li>
+        <li>Arquitetura Medallion e stack técnica</li>
+        <li>Padrão de entrega: 7 componentes por conector</li>
+      </ul>
+      <ul>
+        <li>Cronograma em 5 ondas — 19 semanas, 580h</li>
+        <li>Fontes de dados por onda</li>
+        <li>Dependências da Alup e riscos contratuais</li>
+        <li>Governança, segurança e marcos de homologação</li>
+        <li>Próximos passos das duas primeiras semanas</li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot"><span>Documento confidencial</span><span>02</span></div>
+</section>
+
+<!-- 3 — O projeto em números -->
+<section class="slide">
+  <div class="topbar"><span class="wordmark">ness<i>.</i></span><span class="kicker">Kickoff AlupData</span></div>
+  <div class="body">
+    <div class="num">01</div><h2>O projeto em números</h2><hr class="rule">
+    <div class="kpis">
+      <div class="kpi"><div class="v">580h</div><div class="l">Horas técnicas</div></div>
+      <div class="kpi"><div class="v">19</div><div class="l">Semanas</div></div>
+      <div class="kpi"><div class="v">5</div><div class="l">Ondas de entrega</div></div>
+      <div class="kpi"><div class="v">13</div><div class="l">Conectores previstos</div></div>
+    </div>
+    <div class="cols" style="--c:3">
+      <div class="card"><h3>Objetivo</h3><p>Consolidar em um único DataLake os dados de mercado, regulatórios e internos hoje dispersos em APIs, bancos e planilhas.</p></div>
+      <div class="card"><h3>Regime</h3><p>Alocação de horas técnicas — prioridades e sequência podem ser redefinidas durante a execução, sem aditivo.</p></div>
+      <div class="card"><h3>Resultado</h3><p>Camada Gold com KPIs prontos para consumo por BI e pelo Portal, com linhagem e documentação completas.</p></div>
+    </div>
+  </div>
+  <div class="foot"><span>Documento confidencial</span><span>03</span></div>
+</section>
+
+<!-- 4 — Arquitetura -->
+<section class="slide">
+  <div class="topbar"><span class="wordmark">ness<i>.</i></span><span class="kicker">Kickoff AlupData</span></div>
+  <div class="body">
+    <div class="num">02</div><h2>Arquitetura Medallion</h2>
+    <p class="sub">Fontes → Bronze → Silver → Gold → BI / Portal</p>
+    <div class="flow">
+      <div class="step"><div class="t">Fontes</div><div class="d">APIs públicas, APIs credenciadas, bancos internos e planilhas.</div></div>
+      <div class="arrow">→</div>
+      <div class="step bronze"><div class="t">Bronze</div><div class="d">Tabelas append-only, schema versionado, log de ingestão. Dado bruto preservado.</div></div>
+      <div class="arrow">→</div>
+      <div class="step silver"><div class="t">Silver</div><div class="d">Tipagem, deduplicação e dimensões comuns que viabilizam o cruzamento entre fontes.</div></div>
+      <div class="arrow">→</div>
+      <div class="step gold"><div class="t">Gold</div><div class="d">Regras de negócio e KPIs consolidados, prontos para consumo analítico.</div></div>
+    </div>
+    <div class="cols" style="--c:2">
+      <div>
+        <p style="font-weight:500;color:var(--ink);margin:0 0 8px">Dimensões comuns Silver</p>
+        <p style="font-size:14px;color:var(--gray);margin:0">
+          <code>data_referencia</code> · <code>submercado</code> · <code>codigo_usina</code> ·
+          <code>agente_ccee</code> · <code>periodo_apuracao</code></p>
+      </div>
+      <div>
+        <p style="font-weight:500;color:var(--ink);margin:0 0 8px">Stack</p>
+        <p style="font-size:14px;color:var(--gray);margin:0">
+          Python 3.12 · BigQuery · Cloud Storage · Cloud Composer / Scheduler ·
+          Secret Manager · Terraform · GitHub Actions · pytest</p>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Documento confidencial</span><span>04</span></div>
+</section>
+
+<!-- 5 — Padrão de entrega -->
+<section class="slide">
+  <div class="topbar"><span class="wordmark">ness<i>.</i></span><span class="kicker">Kickoff AlupData</span></div>
+  <div class="body">
+    <div class="num">03</div><h2>Padrão de entrega</h2>
+    <p class="sub">Todo conector entrega os mesmos 7 componentes — sem exceção</p>
+    <div class="cols" style="--c:4;margin-bottom:22px">
+      <div class="card"><h3>01 · Conector Python</h3><p>Extração e transporte, estruturado e testável.</p></div>
+      <div class="card"><h3>02 · Tabela Bronze</h3><p>Append-only, schema versionado, log de ingestão.</p></div>
+      <div class="card"><h3>03 · View Silver</h3><p>Higienizada, tipada, deduplicada, com dimensões comuns.</p></div>
+      <div class="card"><h3>04 · View Gold</h3><p>Regras de negócio e KPIs consolidados.</p></div>
+    </div>
+    <div class="cols" style="--c:4">
+      <div class="card"><h3>05 · Testes</h3><p>pytest — unitários e integração ponta a ponta.</p></div>
+      <div class="card"><h3>06 · Agendamento</h3><p>Cloud Scheduler / Cloud Composer.</p></div>
+      <div class="card"><h3>07 · Documentação</h3><p>Dicionário de dados, mapeamento de campos e linhagem.</p></div>
+      <div class="card" style="border-top-color:var(--line)"><h3>Definition of Done</h3><p>Uma fonte só é considerada entregue com os 7 componentes homologados.</p></div>
+    </div>
+  </div>
+  <div class="foot"><span>Documento confidencial</span><span>05</span></div>
+</section>
+
+<!-- 6 — Cronograma -->
+<section class="slide">
+  <div class="topbar"><span class="wordmark">ness<i>.</i></span><span class="kicker">Kickoff AlupData</span></div>
+  <div class="body">
+    <div class="num">04</div><h2>Cronograma — 5 ondas, 19 semanas</h2><hr class="rule">
+    <div class="wave" style="border-bottom:1px solid var(--ink);font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--gray)">
+      <div>Onda</div><div>Entrega</div><div class="m">Semanas</div><div class="m">Horas</div></div>
+    <div class="wave"><div class="w">0</div><div class="n">Fundação &amp; Arquitetura
+      <span>Mapeamento de fontes, 8 domínios analíticos, dimensões comuns, CI/CD, portal base com autenticação.</span></div>
+      <div class="m">2</div><div class="m">90h</div></div>
+    <div class="wave"><div class="w">1</div><div class="n">Inteligência de Mercado Base
+      <span>Conectores de APIs públicas — CCEE InfoMercado, ONS, ANEEL, IBGE, câmbio BCB.</span></div>
+      <div class="m">5</div><div class="m">120h</div></div>
+    <div class="wave"><div class="w">2</div><div class="n">APIs com Credenciais
+      <span>Fontes que dependem de credenciais e contratos da Alup — CCEE credenciado, BBCE, Hubspot, TempoOK.</span></div>
+      <div class="m">4</div><div class="m">110h</div></div>
+    <div class="wave"><div class="w">3</div><div class="n">Sistemas Internos
+      <span>Oracle FMB, Portal Alup, MySQL RDS Comercialização, RM/TOTVS. Maior onda do projeto.</span></div>
+      <div class="m">5</div><div class="m">155h</div></div>
+    <div class="wave" style="border-bottom:0"><div class="w">4</div><div class="n">Planilhas, Governança &amp; Handoff
+      <span>Motor S2 Data Intake (CSV/XLSX), Dataplex, views Gold de KPIs, documentação final e handoff técnico.</span></div>
+      <div class="m">3</div><div class="m">105h</div></div>
+  </div>
+  <div class="foot"><span>Documento confidencial</span><span>06</span></div>
+</section>
+
+<!-- 7 — Fontes -->
+<section class="slide">
+  <div class="topbar"><span class="wordmark">ness<i>.</i></span><span class="kicker">Kickoff AlupData</span></div>
+  <div class="body">
+    <div class="num">05</div><h2>Fontes de dados por onda</h2><hr class="rule">
+    <div class="cols" style="--c:3">
+      <div>
+        <table><thead><tr><th>Onda 1 — APIs públicas</th></tr></thead><tbody>
+          <tr><td>CCEE (InfoMercado)</td></tr><tr><td>ONS</td></tr><tr><td>ANEEL</td></tr>
+          <tr><td>IBGE</td></tr><tr><td>Câmbio BCB</td></tr></tbody></table>
+        <p style="font-size:13px;color:var(--gray);margin-top:10px">Sem dependência de credencial da Alup — começam de imediato.</p>
+      </div>
+      <div>
+        <table><thead><tr><th>Onda 2 — APIs credenciadas</th></tr></thead><tbody>
+          <tr><td>CCEE (agente credenciado)</td></tr><tr><td>BBCE</td></tr>
+          <tr><td>Hubspot</td></tr><tr><td>TempoOK</td></tr></tbody></table>
+        <p style="font-size:13px;color:var(--gray);margin-top:10px">Bloqueadas até a Alup fornecer tokens e contratos ativos.</p>
+      </div>
+      <div>
+        <table><thead><tr><th>Onda 3 — Sistemas internos</th></tr></thead><tbody>
+          <tr><td>Oracle FMB</td></tr><tr><td>Portal Alup</td></tr>
+          <tr><td>MySQL RDS Comercialização</td></tr><tr><td>RM/TOTVS</td></tr></tbody></table>
+        <p style="font-size:13px;color:var(--gray);margin-top:10px">Exigem VPN e credenciais read-only liberadas antes do início.</p>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Documento confidencial</span><span>07</span></div>
+</section>
+
+<!-- 8 — Dependências -->
+<section class="slide">
+  <div class="topbar"><span class="wordmark">ness<i>.</i></span><span class="kicker">Kickoff AlupData</span></div>
+  <div class="body">
+    <div class="num">06</div><h2>O que precisamos da Alup</h2>
+    <p class="sub">O caminho crítico do projeto passa por estes insumos</p>
+    <table>
+      <thead><tr><th style="width:130px">Prazo</th><th>Insumo</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Onda 0</strong></td><td>Questionário de Gaps (47 perguntas), matriz RACI, data owners nomeados e definição da ferramenta de BI</td></tr>
+        <tr><td><strong>Até Onda 2</strong></td><td>Tokens e acessos: CCEE credenciado, BBCE, Hubspot, TempoOK</td></tr>
+        <tr><td><strong>Até Onda 3</strong></td><td>VPN e credenciais read-only: Oracle FMB, Portal Alup (MySQL/NoSQL/Storage), MySQL RDS Comercialização, endpoints RM/TOTVS</td></tr>
+        <tr><td><strong>Até Onda 4</strong></td><td>Planilhas padronizadas nos templates definidos na Onda 0</td></tr>
+      </tbody>
+    </table>
+    <div class="callout" style="margin-top:20px">
+      <strong>Efeito de atraso.</strong> Acima de 5 dias úteis o cronograma é postergado automaticamente;
+      atraso em VPN/credenciais gera taxa de ociosidade de 4h/dia; acima de 20 dias corridos os serviços são suspensos.
+    </div>
+  </div>
+  <div class="foot"><span>Documento confidencial</span><span>08</span></div>
+</section>
+
+<!-- 9 — Governança -->
+<section class="slide">
+  <div class="topbar"><span class="wordmark">ness<i>.</i></span><span class="kicker">Kickoff AlupData</span></div>
+  <div class="body">
+    <div class="num">07</div><h2>Governança, segurança e marcos</h2><hr class="rule">
+    <div class="cols" style="--c:2">
+      <div>
+        <p style="font-weight:500;color:var(--ink);margin:0 0 12px">Marcos de homologação</p>
+        <table><thead><tr><th>Marco</th><th>Meta</th><th class="num-col">%</th></tr></thead><tbody>
+          <tr><td>1</td><td>Homologação Onda 0</td><td class="num-col">15,52%</td></tr>
+          <tr><td>2</td><td>Homologação Onda 1</td><td class="num-col">20,69%</td></tr>
+          <tr><td>3</td><td>Homologação Onda 2</td><td class="num-col">18,97%</td></tr>
+          <tr><td>4</td><td>Homologação Onda 3</td><td class="num-col">26,72%</td></tr>
+          <tr><td>5</td><td>Onda 4 + Handoff</td><td class="num-col">18,10%</td></tr>
+        </tbody></table>
+        <p style="font-size:13px;color:var(--gray);margin-top:10px">Cada onda tem 30 dias de garantia após a homologação.</p>
+      </div>
+      <div>
+        <p style="font-weight:500;color:var(--ink);margin:0 0 12px">Segurança no ciclo de desenvolvimento</p>
+        <ul>
+          <li><strong>Bandit</strong> — SAST no pipeline de CI</li>
+          <li><strong>pip-audit</strong> — SCA das dependências</li>
+          <li><strong>Gitleaks</strong> — nenhum secret entra no Git</li>
+          <li><strong>Secret Manager</strong> — credenciais fora do código</li>
+          <li>Vulnerabilidades Alta/Crítica corrigidas <em>antes</em> da homologação</li>
+          <li>Eliminação segura dos dados de teste ao fim de cada etapa</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Documento confidencial</span><span>09</span></div>
+</section>
+
+<!-- 10 — Fora de escopo -->
+<section class="slide">
+  <div class="topbar"><span class="wordmark">ness<i>.</i></span><span class="kicker">Kickoff AlupData</span></div>
+  <div class="body">
+    <div class="num">08</div><h2>O que não está na Fase 1</h2>
+    <p class="sub">Alinhar expectativa agora evita retrabalho depois</p>
+    <div class="cols" style="--c:2">
+      <ul>
+        <li>Custos de infraestrutura GCP — BigQuery, Composer, Storage e APIs de terceiros ficam com a Alup</li>
+        <li>Painéis e relatórios de BI (PowerBI, Tableau) — exceto o Portal MVP da Onda 0</li>
+      </ul>
+      <ul>
+        <li>Treinamento operacional de usuários finais — o handoff é técnico</li>
+        <li>Modelos avançados de IA/ML — objeto de uma Fase 3 futura</li>
+      </ul>
+    </div>
+    <div class="callout" style="margin-top:24px">
+      <strong>Sustentação pós-garantia.</strong> Opcional, com franquia de 20h/mês.
+      Cobre monitoramento, correções e ajustes menores em conectores — não cobre novos pipelines,
+      novas fontes ou novas regras de negócio.
+    </div>
+  </div>
+  <div class="foot"><span>Documento confidencial</span><span>10</span></div>
+</section>
+
+<!-- 11 — Próximos passos -->
+<section class="slide dark">
+  <div class="topbar"><span class="wordmark">ness<i>.</i></span><span class="kicker">Próximos passos</span></div>
+  <div class="body">
+    <div class="num">09</div><h2>As duas primeiras semanas</h2>
+    <hr class="rule">
+    <div class="cols" style="--c:2">
+      <ul style="color:#C7D2DE">
+        <li>Envio do Questionário de Gaps (47 perguntas) e prazo de retorno acordado</li>
+        <li>Nomeação dos data owners por domínio e fechamento da matriz RACI</li>
+        <li>Abertura dos acessos GCP e criação dos projetos Bronze/Silver/Gold</li>
+      </ul>
+      <ul style="color:#C7D2DE">
+        <li>Definição da ferramenta de BI que consumirá a camada Gold</li>
+        <li>Início dos pedidos de credenciais das Ondas 2 e 3 — o prazo interno da Alup é o risco maior</li>
+        <li>Ritual semanal de acompanhamento e canal único de decisão</li>
+      </ul>
+    </div>
+    <p style="color:#9AA6B2;font-size:15px;margin-top:26px;max-width:720px">
+      A Onda 0 fecha com a arquitetura homologada e o pipeline de CI/CD rodando — é a base de tudo que vem depois.</p>
+  </div>
+  <div class="foot"><span>ness. Processos e Tecnologia · Contrato CPS-01025/2026</span><span>11</span></div>
+</section>
+
+</div>
+</body>
+</html>

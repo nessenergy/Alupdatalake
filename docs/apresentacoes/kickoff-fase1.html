@@ -2,6 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8">
+<script>document.documentElement.className='js'</script>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>AlupData — Kickoff Fase 1: DataLake</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -12,103 +13,166 @@
   --cyan:#00ADE8; --cyan-dark:#0090C4; --cyan-mist:#E5F6FD;
   --ink:#0E1116; --graphite:#2B333B; --gray:#5A6473;
   --line:#E4E8EC; --mist:#EEF3F8; --white:#fff;
+  --pad:clamp(32px,6vw,120px);
 }
 *{box-sizing:border-box}
-html,body{margin:0;padding:0}
+html{scroll-behavior:smooth}
+html,body{margin:0;padding:0;height:100%}
 body{
   font-family:'Montserrat',-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;
-  color:var(--graphite); background:var(--mist);
+  color:var(--graphite);background:var(--white);
   -webkit-font-smoothing:antialiased;
 }
-.deck{display:flex;flex-direction:column;align-items:center;gap:24px;padding:24px}
+/* ---------- estrutura de rolagem ---------- */
+.deck{height:100vh;overflow-y:scroll;scroll-snap-type:y mandatory;scroll-behavior:smooth}
 .slide{
-  position:relative; width:100%; max-width:1120px; aspect-ratio:16/9;
-  background:var(--white); border:1px solid var(--line);
-  padding:56px 64px 64px; overflow:hidden; display:flex; flex-direction:column;
+  position:relative;min-height:100vh;scroll-snap-align:start;scroll-snap-stop:always;
+  display:flex;flex-direction:column;justify-content:center;
+  padding:calc(var(--pad)*.9) var(--pad);
+  box-shadow:inset 0 -1px 0 var(--line);
 }
-.slide.dark{background:var(--ink); color:var(--white); border-color:var(--ink)}
-.wordmark{font-weight:500;font-size:20px;letter-spacing:-.02em;color:#000}
+.slide.dark{background:var(--ink);color:#C7D2DE;box-shadow:none}
+.slide.mist{background:var(--mist);box-shadow:none}
+.inner{width:100%;max-width:1180px;margin:0 auto}
+/* ---------- marca ---------- */
+.wordmark{position:absolute;top:calc(var(--pad)*.55);left:var(--pad);
+  font-weight:500;font-size:19px;letter-spacing:-.02em;color:#000;z-index:2}
 .slide.dark .wordmark{color:#fff}
 .wordmark i{color:var(--cyan);font-style:normal}
-.topbar{display:flex;justify-content:space-between;align-items:baseline;
-  padding-bottom:14px;border-bottom:1px solid var(--line);margin-bottom:34px}
-.slide.dark .topbar{border-color:#2A3138}
-.topbar .kicker{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--gray)}
-h1{font-weight:600;font-size:46px;line-height:1.08;letter-spacing:-.02em;margin:0;color:var(--white)}
-h2{font-weight:600;font-size:30px;line-height:1.15;letter-spacing:-.02em;margin:0 0 6px;color:var(--ink)}
-.slide.dark h2{color:var(--white)}
-.num{font-weight:600;font-size:14px;letter-spacing:.16em;color:var(--cyan);margin-bottom:10px}
-.sub{font-weight:500;font-size:17px;color:var(--cyan-dark);margin:0 0 26px}
-.rule{width:64px;height:3px;background:var(--cyan);border:0;margin:0 0 28px}
-p,li{font-size:16px;line-height:1.55}
-.body{flex:1;min-height:0;overflow:hidden}
-.cols{display:grid;grid-template-columns:repeat(var(--c,3),1fr);gap:28px}
-.card{border-top:2px solid var(--cyan);padding-top:14px}
-.card h3{font-weight:600;font-size:17px;margin:0 0 6px;color:var(--ink)}
-.card p{font-size:14px;color:var(--gray);margin:0;line-height:1.5}
+.tag{position:absolute;top:calc(var(--pad)*.55);right:var(--pad);
+  font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--gray);z-index:2}
+.pagenum{position:absolute;bottom:calc(var(--pad)*.5);right:var(--pad);
+  font-size:11px;letter-spacing:.14em;color:var(--gray)}
+/* ---------- progresso e navegação ---------- */
+#bar{position:fixed;top:0;left:0;height:3px;width:0;background:var(--cyan);z-index:50;transition:width .15s linear}
+#dots{position:fixed;right:18px;top:50%;transform:translateY(-50%);z-index:50;
+  display:flex;flex-direction:column;gap:11px}
+#dots button{width:9px;height:9px;padding:0;border:1px solid #9AA6B2;background:transparent;
+  border-radius:50%;cursor:pointer;transition:all .2s}
+#dots button[aria-current="true"]{background:var(--cyan);border-color:var(--cyan);transform:scale(1.35)}
+.hint{position:absolute;bottom:calc(var(--pad)*.5);left:var(--pad);
+  font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--gray)}
+.hint span{display:inline-block;animation:nudge 2.4s ease-in-out infinite;margin-left:8px}
+@keyframes nudge{0%,100%{transform:translateY(0)}50%{transform:translateY(5px)}}
+/* ---------- tipografia ---------- */
+.display{font-weight:600;font-size:clamp(44px,7.4vw,104px);line-height:.96;
+  letter-spacing:-.035em;margin:0;color:#fff}
+h2{font-weight:600;font-size:clamp(30px,4.4vw,58px);line-height:1.04;
+  letter-spacing:-.03em;margin:0 0 10px;color:var(--ink)}
+.slide.dark h2{color:#fff}
+.num{font-weight:600;font-size:13px;letter-spacing:.2em;color:var(--cyan);margin-bottom:14px}
+.sub{font-weight:500;font-size:clamp(15px,1.5vw,20px);color:var(--cyan-dark);margin:0 0 clamp(24px,3.4vh,44px)}
+.slide.dark .sub{color:var(--cyan)}
+.rule{width:72px;height:4px;background:var(--cyan);border:0;margin:0 0 clamp(22px,3vh,38px)}
+p,li{font-size:clamp(14px,1.15vw,17px);line-height:1.6}
+.lead{font-size:clamp(16px,1.6vw,23px);line-height:1.5;color:#9AA6B2;max-width:22em}
+/* ---------- componentes ---------- */
+.cols{display:grid;grid-template-columns:repeat(var(--c,3),minmax(0,1fr));gap:clamp(18px,2.4vw,34px)}
+.card{border-top:2px solid var(--cyan);padding-top:16px}
+.card h3{font-weight:600;font-size:clamp(15px,1.3vw,18px);margin:0 0 8px;color:var(--ink)}
+.slide.dark .card h3{color:#fff}
+.card p{font-size:clamp(13px,1vw,15px);color:var(--gray);margin:0;line-height:1.55}
+.slide.dark .card p{color:#8B95A3}
 ul{margin:0;padding-left:0;list-style:none}
-ul li{position:relative;padding-left:20px;margin-bottom:10px}
+ul li{position:relative;padding-left:22px;margin-bottom:14px}
 ul li::before{content:'';position:absolute;left:0;top:.62em;width:7px;height:7px;background:var(--cyan)}
-table{width:100%;border-collapse:collapse;font-size:14px}
-th{background:var(--ink);color:#fff;font-weight:500;text-align:left;padding:10px 12px;font-size:13px}
-td{padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+table{width:100%;border-collapse:collapse;font-size:clamp(13px,1vw,15px)}
+th{background:var(--ink);color:#fff;font-weight:500;text-align:left;padding:11px 14px;font-size:12.5px;
+  letter-spacing:.04em}
+td{padding:11px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+.slide.dark td{border-color:#242B33}
 tbody tr:last-child td{border-bottom:0}
-td.num-col,th.num-col{text-align:right;white-space:nowrap}
-.callout{background:var(--cyan-mist);border-left:3px solid var(--cyan);padding:14px 18px;font-size:14px;line-height:1.5}
+.r{text-align:right;white-space:nowrap}
+.callout{background:var(--cyan-mist);border-left:3px solid var(--cyan);padding:18px 22px;
+  font-size:clamp(13px,1.05vw,16px);line-height:1.55;color:var(--graphite)}
 .callout strong{color:var(--ink)}
-.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;margin-bottom:30px}
-.kpi .v{font-weight:600;font-size:34px;color:var(--ink);letter-spacing:-.02em}
+.slide.dark .callout{background:rgba(0,173,232,.09);color:#C7D2DE}
+.slide.dark .callout strong{color:#fff}
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:clamp(18px,3vw,44px)}
+.kpi .v{font-weight:600;font-size:clamp(40px,6.4vw,88px);line-height:1;
+  letter-spacing:-.04em;color:var(--ink)}
 .slide.dark .kpi .v{color:#fff}
-.kpi .l{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--gray);margin-top:4px}
-.foot{position:absolute;left:64px;right:64px;bottom:22px;display:flex;
-  justify-content:space-between;font-size:11px;color:var(--gray);
-  border-top:1px solid var(--line);padding-top:10px}
-.slide.dark .foot{border-color:#2A3138}
-.flow{display:flex;align-items:stretch;gap:12px;margin-bottom:26px}
-.flow .step{flex:1;border:1px solid var(--line);padding:16px 18px}
-.flow .step .t{font-weight:600;font-size:16px;color:var(--ink)}
-.flow .step .d{font-size:13px;color:var(--gray);margin-top:6px;line-height:1.45}
-.flow .arrow{align-self:center;color:var(--cyan);font-weight:600}
-.step.bronze{border-top:3px solid #B87333}
-.step.silver{border-top:3px solid #9AA6B2}
-.step.gold{border-top:3px solid #C9A227}
-.wave{display:grid;grid-template-columns:60px 1fr 92px 96px;gap:0;align-items:start;
-  border-bottom:1px solid var(--line);padding:11px 0;font-size:14px}
-.wave .w{font-weight:600;color:var(--cyan)}
-.wave .n{font-weight:500;color:var(--ink)}
-.wave .n span{display:block;font-weight:400;font-size:12.5px;color:var(--gray);margin-top:3px;line-height:1.4}
-.wave .m{text-align:right;color:var(--gray)}
+.kpi .v i{font-style:normal;color:var(--cyan)}
+.kpi .l{font-size:clamp(10px,.85vw,12px);letter-spacing:.16em;text-transform:uppercase;
+  color:var(--gray);margin-top:12px;border-top:1px solid var(--line);padding-top:12px}
+.slide.dark .kpi .l{border-color:#242B33}
+/* fluxo medallion */
+.flow{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:clamp(12px,1.6vw,22px)}
+.step{border:1px solid var(--line);border-top-width:4px;padding:clamp(16px,2vw,26px)}
+.slide.dark .step{border-color:#242B33}
+.step .t{font-weight:600;font-size:clamp(16px,1.6vw,22px);color:var(--ink);letter-spacing:-.02em}
+.slide.dark .step .t{color:#fff}
+.step .d{font-size:clamp(12.5px,1vw,15px);color:var(--gray);margin-top:10px;line-height:1.5}
+.step.s0{border-top-color:#5A6473}.step.s1{border-top-color:#B87333}
+.step.s2{border-top-color:#9AA6B2}.step.s3{border-top-color:#C9A227}
+/* ondas */
+.wave{display:grid;grid-template-columns:74px 1fr 96px 96px;align-items:start;
+  border-bottom:1px solid var(--line);padding:clamp(10px,1.5vh,18px) 0}
+.wave.head{border-bottom:1.5px solid var(--ink);font-size:11px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--gray)}
+.wave .w{font-weight:600;font-size:clamp(20px,2.4vw,32px);color:var(--cyan);line-height:1;letter-spacing:-.03em}
+.wave .n{font-weight:500;font-size:clamp(14px,1.25vw,19px);color:var(--ink);letter-spacing:-.01em}
+.wave .n span{display:block;font-weight:400;font-size:clamp(12px,.95vw,14px);color:var(--gray);
+  margin-top:5px;line-height:1.5;max-width:62ch}
+.wave .m{text-align:right;color:var(--gray);font-size:clamp(13px,1.05vw,16px)}
+.wave .m b{color:var(--ink);font-weight:600}
+/* reveal */
+.js .rv{opacity:0;transform:translateY(22px);transition:opacity .6s cubic-bezier(.2,.7,.3,1),transform .6s cubic-bezier(.2,.7,.3,1)}
+.slide.on .rv{opacity:1;transform:none}
+.slide.on .rv:nth-child(2){transition-delay:.06s}
+.slide.on .rv:nth-child(3){transition-delay:.12s}
+.slide.on .rv:nth-child(4){transition-delay:.18s}
+.slide.on .rv:nth-child(5){transition-delay:.24s}
+.slide.on .rv:nth-child(6){transition-delay:.3s}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}.deck{scroll-behavior:auto}
+  .js .rv{opacity:1;transform:none;transition:none}.hint span{animation:none}
+}
+@media (max-width:820px){
+  .deck{scroll-snap-type:none}
+  .slide{min-height:auto;padding:64px 28px}
+  .kpis,.flow,.cols{grid-template-columns:1fr!important;--c:1!important}
+  .wave{grid-template-columns:52px 1fr;row-gap:6px}
+  .wave .m{text-align:left}.wave.head{display:none}
+  #dots{display:none}
+}
 @media print{
-  body{background:#fff}
-  .deck{gap:0;padding:0}
-  .slide{max-width:none;width:100%;height:100vh;aspect-ratio:auto;border:0;page-break-after:always}
+  #bar,#dots,.hint{display:none}
+  .deck{height:auto;overflow:visible}
+  .slide{min-height:auto;height:100vh;page-break-after:always;border:0}
+  .js .rv{opacity:1!important;transform:none!important}
   @page{size:A4 landscape;margin:0}
 }
 </style>
 </head>
 <body>
-<div class="deck">
+<div id="bar"></div>
+<nav id="dots" aria-label="Navegação de slides"></nav>
 
-<!-- 1 — Capa -->
-<section class="slide dark">
-  <div class="topbar"><span class="wordmark">ness<i>.</i></span>
-    <span class="kicker">Kickoff · Contrato CPS-01025/2026</span></div>
-  <div class="body" style="display:flex;flex-direction:column;justify-content:center">
-    <hr class="rule">
-    <h1>AlupData<br>Fase 1 — DataLake</h1>
-    <p style="font-size:19px;color:#9AA6B2;margin-top:22px;max-width:640px">
-      Repositório centralizado de dados operacionais e de mercado do Grupo Alupar.
+<main class="deck" id="deck" tabindex="0">
+
+<!-- 01 CAPA -->
+<section class="slide dark" data-t="Capa">
+  <span class="wordmark">ness<i>.</i></span><span class="tag">Kickoff · CPS-01025/2026</span>
+  <div class="inner">
+    <hr class="rule rv">
+    <h1 class="display rv">AlupData<br>Fase 1 — DataLake</h1>
+    <p class="lead rv" style="margin-top:clamp(20px,3vh,38px)">
+      Um único repositório para os dados operacionais e de mercado do Grupo Alupar.
       Arquitetura Medallion sobre Google Cloud Platform.</p>
   </div>
-  <div class="foot"><span>Grupo Alupar · FGE · IJUI · FOZ · QUELUZ · LAVRINHAS · VERDE 08</span><span>01</span></div>
+  <span class="hint">Role para navegar<span>↓</span></span>
+  <span class="pagenum">01</span>
 </section>
 
-<!-- 2 — Agenda -->
-<section class="slide">
-  <div class="topbar"><span class="wordmark">ness<i>.</i></span><span class="kicker">Kickoff AlupData</span></div>
-  <div class="body">
-    <div class="num">00</div><h2>Agenda</h2><hr class="rule">
-    <div class="cols" style="--c:2">
+<!-- 02 AGENDA -->
+<section class="slide" data-t="Agenda">
+  <span class="wordmark">ness<i>.</i></span><span class="tag">Kickoff AlupData</span>
+  <div class="inner">
+    <div class="num rv">00</div>
+    <h2 class="rv">Agenda</h2>
+    <hr class="rule rv">
+    <div class="cols rv" style="--c:2">
       <ul>
         <li>Por que o AlupData — objetivo e resultado esperado</li>
         <li>Escopo da Fase 1 e o que fica de fora</li>
@@ -124,147 +188,152 @@ td.num-col,th.num-col{text-align:right;white-space:nowrap}
       </ul>
     </div>
   </div>
-  <div class="foot"><span>Documento confidencial</span><span>02</span></div>
+  <span class="pagenum">02</span>
 </section>
 
-<!-- 3 — O projeto em números -->
-<section class="slide">
-  <div class="topbar"><span class="wordmark">ness<i>.</i></span><span class="kicker">Kickoff AlupData</span></div>
-  <div class="body">
-    <div class="num">01</div><h2>O projeto em números</h2><hr class="rule">
-    <div class="kpis">
-      <div class="kpi"><div class="v">580h</div><div class="l">Horas técnicas</div></div>
-      <div class="kpi"><div class="v">19</div><div class="l">Semanas</div></div>
-      <div class="kpi"><div class="v">5</div><div class="l">Ondas de entrega</div></div>
-      <div class="kpi"><div class="v">13</div><div class="l">Conectores previstos</div></div>
+<!-- 03 NÚMEROS -->
+<section class="slide dark" data-t="Números">
+  <span class="wordmark">ness<i>.</i></span><span class="tag">Kickoff AlupData</span>
+  <div class="inner">
+    <div class="num rv">01</div>
+    <h2 class="rv">O projeto em números</h2>
+    <hr class="rule rv">
+    <div class="kpis rv" style="margin-bottom:clamp(28px,5vh,60px)">
+      <div class="kpi"><div class="v"><span class="count" data-to="580">0</span><i>h</i></div><div class="l">Horas técnicas</div></div>
+      <div class="kpi"><div class="v"><span class="count" data-to="19">0</span></div><div class="l">Semanas</div></div>
+      <div class="kpi"><div class="v"><span class="count" data-to="5">0</span></div><div class="l">Ondas de entrega</div></div>
+      <div class="kpi"><div class="v"><span class="count" data-to="13">0</span></div><div class="l">Conectores previstos</div></div>
     </div>
-    <div class="cols" style="--c:3">
-      <div class="card"><h3>Objetivo</h3><p>Consolidar em um único DataLake os dados de mercado, regulatórios e internos hoje dispersos em APIs, bancos e planilhas.</p></div>
+    <div class="cols rv" style="--c:3">
+      <div class="card"><h3>Objetivo</h3><p>Consolidar em um só lugar os dados de mercado, regulatórios e internos hoje dispersos em APIs, bancos e planilhas.</p></div>
       <div class="card"><h3>Regime</h3><p>Alocação de horas técnicas — prioridades e sequência podem ser redefinidas durante a execução, sem aditivo.</p></div>
       <div class="card"><h3>Resultado</h3><p>Camada Gold com KPIs prontos para consumo por BI e pelo Portal, com linhagem e documentação completas.</p></div>
     </div>
   </div>
-  <div class="foot"><span>Documento confidencial</span><span>03</span></div>
+  <span class="pagenum">03</span>
 </section>
 
-<!-- 4 — Arquitetura -->
-<section class="slide">
-  <div class="topbar"><span class="wordmark">ness<i>.</i></span><span class="kicker">Kickoff AlupData</span></div>
-  <div class="body">
-    <div class="num">02</div><h2>Arquitetura Medallion</h2>
-    <p class="sub">Fontes → Bronze → Silver → Gold → BI / Portal</p>
-    <div class="flow">
-      <div class="step"><div class="t">Fontes</div><div class="d">APIs públicas, APIs credenciadas, bancos internos e planilhas.</div></div>
-      <div class="arrow">→</div>
-      <div class="step bronze"><div class="t">Bronze</div><div class="d">Tabelas append-only, schema versionado, log de ingestão. Dado bruto preservado.</div></div>
-      <div class="arrow">→</div>
-      <div class="step silver"><div class="t">Silver</div><div class="d">Tipagem, deduplicação e dimensões comuns que viabilizam o cruzamento entre fontes.</div></div>
-      <div class="arrow">→</div>
-      <div class="step gold"><div class="t">Gold</div><div class="d">Regras de negócio e KPIs consolidados, prontos para consumo analítico.</div></div>
+<!-- 04 ARQUITETURA -->
+<section class="slide" data-t="Arquitetura">
+  <span class="wordmark">ness<i>.</i></span><span class="tag">Kickoff AlupData</span>
+  <div class="inner">
+    <div class="num rv">02</div>
+    <h2 class="rv">Arquitetura Medallion</h2>
+    <p class="sub rv">Fontes → Bronze → Silver → Gold → BI / Portal</p>
+    <div class="flow rv" style="margin-bottom:clamp(22px,3.4vh,40px)">
+      <div class="step s0"><div class="t">Fontes</div><div class="d">APIs públicas, APIs credenciadas, bancos internos e planilhas.</div></div>
+      <div class="step s1"><div class="t">Bronze</div><div class="d">Append-only, schema versionado, log de ingestão. O dado bruto é preservado.</div></div>
+      <div class="step s2"><div class="t">Silver</div><div class="d">Tipagem, deduplicação e dimensões comuns — é aqui que as fontes passam a conversar.</div></div>
+      <div class="step s3"><div class="t">Gold</div><div class="d">Regras de negócio e KPIs consolidados, prontos para consumo analítico.</div></div>
     </div>
-    <div class="cols" style="--c:2">
+    <div class="cols rv" style="--c:2">
       <div>
         <p style="font-weight:500;color:var(--ink);margin:0 0 8px">Dimensões comuns Silver</p>
-        <p style="font-size:14px;color:var(--gray);margin:0">
-          <code>data_referencia</code> · <code>submercado</code> · <code>codigo_usina</code> ·
-          <code>agente_ccee</code> · <code>periodo_apuracao</code></p>
+        <p style="color:var(--gray);margin:0"><code>data_referencia</code> · <code>submercado</code> ·
+          <code>codigo_usina</code> · <code>agente_ccee</code> · <code>periodo_apuracao</code></p>
       </div>
       <div>
         <p style="font-weight:500;color:var(--ink);margin:0 0 8px">Stack</p>
-        <p style="font-size:14px;color:var(--gray);margin:0">
-          Python 3.12 · BigQuery · Cloud Storage · Cloud Composer / Scheduler ·
+        <p style="color:var(--gray);margin:0">Python 3.12 · BigQuery · Cloud Storage · Cloud Composer / Scheduler ·
           Secret Manager · Terraform · GitHub Actions · pytest</p>
       </div>
     </div>
   </div>
-  <div class="foot"><span>Documento confidencial</span><span>04</span></div>
+  <span class="pagenum">04</span>
 </section>
 
-<!-- 5 — Padrão de entrega -->
-<section class="slide">
-  <div class="topbar"><span class="wordmark">ness<i>.</i></span><span class="kicker">Kickoff AlupData</span></div>
-  <div class="body">
-    <div class="num">03</div><h2>Padrão de entrega</h2>
-    <p class="sub">Todo conector entrega os mesmos 7 componentes — sem exceção</p>
-    <div class="cols" style="--c:4;margin-bottom:22px">
+<!-- 05 PADRÃO DE ENTREGA -->
+<section class="slide mist" data-t="Entrega">
+  <span class="wordmark">ness<i>.</i></span><span class="tag">Kickoff AlupData</span>
+  <div class="inner">
+    <div class="num rv">03</div>
+    <h2 class="rv">Todo conector entrega os mesmos 7 componentes</h2>
+    <p class="sub rv">Sem exceção — é o nosso Definition of Done</p>
+    <div class="cols rv" style="--c:4;margin-bottom:clamp(18px,2.6vh,30px)">
       <div class="card"><h3>01 · Conector Python</h3><p>Extração e transporte, estruturado e testável.</p></div>
       <div class="card"><h3>02 · Tabela Bronze</h3><p>Append-only, schema versionado, log de ingestão.</p></div>
       <div class="card"><h3>03 · View Silver</h3><p>Higienizada, tipada, deduplicada, com dimensões comuns.</p></div>
       <div class="card"><h3>04 · View Gold</h3><p>Regras de negócio e KPIs consolidados.</p></div>
     </div>
-    <div class="cols" style="--c:4">
+    <div class="cols rv" style="--c:4">
       <div class="card"><h3>05 · Testes</h3><p>pytest — unitários e integração ponta a ponta.</p></div>
       <div class="card"><h3>06 · Agendamento</h3><p>Cloud Scheduler / Cloud Composer.</p></div>
       <div class="card"><h3>07 · Documentação</h3><p>Dicionário de dados, mapeamento de campos e linhagem.</p></div>
-      <div class="card" style="border-top-color:var(--line)"><h3>Definition of Done</h3><p>Uma fonte só é considerada entregue com os 7 componentes homologados.</p></div>
+      <div class="card" style="border-top-color:var(--line)"><h3>Homologação</h3><p>Uma fonte só é entregue quando os 7 componentes estão prontos.</p></div>
     </div>
   </div>
-  <div class="foot"><span>Documento confidencial</span><span>05</span></div>
+  <span class="pagenum">05</span>
 </section>
 
-<!-- 6 — Cronograma -->
-<section class="slide">
-  <div class="topbar"><span class="wordmark">ness<i>.</i></span><span class="kicker">Kickoff AlupData</span></div>
-  <div class="body">
-    <div class="num">04</div><h2>Cronograma — 5 ondas, 19 semanas</h2><hr class="rule">
-    <div class="wave" style="border-bottom:1px solid var(--ink);font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--gray)">
-      <div>Onda</div><div>Entrega</div><div class="m">Semanas</div><div class="m">Horas</div></div>
-    <div class="wave"><div class="w">0</div><div class="n">Fundação &amp; Arquitetura
-      <span>Mapeamento de fontes, 8 domínios analíticos, dimensões comuns, CI/CD, portal base com autenticação.</span></div>
-      <div class="m">2</div><div class="m">90h</div></div>
-    <div class="wave"><div class="w">1</div><div class="n">Inteligência de Mercado Base
-      <span>Conectores de APIs públicas — CCEE InfoMercado, ONS, ANEEL, IBGE, câmbio BCB.</span></div>
-      <div class="m">5</div><div class="m">120h</div></div>
-    <div class="wave"><div class="w">2</div><div class="n">APIs com Credenciais
-      <span>Fontes que dependem de credenciais e contratos da Alup — CCEE credenciado, BBCE, Hubspot, TempoOK.</span></div>
-      <div class="m">4</div><div class="m">110h</div></div>
-    <div class="wave"><div class="w">3</div><div class="n">Sistemas Internos
-      <span>Oracle FMB, Portal Alup, MySQL RDS Comercialização, RM/TOTVS. Maior onda do projeto.</span></div>
-      <div class="m">5</div><div class="m">155h</div></div>
-    <div class="wave" style="border-bottom:0"><div class="w">4</div><div class="n">Planilhas, Governança &amp; Handoff
-      <span>Motor S2 Data Intake (CSV/XLSX), Dataplex, views Gold de KPIs, documentação final e handoff técnico.</span></div>
-      <div class="m">3</div><div class="m">105h</div></div>
+<!-- 06 CRONOGRAMA -->
+<section class="slide" data-t="Cronograma">
+  <span class="wordmark">ness<i>.</i></span><span class="tag">Kickoff AlupData</span>
+  <div class="inner">
+    <div class="num rv">04</div>
+    <h2 class="rv">Cinco ondas, dezenove semanas</h2>
+    <hr class="rule rv">
+    <div class="rv">
+      <div class="wave head"><div>Onda</div><div>Entrega</div><div class="m">Semanas</div><div class="m">Horas</div></div>
+      <div class="wave"><div class="w">0</div><div class="n">Fundação &amp; Arquitetura
+        <span>Mapeamento de fontes, 8 domínios analíticos, dimensões comuns, CI/CD, portal base com autenticação.</span></div>
+        <div class="m"><b>2</b></div><div class="m"><b>90h</b></div></div>
+      <div class="wave"><div class="w">1</div><div class="n">Inteligência de Mercado Base
+        <span>Conectores de APIs públicas — CCEE InfoMercado, ONS, ANEEL, IBGE, câmbio BCB.</span></div>
+        <div class="m"><b>5</b></div><div class="m"><b>120h</b></div></div>
+      <div class="wave"><div class="w">2</div><div class="n">APIs com Credenciais
+        <span>Fontes que dependem de credenciais e contratos da Alup — CCEE credenciado, BBCE, Hubspot, TempoOK.</span></div>
+        <div class="m"><b>4</b></div><div class="m"><b>110h</b></div></div>
+      <div class="wave"><div class="w">3</div><div class="n">Sistemas Internos
+        <span>Oracle FMB, Portal Alup, MySQL RDS Comercialização, RM/TOTVS. A maior onda do projeto.</span></div>
+        <div class="m"><b>5</b></div><div class="m"><b>155h</b></div></div>
+      <div class="wave" style="border-bottom:0"><div class="w">4</div><div class="n">Planilhas, Governança &amp; Handoff
+        <span>Motor S2 Data Intake (CSV/XLSX), Dataplex, views Gold de KPIs, documentação final e handoff técnico.</span></div>
+        <div class="m"><b>3</b></div><div class="m"><b>105h</b></div></div>
+    </div>
   </div>
-  <div class="foot"><span>Documento confidencial</span><span>06</span></div>
+  <span class="pagenum">06</span>
 </section>
 
-<!-- 7 — Fontes -->
-<section class="slide">
-  <div class="topbar"><span class="wordmark">ness<i>.</i></span><span class="kicker">Kickoff AlupData</span></div>
-  <div class="body">
-    <div class="num">05</div><h2>Fontes de dados por onda</h2><hr class="rule">
-    <div class="cols" style="--c:3">
+<!-- 07 FONTES -->
+<section class="slide mist" data-t="Fontes">
+  <span class="wordmark">ness<i>.</i></span><span class="tag">Kickoff AlupData</span>
+  <div class="inner">
+    <div class="num rv">05</div>
+    <h2 class="rv">Fontes de dados por onda</h2>
+    <hr class="rule rv">
+    <div class="cols rv" style="--c:3">
       <div>
         <table><thead><tr><th>Onda 1 — APIs públicas</th></tr></thead><tbody>
           <tr><td>CCEE (InfoMercado)</td></tr><tr><td>ONS</td></tr><tr><td>ANEEL</td></tr>
           <tr><td>IBGE</td></tr><tr><td>Câmbio BCB</td></tr></tbody></table>
-        <p style="font-size:13px;color:var(--gray);margin-top:10px">Sem dependência de credencial da Alup — começam de imediato.</p>
+        <p style="color:var(--gray);margin-top:12px">Sem dependência de credencial da Alup — começam de imediato.</p>
       </div>
       <div>
         <table><thead><tr><th>Onda 2 — APIs credenciadas</th></tr></thead><tbody>
           <tr><td>CCEE (agente credenciado)</td></tr><tr><td>BBCE</td></tr>
           <tr><td>Hubspot</td></tr><tr><td>TempoOK</td></tr></tbody></table>
-        <p style="font-size:13px;color:var(--gray);margin-top:10px">Bloqueadas até a Alup fornecer tokens e contratos ativos.</p>
+        <p style="color:var(--gray);margin-top:12px">Bloqueadas até a Alup fornecer tokens e contratos ativos.</p>
       </div>
       <div>
         <table><thead><tr><th>Onda 3 — Sistemas internos</th></tr></thead><tbody>
           <tr><td>Oracle FMB</td></tr><tr><td>Portal Alup</td></tr>
           <tr><td>MySQL RDS Comercialização</td></tr><tr><td>RM/TOTVS</td></tr></tbody></table>
-        <p style="font-size:13px;color:var(--gray);margin-top:10px">Exigem VPN e credenciais read-only liberadas antes do início.</p>
+        <p style="color:var(--gray);margin-top:12px">Exigem VPN e credenciais read-only liberadas antes do início.</p>
       </div>
     </div>
   </div>
-  <div class="foot"><span>Documento confidencial</span><span>07</span></div>
+  <span class="pagenum">07</span>
 </section>
 
-<!-- 8 — Dependências -->
-<section class="slide">
-  <div class="topbar"><span class="wordmark">ness<i>.</i></span><span class="kicker">Kickoff AlupData</span></div>
-  <div class="body">
-    <div class="num">06</div><h2>O que precisamos da Alup</h2>
-    <p class="sub">O caminho crítico do projeto passa por estes insumos</p>
-    <table>
-      <thead><tr><th style="width:130px">Prazo</th><th>Insumo</th></tr></thead>
+<!-- 08 DEPENDÊNCIAS -->
+<section class="slide dark" data-t="Dependências">
+  <span class="wordmark">ness<i>.</i></span><span class="tag">Caminho crítico</span>
+  <div class="inner">
+    <div class="num rv">06</div>
+    <h2 class="rv">O que precisamos da Alup</h2>
+    <p class="sub rv">O caminho crítico do projeto passa por estes insumos</p>
+    <table class="rv">
+      <thead><tr><th style="width:150px">Prazo</th><th>Insumo</th></tr></thead>
       <tbody>
         <tr><td><strong>Onda 0</strong></td><td>Questionário de Gaps (47 perguntas), matriz RACI, data owners nomeados e definição da ferramenta de BI</td></tr>
         <tr><td><strong>Até Onda 2</strong></td><td>Tokens e acessos: CCEE credenciado, BBCE, Hubspot, TempoOK</td></tr>
@@ -272,33 +341,35 @@ td.num-col,th.num-col{text-align:right;white-space:nowrap}
         <tr><td><strong>Até Onda 4</strong></td><td>Planilhas padronizadas nos templates definidos na Onda 0</td></tr>
       </tbody>
     </table>
-    <div class="callout" style="margin-top:20px">
+    <div class="callout rv" style="margin-top:clamp(20px,3vh,34px)">
       <strong>Efeito de atraso.</strong> Acima de 5 dias úteis o cronograma é postergado automaticamente;
       atraso em VPN/credenciais gera taxa de ociosidade de 4h/dia; acima de 20 dias corridos os serviços são suspensos.
     </div>
   </div>
-  <div class="foot"><span>Documento confidencial</span><span>08</span></div>
+  <span class="pagenum">08</span>
 </section>
 
-<!-- 9 — Governança -->
-<section class="slide">
-  <div class="topbar"><span class="wordmark">ness<i>.</i></span><span class="kicker">Kickoff AlupData</span></div>
-  <div class="body">
-    <div class="num">07</div><h2>Governança, segurança e marcos</h2><hr class="rule">
-    <div class="cols" style="--c:2">
+<!-- 09 GOVERNANÇA -->
+<section class="slide" data-t="Governança">
+  <span class="wordmark">ness<i>.</i></span><span class="tag">Kickoff AlupData</span>
+  <div class="inner">
+    <div class="num rv">07</div>
+    <h2 class="rv">Governança, segurança e marcos</h2>
+    <hr class="rule rv">
+    <div class="cols rv" style="--c:2">
       <div>
-        <p style="font-weight:500;color:var(--ink);margin:0 0 12px">Marcos de homologação</p>
-        <table><thead><tr><th>Marco</th><th>Meta</th><th class="num-col">%</th></tr></thead><tbody>
-          <tr><td>1</td><td>Homologação Onda 0</td><td class="num-col">15,52%</td></tr>
-          <tr><td>2</td><td>Homologação Onda 1</td><td class="num-col">20,69%</td></tr>
-          <tr><td>3</td><td>Homologação Onda 2</td><td class="num-col">18,97%</td></tr>
-          <tr><td>4</td><td>Homologação Onda 3</td><td class="num-col">26,72%</td></tr>
-          <tr><td>5</td><td>Onda 4 + Handoff</td><td class="num-col">18,10%</td></tr>
+        <p style="font-weight:500;color:var(--ink);margin:0 0 14px">Marcos de homologação</p>
+        <table><thead><tr><th>Marco</th><th>Meta</th><th class="r">%</th></tr></thead><tbody>
+          <tr><td>1</td><td>Homologação Onda 0</td><td class="r">15,52%</td></tr>
+          <tr><td>2</td><td>Homologação Onda 1</td><td class="r">20,69%</td></tr>
+          <tr><td>3</td><td>Homologação Onda 2</td><td class="r">18,97%</td></tr>
+          <tr><td>4</td><td>Homologação Onda 3</td><td class="r">26,72%</td></tr>
+          <tr><td>5</td><td>Onda 4 + Handoff</td><td class="r">18,10%</td></tr>
         </tbody></table>
-        <p style="font-size:13px;color:var(--gray);margin-top:10px">Cada onda tem 30 dias de garantia após a homologação.</p>
+        <p style="color:var(--gray);margin-top:12px">Cada onda tem 30 dias de garantia após a homologação.</p>
       </div>
       <div>
-        <p style="font-weight:500;color:var(--ink);margin:0 0 12px">Segurança no ciclo de desenvolvimento</p>
+        <p style="font-weight:500;color:var(--ink);margin:0 0 14px">Segurança no ciclo de desenvolvimento</p>
         <ul>
           <li><strong>Bandit</strong> — SAST no pipeline de CI</li>
           <li><strong>pip-audit</strong> — SCA das dependências</li>
@@ -310,16 +381,17 @@ td.num-col,th.num-col{text-align:right;white-space:nowrap}
       </div>
     </div>
   </div>
-  <div class="foot"><span>Documento confidencial</span><span>09</span></div>
+  <span class="pagenum">09</span>
 </section>
 
-<!-- 10 — Fora de escopo -->
-<section class="slide">
-  <div class="topbar"><span class="wordmark">ness<i>.</i></span><span class="kicker">Kickoff AlupData</span></div>
-  <div class="body">
-    <div class="num">08</div><h2>O que não está na Fase 1</h2>
-    <p class="sub">Alinhar expectativa agora evita retrabalho depois</p>
-    <div class="cols" style="--c:2">
+<!-- 10 FORA DE ESCOPO -->
+<section class="slide mist" data-t="Escopo">
+  <span class="wordmark">ness<i>.</i></span><span class="tag">Kickoff AlupData</span>
+  <div class="inner">
+    <div class="num rv">08</div>
+    <h2 class="rv">O que não está na Fase 1</h2>
+    <p class="sub rv">Alinhar expectativa agora evita retrabalho depois</p>
+    <div class="cols rv" style="--c:2">
       <ul>
         <li>Custos de infraestrutura GCP — BigQuery, Composer, Storage e APIs de terceiros ficam com a Alup</li>
         <li>Painéis e relatórios de BI (PowerBI, Tableau) — exceto o Portal MVP da Onda 0</li>
@@ -329,39 +401,127 @@ td.num-col,th.num-col{text-align:right;white-space:nowrap}
         <li>Modelos avançados de IA/ML — objeto de uma Fase 3 futura</li>
       </ul>
     </div>
-    <div class="callout" style="margin-top:24px">
+    <div class="callout rv" style="margin-top:clamp(22px,3.4vh,40px)">
       <strong>Sustentação pós-garantia.</strong> Opcional, com franquia de 20h/mês.
       Cobre monitoramento, correções e ajustes menores em conectores — não cobre novos pipelines,
       novas fontes ou novas regras de negócio.
     </div>
   </div>
-  <div class="foot"><span>Documento confidencial</span><span>10</span></div>
+  <span class="pagenum">10</span>
 </section>
 
-<!-- 11 — Próximos passos -->
-<section class="slide dark">
-  <div class="topbar"><span class="wordmark">ness<i>.</i></span><span class="kicker">Próximos passos</span></div>
-  <div class="body">
-    <div class="num">09</div><h2>As duas primeiras semanas</h2>
-    <hr class="rule">
-    <div class="cols" style="--c:2">
-      <ul style="color:#C7D2DE">
+<!-- 11 PRÓXIMOS PASSOS -->
+<section class="slide dark" data-t="Próximos passos">
+  <span class="wordmark">ness<i>.</i></span><span class="tag">Próximos passos</span>
+  <div class="inner">
+    <div class="num rv">09</div>
+    <h2 class="rv">As duas primeiras semanas</h2>
+    <hr class="rule rv">
+    <div class="cols rv" style="--c:2">
+      <ul>
         <li>Envio do Questionário de Gaps (47 perguntas) e prazo de retorno acordado</li>
         <li>Nomeação dos data owners por domínio e fechamento da matriz RACI</li>
         <li>Abertura dos acessos GCP e criação dos projetos Bronze/Silver/Gold</li>
       </ul>
-      <ul style="color:#C7D2DE">
+      <ul>
         <li>Definição da ferramenta de BI que consumirá a camada Gold</li>
-        <li>Início dos pedidos de credenciais das Ondas 2 e 3 — o prazo interno da Alup é o risco maior</li>
+        <li>Início dos pedidos de credenciais das Ondas 2 e 3 — o prazo interno da Alup é o maior risco</li>
         <li>Ritual semanal de acompanhamento e canal único de decisão</li>
       </ul>
     </div>
-    <p style="color:#9AA6B2;font-size:15px;margin-top:26px;max-width:720px">
-      A Onda 0 fecha com a arquitetura homologada e o pipeline de CI/CD rodando — é a base de tudo que vem depois.</p>
+    <p class="lead rv" style="margin-top:clamp(24px,4vh,44px)">
+      A Onda 0 fecha com a arquitetura homologada e o CI/CD rodando — é a base de tudo que vem depois.</p>
   </div>
-  <div class="foot"><span>ness. Processos e Tecnologia · Contrato CPS-01025/2026</span><span>11</span></div>
+  <span class="pagenum">ness. Processos e Tecnologia · CPS-01025/2026</span>
 </section>
 
-</div>
+</main>
+
+<script>
+(function(){
+  var deck=document.getElementById('deck');
+  var slides=Array.prototype.slice.call(deck.querySelectorAll('.slide'));
+  var dots=document.getElementById('dots');
+  var bar=document.getElementById('bar');
+
+  slides.forEach(function(s,i){
+    var b=document.createElement('button');
+    b.type='button';
+    b.title=s.dataset.t||('Slide '+(i+1));
+    b.setAttribute('aria-label','Ir para: '+b.title);
+    b.addEventListener('click',function(){go(i)});
+    dots.appendChild(b);
+  });
+
+  var current=0;
+  function go(i){
+    i=Math.max(0,Math.min(slides.length-1,i));
+    slides[i].scrollIntoView({behavior:'smooth',block:'start'});
+  }
+  function mark(i){
+    current=i;
+    Array.prototype.forEach.call(dots.children,function(d,j){
+      d.setAttribute('aria-current',j===i?'true':'false');
+    });
+  }
+  mark(0);
+
+  // reveals + slide ativo
+  var io=new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if(e.isIntersecting){
+        e.target.classList.add('on');
+        countUp(e.target);
+        mark(slides.indexOf(e.target));
+      }
+    });
+  },{threshold:.55});
+  slides.forEach(function(s){io.observe(s)});
+
+  // barra de progresso
+  deck.addEventListener('scroll',function(){
+    var max=deck.scrollHeight-deck.clientHeight;
+    bar.style.width=(max>0?(deck.scrollTop/max*100):0)+'%';
+  },{passive:true});
+
+  // contadores
+  var reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function countUp(slide){
+    slide.querySelectorAll('.count').forEach(function(el){
+      if(el.dataset.done)return;
+      el.dataset.done='1';
+      var to=parseInt(el.dataset.to,10)||0;
+      if(reduce){el.textContent=to;return}
+      var t0=null,dur=900;
+      requestAnimationFrame(function step(ts){
+        if(t0===null)t0=ts;
+        var p=Math.min(1,(ts-t0)/dur);
+        el.textContent=Math.round(to*(1-Math.pow(1-p,3)));
+        if(p<1)requestAnimationFrame(step);
+      });
+    });
+  }
+
+  // teclado
+  document.addEventListener('keydown',function(e){
+    if(e.metaKey||e.ctrlKey||e.altKey)return;
+    switch(e.key){
+      case 'ArrowRight': case 'PageDown': case ' ':
+        e.preventDefault();go(current+1);break;
+      case 'ArrowLeft': case 'PageUp':
+        e.preventDefault();go(current-1);break;
+      case 'ArrowDown': e.preventDefault();go(current+1);break;
+      case 'ArrowUp': e.preventDefault();go(current-1);break;
+      case 'Home': e.preventDefault();go(0);break;
+      case 'End': e.preventDefault();go(slides.length-1);break;
+      case 'f': case 'F':
+        if(document.fullscreenElement)document.exitFullscreen();
+        else document.documentElement.requestFullscreen&&document.documentElement.requestFullscreen();
+        break;
+    }
+  });
+  deck.focus({preventScroll:true});
+})();
+</script>
 </body>
 </html>

@@ -1,6 +1,6 @@
 # AlupData — Fase 1: DataLake
 
-**Desenvolvido por ness.**
+**Desenvolvido por <span style="font-family: 'Montserrat', sans-serif; font-weight: 500;">ness<span style="color: #00ade8;">.</span></span>**
 
 > Repositório centralizado de dados operacionais e de mercado do Grupo Alupar.
 > Arquitetura Medallion (Bronze → Silver → Gold) na Google Cloud Platform.

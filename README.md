@@ -1,4 +1,6 @@
-# ️ AlupData — Fase 1: DataLake
+# AlupData — Fase 1: DataLake
+
+**Desenvolvido por ness.**
 
 > Repositório centralizado de dados operacionais e de mercado do Grupo Alupar.
 > Arquitetura Medallion (Bronze → Silver → Gold) na Google Cloud Platform.
@@ -117,3 +119,4 @@ Detalhes: [docs/arquitetura/seguranca.md](docs/arquitetura/seguranca.md)
 ## Licença
 
 Propriétario — Desenvolvido sob contrato CPS-01025/2026 para o Grupo Alupar.
+

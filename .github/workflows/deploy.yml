@@ -1,56 +1,56 @@
 name: Deploy GCP
 
 on:
-  workflow_dispatch:
-    inputs:
-      environment:
-        description: 'Ambiente de deploy'
-        required: true
-        type: choice
-        options:
-          - dev
-          - prod
-      module:
-        description: 'Módulo a deployar'
-        required: true
-        type: choice
-        options:
-          - all
-          - infra
-          - connectors
-          - dags
+ workflow_dispatch:
+ inputs:
+ environment:
+ description: 'Ambiente de deploy'
+ required: true
+ type: choice
+ options:
+ - dev
+ - prod
+ module:
+ description: 'Módulo a deployar'
+ required: true
+ type: choice
+ options:
+ - all
+ - infra
+ - connectors
+ - dags
 
 permissions:
-  contents: read
-  id-token: write
+ contents: read
+ id-token: write
 
 jobs:
-  terraform:
-    name: "🏗️ Terraform (${{ inputs.environment }})"
-    if: inputs.module == 'all' || inputs.module == 'infra'
-    runs-on: ubuntu-latest
-    environment: ${{ inputs.environment }}
-    steps:
-      - uses: actions/checkout@v4
-      - uses: hashicorp/setup-terraform@v3
-      - uses: google-github-actions/auth@v2
-        with:
-          credentials_json: ${{ secrets.GCP_SA_KEY }}
-      - run: |
-          cd infra
-          terraform init
-          terraform plan -var-file="environments/${{ inputs.environment }}.tfvars" -out=tfplan
-          terraform apply tfplan
+ terraform:
+ name: "️ Terraform (${{ inputs.environment }})"
+ if: inputs.module == 'all' || inputs.module == 'infra'
+ runs-on: ubuntu-latest
+ environment: ${{ inputs.environment }}
+ steps:
+ - uses: actions/checkout@v4
+ - uses: hashicorp/setup-terraform@v3
+ - uses: google-github-actions/auth@v2
+ with:
+ credentials_json: ${{ secrets.GCP_SA_KEY }}
+ - run: |
+ cd infra
+ terraform init
+ terraform plan -var-file="environments/${{ inputs.environment }}.tfvars" -out=tfplan
+ terraform apply tfplan
 
-  sync-dags:
-    name: "📅 Sync DAGs (${{ inputs.environment }})"
-    if: inputs.module == 'all' || inputs.module == 'dags'
-    runs-on: ubuntu-latest
-    environment: ${{ inputs.environment }}
-    steps:
-      - uses: actions/checkout@v4
-      - uses: google-github-actions/auth@v2
-        with:
-          credentials_json: ${{ secrets.GCP_SA_KEY }}
-      - uses: google-github-actions/setup-gcloud@v2
-      - run: gsutil -m rsync -r -d dags/ gs://${{ vars.COMPOSER_BUCKET }}/dags/
+ sync-dags:
+ name: "Sync DAGs (${{ inputs.environment }})"
+ if: inputs.module == 'all' || inputs.module == 'dags'
+ runs-on: ubuntu-latest
+ environment: ${{ inputs.environment }}
+ steps:
+ - uses: actions/checkout@v4
+ - uses: google-github-actions/auth@v2
+ with:
+ credentials_json: ${{ secrets.GCP_SA_KEY }}
+ - uses: google-github-actions/setup-gcloud@v2
+ - run: gsutil -m rsync -r -d dags/ gs://${{ vars.COMPOSER_BUCKET }}/dags/

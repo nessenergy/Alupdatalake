@@ -91,10 +91,10 @@ Cada uma das 6 coligadas: **R\$ 24.746,67** (divisão igualitária)
 
 ## Exclusões de Escopo (Cláusula 5ª)
 
-- ❌ Custos de infra GCP (BigQuery, Cloud Composer, Storage, APIs de terceiros)
-- ❌ Painéis/relatórios de BI (PowerBI, Tableau) — exceto Portal MVP da Onda 0
-- ❌ Treinamento operacional de usuários finais (exceto handoff técnico)
-- ❌ Modelos de IA/ML avançados (Fase 3 futura)
+- Custos de infra GCP (BigQuery, Cloud Composer, Storage, APIs de terceiros)
+- Painéis/relatórios de BI (PowerBI, Tableau) — exceto Portal MVP da Onda 0
+- Treinamento operacional de usuários finais (exceto handoff técnico)
+- Modelos de IA/ML avançados (Fase 3 futura)
 
 ---
 

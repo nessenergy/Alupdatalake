@@ -4,11 +4,11 @@
 
 ## Tipo de mudança
 
-- [ ] 🔌 Novo conector
-- [ ] 🏗️ Infraestrutura (Terraform/GCP)
-- [ ] 🐛 Correção de bug
-- [ ] 📚 Documentação
-- [ ] ⚙️ Refactoring / melhoria
+- [ ] Novo conector
+- [ ] ️ Infraestrutura (Terraform/GCP)
+- [ ] Correção de bug
+- [ ] Documentação
+- [ ] Refactoring / melhoria
 
 ## Checklist
 

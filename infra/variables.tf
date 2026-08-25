@@ -17,3 +17,9 @@ variable "environment" {
     error_message = "Ambiente deve ser 'dev' ou 'prod'."
   }
 }
+
+variable "imagem_ingestao" {
+  description = "Imagem do container com a CLI alupdata; vazio desliga o agendamento"
+  type        = string
+  default     = ""
+}

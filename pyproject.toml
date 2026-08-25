@@ -11,6 +11,7 @@ dependencies = [
     "google-cloud-secret-manager>=2.20",
     "requests>=2.32",
     "pydantic>=2.9",
+    "pydantic-settings>=2.6",
 ]
 
 [project.optional-dependencies]
@@ -32,6 +33,11 @@ src = ["src"]
 select = ["E", "F", "W", "I", "N", "UP", "S", "B", "A", "C4", "SIM", "TCH"]
 ignore = ["S101"]
 
+[tool.ruff.lint.flake8-type-checking]
+# Pydantic resolve as anotações em runtime: os imports dos tipos usados nos
+# modelos precisam continuar fora do bloco TYPE_CHECKING.
+runtime-evaluated-base-classes = ["pydantic.BaseModel"]
+
 [tool.ruff.format]
 quote-style = "double"
 
@@ -42,6 +48,12 @@ addopts = "-v --tb=short"
 [tool.bandit]
 targets = ["src"]
 severity = ["high", "medium"]
+
+[project.scripts]
+alupdata = "src.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src"]
 
 [build-system]
 requires = ["hatchling"]

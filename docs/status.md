@@ -55,7 +55,7 @@ ADRs 001–004 · 4 dicionários de dados · plano de execução · runbook de d
 
 | # | Item | Bloqueado por |
 |---|---|---|
-| N1 | Preparar contrato de dados das fontes das Ondas 2 e 3 (schema + fixture + teste `skipif`) | nada — é o próximo trabalho útil |
+| N1 | Preparar contrato de dados das fontes das Ondas 2 e 3 | **inviável para 3 das 4 fontes** — ver §6 |
 | N2 | Portal MVP com autenticação (item 0.15 do plano) | escopo precisa ser cravado por escrito |
 | N3 | Primeiro `terraform apply` real e primeiro deploy da imagem | ambiente GCP (A3) |
 
@@ -72,6 +72,7 @@ ADRs 001–004 · 4 dicionários de dados · plano de execução · runbook de d
 | A5 | **RACI e data owners** por domínio | sem dono, dúvida de regra de negócio não tem para quem ir | plano 2.2 (0.12) |
 | A6 | **Ferramenta de BI** definida | o Portal MVP e as views Gold ficam sem consumidor definido | contrato, cláusula 3ª |
 | A7 | Abrir **já** os pedidos de token (Onda 2) e VPN/credencial (Onda 3) | é o maior risco do contrato: atraso dispara ociosidade de 4h/dia | plano §7 |
+| A8 | **Documentação técnica de BBCE e TempoOK** (a Alup é contratante desses serviços) | sem ela não dá nem para preparar o contrato de dados antes do token — ver §5 | §5 |
 
 > **Cláusula 3ª**: atraso > 5 dias úteis posterga o cronograma; > 5 dias úteis em
 > VPN/credencial gera taxa de ociosidade de 4h/dia (R$ 256/h); > 20 dias
@@ -92,7 +93,25 @@ ADRs 001–004 · 4 dicionários de dados · plano de execução · runbook de d
 
 ---
 
-## 5. Ressalva importante
+## 5. Preparar as fontes bloqueadas: o que a sondagem mostrou
+
+O plano previa escrever schema e fixture das fontes das Ondas 2 e 3 a partir da
+documentação pública, para que a chegada do token fosse "ligar e ajustar". A
+sondagem de 2026-08-25 mostra que isso **só se sustenta para uma delas**:
+
+| Fonte | Documentação/API alcançável? | Dá para escrever o contrato hoje? |
+|---|---|---|
+| CCEE InfoMercado | **não** — 403 em tudo, inclusive na página de documentação | não |
+| BBCE | **não** — nenhum endpoint público encontrado | não |
+| TempoOK | site público, mas **sem contrato de API discoverable** | não |
+| Hubspot | sim — API e docs públicas | sim, mas é a de menor valor para o projeto |
+
+Escrever schema por adivinhação seria pior que não escrever: cria retrabalho
+com aparência de progresso. **O que destrava**: a Alup fornecer a documentação
+técnica de BBCE e TempoOK (que ela tem, como contratante desses serviços) —
+isso vale tanto quanto o token, e pode vir antes dele.
+
+## 5.1 Ressalva importante
 
 Tudo foi validado **localmente e em dry-run**. O primeiro `terraform apply` e a
 primeira carga real são onde aparecem os erros que teste local não pega: IAM

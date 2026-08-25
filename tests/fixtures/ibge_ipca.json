@@ -1,0 +1,57 @@
+[
+  {
+    "id": "63",
+    "variavel": "IPCA - Variação mensal",
+    "unidade": "%",
+    "resultados": [
+      {
+        "classificacoes": [],
+        "series": [
+          {
+            "localidade": {
+              "id": "1",
+              "nivel": {
+                "id": "N1",
+                "nome": "Brasil"
+              },
+              "nome": "Brasil"
+            },
+            "serie": {
+              "202601": "0.33",
+              "202602": "0.70",
+              "202603": "0.88",
+              "202604": "..."
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "69",
+    "variavel": "IPCA - Variação acumulada no ano",
+    "unidade": "%",
+    "resultados": [
+      {
+        "classificacoes": [],
+        "series": [
+          {
+            "localidade": {
+              "id": "1",
+              "nivel": {
+                "id": "N1",
+                "nome": "Brasil"
+              },
+              "nome": "Brasil"
+            },
+            "serie": {
+              "202601": "0.33",
+              "202602": "1.03",
+              "202603": "1.92"
+            }
+          }
+        ]
+      }
+    ]
+  }
+]

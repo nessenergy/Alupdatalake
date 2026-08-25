@@ -115,13 +115,20 @@ scripts soltos **de propósito** (ADR 003, 13 fontes / 19 semanas / handoff).
 
 ## Estado atual (2026-08-25)
 
-Concluído: framework, CLI, dois conectores completos (BCB/PTAX diário e
-IBGE/IPCA mensal), Terraform, CI/CD, scaffolding, ADRs 003–004, runbook de
-deploy e plano de execução.
+Concluído: framework, CLI, **quatro conectores completos** — BCB/PTAX (diário),
+IBGE/IPCA (mensal, aninhado), ANEEL/SIGA (cadastro paginado, ~25 mil registros)
+e ONS/carga (CSV anual por subsistema) —, Terraform, CI/CD, scaffolding,
+ADRs 003–004, runbook de deploy e plano de execução.
 
-Bloqueado por insumo da Alup: 8 domínios analíticos, dimensões comuns
-definitivas, RACI, ambiente GCP real, e todas as fontes das Ondas 2 e 3
-(token, VPN, credencial read-only).
+As dimensões comuns já têm dono: `codigo_usina` vem do ANEEL/SIGA e
+`submercado` vem do ONS.
 
-Próximo passo técnico: ANEEL (cadastro de usinas — alimenta `codigo_usina` como
-dimensão), depois ONS e CCEE. Ordem e estimativas em `docs/plano-execucao.md`.
+Bloqueado por insumo da Alup: 8 domínios analíticos, RACI, ambiente GCP real,
+todas as fontes das Ondas 2 e 3 (token, VPN, credencial read-only) e a **CCEE
+InfoMercado**, cujo portal responde 403 a acesso automatizado — ver
+`docs/plano-execucao.md` §3.1.
+
+Próximo passo técnico: com a Onda 1 fechada no que não depende de terceiros, o
+trabalho útil é preparar o contrato de dados das fontes das Ondas 2 e 3 (schema
+Pydantic + fixture a partir da documentação, teste de integração com `skipif`),
+para que a chegada do token seja "ligar e ajustar", não "começar".

@@ -26,6 +26,14 @@ variable "conectores" {
       cron         = "0 9 * * *" # após a publicação do boletim de fechamento
       ultimos_dias = 3           # cobre feriado e republicação
     }
+    ons_carga = {
+      cron         = "0 8 * * *" # o ONS publica o dia anterior de manhã
+      ultimos_dias = 30          # janela larga: o ONS revisa dado publicado
+    }
+    aneel_siga = {
+      cron         = "0 7 * * 1" # cadastro muda devagar: semanal, segunda
+      ultimos_dias = 1           # cadastro completo; a janela não se aplica
+    }
     ibge_ipca = {
       cron         = "0 10 12 * *" # IPCA sai por volta do dia 10
       ultimos_dias = 90            # janela larga: o IBGE revisa série publicada

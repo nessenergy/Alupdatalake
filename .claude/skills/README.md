@@ -1,5 +1,9 @@
 # Skills do projeto
 
+> Estes arquivos são Markdown com frontmatter, sem runtime. O Claude Code os
+> carrega automaticamente; outros agentes (Codex, Cursor, Gemini, Cline) leem o
+> índice em [`AGENTS.md`](../../AGENTS.md) e abrem o `SKILL.md` pelo caminho.
+
 Skills carregadas automaticamente por agentes que trabalham neste repositório.
 Cada uma cobre um eixo da Fase 1 e aponta para os documentos que já existem em
 `docs/` — elas complementam o contrato e a arquitetura, não os substituem.

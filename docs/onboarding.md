@@ -48,3 +48,11 @@ make lint
 - **Comentários e docs**: português (PT-BR)
 - **Commits**: conventional commits em português
 - **Branches**: `feat/`, `fix/`, `docs/`, `chore/`
+
+## Skills do projeto
+
+O repositório traz skills em `.claude/skills/` que agentes carregam
+automaticamente: `conector-alupdata` (os 7 componentes por fonte),
+`gcp-alupdata` (BigQuery, Terraform, Secret Manager), `ssdlc-alupdata`
+(portões de segurança da cláusula 8ª) e `homologacao-onda` (fechamento de onda
+e medição). Ver `.claude/skills/README.md`.

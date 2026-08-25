@@ -72,6 +72,12 @@ alupdata ingerir bcb_cambio_ptax --de 2026-01-01 --ate 2026-01-31 --dry-run
 | `docs/runbook/` | deploy e operação |
 | `scripts/` | deploy de views, scaffolding, sync de skills |
 
+## Vocabulário do setor
+
+Termos como submercado, PLD, CEG, MWmed e garantia física aparecem em quase
+toda view. Se algum não for familiar, [`docs/glossario.md`](docs/glossario.md)
+define todos em uma página.
+
 ## Convenções
 
 - Código (variáveis, funções) em **inglês**; comentários, docs e commits em

@@ -1,0 +1,10 @@
+.git
+.github
+.claude
+.venv
+docs
+infra
+sql
+tests
+scripts
+*.md

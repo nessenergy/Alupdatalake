@@ -1,0 +1,195 @@
+{
+ "help": "https://dadosabertos.aneel.gov.br/api/3/action/help_show?name=datastore_search",
+ "success": true,
+ "result": {
+  "include_total": true,
+  "limit": 3,
+  "records_format": "objects",
+  "resource_id": "11ec447d-698d-4ab8-977f-b424d5deee6a",
+  "total_estimation_threshold": null,
+  "records": [
+   {
+    "_id": 1,
+    "DatGeracaoConjuntoDados": "2026-08-07",
+    "NomEmpreendimento": "E",
+    "IdeNucleoCEG": "000008",
+    "CodCEG": "PCH.PH.MG.000008-6.1",
+    "SigUFPrincipal": "MG",
+    "SigTipoGeracao": "PCH",
+    "DscFaseUsina": "Operação",
+    "DscOrigemCombustivel": "Hídrica",
+    "DscFonteCombustivel": "Potencial hidráulico",
+    "DscTipoOutorga": "Autorização",
+    "NomFonteCombustivel": "Potencial hidráulico",
+    "DatEntradaOperacao": "1953-11-20",
+    "MdaPotenciaOutorgadaKw": "1400,00",
+    "MdaPotenciaFiscalizadaKw": "1400",
+    "MdaGarantiaFisicaKw": ",00",
+    "IdcGeracaoQualificada": "Não",
+    "NumCoordNEmpreendimento": "-20,12479858",
+    "NumCoordEEmpreendimento": "-43,87020250",
+    "DatInicioVigencia": "2000-07-07",
+    "DatFimVigencia": "2030-07-07",
+    "DscPropriRegimePariticipacao": "100% para ANGLOGOLD ASHANTI CORREGO DO SITIO MINERACAO S.A. - 18.565.382/0001-66 (APE)",
+    "DscSubBacia": "41 - Das Velhas - Sao Francisco",
+    "DscMuninicpios": "Nova Lima - MG"
+   },
+   {
+    "_id": 2,
+    "DatGeracaoConjuntoDados": "2026-08-07",
+    "NomEmpreendimento": "F",
+    "IdeNucleoCEG": "000009",
+    "CodCEG": "PCH.PH.MG.000009-4.1",
+    "SigUFPrincipal": "MG",
+    "SigTipoGeracao": "PCH",
+    "DscFaseUsina": "Operação",
+    "DscOrigemCombustivel": "Hídrica",
+    "DscFonteCombustivel": "Potencial hidráulico",
+    "DscTipoOutorga": "Autorização",
+    "NomFonteCombustivel": "Potencial hidráulico",
+    "DatEntradaOperacao": "1953-11-20",
+    "MdaPotenciaOutorgadaKw": "3972,00",
+    "MdaPotenciaFiscalizadaKw": "3972",
+    "MdaGarantiaFisicaKw": ",00",
+    "IdcGeracaoQualificada": "Não",
+    "NumCoordNEmpreendimento": "-20,13187300",
+    "NumCoordEEmpreendimento": "-43,87693500",
+    "DatInicioVigencia": "2000-07-07",
+    "DatFimVigencia": "2030-07-07",
+    "DscPropriRegimePariticipacao": "100% para ANGLOGOLD ASHANTI CORREGO DO SITIO MINERACAO S.A. - 18.565.382/0001-66 (APE)",
+    "DscSubBacia": "41 - Das Velhas - Sao Francisco",
+    "DscMuninicpios": "Nova Lima - MG"
+   },
+   {
+    "_id": 3,
+    "DatGeracaoConjuntoDados": "2026-08-07",
+    "NomEmpreendimento": "G",
+    "IdeNucleoCEG": "000010",
+    "CodCEG": "PCH.PH.MG.000010-8.1",
+    "SigUFPrincipal": "MG",
+    "SigTipoGeracao": "PCH",
+    "DscFaseUsina": "Operação",
+    "DscOrigemCombustivel": "Hídrica",
+    "DscFonteCombustivel": "Potencial hidráulico",
+    "DscTipoOutorga": "Autorização",
+    "NomFonteCombustivel": "Potencial hidráulico",
+    "DatEntradaOperacao": "1937-01-01",
+    "MdaPotenciaOutorgadaKw": "1440,00",
+    "MdaPotenciaFiscalizadaKw": "1440",
+    "MdaGarantiaFisicaKw": ",00",
+    "IdcGeracaoQualificada": "Não",
+    "NumCoordNEmpreendimento": "-20,13754468",
+    "NumCoordEEmpreendimento": "-43,89192620",
+    "DatInicioVigencia": "2000-08-31",
+    "DatFimVigencia": "2030-08-31",
+    "DscPropriRegimePariticipacao": "100% para ANGLOGOLD ASHANTI CORREGO DO SITIO MINERACAO S.A. - 18.565.382/0001-66 (APE)",
+    "DscSubBacia": "41 - Das Velhas - Sao Francisco",
+    "DscMuninicpios": "Nova Lima - MG"
+   }
+  ],
+  "fields": [
+   {
+    "id": "_id",
+    "type": "int"
+   },
+   {
+    "id": "DatGeracaoConjuntoDados",
+    "type": "text"
+   },
+   {
+    "id": "NomEmpreendimento",
+    "type": "text"
+   },
+   {
+    "id": "IdeNucleoCEG",
+    "type": "text"
+   },
+   {
+    "id": "CodCEG",
+    "type": "text"
+   },
+   {
+    "id": "SigUFPrincipal",
+    "type": "text"
+   },
+   {
+    "id": "SigTipoGeracao",
+    "type": "text"
+   },
+   {
+    "id": "DscFaseUsina",
+    "type": "text"
+   },
+   {
+    "id": "DscOrigemCombustivel",
+    "type": "text"
+   },
+   {
+    "id": "DscFonteCombustivel",
+    "type": "text"
+   },
+   {
+    "id": "DscTipoOutorga",
+    "type": "text"
+   },
+   {
+    "id": "NomFonteCombustivel",
+    "type": "text"
+   },
+   {
+    "id": "DatEntradaOperacao",
+    "type": "text"
+   },
+   {
+    "id": "MdaPotenciaOutorgadaKw",
+    "type": "text"
+   },
+   {
+    "id": "MdaPotenciaFiscalizadaKw",
+    "type": "text"
+   },
+   {
+    "id": "MdaGarantiaFisicaKw",
+    "type": "text"
+   },
+   {
+    "id": "IdcGeracaoQualificada",
+    "type": "text"
+   },
+   {
+    "id": "NumCoordNEmpreendimento",
+    "type": "text"
+   },
+   {
+    "id": "NumCoordEEmpreendimento",
+    "type": "text"
+   },
+   {
+    "id": "DatInicioVigencia",
+    "type": "text"
+   },
+   {
+    "id": "DatFimVigencia",
+    "type": "text"
+   },
+   {
+    "id": "DscPropriRegimePariticipacao",
+    "type": "text"
+   },
+   {
+    "id": "DscSubBacia",
+    "type": "text"
+   },
+   {
+    "id": "DscMuninicpios",
+    "type": "text"
+   }
+  ],
+  "_links": {
+   "start": "/api/3/action/datastore_search?resource_id=11ec447d-698d-4ab8-977f-b424d5deee6a&limit=3",
+   "next": "/api/3/action/datastore_search?resource_id=11ec447d-698d-4ab8-977f-b424d5deee6a&limit=3&offset=3"
+  },
+  "total": 3,
+  "total_was_estimated": false
+ }
+}

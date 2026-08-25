@@ -19,4 +19,6 @@ jobs:
  with:
  version: "latest"
  - run: uv sync --frozen
- - run: uv run pip-audit --strict --desc
+ # audita as dependências resolvidas; o próprio pacote (editable) não está no PyPI
+ - run: uv export --no-emit-project --no-hashes --extra dev -o .requirements.txt -q
+ - run: uv run pip-audit --strict --desc -r .requirements.txt

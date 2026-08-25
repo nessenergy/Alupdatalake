@@ -1,0 +1,7 @@
+{
+  "value": [
+    {"cotacaoCompra": 5.4321, "cotacaoVenda": 5.4327, "dataHoraCotacao": "2026-01-02 13:03:24.123", "tipoBoletim": "Fechamento"},
+    {"cotacaoCompra": 5.4210, "cotacaoVenda": 5.4216, "dataHoraCotacao": "2026-01-02 10:07:11.000", "tipoBoletim": "Abertura"},
+    {"cotacaoCompra": 5.5001, "cotacaoVenda": 5.5007, "dataHoraCotacao": "2026-01-05 13:05:02.456", "tipoBoletim": "Fechamento"}
+  ]
+}

@@ -115,12 +115,13 @@ scripts soltos **de propósito** (ADR 003, 13 fontes / 19 semanas / handoff).
 
 ## Estado atual (2026-08-25)
 
-Concluído: framework, CLI, conector BCB/PTAX completo, Terraform, CI/CD,
-scaffolding, ADRs 003–004, runbook de deploy.
+Concluído: framework, CLI, dois conectores completos (BCB/PTAX diário e
+IBGE/IPCA mensal), Terraform, CI/CD, scaffolding, ADRs 003–004, runbook de
+deploy e plano de execução.
 
 Bloqueado por insumo da Alup: 8 domínios analíticos, dimensões comuns
 definitivas, RACI, ambiente GCP real, e todas as fontes das Ondas 2 e 3
 (token, VPN, credencial read-only).
 
-Próximo passo técnico: segundo conector (ONS ou ANEEL) — é ele que valida se o
-framework aguenta uma fonte com formato diferente antes de replicar 11 vezes.
+Próximo passo técnico: ANEEL (cadastro de usinas — alimenta `codigo_usina` como
+dimensão), depois ONS e CCEE. Ordem e estimativas em `docs/plano-execucao.md`.

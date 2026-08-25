@@ -26,6 +26,10 @@ variable "conectores" {
       cron         = "0 9 * * *" # após a publicação do boletim de fechamento
       ultimos_dias = 3           # cobre feriado e republicação
     }
+    ibge_ipca = {
+      cron         = "0 10 12 * *" # IPCA sai por volta do dia 10
+      ultimos_dias = 90            # janela larga: o IBGE revisa série publicada
+    }
   }
 }
 

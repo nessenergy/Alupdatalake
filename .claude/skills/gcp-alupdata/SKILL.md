@@ -5,6 +5,12 @@ description: Convenções de GCP do AlupData — BigQuery (datasets Bronze/Silve
 
 # GCP no AlupData
 
+Para a mecânica dos produtos (sintaxe, flags, APIs), use as skills do Google em
+`.claude/skills/google/` — `bigquery-basics`, `google-cloud-storage-basics`,
+`gcloud`, `cloud-run-basics`. **Este documento tem precedência sobre elas**:
+onde a convenção do projeto e o material do produto divergirem, vale o que está
+aqui.
+
 Tudo em GCP, arquitetura Medallion, infraestrutura por Terraform. Recurso criado
 à mão no console **não existe** — se não está em `infra/`, some no próximo
 `terraform apply` e não sobe para produção.

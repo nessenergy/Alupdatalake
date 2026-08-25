@@ -1,4 +1,4 @@
-.PHONY: install lint format test security audit all clean novo-conector deploy-views listar
+.PHONY: install lint format test security audit all clean novo-conector deploy-views listar sync-skills
 
 install:
 	uv sync
@@ -29,6 +29,9 @@ novo-conector:
 	@test -n "$(fonte)" || (echo "uso: make novo-conector fonte=ons entidade=carga"; exit 1)
 	@test -n "$(entidade)" || (echo "uso: make novo-conector fonte=ons entidade=carga"; exit 1)
 	uv run python -m scripts.novo_conector --fonte $(fonte) --entidade $(entidade)
+
+sync-skills:
+	uv run python -m scripts.sync_skills_google
 
 deploy-views:
 	uv run python -m scripts.deploy_views

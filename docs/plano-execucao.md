@@ -76,18 +76,42 @@ ela é o colchão do cronograma.
 
 | # | Fonte | Est. | Complexidade | Observações |
 |---|---|---|---|---|
-| 1.1 | **CCEE InfoMercado** | 32h ⚠ | alta | Arquivos por período, layout que muda entre anos; é a fonte mais rica e a mais chata |
-| 1.2 | **ONS** | 28h ⚠ | alta | Carga, geração e restrição; granularidade horária/semi-horária define o volume do lake |
-| 1.3 | **ANEEL** | 20h | média | Cadastro de usinas e outorgas — alimenta `codigo_usina` como dimensão |
-| 1.4 | **IBGE** | 12h | baixa | Índices econômicos; API estável e documentada |
+| 1.1 | **CCEE InfoMercado** | 32h ⚠ | alta | **Bloqueada — ver 3.1 abaixo** |
+| 1.2 | **ONS carga** | 28h ⚠ | alta | **Concluído.** CSV anual por subsistema; primeira fonte a preencher `submercado` |
+| 1.3 | **ANEEL SIGA** | 20h | média | **Concluído.** Cadastro de ~25 mil empreendimentos; alimenta `codigo_usina` |
+| 1.4 | **IBGE IPCA** | 12h | baixa | **Concluído.** Período mensal, payload aninhado |
 | 1.5 | **BCB câmbio** | — | — | **Concluído na Onda 0** como conector de referência |
 | 1.6 | Views Gold do domínio de mercado | 16h | — | Depende dos 8 domínios (0.10) |
 | 1.7 | Agendamento e monitoramento das 4 fontes | 8h | — | Job + Scheduler por fonte; alerta em falha |
 | 1.8 | Ajustes no framework revelados pelas fontes reais | 4h | — | Reserva deliberada: a 2ª fonte é quem testa o framework de verdade |
 
-**Ordem recomendada**: IBGE (valida o framework em fonte fácil) → ANEEL →
-ONS → CCEE. Do mais simples ao mais complexo, para que problema de framework
-apareça cedo e barato.
+**Ordem executada**: BCB → IBGE → ANEEL → ONS. Cada uma exercitou um formato
+diferente (diário, mensal aninhado, cadastro paginado, CSV anual) e o framework
+absorveu as quatro sem alteração — só `extrair()` e `transformar()` mudaram.
+
+### 3.1 CCEE InfoMercado — bloqueada por proteção anti-bot
+
+Os domínios `www.ccee.org.br` e `dadosabertos.ccee.org.br` respondem **HTTP 403**
+a requisições automatizadas (o TLS conecta; o 403 vem do servidor da CCEE, com
+página de bloqueio). Isso atinge a API CKAN, a página do InfoMercado e o portal
+de dados abertos.
+
+Caminhos possíveis, em ordem de preferência:
+
+1. **Origem permitida**: a Alup pedir à CCEE a liberação do IP de saída do
+   ambiente GCP (ou uma via oficial de acesso programático). É a solução que
+   mantém o conector igual aos outros.
+2. **Credencial de agente**: a Alup já é agente CCEE; a área credenciada pode
+   ter acesso programático com contrato — o que aproximaria esta fonte do
+   escopo da Onda 2.
+3. **Download manual + S2 Data Intake**: alguém baixa o arquivo e ele entra
+   pelo motor de planilha da Onda 4. Funciona, mas não é ingestão automática e
+   contraria o padrão dos 7 componentes.
+
+**Enquanto não se decide, esta é uma dependência da contratante**, não um item
+técnico em aberto. As 32h continuam alocadas; a onda pode ser homologada com as
+4 fontes concluídas e a CCEE tratada como escopo remanejado, se a Alup
+concordar por escrito.
 
 **Riscos**
 - CCEE e ONS não têm contrato de API estável; mudança de layout entre períodos

@@ -1,13 +1,45 @@
 """Configuração centralizada do projeto AlupData.
 
-Carrega variáveis de ambiente e secrets do GCP Secret Manager.
+Todos os módulos leem daqui — nunca de `os.getenv` espalhado pelo código,
+e nunca com o nome do dataset escrito literalmente.
 """
 
-import os
+from functools import lru_cache
+
+from pydantic import Field
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
-PROJECT_ID = os.getenv("GCP_PROJECT_ID", "alupdata-dev")
-DATASET_BRONZE = os.getenv("BQ_DATASET_BRONZE", "bronze")
-DATASET_SILVER = os.getenv("BQ_DATASET_SILVER", "silver")
-DATASET_GOLD = os.getenv("BQ_DATASET_GOLD", "gold")
-BUCKET_RAW = os.getenv("GCS_BUCKET_RAW", f"{PROJECT_ID}-raw")
+class Settings(BaseSettings):
+    """Configuração lida de variáveis de ambiente (ver `.env.example`)."""
+
+    model_config = SettingsConfigDict(env_file=".env", extra="ignore")
+
+    gcp_project_id: str = "alupdata-dev"
+    gcp_region: str = "us-east1"
+
+    bq_dataset_bronze: str = "bronze"
+    bq_dataset_silver: str = "silver"
+    bq_dataset_gold: str = "gold"
+
+    gcs_bucket_raw: str = ""
+
+    http_timeout: float = Field(default=30.0, description="Timeout por requisição, em segundos")
+    http_max_tentativas: int = Field(default=3, description="Tentativas totais antes de desistir")
+
+    dry_run: bool = Field(default=False, description="Extrai e valida sem gravar em GCS/BigQuery")
+
+    @property
+    def bucket_raw(self) -> str:
+        """Bucket de dado bruto; deriva do projeto quando não informado."""
+        return self.gcs_bucket_raw or f"{self.gcp_project_id}-raw"
+
+    def tabela_bronze(self, fonte: str, entidade: str) -> str:
+        """Nome totalmente qualificado da tabela Bronze de uma entidade."""
+        return f"{self.gcp_project_id}.{self.bq_dataset_bronze}.{fonte}_{entidade}"
+
+
+@lru_cache
+def get_settings() -> Settings:
+    """Settings memoizadas — o processo lê o ambiente uma vez só."""
+    return Settings()

@@ -33,29 +33,47 @@ parcial — é retrabalho na medição.
 
 ## Estrutura do conector (componente 01)
 
+O runner em `src/core/conector.py` já faz raw no GCS, validação, colunas
+técnicas, carga no Bronze e log de execução. **Um conector novo implementa
+apenas `extrair()` e `transformar()`** — não escreva BigQuery, GCS nem
+`_ingestao_id` à mão. Comece pelo scaffolding:
+
+```bash
+make novo-conector fonte=ons entidade=carga   # gera os 7 componentes esqueletados
 ```
-src/conectores/<fonte>/
-├── __init__.py
-├── client.py      # acesso à fonte: HTTP, driver de banco, leitura de arquivo
-├── extract.py     # extrai um período/lote e devolve registros brutos
-└── load.py        # grava em GCS raw e/ou insere na tabela Bronze
+
+```python
+@registrar
+class OnsCarga(Conector):
+    fonte = "ons"
+    entidade = "carga"
+    schema = CargaRegistro          # modelo Pydantic, valida registro a registro
+    schema_versao = "1"
+    max_dias_por_requisicao = 30    # o runner particiona a janela sozinho
+
+    def extrair(self, janela: Janela) -> Iterator[dict]: ...
+    def transformar(self, bruto: dict) -> dict: ...
 ```
+
+Use `src/conectores/bcb_cambio.py` como referência viva — é o conector completo
+da Onda 1.
 
 Regras que valem para todo conector:
 
-- Use `src/core/config.py` para projeto, datasets e bucket; use
-  `src/core/logging.py::get_logger` — nunca `print`.
-- Credencial **só** via Secret Manager (ver skill `ssdlc-alupdata`). Nada de
-  token em código, em `.env` versionado ou em default de função.
-- Extração **parametrizada por período** (`data_inicio`, `data_fim`) para
-  permitir reprocessamento; nunca "sempre hoje".
-- Idempotência: reexecutar a mesma janela não pode duplicar em Silver — a
-  deduplicação é responsabilidade da view Silver, mas o Bronze precisa carregar
-  as colunas que a tornam possível.
-- Falha de rede: `requests` com timeout explícito e retry com backoff. Sem
-  timeout, um pipeline pendura o Composer.
-- Valide o payload com Pydantic antes de gravar; dado que não valida vai para
-  log com o motivo, não é descartado em silêncio.
+- Use `src/core/config.py::get_settings` para projeto, datasets e bucket, e
+  `src/core/logging.py::get_logger` — nunca `print`, nunca o nome do dataset
+  escrito literalmente.
+- Credencial **só** via `src/core/secrets.py` (Secret Manager). Nada de token em
+  código, em `.env` versionado ou em default de função.
+- HTTP por `src/core/http.py::criar_sessao` — timeout e retry já configurados.
+  Fonte que não é HTTP (banco da Onda 3, planilha da Onda 4) implementa o mesmo
+  contrato com outro `extrair()`.
+- Extração **sempre por janela**; nunca "hoje". Reprocessar é passar outra
+  janela, não escrever outro script.
+- Valide com Pydantic. Registro inválido é descartado com log e contado em
+  `linhas_invalidas` — nunca sumir em silêncio.
+- Idempotência: o Bronze é append-only; quem garante que reprocessar não
+  duplica é o `QUALIFY ROW_NUMBER()` da Silver.
 
 ## Bronze (02)
 

@@ -45,3 +45,6 @@ desktop.ini
 
 # Bandit
 bandit-report.json
+
+# Requirements exportado temporariamente pelo `make audit`
+.requirements.txt

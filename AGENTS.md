@@ -115,6 +115,9 @@ scripts soltos **de propósito** (ADR 003, 13 fontes / 19 semanas / handoff).
 
 ## Estado atual (2026-08-25)
 
+> Quadro completo, com pendências e dono de cada uma, em
+> [`docs/status.md`](docs/status.md).
+
 Concluído: framework, CLI, **quatro conectores completos** — BCB/PTAX (diário),
 IBGE/IPCA (mensal, aninhado), ANEEL/SIGA (cadastro paginado, ~25 mil registros)
 e ONS/carga (CSV anual por subsistema) —, Terraform, CI/CD, scaffolding,

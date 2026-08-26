@@ -100,6 +100,7 @@ tbody tr:last-child td{border-bottom:0}
 .callout{background:var(--cyan-mist);border-left:3px solid var(--cyan);padding:18px 22px;
   font-size:clamp(13px,1.05vw,16px);line-height:1.55;color:var(--graphite)}
 .callout strong{color:var(--ink)}
+.callout a,.slide.dark .callout a{color:var(--cyan);text-decoration:underline;text-underline-offset:3px}
 .slide.dark .callout{background:rgba(0,173,232,.09);color:#C7D2DE}
 .slide.dark .callout strong{color:#fff}
 .kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:clamp(18px,3vw,44px)}
@@ -355,6 +356,7 @@ tbody tr:last-child td{border-bottom:0}
     <table class="rv">
       <thead><tr><th style="width:150px">Prazo</th><th>Insumo</th></tr></thead>
       <tbody>
+        <tr><td><strong>Agora</strong></td><td><strong>Ambiente Google Cloud</strong> — projeto, APIs, IAM e Workload Identity Federation. É o que trava a homologação da Onda 0: o código está pronto e validado, mas nada sobe sem ele</td></tr>
         <tr><td><strong>Onda 0</strong></td><td>Questionário de Gaps (47 perguntas), matriz RACI, data owners nomeados e definição da ferramenta de BI</td></tr>
         <tr><td><strong>Até Onda 2</strong></td><td>Tokens e acessos: CCEE credenciado, BBCE, Hubspot, TempoOK</td></tr>
         <tr><td><strong>Até Onda 3</strong></td><td>VPN e credenciais read-only: Oracle FMB, Portal Alup (MySQL/NoSQL/Storage), MySQL RDS Comercialização, endpoints RM/TOTVS</td></tr>
@@ -364,6 +366,9 @@ tbody tr:last-child td{border-bottom:0}
     <div class="callout rv" style="margin-top:clamp(20px,3vh,34px)">
       <strong>Efeito de atraso.</strong> Acima de 5 dias úteis o cronograma é postergado automaticamente;
       atraso em VPN/credenciais gera taxa de ociosidade de 4h/dia; acima de 20 dias corridos os serviços são suspensos.
+      <br><br>
+      <strong>Contratação do Google Cloud:</strong> o detalhamento do que provisionar, com estimativa de custo mensal,
+      está em <a href="https://github.com/nessenergy/Alupdatalake/issues/55">nessenergy/Alupdatalake#55</a>.
     </div>
   </div>
   <span class="pagenum">08</span>

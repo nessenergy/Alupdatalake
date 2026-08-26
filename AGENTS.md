@@ -72,6 +72,12 @@ alupdata ingerir bcb_cambio_ptax --de 2026-01-01 --ate 2026-01-31 --dry-run
 | `docs/runbook/` | deploy e operação |
 | `scripts/` | deploy de views, scaffolding, sync de skills |
 
+## Vocabulário do setor
+
+Termos como submercado, PLD, CEG, MWmed e garantia física aparecem em quase
+toda view. Se algum não for familiar, [`docs/glossario.md`](docs/glossario.md)
+define todos em uma página.
+
 ## Convenções
 
 - Código (variáveis, funções) em **inglês**; comentários, docs e commits em
@@ -114,6 +120,9 @@ remendo. Em particular: o framework em `src/core/` é mais estrutura do que 13
 scripts soltos **de propósito** (ADR 003, 13 fontes / 19 semanas / handoff).
 
 ## Estado atual (2026-08-25)
+
+> Quadro completo, com pendências e dono de cada uma, em
+> [`docs/status.md`](docs/status.md).
 
 Concluído: framework, CLI, **quatro conectores completos** — BCB/PTAX (diário),
 IBGE/IPCA (mensal, aninhado), ANEEL/SIGA (cadastro paginado, ~25 mil registros)

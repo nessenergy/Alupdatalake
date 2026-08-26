@@ -3,6 +3,8 @@
 Contrato CPS-01025/2026 · 580h · 19 semanas · 5 ondas
 Última revisão: 2026-08-25
 
+Situação de execução, atualizada a cada entrega: [`status.md`](status.md).
+
 Este plano detalha **como** as 580h contratadas serão gastas. Ele não substitui
 o contrato (`docs/contrato/resumo-contrato.md`); traduz o escopo em tarefas com
 estimativa, dependência e critério de aceite.

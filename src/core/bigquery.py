@@ -7,15 +7,15 @@ que a fonte devolveu em cada execução.
 
 from __future__ import annotations
 
+import logging
 from typing import TYPE_CHECKING, Any
 
 from src.core.config import get_settings
-from src.core.logging import get_logger
 
 if TYPE_CHECKING:
     from src.core.execucao import Execucao
 
-logger = get_logger(__name__)
+logger = logging.getLogger(__name__)
 
 TABELA_EXECUCOES = "_execucoes"
 

@@ -14,6 +14,7 @@ as fontes internas da Onda 3 não têm com o que cruzar.
 
 from __future__ import annotations
 
+import logging
 from decimal import Decimal, InvalidOperation
 from typing import TYPE_CHECKING, Any
 
@@ -21,7 +22,6 @@ from pydantic import BaseModel, field_validator
 
 from src.core.conector import Conector
 from src.core.http import criar_sessao, get_json
-from src.core.logging import get_logger
 from src.core.registry import registrar
 
 if TYPE_CHECKING:
@@ -33,7 +33,7 @@ URL = "https://dadosabertos.aneel.gov.br/api/3/action/datastore_search"
 RECURSO = "11ec447d-698d-4ab8-977f-b424d5deee6a"  # siga-empreendimentos-geracao.csv
 PAGINA = 1000  # limite por requisição do datastore
 
-logger = get_logger(__name__)
+logger = logging.getLogger(__name__)
 
 
 def _decimal_br(valor: str | None) -> Decimal | None:

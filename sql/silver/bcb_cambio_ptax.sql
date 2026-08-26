@@ -1,6 +1,6 @@
 -- Silver: PTAX higienizada, deduplicada e com as dimensões comuns.
 -- Dedup: para cada (data_referencia, tipo_boletim), vence a ingestão mais recente.
-CREATE OR REPLACE VIEW `${projeto}.${silver}.bcb_cambio` AS
+CREATE OR REPLACE VIEW `${projeto}.${silver}.bcb_cambio_ptax` AS
 SELECT
   data_referencia,
   CAST(NULL AS STRING)  AS submercado,      -- câmbio não é dado de submercado

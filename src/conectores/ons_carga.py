@@ -14,6 +14,7 @@ carga com preço e com o parque gerador.
 from __future__ import annotations
 
 import csv
+import logging
 from datetime import date
 from decimal import Decimal
 from io import StringIO
@@ -23,7 +24,6 @@ from pydantic import BaseModel, field_validator
 
 from src.core.conector import Conector
 from src.core.http import criar_sessao
-from src.core.logging import get_logger
 from src.core.registry import registrar
 
 if TYPE_CHECKING:
@@ -37,7 +37,7 @@ URL = "https://ons-aws-prod-opendata.s3.amazonaws.com/dataset/carga_energia_di/C
 # `submercado` (SE/CO aparece como SE nos dados do ONS).
 SUBMERCADOS = frozenset({"N", "NE", "S", "SE"})
 
-logger = get_logger(__name__)
+logger = logging.getLogger(__name__)
 
 
 class CargaDiaria(BaseModel):

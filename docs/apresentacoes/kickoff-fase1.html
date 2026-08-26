@@ -36,13 +36,27 @@ body{
 .inner{width:100%;max-width:1180px;margin:0 auto}
 /* ---------- marca ---------- */
 .wordmark{position:absolute;top:calc(var(--pad)*.55);left:var(--pad);
-  font-weight:500;font-size:19px;letter-spacing:-.02em;color:#000;z-index:2}
+  font-weight:500;font-size:24px;letter-spacing:-.02em;color:#000;z-index:2}
+.slide.cover .wordmark{font-size:clamp(30px,3.2vw,42px);top:calc(var(--pad)*.62)}
 .slide.dark .wordmark{color:#fff}
 .wordmark i{color:var(--cyan);font-style:normal}
 .tag{position:absolute;top:calc(var(--pad)*.55);right:var(--pad);
   font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--gray);z-index:2}
 .pagenum{position:absolute;bottom:calc(var(--pad)*.5);right:var(--pad);
   font-size:11px;letter-spacing:.14em;color:var(--gray)}
+/* ---------- capa ---------- */
+.slide.cover{justify-content:flex-end;padding-bottom:calc(var(--pad)*1.15)}
+.cover-eyebrow{font-size:12px;letter-spacing:.22em;text-transform:uppercase;
+  color:var(--cyan);margin:0 0 clamp(16px,2.4vh,26px)}
+.slide.cover .lead{max-width:26em;margin-top:clamp(20px,3vh,34px)}
+.cover-meta{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:clamp(16px,2.6vw,40px);margin-top:clamp(38px,6vh,76px);
+  border-top:1px solid #242B33;padding-top:clamp(18px,2.6vh,28px)}
+.cover-meta dt{font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;color:#6B7885;margin:0}
+.cover-meta dd{margin:8px 0 0;font-weight:500;font-size:clamp(14px,1.25vw,18px);
+  color:#fff;letter-spacing:-.01em}
+@media (max-width:820px){.cover-meta{grid-template-columns:repeat(2,minmax(0,1fr));row-gap:22px}}
+
 /* ---------- progresso e navegação ---------- */
 #bar{position:fixed;top:0;left:0;height:3px;width:0;background:var(--cyan);z-index:50;transition:width .15s linear}
 #dots{position:fixed;right:18px;top:50%;transform:translateY(-50%);z-index:50;
@@ -152,14 +166,20 @@ tbody tr:last-child td{border-bottom:0}
 <main class="deck" id="deck" tabindex="0">
 
 <!-- 01 CAPA -->
-<section class="slide dark" data-t="Capa">
+<section class="slide dark cover" data-t="Capa">
   <span class="wordmark">ness<i>.</i></span><span class="tag">Kickoff · CPS-01025/2026</span>
   <div class="inner">
-    <hr class="rule rv">
+    <p class="cover-eyebrow rv">Reunião de partida do projeto</p>
     <h1 class="display rv">AlupData<br>Fase 1 — DataLake</h1>
-    <p class="lead rv" style="margin-top:clamp(20px,3vh,38px)">
+    <p class="lead rv">
       Um único repositório para os dados operacionais e de mercado do Grupo Alupar.
       Arquitetura Medallion sobre Google Cloud Platform.</p>
+    <dl class="cover-meta rv">
+      <div><dt>Cliente</dt><dd>Grupo Alupar</dd></div>
+      <div><dt>Contrato</dt><dd>CPS-01025/2026</dd></div>
+      <div><dt>Execução</dt><dd>5 ondas · 19 semanas</dd></div>
+      <div><dt>Responsável</dt><dd>ness. Processos e Tecnologia</dd></div>
+    </dl>
   </div>
   <span class="hint">Role para navegar<span>↓</span></span>
   <span class="pagenum">01</span>

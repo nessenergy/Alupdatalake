@@ -16,7 +16,6 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
     gcp_project_id: str = "alupdata-dev"
-    gcp_region: str = "us-east1"
 
     bq_dataset_bronze: str = "bronze"
     bq_dataset_silver: str = "silver"

@@ -19,12 +19,10 @@ if TYPE_CHECKING:
 logger = get_logger(__name__)
 
 
-def caminho_raw(execucao: Execucao, extensao: str = "json.gz") -> str:
+def caminho_raw(execucao: Execucao) -> str:
     """Objeto de destino no bucket raw, particionado por data de referência."""
-    return (
-        f"{execucao.fonte}/{execucao.entidade}/"
-        f"dt={execucao.janela.inicio.isoformat()}/{execucao.ingestao_id}.{extensao}"
-    )
+    dt = execucao.janela.inicio.isoformat()
+    return f"{execucao.fonte}/{execucao.entidade}/dt={dt}/{execucao.ingestao_id}.json.gz"
 
 
 def gravar_raw(execucao: Execucao, registros: list[dict[str, Any]]) -> str | None:

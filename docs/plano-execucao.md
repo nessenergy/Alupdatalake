@@ -57,7 +57,7 @@ Marco 1 — 15,52% · R$ 23.040,00
 | 0.12 | Matriz RACI e data owners por domínio | 4h | **Alup** nomear | RACI publicada; cada fonte com dono nomeado |
 | 0.13 | Provisionar o ambiente GCP `dev`: projeto, APIs, WIF, Artifact Registry, backend do state | 8h | **Alup** criar projeto e conceder IAM | `terraform apply` limpo; `make deploy-views` aplicado |
 | 0.14 | Primeiro deploy real: imagem publicada, job agendado, BCB rodando diariamente | 6h | 0.13 | 3 dias consecutivos com `status = SUCESSO` em `bronze._execucoes` |
-| 0.15 | Portal MVP com autenticação (escopo mínimo da cláusula 4ª) | 8h | 0.13 | Login funcionando; uma view Gold visível |
+| 0.15 | Portal MVP com autenticação (escopo mínimo da cláusula 4ª) | 8h → **tela pronta**, falta ligar no BigQuery e publicar | 0.13 | Login funcionando; uma view Gold visível. Escopo cravado na ADR 005; roda hoje com provedor simulado |
 | — | **Homologação da Onda 0** | — | tudo acima | Evidências reunidas (ver `homologacao-onda`) |
 
 **Riscos da onda**

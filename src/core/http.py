@@ -17,12 +17,11 @@ from src.core.config import get_settings
 _METODOS_IDEMPOTENTES = frozenset({"GET", "HEAD", "OPTIONS"})
 
 
-def criar_sessao(max_tentativas: int | None = None) -> requests.Session:
+def criar_sessao() -> requests.Session:
     """Sessão com retry em 429/5xx e backoff exponencial."""
     cfg = get_settings()
-    tentativas = max_tentativas or cfg.http_max_tentativas
     retry = Retry(
-        total=tentativas,
+        total=cfg.http_max_tentativas,
         backoff_factor=1.0,
         status_forcelist=(429, 500, 502, 503, 504),
         allowed_methods=_METODOS_IDEMPOTENTES,

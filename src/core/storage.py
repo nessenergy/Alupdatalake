@@ -8,23 +8,21 @@ from __future__ import annotations
 
 import gzip
 import json
+import logging
 from typing import TYPE_CHECKING, Any
 
 from src.core.config import get_settings
-from src.core.logging import get_logger
 
 if TYPE_CHECKING:
     from src.core.execucao import Execucao
 
-logger = get_logger(__name__)
+logger = logging.getLogger(__name__)
 
 
-def caminho_raw(execucao: Execucao, extensao: str = "json.gz") -> str:
+def caminho_raw(execucao: Execucao) -> str:
     """Objeto de destino no bucket raw, particionado por data de referência."""
-    return (
-        f"{execucao.fonte}/{execucao.entidade}/"
-        f"dt={execucao.janela.inicio.isoformat()}/{execucao.ingestao_id}.{extensao}"
-    )
+    dt = execucao.janela.inicio.isoformat()
+    return f"{execucao.fonte}/{execucao.entidade}/dt={dt}/{execucao.ingestao_id}.json.gz"
 
 
 def gravar_raw(execucao: Execucao, registros: list[dict[str, Any]]) -> str | None:

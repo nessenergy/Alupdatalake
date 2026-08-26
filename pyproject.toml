@@ -58,3 +58,8 @@ packages = ["src"]
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
+
+[dependency-groups]
+dev = [
+    "sqlglot>=30.17.0",
+]

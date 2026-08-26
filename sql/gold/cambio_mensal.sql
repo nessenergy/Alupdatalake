@@ -10,6 +10,6 @@ SELECT
   MIN(cotacao_media)   AS cambio_minimo,
   MAX(cotacao_media)   AS cambio_maximo,
   ARRAY_AGG(cotacao_media ORDER BY data_referencia DESC LIMIT 1)[OFFSET(0)] AS cambio_fechamento
-FROM `${projeto}.${silver}.bcb_cambio`
+FROM `${projeto}.${silver}.bcb_cambio_ptax`
 WHERE tipo_boletim = 'Fechamento'
 GROUP BY periodo_apuracao;

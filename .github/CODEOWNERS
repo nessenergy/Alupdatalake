@@ -1,0 +1,20 @@
+# Code owners — quem precisa aprovar o quê.
+# Substitua @resper1965 pelo time correspondente quando os times existirem
+# na organização (ex.: @nessenergy/dados, @nessenergy/infra).
+
+# Padrão: qualquer mudança
+*                           @resper1965
+
+# Framework de ingestão: mudança aqui afeta os 13 conectores
+/src/core/                  @resper1965
+
+# Infraestrutura e segurança: revisão obrigatória
+/infra/                     @resper1965
+/.github/workflows/         @resper1965
+/SECURITY.md                @resper1965
+/.pre-commit-config.yaml    @resper1965
+
+# Contexto do projeto e decisões
+/AGENTS.md                  @resper1965
+/docs/arquitetura/decisoes/ @resper1965
+/docs/contrato/             @resper1965

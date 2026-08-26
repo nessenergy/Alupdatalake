@@ -45,8 +45,9 @@ class Janela:
         """
         if tamanho < 1:
             raise ValueError("tamanho deve ser >= 1")
-        dias = self.dias()
-        return [Janela(bloco[0], bloco[-1]) for bloco in (dias[i : i + tamanho] for i in range(0, len(dias), tamanho))]
+        passo = timedelta(days=tamanho)
+        inicios = (self.inicio + passo * i for i in range((self.fim - self.inicio).days // tamanho + 1))
+        return [Janela(ini, min(ini + passo - timedelta(days=1), self.fim)) for ini in inicios]
 
     def __str__(self) -> str:
         return f"{self.inicio.isoformat()}..{self.fim.isoformat()}"

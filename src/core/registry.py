@@ -11,8 +11,6 @@ import pkgutil
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from collections.abc import Callable
-
     from src.core.conector import Conector
 
 _REGISTRO: dict[str, type[Conector]] = {}
@@ -50,7 +48,3 @@ def listar() -> list[str]:
     if not _REGISTRO:
         carregar_conectores()
     return sorted(_REGISTRO)
-
-
-def _limpar() -> Callable[[], None]:  # usado só em teste
-    return _REGISTRO.clear

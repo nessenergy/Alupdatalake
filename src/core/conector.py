@@ -6,6 +6,7 @@ gravação do raw, validação, carga no Bronze e log de execução são do runn
 
 from __future__ import annotations
 
+import logging
 from abc import ABC, abstractmethod
 from datetime import UTC, datetime
 from typing import TYPE_CHECKING, Any
@@ -14,13 +15,12 @@ from pydantic import BaseModel, ValidationError
 
 from src.core.bigquery import carregar_bronze, registrar_execucao
 from src.core.execucao import Execucao, Janela
-from src.core.logging import get_logger
 from src.core.storage import gravar_raw
 
 if TYPE_CHECKING:
     from collections.abc import Iterator
 
-logger = get_logger(__name__)
+logger = logging.getLogger(__name__)
 
 
 class Conector(ABC):

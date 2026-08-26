@@ -32,6 +32,11 @@ make test
 make lint
 ```
 
+## Antes do primeiro PR
+
+Leia [`../CONTRIBUTING.md`](../CONTRIBUTING.md) — fluxo, checklist e o que trava
+uma review — e o [glossário](glossario.md), se você não vem do setor elétrico.
+
 ## Workflow de Desenvolvimento
 
 1. Criar branch a partir de `main`: `git checkout -b feat/conector-ccee`

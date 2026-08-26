@@ -186,7 +186,7 @@ Marco 5 — 18,10% · R$ 26.880,00
 
 | # | Tarefa | Est. | Depende de |
 |---|---|---|---|
-| 4.1 | Motor **S2 Data Intake** (CSV/XLSX): ingestão de planilha sob template | 30h | Templates definidos na Onda 0 |
+| 4.1 | Motor **S2 Data Intake** (CSV/XLSX): ingestão de planilha sob template | 30h → **motor pronto**; resta declarar os templates | Templates dependem do Questionário de Gaps (A4). O motor não dependia de nada e foi adiantado em 2026-08-26 — `docs/arquitetura/s2-data-intake.md` |
 | 4.2 | Fontes pendentes que ficaram de ondas anteriores | 20h | — |
 | 4.3 | **Dataplex**: catálogo e linhagem | 20h | Todas as fontes carregadas |
 | 4.4 | Views Gold de KPIs consolidados | 15h | 0.10 (8 domínios) |

@@ -133,7 +133,7 @@ Marco 3 — 18,97% · R$ 28.160,00 · **Bloqueada por credencial da Alup**
 |---|---|---|---|
 | 2.1 | **CCEE agente credenciado** | 32h ⚠ | Certificado/credencial de agente |
 | 2.2 | **BBCE** | 28h ⚠ | Token de API e contrato ativo |
-| 2.3 | **Hubspot** | 20h | Token de API (private app) |
+| 2.3 | **Hubspot** | 20h → **~4h restantes** | Token de API (private app). Os 7 componentes foram escritos às cegas em 2026-08-26; falta rodar contra a API real e ajustar |
 | 2.4 | **TempoOK** | 18h | Token de API e contrato ativo |
 | 2.5 | Views Gold de preço e posição comercial | 12h | — |
 

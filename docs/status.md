@@ -1,6 +1,6 @@
 # Estado do projeto
 
-Atualizado em **2026-08-25** · `main` em `aaff7bd`
+Atualizado em **2026-08-26** · `main` em `55cb686`
 
 Este arquivo responde "onde estamos e o que trava o próximo passo". Detalhe de
 escopo e estimativa fica em [`plano-execucao.md`](plano-execucao.md); contexto
@@ -14,7 +14,7 @@ para agentes, em [`../AGENTS.md`](../AGENTS.md).
 
 | Item | Onde | Verificação |
 |---|---|---|
-| Runner de ingestão (janela, raw no GCS, validação, colunas técnicas, carga, log) | `src/core/` | 39 testes, 79% de cobertura |
+| Runner de ingestão (janela, raw no GCS, validação, colunas técnicas, carga, log) | `src/core/` | 117 testes, 91% de cobertura |
 | CLI única (`alupdata listar` / `ingerir`) | `src/cli.py` | executada contra as 4 fontes |
 | Scaffolding dos 7 componentes | `make novo-conector` | usado nas fontes novas |
 | Deploy de views idempotente | `make deploy-views` | `--dry-run` conferido |
@@ -30,8 +30,12 @@ para agentes, em [`../AGENTS.md`](../AGENTS.md).
 | **IBGE/IPCA** | JSON aninhado, mensal | 12 registros / 6 meses | dia 12, janela 90 dias |
 | **ANEEL/SIGA** | cadastro paginado | **25.263 registros**, 0 inválidos, 28s | semanal, segunda 7h |
 | **ONS/carga** | CSV anual remoto | 28 registros / 7 dias | diário 8h, janela 30 dias |
+| **Hubspot/negócios** | JSON paginado, CRM | **não executado** — sem token (A9) | a cada 6h, janela 2 dias |
 
-Todas verificadas **em dry-run contra as APIs reais**. Nenhuma linha chegou a um
+As quatro primeiras foram verificadas **em dry-run contra as APIs reais**. O
+Hubspot é a exceção: os 7 componentes existem, mas foram escritos contra a
+documentação pública e **nunca falaram com a API** — o teste de integração está
+`skipif` até o token chegar. Nenhuma linha chegou a um
 BigQuery de verdade — o projeto GCP ainda não existe.
 
 ### Dimensões comuns
@@ -73,6 +77,7 @@ ADRs 001–004 · 4 dicionários de dados · plano de execução · runbook de d
 | A6 | **Ferramenta de BI** definida | o Portal MVP e as views Gold ficam sem consumidor definido | contrato, cláusula 3ª |
 | A7 | Abrir **já** os pedidos de token (Onda 2) e VPN/credencial (Onda 3) | é o maior risco do contrato: atraso dispara ociosidade de 4h/dia | plano §7 |
 | A8 | **Documentação técnica de BBCE e TempoOK** (a Alup é contratante desses serviços) | sem ela não dá nem para preparar o contrato de dados antes do token — ver §5 | §5 |
+| A9 | **Token do Hubspot** (private app) no secret `alupdata-hubspot-api-token` | o conector está pronto e parado; nenhuma linha de CRM entra no lake | plano 2.3 (2.3) |
 
 > **Cláusula 3ª**: atraso > 5 dias úteis posterga o cronograma; > 5 dias úteis em
 > VPN/credencial gera taxa de ociosidade de 4h/dia (R$ 256/h); > 20 dias
@@ -104,7 +109,13 @@ sondagem de 2026-08-25 mostra que isso **só se sustenta para uma delas**:
 | CCEE InfoMercado | **não** — 403 em tudo, inclusive na página de documentação | não |
 | BBCE | **não** — nenhum endpoint público encontrado | não |
 | TempoOK | site público, mas **sem contrato de API discoverable** | não |
-| Hubspot | sim — API e docs públicas | sim, mas é a de menor valor para o projeto |
+| Hubspot | sim — API e docs públicas | **feito** em 2026-08-26 — ver abaixo |
+
+O Hubspot foi entregue nesse regime em 2026-08-26: conector, Bronze, Silver,
+Gold, testes (unitário sem rede + integração `skipif`), agendamento e
+dicionário. Quando o token de A9 chegar, a tarefa é rodar e conferir, não
+começar. O que **não** foi possível verificar sem credencial está listado no
+fim de `dicionario-dados/hubspot_negocios.md`.
 
 Escrever schema por adivinhação seria pior que não escrever: cria retrabalho
 com aparência de progresso. **O que destrava**: a Alup fornecer a documentação

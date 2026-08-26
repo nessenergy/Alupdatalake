@@ -11,14 +11,19 @@ não existe caminho de código que só rode em produção.
 from __future__ import annotations
 
 import argparse
+import logging
 import sys
 
 from src.core.config import get_settings
 from src.core.execucao import Janela
-from src.core.logging import get_logger
 from src.core.registry import listar, obter
 
-logger = get_logger("alupdata")
+logging.basicConfig(
+    format="%(asctime)s | %(name)s | %(levelname)s | %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S",
+    level=logging.INFO,
+    stream=sys.stdout,
+)
 
 
 def _parser() -> argparse.ArgumentParser:

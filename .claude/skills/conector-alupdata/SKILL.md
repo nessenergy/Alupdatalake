@@ -61,8 +61,8 @@ da Onda 1.
 Regras que valem para todo conector:
 
 - Use `src/core/config.py::get_settings` para projeto, datasets e bucket, e
-  `src/core/logging.py::get_logger` — nunca `print`, nunca o nome do dataset
-  escrito literalmente.
+  `logging.getLogger(__name__)` do módulo — nunca `print`, nunca o nome do
+  dataset escrito literalmente. O formato é configurado no entrypoint (`src/cli.py`).
 - Credencial **só** via `src/core/secrets.py` (Secret Manager). Nada de token em
   código, em `.env` versionado ou em default de função.
 - HTTP por `src/core/http.py::criar_sessao` — timeout e retry já configurados.

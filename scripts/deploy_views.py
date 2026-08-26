@@ -10,14 +10,20 @@ CREATE OR REPLACE VIEW. Rodar duas vezes é inofensivo.
 from __future__ import annotations
 
 import argparse
+import logging
 import sys
 from pathlib import Path
 from string import Template
 
 from src.core.config import get_settings
-from src.core.logging import get_logger
 
-logger = get_logger("deploy-views")
+logging.basicConfig(
+    format="%(asctime)s | %(name)s | %(levelname)s | %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S",
+    level=logging.INFO,
+    stream=sys.stdout,
+)
+logger = logging.getLogger("deploy-views")
 RAIZ_SQL = Path(__file__).resolve().parents[1] / "sql"
 CAMADAS = ("bronze", "silver", "gold")  # ordem importa: view depende da tabela
 

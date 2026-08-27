@@ -13,6 +13,33 @@ Três políticas:
 Os três dependem do log estruturado (`src/core/observabilidade.py`): é o campo
 `fonte` no `jsonPayload` que permite contar por conector.
 
+## Painel
+
+`google_monitoring_dashboard` cria "AlupData <ambiente> — plataforma": ingestões
+bem-sucedidas por fonte, registros descartados, tarefas do Cloud Run por
+resultado, e um painel de log com os erros.
+
+É o par do `/lake`, não um concorrente. O `/lake` responde "as fontes estão em
+dia?" para quem opera o dado; este responde "a plataforma está saudável?" para
+quem opera a infraestrutura — e fica no mesmo console onde o alerta chega, que é
+onde a pessoa já está quando é acordada.
+
+Duração p95 por conector fica só no `/lake`: o número exato está em
+`bronze._execucoes`, não numa métrica derivada.
+
+## Alerta de custo
+
+`google_billing_budget` avisa em 50% e 90% do gasto, e em 100% da **projeção** —
+esse último é o que pega a curva antes de virar fatura.
+
+Orçamento não impede gasto: o Google não desliga nada sozinho. Ele avisa, que é
+a diferença entre corrigir em um dia e descobrir no fim do mês. Importa mais a
+partir da Onda 3, quando o Composer entra e a conta salta de ~US$ 15 para
+~US$ 450/mês (issue #55).
+
+Requer `billing_account`, que é da Alup. Vazio, o recurso não é criado —
+orçamento com número inventado é pior que nenhum.
+
 ## Antes de aplicar
 
 `emails_alerta` vem vazio de propósito. Alerta sem destinatário é alerta que

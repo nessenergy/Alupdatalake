@@ -29,3 +29,9 @@ variable "emails_alerta" {
   type        = list(string)
   default     = []
 }
+
+variable "billing_account" {
+  description = "ID da conta de faturamento, para o alerta de custo. Vazio desliga — ver issue #55"
+  type        = string
+  default     = ""
+}

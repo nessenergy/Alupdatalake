@@ -69,12 +69,20 @@ O segundo é o que costuma faltar em projeto de dados: job que não dispara não
 gera erro, e sem alerta de ausência ninguém percebe até alguém reclamar do
 número.
 
+## Painel e custo
+
+Além do `/lake`, o Terraform cria um painel no Cloud Monitoring ("AlupData
+<ambiente> — plataforma") e um orçamento com alerta em 50%, 90% e 100% da
+projeção de gasto. Detalhe em
+[`infra/modules/monitoramento/README.md`](../../infra/modules/monitoramento/README.md).
+
+O orçamento precisa do `billing_account` da Alup; sem ele o recurso não é
+criado.
+
 ## O que ainda não existe
 
 - **Destinatário de alerta.** `emails_alerta` está vazio de propósito: quem
   recebe, em que canal e o que faz ao receber é acordo operacional com a Alup.
-- **Métrica de custo.** Budget alert na conta de faturamento — depende do
-  faturamento estar vinculado (pendência A3, issue #55).
 - **Retenção.** O Cloud Logging guarda 30 dias por padrão. O registro durável é
   `bronze._execucoes`, que não expira; se o log precisar durar mais, é sink para
   bucket, e aí é decisão de custo.

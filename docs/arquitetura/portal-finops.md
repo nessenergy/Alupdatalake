@@ -160,6 +160,91 @@ sustentação. Vira proposta separada, com escopo próprio e horas próprias.
 
 ---
 
+## 5-A. Quem lê o número — as três visões
+
+Definido pela Alup em 27/08: o custo é lido em três níveis, terminando na
+diretoria. Isso não é detalhe de tela — **decide o enquadramento contratual de
+metade deste plano**, e por isso vem antes da estimativa.
+
+### ▸ Operacional — "o que eu mudo hoje"
+
+Quem lê: quem opera o pipeline, diariamente ou quando um alerta toca.
+
+| Pergunta | Vem de |
+|---|---|
+| Qual consulta varreu mais byte ontem? | `INFORMATION_SCHEMA.JOBS` |
+| Alguma view começou a varrer a tabela inteira? | comparação com a média móvel da própria view |
+| Que dataset está crescendo mais rápido? | armazenamento ativo × longo prazo |
+| Alguma fonte está reprocessando janela à toa? | `bronze._execucoes` cruzado com bytes |
+
+Granularidade fina, janela curta (7 a 30 dias), sem nenhum valor agregado por
+área. Cada linha existe porque leva a uma ação técnica concreta: reescrever a
+view, particionar, mudar a janela de ingestão, apagar dado de teste esquecido.
+
+**É a camada F1**, e é a única das três que se sustenta como monitoramento pela
+cláusula 10ª — pelo mesmo argumento da ADR 006: mostra o comportamento do
+pipeline, não dado de cliente, e serve para decidir trabalho de sustentação.
+
+### ▸ Orçamento — "estamos dentro do previsto"
+
+Quem lê: quem responde pelo orçamento de nuvem, mensalmente.
+
+| Pergunta | Vem de |
+|---|---|
+| Quanto gastamos no mês, contra o orçado? | billing export + `google_billing_budget` |
+| A curva do mês projeta estouro? | realizado acumulado contra a mesma curva do mês anterior |
+| Onde o dinheiro está: query, armazenamento, compute, terceiros? | billing export por serviço |
+| Quanto custa cada fonte de dado? | rótulos aplicados em F0 |
+
+Granularidade mensal, com um nível de quebra. Aqui entra o que o
+`INFORMATION_SCHEMA` não enxerga: créditos, descontos por uso comprometido, e
+todo serviço que não seja BigQuery.
+
+**É a camada F2**, e depende inteiramente de F0 ter sido feito antes. Sem os
+rótulos, "quanto custa cada fonte" não tem resposta — nem retroativa.
+
+### ▸ Diretoria — "vale o que custa"
+
+Quem lê: a diretoria, trimestralmente ou quando decide renovar.
+
+| Pergunta | Vem de |
+|---|---|
+| Custo por unidade de negócio, não por serviço técnico | rateio sobre os rótulos |
+| A tendência é de crescimento sustentável ou de descontrole? | série longa, 12 meses |
+| Qual o custo de uma fonte nova antes de contratá-la? | modelo de projeção sobre o histórico |
+| O que dá para economizar sem perder capacidade? | recomendações de otimização |
+
+Granularidade grossa, série longa, linguagem de negócio. Poucos números, cada
+um defensável em reunião.
+
+**É a camada F3 — e é BI, pela cláusula 5ª.** Público fora do time técnico,
+métrica de negócio, periodicidade de relatório executivo. Não cabe em
+sustentação e não deve ser embutido de graça no Portal MVP: vira aditivo com
+escopo e horas próprios.
+
+Dizer isso agora é mais barato que dizer depois. Uma tela de diretoria
+construída dentro da franquia de 20h/mês consome a franquia inteira e ainda
+gera a expectativa de que a próxima também sai assim.
+
+### O que muda no plano
+
+Nada é jogado fora, mas a ordem fica obrigatória — cada visão depende do
+alicerce da anterior:
+
+| | Visão | Camada | Enquadramento | Pré-requisito real |
+|---|---|---|---|---|
+| 1º | Operacional | F1 | sustentação | A3 |
+| 2º | Orçamento | F2 | fronteira, a decidir por escrito | F0 feito **antes** de gastar + conta de faturamento |
+| 3º | Diretoria | F3 | **aditivo** | F2 rodando com histórico suficiente para ter tendência |
+
+E reforça o item urgente: **F0 não é preparação, é pré-requisito das duas
+visões de cima.** Rótulo que não foi aplicado no momento do gasto não vira
+rateio por fonte depois, e sem rateio por fonte a visão de orçamento responde
+"gastamos X" sem conseguir dizer em quê — que é exatamente a pergunta que a
+diretoria vai fazer em seguida.
+
+---
+
 ## 6. O que trava o quê
 
 | Camada | Depende de | Se não vier |

@@ -28,6 +28,10 @@ class Settings(BaseSettings):
 
     dry_run: bool = Field(default=False, description="Extrai e valida sem gravar em GCS/BigQuery")
 
+    portal_provedor: str = Field(default="simulado", description="'simulado' ou 'bigquery' (ver ADR 005)")
+    portal_view: str = Field(default="cambio_mensal", description="View Gold exibida pelo Portal MVP")
+    portal_limite_linhas: int = Field(default=200, description="Teto de linhas lidas por request")
+
     @property
     def bucket_raw(self) -> str:
         """Bucket de dado bruto; deriva do projeto quando não informado."""

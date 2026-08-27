@@ -38,6 +38,10 @@ variable "conectores" {
       cron         = "0 10 12 * *" # IPCA sai por volta do dia 10
       ultimos_dias = 90            # janela larga: o IBGE revisa série publicada
     }
+    hubspot_negocios = {
+      cron         = "0 */6 * * *" # CRM muda ao longo do dia; 4x por dia basta
+      ultimos_dias = 2             # cobre execução perdida sem varrer o funil todo
+    }
   }
 }
 

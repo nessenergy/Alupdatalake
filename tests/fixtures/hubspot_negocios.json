@@ -1,0 +1,42 @@
+{
+  "results": [
+    {
+      "id": "1001",
+      "properties": {
+        "dealname": "PPA Cliente Exemplo 2027",
+        "dealstage": "qualificacao",
+        "pipeline": "comercializacao",
+        "amount": "1250000.00",
+        "closedate": "2026-11-30T00:00:00.000Z",
+        "createdate": "2026-02-10T13:05:00.000Z",
+        "hs_lastmodifieddate": "2026-08-20T18:42:11.000Z",
+        "hubspot_owner_id": "77001"
+      }
+    },
+    {
+      "id": "1002",
+      "properties": {
+        "dealname": null,
+        "dealstage": "proposta",
+        "pipeline": "comercializacao",
+        "amount": "",
+        "closedate": "",
+        "createdate": "2026-07-01T09:00:00.000Z",
+        "hs_lastmodifieddate": "2026-08-21T10:00:00.000Z",
+        "hubspot_owner_id": ""
+      }
+    },
+    {
+      "id": "1003",
+      "properties": {
+        "dealname": "Negócio sem estágio",
+        "dealstage": "",
+        "pipeline": "comercializacao",
+        "amount": "500.00",
+        "createdate": "2026-08-01T09:00:00.000Z",
+        "hs_lastmodifieddate": "2026-08-22T11:30:00.000Z"
+      }
+    }
+  ],
+  "paging": {}
+}

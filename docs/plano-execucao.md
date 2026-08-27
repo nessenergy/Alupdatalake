@@ -57,7 +57,7 @@ Marco 1 — 15,52% · R$ 23.040,00
 | 0.12 | Matriz RACI e data owners por domínio | 4h | **Alup** nomear | RACI publicada; cada fonte com dono nomeado |
 | 0.13 | Provisionar o ambiente GCP `dev`: projeto, APIs, WIF, Artifact Registry, backend do state | 8h | **Alup** criar projeto e conceder IAM | `terraform apply` limpo; `make deploy-views` aplicado |
 | 0.14 | Primeiro deploy real: imagem publicada, job agendado, BCB rodando diariamente | 6h | 0.13 | 3 dias consecutivos com `status = SUCESSO` em `bronze._execucoes` |
-| 0.15 | Portal MVP com autenticação (escopo mínimo da cláusula 4ª) | 8h | 0.13 | Login funcionando; uma view Gold visível |
+| 0.15 | Portal MVP com autenticação (escopo mínimo da cláusula 4ª) | 8h → **tela pronta**, falta ligar no BigQuery e publicar | 0.13 | Login funcionando; uma view Gold visível. Escopo cravado na ADR 005; roda hoje com provedor simulado |
 | — | **Homologação da Onda 0** | — | tudo acima | Evidências reunidas (ver `homologacao-onda`) |
 
 **Riscos da onda**
@@ -133,7 +133,7 @@ Marco 3 — 18,97% · R$ 28.160,00 · **Bloqueada por credencial da Alup**
 |---|---|---|---|
 | 2.1 | **CCEE agente credenciado** | 32h ⚠ | Certificado/credencial de agente |
 | 2.2 | **BBCE** | 28h ⚠ | Token de API e contrato ativo |
-| 2.3 | **Hubspot** | 20h | Token de API (private app) |
+| 2.3 | **Hubspot** | 20h → **~4h restantes** | Token de API (private app). Os 7 componentes foram escritos às cegas em 2026-08-26; falta rodar contra a API real e ajustar |
 | 2.4 | **TempoOK** | 18h | Token de API e contrato ativo |
 | 2.5 | Views Gold de preço e posição comercial | 12h | — |
 
@@ -186,7 +186,7 @@ Marco 5 — 18,10% · R$ 26.880,00
 
 | # | Tarefa | Est. | Depende de |
 |---|---|---|---|
-| 4.1 | Motor **S2 Data Intake** (CSV/XLSX): ingestão de planilha sob template | 30h | Templates definidos na Onda 0 |
+| 4.1 | Motor **S2 Data Intake** (CSV/XLSX): ingestão de planilha sob template | 30h → **motor pronto**; resta declarar os templates | Templates dependem do Questionário de Gaps (A4). O motor não dependia de nada e foi adiantado em 2026-08-26 — `docs/arquitetura/s2-data-intake.md` |
 | 4.2 | Fontes pendentes que ficaram de ondas anteriores | 20h | — |
 | 4.3 | **Dataplex**: catálogo e linhagem | 20h | Todas as fontes carregadas |
 | 4.4 | Views Gold de KPIs consolidados | 15h | 0.10 (8 domínios) |

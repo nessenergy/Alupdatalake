@@ -23,3 +23,9 @@ variable "imagem_ingestao" {
   type        = string
   default     = ""
 }
+
+variable "emails_alerta" {
+  description = "Destinatários dos alertas. Vazio cria as políticas sem notificar ninguém — ver modules/monitoramento/README.md"
+  type        = list(string)
+  default     = []
+}

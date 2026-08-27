@@ -15,6 +15,7 @@ from pydantic import BaseModel, ValidationError
 
 from src.core.bigquery import carregar_bronze, registrar_execucao
 from src.core.execucao import Execucao, Janela
+from src.core.observabilidade import contexto_execucao
 from src.core.storage import gravar_raw
 
 if TYPE_CHECKING:
@@ -66,6 +67,10 @@ class Conector(ABC):
     def ingerir(self, janela: Janela) -> Execucao:
         """Executa o ciclo completo: extrai, valida, grava raw, carrega, registra."""
         execucao = Execucao(fonte=self.fonte, entidade=self.entidade, janela=janela)
+        with contexto_execucao(execucao):
+            return self._ingerir(execucao, janela)
+
+    def _ingerir(self, execucao: Execucao, janela: Janela) -> Execucao:
         logger.info("[%s] ingestão %s janela=%s", self.rotulo, execucao.ingestao_id, janela)
 
         try:
@@ -91,6 +96,7 @@ class Conector(ABC):
             execucao.encerrar()
         except Exception as exc:  # noqa: BLE001 — a execução precisa ser registrada como ERRO
             execucao.encerrar(erro=f"{type(exc).__name__}: {exc}")
+            logger.exception("[%s] ingestão falhou", self.rotulo)  # exc_info alimenta o Error Reporting
             registrar_execucao(execucao)
             raise
 

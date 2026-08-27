@@ -19,9 +19,11 @@ from typing import Any
 
 from flask import Flask, Response, request
 from src.core.config import get_settings
+from src.core.observabilidade import configurar_logging
 from src.portal.dados import Painel, SaudeConector, SerieVolumetria, obter_provedor
 from src.portal.grafico import area, cor_do_conector, tabela
 
+configurar_logging()
 app = Flask(__name__)
 
 CABECALHO_IDENTIDADE = "X-Goog-Authenticated-User-Email"

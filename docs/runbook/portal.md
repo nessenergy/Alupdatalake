@@ -32,6 +32,14 @@ Variáveis (todas com padrão em `src/core/config.py`):
 | `PORTAL_VIEW` | `cambio_mensal` | view Gold exibida |
 | `PORTAL_LIMITE_LINHAS` | `200` | teto de linhas por request |
 
+## Rotas
+
+| Rota | O quê |
+|---|---|
+| `/` | uma view Gold de negócio (item 0.15 do plano — [ADR 005](../arquitetura/decisoes/005-escopo-do-portal-mvp.md)) |
+| `/lake` | painel de saúde da ingestão ([ADR 006](../arquitetura/decisoes/006-painel-de-saude.md)) |
+| `/saude` | sonda do Cloud Run — responde sem tocar no BigQuery |
+
 ## Autenticação
 
 **Não há login escrito no aplicativo, e isso é deliberado.** No Cloud Run o

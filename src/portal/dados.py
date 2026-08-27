@@ -27,8 +27,25 @@ class Painel:
     fonte_ultima_ingestao: str | None
 
 
+@dataclass(frozen=True)
+class SaudeConector:
+    """Uma linha de `gold.saude_ingestao`."""
+
+    conector: str
+    situacao: str
+    ultimo_sucesso: datetime | None
+    minutos_desde_sucesso: int | None
+    intervalo_tipico_min: int | None
+    taxa_sucesso_30d: float | None
+    taxa_invalidas: float | None
+    linhas_carregadas_total: int
+    duracao_p95_seg: float | None
+    ultimo_erro: str | None
+
+
 class ProvedorDados(Protocol):
     def painel(self, view: str) -> Painel: ...
+    def saude(self) -> list[SaudeConector]: ...
 
 
 class ProvedorSimulado:
@@ -65,6 +82,39 @@ class ProvedorSimulado:
             ultima_ingestao=datetime(2026, 8, 26, 9, 0, tzinfo=UTC),
             fonte_ultima_ingestao="bcb_cambio_ptax",
         )
+
+    def saude(self) -> list[SaudeConector]:
+        def linha(conector, situacao, sucesso, minutos, intervalo, taxa, invalidas, linhas, p95, erro=None):
+            return SaudeConector(conector, situacao, sucesso, minutos, intervalo, taxa, invalidas, linhas, p95, erro)
+
+        return [
+            linha("bcb_cambio_ptax", "OK", datetime(2026, 8, 26, 9, 0, tzinfo=UTC), 95, 1440, 1.0, 0.0, 1_284, 4.2),
+            linha("ons_carga", "OK", datetime(2026, 8, 26, 8, 2, tzinfo=UTC), 153, 1440, 0.97, 0.004, 8_930, 11.8),
+            linha(
+                "aneel_siga",
+                "ATRASADA",
+                datetime(2026, 8, 17, 7, 0, tzinfo=UTC),
+                13_055,
+                10_080,
+                0.92,
+                0.0,
+                75_789,
+                31.4,
+            ),
+            linha("ibge_ipca", "OK", datetime(2026, 8, 12, 10, 0, tzinfo=UTC), 20_315, 43_200, 1.0, 0.0, 72, 2.1),
+            linha(
+                "hubspot_negocios",
+                "SEM_SUCESSO",
+                None,
+                None,
+                None,
+                0.0,
+                None,
+                0,
+                None,
+                "PermissionDenied: 401 — token ausente (pendência A9)",
+            ),
+        ]
 
 
 NOME_VALIDO = re.compile(r"[a-z][a-z0-9_]{2,62}")
@@ -111,6 +161,30 @@ class ProvedorBigQuery:
             ultima_ingestao=execucao.encerrada_em if execucao else None,
             fonte_ultima_ingestao=execucao.fonte if execucao else None,
         )
+
+    def saude(self) -> list[SaudeConector]:
+        from google.cloud import bigquery  # import tardio
+
+        cfg = get_settings()
+        cliente = bigquery.Client(project=cfg.gcp_project_id)
+        linhas = cliente.query(
+            f"SELECT * FROM `{cfg.gcp_project_id}.{cfg.bq_dataset_gold}.saude_ingestao` ORDER BY conector"  # noqa: S608
+        ).result()
+        return [
+            SaudeConector(
+                conector=linha.conector,
+                situacao=linha.situacao,
+                ultimo_sucesso=linha.ultimo_sucesso,
+                minutos_desde_sucesso=linha.minutos_desde_sucesso,
+                intervalo_tipico_min=linha.intervalo_tipico_min,
+                taxa_sucesso_30d=linha.taxa_sucesso_30d,
+                taxa_invalidas=linha.taxa_invalidas,
+                linhas_carregadas_total=linha.linhas_carregadas_total or 0,
+                duracao_p95_seg=linha.duracao_p95_seg,
+                ultimo_erro=linha.ultimo_erro,
+            )
+            for linha in linhas
+        ]
 
 
 def obter_provedor() -> ProvedorDados:

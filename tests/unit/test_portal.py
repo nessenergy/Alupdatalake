@@ -92,3 +92,40 @@ def test_nome_de_view_invalido_nao_chega_na_query() -> None:
 
     with pytest.raises(ValueError, match="view inválido"):
         ProvedorBigQuery().painel("gold`; DROP TABLE x --")
+
+
+def test_lake_mostra_cada_conector_com_situacao(cliente) -> None:
+    corpo = cliente.get("/lake").get_data(as_text=True)
+    for conector in ("bcb_cambio_ptax", "ons_carga", "aneel_siga", "ibge_ipca", "hubspot_negocios"):
+        assert conector in corpo
+    assert "3 de 5 conectores em dia" in corpo  # aneel atrasada, hubspot sem token
+
+
+def test_lake_destaca_atraso_e_erro(cliente) -> None:
+    corpo = cliente.get("/lake").get_data(as_text=True)
+    assert "atrasada" in corpo
+    assert "nunca teve sucesso" in corpo
+    assert "pendência A9" in corpo  # o erro da última execução aparece na tela
+
+
+def test_lake_formata_numero_para_leitura_humana(cliente) -> None:
+    corpo = cliente.get("/lake").get_data(as_text=True)
+    assert "75.789" in corpo  # separador de milhar brasileiro
+    assert "há 9 dias" in corpo  # 13.055 minutos, não "13055 min"
+    assert "97,0%" in corpo  # taxa com vírgula decimal
+
+
+def test_lake_sem_conector_nao_quebra(cliente, monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr("src.portal.app.obter_provedor", lambda: type("P", (), {"saude": lambda _s: []})())
+    corpo = cliente.get("/lake").get_data(as_text=True)
+    assert "Nenhum conector executou ainda" in corpo
+
+
+def test_lake_escapa_mensagem_de_erro(cliente, monkeypatch: pytest.MonkeyPatch) -> None:
+    from src.portal.dados import SaudeConector
+
+    ruim = SaudeConector("x", "OK", None, None, None, None, None, 0, None, "<img src=x onerror=alert(1)>")
+    monkeypatch.setattr("src.portal.app.obter_provedor", lambda: type("P", (), {"saude": lambda _s: [ruim]})())
+    corpo = cliente.get("/lake").get_data(as_text=True)
+    assert "<img" not in corpo
+    assert "&lt;img" in corpo

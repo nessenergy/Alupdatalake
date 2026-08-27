@@ -1,6 +1,8 @@
 # Plano — Portal de FinOps do custo de nuvem
 
-**Status**: proposta · **Data**: 2026-08-27 · **Não é escopo contratado**
+**Status**: em execução · **Data**: 2026-08-27 · **Contribuição comercial da ness.**
+
+Decisões de implementação em [ADR 007](decisoes/007-portal-de-custo.md).
 
 ---
 
@@ -23,10 +25,22 @@ juntas, e que têm enquadramentos contratuais diferentes:
 | **Observabilidade de custo** | uma tela que mostra o gasto do próprio pipeline, como o painel de saúde mostra a execução dele | mesma abertura da [ADR 006](decisoes/006-painel-de-saude.md): sustentação, cláusula 10ª |
 | **Gestão de FinOps** | rateio por centro de custo, previsão, detecção de anomalia, recomendação de economia | **aditivo** — é produto novo, com público fora do time técnico |
 
-A recomendação deste plano é fazer as duas primeiras e propor a terceira como
-aditivo, se a Alup quiser. Empacotar tudo como "portal de FinOps" e entregar de
-graça criaria um precedente ruim: vira BI, o escopo cresce, e a franquia de
-sustentação some dentro dele.
+**Decisão da ness. em 27/08**: o painel de saúde e o de custo são
+**contribuição comercial**, entregues fora do escopo faturado. As três visões
+saem, inclusive a de diretoria, que pela cláusula 5ª seria aditivo.
+
+Isso muda quem paga, não o que as coisas são. Duas salvaguardas seguem
+valendo, e é por elas que este documento continua separando as camadas:
+
+- **Cortesia declarada não é escopo aberto.** Pedido novo sobre estas telas
+  volta a ser avaliado como escopo — filtro novo, corte novo, integração com
+  ferramenta de BI, exportação agendada. O que está entregue está entregue; o
+  próximo pedido é um pedido.
+- **Não entra na medição nem na franquia.** Não é evidência de onda, não conta
+  como item homologado, e o tempo gasto nele não sai das 20h/mês de
+  sustentação. Se sair, a sustentação vira BI e some.
+
+Registrar isso por escrito é o que separa uma contribuição de um precedente.
 
 ---
 
@@ -282,3 +296,33 @@ tarifa por demanda e capacidade reservada, e não autoriza ninguém a apagar
 dado. Essas três decisões continuam sendo da contratante, e a maior delas — a
 profundidade do histórico do ONS — precisa sair **antes da primeira carga**,
 não depois de a fatura chegar.
+
+---
+
+## 9. O que o mock mostrou
+
+A tela foi construída com o provedor simulado, derivando custo da volumetria
+que já existia — byte varrido acompanha linha carregada, armazenamento
+acompanha o acumulado. Três coisas apareceram só por causa disso, e nenhuma
+delas estava neste plano antes:
+
+**A conta do lake hoje é irrelevante, e não pelo motivo esperado.** Com as
+cinco fontes atuais, trinta dias custam cerca de **US$ 0,21** — e **92% disso é
+custo fixo por execução**, não volume. O job de ingestão e o mínimo faturado
+por consulta somam mais que todo o byte varrido do DataLake.
+
+**Isso inverte a recomendação óbvia.** Nesta escala, reduzir número de
+execuções rende mais que otimizar varredura: a consulta que varre 61 MiB custa
+menos que a que varre 864 bytes, porque as duas batem no mínimo e a segunda
+roda mais vezes. A inversão vale enquanto o volume for este — a Onda 3 muda o
+regime, e é aí que a varredura integral que a tela já marca passa a doer.
+
+**O rateio por fonte funciona, e é o número mais útil da tela.** US$ por milhão
+de linhas separa fonte cara de fonte cara à toa: a ANEEL custa US$ 0,06 por
+milhão de linhas; o IBGE, US$ 154. Nenhuma das duas é problema no volume atual,
+mas a métrica é a que vai apontar o desperdício quando houver. **Ela só existe
+porque o job é rotulado por fonte** — de novo, a camada F0.
+
+Consequência para a Alup: **não vale investir esforço em otimização de custo
+agora.** O que vale é rotular antes de gastar, para que a conversa de otimização
+seja possível quando a Onda 3 tornar a conta relevante.

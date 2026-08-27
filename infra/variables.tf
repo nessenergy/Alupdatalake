@@ -23,3 +23,15 @@ variable "imagem_ingestao" {
   type        = string
   default     = ""
 }
+
+variable "emails_alerta" {
+  description = "Destinatários dos alertas. Vazio cria as políticas sem notificar ninguém — ver modules/monitoramento/README.md"
+  type        = list(string)
+  default     = []
+}
+
+variable "billing_account" {
+  description = "ID da conta de faturamento, para o alerta de custo. Vazio desliga — ver issue #55"
+  type        = string
+  default     = ""
+}

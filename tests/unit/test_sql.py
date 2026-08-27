@@ -61,7 +61,12 @@ def test_silver_deduplica_e_expoe_as_dimensoes_comuns(arquivo):
 
 
 def test_view_referencia_a_camada_anterior(arquivo):
-    """Silver lê do Bronze; Gold lê da Silver — não pula camada."""
+    """Silver lê do Bronze; Gold lê da Silver — não pula camada.
+
+    Exceção: view Gold de monitoramento lê `bronze._execucoes`, o log de
+    execução. Ele não é fonte de dados e por isso não tem Silver — deduplicar
+    ou higienizar um log de execução não faz sentido.
+    """
     camada = arquivo.parent.name
     if camada == "bronze":
         pytest.skip("Bronze não referencia camada anterior")
@@ -72,6 +77,11 @@ def test_view_referencia_a_camada_anterior(arquivo):
         if arvore
         for t in arvore.find_all(exp.Table)
     ]
+    if camada == "gold" and any("_execucoes" in t for t in tabelas):
+        assert not any(f".{anterior}." in t for t in tabelas), (
+            "view de monitoramento não deve misturar o log de execução com dado de negócio"
+        )
+        return
     assert any(f".{anterior}." in t for t in tabelas), f"{camada} deveria ler de {anterior}: {tabelas}"
 
 

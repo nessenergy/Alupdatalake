@@ -71,6 +71,16 @@ module "secrets" {
   environment = var.environment
 }
 
+# Alertas. `emails_alerta` vazio cria as políticas sem destinatário — ver o
+# README do módulo: quem recebe é acordo operacional, não configuração.
+module "monitoramento" {
+  source          = "./modules/monitoramento"
+  project_id      = var.project_id
+  environment     = var.environment
+  emails_alerta   = var.emails_alerta
+  billing_account = var.billing_account
+}
+
 # Só sobe quando existe imagem publicada — antes disso o agendamento não tem o
 # que executar.
 module "scheduler" {

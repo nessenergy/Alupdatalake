@@ -1,0 +1,25 @@
+-- Silver: negócios do CRM, uma linha por negócio na versão mais recente.
+-- Dedup por `negocio_id`: o mesmo negócio é reingerido a cada mudança de estágio.
+CREATE OR REPLACE VIEW `${projeto}.${silver}.hubspot_negocios` AS
+SELECT
+  DATE(modificado_em)  AS data_referencia,
+  CAST(NULL AS STRING) AS submercado,    -- CRM não tem recorte de submercado
+  CAST(NULL AS STRING) AS codigo_usina,  -- negócio comercial não aponta para usina
+  CAST(NULL AS STRING) AS agente_ccee,   -- a contraparte do CRM não é agente CCEE identificado
+  FORMAT_DATE('%Y-%m', DATE(modificado_em)) AS periodo_apuracao,
+  negocio_id,
+  nome,
+  estagio,
+  pipeline,
+  valor,
+  data_fechamento,
+  criado_em,
+  modificado_em,
+  proprietario_id,
+  _ingestao_id,
+  _ingestao_timestamp
+FROM `${projeto}.${bronze}.hubspot_negocios`
+QUALIFY ROW_NUMBER() OVER (
+  PARTITION BY negocio_id
+  ORDER BY modificado_em DESC, _ingestao_timestamp DESC
+) = 1;

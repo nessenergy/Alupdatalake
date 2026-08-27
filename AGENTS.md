@@ -116,7 +116,7 @@ dizem como *este contrato* usa o produto.
 | 004 | SQL versionado sem dbt; Cloud Run Jobs + Scheduler antes de Composer |
 | 005 | Escopo do Portal MVP cravado — o que ele é e o que não é |
 | 006 | Painel de saúde `/lake`: monitoramento não é BI |
-| 007 | *(proposta)* painel de saúde como entrega faturável — revê a 006 |
+| 007 | Painel de custo `/custo`: observabilidade de custo é sustentação, não faturada (PR #56) |
 
 Se você for propor algo que contraria um ADR, escreva um ADR novo — não um
 remendo. Em particular: o framework em `src/core/` é mais estrutura do que 13

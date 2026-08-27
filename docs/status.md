@@ -4,8 +4,9 @@ Atualizado em **2026-08-27** · `main` em `129f579`
 
 Este arquivo responde "onde estamos e o que trava o próximo passo". Detalhe de
 escopo e estimativa fica em [`plano-execucao.md`](plano-execucao.md); o que sai
-em cada semana, em [`plano-semanal.md`](plano-semanal.md); contexto para
-agentes, em [`../AGENTS.md`](../AGENTS.md).
+em cada semana, em [`plano-semanal.md`](plano-semanal.md); o relatório para a
+contratante, em [`relatorio-situacao-2026-08-27.md`](relatorio-situacao-2026-08-27.md);
+contexto para agentes, em [`../AGENTS.md`](../AGENTS.md).
 
 ---
 
@@ -155,6 +156,8 @@ Ordenado por data em que o atraso passa a custar. Prazos derivados do
 | A2 | Decisão sobre a CCEE | Alup | 18/09 | 32h da Onda 1 seguem paradas |
 | A7 | Pedidos de token (Onda 2) e VPN/credencial (Onda 3) **abertos** | Alup | 25/09 | maior risco financeiro: ociosidade de 4h/dia (R$ 256/h) |
 | A8 | Documentação técnica de BBCE e TempoOK | Alup | 25/09 | Onda 2 só começa depois do token, em vez de antes |
+
+Acompanhamento consolidado destas linhas na [issue #57](https://github.com/nessenergy/Alupdatalake/issues/57).
 
 **Registro de atraso**: a data de cada pedido deve ser anotada no dia em que o
 atraso começa, não quando vira problema. É o que sustenta postergação,

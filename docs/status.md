@@ -1,10 +1,11 @@
 # Estado do projeto
 
-Atualizado em **2026-08-26** · `main` em `55cb686`
+Atualizado em **2026-08-27** · `main` em `129f579`
 
 Este arquivo responde "onde estamos e o que trava o próximo passo". Detalhe de
-escopo e estimativa fica em [`plano-execucao.md`](plano-execucao.md); contexto
-para agentes, em [`../AGENTS.md`](../AGENTS.md).
+escopo e estimativa fica em [`plano-execucao.md`](plano-execucao.md); o que sai
+em cada semana, em [`plano-semanal.md`](plano-semanal.md); contexto para
+agentes, em [`../AGENTS.md`](../AGENTS.md).
 
 ---
 
@@ -14,7 +15,7 @@ para agentes, em [`../AGENTS.md`](../AGENTS.md).
 
 | Item | Onde | Verificação |
 |---|---|---|
-| Runner de ingestão (janela, raw no GCS, validação, colunas técnicas, carga, log) | `src/core/` | 117 testes, 91% de cobertura |
+| Runner de ingestão (janela, raw no GCS, validação, colunas técnicas, carga, log) | `src/core/` | 170 testes, 92% de cobertura (suíte inteira) |
 | CLI única (`alupdata listar` / `ingerir`) | `src/cli.py` | executada contra as 4 fontes |
 | Scaffolding dos 7 componentes | `make novo-conector` | usado nas fontes novas |
 | Deploy de views idempotente | `make deploy-views` | `--dry-run` conferido |
@@ -55,7 +56,7 @@ BigQuery de verdade — o projeto GCP ainda não existe.
 
 ### Documentação
 
-ADRs 001–004 · 4 dicionários de dados · plano de execução · runbook de deploy ·
+ADRs 001–006 · 5 dicionários de dados · plano de execução · runbook de deploy ·
 `AGENTS.md` como contexto canônico · skills do projeto e shortlist do Google.
 
 ---
@@ -134,3 +135,38 @@ primeira carga real são onde aparecem os erros que teste local não pega: IAM
 insuficiente, cota de API, permissão de bucket, formato que o BigQuery recusa.
 **A Onda 0 não deve ser declarada homologada antes disso rodar** — o critério
 está na skill `homologacao-onda`.
+
+---
+
+## 6. Painel de dependências — prazo e efeito
+
+Ordenado por data em que o atraso passa a custar. Prazos derivados do
+[`plano-semanal.md`](plano-semanal.md); efeitos, da cláusula 3ª do contrato.
+
+| # | Insumo | Responsável | Prazo útil | Efeito de passar do prazo |
+|---|---|---|---|---|
+| A3 | Projeto GCP `dev`, APIs, IAM, WIF, Artifact Registry, state | Alup | **04/09** | S2 e S3 escorregam inteiras; Onda 0 não homologa; > 5 dias úteis posterga o cronograma |
+| A9 | Token Hubspot no secret `alupdata-hubspot-api-token` | Alup | 11/09 | conector pronto segue parado; item 2.3 não fecha |
+| A4 | Questionário de Gaps respondido | Alup | 11/09 | sem os 8 domínios, a Gold da Onda 1 fica sem alvo |
+| A5 | Matriz RACI e data owners | Alup | 11/09 | dúvida de regra de negócio sem destinatário |
+| A6 | Ferramenta de BI definida | Alup | 11/09 | Portal MVP e views Gold sem consumidor definido |
+| — | Destinatários de alerta e `billing_account` | Alup | 11/09 | alertas e orçamento existem mas não notificam ninguém |
+| — | Branch protection na `main` + variáveis do GitHub | ness./Alup | 04/09 | deploy não autentica; `main` aceita push direto |
+| A2 | Decisão sobre a CCEE | Alup | 18/09 | 32h da Onda 1 seguem paradas |
+| A7 | Pedidos de token (Onda 2) e VPN/credencial (Onda 3) **abertos** | Alup | 25/09 | maior risco financeiro: ociosidade de 4h/dia (R$ 256/h) |
+| A8 | Documentação técnica de BBCE e TempoOK | Alup | 25/09 | Onda 2 só começa depois do token, em vez de antes |
+
+**Registro de atraso**: a data de cada pedido deve ser anotada no dia em que o
+atraso começa, não quando vira problema. É o que sustenta postergação,
+ociosidade ou suspensão numa medição.
+
+---
+
+## 7. Higiene do backlog
+
+O backlog do GitHub foi semeado duas vezes em 2026-08-24, gerando 15 issues
+duplicadas (mesma tarefa, dois números). Elas foram fechadas em 2026-08-27,
+mantendo sempre o número mais baixo de cada par. As issues das quatro fontes
+públicas concluídas e das tarefas de fundação já entregues também foram
+fechadas, com a ressalva de que **entrega técnica não é homologação** — esta
+depende do primeiro `apply` real (§5.1).

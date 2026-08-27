@@ -65,13 +65,23 @@ jobs:
   secrets-scan:
     name: "Detecção de Secrets"
     runs-on: ubuntu-latest
+    env:
+      GITLEAKS_VERSAO: "8.28.0"
     steps:
       - uses: actions/checkout@v4
         with:
+          # Histórico completo: segredo vazado e removido depois continua no
+          # histórico, e é exatamente esse o caso que precisa ser pego.
           fetch-depth: 0
-      - uses: gitleaks/gitleaks-action@v2
-        env:
-          GITLEAKS_LICENSE: ${{ secrets.GITLEAKS_LICENSE }}
+      # O binário, não a action: `gitleaks-action@v2` exige licença paga para
+      # organizações e falha antes de varrer qualquer coisa. O gitleaks em si
+      # é open source, e é ele que a cláusula 8ª pede.
+      - run: |
+          curl -sSfL -o gitleaks.tar.gz \
+            "https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSAO}/gitleaks_${GITLEAKS_VERSAO}_linux_x64.tar.gz"
+          tar -xzf gitleaks.tar.gz gitleaks
+          ./gitleaks version
+      - run: ./gitleaks git --redact --no-banner --exit-code 1 .
 
   terraform-lint:
     name: "Terraform Validate"

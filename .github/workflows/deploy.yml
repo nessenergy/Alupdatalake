@@ -1,83 +1,83 @@
 name: Deploy GCP
 
 on:
- workflow_dispatch:
- inputs:
- environment:
- description: 'Ambiente de deploy'
- required: true
- type: choice
- options:
- - dev
- - prod
- module:
- description: 'Módulo a deployar'
- required: true
- type: choice
- options:
- - all
- - infra
- - connectors
- - dags
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Ambiente de deploy'
+        required: true
+        type: choice
+        options:
+          - dev
+          - prod
+      module:
+        description: 'Módulo a deployar'
+        required: true
+        type: choice
+        options:
+          - all
+          - infra
+          - connectors
+          - dags
 
 permissions:
- contents: read
- id-token: write
+  contents: read
+  id-token: write
 
 jobs:
- terraform:
- name: "️ Terraform (${{ inputs.environment }})"
- if: inputs.module == 'all' || inputs.module == 'infra'
- runs-on: ubuntu-latest
- environment: ${{ inputs.environment }}
- steps:
- - uses: actions/checkout@v4
- - uses: hashicorp/setup-terraform@v3
- - uses: google-github-actions/auth@v2
- with:
- # Workload Identity Federation: nenhuma chave JSON de service account
- # no repositorio ou nos secrets do GitHub.
- workload_identity_provider: ${{ vars.GCP_WIF_PROVIDER }}
- service_account: ${{ vars.GCP_DEPLOY_SA }}
- - run: |
- cd infra
- terraform init
- terraform plan -var-file="environments/${{ inputs.environment }}.tfvars" \
- -var="imagem_ingestao=${{ vars.IMAGEM_INGESTAO }}:latest" -out=tfplan
- terraform apply tfplan
+  terraform:
+    name: "Terraform (${{ inputs.environment }})"
+    if: inputs.module == 'all' || inputs.module == 'infra'
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
+      - uses: google-github-actions/auth@v2
+        with:
+          # Workload Identity Federation: nenhuma chave JSON de service account
+          # no repositório ou nos secrets do GitHub.
+          workload_identity_provider: ${{ vars.GCP_WIF_PROVIDER }}
+          service_account: ${{ vars.GCP_DEPLOY_SA }}
+      - run: |
+          cd infra
+          terraform init
+          terraform plan -var-file="environments/${{ inputs.environment }}.tfvars" \
+            -var="imagem_ingestao=${{ vars.IMAGEM_INGESTAO }}:latest" -out=tfplan
+          terraform apply tfplan
 
- imagem:
- name: "Imagem da CLI (${{ inputs.environment }})"
- if: inputs.module == 'all' || inputs.module == 'connectors'
- runs-on: ubuntu-latest
- environment: ${{ inputs.environment }}
- steps:
- - uses: actions/checkout@v4
- - uses: google-github-actions/auth@v2
- with:
- workload_identity_provider: ${{ vars.GCP_WIF_PROVIDER }}
- service_account: ${{ vars.GCP_DEPLOY_SA }}
- - uses: google-github-actions/setup-gcloud@v2
- - run: gcloud auth configure-docker ${{ vars.GCP_REGION }}-docker.pkg.dev --quiet
- - run: |
- BASE="${{ vars.IMAGEM_INGESTAO }}"
- docker build -t "$BASE:${GITHUB_SHA::7}" -t "$BASE:latest" .
- docker push "$BASE:${GITHUB_SHA::7}"
- docker push "$BASE:latest"
- echo "publicada: $BASE:${GITHUB_SHA::7}"
+  imagem:
+    name: "Imagem da CLI (${{ inputs.environment }})"
+    if: inputs.module == 'all' || inputs.module == 'connectors'
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ vars.GCP_WIF_PROVIDER }}
+          service_account: ${{ vars.GCP_DEPLOY_SA }}
+      - uses: google-github-actions/setup-gcloud@v2
+      - run: gcloud auth configure-docker ${{ vars.GCP_REGION }}-docker.pkg.dev --quiet
+      - run: |
+          BASE="${{ vars.IMAGEM_INGESTAO }}"
+          docker build -t "$BASE:${GITHUB_SHA::7}" -t "$BASE:latest" .
+          docker push "$BASE:${GITHUB_SHA::7}"
+          docker push "$BASE:latest"
+          echo "publicada: $BASE:${GITHUB_SHA::7}"
 
- sync-dags:
- name: "Sync DAGs (${{ inputs.environment }})"
- if: inputs.module == 'all' || inputs.module == 'dags'
- runs-on: ubuntu-latest
- environment: ${{ inputs.environment }}
- steps:
- - uses: actions/checkout@v4
- - uses: google-github-actions/auth@v2
- with:
- # Workload Identity Federation: nenhuma chave JSON de service account
- # no repositorio ou nos secrets do GitHub.
- workload_identity_provider: ${{ vars.GCP_WIF_PROVIDER }}
- service_account: ${{ vars.GCP_DEPLOY_SA }}
- - uses: google-github-actions/setup-gcloud@v2
- - run: gsutil -m rsync -r -d dags/ gs://${{ vars.COMPOSER_BUCKET }}/dags/
+  sync-dags:
+    name: "Sync DAGs (${{ inputs.environment }})"
+    if: inputs.module == 'all' || inputs.module == 'dags'
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: google-github-actions/auth@v2
+        with:
+          # Workload Identity Federation: nenhuma chave JSON de service account
+          # no repositório ou nos secrets do GitHub.
+          workload_identity_provider: ${{ vars.GCP_WIF_PROVIDER }}
+          service_account: ${{ vars.GCP_DEPLOY_SA }}
+      - uses: google-github-actions/setup-gcloud@v2
+      - run: gsutil -m rsync -r -d dags/ gs://${{ vars.COMPOSER_BUCKET }}/dags/

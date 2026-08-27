@@ -66,7 +66,7 @@ ADRs 001–006 · 5 dicionários de dados · plano de execução · runbook de d
 
 | # | Item | Bloqueado por |
 |---|---|---|
-| N1 | Preparar contrato de dados das fontes das Ondas 2 e 3 | **inviável para 3 das 4 fontes** — ver §6 |
+| N1 | Preparar contrato de dados das fontes das Ondas 2 e 3 | **inviável para 3 das 4 fontes** — ver §5 |
 | N2 | Portal MVP: ligar contra o BigQuery e publicar no Cloud Run | escopo cravado na ADR 005; a tela existe e roda com provedor simulado — falta o ambiente GCP (A3) |
 | N3 | Primeiro `terraform apply` real e primeiro deploy da imagem | ambiente GCP (A3) |
 

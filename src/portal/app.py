@@ -22,7 +22,7 @@ from flask import Flask, Response, request
 from src.core.config import get_settings
 from src.core.observabilidade import configurar_logging
 from src.portal.dados import Painel, SaudeConector, SerieVolumetria, obter_provedor
-from src.portal.grafico import area, barras_custo, cor_do_conector, legenda_custo, tabela, usd
+from src.portal.grafico import _milhar, area, barras_custo, cor_do_conector, legenda_custo, tabela, usd
 
 if TYPE_CHECKING:
     from src.portal.custo import PainelCusto
@@ -223,11 +223,6 @@ def _duracao(minutos: int | None) -> str:
 
 def _pct(valor: float | None) -> str:
     return "—" if valor is None else f"{valor * 100:.1f}%".replace(".", ",")
-
-
-def _milhar(valor: int) -> str:
-    """Separador de milhar brasileiro."""
-    return f"{valor:,}".replace(",", ".")
 
 
 def _cartao(c: SaudeConector, serie: SerieVolumetria | None, cor_serie: str) -> str:

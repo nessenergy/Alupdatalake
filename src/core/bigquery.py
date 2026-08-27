@@ -20,7 +20,7 @@ logger = logging.getLogger(__name__)
 TABELA_EXECUCOES = "_execucoes"
 
 
-def _cliente():
+def cliente():
     from google.cloud import bigquery  # import tardio
 
     return bigquery.Client(project=get_settings().gcp_project_id)
@@ -40,7 +40,7 @@ def carregar_bronze(execucao: Execucao, linhas: list[dict[str, Any]]) -> int:
 
     from google.cloud import bigquery
 
-    job = _cliente().load_table_from_json(
+    job = cliente().load_table_from_json(
         linhas,
         tabela,
         job_config=bigquery.LoadJobConfig(
@@ -66,7 +66,7 @@ def registrar_execucao(execucao: Execucao) -> None:
 
     tabela = f"{cfg.gcp_project_id}.{cfg.bq_dataset_bronze}.{TABELA_EXECUCOES}"
     try:
-        erros = _cliente().insert_rows_json(tabela, [execucao.to_row()])
+        erros = cliente().insert_rows_json(tabela, [execucao.to_row()])
         if erros:
             logger.error("falha ao registrar execução em %s: %s", tabela, erros)
     except Exception as exc:  # noqa: BLE001 — log de controle nunca derruba a ingestão

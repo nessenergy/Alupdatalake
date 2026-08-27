@@ -19,7 +19,8 @@ from typing import Any
 
 from flask import Flask, Response, request
 from src.core.config import get_settings
-from src.portal.dados import Painel, SaudeConector, obter_provedor
+from src.portal.dados import Painel, SaudeConector, SerieVolumetria, obter_provedor
+from src.portal.grafico import area, cor_do_conector, tabela
 
 app = Flask(__name__)
 
@@ -41,10 +42,15 @@ def lake() -> Response:
     Escopo em `docs/arquitetura/decisoes/006-painel-de-saude.md`.
     """
     cfg = get_settings()
-    conectores = obter_provedor().saude()
+    provedor = obter_provedor()
     usuario = _usuario(request.headers.get(CABECALHO_IDENTIDADE))
     return Response(
-        _pagina_lake(conectores, usuario, simulado=cfg.portal_provedor != "bigquery"),
+        _pagina_lake(
+            provedor.saude(),
+            provedor.volumetria(),
+            usuario,
+            simulado=cfg.portal_provedor != "bigquery",
+        ),
         mimetype="text/html",
     )
 
@@ -70,11 +76,12 @@ def _celula(valor: Any) -> str:
     return html.escape(str(valor))
 
 
+# Cores de estado são reservadas: nunca reaproveitadas como cor de série.
 SITUACOES = {
-    "OK": ("#1F9D55", "em dia"),
-    "ATRASADA": ("#C9A227", "atrasada"),
-    "FALHA_RECENTE": ("#D2492A", "falha na última execução"),
-    "SEM_SUCESSO": ("#8A94A0", "nunca teve sucesso"),
+    "OK": ("var(--good)", "em dia"),
+    "ATRASADA": ("var(--warning)", "atrasada"),
+    "FALHA_RECENTE": ("var(--critical)", "falha na última execução"),
+    "SEM_SUCESSO": ("var(--idle)", "nunca teve sucesso"),
 }
 
 
@@ -98,10 +105,15 @@ def _milhar(valor: int) -> str:
     return f"{valor:,}".replace(",", ".")
 
 
-def _cartao(c: SaudeConector) -> str:
-    cor, rotulo = SITUACOES.get(c.situacao, ("#8A94A0", c.situacao))
+def _cartao(c: SaudeConector, serie: SerieVolumetria | None, cor_serie: str) -> str:
+    cor, rotulo = SITUACOES.get(c.situacao, ("var(--idle)", c.situacao))
     p95 = "—" if c.duracao_p95_seg is None else f"{c.duracao_p95_seg:.0f}s"
     erro = f'<p class="erro">{html.escape(c.ultimo_erro)}</p>' if c.ultimo_erro else ""
+    grafico = (
+        f'<figure class="figura"><figcaption>Linhas por dia · 30 dias</figcaption>{area(serie, cor_serie)}</figure>'
+        if serie and any(serie.linhas)
+        else ""
+    )
     return f"""<article class="cartao">
   <div class="topo"><span class="ponto" style="background:{cor}"></span>
     <strong>{html.escape(c.conector)}</strong></div>
@@ -112,19 +124,34 @@ def _cartao(c: SaudeConector) -> str:
     <div><dt>Linhas carregadas</dt><dd>{_milhar(c.linhas_carregadas_total)}</dd></div>
     <div><dt>Duração p95</dt><dd>{p95}</dd></div>
   </dl>
+  {grafico}
   {erro}
 </article>"""
 
 
-def _pagina_lake(conectores: list[SaudeConector], usuario: str, *, simulado: bool) -> str:
+def _pagina_lake(
+    conectores: list[SaudeConector],
+    series: list[SerieVolumetria],
+    usuario: str,
+    *,
+    simulado: bool,
+) -> str:
     atrasados = [c for c in conectores if c.situacao != "OK"]
+    por_conector = {s.conector: s for s in series}
+    ordem = sorted(por_conector)
     resumo = (
         f"{len(conectores) - len(atrasados)} de {len(conectores)} conectores em dia"
         if conectores
         else "Nenhum conector executou ainda"
     )
 
-    cartoes = "".join(_cartao(c) for c in conectores)
+    cartoes = "".join(
+        _cartao(c, por_conector.get(c.conector), cor_do_conector(c.conector, ordem))
+        if c.conector in ordem
+        else _cartao(c, None, "#8A94A0")
+        for c in conectores
+    )
+    total_linhas = sum(s.total for s in series)
 
     aviso = (
         '<p class="aviso">Dados de exemplo — o ambiente GCP ainda não existe (pendência A3).</p>' if simulado else ""
@@ -134,32 +161,76 @@ def _pagina_lake(conectores: list[SaudeConector], usuario: str, *, simulado: boo
 <html lang="pt-BR"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>AlupData — saúde do DataLake</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600
+&family=Zilla+Slab:wght@500;600&display=swap">
 <style>
- body{{font-family:system-ui,-apple-system,Segoe UI,Arial,sans-serif;
-       color:#2B333B;margin:0;padding:40px;background:#fff}}
- header{{display:flex;justify-content:space-between;align-items:baseline;
-         border-bottom:2px solid #00ADE8;padding-bottom:12px}}
- h1{{font-size:22px;margin:0;letter-spacing:-.02em}}
- .quem{{font-size:13px;color:#5A6473}}
- .resumo{{font-size:15px;margin:22px 0 4px;font-weight:500}}
- .aviso{{background:#FFF4E5;border-left:3px solid #C9A227;padding:12px 16px;font-size:14px}}
- .grade{{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;margin-top:20px}}
- .cartao{{border:1px solid #E4E8EC;border-radius:6px;padding:16px}}
- .topo{{display:flex;align-items:center;gap:8px;font-size:15px}}
- .ponto{{width:10px;height:10px;border-radius:50%;flex:none}}
- .estado{{font-size:13px;color:#5A6473;margin:6px 0 14px}}
- dl{{display:grid;grid-template-columns:1fr 1fr;gap:10px 16px;margin:0}}
- dt{{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#8A94A0;margin:0}}
- dd{{margin:2px 0 0;font-size:15px;font-variant-numeric:tabular-nums}}
- .erro{{margin:14px 0 0;font-size:12.5px;color:#D2492A;word-break:break-word}}
- footer{{margin-top:28px;font-size:13px;color:#5A6473}}
- a{{color:#0090C4}}
+ /* Tokens no formato do shadcn/ui, com a paleta do alup.io.
+    Sem React e sem build: a ADR 005 mantém o Portal renderizado no servidor. */
+ :root{{
+   --background:#fcfcfb; --foreground:#212121;
+   --card:#ffffff; --card-foreground:#212121;
+   --muted:#f4f4f4; --muted-foreground:#6b6675;
+   --border:#e6e3ea; --ring:#520042;
+   --primary:#520042; --primary-foreground:#ffffff;
+   --radius:.6rem;
+   --good:#0E8A6B; --warning:#B26A00; --critical:#C2185B; --idle:#8A94A0;
+ }}
+ *{{box-sizing:border-box}}
+ body{{font-family:'Hanken Grotesk',system-ui,-apple-system,Segoe UI,Arial,sans-serif;
+   color:var(--foreground);background:var(--background);margin:0;
+   padding:clamp(24px,4vw,48px);-webkit-font-smoothing:antialiased}}
+ header{{display:flex;justify-content:space-between;align-items:baseline;gap:16px;
+   border-bottom:1px solid var(--border);padding-bottom:16px}}
+ h1{{font-family:'Zilla Slab',Georgia,serif;font-weight:600;font-size:clamp(20px,2.4vw,27px);
+   margin:0;letter-spacing:-.01em}}
+ .quem{{font-size:13px;color:var(--muted-foreground)}}
+ .cabeca-secao{{display:flex;justify-content:space-between;align-items:baseline;
+   flex-wrap:wrap;gap:8px;margin:26px 0 2px}}
+ .resumo{{font-size:16px;font-weight:600;margin:0}}
+ .muted{{font-size:13px;color:var(--muted-foreground);margin:0;font-variant-numeric:tabular-nums}}
+ .aviso{{background:#fff8ec;border:1px solid #f0dcb8;border-radius:var(--radius);
+   padding:12px 16px;font-size:14px;margin-top:20px}}
+ .grade{{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));
+   gap:16px;margin-top:16px}}
+ .cartao{{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+   padding:18px 18px 14px;display:flex;flex-direction:column}}
+ .topo{{display:flex;align-items:center;gap:8px;font-size:15px;letter-spacing:-.01em}}
+ .topo strong{{font-weight:600}}
+ .ponto{{width:8px;height:8px;border-radius:50%;flex:none}}
+ .estado{{font-size:12.5px;color:var(--muted-foreground);margin:6px 0 16px}}
+ dl{{display:grid;grid-template-columns:1fr 1fr;gap:12px 16px;margin:0}}
+ dt{{font-size:10.5px;letter-spacing:.07em;text-transform:uppercase;
+   color:var(--muted-foreground);margin:0}}
+ dd{{margin:3px 0 0;font-size:16px;font-variant-numeric:tabular-nums;letter-spacing:-.01em}}
+ .figura{{margin:18px 0 0}}
+ .figura figcaption{{font-size:10.5px;letter-spacing:.07em;text-transform:uppercase;
+   color:var(--muted-foreground);margin-bottom:6px}}
+ .grafico{{width:100%;height:64px;display:block;overflow:visible}}
+ .erro{{margin:14px 0 0;font-size:12.5px;color:var(--critical);word-break:break-word}}
+ .tabela{{margin-top:26px;border:1px solid var(--border);border-radius:var(--radius);
+   background:var(--card)}}
+ .tabela summary{{cursor:pointer;padding:12px 16px;font-size:14px;font-weight:500}}
+ .rolagem{{overflow-x:auto;padding:0 16px 16px}}
+ .tabela table{{border-collapse:collapse;font-size:12.5px;font-variant-numeric:tabular-nums}}
+ .tabela th,.tabela td{{padding:6px 10px;text-align:right;white-space:nowrap;
+   border-bottom:1px solid var(--border)}}
+ .tabela thead th{{text-align:right;color:var(--muted-foreground);font-weight:500}}
+ .tabela tbody th{{text-align:left;font-weight:500}}
+ .tabela .total{{font-weight:600}}
+ footer{{margin-top:28px;font-size:12.5px;color:var(--muted-foreground)}}
+ a{{color:var(--primary)}}
 </style></head>
 <body>
 <header><h1>AlupData · saúde do DataLake</h1><span class="quem">{html.escape(usuario)}</span></header>
 {aviso}
-<p class="resumo">{resumo}</p>
+<div class="cabeca-secao">
+  <p class="resumo">{resumo}</p>
+  <p class="muted">{_milhar(total_linhas)} linhas carregadas nos últimos 30 dias</p>
+</div>
 <div class="grade">{cartoes}</div>
+{tabela(series)}
 <footer>Atraso é medido contra a cadência da própria fonte, não contra um limite fixo.
  · <a href="/">ver dado de negócio</a></footer>
 </body></html>"""

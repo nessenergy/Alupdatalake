@@ -70,6 +70,37 @@ Silver. O teste que garante "Gold lê da Silver" foi ajustado para permitir
 exatamente esse caso e proibir a mistura: uma view de monitoramento não pode
 juntar log de execução com dado de negócio.
 
+## Decisão — visual do shadcn, paleta do alup.io, sem React
+
+O painel adota o **sistema visual** do shadcn/ui — os mesmos tokens
+(`--background`, `--card`, `--muted-foreground`, `--border`, `--radius`), o
+mesmo desenho de cartão e a mesma escala tipográfica — implementado em CSS puro.
+A biblioteca em si é React: adotá-la significaria build, bundler e deploy
+separado, contra a ADR 005, para desenhar cartões e uma área de 30 pontos.
+
+A paleta vem do site institucional da Alup (`alup.io`): roxo `#520042`, azul
+`#1863dc`, cinzas `#f4f4f4`/`#e6e3ea`, texto `#212121`, com Zilla Slab nos
+títulos e Hanken Grotesk no corpo — as mesmas fontes do site.
+
+As cores de **série** (`#8B2A78 #1863dc #0E8A6B #B26A00 #C2185B`) passaram nos
+seis checks do validador de paleta: banda de luminosidade, croma, separação para
+daltonismo (ΔE 9,5 no pior par adjacente), piso de visão normal e contraste com
+a superfície. A cor segue o conector, atribuída em ordem alfabética estável —
+filtrar não repinta quem sobrou.
+
+As cores de **estado** (em dia / atrasada / falha / sem sucesso) são reservadas e
+nunca reaproveitadas como cor de série, e sempre acompanham um rótulo em texto:
+a situação nunca é comunicada só por cor.
+
+## Decisão — série temporal em SVG do servidor
+
+Linhas carregadas por dia, 30 dias, uma área por conector, gerada no servidor.
+Cinco séries de 30 pontos não justificam biblioteca de gráficos, bundler e build.
+Cada dia carrega um `<title>` — que o navegador mostra no hover e o leitor de
+tela anuncia — e a página traz a mesma informação em tabela, que é a exigência
+de acessibilidade de qualquer gráfico. A área tem baseline em zero: área com
+eixo truncado mente sobre a proporção.
+
 ## Consequências
 
 - Não é escopo faturado da Fase 1: é ferramenta da ness. para tornar a

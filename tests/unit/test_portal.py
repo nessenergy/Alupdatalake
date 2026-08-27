@@ -116,7 +116,10 @@ def test_lake_formata_numero_para_leitura_humana(cliente) -> None:
 
 
 def test_lake_sem_conector_nao_quebra(cliente, monkeypatch: pytest.MonkeyPatch) -> None:
-    monkeypatch.setattr("src.portal.app.obter_provedor", lambda: type("P", (), {"saude": lambda _s: []})())
+    monkeypatch.setattr(
+        "src.portal.app.obter_provedor",
+        lambda: type("P", (), {"saude": lambda _s: [], "volumetria": lambda _s, dias=30: []})(),
+    )
     corpo = cliente.get("/lake").get_data(as_text=True)
     assert "Nenhum conector executou ainda" in corpo
 
@@ -125,7 +128,50 @@ def test_lake_escapa_mensagem_de_erro(cliente, monkeypatch: pytest.MonkeyPatch) 
     from src.portal.dados import SaudeConector
 
     ruim = SaudeConector("x", "OK", None, None, None, None, None, 0, None, "<img src=x onerror=alert(1)>")
-    monkeypatch.setattr("src.portal.app.obter_provedor", lambda: type("P", (), {"saude": lambda _s: [ruim]})())
+    monkeypatch.setattr(
+        "src.portal.app.obter_provedor",
+        lambda: type("P", (), {"saude": lambda _s: [ruim], "volumetria": lambda _s, dias=30: []})(),
+    )
     corpo = cliente.get("/lake").get_data(as_text=True)
     assert "<img" not in corpo
     assert "&lt;img" in corpo
+
+
+def test_lake_desenha_serie_temporal_por_conector(cliente) -> None:
+    corpo = cliente.get("/lake").get_data(as_text=True)
+    assert corpo.count("<polyline") == 4  # os 4 com dado; hubspot sem token não desenha
+    assert "Linhas por dia · 30 dias" in corpo
+    assert "linhas carregadas nos últimos 30 dias" in corpo
+
+
+def test_grafico_tem_alternativa_em_texto(cliente) -> None:
+    corpo = cliente.get("/lake").get_data(as_text=True)
+    assert "Ver os números em tabela" in corpo
+    assert "25.263" in corpo  # o pico semanal da ANEEL aparece na tabela
+
+
+def test_cor_da_serie_segue_o_conector_nao_a_posicao() -> None:
+    from src.portal.grafico import cor_do_conector
+
+    ordem = ["aneel_siga", "bcb_cambio_ptax", "hubspot_negocios", "ibge_ipca", "ons_carga"]
+    antes = cor_do_conector("ons_carga", ordem)
+    assert cor_do_conector("ons_carga", ordem) == antes
+    assert cor_do_conector("aneel_siga", ordem) != antes
+
+
+def test_ponto_do_grafico_tem_rotulo_para_hover_e_leitor_de_tela() -> None:
+    from src.portal.dados import ProvedorSimulado
+    from src.portal.grafico import area
+
+    serie = next(s for s in ProvedorSimulado().volumetria() if s.conector == "aneel_siga")
+    svg = area(serie, "#8B2A78")
+    assert svg.count("<title>") == len(serie.linhas)
+    assert "25.263 linhas" in svg
+    assert 'aria-label="aneel_siga: 101.052 linhas em 30 dias"' in svg
+
+
+def test_area_de_serie_vazia_nao_quebra() -> None:
+    from src.portal.dados import SerieVolumetria
+    from src.portal.grafico import area
+
+    assert "<polyline" not in area(SerieVolumetria("x", [], []), "#8B2A78")

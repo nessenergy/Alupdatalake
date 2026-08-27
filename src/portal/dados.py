@@ -9,7 +9,7 @@ from __future__ import annotations
 
 import re
 from dataclasses import dataclass
-from datetime import UTC, datetime
+from datetime import UTC, date, datetime, timedelta
 from decimal import Decimal
 from typing import Any, Protocol
 
@@ -43,9 +43,23 @@ class SaudeConector:
     ultimo_erro: str | None
 
 
+@dataclass(frozen=True)
+class SerieVolumetria:
+    """Linhas carregadas por dia, de um conector — `gold.volumetria_lake`."""
+
+    conector: str
+    dias: list[date]
+    linhas: list[int]
+
+    @property
+    def total(self) -> int:
+        return sum(self.linhas)
+
+
 class ProvedorDados(Protocol):
     def painel(self, view: str) -> Painel: ...
     def saude(self) -> list[SaudeConector]: ...
+    def volumetria(self, dias: int = 30) -> list[SerieVolumetria]: ...
 
 
 class ProvedorSimulado:
@@ -116,6 +130,36 @@ class ProvedorSimulado:
             ),
         ]
 
+    def volumetria(self, dias: int = 30) -> list[SerieVolumetria]:
+        """Séries determinísticas: mesma entrada, mesmo desenho — teste não oscila."""
+        fim = date(2026, 8, 26)
+        calendario = [fim - timedelta(days=i) for i in reversed(range(dias))]
+        perfis = {
+            # (base, amplitude, período) — formas distintas para a tela mostrar
+            "bcb_cambio_ptax": (3, 1, 7),
+            "ons_carga": (28, 9, 7),
+            "aneel_siga": (0, 0, 0),  # cadastro semanal: pico isolado
+            "ibge_ipca": (0, 0, 0),  # mensal: um ponto só
+            "hubspot_negocios": (0, 0, 0),  # sem token: série vazia
+        }
+        series = []
+        for conector, (base, amplitude, periodo) in perfis.items():
+            if conector == "aneel_siga":
+                linhas = [25_263 if dia.weekday() == 0 else 0 for dia in calendario]
+            elif conector == "ibge_ipca":
+                linhas = [12 if dia.day == 12 else 0 for dia in calendario]
+            elif conector == "hubspot_negocios":
+                linhas = [0] * dias
+            else:
+                linhas = [
+                    max(0, base + round(amplitude * ((i % periodo) - periodo / 2) / periodo * 2))
+                    if dia.weekday() < 5
+                    else 0
+                    for i, dia in enumerate(calendario)
+                ]
+            series.append(SerieVolumetria(conector, calendario, linhas))
+        return series
+
 
 NOME_VALIDO = re.compile(r"[a-z][a-z0-9_]{2,62}")
 
@@ -184,6 +228,26 @@ class ProvedorBigQuery:
                 ultimo_erro=linha.ultimo_erro,
             )
             for linha in linhas
+        ]
+
+    def volumetria(self, dias: int = 30) -> list[SerieVolumetria]:
+        from google.cloud import bigquery  # import tardio
+
+        cfg = get_settings()
+        cliente = bigquery.Client(project=cfg.gcp_project_id)
+        linhas = cliente.query(
+            f"SELECT conector, dia, linhas_carregadas "  # noqa: S608
+            f"FROM `{cfg.gcp_project_id}.{cfg.bq_dataset_gold}.volumetria_lake` "
+            "WHERE dia >= DATE_SUB(CURRENT_DATE(), INTERVAL @dias DAY) ORDER BY conector, dia",
+            job_config=bigquery.QueryJobConfig(query_parameters=[bigquery.ScalarQueryParameter("dias", "INT64", dias)]),
+        ).result()
+
+        por_conector: dict[str, list[tuple[date, int]]] = {}
+        for linha in linhas:
+            por_conector.setdefault(linha.conector, []).append((linha.dia, linha.linhas_carregadas or 0))
+        return [
+            SerieVolumetria(conector, [d for d, _ in pontos], [v for _, v in pontos])
+            for conector, pontos in por_conector.items()
         ]
 
 

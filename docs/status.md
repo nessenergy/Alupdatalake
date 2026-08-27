@@ -4,8 +4,8 @@ Atualizado em **2026-08-27** · `main` em `129f579`
 
 Este arquivo responde "onde estamos e o que trava o próximo passo". Detalhe de
 escopo e estimativa fica em [`plano-execucao.md`](plano-execucao.md); o que sai
-em cada semana, em [`plano-semanal.md`](plano-semanal.md); o relatório para a
-contratante, em [`relatorio-situacao-2026-08-27.md`](relatorio-situacao-2026-08-27.md);
+em cada semana, em [`plano-semanal.md`](plano-semanal.md); os relatórios emitidos
+para a contratante, em [`relatorios/`](relatorios/);
 contexto para agentes, em [`../AGENTS.md`](../AGENTS.md).
 
 ---

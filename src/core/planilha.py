@@ -38,7 +38,6 @@ class TemplatePlanilha:
     encoding: str = "utf-8-sig"  # lê com e sem BOM
     linha_cabecalho: int = 1  # 1-based; > 1 quando há título acima
     aba: str | None = None  # None = primeira aba
-    decimal_brasileiro: bool = True
     colunas_decimais: frozenset[str] = field(default_factory=frozenset)
 
 
@@ -95,7 +94,7 @@ def _montar(linha: list[Any], posicoes: dict[int, str], template: TemplatePlanil
     registro: dict[str, Any] = {}
     for i, campo in posicoes.items():
         valor = _texto(linha[i]) if i < len(linha) else None
-        if valor is not None and template.decimal_brasileiro and campo in template.colunas_decimais:
+        if valor is not None and campo in template.colunas_decimais:
             valor = decimal_br(valor)
         registro[campo] = valor
     return registro

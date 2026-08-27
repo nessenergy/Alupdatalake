@@ -103,13 +103,13 @@ TESTE = '''"""Testes do conector {fonte}/{entidade} — sem rede."""
 
 import pytest
 
-from src.conectores.{modulo} import {classe}
+from src.conectores.{rotulo} import {classe}
 from src.core.execucao import Janela
 
 
 @pytest.fixture
 def conector(monkeypatch):
-    monkeypatch.setattr("src.conectores.{modulo}.criar_sessao", lambda: None)
+    monkeypatch.setattr("src.conectores.{rotulo}.criar_sessao", lambda: None)
     return {classe}()
 
 
@@ -169,23 +169,21 @@ def main(argv: list[str] | None = None) -> int:
 
     fonte, entidade = args.fonte.lower(), args.entidade.lower()
     rotulo = f"{fonte}_{entidade}"
-    modulo = rotulo
     classe = "".join(parte.capitalize() for parte in rotulo.split("_"))
     ctx = {
         "fonte": fonte,
         "entidade": entidade,
         "rotulo": rotulo,
-        "modulo": modulo,
         "classe": classe,
         "fonte_titulo": fonte.upper(),
     }
 
     print(f"Conector {rotulo}:")
-    escrever(RAIZ / "src" / "conectores" / f"{modulo}.py", CONECTOR.format(**ctx))
+    escrever(RAIZ / "src" / "conectores" / f"{rotulo}.py", CONECTOR.format(**ctx))
     escrever(RAIZ / "sql" / "bronze" / f"{rotulo}.sql", BRONZE.format(**ctx))
     escrever(RAIZ / "sql" / "silver" / f"{rotulo}.sql", SILVER.format(**ctx))
     escrever(RAIZ / "sql" / "gold" / f"{rotulo}.sql", GOLD.format(**ctx))
-    escrever(RAIZ / "tests" / "unit" / "conectores" / f"test_{modulo}.py", TESTE.format(**ctx))
+    escrever(RAIZ / "tests" / "unit" / "conectores" / f"test_{rotulo}.py", TESTE.format(**ctx))
     escrever(RAIZ / "docs" / "dicionario-dados" / f"{rotulo}.md", DICIONARIO.format(**ctx))
     print("\nFaltam os componentes 06 (agendamento) e a implementação — ver skill `conector-alupdata`.")
     return 0

@@ -13,6 +13,7 @@ from datetime import UTC, date, datetime, timedelta
 from decimal import Decimal
 from typing import Any, Protocol
 
+from src.core.bigquery import cliente
 from src.core.config import get_settings
 from src.portal.custo import (
     BYTES_POR_LINHA,
@@ -52,7 +53,7 @@ class SaudeConector:
     taxa_invalidas: float | None
     linhas_carregadas_total: int
     duracao_p95_seg: float | None
-    ultimo_erro: str | None
+    ultimo_erro: str | None = None
 
 
 @dataclass(frozen=True)
@@ -111,13 +112,14 @@ class ProvedorSimulado:
         )
 
     def saude(self) -> list[SaudeConector]:
-        def linha(conector, situacao, sucesso, minutos, intervalo, taxa, invalidas, linhas, p95, erro=None):
-            return SaudeConector(conector, situacao, sucesso, minutos, intervalo, taxa, invalidas, linhas, p95, erro)
-
         return [
-            linha("bcb_cambio_ptax", "OK", datetime(2026, 8, 26, 9, 0, tzinfo=UTC), 95, 1440, 1.0, 0.0, 1_284, 4.2),
-            linha("ons_carga", "OK", datetime(2026, 8, 26, 8, 2, tzinfo=UTC), 153, 1440, 0.97, 0.004, 8_930, 11.8),
-            linha(
+            SaudeConector(
+                "bcb_cambio_ptax", "OK", datetime(2026, 8, 26, 9, 0, tzinfo=UTC), 95, 1440, 1.0, 0.0, 1_284, 4.2
+            ),
+            SaudeConector(
+                "ons_carga", "OK", datetime(2026, 8, 26, 8, 2, tzinfo=UTC), 153, 1440, 0.97, 0.004, 8_930, 11.8
+            ),
+            SaudeConector(
                 "aneel_siga",
                 "ATRASADA",
                 datetime(2026, 8, 17, 7, 0, tzinfo=UTC),
@@ -128,8 +130,10 @@ class ProvedorSimulado:
                 75_789,
                 31.4,
             ),
-            linha("ibge_ipca", "OK", datetime(2026, 8, 12, 10, 0, tzinfo=UTC), 20_315, 43_200, 1.0, 0.0, 72, 2.1),
-            linha(
+            SaudeConector(
+                "ibge_ipca", "OK", datetime(2026, 8, 12, 10, 0, tzinfo=UTC), 20_315, 43_200, 1.0, 0.0, 72, 2.1
+            ),
+            SaudeConector(
                 "hubspot_negocios",
                 "SEM_SUCESSO",
                 None,
@@ -147,31 +151,25 @@ class ProvedorSimulado:
         """Séries determinísticas: mesma entrada, mesmo desenho — teste não oscila."""
         fim = date(2026, 8, 26)
         calendario = [fim - timedelta(days=i) for i in reversed(range(dias))]
-        perfis = {
-            # (base, amplitude, período) — formas distintas para a tela mostrar
-            "bcb_cambio_ptax": (3, 1, 7),
-            "ons_carga": (28, 9, 7),
-            "aneel_siga": (0, 0, 0),  # cadastro semanal: pico isolado
-            "ibge_ipca": (0, 0, 0),  # mensal: um ponto só
-            "hubspot_negocios": (0, 0, 0),  # sem token: série vazia
+        # (base, amplitude, período) — só as séries diárias; as outras três têm
+        # forma própria logo abaixo.
+        diarios = {"bcb_cambio_ptax": (3, 1, 7), "ons_carga": (28, 9, 7)}
+
+        def onda(base: int, amplitude: int, periodo: int) -> list[int]:
+            return [
+                max(0, base + round(amplitude * ((i % periodo) - periodo / 2) / periodo * 2))
+                if dia.weekday() < 5
+                else 0
+                for i, dia in enumerate(calendario)
+            ]
+
+        linhas_por_conector = {
+            **{conector: onda(*perfil) for conector, perfil in diarios.items()},
+            "aneel_siga": [25_263 if dia.weekday() == 0 else 0 for dia in calendario],  # cadastro semanal
+            "ibge_ipca": [12 if dia.day == 12 else 0 for dia in calendario],  # mensal: um ponto só
+            "hubspot_negocios": [0] * dias,  # sem token: série vazia
         }
-        series = []
-        for conector, (base, amplitude, periodo) in perfis.items():
-            if conector == "aneel_siga":
-                linhas = [25_263 if dia.weekday() == 0 else 0 for dia in calendario]
-            elif conector == "ibge_ipca":
-                linhas = [12 if dia.day == 12 else 0 for dia in calendario]
-            elif conector == "hubspot_negocios":
-                linhas = [0] * dias
-            else:
-                linhas = [
-                    max(0, base + round(amplitude * ((i % periodo) - periodo / 2) / periodo * 2))
-                    if dia.weekday() < 5
-                    else 0
-                    for i, dia in enumerate(calendario)
-                ]
-            series.append(SerieVolumetria(conector, calendario, linhas))
-        return series
+        return [SerieVolumetria(conector, calendario, linhas) for conector, linhas in linhas_por_conector.items()]
 
     # Quanto cada camada varre, como fração do que está acumulado em Bronze.
     # A Silver varre a partição do dia; a Gold e o Portal varrem histórico.
@@ -332,9 +330,9 @@ class ProvedorBigQuery:
         from google.cloud import bigquery  # import tardio
 
         cfg = get_settings()
-        cliente = bigquery.Client(project=cfg.gcp_project_id)
+        bq = cliente()
 
-        resultado = cliente.query(
+        resultado = bq.query(
             f"SELECT * FROM `{cfg.gcp_project_id}.{cfg.bq_dataset_gold}.{view}` LIMIT @limite",  # noqa: S608  # nosec B608
             job_config=bigquery.QueryJobConfig(
                 query_parameters=[bigquery.ScalarQueryParameter("limite", "INT64", cfg.portal_limite_linhas)]
@@ -345,7 +343,7 @@ class ProvedorBigQuery:
 
         execucao = next(
             iter(
-                cliente.query(
+                bq.query(
                     f"SELECT fonte, encerrada_em FROM `{cfg.gcp_project_id}.{cfg.bq_dataset_bronze}._execucoes` "  # noqa: S608  # nosec B608
                     "WHERE status = 'SUCESSO' ORDER BY encerrada_em DESC LIMIT 1"
                 ).result()
@@ -362,13 +360,14 @@ class ProvedorBigQuery:
         )
 
     def saude(self) -> list[SaudeConector]:
-        from google.cloud import bigquery  # import tardio
-
         cfg = get_settings()
-        cliente = bigquery.Client(project=cfg.gcp_project_id)
-        linhas = cliente.query(
-            f"SELECT * FROM `{cfg.gcp_project_id}.{cfg.bq_dataset_gold}.saude_ingestao` ORDER BY conector"  # noqa: S608  # nosec B608
-        ).result()
+        linhas = (
+            cliente()
+            .query(
+                f"SELECT * FROM `{cfg.gcp_project_id}.{cfg.bq_dataset_gold}.saude_ingestao` ORDER BY conector"  # noqa: S608  # nosec B608
+            )
+            .result()
+        )
         return [
             SaudeConector(
                 conector=linha.conector,
@@ -389,13 +388,18 @@ class ProvedorBigQuery:
         from google.cloud import bigquery  # import tardio
 
         cfg = get_settings()
-        cliente = bigquery.Client(project=cfg.gcp_project_id)
-        linhas = cliente.query(
-            f"SELECT conector, dia, linhas_carregadas "  # noqa: S608  # nosec B608
-            f"FROM `{cfg.gcp_project_id}.{cfg.bq_dataset_gold}.volumetria_lake` "
-            "WHERE dia >= DATE_SUB(CURRENT_DATE(), INTERVAL @dias DAY) ORDER BY conector, dia",
-            job_config=bigquery.QueryJobConfig(query_parameters=[bigquery.ScalarQueryParameter("dias", "INT64", dias)]),
-        ).result()
+        linhas = (
+            cliente()
+            .query(
+                f"SELECT conector, dia, linhas_carregadas "  # noqa: S608  # nosec B608
+                f"FROM `{cfg.gcp_project_id}.{cfg.bq_dataset_gold}.volumetria_lake` "
+                "WHERE dia >= DATE_SUB(CURRENT_DATE(), INTERVAL @dias DAY) ORDER BY conector, dia",
+                job_config=bigquery.QueryJobConfig(
+                    query_parameters=[bigquery.ScalarQueryParameter("dias", "INT64", dias)]
+                ),
+            )
+            .result()
+        )
 
         por_conector: dict[str, list[tuple[date, int]]] = {}
         for linha in linhas:

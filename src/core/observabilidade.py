@@ -28,14 +28,9 @@ if TYPE_CHECKING:
 
 _contexto: ContextVar[dict[str, str] | None] = ContextVar("contexto_log", default=None)
 
-# Cloud Logging espera estes nomes; o resto do payload é livre.
-_SEVERIDADE = {
-    "DEBUG": "DEBUG",
-    "INFO": "INFO",
-    "WARNING": "WARNING",
-    "ERROR": "ERROR",
-    "CRITICAL": "CRITICAL",
-}
+# Os níveis do logging já são os nomes que o Cloud Logging espera; nível
+# customizado, fora desta lista, cai em DEFAULT.
+_SEVERIDADES = frozenset({"DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"})
 
 FORMATO_TEXTO = "%(asctime)s | %(name)s | %(levelname)s | %(message)s"
 
@@ -45,7 +40,7 @@ class FormatadorJson(logging.Formatter):
 
     def format(self, record: logging.LogRecord) -> str:
         payload: dict[str, Any] = {
-            "severity": _SEVERIDADE.get(record.levelname, "DEFAULT"),
+            "severity": record.levelname if record.levelname in _SEVERIDADES else "DEFAULT",
             "message": record.getMessage(),
             "logger": record.name,
             **(_contexto.get() or {}),

@@ -16,6 +16,7 @@ import html
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
+    from src.portal.custo import CustoDia
     from src.portal.dados import SerieVolumetria
 
 # Ordem fixa: a cor segue o conector, nunca a posição na lista. Filtrar não
@@ -84,3 +85,80 @@ def tabela(series: list[SerieVolumetria]) -> str:
         f"<div class='rolagem'><table><thead><tr><th>Conector</th>{cabecalho}<th>Total</th></tr></thead>"
         f"<tbody>{corpo}</tbody></table></div></details>"
     )
+
+
+# Composição do gasto: cor por natureza de custo, não por fonte. São escalas
+# diferentes e não podem compartilhar paleta com as séries de volumetria.
+CORES_CUSTO = {
+    "query": ("#1863dc", "Consulta"),
+    "armazenamento": ("#0E8A6B", "Armazenamento"),
+    "compute": ("#B26A00", "Compute"),
+}
+
+LARGURA_BARRAS = 720
+ALTURA_BARRAS = 132
+
+
+def usd(valor: object) -> str:
+    """Dólar no formato brasileiro, com casas suficientes para o valor não sumir.
+
+    Duas casas escondem a conta de um lake pequeno: quase tudo vira US$ 0,00 e
+    a tela passa a impressão de que não há o que olhar.
+    """
+    numero = float(valor)
+    casas = 2 if abs(numero) >= 1 else 4
+    return f"US$ {numero:,.{casas}f}".replace(",", "\x00").replace(".", ",").replace("\x00", ".")
+
+
+def barras_custo(dias: list[CustoDia]) -> str:
+    """Barras empilhadas por dia: quanto se gastou e em quê.
+
+    Empilhada porque a pergunta é de composição — "o que puxou a conta hoje" —
+    e não de comparação entre séries. Baseline em zero, como toda barra.
+    """
+    if not dias:
+        return ""
+
+    teto = max((float(d.total_usd) for d in dias), default=0.0) or 1.0
+    largura_barra = LARGURA_BARRAS / len(dias)
+    util = ALTURA_BARRAS - 4
+
+    barras = []
+    for i, dia in enumerate(dias):
+        x = i * largura_barra
+        y = float(ALTURA_BARRAS)
+        pedacos = []
+        for chave in ("query", "armazenamento", "compute"):
+            valor = float(getattr(dia, f"{chave}_usd"))
+            if valor <= 0:
+                continue
+            altura = valor / teto * util
+            y -= altura
+            cor, _ = CORES_CUSTO[chave]
+            pedacos.append(
+                f'<rect x="{x + largura_barra * 0.15:.1f}" y="{y:.1f}" '
+                f'width="{largura_barra * 0.7:.1f}" height="{altura:.1f}" fill="{cor}"/>'
+            )
+        rotulo = (
+            f"{dia.dia.strftime('%d/%m')} · {usd(dia.total_usd)} "
+            f"(consulta {usd(dia.query_usd)}, armazenamento {usd(dia.armazenamento_usd)})"
+        )
+        barras.append(
+            "".join(pedacos) + f'<rect x="{x:.1f}" y="0" width="{largura_barra:.1f}" height="{ALTURA_BARRAS}" '
+            f'fill="transparent"><title>{html.escape(rotulo)}</title></rect>'
+        )
+
+    legenda = " · ".join(f"{nome}" for _, (_, nome) in CORES_CUSTO.items())
+    return (
+        f'<svg viewBox="0 0 {LARGURA_BARRAS} {ALTURA_BARRAS}" class="grafico grafico-alto" role="img" '
+        f'aria-label="Custo diário empilhado por natureza: {html.escape(legenda)}. '
+        f'Maior dia: {html.escape(usd(teto))}." preserveAspectRatio="none">' + "".join(barras) + "</svg>"
+    )
+
+
+def legenda_custo() -> str:
+    """Legenda da composição — a cor precisa dizer o que significa."""
+    itens = "".join(
+        f'<li><span class="chave" style="background:{cor}"></span>{nome}</li>' for _, (cor, nome) in CORES_CUSTO.items()
+    )
+    return f'<ul class="legenda">{itens}</ul>'

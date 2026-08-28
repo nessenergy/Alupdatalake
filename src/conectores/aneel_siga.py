@@ -15,13 +15,14 @@ as fontes internas da Onda 3 não têm com o que cruzar.
 from __future__ import annotations
 
 import logging
-from decimal import Decimal, InvalidOperation
+from decimal import Decimal
 from typing import TYPE_CHECKING, Any
 
 from pydantic import BaseModel, field_validator
 
 from src.core.conector import Conector
 from src.core.http import criar_sessao, get_json
+from src.core.planilha import decimal_br
 from src.core.registry import registrar
 
 if TYPE_CHECKING:
@@ -37,21 +38,14 @@ logger = logging.getLogger(__name__)
 
 
 def _decimal_br(valor: str | None) -> Decimal | None:
-    """Converte número no formato brasileiro (1.400,00) para Decimal.
+    """Como `decimal_br`, mas número inválido vira None em vez de erro.
 
-    A ANEEL usa vírgula decimal e às vezes omite o inteiro (",00" = zero).
-    Campo vazio vira None — ausência de outorga não é potência zero.
+    A ANEEL publica campo sujo em cadastro de 25 mil linhas: descartar o
+    registro inteiro por causa de uma potência ilegível perderia o resto dele.
     """
-    if valor is None:
-        return None
-    texto = valor.strip().replace(".", "").replace(",", ".")
-    if texto in {"", "."}:
-        return None
-    if texto.startswith("."):
-        texto = "0" + texto
     try:
-        return Decimal(texto)
-    except InvalidOperation:
+        return decimal_br(valor)
+    except ValueError:
         return None
 
 

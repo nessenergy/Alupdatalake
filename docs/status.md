@@ -1,6 +1,6 @@
 # Estado do projeto
 
-Atualizado em **2026-08-27** · `main` em `129f579`
+Atualizado em **2026-08-28** · `main` em `b2e5510`
 
 Este arquivo responde "onde estamos e o que trava o próximo passo". Detalhe de
 escopo e estimativa fica em [`plano-execucao.md`](plano-execucao.md); o que sai
@@ -16,7 +16,7 @@ contexto para agentes, em [`../AGENTS.md`](../AGENTS.md).
 
 | Item | Onde | Verificação |
 |---|---|---|
-| Runner de ingestão (janela, raw no GCS, validação, colunas técnicas, carga, log) | `src/core/` | 170 testes, 92% de cobertura (suíte inteira) |
+| Runner de ingestão (janela, raw no GCS, validação, colunas técnicas, carga, log) | `src/core/` | 186 testes, 92% de cobertura (suíte inteira) |
 | CLI única (`alupdata listar` / `ingerir`) | `src/cli.py` | executada contra as 4 fontes |
 | Scaffolding dos 7 componentes | `make novo-conector` | usado nas fontes novas |
 | Deploy de views idempotente | `make deploy-views` | `--dry-run` conferido |
@@ -57,7 +57,7 @@ BigQuery de verdade — o projeto GCP ainda não existe.
 
 ### Documentação
 
-ADRs 001–006 · 5 dicionários de dados · plano de execução · runbook de deploy ·
+ADRs 001–007 · 5 dicionários de dados · plano de execução · runbook de deploy ·
 `AGENTS.md` como contexto canônico · skills do projeto e shortlist do Google.
 
 ---

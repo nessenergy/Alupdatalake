@@ -1,0 +1,477 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Questões Abertas do AlupData</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&display=swap">
+<style>
+  :root{
+    --cyan:#00ADE8; --cyan-escuro:#0090C4; --cyan-nevoa:#E5F6FD;
+    --tinta:#0E1116; --grafite:#2B333B; --cinza:#5A6473;
+    --linha:#E4E8EC; --linha-forte:#C7D2DE; --nevoa:#EEF3F8; --branco:#FFFFFF;
+
+    --ground:#FFFFFF; --surface:#F7FAFC; --ink:#0E1116; --body:#2B333B;
+    --muted:#5A6473; --rule:#E4E8EC; --rule-strong:#C7D2DE;
+    --accent:#00ADE8; --accent-deep:#0090C4; --accent-wash:#E5F6FD;
+    --ok:#0E7C63; --atencao:#9A5B00; --critico:#A3202C;
+    --ok-wash:#E6F4F0; --atencao-wash:#FBF1E2; --critico-wash:#FBECEE;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --ground:#0E1116; --surface:#161B22; --ink:#F2F5F8; --body:#C6CEd8;
+      --muted:#8B96A5; --rule:#242C36; --rule-strong:#38424E;
+      --accent:#3FC4F2; --accent-deep:#7FD8F7; --accent-wash:#10222C;
+      --ok:#4FCFAA; --atencao:#E0A64B; --critico:#F2848F;
+      --ok-wash:#10231F; --atencao-wash:#2A2114; --critico-wash:#2B1518;
+    }
+  }
+  :root[data-theme="dark"]{
+    --ground:#0E1116; --surface:#161B22; --ink:#F2F5F8; --body:#C6CED8;
+    --muted:#8B96A5; --rule:#242C36; --rule-strong:#38424E;
+    --accent:#3FC4F2; --accent-deep:#7FD8F7; --accent-wash:#10222C;
+    --ok:#4FCFAA; --atencao:#E0A64B; --critico:#F2848F;
+    --ok-wash:#10231F; --atencao-wash:#2A2114; --critico-wash:#2B1518;
+  }
+
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:var(--ground); color:var(--body);
+    font-family:"Montserrat","Helvetica Neue",Arial,sans-serif;
+    font-weight:400; font-size:16px; line-height:1.62;
+    -webkit-font-smoothing:antialiased;
+  }
+  .page{max-width:60rem; margin:0 auto; padding:0 clamp(1.25rem,4vw,3.5rem) 6rem}
+
+  /* ---- cabeçalho ---- */
+  .topbar{
+    display:flex; align-items:center; justify-content:space-between; gap:1rem;
+    padding:1.5rem 0 1.1rem; border-bottom:1px solid var(--rule);
+    max-width:60rem; margin:0 auto; padding-inline:clamp(1.25rem,4vw,3.5rem);
+  }
+  .wordmark{height:1.15rem; width:auto; color:var(--ink)}
+  .topbar .doc{font-size:.72rem; letter-spacing:.13em; text-transform:uppercase; color:var(--muted)}
+
+  /* ---- capa ---- */
+  .cover{padding:clamp(3rem,7vw,5rem) 0 clamp(2.5rem,5vw,3.5rem)}
+  .eyebrow{
+    font-size:.74rem; letter-spacing:.16em; text-transform:uppercase;
+    color:var(--accent-deep); font-weight:500; margin:0 0 1.4rem;
+  }
+  .eyebrow::before{
+    content:""; display:block; width:2.5rem; height:2px;
+    background:var(--accent); margin-bottom:1.1rem;
+  }
+  h1{
+    font-size:clamp(2.1rem,5.4vw,3.1rem); line-height:1.1; font-weight:600;
+    letter-spacing:-.025em; color:var(--ink); margin:0 0 1.5rem;
+    text-wrap:balance; max-width:22ch;
+  }
+  .lede{font-size:clamp(1.02rem,1.9vw,1.16rem); color:var(--body); max-width:60ch; margin:0}
+  .lede b{font-weight:600; color:var(--ink)}
+
+  dl.meta{
+    display:grid; grid-template-columns:repeat(auto-fit,minmax(11rem,1fr));
+    gap:1.5rem 2rem; margin:2.75rem 0 0; padding-top:1.75rem;
+    border-top:1px solid var(--rule);
+  }
+  dl.meta dt{
+    font-size:.7rem; letter-spacing:.13em; text-transform:uppercase;
+    color:var(--muted); margin-bottom:.4rem;
+  }
+  dl.meta dd{margin:0; font-size:.95rem; font-weight:500; color:var(--ink)}
+
+  /* ---- placar ---- */
+  .placar{
+    display:grid; grid-template-columns:repeat(auto-fit,minmax(13rem,1fr));
+    gap:1px; background:var(--rule); border:1px solid var(--rule);
+    margin:3.5rem 0 0;
+  }
+  .placar > div{background:var(--surface); padding:1.5rem 1.4rem}
+  .placar .n{
+    font-size:2.4rem; font-weight:600; line-height:1; color:var(--ink);
+    letter-spacing:-.03em; font-variant-numeric:tabular-nums;
+  }
+  .placar .n.alerta{color:var(--critico)}
+  .placar .r{font-size:.85rem; color:var(--muted); margin-top:.6rem; line-height:1.45}
+
+  /* ---- seções ---- */
+  section{margin-top:clamp(3.5rem,7vw,5rem)}
+  h2{
+    display:flex; align-items:baseline; gap:.85rem; margin:0 0 .35rem;
+    font-size:clamp(1.35rem,2.6vw,1.6rem); font-weight:500;
+    letter-spacing:-.015em; color:var(--ink); text-wrap:balance;
+  }
+  h2 .num{
+    font-size:.82rem; font-weight:600; color:var(--accent);
+    letter-spacing:.08em; font-variant-numeric:tabular-nums; flex:none;
+  }
+  .rule{height:1px; background:var(--rule); margin:.9rem 0 1.75rem}
+  h3{
+    font-size:.95rem; font-weight:500; color:var(--accent-deep);
+    margin:2.25rem 0 .75rem; letter-spacing:.005em;
+  }
+  h3::before{content:"▸ "; color:var(--accent)}
+  p{margin:0 0 1.1rem; max-width:66ch}
+  p:last-child{margin-bottom:0}
+  strong{font-weight:600; color:var(--ink)}
+  a{color:var(--accent-deep); text-decoration:underline; text-underline-offset:2px;
+    text-decoration-thickness:1px; text-decoration-color:var(--rule-strong)}
+  a:hover{text-decoration-color:var(--accent)}
+  a:focus-visible{outline:2px solid var(--accent); outline-offset:2px; border-radius:2px}
+
+  ul{margin:0 0 1.1rem; padding-left:1.15rem; max-width:66ch}
+  ul li{margin-bottom:.5rem; padding-left:.2rem}
+  ul li::marker{color:var(--accent)}
+
+  /* ---- tabelas ---- */
+  .scroll{overflow-x:auto; margin:0 0 1.25rem; -webkit-overflow-scrolling:touch}
+  table{border-collapse:collapse; width:100%; min-width:38rem; font-size:.9rem}
+  thead th{
+    background:var(--ink); color:var(--ground); font-weight:500; text-align:left;
+    padding:.7rem .85rem; font-size:.72rem; letter-spacing:.1em; text-transform:uppercase;
+    white-space:nowrap;
+  }
+  tbody td{padding:.8rem .85rem; border-bottom:1px solid var(--rule); vertical-align:top}
+  tbody tr:last-child td{border-bottom:1px solid var(--rule-strong)}
+  td.cod{font-weight:600; color:var(--ink); white-space:nowrap; font-variant-numeric:tabular-nums}
+  td.prazo{white-space:nowrap; font-variant-numeric:tabular-nums; font-weight:500}
+  caption{caption-side:bottom; text-align:left; font-size:.8rem; color:var(--muted);
+    padding-top:.75rem; line-height:1.5}
+
+  .pill{
+    display:inline-block; font-size:.68rem; letter-spacing:.08em; text-transform:uppercase;
+    font-weight:600; padding:.2rem .5rem; border-radius:2px; white-space:nowrap;
+  }
+  .pill.crit{background:var(--critico-wash); color:var(--critico)}
+  .pill.aten{background:var(--atencao-wash); color:var(--atencao)}
+  .pill.ok{background:var(--ok-wash); color:var(--ok)}
+
+  /* ---- callout ---- */
+  .callout{
+    background:var(--accent-wash); border-left:3px solid var(--accent);
+    padding:1.15rem 1.35rem; margin:1.75rem 0; max-width:70ch;
+  }
+  .callout p{margin:0; font-size:.95rem}
+  .callout p + p{margin-top:.7rem}
+  .callout.crit{background:var(--critico-wash); border-left-color:var(--critico)}
+
+  /* ---- semanas ---- */
+  .semanas{display:grid; gap:1px; background:var(--rule); border:1px solid var(--rule)}
+  .semana{background:var(--surface); padding:1.4rem 1.5rem; display:grid;
+    grid-template-columns:7.5rem 1fr; gap:.4rem 1.75rem}
+  .semana .quando{font-variant-numeric:tabular-nums}
+  .semana .s{font-size:1.05rem; font-weight:600; color:var(--ink); letter-spacing:-.01em}
+  .semana .d{font-size:.78rem; color:var(--muted); margin-top:.15rem}
+  .semana .corpo p{font-size:.92rem; margin-bottom:.6rem}
+  .semana .corpo ul{font-size:.92rem; margin-bottom:.6rem}
+  .semana .marco{
+    font-size:.72rem; letter-spacing:.1em; text-transform:uppercase; font-weight:600;
+    color:var(--accent-deep); margin-top:.65rem;
+  }
+  @media (max-width:34rem){ .semana{grid-template-columns:1fr} }
+
+  footer{
+    margin-top:clamp(4rem,8vw,6rem); padding-top:1.5rem;
+    border-top:1px solid var(--rule); font-size:.8rem; color:var(--muted);
+    display:flex; flex-wrap:wrap; gap:.5rem 1.5rem; justify-content:space-between;
+  }
+</style>
+</head>
+<body>
+<header class="topbar">
+  <svg class="wordmark" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="1220.8" height="403.2" viewBox="0 0 1220.80 403.20">
+<g transform="translate(41.230,318.938) scale(0.44362,-0.44362)">
+<path transform="translate(0,0)" d="M594 305V0H498V294Q498 371 461.0 410.0Q424 449 355 449Q277 449 232.0 403.5Q187 358 187 273V0H91V530H183V450Q212 491 261.5 513.0Q311 535 374 535Q475 535 534.5 476.5Q594 418 594 305Z" fill="currentColor"/>
+<path transform="translate(681,0)" d="M568 233H138Q147 163 199.5 120.5Q252 78 330 78Q425 78 483 142L536 80Q500 38 446.5 16.0Q393 -6 327 -6Q243 -6 178.0 28.5Q113 63 77.5 125.0Q42 187 42 265Q42 342 76.5 404.0Q111 466 171.5 500.5Q232 535 308 535Q384 535 443.5 500.5Q503 466 536.5 404.0Q570 342 570 262Q570 251 568 233ZM138 302H478Q470 369 423.5 411.5Q377 454 308 454Q239 454 192.5 412.0Q146 370 138 302Z" fill="currentColor"/>
+<path transform="translate(1293,0)" d="M24 56 64 132Q99 107 149.0 92.0Q199 77 250 77Q376 77 376 149Q376 173 359.0 187.0Q342 201 316.5 207.5Q291 214 244 222Q180 232 139.5 245.0Q99 258 70.0 289.0Q41 320 41 376Q41 448 101.0 491.5Q161 535 262 535Q315 535 368.0 522.0Q421 509 455 487L414 411Q349 453 261 453Q200 453 168.0 433.0Q136 413 136 380Q136 354 154.0 339.0Q172 324 198.5 317.0Q225 310 273 301Q337 290 376.5 277.5Q416 265 444.0 235.0Q472 205 472 151Q472 79 410.5 36.5Q349 -6 243 -6Q178 -6 118.0 11.5Q58 29 24 56Z" fill="currentColor"/>
+<path transform="translate(1794,0)" d="M24 56 64 132Q99 107 149.0 92.0Q199 77 250 77Q376 77 376 149Q376 173 359.0 187.0Q342 201 316.5 207.5Q291 214 244 222Q180 232 139.5 245.0Q99 258 70.0 289.0Q41 320 41 376Q41 448 101.0 491.5Q161 535 262 535Q315 535 368.0 522.0Q421 509 455 487L414 411Q349 453 261 453Q200 453 168.0 433.0Q136 413 136 380Q136 354 154.0 339.0Q172 324 198.5 317.0Q225 310 273 301Q337 290 376.5 277.5Q416 265 444.0 235.0Q472 205 472 151Q472 79 410.5 36.5Q349 -6 243 -6Q178 -6 118.0 11.5Q58 29 24 56Z" fill="currentColor"/>
+<path transform="translate(2295,0)" d="M46 63Q46 92 66.0 111.5Q86 131 114 131Q142 131 161.0 112.0Q180 93 180 63Q180 33 160.5 13.5Q141 -6 114 -6Q86 -6 66.0 13.5Q46 33 46 63Z" fill="#00ADE8"/>
+</g></svg>
+  <span class="doc">Relatório de situação</span>
+</header>
+
+<div class="page">
+
+  <div class="cover">
+    <p class="eyebrow">AlupData Fase 1 · DataLake · 27 de agosto de 2026</p>
+    <h1>Questões abertas e o que esperamos entregar</h1>
+    <p class="lede">Todo o trabalho técnico que não depende de insumo da Alup está entregue e testado. O que falta para homologar a Onda 0 <b>não é código</b> — são onze decisões e provisionamentos que só a contratante pode fazer, e a primeira delas vence em <b>4 de setembro</b>.</p>
+
+    <dl class="meta">
+      <div><dt>Contrato</dt><dd>CPS-01025/2026</dd></div>
+      <div><dt>Escopo</dt><dd>580h · 19 semanas · 5 ondas</dd></div>
+      <div><dt>Execução</dt><dd>ness. Processos e Tecnologia</dd></div>
+      <div><dt>Próximo marco</dt><dd>Onda 0 · 15,52%</dd></div>
+    </dl>
+
+    <div class="placar">
+      <div>
+        <div class="n">5</div>
+        <div class="r">conectores com os 7 componentes da cláusula 2ª escritos e testados</div>
+      </div>
+      <div>
+        <div class="n">170</div>
+        <div class="r">testes automatizados passando, 92% de cobertura, CI verde</div>
+      </div>
+      <div>
+        <div class="n alerta">0</div>
+        <div class="r">linhas carregadas em produção — o ambiente Google Cloud ainda não existe</div>
+      </div>
+    </div>
+  </div>
+
+  <section>
+    <h2><span class="num">01</span> Onde o projeto está hoje</h2>
+    <div class="rule"></div>
+
+    <p>A fundação está construída: framework de ingestão, CLI, Terraform completo, CI/CD com os portões de segurança da cláusula 8ª (Bandit, pip-audit, Gitleaks), log estruturado com correlação por execução, alertas, painel de saúde do lake e o Portal MVP. Cinco fontes têm os sete componentes obrigatórios — BCB, IBGE, ANEEL, ONS e Hubspot.</p>
+
+    <p>Quatro dessas fontes foram verificadas em <em>dry-run</em> contra as APIs reais. A ANEEL trouxe 25.263 registros sem nenhum inválido em 28 segundos. O Hubspot é a exceção declarada: foi escrito contra a documentação pública e <strong>nunca falou com a API</strong>, porque não há token.</p>
+
+    <div class="callout crit">
+      <p><strong>A ressalva que governa tudo abaixo.</strong> Nada foi validado contra um Google Cloud real. Não houve nenhum <code>terraform apply</code>, nenhuma linha em BigQuery, nenhum job executado em nuvem. É no primeiro <em>apply</em> que aparecem os erros que teste local não pega — IAM insuficiente, cota de API, permissão de bucket, formato que o BigQuery recusa.</p>
+      <p>Por isso <strong>a Onda 0 não deve ser declarada homologada antes disso rodar</strong>, e por isso o item A3 abaixo é o único que realmente importa nesta semana.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2><span class="num">02</span> As onze questões abertas</h2>
+    <div class="rule"></div>
+
+    <p>Ordenadas pela data em que o atraso passa a custar, não por onda. Cada linha é uma pergunta que precisa de resposta de alguém nomeado — não um item de acompanhamento.</p>
+
+    <div class="scroll">
+      <table>
+        <thead>
+          <tr><th>#</th><th>A questão</th><th>Quem responde</th><th>Prazo</th><th>Se passar do prazo</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="cod">A3</td>
+            <td>O projeto GCP <code>dev</code> vai existir quando? Precisamos dele criado, com 10 APIs habilitadas, IAM, Workload Identity Federation, Artifact Registry e bucket de state.</td>
+            <td>Alup</td>
+            <td class="prazo"><span class="pill crit">04/09</span></td>
+            <td>Duas semanas inteiras de trabalho escorregam; a Onda 0 não homologa; passa a contar a cláusula 3ª</td>
+          </tr>
+          <tr>
+            <td class="cod">—</td>
+            <td>Quem ativa a proteção da branch <code>main</code> e cadastra as quatro variáveis do GitHub que o deploy exige?</td>
+            <td>ness. / Alup</td>
+            <td class="prazo"><span class="pill crit">04/09</span></td>
+            <td>O workflow de deploy falha na autenticação e a <code>main</code> segue aceitando push direto</td>
+          </tr>
+          <tr>
+            <td class="cod">A9</td>
+            <td>O token do Hubspot (private app) sai desta semana? Ele vai no secret <code>alupdata-hubspot-api-token</code>.</td>
+            <td>Alup</td>
+            <td class="prazo"><span class="pill aten">11/09</span></td>
+            <td>Um conector pronto continua parado; nenhuma linha de CRM entra no lake</td>
+          </tr>
+          <tr>
+            <td class="cod">A4</td>
+            <td>Quem responde as 47 perguntas do Questionário de Gaps, e até quando?</td>
+            <td>Alup</td>
+            <td class="prazo"><span class="pill aten">11/09</span></td>
+            <td>Sem ele os 8 domínios analíticos não se definem e a camada Gold fica sem alvo</td>
+          </tr>
+          <tr>
+            <td class="cod">A5</td>
+            <td>Quem é o <em>data owner</em> de cada domínio? Sem isso, dúvida de regra de negócio não tem destinatário.</td>
+            <td>Alup</td>
+            <td class="prazo"><span class="pill aten">11/09</span></td>
+            <td>Cada dúvida vira e-mail sem dono e atrasa a fonte inteira</td>
+          </tr>
+          <tr>
+            <td class="cod">A6</td>
+            <td>Qual é a ferramenta de BI definitiva? O Portal MVP e as views Gold precisam saber para quem entregam.</td>
+            <td>Alup</td>
+            <td class="prazo"><span class="pill aten">11/09</span></td>
+            <td>Modelagem da Gold sem consumidor definido — risco de retrabalho</td>
+          </tr>
+          <tr>
+            <td class="cod">—</td>
+            <td>Para quais e-mails os alertas devem tocar, e qual é a <code>billing_account</code> do orçamento?</td>
+            <td>Alup</td>
+            <td class="prazo"><span class="pill aten">11/09</span></td>
+            <td>Alertas e orçamento existem no Terraform mas não notificam ninguém</td>
+          </tr>
+          <tr>
+            <td class="cod">A2</td>
+            <td>A CCEE: liberamos o IP de saída, usamos credencial de agente, ou remanejamos as 32h por escrito?</td>
+            <td>Alup</td>
+            <td class="prazo"><span class="pill aten">18/09</span></td>
+            <td>32h seguem paradas e a dimensão <code>agente_ccee</code> continua sem origem</td>
+          </tr>
+          <tr>
+            <td class="cod">A7</td>
+            <td>Os pedidos de token (Onda 2) e de VPN com credencial read-only (Onda 3) já foram abertos internamente? Em que data?</td>
+            <td>Alup</td>
+            <td class="prazo"><span class="pill aten">25/09</span></td>
+            <td>É o único item que dispara cláusula financeira: ociosidade de 4h/dia, R$ 256/h</td>
+          </tr>
+          <tr>
+            <td class="cod">A8</td>
+            <td>A documentação técnica de BBCE e TempoOK pode vir antes do token? A Alup a tem, como contratante desses serviços.</td>
+            <td>Alup</td>
+            <td class="prazo"><span class="pill aten">25/09</span></td>
+            <td>A Onda 2 só começa depois do token, em vez de já chegar pronta como o Hubspot</td>
+          </tr>
+          <tr>
+            <td class="cod">—</td>
+            <td>Qual profundidade de histórico do ONS vamos carregar? Se for semi-horária com histórico longo, o custo de BigQuery muda de ordem de grandeza.</td>
+            <td>Alup / ness.</td>
+            <td class="prazo"><span class="pill ok">antes da 1ª carga</span></td>
+            <td>Decidir depois de carregar é caro: significa recarregar</td>
+          </tr>
+        </tbody>
+        <caption>Prazos derivados do plano semanal. Efeitos, da cláusula 3ª do contrato: atraso superior a 5 dias úteis posterga o cronograma; superior a 5 dias úteis em VPN ou credencial gera taxa de ociosidade; superior a 20 dias corridos suspende os serviços.</caption>
+      </table>
+    </div>
+
+    <div class="callout">
+      <p><strong>Sobre registro de atraso.</strong> A data de cada pedido precisa ser anotada no dia em que o atraso começa, não quando vira problema. É o que sustenta uma postergação, uma cobrança de ociosidade ou uma suspensão numa medição — e é do interesse das duas partes que esse registro exista antes de ser necessário.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2><span class="num">03</span> O que esperamos entregar, semana a semana</h2>
+    <div class="rule"></div>
+
+    <p>Cada semana tem duas trilhas: o que a ness. produz sozinha, e o insumo que precisa chegar para a semana seguinte existir. Da S2 em diante, tudo é condicional ao item A3.</p>
+
+    <div class="semanas">
+      <div class="semana">
+        <div class="quando"><div class="s">S1</div><div class="d">31/08 – 04/09</div></div>
+        <div class="corpo">
+          <p><strong>Ambiente e contrato de dados.</strong></p>
+          <ul>
+            <li>Repositório pronto para o primeiro <em>apply</em>: proteção de branch e variáveis do GitHub</li>
+            <li>Runbook do dia-1 do ambiente, com a ordem exata dos módulos e o que conferir em cada um</li>
+            <li>Roteiro de condução do Questionário de Gaps, agrupado por domínio e por quem responde</li>
+          </ul>
+        </div>
+      </div>
+      <div class="semana">
+        <div class="quando"><div class="s">S2</div><div class="d">07/09 – 11/09</div></div>
+        <div class="corpo">
+          <p><strong>Primeiro deploy real.</strong> Esta semana só existe se A3 tiver chegado.</p>
+          <ul>
+            <li><code>terraform apply</code> de verdade: datasets, bucket, secrets, IAM, job, agendador, monitoramento</li>
+            <li>Imagem publicada e primeira execução real — uma linha com <code>SUCESSO</code> em <code>bronze._execucoes</code></li>
+            <li>Views Silver e Gold das cinco fontes existindo em BigQuery</li>
+            <li>Hubspot rodado contra a API real, se o token tiver vindo</li>
+          </ul>
+        </div>
+      </div>
+      <div class="semana">
+        <div class="quando"><div class="s">S3</div><div class="d">14/09 – 18/09</div></div>
+        <div class="corpo">
+          <p><strong>Fechar a Onda 0.</strong></p>
+          <ul>
+            <li>Os 8 domínios analíticos definidos a partir das respostas do Questionário</li>
+            <li>Dimensões comuns Silver fechadas contra dado real, não contra <em>fixture</em></li>
+            <li>Portal MVP ligado no BigQuery e publicado com autenticação</li>
+            <li>BCB rodando sozinho por 3 dias consecutivos — o critério de aceite do item 0.14</li>
+          </ul>
+          <div class="marco">Marco · Onda 0 · 15,52% · R$ 23.040,00</div>
+        </div>
+      </div>
+      <div class="semana">
+        <div class="quando"><div class="s">S4</div><div class="d">21/09 – 25/09</div></div>
+        <div class="corpo">
+          <p><strong>Fechar a Onda 1 e abrir a 2.</strong></p>
+          <ul>
+            <li>Views Gold do domínio de mercado, agora com os 8 domínios como alvo</li>
+            <li>As quatro fontes públicas agendadas e monitoradas em produção</li>
+            <li>Dossiê de homologação, com a CCEE tratada conforme a decisão de A2</li>
+          </ul>
+          <div class="marco">Marco · Onda 1 · 20,69% · R$ 30.720,00</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2><span class="num">04</span> O que não depende de ninguém</h2>
+    <div class="rule"></div>
+
+    <p>Para não deixar dúvida sobre onde está o caminho crítico: a ness. já adiantou tudo o que era possível adiantar sem ambiente e sem credencial. O motor de planilhas da Onda 4 foi construído antes da hora porque não dependia de nada. O conector do Hubspot foi escrito às cegas contra a documentação pública, com o teste de integração desligado até o token chegar — quando ele vier, a tarefa é rodar e conferir, não começar.</p>
+
+    <p>O mesmo tratamento foi tentado com BBCE, TempoOK e CCEE, e <strong>não se sustenta</strong>: a CCEE responde 403 até na página de documentação, a BBCE não tem endpoint público e a TempoOK não publica contrato de API. Escrever schema por adivinhação seria pior que não escrever — cria retrabalho com aparência de progresso. É isso que torna o item A8 tão útil quanto o token em si.</p>
+
+    <p>Também foram entregues, fora do escopo faturado e dentro da possibilidade de sustentação: o painel de saúde do lake (frescor, confiabilidade e volumetria por conector) e a observabilidade estruturada com alertas de falha, de silêncio e de registros inválidos em alta.</p>
+  </section>
+
+  <section>
+    <h2><span class="num">05</span> Riscos, na ordem em que preocupam</h2>
+    <div class="rule"></div>
+
+    <div class="scroll">
+      <table>
+        <thead>
+          <tr><th>Risco</th><th>Impacto</th><th>O que estamos fazendo</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>VPN e credenciais da Onda 3 atrasam</td>
+            <td><span class="pill crit">Alto</span> 155h paradas e ociosidade de 4h/dia</td>
+            <td>Pedir na Onda 0, não na véspera; registrar data de pedido e de cobrança</td>
+          </tr>
+          <tr>
+            <td>O ambiente GCP não sai a tempo</td>
+            <td><span class="pill crit">Alto</span> nenhuma onda homologa</td>
+            <td>Issue #55 com o detalhamento e a estimativa de custo; prazo declarado em 04/09</td>
+          </tr>
+          <tr>
+            <td>Layout de CCEE ou ONS muda sem aviso</td>
+            <td><span class="pill aten">Alto</span> 60h em risco</td>
+            <td>Validação Pydantic transforma isso em erro visível; o bruto no GCS permite reprocessar sem rebater na fonte</td>
+          </tr>
+          <tr>
+            <td>Schema de sistema legado pior que o previsto</td>
+            <td><span class="pill aten">Médio-alto</span> realocação de horas</td>
+            <td>Regime de horas permite realocar; comunicar antes de estourar, não depois</td>
+          </tr>
+          <tr>
+            <td>Volume do ONS estoura o custo de BigQuery</td>
+            <td><span class="pill aten">Médio</span> custo recorrente da Alup</td>
+            <td>Particionamento sempre; decidir profundidade de histórico antes de carregar</td>
+          </tr>
+          <tr>
+            <td>O escopo do Portal MVP cresce</td>
+            <td><span class="pill aten">Médio</span> poço sem fundo</td>
+            <td>Escopo cravado por escrito na ADR 005; pedido novo vira proposta de aditivo</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <h2><span class="num">06</span> O que pedimos de decisão agora</h2>
+    <div class="rule"></div>
+
+    <p>Três coisas, em ordem. Nenhuma delas é técnica.</p>
+
+    <ul>
+      <li><strong>Uma data para o projeto GCP</strong>, com nome de quem provisiona. Não uma estimativa — uma data. Todo o resto do cronograma pendura nela.</li>
+      <li><strong>Uma data para o Questionário de Gaps</strong> e o nome de quem responde cada bloco. Ele não trava o deploy, mas trava a modelagem da camada Gold, que é o que a Alup efetivamente vai consumir.</li>
+      <li><strong>Abrir hoje os pedidos de token e de VPN</strong> das Ondas 2 e 3, mesmo que só sejam usados em outubro. É o item de maior risco financeiro do contrato e o único cujo prazo interno não controlamos.</li>
+    </ul>
+
+    <div class="callout">
+      <p><strong>O que gostaríamos de poder dizer na próxima reunião:</strong> que a Onda 0 está homologada com evidência de execução real, que a Onda 1 fechou com quatro fontes carregando sozinhas todo dia, e que a Onda 2 já tem conector escrito esperando credencial. Os três dependem de decisões desta semana, não de linhas de código.</p>
+    </div>
+  </section>
+
+  <footer>
+    <span>ness. Processos e Tecnologia · Contrato CPS-01025/2026</span>
+    <span>Documento confidencial · 27/08/2026</span>
+  </footer>
+
+</div>
+</body>
+</html>

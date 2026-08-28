@@ -1,0 +1,102 @@
+-- Gold: custo de nuvem por dia, fonte e camada.
+-- Responde "quanto o lake custou, em quê, e o que mudou" — matéria-prima é o
+-- log de jobs do próprio BigQuery, não dado de negócio. Mesma natureza da
+-- `saude_ingestao`: é a plataforma se observando.
+--
+-- Cobre a camada F1 do plano de FinOps: byte varrido e armazenamento, que são
+-- a maior parcela da conta do lake. Compute e serviços de terceiros só entram
+-- com o billing export (camada F2) — esta view não os enxerga e não finge que
+-- enxerga. Ver `docs/arquitetura/portal-finops.md`.
+--
+-- As tarifas são premissa declarada aqui, num lugar só. Quando a Alup fechar
+-- preço com desconto por uso comprometido, muda-se a constante — não a lógica.
+CREATE OR REPLACE VIEW `${projeto}.${gold}.custo_consultas` AS
+WITH tarifas AS (
+  SELECT
+    6.25 AS usd_por_tib_varrido,
+    0.020 AS usd_por_gib_mes_ativo,
+    10 * 1024 * 1024 AS minimo_bytes_faturados
+),
+-- O rótulo é o que torna o custo atribuível. Job sem rótulo não some da conta:
+-- aparece como 'não rotulado', que é a única forma honesta de mostrá-lo.
+jobs AS (
+  SELECT
+    DATE(j.creation_time) AS dia,
+    IFNULL((SELECT value FROM UNNEST(j.labels) WHERE key = 'fonte'), 'não rotulado') AS fonte,
+    IFNULL((SELECT value FROM UNNEST(j.labels) WHERE key = 'camada'), 'não rotulado') AS camada,
+    IFNULL((SELECT value FROM UNNEST(j.labels) WHERE key = 'consulta'), j.statement_type) AS consulta,
+    GREATEST(IFNULL(j.total_bytes_billed, 0), (SELECT minimo_bytes_faturados FROM tarifas)) AS bytes_faturados,
+    IFNULL(j.total_bytes_processed, 0) AS bytes_varridos
+  FROM `${projeto}.region-us`.INFORMATION_SCHEMA.JOBS_BY_PROJECT AS j
+  WHERE j.job_type = 'QUERY'
+    AND j.state = 'DONE'
+    AND j.error_result IS NULL
+    AND j.creation_time >= TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL 90 DAY)
+),
+consultas AS (
+  SELECT
+    dia,
+    fonte,
+    camada,
+    consulta,
+    COUNT(*) AS execucoes,
+    SUM(bytes_varridos) AS bytes_varridos,
+    SUM(bytes_faturados) / POW(1024, 4) * (SELECT usd_por_tib_varrido FROM tarifas) AS custo_query_usd
+  FROM jobs
+  GROUP BY dia, fonte, camada, consulta
+),
+-- Armazenamento é um retrato do momento, não uma série. Rateia-se por dia
+-- dividindo a tarifa mensal por 30 — aproximação assumida, e declarada.
+-- `TABLE_STORAGE` não carrega rótulo: a atribuição vem do nome da tabela, que
+-- é o nome da fonte por convenção do `make novo-conector`. Se a convenção
+-- mudar, esta é a linha que quebra — de propósito.
+armazenamento AS (
+  SELECT
+    s.table_name AS fonte,
+    SUM(s.active_logical_bytes) / POW(1024, 3)
+      * (SELECT usd_por_gib_mes_ativo FROM tarifas) / 30 AS custo_armazenamento_dia_usd
+  FROM `${projeto}.region-us`.INFORMATION_SCHEMA.TABLE_STORAGE AS s
+  WHERE s.table_schema = '${bronze}' AND NOT STARTS_WITH(s.table_name, '_')
+  GROUP BY fonte
+),
+-- Quanto cada fonte carregou no dia: é o denominador que separa "fonte cara"
+-- de "fonte cara à toa".
+carga AS (
+  SELECT
+    DATE(encerrada_em) AS dia,
+    CONCAT(fonte, '_', entidade) AS fonte,
+    SUM(IFNULL(linhas_carregadas, 0)) AS linhas_carregadas
+  FROM `${projeto}.${bronze}._execucoes`
+  WHERE status = 'SUCESSO' AND encerrada_em IS NOT NULL
+  GROUP BY dia, fonte
+)
+SELECT
+  c.dia,
+  c.fonte,
+  c.camada,
+  c.consulta,
+  c.execucoes,
+  c.bytes_varridos,
+  c.custo_query_usd,
+  IFNULL(a.custo_armazenamento_dia_usd, 0) AS custo_armazenamento_usd,
+  IFNULL(g.linhas_carregadas, 0) AS linhas_carregadas,
+  -- Desvio da consulta contra a média móvel dela mesma, em 7 dias. É o que
+  -- separa "esta consulta é cara" de "esta consulta ficou cara" — só a segunda
+  -- é acionável.
+  SAFE_DIVIDE(
+    c.custo_query_usd
+      - AVG(c.custo_query_usd) OVER (
+          PARTITION BY c.fonte, c.consulta ORDER BY c.dia
+          ROWS BETWEEN 7 PRECEDING AND 1 PRECEDING
+        ),
+    NULLIF(
+      AVG(c.custo_query_usd) OVER (
+        PARTITION BY c.fonte, c.consulta ORDER BY c.dia
+        ROWS BETWEEN 7 PRECEDING AND 1 PRECEDING
+      ),
+      0
+    )
+  ) AS variacao_vs_media
+FROM consultas AS c
+LEFT JOIN armazenamento AS a ON a.fonte = c.fonte
+LEFT JOIN carga AS g ON g.dia = c.dia AND g.fonte = c.fonte

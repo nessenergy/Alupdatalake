@@ -1,7 +1,7 @@
 .PHONY: install lint format test security audit all clean novo-conector deploy-views listar sync-skills
 
 install:
-	uv sync
+	uv sync --extra dev
 
 lint:
 	uv run ruff check src/ tests/ scripts/

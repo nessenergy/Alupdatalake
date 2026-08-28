@@ -5,7 +5,8 @@ Escopo em `docs/arquitetura/decisoes/005-escopo-do-portal-mvp.md`.
 
 from __future__ import annotations
 
-from datetime import UTC, datetime
+from datetime import UTC, date, datetime
+from decimal import Decimal
 
 import pytest
 from src.core.config import get_settings
@@ -175,3 +176,108 @@ def test_area_de_serie_vazia_nao_quebra() -> None:
     from src.portal.grafico import area
 
     assert "<polyline" not in area(SerieVolumetria("x", [], []), "#8B2A78")
+
+
+# --- custo de nuvem (rota /custo) -------------------------------------------
+
+
+def test_custo_traz_as_tres_visoes(cliente) -> None:
+    corpo = cliente.get("/custo").get_data(as_text=True)
+    assert "Operacional" in corpo
+    assert "Orçamento" in corpo
+    assert "Diretoria" in corpo
+
+
+def test_custo_rotula_o_dado_como_exemplo(cliente) -> None:
+    assert "Nenhum valor desta tela veio de uma fatura" in cliente.get("/custo").get_data(as_text=True)
+
+
+def test_fonte_que_nunca_carregou_nao_custa() -> None:
+    """Sem tabela não há o que varrer — o Hubspot está nesse estado (A9)."""
+    from src.portal.dados import ProvedorSimulado
+
+    fontes = {f.fonte: f for f in ProvedorSimulado().custo().fontes}
+    assert fontes["hubspot_negocios"].total_usd == 0
+    assert fontes["hubspot_negocios"].usd_por_milhao_de_linhas is None
+
+
+def test_custo_nao_e_arredondado_a_cada_dia() -> None:
+    """Trinta parcelas de meio centavo não podem virar trinta zeros."""
+    from src.portal.dados import ProvedorSimulado
+
+    painel = ProvedorSimulado().custo()
+    assert painel.total_usd > 0
+    assert all(dia.total_usd >= 0 for dia in painel.dias)
+    # se houvesse arredondamento por dia, a soma bateria exatamente em centavos
+    assert painel.total_usd != painel.total_usd.quantize(Decimal("0.01"))
+
+
+def test_minimo_faturado_por_consulta_vale_mesmo_varrendo_quase_nada() -> None:
+    from src.portal.custo import MINIMO_BYTES_FATURADOS, custo_de_query
+
+    assert custo_de_query(1) == custo_de_query(MINIMO_BYTES_FATURADOS)
+    assert custo_de_query(1, consultas=3) == custo_de_query(MINIMO_BYTES_FATURADOS * 3)
+
+
+def test_consultas_sao_ordenadas_por_custo_nao_por_byte() -> None:
+    """Com mínimo por consulta em vigor, varrer mais não é custar mais."""
+    from src.portal.dados import ProvedorSimulado
+
+    consultas = ProvedorSimulado().custo().consultas
+    assert [c.custo_usd for c in consultas] == sorted((c.custo_usd for c in consultas), reverse=True)
+    mais_varrida = max(consultas, key=lambda c: c.bytes_varridos)
+    assert mais_varrida is not consultas[0]
+
+
+def test_varredura_integral_e_marcada_como_anomala(cliente) -> None:
+    from src.portal.dados import ProvedorSimulado
+
+    anomalas = [c for c in ProvedorSimulado().custo().consultas if c.anomala]
+    assert [c.fonte for c in anomalas] == ["aneel_siga"]
+    assert "varredura integral" in cliente.get("/custo").get_data(as_text=True)
+
+
+def test_orcamento_projeta_o_fechamento_do_mes() -> None:
+    from src.portal.custo import Orcamento
+
+    o = Orcamento(date(2026, 8, 1), Decimal("100"), Decimal("50"), dias_decorridos=10, dias_do_mes=30)
+    assert o.projetado_usd == Decimal("150")
+    assert o.estoura
+
+
+def test_orcamento_sem_dia_decorrido_nao_divide_por_zero() -> None:
+    from src.portal.custo import Orcamento
+
+    o = Orcamento(date(2026, 8, 1), Decimal("100"), Decimal("0"), dias_decorridos=0, dias_do_mes=30)
+    assert o.projetado_usd == 0
+    assert not o.estoura
+
+
+def test_dominio_de_negocio_e_provisorio_ate_o_questionario_de_gaps(cliente) -> None:
+    from src.portal.dados import ProvedorSimulado
+
+    dominios = dict(ProvedorSimulado().custo().por_dominio)
+    assert "Macroeconomia" in dominios  # BCB + IBGE
+    assert "provisório" in cliente.get("/custo").get_data(as_text=True)
+
+
+def test_valor_pequeno_nao_vira_zero_na_formatacao() -> None:
+    from src.portal.grafico import usd
+
+    assert usd(Decimal("0.0068")) == "US$ 0,0068"
+    assert usd(Decimal("1234.5")) == "US$ 1.234,50"
+
+
+def test_grafico_de_custo_vazio_nao_quebra() -> None:
+    from src.portal.grafico import barras_custo
+
+    assert barras_custo([]) == ""
+
+
+def test_cada_barra_do_custo_tem_rotulo_para_leitor_de_tela() -> None:
+    from src.portal.dados import ProvedorSimulado
+    from src.portal.grafico import barras_custo
+
+    svg = barras_custo(ProvedorSimulado().custo().dias)
+    assert svg.count("<title>") == 30
+    assert "US$" in svg

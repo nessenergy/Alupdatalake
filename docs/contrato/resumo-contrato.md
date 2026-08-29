@@ -36,26 +36,32 @@ Prestação de serviços especializados de **arquitetura, modelagem e engenharia
 
 ## Cronograma — Ondas de Desenvolvimento (Cláusula 4ª)
 
-**Duração total estimada: 19 semanas**
+**Kickoff: 27/08/2026 · Duração total estimada: 19 semanas · Término previsto: 08/01/2027**
 
-| Onda | Nome | Semanas | Horas | Atividades-chave |
-|------|------|---------|-------|-------------------|
-| **0** | Fundação & Arquitetura | 2 | 90h | Mapeamento de fontes, 8 domínios analíticos, arquitetura Medallion, dimensões comuns Silver, CI/CD, portal base com auth |
-| **1** | Inteligência de Mercado Base | 5 | 120h | Conectores para APIs públicas (sem credencial Alup), tabelas Bronze, views Silver/Gold |
-| **2** | Modelos Preditivos & APIs com Credenciais | 4 | 110h | Conectores dependentes de credenciais/contratos da Alup |
-| **3** | Sistemas Internos | 5 | 155h | Conectores para bancos internos e sistemas corporativos (FMB Oracle, Portal Alup MySQL/NoSQL, RM/TOTVS, etc.) |
-| **4** | Planilhas, Fontes Pendentes, Governança & Handoff | 3 | 105h | Motor de ingestão "S2 Data Intake" (CSV/XLSX), Dataplex, views Gold KPIs, documentação final, handoff |
+Jornada em período comercial (seg–sex). Datas de término = data-alvo de homologação da onda.
+
+| Onda | Nome | Início | Término | Semanas | Horas | Atividades-chave |
+|------|------|--------|---------|---------|-------|-------------------|
+| **0** | Fundação & Arquitetura | 31/08/2026 | 11/09/2026 | 2 | 90h | Mapeamento de fontes, 8 domínios analíticos, arquitetura Medallion, dimensões comuns Silver, CI/CD, portal base com auth |
+| **1** | Inteligência de Mercado Base | 14/09/2026 | 16/10/2026 | 5 | 120h | Conectores para APIs públicas (sem credencial Alup), tabelas Bronze, views Silver/Gold |
+| **2** | Modelos Preditivos & APIs com Credenciais | 19/10/2026 | 13/11/2026 | 4 | 110h | Conectores dependentes de credenciais/contratos da Alup |
+| **3** | Sistemas Internos | 16/11/2026 | 18/12/2026 | 5 | 155h | Conectores para bancos internos e sistemas corporativos (FMB Oracle, Portal Alup MySQL/NoSQL, RM/TOTVS, etc.) |
+| **4** | Planilhas, Fontes Pendentes, Governança & Handoff | 21/12/2026 | 08/01/2027 | 3 | 105h | Motor de ingestão "S2 Data Intake" (CSV/XLSX), Dataplex, views Gold KPIs, documentação final, handoff |
+
+> [!NOTE]
+> **Feriados no período** (não descontados das 19 semanas): 07/09, 12/10, 02/11, 20/11, 25/12/2026 e 01/01/2027.
+> A Onda 4 atravessa o recesso de fim de ano. Havendo recesso de 21/12/2026 a 01/01/2027, o término desloca para **22/01/2027**.
 
 ---
 
 ## Dependências Críticas da Contratante (Cláusula 3ª)
 
-| Quando | O que a Alup deve fornecer |
-|--------|---------------------------|
-| **Onda 0** | Questionário de Gaps (47 perguntas), RACI, data owners, definição de ferramenta BI |
-| **Até Onda 2** | Tokens/APIs: CCEE, BBCE, Hubspot, TempoOK |
-| **Até Onda 3** | VPN, credenciais read-only Oracle FMB, Portal Alup (MySQL/NoSQL/Storage), MySQL RDS Comercialização, endpoints RM/TOTVS |
-| **Até Onda 4** | Planilhas padronizadas sob templates definidos |
+| Quando | Prazo | O que a Alup deve fornecer |
+|--------|-------|---------------------------|
+| **Onda 0** | até 11/09/2026 | Questionário de Gaps (47 perguntas), RACI, data owners, definição de ferramenta BI |
+| **Até Onda 2** | até 19/10/2026 | Tokens/APIs: CCEE, BBCE, Hubspot, TempoOK |
+| **Até Onda 3** | até 16/11/2026 | VPN, credenciais read-only Oracle FMB, Portal Alup (MySQL/NoSQL/Storage), MySQL RDS Comercialização, endpoints RM/TOTVS |
+| **Até Onda 4** | até 21/12/2026 | Planilhas padronizadas sob templates definidos |
 
 > [!WARNING]
 > - Atraso > 5 dias úteis → cronograma postergado automaticamente
@@ -73,13 +79,13 @@ Prestação de serviços especializados de **arquitetura, modelagem e engenharia
 
 ### Faturamento por Marco
 
-| Marco | Meta | % | Valor |
-|-------|------|---|-------|
-| 1 | Homologação Onda 0 | 15,52% | R\$ 23.040,00 |
-| 2 | Homologação Onda 1 | 20,69% | R\$ 30.720,00 |
-| 3 | Homologação Onda 2 | 18,97% | R\$ 28.160,00 |
-| 4 | Homologação Onda 3 | 26,72% | R\$ 39.680,00 |
-| 5 | Homologação Onda 4 + Handoff | 18,10% | R\$ 26.880,00 |
+| Marco | Meta | Data-alvo | % | Valor |
+|-------|------|-----------|---|-------|
+| 1 | Homologação Onda 0 | 11/09/2026 | 15,52% | R\$ 23.040,00 |
+| 2 | Homologação Onda 1 | 16/10/2026 | 20,69% | R\$ 30.720,00 |
+| 3 | Homologação Onda 2 | 13/11/2026 | 18,97% | R\$ 28.160,00 |
+| 4 | Homologação Onda 3 | 18/12/2026 | 26,72% | R\$ 39.680,00 |
+| 5 | Homologação Onda 4 + Handoff | 08/01/2027 | 18,10% | R\$ 26.880,00 |
 
 ### Rateio entre Coligadas
 

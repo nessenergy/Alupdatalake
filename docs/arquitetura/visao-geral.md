@@ -52,7 +52,7 @@ Todas as views Silver compartilham estas dimensões para viabilizar cruzamentos:
 
 ## 8 Domínios Analíticos
 
-> A ser definido durante a Onda 0 (mapeamento de fontes de dados).
+> A ser definido durante a Onda 0 (mapeamento de fontes de dados) — até 11/09/2026.
 
 ## Stack Tecnológico
 

@@ -13,7 +13,23 @@
 | **Contratantes** | FGE, IJUI, FOZ, QUELUZ, LAVRINHAS, VERDE 08 (Grupo Alupar) |
 | **Contratada** | ness. Processos e Tecnologia |
 | **Horas** | 580h em 5 ondas (19 semanas) |
+| **Kickoff** | 27/08/2026 |
+| **Término previsto** | 08/01/2027 |
 | **Stack** | Python · BigQuery · Cloud Storage · Terraform · Cloud Composer |
+
+## Cronograma
+
+| Onda | Nome | Início | Término | Horas |
+|------|------|--------|---------|-------|
+| 0 | Fundação & Arquitetura | 31/08/2026 | 11/09/2026 | 90h |
+| 1 | Inteligência de Mercado Base | 14/09/2026 | 16/10/2026 | 120h |
+| 2 | Modelos Preditivos & APIs com Credenciais | 19/10/2026 | 13/11/2026 | 110h |
+| 3 | Sistemas Internos | 16/11/2026 | 18/12/2026 | 155h |
+| 4 | Planilhas, Governança & Handoff | 21/12/2026 | 08/01/2027 | 105h |
+
+Jornada em período comercial (seg–sex). Datas de término = data-alvo de homologação
+e de marco de faturamento. Detalhes e feriados:
+[Resumo do Contrato](docs/contrato/resumo-contrato.md#cronograma--ondas-de-desenvolvimento-cláusula-4ª).
 
 ## Trabalhando neste repositório com um agente
 
@@ -100,21 +116,21 @@ uv run alupdata ingerir ons_carga --de 2026-01-01 --ate 2026-01-31 --dry-run
 
 ## Conectores
 
-| Fonte | Onda | Tipo | Status |
-|-------|------|------|--------|
-| Câmbio BCB (PTAX) | 1 | API pública | **Concluído** |
-| IBGE (IPCA) | 1 | API pública | **Concluído** |
-| ANEEL (SIGA) | 1 | API pública | **Concluído** — fonte de `codigo_usina` |
-| ONS (carga diária) | 1 | Arquivo público | **Concluído** — fonte de `submercado` |
-| CCEE (InfoMercado) | 1 | API Pública | **Bloqueado** — portal responde 403 a acesso automatizado ([§3.1](docs/plano-execucao.md)) |
-| CCEE (Credenciado) | 2 | API Credenciada | Backlog |
-| BBCE | 2 | API Credenciada | Backlog |
-| Hubspot | 2 | API Credenciada | Backlog |
-| TempoOK | 2 | API Credenciada | Backlog |
-| Oracle FMB | 3 | Banco Interno | Backlog |
-| Portal Alup | 3 | Banco Interno | Backlog |
-| MySQL RDS | 3 | Banco Interno | Backlog |
-| RM/TOTVS | 3 | Sistema Interno | Backlog |
+| Fonte | Onda | Entrega até | Tipo | Status |
+|-------|------|-------------|------|--------|
+| Câmbio BCB (PTAX) | 1 | 16/10/2026 | API pública | **Concluído** |
+| IBGE (IPCA) | 1 | 16/10/2026 | API pública | **Concluído** |
+| ANEEL (SIGA) | 1 | 16/10/2026 | API pública | **Concluído** — fonte de `codigo_usina` |
+| ONS (carga diária) | 1 | 16/10/2026 | Arquivo público | **Concluído** — fonte de `submercado` |
+| CCEE (InfoMercado) | 1 | 16/10/2026 | API Pública | **Bloqueado** — portal responde 403 a acesso automatizado ([§3.1](docs/plano-execucao.md)) |
+| CCEE (Credenciado) | 2 | 13/11/2026 | API Credenciada | Backlog |
+| BBCE | 2 | 13/11/2026 | API Credenciada | Backlog |
+| Hubspot | 2 | 13/11/2026 | API Credenciada | Backlog |
+| TempoOK | 2 | 13/11/2026 | API Credenciada | Backlog |
+| Oracle FMB | 3 | 18/12/2026 | Banco Interno | Backlog |
+| Portal Alup | 3 | 18/12/2026 | Banco Interno | Backlog |
+| MySQL RDS | 3 | 18/12/2026 | Banco Interno | Backlog |
+| RM/TOTVS | 3 | 18/12/2026 | Sistema Interno | Backlog |
 
 ## Progresso por Onda
 

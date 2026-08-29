@@ -43,9 +43,7 @@ Reescreva a mensagem descrevendo o que mudou e por quê.
 def infracoes(texto: str) -> list[str]:
     """Linhas da mensagem que violam a regra, ignorando comentários do git."""
     return [
-        linha.strip()
-        for linha in texto.splitlines()
-        if not linha.lstrip().startswith("#") and PADRAO.search(linha)
+        linha.strip() for linha in texto.splitlines() if not linha.lstrip().startswith("#") and PADRAO.search(linha)
     ]
 
 

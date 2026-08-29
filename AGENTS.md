@@ -16,7 +16,7 @@ entrega não.
 Plano detalhado: `docs/plano-execucao.md`. Contrato resumido:
 `docs/contrato/resumo-contrato.md`.
 
-## As cinco regras que não se negociam
+## As seis regras que não se negociam
 
 1. **Toda fonte entrega 7 componentes** (cláusula 2ª): conector Python, tabela
    Bronze, view Silver, view Gold, testes, agendamento, documentação com
@@ -29,6 +29,14 @@ Plano detalhado: `docs/plano-execucao.md`. Contrato resumido:
    ROW_NUMBER()`). Toda tabela Bronze é particionada e clusterizada — sem isso
    o custo de BigQuery, que é da Alup, cresce por varredura completa.
 5. **Recurso GCP que não está em `infra/` não existe.** Nada de console.
+6. **Nada de atribuição a IA no que fica registrado.** Sem trailer
+   `Co-Authored-By` de ferramenta, sem assinatura do tipo "Generated with", sem
+   branch `claude/*` ou equivalente, sem menção a IA em commit, corpo de PR ou
+   documento entregue. O repositório é artefato do contrato CPS-01025/2026, cuja
+   cláusula 7ª trata de propriedade intelectual: co-autoria de terceiro no
+   histórico cria ambiguidade sobre titularidade. Nomeie branches pelo assunto
+   (`docs/…`, `feat/…`). Vale para agente e para humano. Verificado por
+   `scripts/verifica_atribuicao.py`, no hook `commit-msg` e no CI.
 
 ## Como escrever um conector
 

@@ -89,7 +89,7 @@ cd alupdatalake
 
 # Setup Python
 uv sync
-pre-commit install
+pre-commit install --hook-type pre-commit --hook-type commit-msg
 
 # Testes
 make test

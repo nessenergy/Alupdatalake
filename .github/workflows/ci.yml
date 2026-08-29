@@ -43,6 +43,23 @@ jobs:
           name: coverage-report
           path: coverage.xml
 
+  atribuicao:
+    name: "Commits sem atribuição a IA"
+    runs-on: ubuntu-latest
+    # Só em PR: na push para main os commits já passaram por aqui, e o
+    # histórico anterior à regra não deve reprovar builds novos.
+    if: github.event_name == 'pull_request'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      # Regra 6 (AGENTS.md). Repete o hook commit-msg local, que só roda para
+      # quem instalou `pre-commit install --hook-type commit-msg`.
+      - run: python scripts/verifica_atribuicao.py --demo
+      - run: |
+          python scripts/verifica_atribuicao.py --intervalo \
+            "origin/${{ github.base_ref }}..HEAD"
+
   sast:
     name: "SAST (Bandit)"
     runs-on: ubuntu-latest

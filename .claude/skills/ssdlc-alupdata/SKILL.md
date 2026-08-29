@@ -18,7 +18,8 @@ homologação da onda**, e homologação é o que dispara a medição.
 | Gitleaks | secret no código/histórico | pre-commit |
 
 `make all` roda lint + testes + Bandit + pip-audit. É o que se roda antes de
-abrir PR; `pre-commit install` garante Ruff/Bandit/Gitleaks a cada commit.
+abrir PR; `pre-commit install --hook-type pre-commit --hook-type commit-msg`
+garante Ruff/Bandit/Gitleaks a cada commit e a regra 6 na mensagem.
 
 ## Segredos
 

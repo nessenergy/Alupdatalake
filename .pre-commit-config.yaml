@@ -16,3 +16,14 @@ repos:
     rev: v8.21.2
     hooks:
       - id: gitleaks
+
+  # Regra 6 (AGENTS.md): o histórico é artefato contratual — sem atribuição a IA.
+  # Exige `pre-commit install --hook-type commit-msg`; o CI repete a checagem
+  # para quem não instalou os hooks.
+  - repo: local
+    hooks:
+      - id: sem-atribuicao-ia
+        name: "Commit sem atribuição a ferramenta de IA"
+        entry: python scripts/verifica_atribuicao.py
+        language: system
+        stages: [commit-msg]

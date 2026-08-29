@@ -13,7 +13,8 @@ aparecem em quase toda view.
 
 ```bash
 uv sync --extra dev      # dependências
-uv run pre-commit install # Ruff, Bandit e Gitleaks a cada commit
+uv run pre-commit install --hook-type pre-commit --hook-type commit-msg
+# Ruff, Bandit e Gitleaks a cada commit; regra 6 na mensagem do commit
 cp .env.example .env      # ajuste os valores locais
 make test                 # deve passar do zero
 ```

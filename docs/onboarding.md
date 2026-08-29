@@ -21,7 +21,7 @@ cd alupdatalake
 uv sync
 
 # 3. Instalar hooks de pre-commit
-uv run pre-commit install
+uv run pre-commit install --hook-type pre-commit --hook-type commit-msg
 
 # 4. Copiar variáveis de ambiente
 cp .env.example .env

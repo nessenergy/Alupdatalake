@@ -140,7 +140,7 @@ Concluído: framework, CLI, replay do raw, caminho relacional e **quatro
 conectores completos** — BCB/PTAX (diário),
 IBGE/IPCA (mensal, aninhado), ANEEL/SIGA (cadastro paginado, ~25 mil registros)
 e ONS/carga (CSV anual por subsistema) —, Terraform, CI/CD, scaffolding,
-ADRs 003–004, runbook de deploy e plano de execução.
+ADRs 003–008, runbook de deploy e de primeiro deploy, e plano de execução.
 
 As dimensões comuns já têm dono: `codigo_usina` vem do ANEEL/SIGA e
 `submercado` vem do ONS.

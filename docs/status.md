@@ -1,7 +1,7 @@
 # Estado do projeto
 
-Atualizado em **2026-08-30** · base analisada `3b8f525` · alterações desta
-rodada ainda no working tree
+Atualizado em **2026-08-30** · `main` em `249ec2b` · lote de replay,
+sanitização, IAM e CI commitado
 
 Este arquivo responde "onde estamos e o que trava o próximo passo". Detalhe de
 escopo e estimativa fica em [`plano-execucao.md`](plano-execucao.md); o que sai
@@ -18,6 +18,7 @@ contexto para agentes, em [`../AGENTS.md`](../AGENTS.md).
 | Item | Onde | Verificação |
 |---|---|---|
 | Runner de ingestão (janela, raw no GCS, validação, colunas técnicas, carga, log) | `src/core/` | 226 testes aprovados, 92% de cobertura (suíte inteira) |
+| Caminho de banco relacional (Oracle/MySQL) para a Onda 3 | `src/core/banco.py` | ADR 008; 16 testes sem rede; **nenhuma conexão real** — depende de VPN (A7) |
 | Replay do raw sem nova chamada à fonte | `alupdata reprocessar-raw`, `src/core/storage.py` | testes locais com JSONL gzip; falta validar contra GCS real |
 | CLI única (`alupdata listar` / `ingerir`) | `src/cli.py` | executada contra as 4 fontes |
 | Scaffolding dos 7 componentes | `make novo-conector` | usado nas fontes novas |
@@ -28,7 +29,7 @@ contexto para agentes, em [`../AGENTS.md`](../AGENTS.md).
 | Alertas (falha, silêncio, inválidos em alta) | `infra/modules/monitoramento` | `terraform validate` limpo; **sem destinatário** — ver runbook |
 | Painel no Cloud Monitoring e orçamento com alerta de custo | `infra/modules/monitoramento` | orçamento precisa do `billing_account` da Alup (A3) |
 | Terraform: datasets, bucket raw, secrets, Cloud Run Job + Scheduler, IAM | `infra/` | IAM restringido por recurso; Terraform 1.15.8 `fmt` e `validate` limpos |
-| CI/CD: lint, testes, Bandit, pip-audit, Gitleaks, Terraform | `.github/workflows/` | workflow de deploy ordenado; alterações locais ainda não passaram pelo GitHub Actions |
+| CI/CD: lint, testes, Bandit, pip-audit, Gitleaks, Terraform | `.github/workflows/` | workflow de deploy ordenado; 7 jobs verdes no Actions |
 | Imagem da CLI | `Dockerfile` | build local não executado: Docker Desktop sem daemon ativo |
 
 ### Conectores (7 componentes cada, exceto onde indicado)
@@ -104,7 +105,7 @@ ADRs 001–008 · 5 dicionários de dados · plano de execução · runbook de d
 | 0 — Fundação | 90h · marco 15,52% | Técnico concluído; **falta o que depende da Alup** (A3–A6) para homologar |
 | 1 — Mercado base | 120h · marco 20,69% | **4 de 5 fontes concluídas**; CCEE bloqueada (A2) |
 | 2 — APIs credenciadas | 110h · marco 18,97% | Não iniciada; bloqueada por token (A7) |
-| 3 — Sistemas internos | 155h · marco 26,72% | Não iniciada; bloqueada por VPN (A7) |
+| 3 — Sistemas internos | 155h · marco 26,72% | Caminho de banco pronto (ADR 008); **nenhuma fonte iniciada** — bloqueada por VPN (A7) |
 | 4 — Planilhas e handoff | 105h · marco 18,10% | Não iniciada |
 
 ---

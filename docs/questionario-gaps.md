@@ -8,7 +8,7 @@
 
 ## Como usar
 
-47 perguntas em 7 blocos. Cada bloco tem um destinatário provável — a coluna
+48 perguntas em 7 blocos. Cada bloco tem um destinatário provável — a coluna
 **Quem** é sugestão, não imposição; se o dono certo for outro, corrija.
 
 Regras que tornam a resposta útil:
@@ -60,7 +60,7 @@ para quem ir, e a ness. para de trabalhar esperando resposta.
 
 ---
 
-## Bloco C — Fontes e sistemas internos (10)
+## Bloco C — Fontes e sistemas internos (11)
 
 Ondas 2 e 3. **A7** é o maior risco financeiro do contrato: atraso > 5 dias
 úteis em VPN/credencial dispara ociosidade de 4h/dia (R$ 256/h, cláusula 3ª).
@@ -70,13 +70,44 @@ Ondas 2 e 3. **A7** é o maior risco financeiro do contrato: atraso > 5 dias
 | C1 | **[BLOQUEIA]** Os pedidos internos de token (Onda 2) e VPN/credencial read-only (Onda 3) já foram **abertos**? Envie os números de chamado. | TI | |
 | C2 | **[BLOQUEIA]** Qual o prazo real do processo interno de liberação de acesso a banco de produção, do pedido à credencial na mão? | TI / Segurança | |
 | C3 | **[BLOQUEIA]** A Alup consegue fornecer a **documentação técnica de BBCE e TempoOK** (contratos de API, manuais do fornecedor)? Ela vale tanto quanto o token e pode vir antes. | Comercial | |
-| C4 | **[BLOQUEIA]** CCEE InfoMercado responde 403 a acesso automatizado. Qual caminho a Alup escolhe: (a) liberar IP junto à CCEE, (b) fornecer credencial de agente, (c) remanejar as 32h para outro escopo? | Comercial | |
+| C4 | **[BLOQUEIA]** CCEE InfoMercado responde 403 a acesso automatizado. Qual caminho a Alup escolhe: (a) liberar IP junto à CCEE, (b) fornecer credencial de agente, (c) **ler do SQL Server que já recebe o Balanço Energético** — ver adendo abaixo, (d) remanejar as 32h para outro escopo? | Comercial | |
 | C5 | Oracle FMB: versão, host, porta, nome do schema, e existe réplica de leitura? | TI | |
 | C6 | Portal Alup: quais bases exatamente (MySQL, NoSQL, Storage), e qual o volume aproximado de cada uma? | TI | |
 | C7 | RM/TOTVS: a integração será por API, view de banco ou exportação? Existe ambiente de homologação? | TI | |
 | C8 | MySQL RDS Comercialização: está em qual nuvem/região, e há peering ou precisa de VPN? | TI | |
 | C9 | Para cada sistema interno: qual a janela em que a extração pode rodar sem impactar a operação? | TI | |
 | C10 | Há alguma fonte relevante que **não** está na lista do contrato e deveria estar? | Todas as áreas | |
+| C11 | **SQL Server do Balanço Energético** (ver adendo): host, instância, base, tabela e versão do SQL Server; quem administra; qual o histórico disponível; e a carga do Leonardo grava tudo ou só o mês corrente? | TI / Comercial | |
+
+### Adendo ao C4 — o SQL Server do Balanço Energético
+
+A Alup informou que já mantém um **SQL Server com o realizado do Balanço
+Energético vindo da CCEE**, alimentado por um processo mensal manual conduzido
+pelo Leonardo. A informação foi passada como contexto, sem pedido de inclusão
+no escopo.
+
+Registramos aqui porque ela **muda o C4**, em três pontos:
+
+1. **Abre uma alternativa que não existia.** As opções originais supunham que a
+   única via para o dado da CCEE era o portal, hoje bloqueado por 403. Se o
+   Balanço Energético que a Alup precisa já está nesse SQL Server, ler dali
+   pode entregar o resultado sem depender de liberação da CCEE — e as 32h
+   deixam de ser candidatas a remanejamento.
+
+2. **Pode destravar a dimensão `agente_ccee`.** É uma das cinco dimensões
+   comuns da camada Silver e hoje é a única **sem fonte definida**, justamente
+   por depender do desbloqueio da CCEE. Se a tabela do Balanço carrega o código
+   do agente, a dimensão passa a ter origem.
+
+3. **Envolve um banco que o projeto ainda não acessa.** O framework fala Oracle
+   e MySQL; SQL Server exigiria um driver adicional. É trabalho pequeno, mas
+   precisa ser dimensionado antes de a opção (c) ser escolhida, não depois.
+
+**Se a automação não for feita**, fica registrado que o dado continua sendo
+coletado mensalmente pelo processo manual do Leonardo. Isso é uma dependência
+de pessoa: o dado do Balanço Energético passa a ter frequência, prazo e
+qualidade atrelados à disponibilidade de uma pessoa, sem alerta se falhar.
+Aceitável como decisão consciente — mas precisa ser decisão, não omissão.
 
 ---
 

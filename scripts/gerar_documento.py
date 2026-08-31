@@ -217,6 +217,11 @@ def gerar_pdf(fonte: Path, saida: Path, classe: str) -> Path:
     with tempfile.TemporaryDirectory() as tmp:
         origem = Path(tmp) / "documento.html"
         origem.write_text(montar_html(fonte.read_text(encoding="utf-8"), classe=classe), encoding="utf-8")
+        # Escreve num temporário e só então substitui. Imprimir direto sobre o
+        # destino falha em silêncio quando ele está aberto num visualizador: o
+        # navegador não grava, o arquivo antigo continua lá, e um documento
+        # desatualizado seguiria para a contratante.
+        provisorio = Path(tmp) / "documento.pdf"
         subprocess.run(  # noqa: S603 — argumentos fixos, sem entrada do usuário
             [
                 str(encontrar_navegador()),
@@ -224,15 +229,22 @@ def gerar_pdf(fonte: Path, saida: Path, classe: str) -> Path:
                 "--disable-gpu",
                 "--no-pdf-header-footer",
                 "--virtual-time-budget=10000",  # espera a fonte remota carregar
-                f"--print-to-pdf={saida}",
+                f"--print-to-pdf={provisorio}",
                 origem.as_uri(),
             ],
             check=True,
             capture_output=True,
             timeout=180,
         )
-    if not saida.exists():
-        raise SystemExit("o navegador terminou sem escrever o PDF")
+        if not provisorio.exists():
+            raise SystemExit("o navegador terminou sem escrever o PDF")
+        try:
+            shutil.move(str(provisorio), str(saida))
+        except OSError as exc:
+            raise SystemExit(
+                f"não foi possível escrever em {saida}: {exc}.\n"
+                "O arquivo provavelmente está aberto num visualizador de PDF — feche-o e repita."
+            ) from exc
     return saida
 
 

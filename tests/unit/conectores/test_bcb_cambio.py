@@ -108,3 +108,13 @@ def test_erro_na_fonte_encerra_a_execucao_como_erro(conector, monkeypatch):
 
     with pytest.raises(ConnectionError):
         conector.ingerir(Janela.de_texto("2026-01-01", "2026-01-05"))
+
+
+def test_falha_no_registro_operacional_impede_sucesso_completo(conector, monkeypatch):
+    def falhar_registro(_execucao):
+        raise RuntimeError("controle indisponível")
+
+    monkeypatch.setattr("src.core.conector.registrar_execucao", falhar_registro)
+
+    with pytest.raises(RuntimeError, match="controle indisponível"):
+        conector.ingerir(Janela.de_texto("2026-01-01", "2026-01-05"))

@@ -13,11 +13,17 @@ def test_sessao_tem_retry_configurado_para_5xx_e_429():
     assert 503 in retry.status_forcelist
 
 
-def test_retry_so_em_metodos_idempotentes():
+def test_retry_so_em_metodos_idempotentes_por_padrao():
     permitidos = criar_sessao().get_adapter("https://exemplo").max_retries.allowed_methods
 
     assert "GET" in permitidos
     assert "POST" not in permitidos  # repetir POST duplicaria efeito
+
+
+def test_post_pode_ser_habilitado_para_consulta_idempotente():
+    permitidos = criar_sessao(retry_post=True).get_adapter("https://exemplo").max_retries.allowed_methods
+
+    assert "POST" in permitidos
 
 
 def test_get_json_sempre_passa_timeout(monkeypatch):

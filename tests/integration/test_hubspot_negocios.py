@@ -1,6 +1,6 @@
 """Chamada real à API do Hubspot.
 
-Pulado enquanto a Alup não entrega o token (pendência A5). Para rodar quando a
+Pulado enquanto a Alup não entrega o token (pendência A9). Para rodar quando a
 credencial existir no Secret Manager:
 
     ALUPDATA_INTEGRACAO_HUBSPOT=1 uv run pytest tests/integration -q
@@ -16,7 +16,7 @@ from src.core.execucao import Janela
 
 pytestmark = pytest.mark.skipif(
     not os.getenv("ALUPDATA_INTEGRACAO_HUBSPOT"),
-    reason="token do Hubspot ainda não entregue (pendência A5)",
+    reason="token do Hubspot ainda não entregue (pendência A9)",
 )
 
 

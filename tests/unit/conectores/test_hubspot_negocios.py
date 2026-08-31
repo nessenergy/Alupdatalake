@@ -20,7 +20,7 @@ FIXTURE = json.loads((Path(__file__).parents[2] / "fixtures" / "hubspot_negocios
 
 @pytest.fixture
 def conector(monkeypatch: pytest.MonkeyPatch) -> HubspotNegocios:
-    monkeypatch.setattr("src.conectores.hubspot_negocios.ler_secret", lambda *_: "token-de-teste")
+    monkeypatch.setattr("src.conectores.hubspot_negocios.ler_secret", lambda *_: "valor-simulado")
     return HubspotNegocios()
 
 
@@ -64,7 +64,7 @@ def test_paginacao_segue_o_cursor_e_para_sem_ele(conector: HubspotNegocios, monk
 
     def post_falso(_url: str, *, json: dict, headers: dict, timeout: float) -> RespostaFalsa:  # noqa: A002
         corpos.append(dict(json))
-        assert headers["Authorization"] == "Bearer token-de-teste"
+        assert headers["Authorization"] == "Bearer valor-simulado"
         assert timeout > 0
         return RespostaFalsa(paginas[len(corpos) - 1])
 
@@ -81,3 +81,17 @@ def test_janela_vira_intervalo_em_milissegundos() -> None:
     fim = _epoch_ms(date(2026, 8, 20), fim_do_dia=True)
     assert inicio == "1787184000000"  # 2026-08-20T00:00:00Z
     assert int(fim) - int(inicio) == 86_399_999  # o dia inteiro, sem invadir o seguinte
+
+
+def test_hubspot_habilita_retry_do_post(monkeypatch: pytest.MonkeyPatch) -> None:
+    opcoes: dict = {}
+
+    def sessao_falsa(**kwargs):
+        opcoes.update(kwargs)
+        return object()
+
+    monkeypatch.setattr("src.conectores.hubspot_negocios.criar_sessao", sessao_falsa)
+
+    HubspotNegocios()
+
+    assert opcoes == {"retry_post": True}

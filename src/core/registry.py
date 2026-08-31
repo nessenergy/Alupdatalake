@@ -14,6 +14,7 @@ if TYPE_CHECKING:
     from src.core.conector import Conector
 
 _REGISTRO: dict[str, type[Conector]] = {}
+_CARREGADO = False
 
 
 def registrar(cls: type[Conector]) -> type[Conector]:
@@ -27,16 +28,19 @@ def registrar(cls: type[Conector]) -> type[Conector]:
 
 def carregar_conectores() -> None:
     """Importa todos os submódulos de `src.conectores` para popular o registro."""
+    global _CARREGADO  # noqa: PLW0603 — estado explícito do catálogo do processo
+    if _CARREGADO:
+        return
     import src.conectores as pacote
 
     for info in pkgutil.iter_modules(pacote.__path__):
         importlib.import_module(f"{pacote.__name__}.{info.name}")
+    _CARREGADO = True
 
 
 def obter(rotulo: str) -> Conector:
     """Instancia o conector registrado sob `rotulo`."""
-    if not _REGISTRO:
-        carregar_conectores()
+    carregar_conectores()
     if rotulo not in _REGISTRO:
         disponiveis = ", ".join(sorted(_REGISTRO)) or "nenhum"
         raise KeyError(f"conector desconhecido: {rotulo} (disponíveis: {disponiveis})")
@@ -45,6 +49,5 @@ def obter(rotulo: str) -> Conector:
 
 def listar() -> list[str]:
     """Rótulos de todos os conectores registrados."""
-    if not _REGISTRO:
-        carregar_conectores()
+    carregar_conectores()
     return sorted(_REGISTRO)

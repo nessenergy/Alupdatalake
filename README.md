@@ -113,6 +113,7 @@ uv run alupdata ingerir ons_carga --de 2026-01-01 --ate 2026-01-31 --dry-run
 | `make novo-conector fonte=X entidade=Y` | esqueleto dos 7 componentes |
 | `make deploy-views` | aplica o SQL de `sql/` no BigQuery |
 | `make sync-skills` | atualiza as skills vendorizadas do Google |
+| `alupdata reprocessar-raw ...` | revalida um raw do GCS sem chamar novamente a fonte |
 
 ## Conectores
 
@@ -125,7 +126,7 @@ uv run alupdata ingerir ons_carga --de 2026-01-01 --ate 2026-01-31 --dry-run
 | CCEE (InfoMercado) | 1 | 16/10/2026 | API Pública | **Bloqueado** — portal responde 403 a acesso automatizado ([§3.1](docs/plano-execucao.md)) |
 | CCEE (Credenciado) | 2 | 13/11/2026 | API Credenciada | Backlog |
 | BBCE | 2 | 13/11/2026 | API Credenciada | Backlog |
-| Hubspot | 2 | 13/11/2026 | API Credenciada | Backlog |
+| Hubspot | 2 | 13/11/2026 | API Credenciada | **Implementado, não validado na API** — aguarda token A9 |
 | TempoOK | 2 | 13/11/2026 | API Credenciada | Backlog |
 | Oracle FMB | 3 | 18/12/2026 | Banco Interno | Backlog |
 | Portal Alup | 3 | 18/12/2026 | Banco Interno | Backlog |
@@ -161,6 +162,7 @@ Detalhes: [docs/arquitetura/seguranca.md](docs/arquitetura/seguranca.md)
 - [Estado do projeto e pendências](docs/status.md)
 - [Plano de execução](docs/plano-execucao.md)
 - [Runbook de deploy](docs/runbook/deploy.md)
+- [Checklist do primeiro deploy](docs/runbook/primeiro-deploy.md)
 - [Contexto para agentes](AGENTS.md)
 
 ## Licença

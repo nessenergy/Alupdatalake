@@ -12,6 +12,7 @@ Situação corrente e viva fica em [`../status.md`](../status.md); este diretór
 | Data | Relatório | Marco em jogo | Questões abertas |
 |---|---|---|---|
 | 27/08/2026 | [Questões abertas e o que esperamos entregar](2026-08-27-situacao.md) · [versão HTML](2026-08-27-situacao.html) | Onda 0 · 15,52% | 11 · acompanhadas na [issue #57](https://github.com/nessenergy/Alupdatalake/issues/57) |
+| 30/08/2026 | [Preparação local sem GCP](2026-08-30-preparacao-local-sem-gcp.md) | Prontidão técnica | GCP, Docker, Terraform e integrações reais ainda pendentes |
 
 ## Convenções
 

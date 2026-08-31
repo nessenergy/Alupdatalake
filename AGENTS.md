@@ -131,12 +131,13 @@ Se você for propor algo que contraria um ADR, escreva um ADR novo — não um
 remendo. Em particular: o framework em `src/core/` é mais estrutura do que 13
 scripts soltos **de propósito** (ADR 003, 13 fontes / 19 semanas / handoff).
 
-## Estado atual (2026-08-25)
+## Estado atual (2026-08-30)
 
 > Quadro completo, com pendências e dono de cada uma, em
 > [`docs/status.md`](docs/status.md).
 
-Concluído: framework, CLI, **quatro conectores completos** — BCB/PTAX (diário),
+Concluído: framework, CLI, replay do raw, caminho relacional e **quatro
+conectores completos** — BCB/PTAX (diário),
 IBGE/IPCA (mensal, aninhado), ANEEL/SIGA (cadastro paginado, ~25 mil registros)
 e ONS/carga (CSV anual por subsistema) —, Terraform, CI/CD, scaffolding,
 ADRs 003–004, runbook de deploy e plano de execução.
@@ -149,7 +150,7 @@ todas as fontes das Ondas 2 e 3 (token, VPN, credencial read-only) e a **CCEE
 InfoMercado**, cujo portal responde 403 a acesso automatizado — ver
 `docs/plano-execucao.md` §3.1.
 
-Próximo passo técnico: com a Onda 1 fechada no que não depende de terceiros, o
-trabalho útil é preparar o contrato de dados das fontes das Ondas 2 e 3 (schema
-Pydantic + fixture a partir da documentação, teste de integração com `skipif`),
-para que a chegada do token seja "ligar e ajustar", não "começar".
+Próximo passo técnico: validar no primeiro ambiente GCP o IAM por recurso, o
+deploy com imagem imutável, a carga ponta a ponta e o replay do raw. Em paralelo,
+preparar contrato de dados das Ondas 2 e 3 apenas quando houver documentação
+real; schema por adivinhação continua proibido.

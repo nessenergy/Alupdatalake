@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import logging
+import uuid
 from datetime import date
 
 import pytest
@@ -60,6 +61,20 @@ def test_excecao_vira_stack_trace_para_o_error_reporting() -> None:
         registro = _registro(logging.ERROR, "falhou", exc_info=sys.exc_info())
     saida = json.loads(FormatadorJson().format(registro))
     assert "ValueError: quebrou" in saida["stack_trace"]
+
+
+def test_mensagem_e_stack_trace_sao_sanitizados() -> None:
+    marcador = uuid.uuid4().hex
+    try:
+        raise ValueError(f"Bearer {marcador}")
+    except ValueError:
+        import sys
+
+        registro = _registro(logging.ERROR, f"Authorization: Bearer {marcador}", exc_info=sys.exc_info())
+
+    saida = json.loads(FormatadorJson().format(registro))
+    assert marcador not in saida["message"]
+    assert marcador not in saida["stack_trace"]
 
 
 def test_formato_e_texto_no_laptop_e_json_no_cloud_run(monkeypatch: pytest.MonkeyPatch) -> None:

@@ -42,6 +42,9 @@ class ConexaoFalsa:
     def cursor(self) -> CursorFalso:
         return self._cursor
 
+    def close(self) -> None:
+        self.fechada = True
+
 
 @pytest.fixture
 def cursor() -> CursorFalso:
@@ -86,10 +89,29 @@ def test_consultar_fecha_o_cursor_mesmo_com_erro() -> None:
     assert cursor.fechado, "cursor precisa ser fechado; conexão sob VPN não perdoa vazamento"
 
 
+@pytest.mark.parametrize("sql", ["INSERT INTO t VALUES (1)", "UPDATE t SET x = 1", "DELETE FROM t", "DROP TABLE t"])
+def test_consultar_recusa_comando_de_escrita_antes_de_abrir_cursor(sql: str, cursor: CursorFalso) -> None:
+    with pytest.raises(ValueError, match="somente leitura"):
+        list(banco.consultar(ConexaoFalsa(cursor), sql))
+
+    assert cursor.sql is None
+
+
 def test_consultar_e_preguicoso_ate_o_primeiro_next(cursor: CursorFalso) -> None:
     banco.consultar(ConexaoFalsa(cursor), "SELECT 1")
 
     assert cursor.sql is None, "gerador não deve executar SQL antes de ser consumido"
+
+
+def test_abrir_conexao_fecha_mesmo_quando_o_bloco_falha(monkeypatch: pytest.MonkeyPatch, cursor: CursorFalso) -> None:
+    conexao = ConexaoFalsa(cursor)
+    conexao.fechada = False
+    monkeypatch.setattr(banco, "criar_conexao", lambda *_args: conexao)
+
+    with pytest.raises(RuntimeError, match="falha simulada"), banco.abrir_conexao("fmb"):
+        raise RuntimeError("falha simulada")
+
+    assert conexao.fechada
 
 
 @pytest.mark.parametrize("dsn", ["postgres://u:s@h/b", "http://exemplo", "sem-esquema"])

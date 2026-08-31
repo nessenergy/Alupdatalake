@@ -24,6 +24,8 @@ da janela em memória. Para o FMB, isso significa manter a janela curta
 from __future__ import annotations
 
 import logging
+import re
+from contextlib import contextmanager
 from typing import TYPE_CHECKING, Any
 from urllib.parse import unquote, urlparse
 
@@ -36,6 +38,7 @@ if TYPE_CHECKING:
 logger = logging.getLogger(__name__)
 
 PORTA_PADRAO = {"oracle": 1521, "mysql": 3306}
+_SOMENTE_LEITURA = re.compile(r"^\s*(?:--[^\n]*\n\s*)*(SELECT|WITH)\b", re.IGNORECASE)
 
 
 def conectar(dsn: str) -> Any:
@@ -80,6 +83,16 @@ def criar_conexao(fonte: str, campo: str = "dsn") -> Any:
     return conectar(ler_secret(fonte, campo))
 
 
+@contextmanager
+def abrir_conexao(fonte: str, campo: str = "dsn") -> Iterator[Any]:
+    """Abre e fecha uma conexão da fonte mesmo quando a consulta falha."""
+    conexao = criar_conexao(fonte, campo)
+    try:
+        yield conexao
+    finally:
+        conexao.close()
+
+
 def consultar(
     conexao: Any,
     sql: str,
@@ -95,6 +108,8 @@ def consultar(
     Os nomes de coluna vêm em minúsculas — Oracle os devolve em maiúsculas, e o
     resto do framework trabalha em `snake_case`.
     """
+    if not _SOMENTE_LEITURA.match(sql):
+        raise ValueError("consulta de origem deve ser somente leitura (SELECT ou WITH)")
     tamanho = lote or get_settings().banco_lote
     cursor = conexao.cursor()
     try:

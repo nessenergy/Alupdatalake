@@ -65,6 +65,12 @@ lote é também o `arraysize`, isto é, quantos round-trips a VPN paga.
 Oracle devolve identificadores em maiúsculas; o resto do framework trabalha em
 `snake_case`. A normalização acontece em um lugar só.
 
+### Defesa de somente leitura
+
+`consultar()` recusa comandos que não comecem por `SELECT` ou `WITH`, e
+`abrir_conexao()` garante o fechamento da conexão. Essa validação reduz erro
+acidental, mas não substitui a credencial read-only fornecida pela Alup.
+
 ## Limite conhecido
 
 `Conector._ingerir` materializa o resultado de `extrair()` numa lista antes de

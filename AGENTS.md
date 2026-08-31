@@ -69,7 +69,7 @@ alupdata ingerir bcb_cambio_ptax --de 2026-01-01 --ate 2026-01-31 --dry-run
 
 | Caminho | O quê |
 |---|---|
-| `src/core/` | framework de ingestão — runner, janela, registry, GCS, BigQuery, secrets, HTTP |
+| `src/core/` | framework de ingestão — runner, janela, registry, GCS, BigQuery, secrets, HTTP, banco |
 | `src/conectores/` | um módulo por fonte |
 | `src/cli.py` | CLI única: laptop, Cloud Run Job e DAG usam o mesmo comando |
 | `sql/{bronze,silver,gold}/` | DDL e views versionadas, aplicadas por `make deploy-views` |
@@ -125,6 +125,7 @@ dizem como *este contrato* usa o produto.
 | 005 | Escopo do Portal MVP cravado — o que ele é e o que não é |
 | 006 | Painel de saúde `/lake`: monitoramento não é BI |
 | 007 | Painel de custo `/custo`: observabilidade de custo é sustentação, não faturada (PR #56) |
+| 008 | Acesso a bancos relacionais: drivers puro-Python, DSN única no Secret Manager |
 
 Se você for propor algo que contraria um ADR, escreva um ADR novo — não um
 remendo. Em particular: o framework em `src/core/` é mais estrutura do que 13

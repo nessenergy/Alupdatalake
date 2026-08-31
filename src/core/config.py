@@ -26,6 +26,11 @@ class Settings(BaseSettings):
     http_timeout: float = Field(default=30.0, description="Timeout por requisição, em segundos")
     http_max_tentativas: int = Field(default=3, description="Tentativas totais antes de desistir")
 
+    banco_timeout: float = Field(default=30.0, description="Timeout de conexão a banco relacional, em segundos")
+    banco_lote: int = Field(
+        default=1000, description="Linhas por fetchmany; também é o arraysize pago em round-trip sob VPN"
+    )
+
     dry_run: bool = Field(default=False, description="Extrai e valida sem gravar em GCS/BigQuery")
 
     portal_provedor: str = Field(default="simulado", description="'simulado' ou 'bigquery' (ver ADR 005)")

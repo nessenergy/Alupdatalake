@@ -1,6 +1,8 @@
 repos:
+  # A rev acompanha o ruff das dev-dependencies. Divergir das duas versões faz
+  # o hook e o CI formatarem diferente, e todo commit vira churn de formatação.
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.8.6
+    rev: v0.16.4
     hooks:
       - id: ruff
         args: [--fix]
@@ -10,7 +12,12 @@ repos:
     rev: "1.8.3"
     hooks:
       - id: bandit
-        args: ["-r", "src/", "-ll"]
+        # `pass_filenames: false` é obrigatório junto de `-r src/`: sem isso o
+        # pre-commit anexa os arquivos do commit aos argumentos e o bandit
+        # aborta com "unrecognized arguments". O alvo é o pacote inteiro, e é
+        # o mesmo que o CI varre.
+        args: ["-r", "src/", "scripts/", "-ll"]
+        pass_filenames: false
 
   - repo: https://github.com/gitleaks/gitleaks
     rev: v8.21.2

@@ -13,10 +13,12 @@ Situação corrente e viva fica em [`../status.md`](../status.md); este diretór
 |---|---|---|---|
 | 27/08/2026 | [Questões abertas e o que esperamos entregar](2026-08-27-situacao.md) · [versão HTML](2026-08-27-situacao.html) | Onda 0 · 15,52% | 11 · acompanhadas na [issue #57](https://github.com/nessenergy/Alupdatalake/issues/57) |
 | 30/08/2026 | [Preparação local sem GCP](2026-08-30-preparacao-local-sem-gcp.md) | Prontidão técnica | GCP, Docker, Terraform e integrações reais ainda pendentes |
+| 31/08/2026 | [Início da Onda 0](2026-08-31-inicio-onda-0.md) · [versão HTML](2026-08-31-inicio-onda-0.html) | Onda 0 · 15,52% · 11/09 | 7 · com [#67](https://github.com/nessenergy/Alupdatalake/issues/67) (região) e [#68](https://github.com/nessenergy/Alupdatalake/issues/68) (revisão na main) abertas hoje |
 
 ## Convenções
 
 - **Nome do arquivo**: `AAAA-MM-DD-assunto.md`, data de emissão.
+- **Como gerar o HTML**: `make relatorio ARQ=docs/relatorios/AAAA-MM-DD-assunto.md`.
 - **Dois formatos**: o `.md` é a fonte e o que se lê no GitHub; o `.html` é a
   mesma coisa com a identidade ness. aplicada, para enviar à contratante ou
   imprimir em PDF. O HTML é autocontido — abre direto no navegador, sem

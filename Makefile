@@ -45,4 +45,7 @@ clean:
 	rm -f coverage.xml bandit-report.json .requirements.txt
 
 questionario-pdf: ## Reemite o PDF de envio do Questionario de Gaps
-	uv run --with markdown python scripts/gerar_pdf_questionario.py
+	uv run --with markdown python scripts/gerar_documento.py docs/questionario-gaps.md 		--pdf --classe questionario --saida-pdf docs/envio/Questionario-de-Gaps-AlupData.pdf
+
+relatorio: ## Gera o HTML de um relatorio: make relatorio ARQ=docs/relatorios/AAAA-MM-DD-x.md
+	uv run --with markdown python scripts/gerar_documento.py $(ARQ) --html

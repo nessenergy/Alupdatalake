@@ -1,0 +1,481 @@
+<!doctype html><html lang='pt-BR'><head><meta charset='utf-8'><title>Questionário de Gaps — AlupData</title><link rel='preconnect' href='https://fonts.googleapis.com'><link href='https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&display=swap' rel='stylesheet'><style>
+@page { size: A4; margin: 16mm 14mm 16mm 14mm; }
+
+/* Só a versão de tela: no PDF a margem é da @page. */
+@media screen {
+  body { max-width: 900px; margin: 0 auto; padding: 32px 24px 64px; font-size: 15px; }
+  table { font-size: 14px; }
+}
+
+:root {
+  --tinta: #12161a;
+  --suave: #5c6772;
+  --linha: #dfe4e9;
+  --ness: #00ade8;
+  --alerta: #b3261e;
+  --fundo-alerta: #fdf3f2;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: Montserrat, "Segoe UI", system-ui, sans-serif;
+  font-size: 9.4pt;
+  line-height: 1.5;
+  color: var(--tinta);
+  margin: 0;
+}
+
+/* ---------------------------------------------------------------- cabeçalho */
+
+.marca {
+  font-weight: 600;
+  font-size: 15pt;
+  letter-spacing: -0.02em;
+  margin: 0 0 2mm;
+}
+.marca span { color: var(--ness); }
+
+h1 {
+  font-size: 17pt;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  margin: 0 0 1mm;
+  padding-bottom: 3mm;
+  border-bottom: 2px solid var(--ness);
+}
+
+h2 {
+  font-size: 11.5pt;
+  font-weight: 600;
+  margin: 8mm 0 2.5mm;
+  padding-top: 3mm;
+  border-top: 1px solid var(--linha);
+  /* Um bloco não deve abrir no rodapé e continuar na página seguinte. */
+  break-after: avoid;
+}
+
+h3 { font-size: 10pt; font-weight: 600; margin: 5mm 0 2mm; break-after: avoid; }
+
+p { margin: 0 0 2.5mm; }
+strong { font-weight: 600; }
+code {
+  font-family: "Cascadia Mono", Consolas, monospace;
+  font-size: 8.6pt;
+  background: #f2f4f6;
+  padding: 0.3mm 1mm;
+  border-radius: 2px;
+}
+
+/* -------------------------------------------------------------------- tabela */
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0 0 4mm;
+  font-size: 8.8pt;
+}
+th {
+  text-align: left;
+  font-weight: 600;
+  font-size: 7.8pt;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--suave);
+  border-bottom: 1.5px solid var(--tinta);
+  padding: 1.6mm 2mm;
+}
+td {
+  border-bottom: 1px solid var(--linha);
+  padding: 2.4mm 2mm;
+  vertical-align: top;
+}
+/* Uma pergunta não se parte entre páginas. */
+tr { break-inside: avoid; }
+thead { display: table-header-group; }
+
+/* Larguras de coluna do formulário: código estreito, "Resposta" com espaço de
+   escrita. Valem só no questionário — num relatório espremeriam a 1ª coluna e
+   pintariam a última sem motivo. */
+.questionario td:first-child { width: 7%; font-weight: 600; font-variant-numeric: tabular-nums; }
+.questionario th:last-child, .questionario td:last-child { width: 30%; background: #fafbfc; }
+.questionario td:nth-child(3) { width: 15%; color: var(--suave); font-size: 8.2pt; }
+
+/* --------------------------------------------------------------- destaques */
+
+.bloqueia {
+  display: inline-block;
+  background: var(--alerta);
+  color: #fff;
+  font-size: 6.8pt;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  padding: 0.4mm 1.4mm;
+  border-radius: 2px;
+  margin-right: 1.2mm;
+  vertical-align: 1px;
+}
+
+blockquote {
+  margin: 0 0 3mm;
+  padding: 2.5mm 3mm;
+  background: var(--fundo-alerta);
+  border-left: 3px solid var(--alerta);
+}
+blockquote p:last-child { margin-bottom: 0; }
+
+/* O `---` do Markdown separa as seções na fonte, mas no PDF a borda de `h2` já
+   faz esse trabalho: manter os dois empilha traços. */
+hr { display: none; }
+hr + h2 { margin-top: 7mm; }
+
+ul { margin: 0 0 3mm; padding-left: 5mm; }
+li { margin-bottom: 1.2mm; }
+
+.rodape {
+  margin-top: 8mm;
+  padding-top: 3mm;
+  border-top: 1px solid var(--linha);
+  font-size: 7.6pt;
+  color: var(--suave);
+}
+</style></head><body class='relatorio'><p class="marca">ness<span>.</span></p><h1>Início da Onda 0 — o que está pronto e o que depende da Alup</h1>
+<p><strong>Emitido em</strong> 31/08/2026 · <strong>Para</strong> Grupo Alupar · <strong>Por</strong> ness. Processos e Tecnologia
+<strong>Contrato</strong> CPS-01025/2026 — AlupData Fase 1: DataLake
+<strong>Marco em jogo</strong> Onda 0 · 15,52% · R$ 23.040,00 · homologação prevista para <strong>11/09/2026</strong></p>
+<hr />
+<h2>Em uma frase</h2>
+<p>A Onda 0 começa hoje com o trabalho técnico da ness. <strong>adiantado</strong> — inclusive
+com entregas de ondas posteriores já feitas —, e com o caminho para homologar
+<strong>inteiramente dependente de insumo da Alup</strong>, sendo o mais urgente o ambiente
+Google Cloud, que vence nesta sexta.</p>
+<hr />
+<h2>1. Cronograma: onde estamos</h2>
+<p>O contrato prevê 19 semanas a partir do kickoff de 27/08/2026. Ancorado nesse
+marco e alinhado de segunda a sexta, cada onda termina numa sexta-feira, que
+passa a ser a data-alvo de homologação e de medição.</p>
+<table>
+<thead>
+<tr>
+<th>Onda</th>
+<th>Início</th>
+<th>Término</th>
+<th>Marco</th>
+<th>Valor</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>0 — Fundação</strong></td>
+<td>31/08/2026</td>
+<td><strong>11/09/2026</strong></td>
+<td>15,52%</td>
+<td>R$ 23.040,00</td>
+</tr>
+<tr>
+<td>1 — Mercado base</td>
+<td>14/09/2026</td>
+<td>16/10/2026</td>
+<td>20,69%</td>
+<td>R$ 30.720,00</td>
+</tr>
+<tr>
+<td>2 — APIs credenciadas</td>
+<td>19/10/2026</td>
+<td>13/11/2026</td>
+<td>18,97%</td>
+<td>R$ 28.160,00</td>
+</tr>
+<tr>
+<td>3 — Sistemas internos</td>
+<td>16/11/2026</td>
+<td>18/12/2026</td>
+<td>26,72%</td>
+<td>R$ 39.680,00</td>
+</tr>
+<tr>
+<td>4 — Planilhas e handoff</td>
+<td>21/12/2026</td>
+<td>08/01/2027</td>
+<td>18,10%</td>
+<td>R$ 26.880,00</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>Recesso de fim de ano.</strong> A Onda 4 atravessa 25/12 e 01/01. As datas acima
+seguem o cálculo contratual de 19 semanas corridas. Havendo recesso de 21/12
+a 01/01, o marco 5 desloca para <strong>22/01/2027</strong>. Precisa ser combinado.</p>
+</blockquote>
+<hr />
+<h2>2. Entregue</h2>
+<p>Tudo abaixo está no repositório, com testes automatizados e pipeline verde.</p>
+<h3>Framework de ingestão</h3>
+<p>Um runner único cuida de janela de datas, gravação do dado bruto, validação,
+colunas técnicas, carga e registro de execução. Um conector novo implementa
+apenas como falar com a fonte. <strong>229 testes automatizados</strong>, cobertura de 92%.</p>
+<p>Isso é o que sustenta a promessa de 13 conectores em 19 semanas sem que o
+décimo terceiro seja escrito de um jeito diferente do primeiro.</p>
+<h3>Conectores — 4 de 5 fontes públicas completas</h3>
+<table>
+<thead>
+<tr>
+<th>Fonte</th>
+<th>Volume verificado</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Câmbio BCB (PTAX)</td>
+<td>diário, verificado contra a API real</td>
+</tr>
+<tr>
+<td>IBGE (IPCA)</td>
+<td>mensal, JSON aninhado</td>
+</tr>
+<tr>
+<td>ANEEL (SIGA)</td>
+<td><strong>25.263 registros</strong>, zero inválidos, 28 segundos</td>
+</tr>
+<tr>
+<td>ONS (carga)</td>
+<td>CSV anual por subsistema</td>
+</tr>
+<tr>
+<td>Hubspot</td>
+<td>os 7 componentes prontos; <strong>nunca executado</strong> — falta o token (A9)</td>
+</tr>
+</tbody>
+</table>
+<p>As quatro primeiras foram verificadas contra as APIs reais em modo de simulação.</p>
+<h3>Entregas adiantadas de ondas posteriores</h3>
+<p>Feitas porque não dependiam de insumo da Alup e reduzem risco mais adiante:</p>
+<ul>
+<li><strong>Motor de ingestão de planilhas</strong> (escopo da Onda 4)</li>
+<li><strong>Caminho de acesso a bancos Oracle e MySQL</strong> (escopo da Onda 3) — quando a
+  VPN chegar, a tarefa é apontar a conexão, não começar a Onda 3</li>
+<li><strong>Portal MVP</strong> com painel de saúde e de custo de nuvem</li>
+<li><strong>Reprocessamento</strong> de dado já coletado, sem consultar a fonte de novo</li>
+</ul>
+<h3>Segurança (cláusula 8ª)</h3>
+<ul>
+<li>SAST (Bandit), SCA (pip-audit) e varredura de segredos (Gitleaks) em todo PR</li>
+<li>Credenciais exclusivamente no Secret Manager</li>
+<li><strong>Permissões restringidas por recurso</strong>: a conta de serviço de ingestão
+  acessa apenas o conjunto de dados, o bucket e os segredos de que precisa —
+  não o projeto inteiro</li>
+<li>Remoção automática de credencial de registros de log e de mensagens de erro</li>
+</ul>
+<hr />
+<h2>3. O que trava a homologação da Onda 0</h2>
+<p>Nada nesta lista depende de trabalho da ness.</p>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Insumo</th>
+<th>Prazo</th>
+<th>Efeito de passar do prazo</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>A3</strong></td>
+<td>Projeto GCP <code>dev</code>: criar, habilitar APIs, IAM, federação de identidade, Artifact Registry e bucket de estado</td>
+<td><strong>04/09</strong></td>
+<td>nada sobe; as semanas de 07/09 e 14/09 escorregam inteiras</td>
+</tr>
+<tr>
+<td><strong>A4</strong></td>
+<td>Questionário de Gaps respondido</td>
+<td>11/09</td>
+<td>sem os 8 domínios analíticos, a camada de consumo fica sem alvo</td>
+</tr>
+<tr>
+<td><strong>A5</strong></td>
+<td>Matriz RACI e responsáveis por domínio</td>
+<td>11/09</td>
+<td>dúvida de regra de negócio sem destinatário</td>
+</tr>
+<tr>
+<td><strong>A6</strong></td>
+<td>Ferramenta de BI definida</td>
+<td>11/09</td>
+<td>Portal e camada Gold sem consumidor definido</td>
+</tr>
+<tr>
+<td><strong>A9</strong></td>
+<td>Token do Hubspot</td>
+<td>11/09</td>
+<td>conector pronto segue parado</td>
+</tr>
+<tr>
+<td>—</td>
+<td>Destinatários de alerta e conta de faturamento</td>
+<td>11/09</td>
+<td>alertas existem e não notificam ninguém</td>
+</tr>
+</tbody>
+</table>
+<h3>O ponto mais importante deste relatório</h3>
+<p><strong>Nada foi validado contra um Google Cloud real.</strong> Não houve um único
+<code>terraform apply</code>, nenhuma linha gravada em BigQuery, nenhum job executado em
+nuvem. Todo o trabalho descrito na seção 2 foi verificado localmente.</p>
+<p>O primeiro contato com o ambiente real é onde aparecem os erros que teste local
+não pega: permissão insuficiente, cota de API, formato que o BigQuery recusa.
+Por isso a ness. registra que <strong>a Onda 0 não deve ser declarada homologada
+antes de o ambiente existir e a primeira carga rodar de ponta a ponta</strong>.</p>
+<p>O caminho crítico inteiro passa por A3, com vencimento nesta sexta.</p>
+<hr />
+<h2>4. Questionário de Gaps — emitido hoje</h2>
+<p>As 47 perguntas foram entregues nesta data, em 7 blocos, com prazos escalonados
+por dependência em vez de um prazo único:</p>
+<table>
+<thead>
+<tr>
+<th>Bloco</th>
+<th>Assunto</th>
+<th>Prazo</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>E</td>
+<td>Ambiente Google Cloud</td>
+<td><strong>04/09</strong></td>
+</tr>
+<tr>
+<td>A, B, D, F, G</td>
+<td>Domínios, responsáveis, regras de negócio, LGPD, BI</td>
+<td>11/09</td>
+</tr>
+<tr>
+<td>C4</td>
+<td>Decisão sobre a CCEE</td>
+<td>18/09</td>
+</tr>
+<tr>
+<td>C</td>
+<td>Fontes internas e acessos</td>
+<td>25/09</td>
+</tr>
+</tbody>
+</table>
+<p>Doze perguntas estão marcadas como bloqueantes: travam trabalho já contratado e
+parado. Se um bloco inteiro não puder ser respondido no prazo, são elas que
+importam.</p>
+<p><strong>"Não sei" é resposta válida e desejada.</strong> O objetivo do instrumento é
+localizar lacunas, não coletar respostas completas.</p>
+<hr />
+<h2>5. Questões abertas</h2>
+<p>Todas com issue de acompanhamento, conforme a convenção deste projeto.</p>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Questão</th>
+<th>Quem decide</th>
+<th>Prazo</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="https://github.com/nessenergy/Alupdatalake/issues/55">#55</a></td>
+<td>Provisionamento do ambiente GCP (A3)</td>
+<td>Alup</td>
+<td><strong>04/09</strong></td>
+</tr>
+<tr>
+<td><a href="https://github.com/nessenergy/Alupdatalake/issues/67">#67</a></td>
+<td><strong>Região do ambiente</strong>: <code>us-east1</code> ou <code>southamerica-east1</code></td>
+<td>Alup (pergunta E7)</td>
+<td>antes do primeiro apply</td>
+</tr>
+<tr>
+<td><a href="https://github.com/nessenergy/Alupdatalake/issues/8">#8</a></td>
+<td>Questionário de Gaps respondido (A4)</td>
+<td>Alup</td>
+<td>11/09</td>
+</tr>
+<tr>
+<td><a href="https://github.com/nessenergy/Alupdatalake/issues/9">#9</a> · <a href="https://github.com/nessenergy/Alupdatalake/issues/10">#10</a></td>
+<td>RACI e ferramenta de BI (A5, A6)</td>
+<td>Alup</td>
+<td>11/09</td>
+</tr>
+<tr>
+<td><a href="https://github.com/nessenergy/Alupdatalake/issues/52">#52</a></td>
+<td>CCEE responde 403 a acesso automatizado (A2)</td>
+<td>Alup</td>
+<td>18/09</td>
+</tr>
+<tr>
+<td><a href="https://github.com/nessenergy/Alupdatalake/issues/12">#12</a> a <a href="https://github.com/nessenergy/Alupdatalake/issues/15">#15</a></td>
+<td>Tokens e VPN das Ondas 2 e 3 (A7)</td>
+<td>Alup</td>
+<td>25/09</td>
+</tr>
+<tr>
+<td><a href="https://github.com/nessenergy/Alupdatalake/issues/68">#68</a></td>
+<td><strong>Revisão obrigatória na branch principal</strong></td>
+<td><strong>ness.</strong></td>
+<td>antes da homologação</td>
+</tr>
+</tbody>
+</table>
+<h3>Duas questões novas, levantadas hoje</h3>
+<p><strong>Região do ambiente (<a href="https://github.com/nessenergy/Alupdatalake/issues/67">#67</a>).</strong>
+A configuração atual aponta para os Estados Unidos; a pergunta E7 do
+questionário assume São Paulo. Conjunto de dados do BigQuery <strong>não muda de
+região depois de criado</strong> — corrigir mais tarde significa apagar, recriar e
+recarregar. Sob a LGPD isso é residência de dado, não apenas latência. A
+recomendação técnica da ness. é <code>southamerica-east1</code>.</p>
+<p><strong>Revisão obrigatória na branch principal (<a href="https://github.com/nessenergy/Alupdatalake/issues/68">#68</a>).</strong>
+Questão da ness., registrada aqui por transparência: o plano atual do GitHub
+não permite exigir revisão antes de integrar código. O pipeline de segurança
+roda em toda proposta de mudança, mas não bloqueia. Será resolvido por
+mudança de plano ou por aceite formal de risco antes da homologação.</p>
+<hr />
+<h2>6. Efeito contratual — cláusula 3ª</h2>
+<p>Registrado porque a cláusula exige que a data do pedido conste do dia em que o
+atraso começa, não do dia em que vira problema.</p>
+<table>
+<thead>
+<tr>
+<th>Situação</th>
+<th>Efeito</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Atraso &gt; 5 dias úteis em qualquer insumo</td>
+<td>cronograma postergado automaticamente</td>
+</tr>
+<tr>
+<td>Atraso &gt; 5 dias úteis em VPN ou credencial</td>
+<td>taxa de ociosidade de 4h/dia (R$ 256/h)</td>
+</tr>
+<tr>
+<td>Atraso &gt; 20 dias corridos</td>
+<td>suspensão automática dos serviços</td>
+</tr>
+</tbody>
+</table>
+<p>O risco financeiro concentra-se em <strong>A7</strong> (tokens e VPN, prazo 25/09). Como o
+caminho técnico de acesso a bancos já está pronto, o tempo perdido ali deixou
+de ser desenvolvimento pendente e passou a ser ociosidade — que é exatamente o
+que a cláusula precifica. <strong>Abrir os pedidos internos agora</strong>, mesmo para
+acesso que só será usado em novembro, é a única mitigação disponível.</p>
+<hr />
+<h2>7. O que pedimos nesta semana</h2>
+<ol>
+<li><strong>Uma data para o ambiente GCP, com o nome de quem provisiona.</strong> Não uma
+   estimativa. Todo o cronograma pendura nela, e o prazo é sexta.</li>
+<li><strong>Resposta ao bloco E do questionário até 04/09</strong>, mesmo que os demais
+   blocos venham depois — ele é pré-requisito de todo o restante.</li>
+<li><strong>Abertura imediata dos pedidos de token e VPN</strong> das Ondas 2 e 3.</li>
+<li><strong>Confirmação da região</strong> e da existência ou não de recesso de fim de ano.</li>
+</ol>
+<hr />
+<p><em>ness. Processos e Tecnologia Ltda. · CNPJ 72.027.097/0001-37</em>
+<em>Situação corrente e viva em <a href="../status.md"><code>docs/status.md</code></a>; este documento é um retrato de 31/08/2026 e não será editado.</em></p><p class="rodape">ness. Processos e Tecnologia Ltda. · CNPJ 72.027.097/0001-37 · Contrato CPS-01025/2026 — AlupData Fase 1: DataLake</p></body></html>

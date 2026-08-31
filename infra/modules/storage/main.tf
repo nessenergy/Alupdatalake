@@ -4,6 +4,7 @@
 variable "project_id" { type = string }
 variable "region" { type = string }
 variable "environment" { type = string }
+variable "service_account_email" { type = string }
 variable "dias_retencao_raw" {
   description = "Dias até o dado bruto ir para Nearline; 0 desliga a regra"
   type        = number
@@ -39,6 +40,17 @@ resource "google_storage_bucket" "raw" {
     projeto  = "alupdata"
     ambiente = var.environment
   }
+}
+
+resource "google_storage_bucket_iam_member" "ingestao" {
+  for_each = toset([
+    "roles/storage.objectCreator",
+    "roles/storage.objectViewer",
+  ])
+
+  bucket = google_storage_bucket.raw.name
+  role   = each.value
+  member = "serviceAccount:${var.service_account_email}"
 }
 
 output "bucket_raw" {

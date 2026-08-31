@@ -5,6 +5,7 @@
 
 variable "project_id" { type = string }
 variable "environment" { type = string }
+variable "service_account_email" { type = string }
 variable "segredos" {
   description = "Nomes no padrão alupdata-<fonte>-<campo>"
   type        = list(string)
@@ -13,7 +14,20 @@ variable "segredos" {
     "alupdata-bbce-api-token",
     "alupdata-hubspot-api-token",
     "alupdata-tempook-api-token",
+    "alupdata-fmb-dsn",
+    "alupdata-portal-alup-dsn",
+    "alupdata-comercializacao-dsn",
+    "alupdata-rm-dsn",
   ]
+}
+
+resource "google_secret_manager_secret_iam_member" "ingestao" {
+  for_each = google_secret_manager_secret.fonte
+
+  project   = var.project_id
+  secret_id = each.value.secret_id
+  role      = "roles/secretmanager.secretAccessor"
+  member    = "serviceAccount:${var.service_account_email}"
 }
 
 resource "google_secret_manager_secret" "fonte" {

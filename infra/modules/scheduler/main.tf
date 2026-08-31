@@ -103,6 +103,16 @@ resource "google_cloud_scheduler_job" "ingestao" {
   }
 }
 
+resource "google_cloud_run_v2_job_iam_member" "scheduler" {
+  for_each = google_cloud_run_v2_job.ingestao
+
+  project  = var.project_id
+  location = var.region
+  name     = each.value.name
+  role     = "roles/run.invoker"
+  member   = "serviceAccount:${var.service_account_email}"
+}
+
 output "jobs" {
   description = "Nomes dos Cloud Run Jobs de ingestão"
   value       = [for j in google_cloud_run_v2_job.ingestao : j.name]

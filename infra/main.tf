@@ -22,9 +22,9 @@ provider "google" {
 
 # ------------------------------------------------------------------ identidade
 
-# Uma service account para as ingestões, com o mínimo necessário: escreve no
-# Bronze, lê o bucket raw e os secrets. Nada de chave JSON — o CI usa Workload
-# Identity Federation e o Cloud Run Job usa a própria identidade.
+# Uma service account para as ingestões. Permissões de dado ficam no recurso
+# específico (dataset, bucket, secret e job); só a criação de jobs BigQuery é
+# inevitavelmente concedida no projeto.
 resource "google_service_account" "ingestao" {
   account_id   = "alupdata-ingestao"
   display_name = "AlupData — ingestão"
@@ -33,11 +33,7 @@ resource "google_service_account" "ingestao" {
 
 locals {
   papeis_ingestao = [
-    "roles/bigquery.dataEditor",
     "roles/bigquery.jobUser",
-    "roles/storage.objectCreator",
-    "roles/secretmanager.secretAccessor",
-    "roles/run.invoker",
   ]
 }
 
@@ -47,6 +43,13 @@ resource "google_project_iam_member" "ingestao" {
   project = var.project_id
   role    = each.value
   member  = "serviceAccount:${google_service_account.ingestao.email}"
+}
+
+resource "google_bigquery_dataset_iam_member" "ingestao_bronze" {
+  project    = var.project_id
+  dataset_id = module.bigquery.dataset_ids["bronze"]
+  role       = "roles/bigquery.dataEditor"
+  member     = "serviceAccount:${google_service_account.ingestao.email}"
 }
 
 # --------------------------------------------------------------------- módulos
@@ -59,16 +62,18 @@ module "bigquery" {
 }
 
 module "storage" {
-  source      = "./modules/storage"
-  project_id  = var.project_id
-  region      = var.region
-  environment = var.environment
+  source                = "./modules/storage"
+  project_id            = var.project_id
+  region                = var.region
+  environment           = var.environment
+  service_account_email = google_service_account.ingestao.email
 }
 
 module "secrets" {
-  source      = "./modules/secrets"
-  project_id  = var.project_id
-  environment = var.environment
+  source                = "./modules/secrets"
+  project_id            = var.project_id
+  environment           = var.environment
+  service_account_email = google_service_account.ingestao.email
 }
 
 # Alertas. `emails_alerta` vazio cria as políticas sem destinatário — ver o

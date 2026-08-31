@@ -33,7 +33,6 @@ htmlcov/
 *.tfstate
 *.tfstate.*
 *.tfplan
-.terraform.lock.hcl
 
 # GCP
 service-account-*.json

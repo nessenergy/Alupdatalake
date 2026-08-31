@@ -43,3 +43,6 @@ clean:
 	find . -type d -name __pycache__ -exec rm -rf {} + 2>/dev/null || true
 	find . -type d -name .pytest_cache -exec rm -rf {} + 2>/dev/null || true
 	rm -f coverage.xml bandit-report.json .requirements.txt
+
+questionario-pdf: ## Reemite o PDF de envio do Questionario de Gaps
+	uv run --with markdown python scripts/gerar_pdf_questionario.py

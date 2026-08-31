@@ -2,7 +2,7 @@
 
 **Contrato** CPS-01025/2026 · **Onda 0** · dependência **A4** (cláusula 3ª)
 **Emitido por** ness. Processos e Tecnologia · **Para** Grupo Alupar
-**Data de emissão** 29/08/2026 · **Prazo de resposta** 11/09/2026
+**Data de emissão** 31/08/2026 · **Prazo de resposta** 11/09/2026
 
 ---
 
@@ -150,7 +150,7 @@ que o atraso começa, não do dia em que vira problema.
 | Atraso > 5 dias úteis em VPN/credencial | taxa de ociosidade de 4h/dia (R$ 256/h) |
 | Atraso > 20 dias corridos | suspensão automática dos serviços |
 
-**Data de emissão deste questionário: 29/08/2026.** O prazo de 11/09/2026 para
+**Data de emissão deste questionário: 31/08/2026.** O prazo de 11/09/2026 para
 os blocos A, B, D, F e G segue o marco da Onda 0. O bloco E (GCP) tem prazo
 **04/09/2026** por ser pré-requisito de todo o restante. O bloco C tem prazo
 **25/09/2026**, exceto C4 (CCEE), cujo prazo é **18/09/2026**.

@@ -17,7 +17,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v4
         with:
-          version: "latest"
+          version: "0.5.11"
       # `--extra dev` é obrigatório: ruff, pytest, bandit e pip-audit vivem
       # em [project.optional-dependencies].dev, que o sync padrão não instala.
       - run: uv sync --frozen --extra dev

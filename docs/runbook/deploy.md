@@ -1,5 +1,8 @@
 # Runbook — deploy da infraestrutura e das ingestões
 
+Para a primeira implantação, use também a checklist
+[`primeiro-deploy.md`](primeiro-deploy.md).
+
 ## O que existe
 
 | Recurso | Onde é declarado |
@@ -9,6 +12,16 @@
 | Secrets das fontes credenciadas (vazios) | `infra/modules/secrets` |
 | Cloud Run Job + Cloud Scheduler por conector | `infra/modules/scheduler` |
 | Service account `alupdata-ingestao` e seu IAM | `infra/main.tf` |
+
+IAM da identidade de ingestão:
+
+| Escopo | Papel |
+|---|---|
+| Projeto | `roles/bigquery.jobUser` |
+| Dataset Bronze | `roles/bigquery.dataEditor` |
+| Bucket raw | `roles/storage.objectCreator` e `roles/storage.objectViewer` |
+| Cada secret declarado | `roles/secretmanager.secretAccessor` |
+| Cada Cloud Run Job | `roles/run.invoker` |
 
 Recurso criado no console não existe: some no próximo `apply`.
 
@@ -34,13 +47,14 @@ Recurso criado no console não existe: some no próximo `apply`.
 
 Workflow **Deploy GCP** (`workflow_dispatch`), escolhendo ambiente e módulo:
 
-- `connectors` → constrói e publica a imagem da CLI (`:<sha>` e `:latest`)
-- `infra` → `terraform plan` + `apply` usando `IMAGEM_INGESTAO:latest`
-- `all` → os dois
+- `connectors` → constrói e publica a imagem da CLI (`:<sha completo>` e `:latest`)
+- `infra` → `terraform plan` + `apply` usando a imagem já publicada em `:latest`
+- `all` → publica a imagem imutável, aplica Terraform com essa mesma tag e
+  depois aplica o SQL versionado
 
-Ordem na primeira vez: **`connectors` antes de `infra`**. Sem imagem publicada,
-`imagem_ingestao` fica vazio e o módulo de agendamento não sobe — de propósito,
-para o `apply` não falhar referenciando uma imagem inexistente.
+No fluxo `all`, o job Terraform depende explicitamente do job de imagem. Isso
+impede o primeiro `apply` de disputar com o primeiro push. O estado guarda a tag
+imutável do commit; `latest` permanece apenas como conveniência operacional.
 
 ## Views
 
@@ -65,6 +79,18 @@ Reprocessar uma janela específica (o Bronze é append-only; a Silver deduplica)
 ```bash
 alupdata ingerir bcb_cambio_ptax --de 2026-01-01 --ate 2026-01-31
 ```
+
+Reprocessar um payload já arquivado, sem chamar a fonte novamente:
+
+```bash
+alupdata reprocessar-raw bcb_cambio_ptax \
+  --uri gs://<bucket>/bcb/cambio_ptax/dt=2026-01-01/<ingestao_id>.json.gz \
+  --de 2026-01-01 --ate 2026-01-31
+```
+
+O replay cria uma nova execução com `modo=REPLAY` e preenche
+`origem_ingestao_id`. A janela é obrigatória porque os objetos raw gravados até
+esta versão não carregam a data final no próprio arquivo.
 
 ## Segredos
 

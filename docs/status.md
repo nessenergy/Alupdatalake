@@ -1,6 +1,7 @@
 # Estado do projeto
 
-Atualizado em **2026-08-28** · `main` em `b2e5510`
+Atualizado em **2026-08-30** · `main` em `249ec2b` · lote de replay,
+sanitização, IAM e CI commitado
 
 Este arquivo responde "onde estamos e o que trava o próximo passo". Detalhe de
 escopo e estimativa fica em [`plano-execucao.md`](plano-execucao.md); o que sai
@@ -16,7 +17,9 @@ contexto para agentes, em [`../AGENTS.md`](../AGENTS.md).
 
 | Item | Onde | Verificação |
 |---|---|---|
-| Runner de ingestão (janela, raw no GCS, validação, colunas técnicas, carga, log) | `src/core/` | 186 testes, 92% de cobertura (suíte inteira) |
+| Runner de ingestão (janela, raw no GCS, validação, colunas técnicas, carga, log) | `src/core/` | 226 testes aprovados, 92% de cobertura (suíte inteira) |
+| Caminho de banco relacional (Oracle/MySQL) para a Onda 3 | `src/core/banco.py` | ADR 008; 16 testes sem rede; **nenhuma conexão real** — depende de VPN (A7) |
+| Replay do raw sem nova chamada à fonte | `alupdata reprocessar-raw`, `src/core/storage.py` | testes locais com JSONL gzip; falta validar contra GCS real |
 | CLI única (`alupdata listar` / `ingerir`) | `src/cli.py` | executada contra as 4 fontes |
 | Scaffolding dos 7 componentes | `make novo-conector` | usado nas fontes novas |
 | Deploy de views idempotente | `make deploy-views` | `--dry-run` conferido |
@@ -25,9 +28,9 @@ contexto para agentes, em [`../AGENTS.md`](../AGENTS.md).
 | Log estruturado com correlação por execução | `src/core/observabilidade.py` | 8 testes; verificado contra a API do BCB |
 | Alertas (falha, silêncio, inválidos em alta) | `infra/modules/monitoramento` | `terraform validate` limpo; **sem destinatário** — ver runbook |
 | Painel no Cloud Monitoring e orçamento com alerta de custo | `infra/modules/monitoramento` | orçamento precisa do `billing_account` da Alup (A3) |
-| Terraform: datasets, bucket raw, secrets, Cloud Run Job + Scheduler, IAM | `infra/` | `fmt` e `validate` limpos |
-| CI/CD: lint, testes, Bandit, pip-audit, Gitleaks, Terraform | `.github/workflows/` | verde |
-| Imagem da CLI | `Dockerfile` | build não executado (sem Artifact Registry ainda) |
+| Terraform: datasets, bucket raw, secrets, Cloud Run Job + Scheduler, IAM | `infra/` | IAM restringido por recurso; Terraform 1.15.8 `fmt` e `validate` limpos |
+| CI/CD: lint, testes, Bandit, pip-audit, Gitleaks, Terraform | `.github/workflows/` | workflow de deploy ordenado; 7 jobs verdes no Actions |
+| Imagem da CLI | `Dockerfile` | build local não executado: Docker Desktop sem daemon ativo |
 
 ### Conectores (7 componentes cada, exceto onde indicado)
 
@@ -57,7 +60,7 @@ BigQuery de verdade — o projeto GCP ainda não existe.
 
 ### Documentação
 
-ADRs 001–007 · 5 dicionários de dados · plano de execução · runbook de deploy ·
+ADRs 001–008 · 5 dicionários de dados · plano de execução · runbook de deploy ·
 `AGENTS.md` como contexto canônico · skills do projeto e shortlist do Google.
 
 ---
@@ -69,6 +72,8 @@ ADRs 001–007 · 5 dicionários de dados · plano de execução · runbook de d
 | N1 | Preparar contrato de dados das fontes das Ondas 2 e 3 | **inviável para 3 das 4 fontes** — ver §5 |
 | N2 | Portal MVP: ligar contra o BigQuery e publicar no Cloud Run | escopo cravado na ADR 005; a tela existe e roda com provedor simulado — falta o ambiente GCP (A3) |
 | N3 | Primeiro `terraform apply` real e primeiro deploy da imagem | ambiente GCP (A3) |
+| N4 | Validar replay contra objeto real no GCS e conferir linhagem no BigQuery | ambiente GCP (A3) |
+| N5 | Construir e executar a imagem no ambiente de desenvolvimento | Docker Desktop não disponibilizou o daemon nesta estação |
 
 ---
 
@@ -100,7 +105,7 @@ ADRs 001–007 · 5 dicionários de dados · plano de execução · runbook de d
 | 0 — Fundação | 90h · marco 15,52% | Técnico concluído; **falta o que depende da Alup** (A3–A6) para homologar |
 | 1 — Mercado base | 120h · marco 20,69% | **4 de 5 fontes concluídas**; CCEE bloqueada (A2) |
 | 2 — APIs credenciadas | 110h · marco 18,97% | Não iniciada; bloqueada por token (A7) |
-| 3 — Sistemas internos | 155h · marco 26,72% | Não iniciada; bloqueada por VPN (A7) |
+| 3 — Sistemas internos | 155h · marco 26,72% | Caminho de banco pronto (ADR 008); **nenhuma fonte iniciada** — bloqueada por VPN (A7) |
 | 4 — Planilhas e handoff | 105h · marco 18,10% | Não iniciada |
 
 ---
@@ -136,6 +141,11 @@ primeira carga real são onde aparecem os erros que teste local não pega: IAM
 insuficiente, cota de API, permissão de bucket, formato que o BigQuery recusa.
 **A Onda 0 não deve ser declarada homologada antes disso rodar** — o critério
 está na skill `homologacao-onda`.
+
+O replay do raw, a restrição de IAM e a nova ordem do deploy foram validados
+por testes locais e inspeção estática. Ainda não foram exercitados pelas APIs
+reais do GCS, IAM, Cloud Run ou BigQuery. O registro detalhado da rodada está em
+[`relatorios/2026-08-30-preparacao-local-sem-gcp.md`](relatorios/2026-08-30-preparacao-local-sem-gcp.md).
 
 ---
 

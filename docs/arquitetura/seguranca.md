@@ -23,6 +23,20 @@ Conforme cláusula 8.4 do contrato CPS-01025/2026, o projeto adota práticas de 
 - Usar Google Cloud Secret Manager para todas as credenciais
 - Variáveis de ambiente para configuração não-sensível
 - `.env` está no `.gitignore`
+- Sanitizar mensagem e stack trace antes de logar ou persistir erro
+- Conceder `secretAccessor` por secret, não no projeto inteiro
+
+O módulo `src/core/seguranca.py` remove padrões de DSN, Bearer e parâmetros
+sensíveis. Erros de validação não incluem o valor bruto que foi rejeitado.
+
+### Menor privilégio
+
+- A identidade de ingestão cria jobs BigQuery no projeto, mas edita apenas o
+  dataset Bronze.
+- O bucket raw concede criação e leitura de objetos, sem administração do
+  bucket.
+- Invocação de Cloud Run é concedida por job.
+- Credencial read-only na origem continua obrigatória para bancos internos.
 
 ### Gestão de Vulnerabilidades (Cláusula 8.6)
 

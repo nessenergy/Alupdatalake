@@ -17,14 +17,19 @@ from src.core.config import get_settings
 _METODOS_IDEMPOTENTES = frozenset({"GET", "HEAD", "OPTIONS"})
 
 
-def criar_sessao() -> requests.Session:
-    """Sessão com retry em 429/5xx e backoff exponencial."""
+def criar_sessao(*, retry_post: bool = False) -> requests.Session:
+    """Sessão com retry em 429/5xx e backoff exponencial.
+
+    POST fica desligado por padrão. Conectores podem habilitá-lo somente para
+    endpoints de consulta cuja repetição não produz efeito na origem.
+    """
     cfg = get_settings()
+    metodos = _METODOS_IDEMPOTENTES | ({"POST"} if retry_post else set())
     retry = Retry(
         total=cfg.http_max_tentativas,
         backoff_factor=1.0,
         status_forcelist=(429, 500, 502, 503, 504),
-        allowed_methods=_METODOS_IDEMPOTENTES,
+        allowed_methods=metodos,
         raise_on_status=False,
     )
     sessao = requests.Session()

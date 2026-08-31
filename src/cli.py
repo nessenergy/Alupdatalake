@@ -33,6 +33,12 @@ def _parser() -> argparse.ArgumentParser:
     ingerir.add_argument("--ate", help="fim da janela (YYYY-MM-DD)")
     ingerir.add_argument("--ultimos-dias", type=int, help="janela terminando ontem")
     ingerir.add_argument("--dry-run", action="store_true", help="extrai e valida sem gravar")
+
+    replay = sub.add_parser("reprocessar-raw", help="reprocessa um objeto raw já arquivado no GCS")
+    replay.add_argument("conector", help="rótulo do conector dono do raw")
+    replay.add_argument("--uri", required=True, help="objeto gs:// no layout raw canônico")
+    replay.add_argument("--de", required=True, help="início da janela original (YYYY-MM-DD)")
+    replay.add_argument("--ate", required=True, help="fim da janela original (YYYY-MM-DD)")
     return parser
 
 
@@ -51,6 +57,11 @@ def main(argv: list[str] | None = None) -> int:
         for rotulo in listar():
             print(rotulo)
         return 0
+
+    if args.comando == "reprocessar-raw":
+        conector = obter(args.conector)
+        execucao = conector.reprocessar_raw(args.uri, Janela.de_texto(args.de, args.ate))
+        return 0 if execucao.status == "SUCESSO" else 1
 
     if args.dry_run:
         get_settings().dry_run = True

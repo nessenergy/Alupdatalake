@@ -4,6 +4,8 @@ CREATE TABLE IF NOT EXISTS `${projeto}.${bronze}._execucoes` (
   ingestao_id      STRING    NOT NULL,
   fonte            STRING    NOT NULL,
   entidade         STRING    NOT NULL,
+  modo             STRING    NOT NULL OPTIONS(description="FONTE | REPLAY"),
+  origem_ingestao_id STRING  OPTIONS(description="Execução cujo raw originou o replay"),
   janela_inicio    DATE      NOT NULL,
   janela_fim       DATE      NOT NULL,
   status           STRING    NOT NULL OPTIONS(description="SUCESSO | ERRO | EM_EXECUCAO"),

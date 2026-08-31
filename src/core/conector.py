@@ -16,7 +16,8 @@ from pydantic import BaseModel, ValidationError
 from src.core.bigquery import carregar_bronze, registrar_execucao
 from src.core.execucao import Execucao, Janela
 from src.core.observabilidade import contexto_execucao
-from src.core.storage import gravar_raw
+from src.core.seguranca import sanitizar
+from src.core.storage import gravar_raw, identificar_raw, ler_raw
 
 if TYPE_CHECKING:
     from collections.abc import Iterator
@@ -80,24 +81,15 @@ class Conector(ABC):
             execucao.linhas_extraidas = len(brutos)
 
             gravar_raw(execucao, brutos)
-
-            tecnicas = self._colunas_tecnicas(execucao)
-            linhas: list[dict[str, Any]] = []
-            for bruto in brutos:
-                try:
-                    validado = self.schema.model_validate(self.transformar(bruto))
-                except ValidationError as exc:
-                    execucao.linhas_invalidas += 1
-                    logger.warning("[%s] registro inválido descartado: %s", self.rotulo, exc.errors()[:1])
-                    continue
-                linhas.append(validado.model_dump(mode="json") | tecnicas)
-
-            execucao.linhas_carregadas = carregar_bronze(execucao, linhas)
+            self._validar_e_carregar(execucao, brutos)
             execucao.encerrar()
         except Exception as exc:  # noqa: BLE001 — a execução precisa ser registrada como ERRO
-            execucao.encerrar(erro=f"{type(exc).__name__}: {exc}")
+            execucao.encerrar(erro=sanitizar(f"{type(exc).__name__}: {exc}"))
             logger.exception("[%s] ingestão falhou", self.rotulo)  # exc_info alimenta o Error Reporting
-            registrar_execucao(execucao)
+            try:
+                registrar_execucao(execucao)
+            except Exception:  # noqa: BLE001 — preserva a exceção original da ingestão
+                logger.critical("[%s] falha adicional ao registrar a execução com erro", self.rotulo, exc_info=True)
             raise
 
         registrar_execucao(execucao)
@@ -111,6 +103,54 @@ class Conector(ABC):
             execucao.duracao_segundos or 0.0,
         )
         return execucao
+
+    def _validar_e_carregar(self, execucao: Execucao, brutos: list[dict[str, Any]]) -> None:
+        tecnicas = self._colunas_tecnicas(execucao)
+        linhas: list[dict[str, Any]] = []
+        for bruto in brutos:
+            try:
+                validado = self.schema.model_validate(self.transformar(bruto))
+            except ValidationError as exc:
+                execucao.linhas_invalidas += 1
+                logger.warning(
+                    "[%s] registro inválido descartado: %s",
+                    self.rotulo,
+                    exc.errors(include_input=False)[:1],
+                )
+                continue
+            linhas.append(validado.model_dump(mode="json") | tecnicas)
+        execucao.linhas_carregadas = carregar_bronze(execucao, linhas)
+
+    def reprocessar_raw(self, uri: str, janela: Janela) -> Execucao:
+        """Revalida e recarrega um raw existente sem acessar a fonte."""
+        info = identificar_raw(uri)
+        if (info.fonte, info.entidade) != (self.fonte, self.entidade):
+            raise ValueError(f"raw pertence a {info.fonte}_{info.entidade}, não a {self.rotulo}")
+
+        execucao = Execucao(
+            fonte=self.fonte,
+            entidade=self.entidade,
+            janela=janela,
+            modo="REPLAY",
+            origem_ingestao_id=info.ingestao_id,
+        )
+        with contexto_execucao(execucao):
+            logger.info("[%s] replay %s a partir de %s", self.rotulo, execucao.ingestao_id, uri)
+            try:
+                brutos = ler_raw(uri)
+                execucao.linhas_extraidas = len(brutos)
+                self._validar_e_carregar(execucao, brutos)
+                execucao.encerrar()
+            except Exception as exc:  # noqa: BLE001 — registra toda falha do replay
+                execucao.encerrar(erro=sanitizar(f"{type(exc).__name__}: {exc}"))
+                logger.exception("[%s] replay falhou", self.rotulo)
+                try:
+                    registrar_execucao(execucao)
+                except Exception:  # noqa: BLE001 — preserva a exceção original
+                    logger.critical("[%s] falha adicional ao registrar o replay com erro", self.rotulo, exc_info=True)
+                raise
+            registrar_execucao(execucao)
+            return execucao
 
     @property
     def rotulo(self) -> str:

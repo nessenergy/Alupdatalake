@@ -11,6 +11,7 @@ import logging
 from typing import TYPE_CHECKING, Any
 
 from src.core.config import get_settings
+from src.core.seguranca import sanitizar
 
 if TYPE_CHECKING:
     from src.core.execucao import Execucao
@@ -18,6 +19,10 @@ if TYPE_CHECKING:
 logger = logging.getLogger(__name__)
 
 TABELA_EXECUCOES = "_execucoes"
+
+
+class RegistroExecucaoError(RuntimeError):
+    """Carga pode ter ocorrido, mas sua evidência operacional não foi gravada."""
 
 
 def cliente():
@@ -56,8 +61,8 @@ def carregar_bronze(execucao: Execucao, linhas: list[dict[str, Any]]) -> int:
 def registrar_execucao(execucao: Execucao) -> None:
     """Grava a linha de controle em `bronze._execucoes`.
 
-    Falha aqui é logada, não propagada: perder o log de controle não pode
-    derrubar uma ingestão que deu certo.
+    Falha aqui é propagada: uma carga sem evidência operacional não pode ser
+    declarada como sucesso completo nem homologada.
     """
     cfg = get_settings()
     if cfg.dry_run:
@@ -68,6 +73,8 @@ def registrar_execucao(execucao: Execucao) -> None:
     try:
         erros = cliente().insert_rows_json(tabela, [execucao.to_row()])
         if erros:
-            logger.error("falha ao registrar execução em %s: %s", tabela, erros)
-    except Exception as exc:  # noqa: BLE001 — log de controle nunca derruba a ingestão
-        logger.error("falha ao registrar execução em %s: %s", tabela, exc)
+            raise RegistroExecucaoError(sanitizar(f"BigQuery recusou o registro operacional: {erros}"))
+    except RegistroExecucaoError:
+        raise
+    except Exception as exc:
+        raise RegistroExecucaoError(sanitizar(f"falha ao registrar execução em {tabela}: {exc}")) from exc

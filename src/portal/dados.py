@@ -361,13 +361,14 @@ class ProvedorBigQuery:
 
     def saude(self) -> list[SaudeConector]:
         cfg = get_settings()
-        linhas = (
-            cliente()
-            .query(
-                f"SELECT * FROM `{cfg.gcp_project_id}.{cfg.bq_dataset_gold}.saude_ingestao` ORDER BY conector"  # noqa: S608  # nosec B608
-            )
-            .result()
+        sql = (
+            "SELECT conector, situacao, ultimo_sucesso, minutos_desde_sucesso, "  # noqa: S608  # nosec B608
+            "intervalo_tipico_min, taxa_sucesso_30d, taxa_invalidas, "
+            "linhas_carregadas_total, duracao_p95_seg, ultimo_erro "
+            f"FROM `{cfg.gcp_project_id}.{cfg.bq_dataset_gold}.saude_ingestao` "
+            "ORDER BY conector"
         )
+        linhas = cliente().query(sql).result()
         return [
             SaudeConector(
                 conector=linha.conector,
@@ -426,13 +427,13 @@ class ProvedorBigQuery:
             # não consegue separar o que ela mesma gasta.
             labels={"componente": "portal", "camada": "gold"},
         )
-        linhas = list(
-            cliente.query(
-                f"SELECT * FROM `{cfg.gcp_project_id}.{cfg.bq_dataset_gold}.custo_consultas` "  # noqa: S608  # nosec B608
-                "WHERE dia >= DATE_SUB(CURRENT_DATE(), INTERVAL @dias DAY) ORDER BY dia",
-                job_config=config,
-            ).result()
+        sql = (
+            "SELECT dia, fonte, camada, consulta, execucoes, bytes_varridos, "  # noqa: S608  # nosec B608
+            "custo_query_usd, custo_armazenamento_usd, linhas_carregadas, variacao_vs_media "
+            f"FROM `{cfg.gcp_project_id}.{cfg.bq_dataset_gold}.custo_consultas` "
+            "WHERE dia >= DATE_SUB(CURRENT_DATE(), INTERVAL @dias DAY) ORDER BY dia"
         )
+        linhas = list(cliente.query(sql, job_config=config).result())
 
         por_dia: dict[date, dict[str, Decimal]] = {}
         por_fonte: dict[str, dict[str, Decimal | int]] = {}

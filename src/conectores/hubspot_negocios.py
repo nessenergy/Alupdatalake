@@ -4,7 +4,7 @@ Fonte: Hubspot CRM API v3, objeto `deals`.
 Documentação: https://developers.hubspot.com/docs/api/crm/deals
 
 Escrito contra a documentação pública, **sem token**: a credencial é uma
-pendência da Alup (pendência A5, `docs/status.md`). O contrato de dados abaixo
+pendência da Alup (pendência A9, `docs/status.md`). O contrato de dados abaixo
 vale até a primeira execução real — quando o token chegar, a tarefa é ligar e
 conferir, não começar.
 
@@ -82,7 +82,9 @@ class HubspotNegocios(Conector):
     max_dias_por_requisicao = None  # o filtro da busca aceita o intervalo inteiro
 
     def __init__(self) -> None:
-        self._sessao = criar_sessao()
+        # O endpoint é POST, mas apenas consulta: repetir 429/5xx não cria ou
+        # altera negócio na origem.
+        self._sessao = criar_sessao(retry_post=True)
 
     def _cabecalhos(self) -> dict[str, str]:
         return {"Authorization": f"Bearer {ler_secret(self.fonte, 'api-token')}"}

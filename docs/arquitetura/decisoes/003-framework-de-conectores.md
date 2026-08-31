@@ -33,7 +33,9 @@ Decisões que vêm junto:
 - **Bronze append-only, dedup na Silver** (`QUALIFY ROW_NUMBER()`). Mantém a
   auditoria do que a fonte devolveu em cada execução e simplifica a carga.
 - **GCS antes do BigQuery.** Bug de parser reprocessa do raw, sem bater de novo
-  numa fonte com rate limit ou retenção curta.
+  numa fonte com rate limit ou retenção curta. O comando
+  `alupdata reprocessar-raw` cria nova execução com `modo=REPLAY` e referência
+  à ingestão que produziu o objeto original.
 - **CLI única** (`alupdata ingerir <conector> --de --ate`), usada igual no
   laptop, no Cloud Run Job e na DAG. Não existe código que só roda em produção.
 - **Scaffolding** (`make novo-conector`) gera os 7 componentes esqueletados,

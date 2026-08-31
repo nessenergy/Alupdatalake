@@ -19,7 +19,10 @@ import os
 import sys
 from contextlib import contextmanager
 from contextvars import ContextVar
+from copy import copy
 from typing import TYPE_CHECKING, Any
+
+from src.core.seguranca import sanitizar
 
 if TYPE_CHECKING:
     from collections.abc import Iterator
@@ -41,14 +44,26 @@ class FormatadorJson(logging.Formatter):
     def format(self, record: logging.LogRecord) -> str:
         payload: dict[str, Any] = {
             "severity": record.levelname if record.levelname in _SEVERIDADES else "DEFAULT",
-            "message": record.getMessage(),
+            "message": sanitizar(record.getMessage()),
             "logger": record.name,
             **(_contexto.get() or {}),
         }
         if record.exc_info:
             # O Error Reporting agrupa por assinatura quando encontra este campo.
-            payload["stack_trace"] = self.formatException(record.exc_info)
+            payload["stack_trace"] = sanitizar(self.formatException(record.exc_info), limite=12000)
         return json.dumps(payload, ensure_ascii=False, default=str)
+
+
+class FormatadorTexto(logging.Formatter):
+    """Formato humano com a mesma redação aplicada ao JSON de produção."""
+
+    def format(self, record: logging.LogRecord) -> str:
+        seguro = copy(record)
+        seguro.msg = sanitizar(record.getMessage())
+        seguro.args = ()
+        if record.exc_info:
+            seguro.exc_text = sanitizar(self.formatException(record.exc_info), limite=12000)
+        return super().format(seguro)
 
 
 def _formato_padrao() -> str:
@@ -64,7 +79,7 @@ def configurar_logging() -> None:
     if _formato_padrao() == "json":
         manipulador.setFormatter(FormatadorJson())
     else:
-        manipulador.setFormatter(logging.Formatter(FORMATO_TEXTO, datefmt="%Y-%m-%d %H:%M:%S"))
+        manipulador.setFormatter(FormatadorTexto(FORMATO_TEXTO, datefmt="%Y-%m-%d %H:%M:%S"))
 
     raiz = logging.getLogger()
     raiz.handlers = [manipulador]

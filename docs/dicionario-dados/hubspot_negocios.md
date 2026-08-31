@@ -1,6 +1,6 @@
 # Hubspot — negócios do CRM
 
-**Onda 2 · bloqueado por credencial (pendência A5).** Implementado contra a
+**Onda 2 · bloqueado por credencial (pendência A9).** Implementado contra a
 documentação pública da API; nunca executado contra dado real. O contrato
 abaixo vale até a primeira execução com token — divergência encontrada ali é
 esperada e deve virar `schema_versao = "2"`.
@@ -14,7 +14,7 @@ esperada e deve virar `schema_versao = "2"`.
 | Autenticação | `Authorization: Bearer <token>` — private app, secret `alupdata-hubspot-api-token` |
 | Paginação | cursor `paging.next.after`, 100 registros por página |
 | Frequência | a cada 6 horas (`infra/modules/scheduler`) |
-| Dono do dado | comercial da Alup — a nomear na matriz RACI (pendência A4) |
+| Dono do dado | comercial da Alup — a nomear na matriz RACI (pendência A5) |
 
 ### Por que a janela filtra por `hs_lastmodifieddate`
 

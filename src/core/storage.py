@@ -7,9 +7,14 @@ algumas APIs do projeto têm rate limit ou retenção curta.
 from __future__ import annotations
 
 import gzip
+import io
 import json
 import logging
+import re
+from dataclasses import dataclass
+from datetime import date
 from typing import TYPE_CHECKING, Any
+from urllib.parse import urlparse
 
 from src.core.config import get_settings
 
@@ -17,6 +22,82 @@ if TYPE_CHECKING:
     from src.core.execucao import Execucao
 
 logger = logging.getLogger(__name__)
+
+_CAMINHO_RAW = re.compile(
+    r"^(?P<fonte>[a-z0-9_-]+)/(?P<entidade>[a-z0-9_-]+)/dt=(?P<data>\d{4}-\d{2}-\d{2})/"
+    r"(?P<ingestao_id>[A-Za-z0-9_-]+)\.json\.gz$"
+)
+MAX_RAW_BYTES = 100 * 1024 * 1024
+
+
+@dataclass(frozen=True)
+class RawInfo:
+    bucket: str
+    caminho: str
+    fonte: str
+    entidade: str
+    data_referencia: date
+    ingestao_id: str
+
+
+def identificar_raw(uri: str) -> RawInfo:
+    """Valida o layout canônico e identifica a origem de um objeto raw."""
+    parsed = urlparse(uri)
+    caminho = parsed.path.lstrip("/")
+    match = _CAMINHO_RAW.fullmatch(caminho)
+    if parsed.scheme != "gs" or not parsed.netloc or not match:
+        raise ValueError("URI de raw inválida; use gs://bucket/fonte/entidade/dt=AAAA-MM-DD/id.json.gz")
+    grupos = match.groupdict()
+    try:
+        data_referencia = date.fromisoformat(grupos["data"])
+    except ValueError as exc:
+        raise ValueError("URI de raw contém data inválida") from exc
+    return RawInfo(
+        bucket=parsed.netloc,
+        caminho=caminho,
+        fonte=grupos["fonte"],
+        entidade=grupos["entidade"],
+        data_referencia=data_referencia,
+        ingestao_id=grupos["ingestao_id"],
+    )
+
+
+def ler_raw(uri: str) -> list[dict[str, Any]]:
+    """Lê JSONL gzip do GCS para replay, sem consultar novamente a fonte."""
+    info = identificar_raw(uri)
+    from google.cloud import storage
+
+    cliente = storage.Client(project=get_settings().gcp_project_id)
+    blob = cliente.bucket(info.bucket).blob(info.caminho)
+
+    # O tamanho é conferido pelos metadados, antes de baixar: medir depois do
+    # download não protege de nada — o estouro de memória já teria acontecido.
+    blob.reload()
+    if blob.size is None:
+        raise ValueError("raw sem tamanho declarado no GCS")
+    if blob.size > MAX_RAW_BYTES:
+        raise ValueError(f"raw excede o limite comprimido de {MAX_RAW_BYTES} bytes")
+
+    corpo_comprimido = blob.download_as_bytes()
+    # Leitura com teto em vez de `gzip.decompress`: gzip descompacta na razão de
+    # ~1000:1, então 100 MB comprimidos cabem na memória mas viram dezenas de GB.
+    try:
+        with gzip.GzipFile(fileobj=io.BytesIO(corpo_comprimido)) as fluxo:
+            corpo = fluxo.read(MAX_RAW_BYTES + 1)
+    except (OSError, EOFError) as exc:
+        raise ValueError("raw gzip inválido") from exc
+    if len(corpo) > MAX_RAW_BYTES:
+        raise ValueError(f"raw excede o limite descomprimido de {MAX_RAW_BYTES} bytes")
+
+    registros: list[dict[str, Any]] = []
+    for numero, linha in enumerate(corpo.decode("utf-8").splitlines(), start=1):
+        if not linha.strip():
+            continue
+        registro = json.loads(linha)
+        if not isinstance(registro, dict):
+            raise ValueError(f"linha {numero} do raw não é um objeto JSON")
+        registros.append(registro)
+    return registros
 
 
 def caminho_raw(execucao: Execucao) -> str:

@@ -60,6 +60,8 @@ class Execucao:
     fonte: str
     entidade: str
     janela: Janela
+    modo: str = "FONTE"
+    origem_ingestao_id: str | None = None
     ingestao_id: str = field(default_factory=lambda: uuid.uuid4().hex)
     iniciada_em: datetime = field(default_factory=lambda: datetime.now(UTC))
     linhas_extraidas: int = 0
@@ -90,6 +92,8 @@ class Execucao:
             "ingestao_id": self.ingestao_id,
             "fonte": self.fonte,
             "entidade": self.entidade,
+            "modo": self.modo,
+            "origem_ingestao_id": self.origem_ingestao_id,
             "janela_inicio": self.janela.inicio.isoformat(),
             "janela_fim": self.janela.fim.isoformat(),
             "status": self.status,

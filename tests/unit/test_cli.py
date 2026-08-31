@@ -76,3 +76,18 @@ def test_execucao_com_erro_devolve_codigo_1(monkeypatch):
 def test_conector_desconhecido_falha_alto():
     with pytest.raises(KeyError, match="desconhecido"):
         main(["ingerir", "fonte_que_nao_existe", "--ultimos-dias", "1"])
+
+
+def test_reprocessar_raw_repassa_uri_e_janela(monkeypatch):
+    chamadas = []
+
+    class ConectorFalso:
+        def reprocessar_raw(self, uri, janela):
+            chamadas.append((uri, janela))
+            return type("E", (), {"status": "SUCESSO"})()
+
+    monkeypatch.setattr("src.cli.obter", lambda _rotulo: ConectorFalso())
+    uri = "gs://lake-raw/bcb/cambio_ptax/dt=2026-01-01/origem.json.gz"
+
+    assert main(["reprocessar-raw", "bcb_cambio_ptax", "--uri", uri, "--de", "2026-01-01", "--ate", "2026-01-02"]) == 0
+    assert chamadas == [(uri, Janela.de_texto("2026-01-01", "2026-01-02"))]

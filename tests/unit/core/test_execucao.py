@@ -47,3 +47,18 @@ def test_execucao_encerrada_com_erro_vira_status_erro():
     assert execucao.status == "ERRO"
     assert execucao.to_row()["erro"] == "HTTPError: 503"
     assert execucao.duracao_segundos >= 0
+
+
+def test_execucao_de_replay_guarda_a_linhagem():
+    execucao = Execucao(
+        fonte="bcb",
+        entidade="cambio_ptax",
+        janela=Janela.de_texto("2026-01-01", "2026-01-02"),
+        modo="REPLAY",
+        origem_ingestao_id="origem123",
+    )
+
+    linha = execucao.to_row()
+
+    assert linha["modo"] == "REPLAY"
+    assert linha["origem_ingestao_id"] == "origem123"

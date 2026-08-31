@@ -1,12 +1,16 @@
-"""Gera o PDF de envio do Questionário de Gaps a partir do Markdown.
+"""Renderiza um documento Markdown com a identidade ness., em HTML e/ou PDF.
 
-O Markdown em `docs/questionario-gaps.md` é a fonte única: este script só
-apresenta. Reemitir depois de qualquer alteração é `make questionario-pdf`.
+O Markdown é sempre a fonte única; este script só apresenta. Usado pelos
+documentos que saem para a contratante: o Questionário de Gaps e os relatórios
+de situação, que por convenção existem em `.md` e `.html`
+(ver `docs/relatorios/README.md`).
 
-Renderiza via Chrome/Edge headless — a mesma engine do navegador, o que evita
-divergência entre o que se revisa em tela e o que o cliente recebe.
+O HTML é autocontido — abre direto no navegador, sem servidor e sem dependência
+externa além da fonte Montserrat. O PDF sai do Chrome/Edge headless, a mesma
+engine em que o documento é revisado, o que evita divergência entre o que se vê
+em tela e o que o cliente recebe.
 
-    uv run python scripts/gerar_pdf_questionario.py [--saida caminho.pdf]
+    uv run --with markdown python scripts/gerar_documento.py FONTE.md --html --pdf
 """
 
 from __future__ import annotations
@@ -21,8 +25,6 @@ from pathlib import Path
 import markdown
 
 RAIZ = Path(__file__).resolve().parent.parent
-FONTE = RAIZ / "docs" / "questionario-gaps.md"
-SAIDA_PADRAO = RAIZ / "docs" / "envio" / "Questionario-de-Gaps-AlupData.pdf"
 
 NAVEGADORES = (
     Path(r"C:\Program Files\Google\Chrome\Application\chrome.exe"),
@@ -31,6 +33,12 @@ NAVEGADORES = (
 
 ESTILO = """
 @page { size: A4; margin: 16mm 14mm 16mm 14mm; }
+
+/* Só a versão de tela: no PDF a margem é da @page. */
+@media screen {
+  body { max-width: 900px; margin: 0 auto; padding: 32px 24px 64px; font-size: 15px; }
+  table { font-size: 14px; }
+}
 
 :root {
   --tinta: #12161a;
@@ -119,10 +127,12 @@ td {
 tr { break-inside: avoid; }
 thead { display: table-header-group; }
 
-/* Coluna 1 (código) estreita; a última (Resposta) recebe o espaço de escrita. */
-table td:first-child { width: 7%; font-weight: 600; font-variant-numeric: tabular-nums; }
-table th:last-child, table td:last-child { width: 30%; background: #fafbfc; }
-.bloco table td:nth-child(3) { width: 15%; color: var(--suave); font-size: 8.2pt; }
+/* Larguras de coluna do formulário: código estreito, "Resposta" com espaço de
+   escrita. Valem só no questionário — num relatório espremeriam a 1ª coluna e
+   pintariam a última sem motivo. */
+.questionario td:first-child { width: 7%; font-weight: 600; font-variant-numeric: tabular-nums; }
+.questionario th:last-child, .questionario td:last-child { width: 30%; background: #fafbfc; }
+.questionario td:nth-child(3) { width: 15%; color: var(--suave); font-size: 8.2pt; }
 
 /* --------------------------------------------------------------- destaques */
 
@@ -175,7 +185,7 @@ def encontrar_navegador() -> Path:
     raise SystemExit("Chrome ou Edge não encontrado; nenhum deles está instalado num caminho conhecido.")
 
 
-def montar_html(texto_md: str) -> str:
+def montar_html(texto_md: str, *, classe: str = "relatorio") -> str:
     corpo = markdown.markdown(texto_md, extensions=["tables", "attr_list"])
     # O marcador textual vira etiqueta visual — quem lê precisa achar as
     # perguntas que travam trabalho sem ler as 47.
@@ -192,19 +202,21 @@ def montar_html(texto_md: str) -> str:
         "<link href='https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&display=swap' "
         "rel='stylesheet'>"
         f"<style>{ESTILO}</style></head>"
-        f"<body class='bloco'>{marca}{corpo}{rodape}</body></html>"
+        f"<body class='{classe}'>{marca}{corpo}{rodape}</body></html>"
     )
 
 
-def gerar(saida: Path) -> Path:
-    if not FONTE.exists():
-        raise SystemExit(f"fonte não encontrada: {FONTE}")
-    html = montar_html(FONTE.read_text(encoding="utf-8"))
+def gerar_html(fonte: Path, saida: Path, classe: str) -> Path:
     saida.parent.mkdir(parents=True, exist_ok=True)
+    saida.write_text(montar_html(fonte.read_text(encoding="utf-8"), classe=classe), encoding="utf-8")
+    return saida
 
+
+def gerar_pdf(fonte: Path, saida: Path, classe: str) -> Path:
+    saida.parent.mkdir(parents=True, exist_ok=True)
     with tempfile.TemporaryDirectory() as tmp:
-        origem = Path(tmp) / "questionario.html"
-        origem.write_text(html, encoding="utf-8")
+        origem = Path(tmp) / "documento.html"
+        origem.write_text(montar_html(fonte.read_text(encoding="utf-8"), classe=classe), encoding="utf-8")
         subprocess.run(  # noqa: S603 — argumentos fixos, sem entrada do usuário
             [
                 str(encontrar_navegador()),
@@ -225,11 +237,31 @@ def gerar(saida: Path) -> Path:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--saida", type=Path, default=SAIDA_PADRAO)
+    parser = argparse.ArgumentParser(description="Renderiza Markdown com a identidade ness.")
+    parser.add_argument("fonte", type=Path, help="arquivo .md a renderizar")
+    parser.add_argument("--html", action="store_true", help="gera .html ao lado da fonte")
+    parser.add_argument("--pdf", action="store_true", help="gera .pdf")
+    parser.add_argument("--saida-pdf", type=Path, help="caminho do PDF (padrão: ao lado da fonte)")
+    parser.add_argument(
+        "--classe",
+        default="relatorio",
+        choices=("relatorio", "questionario"),
+        help="questionario aplica as larguras de coluna do formulário",
+    )
     args = parser.parse_args()
-    caminho = gerar(args.saida)
-    print(f"{caminho} ({caminho.stat().st_size / 1024:.0f} KB)")
+
+    if not args.fonte.exists():
+        raise SystemExit(f"fonte não encontrada: {args.fonte}")
+    if not (args.html or args.pdf):
+        raise SystemExit("escolha ao menos um formato: --html, --pdf")
+
+    if args.html:
+        caminho = gerar_html(args.fonte, args.fonte.with_suffix(".html"), args.classe)
+        print(f"{caminho} ({caminho.stat().st_size / 1024:.0f} KB)")
+    if args.pdf:
+        destino = args.saida_pdf or args.fonte.with_suffix(".pdf")
+        caminho = gerar_pdf(args.fonte, destino, args.classe)
+        print(f"{caminho} ({caminho.stat().st_size / 1024:.0f} KB)")
     return 0
 
 

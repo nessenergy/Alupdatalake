@@ -1,6 +1,6 @@
 # Plano semanal — próximas 4 semanas
 
-Emitido em **2026-08-27** · `main` em `129f579` ·
+Emitido em **2026-08-27** · S1 revisada em **2026-08-31** · `main` em `db94412` ·
 Escopo e estimativa por onda: [`plano-execucao.md`](plano-execucao.md) ·
 Situação atual: [`status.md`](status.md)
 
@@ -26,17 +26,60 @@ Semanas contadas de segunda a sexta. S1 começa em **2026-08-31**.
 
 ## S1 · 31/08 – 04/09 · Ambiente e contrato de dados
 
-| Trilha | Item | Entregável verificável |
+> Revisado em **31/08**, primeiro dia da semana. Dois itens previstos aqui já
+> foram entregues antes de a semana começar (PRs #61 a #65): o runbook do
+> primeiro deploy e o Questionário de Gaps. Em compensação, dois bloqueios
+> novos apareceram — ver "Descobertas" abaixo.
+
+### Já entregue, antes do prazo
+
+| Item | Onde |
+|---|---|
+| Runbook do primeiro deploy | [`runbook/primeiro-deploy.md`](runbook/primeiro-deploy.md) |
+| Questionário de Gaps: 47 perguntas, 7 blocos, prazos escalonados | [`questionario-gaps.md`](questionario-gaps.md) · PDF em `envio/` |
+| Caminho de banco relacional da Onda 3 | `src/core/banco.py` (ADR 008) |
+| Replay de raw, sanitização de credencial, IAM por recurso | PR #64 |
+
+### O que esta semana precisa produzir
+
+| Dia | Item | Entregável verificável |
 |---|---|---|
-| Entregamos | Repositório pronto para o primeiro `apply`: branch protection na `main`, variáveis `GCP_WIF_PROVIDER`, `GCP_DEPLOY_SA`, `GCP_REGION`, `IMAGEM_INGESTAO` | workflow de deploy chega até a autenticação e falha só por falta de projeto |
-| Entregamos | Runbook do dia-1 do ambiente: sequência exata de `terraform apply`, ordem dos módulos, o que conferir depois de cada um | `docs/runbook/dia-1.md` |
-| Entregamos | Roteiro de condução do Questionário de Gaps (A4): as 47 perguntas agrupadas por domínio, com quem responde cada bloco | documento pronto para a reunião, não um formulário solto |
-| Destrava | **A3** — projeto GCP `dev` criado, 10 APIs habilitadas, IAM e WIF configurados, Artifact Registry e bucket de state | issue [#55](https://github.com/nessenergy/Alupdatalake/issues/55) |
-| Destrava | **A9** — token Hubspot no secret `alupdata-hubspot-api-token` | conector já pronto; é rodar e conferir |
+| **Seg 31/08** | **Enviar o Questionário de Gaps à Alup** | e-mail enviado, com data, hora e destinatários registrados na issue [#8](https://github.com/nessenergy/Alupdatalake/issues/8) |
+| **Seg 31/08** | Cobrar A3 por escrito, pedindo **data com responsável nomeado** | registro na issue [#55](https://github.com/nessenergy/Alupdatalake/issues/55) |
+| **Seg 31/08** | **Decidir a região** do ambiente: `us-east1` (valor atual em `dev.tfvars`) ou `southamerica-east1` (o que a pergunta E7 assume) | `dev.tfvars` e `prod.tfvars` coerentes com a decisão |
+| Ter–Qua | Build da imagem da CLI e execução local do job | `docker run` da imagem executando `alupdata listar` |
+| Ter–Qua | `banco.py` exercitado contra Oracle XE e MySQL em contêiner | uma consulta real por driver, com paginação verificada |
+| Qui–Sex | Variáveis do GitHub preenchidas assim que A3 der os valores | `gh api .../actions/variables` devolvendo as quatro |
+| Qui–Sex | Issues das lacunas de rastreamento criadas e ligadas ao Project | trabalho das PRs #62–#65 rastreável na medição |
+
+### Destrava (ação da Alup)
+
+| Insumo | Prazo | Issue |
+|---|---|---|
+| **A3** — projeto GCP `dev`, 10 APIs, IAM, WIF, Artifact Registry, bucket de state | **04/09** | [#55](https://github.com/nessenergy/Alupdatalake/issues/55), [#1](https://github.com/nessenergy/Alupdatalake/issues/1) |
+| **A9** — token Hubspot no secret `alupdata-hubspot-api-token` | 11/09 | [#24](https://github.com/nessenergy/Alupdatalake/issues/24) |
 
 > Se A3 não chegar até **04/09**, começa a contagem da cláusula 3ª (atraso > 5
 > dias úteis posterga o cronograma). Registrar a data do pedido no dia em que o
 > atraso começa.
+
+### Descobertas de 31/08
+
+**A região está divergente e a decisão é irreversível.** `dev.tfvars` aponta
+`us-east1`; a pergunta E7 do questionário assume `southamerica-east1`. Dataset
+do BigQuery **não muda de região depois de criado** — corrigir mais tarde é
+recriar tudo e recarregar. Precisa ser decidido antes do primeiro `apply`, e
+tem efeito de residência de dado sob a LGPD, não só de latência.
+
+**Branch protection é impossível no plano atual.** A organização está no
+GitHub Free com repositório privado; tanto `branch protection` quanto
+`rulesets` respondem 403 pedindo upgrade. Hoje a `main` aceita push direto sem
+revisão obrigatória — o que contraria o SSDLC da cláusula 8ª. As saídas são
+GitHub Team (pago por usuário) ou assumir formalmente o risco por escrito.
+Enquanto isso, o CI roda em toda PR mas **não impede** um push direto.
+
+**Docker está ativo** (29.6.1), ao contrário do que `status.md` registrava. O
+build da imagem deixa de depender de ambiente e vira tarefa desta semana.
 
 ---
 

@@ -199,14 +199,14 @@ pre i{color:#6B7885;font-style:normal}
 
 <!-- 01 CAPA -->
 <section class="slide dark cover" data-t="Capa">
-  <span class="wordmark">ness<i>.</i></span><span class="tag">Revisão arquitetural · Google</span>
+  <span class="wordmark">ness<i>.</i></span><span class="tag">Revisão conceitual · Google</span>
   <div class="inner">
-    <p class="cover-eyebrow rv">Sessão de crítica técnica</p>
+    <p class="cover-eyebrow rv">Validação conceitual de arquitetura</p>
     <h1 class="display rv">AlupData<br>DataLake em GCP</h1>
     <p class="lead rv">
-      Origem, tratamento e destino do dado do Grupo Alupar.
-      Arquitetura Medallion sobre BigQuery, Cloud Storage e Cloud Run.
-      Trazemos o desenho para ser criticado — não para ser aprovado.</p>
+      O modelo de origem, tratamento e destino do dado do Grupo Alupar.
+      Arquitetura Medallion sobre BigQuery, Cloud Storage e Cloud Run —
+      apresentada para validação do desenho e para receber cenários melhores, se houver.</p>
     <dl class="cover-meta rv">
       <div><dt>Cliente final</dt><dd>Grupo Alupar</dd></div>
       <div><dt>Execução</dt><dd>ness.</dd></div>
@@ -224,23 +224,24 @@ pre i{color:#6B7885;font-style:normal}
     <p class="num rv">O PEDIDO</p>
     <h2 class="rv">O que queremos desta sessão</h2>
     <hr class="rule rv">
-    <p class="sub rv">Não é uma apresentação de venda. É uma revisão de projeto com quem conhece a plataforma por dentro.</p>
+    <p class="sub rv">Validar o modelo conceitual com quem conhece a plataforma por dentro, enquanto mudar de desenho ainda é barato.</p>
     <div class="cols" style="--c:3">
-      <div class="card rv"><h3>Atacar as escolhas</h3>
-        <p>Cinco decisões estruturais estão registradas em ADR e são caras de reverter depois da Onda 2.
-           Queremos saber quais delas o time do Google desfaria — e com que argumento.</p></div>
+      <div class="card rv"><h3>Validar as escolhas estruturais</h3>
+        <p>Cinco decisões de arquitetura estão registradas em ADR e sustentam as 19 semanas seguintes.
+           Queremos saber se o time do Google as manteria — e, onde não, com que argumento.</p></div>
       <div class="card rv"><h3>Apontar o serviço melhor</h3>
-        <p>Onde estamos escrevendo código que um serviço gerenciado já resolve
-           (Datastream, Dataflow, Dataform, Workflows, BigLake, DTS), queremos ouvir o nome do serviço e o trade-off real.</p></div>
+        <p>Onde o modelo escreve código que um serviço gerenciado já resolve
+           (Datastream, Dataflow, Dataform, Workflows, BigLake, DTS), queremos ouvir o nome do serviço
+           e o trade-off real.</p></div>
       <div class="card rv"><h3>Dimensionar custo e escala</h3>
         <p>O custo de infra é do cliente. Queremos crítica sobre particionamento, retenção,
-           slots vs. on-demand e o que quebra quando o ONS semi-horário entrar.</p></div>
+           slots vs. on-demand e o comportamento do modelo quando o volume mudar de ordem de grandeza.</p></div>
     </div>
     <div class="callout rv" style="margin-top:clamp(24px,3.4vh,40px)">
-      <strong>Estado honesto antes de começar:</strong> todo o pipeline está implementado, testado e verificado
-      contra as APIs de origem em <em>dry-run</em>. <strong>Nenhuma linha chegou a um BigQuery real</strong> —
-      o projeto GCP do cliente ainda não foi provisionado. É o melhor momento possível para uma crítica:
-      nada está gasto, nada está migrado.
+      <strong>Por que agora:</strong> o framework de ingestão, as três camadas, a infraestrutura em Terraform
+      e o pipeline de CI/CD estão escritos e testados. O modelo está completo no papel e no código —
+      e ainda <strong>antes do primeiro <code>terraform apply</code></strong>. É a janela em que uma
+      recomendação de arquitetura se aplica como reprojeto, e não como migração.
     </div>
   </div>
   <span class="pagenum">02</span>
@@ -251,28 +252,28 @@ pre i{color:#6B7885;font-style:normal}
   <span class="wordmark">ness<i>.</i></span><span class="tag">02 · Contexto</span>
   <div class="inner">
     <p class="num rv">CONTEXTO</p>
-    <h2 class="rv">O projeto em quatro números</h2>
+    <h2 class="rv">O modelo em quatro números</h2>
     <hr class="rule rv">
     <div class="kpis rv">
       <div class="kpi"><div class="v"><span class="count" data-to="6">6</span></div>
         <div class="l">Coligadas geradoras</div></div>
       <div class="kpi"><div class="v"><span class="count" data-to="13">13</span></div>
-        <div class="l">Fontes de dados contratadas</div></div>
-      <div class="kpi"><div class="v"><span class="count" data-to="4">4</span><i>/13</i></div>
-        <div class="l">Fontes verificadas contra a origem real</div></div>
-      <div class="kpi"><div class="v"><span class="count" data-to="25">25</span><i>k</i></div>
-        <div class="l">Registros na maior carga verificada</div></div>
+        <div class="l">Fontes de dados no escopo</div></div>
+      <div class="kpi"><div class="v"><span class="count" data-to="3">3</span></div>
+        <div class="l">Camadas — Bronze, Silver, Gold</div></div>
+      <div class="kpi"><div class="v"><span class="count" data-to="7">7</span></div>
+        <div class="l">Componentes por fonte, sempre</div></div>
     </div>
     <div class="cols rv" style="--c:2;margin-top:clamp(30px,4.5vh,56px)">
       <div class="callout">
-        <strong>Toda fonte entrega 7 componentes</strong>, sempre os mesmos: conector Python, tabela Bronze,
+        <strong>Toda fonte entrega os mesmos 7 componentes:</strong> conector Python, tabela Bronze,
         view Silver, view Gold, testes, agendamento em Terraform e documentação com linhagem.
-        Fonte com 5 de 7 não é entrega parcial — é retrabalho.
+        A unidade de entrega é a fonte inteira, ponta a ponta — nunca meia fonte em cinco frentes.
       </div>
       <div class="callout">
-        <strong>Regime de horas, 19 semanas, 5 ondas.</strong> A prioridade pode mudar no meio do caminho;
-        o padrão de entrega por fonte, não. É isso que permite absorver crítica arquitetural
-        sem reescrever o que já está pronto.
+        <strong>Um framework, treze fontes.</strong> O runner de ingestão é comum a todas; um conector novo
+        descreve apenas como falar com a sua origem. É o que permite que a décima terceira fonte custe
+        o mesmo que a quarta, e que uma recomendação de arquitetura se aplique a todas de uma vez.
       </div>
     </div>
   </div>
@@ -309,7 +310,6 @@ pre i{color:#6B7885;font-style:normal}
       <text class="cap" x="990" y="14">DESTINO</text>
       <line x1="0" y1="22" x2="1180" y2="22" stroke="#E4E8EC"/>
 
-      <!-- origem -->
       <rect class="bx" x="0" y="40" width="250" height="60" rx="2"/>
       <rect x="0" y="40" width="3" height="60" fill="#5A6473"/>
       <text class="hd" x="16" y="62">APIs públicas</text>
@@ -333,7 +333,6 @@ pre i{color:#6B7885;font-style:normal}
       <text class="hd" x="16" y="278">Planilhas sob template</text>
       <text class="ln" x="16" y="296">CSV / XLSX — única fonte editada por pessoa</text>
 
-      <!-- ingestão -->
       <rect class="bx" x="300" y="70" width="190" height="96" rx="2"/>
       <rect x="300" y="70" width="3" height="96" fill="#00ADE8"/>
       <text class="hd" x="316" y="92">Conector Python</text>
@@ -349,7 +348,6 @@ pre i{color:#6B7885;font-style:normal}
       <text class="ln" x="316" y="240">do parsing · replay sem a fonte</text>
       <text class="svc" x="316" y="256">Cloud Storage</text>
 
-      <!-- camadas -->
       <rect class="bx" x="540" y="70" width="182" height="192" rx="2"/>
       <rect x="540" y="70" width="3" height="192" fill="#B87333"/>
       <text class="hd" x="556" y="92">Bronze</text>
@@ -370,24 +368,22 @@ pre i{color:#6B7885;font-style:normal}
       <text class="ln" x="756" y="176">revisão da fonte vence</text>
       <text class="svc" x="756" y="200">BigQuery · dataset silver</text>
 
-
       <rect class="bx" x="540" y="282" width="382" height="56" rx="2"/>
       <rect x="540" y="282" width="3" height="56" fill="#C9A227"/>
       <text class="hd" x="556" y="304">Gold — uma pergunta de negócio por view</text>
       <text class="ln" x="556" y="322">carga mensal por submercado · parque gerador · câmbio · IPCA · funil comercial</text>
 
-      <!-- destino -->
       <rect class="bx" x="960" y="70" width="220" height="58" rx="2"/>
       <rect x="960" y="70" width="3" height="58" fill="#00ADE8"/>
       <text class="hd" x="976" y="92">Portal MVP</text>
-      <text class="ln" x="976" y="110">autenticado · uma view Gold</text>
+      <text class="ln" x="976" y="110">autenticado · views Gold</text>
       <text class="svc" x="976" y="124">Cloud Run</text>
 
       <rect class="bx" x="960" y="146" width="220" height="58" rx="2"/>
       <rect x="960" y="146" width="3" height="58" fill="#00ADE8"/>
       <text class="hd" x="976" y="168">Ferramenta de BI</text>
-      <text class="ln" x="976" y="186">a definir pelo cliente</text>
-      <text class="svc" x="976" y="200">Looker Studio? Power BI?</text>
+      <text class="ln" x="976" y="186">consome view SQL</text>
+      <text class="svc" x="976" y="200">Looker Studio · Power BI</text>
 
       <rect class="bx" x="960" y="222" width="220" height="58" rx="2"/>
       <rect x="960" y="222" width="3" height="58" fill="#00ADE8"/>
@@ -395,7 +391,6 @@ pre i{color:#6B7885;font-style:normal}
       <text class="ln" x="976" y="262">Onda 4</text>
       <text class="svc" x="976" y="276">Dataplex</text>
 
-      <!-- setas -->
       <path class="fl" d="M250 142 H292"/>
       <path class="fl" d="M490 118 H532"/>
       <path class="fl" d="M490 224 C512 224 512 150 532 150"/>
@@ -421,9 +416,9 @@ pre i{color:#6B7885;font-style:normal}
   <div class="inner">
     <p class="kicker rv">Parte I</p>
     <h2 class="display rv">Origem</h2>
-    <p class="lead rv">Treze fontes em quatro naturezas diferentes: API pública, API com credencial,
-      banco de sistema legado atrás de VPN e planilha editada por pessoa.
-      A que dá mais trabalho não é a maior — é a menos documentada.</p>
+    <p class="lead rv">Treze fontes em quatro naturezas: API pública, API com credencial,
+      banco de sistema interno e planilha sob template. O modelo trata as quatro
+      com o mesmo contrato — o que muda é apenas como se fala com cada uma.</p>
   </div>
   <span class="pagenum">05</span>
 </section>
@@ -433,62 +428,105 @@ pre i{color:#6B7885;font-style:normal}
   <span class="wordmark">ness<i>.</i></span><span class="tag">04 · Origem</span>
   <div class="inner">
     <p class="num rv">CATÁLOGO</p>
-    <h2 class="rv">As 13 fontes e o que cada uma exige</h2>
+    <h2 class="rv">As 13 fontes e o papel de cada uma</h2>
     <hr class="rule rv">
     <div class="scrollx rv">
     <table>
       <thead><tr>
-        <th>Fonte</th><th>Natureza</th><th>Formato</th><th class="nw">Frequência</th>
-        <th>Acesso</th><th>Situação</th>
+        <th>Fonte</th><th>Natureza</th><th>Formato</th><th>Acesso</th><th>Papel no modelo</th>
       </tr></thead>
       <tbody>
-        <tr><td><b>BCB / PTAX</b></td><td>API pública</td><td>JSON diário</td><td>diária, 9h</td><td>anônimo</td><td class="ok">Concluída · verificada</td></tr>
-        <tr><td><b>IBGE / IPCA</b></td><td>API pública</td><td>JSON aninhado</td><td>mensal, dia 12</td><td>anônimo</td><td class="ok">Concluída · verificada</td></tr>
-        <tr><td><b>ANEEL / SIGA</b></td><td>API pública</td><td>cadastro paginado</td><td>semanal</td><td>anônimo</td><td class="ok">Concluída · 25.263 registros</td></tr>
-        <tr><td><b>ONS / carga</b></td><td>API pública</td><td>CSV anual por subsistema</td><td>diária, 8h</td><td>anônimo</td><td class="ok">Concluída · verificada</td></tr>
-        <tr><td><b>CCEE InfoMercado</b></td><td>Portal público</td><td>CKAN / arquivo</td><td>mensal</td><td>anônimo</td><td class="blk">HTTP 403 a acesso automatizado</td></tr>
-        <tr><td><b>Hubspot</b></td><td>API credenciada</td><td>JSON paginado</td><td>a cada 6h</td><td>token private app</td><td class="wait">Código pronto · nunca falou com a API</td></tr>
-        <tr><td><b>CCEE agente</b></td><td>API credenciada</td><td>a confirmar</td><td>mensal</td><td>credencial de agente</td><td class="blk">Sem documentação alcançável</td></tr>
-        <tr><td><b>BBCE</b></td><td>API credenciada</td><td>a confirmar</td><td>intradiária</td><td>token + contrato</td><td class="blk">Nenhum endpoint público encontrado</td></tr>
-        <tr><td><b>TempoOK</b></td><td>API credenciada</td><td>a confirmar</td><td>diária</td><td>token + contrato</td><td class="blk">Sem contrato de API descoberto</td></tr>
-        <tr><td><b>Oracle FMB</b></td><td>Banco interno</td><td>tabelas / views</td><td>diária</td><td>VPN + read-only</td><td class="wait">Caminho de banco pronto · sem VPN</td></tr>
-        <tr><td><b>Portal Alup</b></td><td>Banco interno</td><td>MySQL + NoSQL + Storage</td><td>diária</td><td>VPN + read-only</td><td class="wait">Aguarda credencial</td></tr>
-        <tr><td><b>MySQL RDS comercialização</b></td><td>Banco interno</td><td>tabelas</td><td>diária</td><td>VPN ou peering</td><td class="wait">Aguarda credencial</td></tr>
-        <tr><td><b>RM / TOTVS</b></td><td>ERP</td><td>API ou view</td><td>a definir</td><td>endpoint + credencial</td><td class="wait">Aguarda definição</td></tr>
+        <tr><td><b>ONS</b> — carga</td><td>API pública</td><td>CSV anual por subsistema</td><td>anônimo</td><td>Carga de energia por subsistema. <b>Dona da dimensão <code>submercado</code></b></td></tr>
+        <tr><td><b>ANEEL</b> — SIGA</td><td>API pública</td><td>cadastro paginado</td><td>anônimo</td><td>Cadastro do parque gerador. <b>Dona da dimensão <code>codigo_usina</code></b></td></tr>
+        <tr><td><b>CCEE</b> — InfoMercado</td><td>API pública</td><td>arquivo / CKAN</td><td>anônimo</td><td>Contabilização de mercado. <b>Origem de <code>agente_ccee</code></b></td></tr>
+        <tr><td><b>BCB</b> — PTAX</td><td>API pública</td><td>JSON diário</td><td>anônimo</td><td>Câmbio de fechamento para contrato indexado em dólar</td></tr>
+        <tr><td><b>IBGE</b> — IPCA</td><td>API pública</td><td>JSON aninhado, mensal</td><td>anônimo</td><td>Índice de reajuste e deflacionamento de série de preço</td></tr>
+        <tr><td><b>CCEE</b> — agente</td><td>API credenciada</td><td>a confirmar na integração</td><td>credencial de agente</td><td>Posição contabilizada das coligadas na câmara</td></tr>
+        <tr><td><b>BBCE</b></td><td>API credenciada</td><td>a confirmar na integração</td><td>token de API</td><td>Preço e posição no mercado de balcão</td></tr>
+        <tr><td><b>TempoOK</b></td><td>API credenciada</td><td>a confirmar na integração</td><td>token de API</td><td>Previsão meteorológica — insumo de previsão de geração</td></tr>
+        <tr><td><b>Hubspot</b></td><td>API credenciada</td><td>JSON paginado, CRM</td><td>token private app</td><td>Funil comercial: onde a negociação está e há quanto tempo</td></tr>
+        <tr><td><b>Oracle FMB</b></td><td>Banco interno</td><td>tabelas e views</td><td>VPN + read-only</td><td>Faturamento e medição — o realizado operacional</td></tr>
+        <tr><td><b>Portal Alup</b></td><td>Banco interno</td><td>MySQL + NoSQL + Storage</td><td>VPN + read-only</td><td>Dado operacional do portal próprio</td></tr>
+        <tr><td><b>MySQL RDS</b> — comercialização</td><td>Banco interno</td><td>tabelas</td><td>VPN ou peering</td><td>Contratos e posição comercial</td></tr>
+        <tr><td><b>RM / TOTVS</b></td><td>ERP</td><td>API ou view de banco</td><td>endpoint + credencial</td><td>Ponte com o financeiro e o contábil</td></tr>
       </tbody>
     </table>
     </div>
     <div class="callout rv" style="margin-top:clamp(18px,2.4vh,28px)">
-      <strong>Mais uma, surgida como contexto e registrada como decisão:</strong> a Alup já mantém um
-      <strong>SQL Server</strong> com o realizado do Balanço Energético da CCEE, alimentado por processo
-      mensal manual. Vira uma quarta via para o dado da CCEE — e possivelmente a origem da única
-      dimensão comum hoje órfã. O framework hoje fala Oracle e MySQL; SQL Server pede driver novo.
+      <strong>O que a tabela mostra sobre o modelo:</strong> a heterogeneidade está toda na coluna de
+      formato e acesso — e nenhuma delas atravessa a fronteira do conector. Depois da validação Pydantic,
+      as treze fontes são a mesma coisa para as camadas seguintes.
     </div>
   </div>
   <span class="pagenum">06</span>
 </section>
 
-<!-- 07 CONTRATO DE DADOS -->
-<section class="slide mist" data-t="Contrato de dados">
+<!-- 07 QUATRO NATUREZAS -->
+<section class="slide mist" data-t="Quatro naturezas">
   <span class="wordmark">ness<i>.</i></span><span class="tag">05 · Origem</span>
   <div class="inner">
-    <p class="num rv">CONTRATO DE DADOS</p>
-    <h2 class="rv">Como tratamos fonte sem contrato estável</h2>
+    <p class="num rv">HETEROGENEIDADE</p>
+    <h2 class="rv">Quatro naturezas de origem, um contrato só</h2>
     <hr class="rule rv">
-    <p class="sub rv">CCEE e ONS não publicam contrato de API versionado. Layout muda entre períodos, e isso é normal.</p>
+    <p class="sub rv">O que muda de uma fonte para outra é a implementação de <code>extrair()</code>. Nada além disso.</p>
+    <div class="flow rv">
+      <div class="step s0"><div class="t">API HTTP</div><div class="d">Cliente HTTP do framework, com retry e timeout. Paginação e janela de datas resolvidas pelo runner. É o transporte da maior parte das fontes de mercado.</div></div>
+      <div class="step s1"><div class="t">Arquivo remoto</div><div class="d">CSV ou planilha baixada por HTTP e lida em memória. A gravação do bruto no GCS é a mesma das demais.</div></div>
+      <div class="step s2"><div class="t">Banco relacional</div><div class="d">Driver puro-Python, DSN única no Secret Manager, consulta por janela sobre credencial read-only. <b>4 fontes internas.</b></div></div>
+      <div class="step s3"><div class="t">Planilha sob template</div><div class="d">Único insumo editado por pessoa. Arquivo fora do template é <b>rejeitado inteiro</b>, com erro que nomeia a coluna que falta.</div></div>
+    </div>
+    <div class="cols rv" style="--c:2;margin-top:clamp(24px,3.2vh,38px)">
+      <div>
+        <p class="codecap">O que o conector implementa — e o que ele nunca precisa saber</p>
+        <pre>class OnsCarga(Conector):
+    fonte = "ons"; entidade = "carga"
+    schema = RegistroCarga
+
+    def <b>extrair</b>(self, janela) -&gt; Iterator[dict]:
+        <i># fala com a origem, devolve dicionários brutos</i>
+
+    def <b>transformar</b>(self, bruto) -&gt; dict:
+        <i># ajusta o registro ao schema</i>
+
+<i># o runner faz o resto, igual para as 13:</i>
+<i># particionar a janela · gravar o raw · validar</i>
+<i># · colunas técnicas · carregar · registrar</i></pre>
+      </div>
+      <div class="callout">
+        <strong>Por que isso importa para a validação:</strong> uma recomendação de arquitetura que caia
+        sobre o runner — trocar o transporte, mudar o formato do raw, alterar a estratégia de carga —
+        vale para as treze fontes de uma vez, sem tocar em nenhum conector.
+        A superfície de mudança do modelo é deliberadamente pequena.
+        <br><br>
+        É também o que sustenta o handoff: quem assumir a operação aprende <em>um</em> padrão,
+        não treze integrações.
+      </div>
+    </div>
+  </div>
+  <span class="pagenum">07</span>
+</section>
+
+<!-- 08 CONTRATO DE DADOS -->
+<section class="slide" data-t="Contrato de dados">
+  <span class="wordmark">ness<i>.</i></span><span class="tag">06 · Origem</span>
+  <div class="inner">
+    <p class="num rv">CONTRATO DE DADOS</p>
+    <h2 class="rv">Três garantias na fronteira de entrada</h2>
+    <hr class="rule rv">
+    <p class="sub rv">Fontes do setor elétrico revisam dado publicado e mudam layout entre períodos. O modelo assume isso como regra, não como exceção.</p>
     <div class="cols rv" style="--c:3">
       <div class="card"><h3>Schema declarado, não inferido</h3>
         <p>Cada fonte tem um modelo <b>Pydantic</b> com <code>schema_versao</code>. Registro que não valida
            é descartado e <b>contado</b>, nunca carregado torto. Mudança de layout aparece como pico de
            inválidos no painel, não como número errado num relatório meses depois.</p></div>
       <div class="card"><h3>Raw antes do parsing</h3>
-        <p>O payload cru vai para o Cloud Storage <b>antes</b> de qualquer interpretação. Bug de parser
-           se corrige com <code>reprocessar-raw</code>, sem bater de novo na origem — importante para
-           fonte com rate limit ou retenção curta.</p></div>
+        <p>O payload cru vai para o Cloud Storage <b>antes</b> de qualquer interpretação. Corrigir um parser
+           é reprocessar do GCS, sem bater de novo na origem — o que importa para fonte com rate limit
+           ou retenção curta.</p></div>
       <div class="card"><h3>Janela sempre explícita</h3>
         <p>Nenhum conector decide "hoje" sozinho. A janela de datas é parâmetro, e reprocessar é
            passar outra janela. As janelas de agendamento são largas de propósito
-           (30 dias no ONS, 90 no IBGE) porque essas fontes <b>revisam</b> dado publicado.</p></div>
+           (30 dias no ONS, 90 no IBGE) porque essas fontes <b>revisam</b> o que publicaram.</p></div>
     </div>
     <div class="cols rv" style="--c:2;margin-top:clamp(22px,3vh,36px)">
       <div>
@@ -500,55 +538,11 @@ pre i{color:#6B7885;font-style:normal}
 <i># teto de 100 MB comprimido, conferido pelos metadados antes do download</i></pre>
       </div>
       <div class="callout ask">
-        <strong>Pergunta ao Google:</strong> para as fontes de arquivo (ONS CSV anual, InfoMercado, planilhas),
-        vale manter esse padrão de <em>raw imutável + carga</em>, ou o desenho melhora com
+        <strong>Pergunta ao Google:</strong> para as fontes de arquivo (CSV do ONS, InfoMercado, planilhas),
+        vale manter esse padrão de <em>raw imutável + carga na tabela</em>, ou o desenho melhora com
         <strong>tabela externa / BigLake</strong> sobre o bucket e transformação só no BigQuery?
-        Nosso viés foi carregar, para ter partição, clustering e custo previsível.
+        Nosso viés foi carregar, para ter partição, clustering e custo de consulta previsível.
       </div>
-    </div>
-  </div>
-  <span class="pagenum">07</span>
-</section>
-
-<!-- 08 CCEE -->
-<section class="slide" data-t="Bloqueio CCEE">
-  <span class="wordmark">ness<i>.</i></span><span class="tag">06 · Origem</span>
-  <div class="inner">
-    <p class="num rv">O CASO DIFÍCIL</p>
-    <h2 class="rv">CCEE: a origem que responde 403</h2>
-    <hr class="rule rv">
-    <p class="sub rv">A câmara de comercialização é a fonte mais importante do domínio — e a única que recusa acesso programático.</p>
-    <div class="cols rv" style="--c:2">
-      <div>
-        <ul>
-          <li><b>O sintoma</b>: <code>www.ccee.org.br</code> e <code>dadosabertos.ccee.org.br</code> devolvem
-            HTTP 403 a requisição automatizada. O TLS conecta; o bloqueio vem do servidor, com página de
-            proteção. Atinge a API CKAN, a página do InfoMercado e o portal de dados abertos —
-            inclusive a documentação.</li>
-          <li><b>O efeito colateral que importa</b>: <code>agente_ccee</code> é uma das cinco dimensões
-            comuns da Silver e hoje é a <b>única sem fonte definida</b>. Sem ela, cruzar dado interno
-            com contabilização de mercado fica manual.</li>
-          <li><b>O que não fazemos</b>: contornar proteção anti-bot. Acesso a dado de terceiro se
-            resolve por via oficial, não por evasão.</li>
-        </ul>
-      </div>
-      <div>
-        <table>
-          <thead><tr><th>Via</th><th>O que exige</th><th>Efeito no desenho</th></tr></thead>
-          <tbody>
-            <tr><td><b>a. IP liberado</b></td><td>A Alup pedir à CCEE a liberação do IP de saída do ambiente GCP</td><td>Conector fica igual aos outros. <b>Preferida</b> — e pede IP de saída estável (NAT)</td></tr>
-            <tr><td><b>b. Credencial de agente</b></td><td>Área credenciada da Alup, que já é agente</td><td>Aproxima a fonte da Onda 2; contrato de dados desconhecido</td></tr>
-            <tr><td><b>c. SQL Server do Balanço</b></td><td>Ler o realizado que a Alup já recebe e armazena</td><td>Não depende da CCEE. Pede driver SQL Server no framework</td></tr>
-            <tr><td><b>d. Download manual</b></td><td>Pessoa baixa; entra pelo motor de planilha</td><td>Funciona, mas não é ingestão automática — dependência de pessoa</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-    <div class="callout ask rv" style="margin-top:clamp(20px,2.8vh,32px)">
-      <strong>Pergunta ao Google:</strong> existe padrão de referência para ingestão de portal público que
-      bloqueia automação — saída por NAT com IP fixo e reputação, algum caminho de acordo institucional,
-      ou a recomendação é simplesmente tratar como fonte semi-manual e investir no
-      <em>contrato de dados</em> com a origem?
     </div>
   </div>
   <span class="pagenum">08</span>
@@ -560,8 +554,8 @@ pre i{color:#6B7885;font-style:normal}
   <div class="inner">
     <p class="kicker rv">Parte II</p>
     <h2 class="display rv">Tratamento</h2>
-    <p class="lead rv">Um runner único, quatro formatos absorvidos sem alterar o framework,
-      e três camadas com uma regra cada: Bronze não mente, Silver não duplica, Gold responde pergunta.</p>
+    <p class="lead rv">Um runner único e três camadas com uma regra cada:
+      Bronze não interpreta, Silver não duplica, Gold responde a uma pergunta de negócio nomeada.</p>
   </div>
   <span class="pagenum">09</span>
 </section>
@@ -571,39 +565,31 @@ pre i{color:#6B7885;font-style:normal}
   <span class="wordmark">ness<i>.</i></span><span class="tag">07 · Tratamento</span>
   <div class="inner">
     <p class="num rv">INGESTÃO</p>
-    <h2 class="rv">O que é do framework e o que é da fonte</h2>
+    <h2 class="rv">As nove etapas que o framework garante</h2>
     <hr class="rule rv">
-    <p class="sub rv">Um conector novo implementa duas funções. As outras nove etapas são do runner, iguais para as 13 fontes.</p>
+    <p class="sub rv">O conector implementa duas funções. Estas nove são do runner, idênticas para as treze fontes.</p>
     <div class="steps rv">
       <div class="it"><b>Particiona a janela</b><span>Respeita o limite da fonte (<code>max_dias_por_requisicao</code>) sem o conector saber disso.</span></div>
-      <div class="it"><b>extrair() — da fonte</b><span>Fala HTTP, driver de banco ou arquivo. É a única parte que conhece a origem.</span></div>
-      <div class="it"><b>Grava o raw no GCS</b><span>JSONL gzip, antes de qualquer parsing. Habilita o replay.</span></div>
-      <div class="it"><b>transformar() — da fonte</b><span>Renomeia campo, normaliza número BR, achata payload aninhado.</span></div>
+      <div class="it"><b>Chama extrair()</b><span>A única fronteira que conhece a origem — HTTP, driver de banco ou arquivo.</span></div>
+      <div class="it"><b>Grava o raw no GCS</b><span>JSONL gzip, antes de qualquer parsing. É o que habilita o replay.</span></div>
+      <div class="it"><b>Chama transformar()</b><span>Renomeia campo, normaliza número no formato brasileiro, achata payload aninhado.</span></div>
       <div class="it"><b>Valida com Pydantic</b><span>Registro inválido é descartado e contado; o valor rejeitado não entra no log.</span></div>
       <div class="it"><b>Acrescenta colunas técnicas</b><span><code>_ingestao_id</code>, <code>_ingestao_timestamp</code>, <code>_fonte</code>, <code>_schema_versao</code>.</span></div>
       <div class="it"><b>Carrega no Bronze</b><span>Load job com <code>WRITE_APPEND</code> e adição de campo permitida.</span></div>
-      <div class="it"><b>Registra a execução</b><span>Uma linha em <code>bronze._execucoes</code>. Falha em registrar é falha, não detalhe.</span></div>
+      <div class="it"><b>Registra a execução</b><span>Uma linha em <code>bronze._execucoes</code>. Carga sem evidência operacional não é sucesso.</span></div>
       <div class="it"><b>Sanitiza o erro</b><span>DSN, Bearer e parâmetro sensível são removidos antes de logar ou persistir.</span></div>
     </div>
     <div class="cols rv" style="--c:2;margin-top:clamp(22px,3vh,34px)">
-      <div>
-        <p class="codecap">O contrato inteiro de um conector novo</p>
-        <pre>class OnsCarga(Conector):
-    fonte = "ons"; entidade = "carga"
-    schema = RegistroCarga
-
-    def <b>extrair</b>(self, janela) -&gt; Iterator[dict]:
-        <i># fala com a origem, devolve dicionários brutos</i>
-
-    def <b>transformar</b>(self, bruto) -&gt; dict:
-        <i># ajusta o registro ao schema</i></pre>
+      <div class="callout">
+        <strong>O modelo já foi exercitado contra formatos deliberadamente diferentes</strong> — JSON diário,
+        JSON aninhado mensal, cadastro paginado de 25 mil linhas e CSV anual remoto. O framework
+        absorveu os quatro <strong>sem alteração</strong>: só <code>extrair()</code> e
+        <code>transformar()</code> mudaram.
       </div>
       <div class="callout">
-        <strong>A prova de que o desenho aguenta:</strong> as quatro fontes concluídas exercitam formatos
-        deliberadamente diferentes — JSON diário, JSON aninhado mensal, cadastro paginado de 25 mil linhas
-        e CSV anual remoto. <strong>O framework absorveu as quatro sem alteração</strong>; só
-        <code>extrair()</code> e <code>transformar()</code> mudaram. Na Onda 3, <code>extrair()</code>
-        passa a falar com driver de banco e o contrato continua o mesmo.
+        <strong>E o mesmo contrato vale para o dado interno.</strong> Nas fontes de banco,
+        <code>extrair()</code> passa a falar com um driver em vez de HTTP — e as outras oito etapas,
+        a linhagem e o log continuam idênticos. O caminho relacional já está escrito sob esse contrato.
       </div>
     </div>
   </div>
@@ -629,17 +615,17 @@ pre i{color:#6B7885;font-style:normal}
             <tr><td><b>hubspot_negocios</b></td><td class="nw">0 */6 * * *</td><td class="nw">2 dias</td><td>CRM muda ao longo do dia, mas varrer o funil todo é caro</td></tr>
           </tbody>
         </table>
-        <p style="margin-top:14px;color:var(--gray)">Cada linha é um <b>Cloud Run Job</b> (<code>max_retries 2</code>, timeout 30 min)
+        <p style="margin-top:14px;color:var(--gray)">Cada linha é um <b>Cloud Run Job</b> (<code>max_retries 2</code>, timeout de 30 min)
           e um <b>Cloud Scheduler</b> com OAuth token, tudo declarado em Terraform. O job executa
           a mesma CLI do repositório.</p>
       </div>
       <div>
         <div class="callout">
           <strong>A decisão registrada (ADR 004):</strong> Composer cobra por ambiente ligado, 24×7, e o
-          custo de infra é do cliente. Pagar isso desde a semana 3 para agendar cinco extrações diárias
-          independentes não se justifica. <strong>O gatilho da migração está escrito</strong>: quando
-          aparecer dependência real entre pipelines — Onda 3, sistemas internos alimentando views que
-          cruzam fontes. A CLI única torna a migração barata: a DAG passa a chamar o mesmo comando.
+          custo de infra é do cliente. Pagar isso para agendar extrações diárias independentes não se
+          justifica no início. <strong>O gatilho da migração está escrito</strong>: quando aparecer
+          dependência real entre pipelines — Onda 3, sistemas internos alimentando views que cruzam
+          fontes. A CLI única torna a migração barata: a DAG passa a chamar o mesmo comando.
         </div>
         <div class="callout ask" style="margin-top:18px">
           <strong>Pergunta ao Google:</strong> nesse meio de caminho — dependência entre pipelines, mas longe
@@ -662,14 +648,14 @@ pre i{color:#6B7885;font-style:normal}
     <h2 class="rv">Uma regra por camada, sem exceção</h2>
     <hr class="rule rv">
     <div class="flow rv">
-      <div class="step s0"><div class="t">Raw</div><div class="d">Cloud Storage. Objeto imutável, o que a fonte devolveu, gravado antes do parsing. Só isso.</div></div>
+      <div class="step s0"><div class="t">Raw</div><div class="d">Cloud Storage. Objeto imutável, exatamente o que a fonte devolveu, gravado antes do parsing.</div></div>
       <div class="step s1"><div class="t">Bronze</div><div class="d"><b>Tabela append-only.</b> Fiel à origem, sem regra de negócio. Particionada por data de ingestão, clusterizada pelas chaves de consulta.</div></div>
       <div class="step s2"><div class="t">Silver</div><div class="d"><b>View.</b> Tipagem, unidade, deduplicação por <code>QUALIFY ROW_NUMBER()</code> e as cinco dimensões comuns.</div></div>
       <div class="step s3"><div class="t">Gold</div><div class="d"><b>View.</b> Uma pergunta de negócio nomeada por view. Teste de CI exige que só leia da Silver.</div></div>
     </div>
     <div class="cols rv" style="--c:3;margin-top:clamp(22px,3vh,34px)">
       <div>
-        <p class="codecap">Bronze — sem partição o custo é do cliente</p>
+        <p class="codecap">Bronze — partição e clustering são regra, não otimização</p>
         <pre>CREATE TABLE IF NOT EXISTS
   `${projeto}.bronze.ons_carga` (
   data_referencia DATE NOT NULL,
@@ -725,35 +711,35 @@ GROUP BY periodo_apuracao, submercado;</pre>
     <p class="num rv">DIMENSÕES COMUNS</p>
     <h2 class="rv">Cinco colunas que tornam o cruzamento possível</h2>
     <hr class="rule rv">
-    <p class="sub rv">Toda view Silver expõe as mesmas cinco dimensões — inclusive como NULL, quando a granularidade da fonte não as tem.</p>
+    <p class="sub rv">Toda view Silver expõe as mesmas cinco dimensões — inclusive como NULL declarado, quando a granularidade da fonte não as tem.</p>
     <div class="cols rv" style="--c:2">
       <div class="scrollx">
         <table>
-          <thead><tr><th>Dimensão</th><th>Dona</th><th>Situação</th></tr></thead>
+          <thead><tr><th>Dimensão</th><th>Fonte que a define</th><th>Papel</th></tr></thead>
           <tbody>
-            <tr><td><b>data_referencia</b></td><td>todas as fontes</td><td class="ok">Fechada</td></tr>
-            <tr><td><b>periodo_apuracao</b></td><td>derivada na Silver</td><td class="ok">Fechada</td></tr>
-            <tr><td><b>codigo_usina</b></td><td>ANEEL/SIGA — CodCEG</td><td class="ok">Fechada</td></tr>
-            <tr><td><b>submercado</b></td><td>ONS — N, NE, S, SE</td><td class="ok">Fechada</td></tr>
-            <tr><td><b>agente_ccee</b></td><td>CCEE</td><td class="blk">Órfã — depende do desbloqueio</td></tr>
+            <tr><td><b>data_referencia</b></td><td>todas as fontes</td><td>Eixo temporal comum a qualquer cruzamento</td></tr>
+            <tr><td><b>periodo_apuracao</b></td><td>derivada na Silver</td><td>Agregação mensal alinhada entre fontes</td></tr>
+            <tr><td><b>codigo_usina</b></td><td>ANEEL/SIGA — CodCEG</td><td>Chave do ativo de geração entre sistemas</td></tr>
+            <tr><td><b>submercado</b></td><td>ONS — N, NE, S, SE</td><td>Recorte de mercado para preço e carga</td></tr>
+            <tr><td><b>agente_ccee</b></td><td>CCEE</td><td>Liga a coligada à sua posição contabilizada</td></tr>
           </tbody>
         </table>
       </div>
       <div>
         <ul class="tight">
-          <li><b>Dimensão tem dona nomeada.</b> Uma fonte é a autoridade de cada dimensão; as outras
-            se conformam a ela. Sem isso, duas fontes divergem no código da usina e ninguém sabe qual está certa.</li>
+          <li><b>Cada dimensão tem uma fonte autoritativa.</b> Uma fonte define; as outras se conformam a ela.
+            Sem isso, duas fontes divergem no código da usina e ninguém sabe qual está certa.</li>
           <li><b>NULL declarado é melhor que coluna ausente.</b> A carga do ONS é agregada por subsistema,
-            então <code>codigo_usina</code> e <code>agente_ccee</code> saem como NULL <b>com comentário</b> —
+            então <code>codigo_usina</code> sai como NULL <b>com comentário na view</b> —
             e o cruzamento não quebra.</li>
-          <li><b>Retificação é questão aberta de negócio</b>, não técnica: quando a CCEE recontabiliza
-            um mês fechado, sobrescreve-se ou versiona-se? Está no questionário enviado ao cliente,
-            e a resposta muda o desenho da Silver.</li>
+          <li><b>A conformação vive na Silver</b>, não no conector: mudar a regra de uma dimensão é mudar
+            uma view, não treze integrações.</li>
         </ul>
         <div class="callout ask" style="margin-top:6px">
           <strong>Pergunta ao Google:</strong> conformar dimensão dentro de cada view Silver escala até
-          13 fontes, ou vale um <strong>conjunto de dimensões conformadas</strong> próprio
-          (tabelas de dimensão versionadas, com SCD tipo 2 para usina que troca de coligada)?
+          13 fontes, ou vale um <strong>conjunto de dimensões conformadas</strong> próprio —
+          tabelas de dimensão versionadas, com <strong>SCD tipo 2</strong> para o caso de um ativo
+          mudar de titularidade ao longo do tempo?
         </div>
       </div>
     </div>
@@ -762,7 +748,7 @@ GROUP BY periodo_apuracao, submercado;</pre>
 </section>
 
 <!-- 14 SQL PURO -->
-<section class="slide" data-t="SQL sem dbt">
+<section class="slide" data-t="SQL sem framework">
   <span class="wordmark">ness<i>.</i></span><span class="tag">11 · Tratamento</span>
   <div class="inner">
     <p class="num rv">TRANSFORMAÇÃO</p>
@@ -774,8 +760,8 @@ GROUP BY periodo_apuracao, submercado;</pre>
           <li><b>O que é</b>: arquivos <code>.sql</code> em <code>sql/{bronze,silver,gold}/</code>,
             aplicados por um deploy idempotente — <code>CREATE TABLE IF NOT EXISTS</code> no Bronze,
             <code>CREATE OR REPLACE VIEW</code> nas demais. Sem dbt e sem Dataform na Fase 1.</li>
-          <li><b>Por quê</b>: o contrato não pede; o handoff ao time do cliente fica com uma peça a menos
-            para operar; e o volume da Fase 1 é de <b>views</b>, não de um grafo com centenas de modelos.
+          <li><b>Por quê</b>: o volume da Fase 1 é de <b>13 views</b>, não de um grafo com centenas de
+            modelos; e o handoff ao time que vai operar fica com uma peça a menos.
             Tudo é legível por quem sabe SQL, sem ferramenta intermediária.</li>
           <li><b>O custo que assumimos, por escrito</b>: teste de dado e linhagem automática — que uma
             ferramenta daria de graça — ficam por nossa conta. A linhagem é o componente 07
@@ -789,14 +775,14 @@ GROUP BY periodo_apuracao, submercado;</pre>
         <div class="callout">
           <strong>A cláusula de saída está escrita:</strong> se o número de views crescer muito além do
           previsto, reavaliar a decisão vira um ADR novo — não um remendo. É exatamente o tipo de
-          gatilho que gostaríamos de calibrar com quem já viu isso dar errado.
+          gatilho que gostaríamos de calibrar com quem já viu isso escalar.
         </div>
         <div class="callout ask" style="margin-top:18px">
           <strong>Pergunta ao Google:</strong> <strong>Dataform</strong> é nativo do BigQuery e não cobra
           ambiente ligado — o argumento de custo que vale contra o Composer não vale contra ele.
-          A pergunta é de handoff e de peso operacional: em um projeto de 13 views que será operado por
+          A pergunta é de peso operacional e de handoff: em um projeto de 13 views que será operado por
           um time pequeno, Dataform paga o próprio custo de aprendizado pelos testes de dado e
-          pela linhagem que traz? E qual é o caminho de migração de SQL solto para Dataform depois,
+          pela linhagem que traz? E qual é o caminho de migração de SQL versionado para Dataform
           se a Fase 2 crescer?
         </div>
       </div>
@@ -811,9 +797,8 @@ GROUP BY periodo_apuracao, submercado;</pre>
   <div class="inner">
     <p class="kicker rv">Parte III</p>
     <h2 class="display rv">Destino</h2>
-    <p class="lead rv">Oito views Gold, um portal autenticado, uma ferramenta de BI ainda por definir
-      e um catálogo na última onda. É a parte do desenho com mais espaço para crítica —
-      porque é a que menos depende de nós.</p>
+    <p class="lead rv">A camada Gold serve view SQL — e por isso não presume o consumidor.
+      Portal próprio, ferramenta de BI e catálogo consomem a mesma superfície.</p>
   </div>
   <span class="pagenum">15</span>
 </section>
@@ -823,7 +808,7 @@ GROUP BY periodo_apuracao, submercado;</pre>
   <span class="wordmark">ness<i>.</i></span><span class="tag">12 · Destino</span>
   <div class="inner">
     <p class="num rv">CONSUMO</p>
-    <h2 class="rv">O que a Gold entrega hoje</h2>
+    <h2 class="rv">Uma pergunta de negócio por view</h2>
     <hr class="rule rv">
     <div class="cols rv" style="--c:2">
       <div class="scrollx">
@@ -836,28 +821,27 @@ GROUP BY periodo_apuracao, submercado;</pre>
             <tr><td><b>inflacao_mensal</b></td><td>Qual o índice para reajuste de contrato e deflacionamento de série?</td><td>IBGE</td></tr>
             <tr><td><b>funil_comercial</b></td><td>Onde o pipeline comercial está travado, e há quanto tempo?</td><td>Hubspot</td></tr>
             <tr><td><b>saude_ingestao</b></td><td>O dado está fresco e dá para confiar nele?</td><td><i>_execucoes</i></td></tr>
-            <tr><td><b>volumetria_lake</b></td><td>Quanto dado entrou por conector, e a tendência?</td><td><i>_execucoes</i></td></tr>
+            <tr><td><b>volumetria_lake</b></td><td>Quanto dado entrou por conector, e qual a tendência?</td><td><i>_execucoes</i></td></tr>
             <tr><td><b>custo_consultas</b></td><td>Quanto o lake custou, em quê, e o que mudou?</td><td><i>INFORMATION_SCHEMA</i></td></tr>
           </tbody>
         </table>
       </div>
       <div>
         <ul class="tight">
-          <li><b>Portal MVP</b> — aplicação autenticada em Cloud Run, escopo cravado em ADR:
-            login e views Gold visíveis. A tela existe e roda com provedor de identidade simulado;
-            falta ligar no BigQuery real.</li>
-          <li><b>Ferramenta de BI</b> — <b>ainda não definida pelo cliente</b>. É pendência aberta,
-            e ela decide se a Gold precisa ser view, materialized view ou extração agendada.</li>
+          <li><b>Portal MVP</b> — aplicação autenticada em Cloud Run, com escopo cravado em ADR:
+            login e views Gold visíveis. É o consumidor de referência, não a ferramenta de análise.</li>
+          <li><b>Ferramenta de BI</b> — o modelo <b>não presume qual</b>. A Gold é view SQL sobre BigQuery;
+            Looker Studio, Power BI ou outro consomem a mesma superfície, sem camada intermediária
+            e sem reprocessamento.</li>
           <li><b>Dataplex</b> — catálogo e linhagem na Onda 4, quando todas as fontes estiverem carregadas.</li>
           <li><b>As três últimas linhas da tabela não são BI</b>: são observabilidade do próprio pipeline,
-            e por isso leem log de sistema em vez de dado de negócio. A separação é regra de CI,
+            e por isso leem log de sistema em vez de dado de negócio. A separação é <b>regra de CI</b>,
             não convenção.</li>
         </ul>
         <div class="callout ask">
-          <strong>Pergunta ao Google:</strong> os 8 domínios analíticos do cliente ainda estão sendo
-          definidos, e o consumidor final não está escolhido. Vale <strong>esperar</strong> a escolha do BI
-          para desenhar o formato da Gold, ou existe forma de servir que não te prende
-          (view + <strong>BI Engine</strong>, ou <strong>Looker Studio</strong> como default reversível)?
+          <strong>Pergunta ao Google:</strong> servir view SQL e deixar a escolha do BI em aberto é a
+          decisão certa para não prender o cliente, ou existe ganho concreto em fixar
+          <strong>Looker Studio + BI Engine</strong> desde o início — e o que se perde em reversibilidade?
         </div>
       </div>
     </div>
@@ -905,9 +889,9 @@ iniciada_em · encerrada_em · duracao_segundos · erro
             Bronze duplica de propósito; a Silver é quem resolve.</li>
         </ul>
         <div class="callout ask">
-          <strong>Pergunta ao Google:</strong> vale trocar esse log próprio por <strong>Dataplex data quality</strong> /
-          <strong>data profiling</strong>, ou os dois convivem — um para "a carga rodou",
-          outro para "o dado faz sentido"?
+          <strong>Pergunta ao Google:</strong> esse log próprio e o <strong>Dataplex data quality</strong>
+          se sobrepõem ou se complementam — um para "a carga rodou", outro para "o dado faz sentido"?
+          E o profiling automático mudaria a forma como declaramos qualidade por fonte?
         </div>
       </div>
     </div>
@@ -920,18 +904,19 @@ iniciada_em · encerrada_em · duracao_segundos · erro
   <span class="wordmark">ness<i>.</i></span><span class="tag">14 · Operação</span>
   <div class="inner">
     <p class="num rv">CUSTO</p>
-    <h2 class="rv">A conta é do cliente — e a janela para acertar é agora</h2>
+    <h2 class="rv">A conta é do cliente — e o rateio se decide antes do consumo</h2>
     <hr class="rule rv">
-    <p class="sub rv">Custo já gasto não se rateia depois. O rateio se apoia em rótulo aplicado no momento do consumo.</p>
+    <p class="sub rv">Custo já gasto não se rateia depois: a atribuição se apoia em rótulo aplicado no momento em que o recurso consome.</p>
     <div class="cols rv" style="--c:3">
-      <div class="card"><h3>Rotular antes do primeiro apply</h3>
+      <div class="card"><h3>Taxonomia no primeiro apply</h3>
         <p>Datasets, bucket, jobs e secrets já carregam <code>projeto</code>, <code>ambiente</code> e
-          <code>camada</code>. Recurso sem rótulo entra na fatura como massa indistinta, e nenhum
-          relatório recupera isso retroativamente. Como o ambiente ainda não existe, estamos no único
-          momento em que isso sai de graça.</p></div>
+          <code>camada</code>, declarados em Terraform. Recurso sem rótulo entra na fatura como massa
+          indistinta, e nenhum relatório recupera isso retroativamente — por isso a taxonomia entra
+          <b>no</b> apply, não depois dele.</p></div>
       <div class="card"><h3>Particionar e clusterizar sempre</h3>
-        <p>É regra do projeto, não otimização posterior: toda tabela Bronze é particionada por data de
-          ingestão e clusterizada pelas chaves de consulta. Sem isso, o custo cresce por varredura completa.</p></div>
+        <p>É regra do modelo, não otimização posterior: toda tabela Bronze é particionada por data de
+          ingestão e clusterizada pelas chaves de consulta. Sem isso, o custo cresce por varredura completa
+          a cada consulta do BI.</p></div>
       <div class="card"><h3>Medir o próprio gasto</h3>
         <p>Uma view Gold sobre <code>INFORMATION_SCHEMA.JOBS</code> e <code>TABLE_STORAGE</code> responde
           "quanto o lake custou, em quê, e o que mudou". Mais um orçamento com alerta, em Terraform.
@@ -939,19 +924,19 @@ iniciada_em · encerrada_em · duracao_segundos · erro
     </div>
     <div class="cols rv" style="--c:2;margin-top:clamp(22px,3vh,34px)">
       <div class="callout">
-        <strong>Uma exceção honesta ao nosso próprio processo:</strong> a regra do projeto é
-        "recurso GCP que não está no Terraform não existe". O <strong>billing export</strong> parece ser
-        configuração da conta de faturamento, sem recurso Terraform equivalente. Se confirmado, vira passo
-        manual de runbook com dono nomeado — exceção documentada, não furo descoberto em produção.
-        <strong>Gostaríamos de confirmar isso com vocês.</strong>
+        <strong>Um ponto de plataforma que queremos confirmar:</strong> a regra do modelo é que
+        recurso GCP se declara em Terraform. Até onde apuramos, ligar o <strong>billing export</strong>
+        para o BigQuery é configuração da <em>conta de faturamento</em>, sem recurso Terraform equivalente —
+        o dataset de destino e o IAM ficam no código, o interruptor não.
+        Se for isso mesmo, vira passo de runbook com dono nomeado.
       </div>
       <div class="callout ask">
         <strong>Perguntas ao Google:</strong> (1) o volume da Fase 1 é modesto, mas se a granularidade do ONS
-        virar semi-horária com histórico longo, o volume muda de ordem — em que ponto sai de
+        for semi-horária com histórico longo, ele muda de ordem — em que ponto o modelo sai de
         <strong>on-demand</strong> para <strong>slots/edition</strong>? (2) faz sentido
         <strong>partition expiration</strong> no Bronze, dado que o raw no GCS já é a memória longa?
-        (3) o eixo de rótulo por <strong>fonte de dado</strong> é o certo para atribuir custo por conector,
-        ou existe recorte melhor?
+        (3) o eixo de rótulo por <strong>fonte de dado</strong> é o recorte certo para atribuir custo
+        por conector, ou existe recorte melhor?
       </div>
     </div>
   </div>
@@ -969,10 +954,9 @@ iniciada_em · encerrada_em · duracao_segundos · erro
       <div>
         <ul class="tight">
           <li><b>Credencial só no Secret Manager</b>, concedida por <b>secret</b>, nunca no projeto inteiro.
-            Nada em código, <code>.env</code> versionado, fixture, log ou mensagem de erro — nem
-            "temporariamente".</li>
+            Nada em código, <code>.env</code> versionado, fixture, log ou mensagem de erro.</li>
           <li><b>Uma service account de ingestão</b>, com um único papel no nível do projeto
-            (<code>bigquery.jobUser</code>, que é inevitável para criar job). Editar dado é permissão
+            (<code>bigquery.jobUser</code>, inevitável para criar job). Editar dado é permissão
             <b>do dataset Bronze</b>; o bucket dá criar e ler objeto, sem administrar bucket;
             invocar Cloud Run é concedido <b>por job</b>.</li>
           <li><b>Deploy por Workload Identity Federation</b> — o CI não guarda chave de service account.</li>
@@ -992,16 +976,16 @@ iniciada_em · encerrada_em · duracao_segundos · erro
               <tr><td><b>Gitleaks</b></td><td>credencial no código e no histórico</td><td>todo PR</td></tr>
               <tr><td><b>Ruff</b></td><td>lint e formatação</td><td>todo PR</td></tr>
               <tr><td><b>Terraform validate</b></td><td>infra que não converge</td><td>todo PR</td></tr>
-              <tr><td><b>Verificação de atribuição</b></td><td>menção a ferramenta de IA no histórico — cláusula 7ª, propriedade intelectual</td><td>todo PR + hook local</td></tr>
+              <tr><td><b>Verificação de atribuição</b></td><td>menção a ferramenta de IA no histórico — cláusula de propriedade intelectual</td><td>todo PR + hook local</td></tr>
               <tr><td><b>pytest</b></td><td>229 testes · 92% de cobertura</td><td>todo PR</td></tr>
             </tbody>
           </table>
         </div>
         <div class="callout ask" style="margin-top:18px">
           <strong>Perguntas ao Google:</strong> o dado é operacional e de mercado, sem dado pessoal
-          relevante — nesse cenário, <strong>VPC Service Controls</strong> é exagero ou é o padrão que
-          você recomendaria de saída? E para os quatro sistemas internos atrás de VPN, o caminho de
-          referência é <strong>Cloud VPN + Serverless VPC Access</strong>, ou vale
+          relevante — nesse cenário, <strong>VPC Service Controls</strong> é o padrão que vocês
+          recomendariam de saída, ou peso desnecessário? E para os sistemas internos,
+          o caminho de referência é <strong>Cloud VPN + Serverless VPC Access</strong>, ou
           <strong>Private Service Connect</strong>?
         </div>
       </div>
@@ -1010,43 +994,31 @@ iniciada_em · encerrada_em · duracao_segundos · erro
   <span class="pagenum">19</span>
 </section>
 
-<!-- 20 ESTADO REAL -->
-<section class="slide dark" data-t="Estado real">
-  <span class="wordmark">ness<i>.</i></span><span class="tag">16 · Situação</span>
+<!-- 20 PRINCÍPIOS -->
+<section class="slide dark" data-t="Princípios">
+  <span class="wordmark">ness<i>.</i></span><span class="tag">16 · Síntese</span>
   <div class="inner">
-    <p class="num rv">ESTADO REAL</p>
-    <h2 class="rv">O que está provado e o que não está</h2>
+    <p class="num rv">SÍNTESE</p>
+    <h2 class="rv">Os oito invariantes do modelo</h2>
     <hr class="rule rv">
-    <div class="cols rv" style="--c:2">
-      <div>
-        <h3 style="color:#fff;font-size:clamp(14px,1.2vw,17px);margin:0 0 14px">Provado</h3>
-        <ul class="tight">
-          <li>Framework de ingestão completo: janela, raw no GCS, validação, colunas técnicas, carga, log —
-            <b>229 testes, 92% de cobertura</b>.</li>
-          <li><b>Quatro fontes públicas verificadas contra as APIs reais</b> em dry-run, incluindo
-            25.263 registros da ANEEL com zero inválidos em 28 segundos.</li>
-          <li>Terraform completo: datasets, bucket, secrets, Cloud Run Job, Scheduler, IAM por recurso,
-            alertas e orçamento — <code>fmt</code> e <code>validate</code> limpos.</li>
-          <li>CI/CD com seis portões verdes; deploy de views idempotente; replay do raw; caminho de
-            banco relacional pronto para a Onda 3.</li>
-        </ul>
-      </div>
-      <div>
-        <h3 style="color:#fff;font-size:clamp(14px,1.2vw,17px);margin:0 0 14px">Não provado — e é aqui que aparecem os erros que teste local não pega</h3>
-        <ul class="tight">
-          <li><b>Nenhuma linha chegou a um BigQuery real.</b> O projeto GCP do cliente ainda não foi
-            provisionado.</li>
-          <li>Primeiro <code>terraform apply</code>, primeira imagem publicada e primeira carga
-            ponta a ponta: pendentes. É onde surgem IAM insuficiente, cota de API, permissão de bucket
-            e formato que o BigQuery recusa.</li>
-          <li>Replay contra objeto real no GCS e linhagem conferida no BigQuery: pendentes.</li>
-          <li>Cinco fontes com credencial ou VPN pendente; a CCEE bloqueada por 403.</li>
-        </ul>
-        <div class="callout" style="margin-top:6px">
-          <strong>Por isso esta sessão é agora.</strong> Crítica que chega antes do primeiro
-          <code>apply</code> é reprojeto de graça. Depois da Onda 2, é migração.
-        </div>
-      </div>
+    <p class="sub rv">Se um deles não se sustentar na sua experiência, é a coisa mais útil que podemos ouvir hoje.</p>
+    <div class="qgrid rv">
+      <div class="q"><div class="n2">01</div><div><b>Bronze é fiel à origem</b>
+        <span>Append-only, sem regra de negócio. O que a fonte devolveu fica registrado como devolveu.</span></div></div>
+      <div class="q"><div class="n2">02</div><div><b>A deduplicação vive na Silver</b>
+        <span>Uma única regra, expressa em SQL legível, com a revisão mais recente da fonte vencendo.</span></div></div>
+      <div class="q"><div class="n2">03</div><div><b>A janela é sempre explícita</b>
+        <span>Nenhum conector decide "hoje". Reprocessar é passar outra janela — não é um modo especial.</span></div></div>
+      <div class="q"><div class="n2">04</div><div><b>O bruto é gravado antes do parsing</b>
+        <span>Corrigir interpretação nunca exige voltar à origem. O raw é a memória longa do lake.</span></div></div>
+      <div class="q"><div class="n2">05</div><div><b>Partição e clustering são regra</b>
+        <span>Não são otimização posterior: o custo de varredura é do cliente desde a primeira consulta.</span></div></div>
+      <div class="q"><div class="n2">06</div><div><b>Recurso GCP se declara em Terraform</b>
+        <span>Nada de console. O ambiente é reconstruível, e a mudança de infra passa por revisão como código.</span></div></div>
+      <div class="q"><div class="n2">07</div><div><b>Toda fonte entrega os mesmos 7 componentes</b>
+        <span>Conector, Bronze, Silver, Gold, testes, agendamento e documentação com linhagem. Sem meia entrega.</span></div></div>
+      <div class="q"><div class="n2">08</div><div><b>Uma CLI, três ambientes</b>
+        <span>Laptop, Cloud Run Job e futura DAG executam o mesmo comando. Não há caminho que só exista em produção.</span></div></div>
     </div>
   </div>
   <span class="pagenum">20</span>
@@ -1054,37 +1026,37 @@ iniciada_em · encerrada_em · duracao_segundos · erro
 
 <!-- 21 ALTERNATIVAS -->
 <section class="slide" data-t="Alternativas">
-  <span class="wordmark">ness<i>.</i></span><span class="tag">17 · Crítica</span>
+  <span class="wordmark">ness<i>.</i></span><span class="tag">17 · Discussão</span>
   <div class="inner">
     <p class="num rv">ALTERNATIVAS</p>
-    <h2 class="rv">O que consideramos e por que descartamos</h2>
+    <h2 class="rv">O que consideramos, e o que mudaria a escolha</h2>
     <hr class="rule rv">
-    <p class="sub rv">Cada linha é um convite. Se o argumento não se sustenta na sua experiência, é a hora de dizer.</p>
+    <p class="sub rv">Cada linha é um convite. Se a condição da última coluna já valer no seu julgamento, queremos saber agora.</p>
     <div class="scrollx rv">
     <table>
-      <thead><tr><th>Alternativa</th><th>Nossa escolha</th><th>O argumento que usamos</th><th>Onde ele pode estar errado</th></tr></thead>
+      <thead><tr><th>Alternativa</th><th>Escolha do modelo</th><th>Argumento</th><th>Condição que mudaria a escolha</th></tr></thead>
       <tbody>
         <tr><td><b>Cloud Composer</b> desde o início</td><td>Cloud Run Jobs + Scheduler</td>
-          <td>Composer cobra ambiente ligado 24×7; a Fase 1 tem cinco extrações diárias independentes, sem dependência entre elas</td>
-          <td>Se a Onda 3 chegar com muita dependência de uma vez, migrar cinco pipelines já em produção pode custar mais que ter começado no Composer</td></tr>
+          <td>Composer cobra ambiente ligado 24×7; a Fase 1 tem extrações diárias independentes, sem dependência entre elas</td>
+          <td>Se a Onda 3 trouxer muitas dependências de uma vez, migrar pipelines já em produção pode custar mais que ter começado no Composer</td></tr>
         <tr><td><b>Dataflow</b> / Beam</td><td>Conector Python em container</td>
-          <td>Volume modesto e 13 fontes heterogêneas; o custo aqui é de <em>integração</em>, não de processamento distribuído</td>
-          <td>Se alguma fonte interna trouxer volume grande ou exigir streaming, o conector simples não estica</td></tr>
+          <td>Volume modesto e 13 fontes heterogêneas: o custo aqui é de <em>integração</em>, não de processamento distribuído</td>
+          <td>Uma fonte interna com volume grande ou exigência de streaming — aí o conector simples não estica</td></tr>
         <tr><td><b>Datastream</b> para os bancos internos</td><td>Extração por janela via driver read-only</td>
-          <td>Ainda não conhecemos os schemas; a operação do cliente tem janela restrita para extração</td>
-          <td><b>É a nossa maior dúvida.</b> CDC gerenciado pode ser melhor que <code>SELECT</code> por janela em Oracle e MySQL — e evita discussão de janela de carga</td></tr>
+          <td>A operação do cliente tem janela restrita para extração, e o contrato do conector já cobre banco</td>
+          <td>CDC gerenciado pode ser melhor que <code>SELECT</code> por janela em Oracle e MySQL — e dispensa a discussão de janela de carga</td></tr>
         <tr><td><b>dbt</b> ou <b>Dataform</b></td><td>SQL versionado, deploy idempotente</td>
           <td>13 views (5 Silver + 8 Gold), não centenas de modelos; handoff a time pequeno fica com uma peça a menos</td>
-          <td>Perdemos teste de dado e linhagem automática de graça, e assumimos isso por escrito</td></tr>
-        <tr><td><b>Tabela externa / BigLake</b> sobre o raw</td><td>Carga no Bronze</td>
+          <td>Crescimento além do previsto, ou o valor dos testes de dado e da linhagem automática superando o custo de aprendizado</td></tr>
+        <tr><td><b>Tabela externa / BigLake</b> sobre o raw</td><td>Carga na tabela Bronze</td>
           <td>Tabela nativa dá partição, clustering e custo previsível; o raw fica como memória longa e base do replay</td>
-          <td>Duplica o armazenamento do que já está no bucket, e para fonte de arquivo puro pode ser desnecessário</td></tr>
+          <td>Fontes predominantemente de arquivo, onde duplicar o armazenamento não compensa</td></tr>
         <tr><td><b>Data Fusion</b> / integração visual</td><td>Código Python versionado</td>
           <td>O contrato exige entrega em repositório com teste e revisão; pipeline visual não passa por code review</td>
-          <td>Menos código para o cliente manter depois do handoff</td></tr>
+          <td>Se o time que assumir a operação preferir menos código para manter que rastreabilidade em git</td></tr>
         <tr><td><b>Tabelas materializadas</b> na Silver/Gold</td><td>Views</td>
           <td>Volume modesto; view não tem custo de armazenamento nem estado para reprocessar</td>
-          <td>Concorrência de leitura pelo BI pode tornar a varredura repetida mais cara que materializar</td></tr>
+          <td>Concorrência de leitura pelo BI tornando a varredura repetida mais cara que materializar</td></tr>
       </tbody>
     </table>
     </div>
@@ -1094,7 +1066,7 @@ iniciada_em · encerrada_em · duracao_segundos · erro
 
 <!-- 22 AS PERGUNTAS -->
 <section class="slide dark" data-t="Perguntas">
-  <span class="wordmark">ness<i>.</i></span><span class="tag">18 · Agenda da crítica</span>
+  <span class="wordmark">ness<i>.</i></span><span class="tag">18 · Pauta</span>
   <div class="inner">
     <p class="num rv">A PAUTA</p>
     <h2 class="rv">Oito perguntas que valem mais que uma aprovação</h2>
@@ -1104,8 +1076,8 @@ iniciada_em · encerrada_em · duracao_segundos · erro
         <span>Conector Python em Cloud Run é o padrão certo para 13 fontes heterogêneas de baixo volume,
           ou há serviço gerenciado que reduz código sem aumentar acoplamento?</span></div></div>
       <div class="q"><div class="n2">02</div><div><b>Bancos internos</b>
-        <span>Datastream com CDC ou extração por janela via driver? A operação do cliente tem janela
-          restrita — isso muda a resposta?</span></div></div>
+        <span>Datastream com CDC ou extração por janela via driver? A janela restrita de operação
+          do cliente muda a resposta?</span></div></div>
       <div class="q"><div class="n2">03</div><div><b>Orquestração</b>
         <span>Cloud Workflows como degrau entre Scheduler e Composer, ou é um passo intermediário
           que só adiciona uma peça?</span></div></div>
@@ -1114,16 +1086,16 @@ iniciada_em · encerrada_em · duracao_segundos · erro
           e qual o caminho de migração depois?</span></div></div>
       <div class="q"><div class="n2">05</div><div><b>Camadas</b>
         <span>Bronze append-only com dedup na view Silver: aguenta 13 fontes,
-          ou o ponto de virada para materializar chega antes do que pensamos?</span></div></div>
+          ou o ponto de virada para materializar chega antes do que projetamos?</span></div></div>
       <div class="q"><div class="n2">06</div><div><b>Custo</b>
         <span>Taxonomia de rótulo, partição, retenção do raw e o ponto de saída de on-demand
           para slots — o que faríamos diferente <em>antes</em> do primeiro apply?</span></div></div>
       <div class="q"><div class="n2">07</div><div><b>Governança</b>
         <span>Dataplex na Onda 4 é tarde? Catálogo, linhagem e qualidade deveriam entrar
           junto com a primeira fonte?</span></div></div>
-      <div class="q"><div class="n2">08</div><div><b>Origem bloqueada</b>
-        <span>Existe padrão de referência para portal público que recusa automação —
-          IP de saída estável, acordo institucional, ou aceitar a via semi-manual?</span></div></div>
+      <div class="q"><div class="n2">08</div><div><b>Organização do ambiente</b>
+        <span>Um projeto por ambiente com três datasets, ou separação por projeto entre camadas?
+          O que envelhece melhor quando entrarem novos domínios e novos consumidores?</span></div></div>
     </div>
     <div class="callout rv" style="margin-top:clamp(22px,3vh,36px)">
       <strong>O que pedimos concretamente:</strong> para cada pergunta, o nome do serviço que você usaria,
@@ -1144,21 +1116,21 @@ iniciada_em · encerrada_em · duracao_segundos · erro
     <div class="steps rv" style="grid-template-columns:repeat(4,minmax(0,1fr))">
       <div class="it"><b>Registrar</b><span>Cada recomendação vira ADR novo ou revisão de ADR existente,
         com o argumento que a motivou.</span></div>
-      <div class="it"><b>Reprojetar o que couber</b><span>Antes do primeiro <code>terraform apply</code>.
-        É a janela em que mudar de desenho não custa migração.</span></div>
-      <div class="it"><b>Aplicar</b><span>Primeiro apply com a taxonomia de custo já definida,
-        primeira carga ponta a ponta, três dias consecutivos de sucesso.</span></div>
-      <div class="it"><b>Voltar</b><span>Revisão nova quando a Onda 3 abrir os sistemas internos —
-        é onde o desenho encontra o dado difícil.</span></div>
+      <div class="it"><b>Ajustar o desenho</b><span>Antes do primeiro <code>terraform apply</code>.
+        É a janela em que mudar de modelo não custa migração.</span></div>
+      <div class="it"><b>Instanciar</b><span>Primeiro apply com a taxonomia de custo já definida,
+        e a carga ponta a ponta das fontes públicas.</span></div>
+      <div class="it"><b>Voltar</b><span>Revisão nova quando os sistemas internos entrarem —
+        é onde o modelo encontra o dado legado.</span></div>
     </div>
     <div class="callout rv" style="margin-top:clamp(26px,3.6vh,44px)">
-      <strong>Uma última nota sobre método.</strong> Toda decisão estrutural deste projeto está escrita
+      <strong>Uma última nota sobre método.</strong> Toda decisão estrutural deste modelo está escrita
       como ADR, com contexto, decisão e <em>consequência assumida</em>. Não pedimos que você concorde
-      com as oito decisões — pedimos que aponte quais delas você desfaria, para que a consequência
-      deixe de ser assumida e passe a ser corrigida.
+      com as oito — pedimos que aponte quais desfaria, para que a consequência deixe de ser assumida
+      e passe a ser corrigida.
     </div>
     <p class="lead rv" style="margin-top:clamp(24px,3.4vh,40px);max-width:34em">
-      Obrigado. As perguntas do slide 22 são a pauta; o resto do baralho é contexto para respondê-las.</p>
+      Obrigado. As perguntas do slide 22 são a pauta; o resto do baralho é o contexto para respondê-las.</p>
   </div>
   <span class="pagenum">ness. Processos e Tecnologia · AlupData Fase 1</span>
 </section>

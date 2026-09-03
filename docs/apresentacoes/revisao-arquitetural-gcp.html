@@ -258,8 +258,8 @@ pre i{color:#6B7885;font-style:normal}
         <div class="l">Coligadas geradoras</div></div>
       <div class="kpi"><div class="v"><span class="count" data-to="13">13</span></div>
         <div class="l">Fontes de dados contratadas</div></div>
-      <div class="kpi"><div class="v"><span class="count" data-to="5">5</span><i>/13</i></div>
-        <div class="l">Fontes com os 7 componentes</div></div>
+      <div class="kpi"><div class="v"><span class="count" data-to="4">4</span><i>/13</i></div>
+        <div class="l">Fontes verificadas contra a origem real</div></div>
       <div class="kpi"><div class="v"><span class="count" data-to="25">25</span><i>k</i></div>
         <div class="l">Registros na maior carga verificada</div></div>
     </div>
@@ -794,7 +794,7 @@ GROUP BY periodo_apuracao, submercado;</pre>
         <div class="callout ask" style="margin-top:18px">
           <strong>Pergunta ao Google:</strong> <strong>Dataform</strong> é nativo do BigQuery e não cobra
           ambiente ligado — o argumento de custo que vale contra o Composer não vale contra ele.
-          A pergunta é de handoff e de peso operacional: em um projeto de ~15 views que será operado por
+          A pergunta é de handoff e de peso operacional: em um projeto de 13 views que será operado por
           um time pequeno, Dataform paga o próprio custo de aprendizado pelos testes de dado e
           pela linhagem que traz? E qual é o caminho de migração de SQL solto para Dataform depois,
           se a Fase 2 crescer?
@@ -992,7 +992,8 @@ iniciada_em · encerrada_em · duracao_segundos · erro
               <tr><td><b>Gitleaks</b></td><td>credencial no código e no histórico</td><td>todo PR</td></tr>
               <tr><td><b>Ruff</b></td><td>lint e formatação</td><td>todo PR</td></tr>
               <tr><td><b>Terraform validate</b></td><td>infra que não converge</td><td>todo PR</td></tr>
-              <tr><td><b>pytest</b></td><td>226 testes · 92% de cobertura</td><td>todo PR</td></tr>
+              <tr><td><b>Verificação de atribuição</b></td><td>menção a ferramenta de IA no histórico — cláusula 7ª, propriedade intelectual</td><td>todo PR + hook local</td></tr>
+              <tr><td><b>pytest</b></td><td>229 testes · 92% de cobertura</td><td>todo PR</td></tr>
             </tbody>
           </table>
         </div>
@@ -1021,7 +1022,7 @@ iniciada_em · encerrada_em · duracao_segundos · erro
         <h3 style="color:#fff;font-size:clamp(14px,1.2vw,17px);margin:0 0 14px">Provado</h3>
         <ul class="tight">
           <li>Framework de ingestão completo: janela, raw no GCS, validação, colunas técnicas, carga, log —
-            <b>226 testes, 92% de cobertura</b>.</li>
+            <b>229 testes, 92% de cobertura</b>.</li>
           <li><b>Quatro fontes públicas verificadas contra as APIs reais</b> em dry-run, incluindo
             25.263 registros da ANEEL com zero inválidos em 28 segundos.</li>
           <li>Terraform completo: datasets, bucket, secrets, Cloud Run Job, Scheduler, IAM por recurso,
@@ -1073,7 +1074,7 @@ iniciada_em · encerrada_em · duracao_segundos · erro
           <td>Ainda não conhecemos os schemas; a operação do cliente tem janela restrita para extração</td>
           <td><b>É a nossa maior dúvida.</b> CDC gerenciado pode ser melhor que <code>SELECT</code> por janela em Oracle e MySQL — e evita discussão de janela de carga</td></tr>
         <tr><td><b>dbt</b> ou <b>Dataform</b></td><td>SQL versionado, deploy idempotente</td>
-          <td>~15 views, não centenas de modelos; handoff a time pequeno fica com uma peça a menos</td>
+          <td>13 views (5 Silver + 8 Gold), não centenas de modelos; handoff a time pequeno fica com uma peça a menos</td>
           <td>Perdemos teste de dado e linhagem automática de graça, e assumimos isso por escrito</td></tr>
         <tr><td><b>Tabela externa / BigLake</b> sobre o raw</td><td>Carga no Bronze</td>
           <td>Tabela nativa dá partição, clustering e custo previsível; o raw fica como memória longa e base do replay</td>

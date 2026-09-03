@@ -1,0 +1,1250 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<script>document.documentElement.className='js'</script>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AlupData — Revisão Arquitetural do DataLake em GCP</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --cyan:#00ADE8; --cyan-dark:#0090C4; --cyan-mist:#E5F6FD;
+  --ink:#0E1116; --graphite:#2B333B; --gray:#5A6473;
+  --line:#E4E8EC; --mist:#EEF3F8; --white:#fff;
+  --bronze:#B87333; --silver:#9AA6B2; --gold:#C9A227;
+  --pad:clamp(32px,6vw,120px);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+html,body{margin:0;padding:0;height:100%}
+body{
+  font-family:'Montserrat',-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;
+  color:var(--graphite);background:var(--white);
+  -webkit-font-smoothing:antialiased;
+}
+/* ---------- estrutura de rolagem ---------- */
+.deck{height:100vh;overflow-y:scroll;scroll-snap-type:y mandatory;scroll-behavior:smooth}
+.slide{
+  position:relative;min-height:100vh;scroll-snap-align:start;scroll-snap-stop:always;
+  display:flex;flex-direction:column;justify-content:center;
+  padding:calc(var(--pad)*.9) var(--pad);
+  box-shadow:inset 0 -1px 0 var(--line);
+}
+.slide.dark{background:var(--ink);color:#C7D2DE;box-shadow:none}
+.slide.mist{background:var(--mist);box-shadow:none}
+.inner{width:100%;max-width:1180px;margin:0 auto}
+/* ---------- marca ---------- */
+.wordmark{position:absolute;top:calc(var(--pad)*.55);left:var(--pad);
+  font-weight:500;font-size:24px;letter-spacing:-.02em;color:#000;z-index:2}
+.slide.cover .wordmark{font-size:clamp(30px,3.2vw,42px);top:calc(var(--pad)*.62)}
+.slide.dark .wordmark{color:#fff}
+.wordmark i{color:var(--cyan);font-style:normal}
+.tag{position:absolute;top:calc(var(--pad)*.55);right:var(--pad);
+  font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--gray);z-index:2}
+.slide.dark .tag{color:#6B7885}
+.pagenum{position:absolute;bottom:calc(var(--pad)*.5);right:var(--pad);
+  font-size:11px;letter-spacing:.14em;color:var(--gray)}
+/* ---------- capa ---------- */
+.slide.cover{justify-content:flex-end;padding-bottom:calc(var(--pad)*1.15)}
+.cover-eyebrow{font-size:12px;letter-spacing:.22em;text-transform:uppercase;
+  color:var(--cyan);margin:0 0 clamp(16px,2.4vh,26px)}
+.slide.cover .lead{max-width:27em;margin-top:clamp(20px,3vh,34px)}
+.cover-meta{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:clamp(16px,2.6vw,40px);margin-top:clamp(38px,6vh,76px);
+  border-top:1px solid #242B33;padding-top:clamp(18px,2.6vh,28px)}
+.cover-meta dt{font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;color:#6B7885;margin:0}
+.cover-meta dd{margin:8px 0 0;font-weight:500;font-size:clamp(14px,1.25vw,18px);
+  color:#fff;letter-spacing:-.01em}
+@media (max-width:820px){.cover-meta{grid-template-columns:repeat(2,minmax(0,1fr));row-gap:22px}}
+/* ---------- divisor de seção ---------- */
+.slide.divider{justify-content:center}
+.divider .kicker{font-size:12px;letter-spacing:.22em;text-transform:uppercase;color:var(--cyan);margin:0 0 18px}
+.divider .display{font-size:clamp(40px,6.4vw,88px)}
+.divider .lead{margin-top:26px;max-width:30em}
+/* ---------- progresso e navegação ---------- */
+#bar{position:fixed;top:0;left:0;height:3px;width:0;background:var(--cyan);z-index:50;transition:width .15s linear}
+#dots{position:fixed;right:18px;top:50%;transform:translateY(-50%);z-index:50;
+  display:flex;flex-direction:column;gap:9px}
+#dots button{width:9px;height:9px;padding:0;border:1px solid #9AA6B2;background:transparent;
+  border-radius:50%;cursor:pointer;transition:all .2s}
+#dots button[aria-current="true"]{background:var(--cyan);border-color:var(--cyan);transform:scale(1.35)}
+.hint{position:absolute;bottom:calc(var(--pad)*.5);left:var(--pad);
+  font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--gray)}
+.hint span{display:inline-block;animation:nudge 2.4s ease-in-out infinite;margin-left:8px}
+@keyframes nudge{0%,100%{transform:translateY(0)}50%{transform:translateY(5px)}}
+/* ---------- tipografia ---------- */
+.display{font-weight:600;font-size:clamp(44px,7.4vw,104px);line-height:.96;
+  letter-spacing:-.035em;margin:0;color:#fff}
+h2{font-weight:600;font-size:clamp(26px,3.8vw,50px);line-height:1.04;
+  letter-spacing:-.03em;margin:0 0 10px;color:var(--ink)}
+.slide.dark h2{color:#fff}
+h3{font-weight:600}
+.num{font-weight:600;font-size:13px;letter-spacing:.2em;color:var(--cyan);margin-bottom:14px}
+.sub{font-weight:500;font-size:clamp(14px,1.4vw,19px);color:var(--cyan-dark);margin:0 0 clamp(20px,2.8vh,36px)}
+.slide.dark .sub{color:var(--cyan)}
+.rule{width:72px;height:4px;background:var(--cyan);border:0;margin:0 0 clamp(20px,2.6vh,32px)}
+p,li{font-size:clamp(13px,1.1vw,16px);line-height:1.6}
+.lead{font-size:clamp(16px,1.6vw,23px);line-height:1.5;color:#9AA6B2;max-width:22em}
+.slide:not(.dark) .lead{color:var(--gray)}
+/* ---------- componentes ---------- */
+.cols{display:grid;grid-template-columns:repeat(var(--c,3),minmax(0,1fr));gap:clamp(16px,2.2vw,32px)}
+.card{border-top:2px solid var(--cyan);padding-top:16px}
+.card h3{font-size:clamp(14px,1.2vw,17px);margin:0 0 8px;color:var(--ink)}
+.slide.dark .card h3{color:#fff}
+.card p{font-size:clamp(12.5px,.98vw,14.5px);color:var(--gray);margin:0;line-height:1.55}
+.slide.dark .card p{color:#8B95A3}
+.card.q{border-top-color:var(--gold)}
+ul{margin:0;padding-left:0;list-style:none}
+ul li{position:relative;padding-left:22px;margin-bottom:12px}
+ul li::before{content:'';position:absolute;left:0;top:.62em;width:7px;height:7px;background:var(--cyan)}
+ul.tight li{margin-bottom:8px}
+table{width:100%;border-collapse:collapse;font-size:clamp(11.5px,.95vw,14px)}
+th{background:var(--ink);color:#fff;font-weight:500;text-align:left;padding:10px 12px;font-size:11.5px;
+  letter-spacing:.04em}
+td{padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+.slide.dark td{border-color:#242B33}
+tbody tr:last-child td{border-bottom:0}
+td b{color:var(--ink);font-weight:600}
+.slide.dark td b{color:#fff}
+.r{text-align:right;white-space:nowrap}
+.nw{white-space:nowrap}
+.ok{color:#1B8A5A;font-weight:600}
+.blk{color:#C0392B;font-weight:600}
+.wait{color:#B87333;font-weight:600}
+.callout{background:var(--cyan-mist);border-left:3px solid var(--cyan);padding:16px 20px;
+  font-size:clamp(12.5px,1vw,15px);line-height:1.55;color:var(--graphite)}
+.callout strong{color:var(--ink)}
+.slide.dark .callout{background:rgba(0,173,232,.09);color:#C7D2DE}
+.slide.dark .callout strong{color:#fff}
+.callout.ask{background:#FFF9E8;border-left-color:var(--gold)}
+.slide.dark .callout.ask{background:rgba(201,162,39,.12)}
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:clamp(18px,3vw,44px)}
+.kpi .v{font-weight:600;font-size:clamp(38px,5.8vw,80px);line-height:1;
+  letter-spacing:-.04em;color:var(--ink)}
+.slide.dark .kpi .v{color:#fff}
+.kpi .v i{font-style:normal;color:var(--cyan)}
+.kpi .l{font-size:clamp(10px,.85vw,12px);letter-spacing:.16em;text-transform:uppercase;
+  color:var(--gray);margin-top:12px;border-top:1px solid var(--line);padding-top:12px}
+.slide.dark .kpi .l{border-color:#242B33}
+/* camadas medallion */
+.flow{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:clamp(12px,1.6vw,22px)}
+.step{border:1px solid var(--line);border-top-width:4px;padding:clamp(14px,1.8vw,24px)}
+.slide.dark .step{border-color:#242B33}
+.step .t{font-weight:600;font-size:clamp(15px,1.5vw,21px);color:var(--ink);letter-spacing:-.02em}
+.slide.dark .step .t{color:#fff}
+.step .d{font-size:clamp(12px,.95vw,14px);color:var(--gray);margin-top:10px;line-height:1.5}
+.step.s0{border-top-color:#5A6473}.step.s1{border-top-color:var(--bronze)}
+.step.s2{border-top-color:var(--silver)}.step.s3{border-top-color:var(--gold)}
+/* código */
+pre{margin:0;background:#0B0E12;color:#D7E1EC;padding:16px 18px;overflow-x:auto;
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  font-size:clamp(10.5px,.85vw,13px);line-height:1.62;border-left:3px solid var(--cyan)}
+pre b{color:var(--cyan);font-weight:400}
+pre i{color:#6B7885;font-style:normal}
+.codecap{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--gray);margin:0 0 8px}
+/* diagrama */
+.diagram{width:100%;height:auto;display:block}
+.scrollx{overflow-x:auto}
+/* passos numerados */
+.steps{counter-reset:s;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(14px,2vw,26px)}
+.steps .it{position:relative;padding-top:14px;border-top:1px solid var(--line)}
+.slide.dark .steps .it{border-color:#242B33}
+.steps .it::before{counter-increment:s;content:counter(s,decimal-leading-zero);
+  font-size:11px;letter-spacing:.16em;color:var(--cyan);display:block;margin-bottom:8px}
+.steps .it b{display:block;color:var(--ink);font-size:clamp(13.5px,1.1vw,16px);margin-bottom:6px}
+.slide.dark .steps .it b{color:#fff}
+.steps .it span{font-size:clamp(12px,.95vw,14px);color:var(--gray);line-height:1.55}
+/* perguntas */
+.qgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(14px,2vw,28px) clamp(22px,3vw,48px)}
+.q{display:grid;grid-template-columns:34px 1fr;gap:14px;align-items:start}
+.q .n2{font-weight:600;font-size:15px;color:var(--cyan);padding-top:2px}
+.q b{display:block;color:var(--ink);font-size:clamp(13.5px,1.1vw,16px);margin-bottom:5px;letter-spacing:-.01em}
+.slide.dark .q b{color:#fff}
+.q span{font-size:clamp(12px,.95vw,14px);color:var(--gray);line-height:1.5}
+.slide.dark .q span{color:#8B95A3}
+/* reveal */
+.js .rv{opacity:0;transform:translateY(22px);transition:opacity .6s cubic-bezier(.2,.7,.3,1),transform .6s cubic-bezier(.2,.7,.3,1)}
+.slide.on .rv{opacity:1;transform:none}
+.slide.on .rv:nth-child(2){transition-delay:.06s}
+.slide.on .rv:nth-child(3){transition-delay:.12s}
+.slide.on .rv:nth-child(4){transition-delay:.18s}
+.slide.on .rv:nth-child(5){transition-delay:.24s}
+.slide.on .rv:nth-child(6){transition-delay:.3s}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}.deck{scroll-behavior:auto}
+  .js .rv{opacity:1;transform:none;transition:none}.hint span{animation:none}
+}
+@media (max-width:820px){
+  .deck{scroll-snap-type:none}
+  .slide{min-height:auto;padding:64px 28px}
+  .kpis,.flow,.cols,.steps,.qgrid{grid-template-columns:1fr!important;--c:1!important}
+  #dots{display:none}
+}
+@media print{
+  #bar,#dots,.hint{display:none}
+  .deck{height:auto;overflow:visible}
+  .slide{min-height:auto;height:100vh;page-break-after:always;border:0}
+  .js .rv{opacity:1!important;transform:none!important}
+  @page{size:A4 landscape;margin:0}
+}
+</style>
+</head>
+<body>
+<div id="bar"></div>
+<nav id="dots" aria-label="Navegação de slides"></nav>
+
+<main class="deck" id="deck" tabindex="0">
+
+<!-- 01 CAPA -->
+<section class="slide dark cover" data-t="Capa">
+  <span class="wordmark">ness<i>.</i></span><span class="tag">Revisão arquitetural · Google</span>
+  <div class="inner">
+    <p class="cover-eyebrow rv">Sessão de crítica técnica</p>
+    <h1 class="display rv">AlupData<br>DataLake em GCP</h1>
+    <p class="lead rv">
+      Origem, tratamento e destino do dado do Grupo Alupar.
+      Arquitetura Medallion sobre BigQuery, Cloud Storage e Cloud Run.
+      Trazemos o desenho para ser criticado — não para ser aprovado.</p>
+    <dl class="cover-meta rv">
+      <div><dt>Cliente final</dt><dd>Grupo Alupar</dd></div>
+      <div><dt>Execução</dt><dd>ness.</dd></div>
+      <div><dt>Fase</dt><dd>1 — DataLake</dd></div>
+      <div><dt>Data</dt><dd>Setembro / 2026</dd></div>
+    </dl>
+  </div>
+  <span class="hint">Role ou use as setas<span>↓</span></span>
+</section>
+
+<!-- 02 O PEDIDO -->
+<section class="slide" data-t="O pedido">
+  <span class="wordmark">ness<i>.</i></span><span class="tag">01 · Objetivo</span>
+  <div class="inner">
+    <p class="num rv">O PEDIDO</p>
+    <h2 class="rv">O que queremos desta sessão</h2>
+    <hr class="rule rv">
+    <p class="sub rv">Não é uma apresentação de venda. É uma revisão de projeto com quem conhece a plataforma por dentro.</p>
+    <div class="cols" style="--c:3">
+      <div class="card rv"><h3>Atacar as escolhas</h3>
+        <p>Cinco decisões estruturais estão registradas em ADR e são caras de reverter depois da Onda 2.
+           Queremos saber quais delas o time do Google desfaria — e com que argumento.</p></div>
+      <div class="card rv"><h3>Apontar o serviço melhor</h3>
+        <p>Onde estamos escrevendo código que um serviço gerenciado já resolve
+           (Datastream, Dataflow, Dataform, Workflows, BigLake, DTS), queremos ouvir o nome do serviço e o trade-off real.</p></div>
+      <div class="card rv"><h3>Dimensionar custo e escala</h3>
+        <p>O custo de infra é do cliente. Queremos crítica sobre particionamento, retenção,
+           slots vs. on-demand e o que quebra quando o ONS semi-horário entrar.</p></div>
+    </div>
+    <div class="callout rv" style="margin-top:clamp(24px,3.4vh,40px)">
+      <strong>Estado honesto antes de começar:</strong> todo o pipeline está implementado, testado e verificado
+      contra as APIs de origem em <em>dry-run</em>. <strong>Nenhuma linha chegou a um BigQuery real</strong> —
+      o projeto GCP do cliente ainda não foi provisionado. É o melhor momento possível para uma crítica:
+      nada está gasto, nada está migrado.
+    </div>
+  </div>
+  <span class="pagenum">02</span>
+</section>
+
+<!-- 03 NÚMEROS -->
+<section class="slide mist" data-t="Números">
+  <span class="wordmark">ness<i>.</i></span><span class="tag">02 · Contexto</span>
+  <div class="inner">
+    <p class="num rv">CONTEXTO</p>
+    <h2 class="rv">O projeto em quatro números</h2>
+    <hr class="rule rv">
+    <div class="kpis rv">
+      <div class="kpi"><div class="v"><span class="count" data-to="6">6</span></div>
+        <div class="l">Coligadas geradoras</div></div>
+      <div class="kpi"><div class="v"><span class="count" data-to="13">13</span></div>
+        <div class="l">Fontes de dados contratadas</div></div>
+      <div class="kpi"><div class="v"><span class="count" data-to="5">5</span><i>/13</i></div>
+        <div class="l">Fontes com os 7 componentes</div></div>
+      <div class="kpi"><div class="v"><span class="count" data-to="25">25</span><i>k</i></div>
+        <div class="l">Registros na maior carga verificada</div></div>
+    </div>
+    <div class="cols rv" style="--c:2;margin-top:clamp(30px,4.5vh,56px)">
+      <div class="callout">
+        <strong>Toda fonte entrega 7 componentes</strong>, sempre os mesmos: conector Python, tabela Bronze,
+        view Silver, view Gold, testes, agendamento em Terraform e documentação com linhagem.
+        Fonte com 5 de 7 não é entrega parcial — é retrabalho.
+      </div>
+      <div class="callout">
+        <strong>Regime de horas, 19 semanas, 5 ondas.</strong> A prioridade pode mudar no meio do caminho;
+        o padrão de entrega por fonte, não. É isso que permite absorver crítica arquitetural
+        sem reescrever o que já está pronto.
+      </div>
+    </div>
+  </div>
+  <span class="pagenum">03</span>
+</section>
+
+<!-- 04 VISÃO PONTA A PONTA -->
+<section class="slide" data-t="Ponta a ponta">
+  <span class="wordmark">ness<i>.</i></span><span class="tag">03 · Visão geral</span>
+  <div class="inner">
+    <p class="num rv">PONTA A PONTA</p>
+    <h2 class="rv">Origem → tratamento → destino</h2>
+    <hr class="rule rv">
+    <div class="scrollx rv">
+    <svg class="diagram" viewBox="0 0 1180 360" role="img"
+         aria-label="Fluxo de dados: origens externas e internas entram por conectores Python em Cloud Run Jobs, gravam o bruto no Cloud Storage, carregam no BigQuery Bronze, são higienizadas na Silver e consolidadas na Gold, servindo Portal, BI e Dataplex.">
+      <defs>
+        <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+          <path d="M0 0 L10 5 L0 10 z" fill="#9AA6B2"/>
+        </marker>
+        <style>
+          .bx{fill:#fff;stroke:#E4E8EC}
+          .hd{font:600 12px Montserrat,sans-serif;fill:#0E1116}
+          .ln{font:400 10.5px Montserrat,sans-serif;fill:#5A6473}
+          .cap{font:600 9.5px Montserrat,sans-serif;fill:#00ADE8;letter-spacing:.14em}
+          .svc{font:500 9.5px Montserrat,sans-serif;fill:#0090C4}
+          .fl{stroke:#9AA6B2;stroke-width:1.4;fill:none;marker-end:url(#ar)}
+        </style>
+      </defs>
+
+      <text class="cap" x="0" y="14">ORIGEM</text>
+      <text class="cap" x="300" y="14">INGESTÃO</text>
+      <text class="cap" x="530" y="14">TRATAMENTO — MEDALLION</text>
+      <text class="cap" x="990" y="14">DESTINO</text>
+      <line x1="0" y1="22" x2="1180" y2="22" stroke="#E4E8EC"/>
+
+      <!-- origem -->
+      <rect class="bx" x="0" y="40" width="250" height="60" rx="2"/>
+      <rect x="0" y="40" width="3" height="60" fill="#5A6473"/>
+      <text class="hd" x="16" y="62">APIs públicas</text>
+      <text class="ln" x="16" y="80">BCB · IBGE · ANEEL · ONS · CCEE</text>
+      <text class="ln" x="16" y="94">HTTPS · JSON e CSV</text>
+
+      <rect class="bx" x="0" y="112" width="250" height="60" rx="2"/>
+      <rect x="0" y="112" width="3" height="60" fill="#5A6473"/>
+      <text class="hd" x="16" y="134">APIs credenciadas</text>
+      <text class="ln" x="16" y="152">CCEE agente · BBCE · Hubspot · TempoOK</text>
+      <text class="ln" x="16" y="166">Token no Secret Manager</text>
+
+      <rect class="bx" x="0" y="184" width="250" height="60" rx="2"/>
+      <rect x="0" y="184" width="3" height="60" fill="#5A6473"/>
+      <text class="hd" x="16" y="206">Sistemas internos</text>
+      <text class="ln" x="16" y="224">Oracle FMB · MySQL RDS · Portal · RM/TOTVS</text>
+      <text class="ln" x="16" y="238">VPN · driver puro-Python · read-only</text>
+
+      <rect class="bx" x="0" y="256" width="250" height="56" rx="2"/>
+      <rect x="0" y="256" width="3" height="56" fill="#5A6473"/>
+      <text class="hd" x="16" y="278">Planilhas sob template</text>
+      <text class="ln" x="16" y="296">CSV / XLSX — única fonte editada por pessoa</text>
+
+      <!-- ingestão -->
+      <rect class="bx" x="300" y="70" width="190" height="96" rx="2"/>
+      <rect x="300" y="70" width="3" height="96" fill="#00ADE8"/>
+      <text class="hd" x="316" y="92">Conector Python</text>
+      <text class="ln" x="316" y="110">extrair() + transformar()</text>
+      <text class="ln" x="316" y="124">runner único · janela de datas</text>
+      <text class="ln" x="316" y="138">validação Pydantic</text>
+      <text class="svc" x="316" y="158">Cloud Run Job + Scheduler</text>
+
+      <rect class="bx" x="300" y="186" width="190" height="76" rx="2"/>
+      <rect x="300" y="186" width="3" height="76" fill="#00ADE8"/>
+      <text class="hd" x="316" y="208">Raw imutável</text>
+      <text class="ln" x="316" y="226">JSONL gzip, gravado antes</text>
+      <text class="ln" x="316" y="240">do parsing · replay sem a fonte</text>
+      <text class="svc" x="316" y="256">Cloud Storage</text>
+
+      <!-- camadas -->
+      <rect class="bx" x="540" y="70" width="182" height="192" rx="2"/>
+      <rect x="540" y="70" width="3" height="192" fill="#B87333"/>
+      <text class="hd" x="556" y="92">Bronze</text>
+      <text class="ln" x="556" y="112">tabela append-only</text>
+      <text class="ln" x="556" y="128">fiel à origem</text>
+      <text class="ln" x="556" y="144">particionada + clusterizada</text>
+      <text class="ln" x="556" y="160">colunas técnicas de linhagem</text>
+      <text class="ln" x="556" y="176">_execucoes: log de toda carga</text>
+      <text class="svc" x="556" y="200">BigQuery · dataset bronze</text>
+
+      <rect class="bx" x="740" y="70" width="182" height="192" rx="2"/>
+      <rect x="740" y="70" width="3" height="192" fill="#9AA6B2"/>
+      <text class="hd" x="756" y="92">Silver</text>
+      <text class="ln" x="756" y="112">view, não tabela</text>
+      <text class="ln" x="756" y="128">dedup por QUALIFY</text>
+      <text class="ln" x="756" y="144">tipagem e unidades</text>
+      <text class="ln" x="756" y="160">5 dimensões comuns</text>
+      <text class="ln" x="756" y="176">revisão da fonte vence</text>
+      <text class="svc" x="756" y="200">BigQuery · dataset silver</text>
+
+
+      <rect class="bx" x="540" y="282" width="382" height="56" rx="2"/>
+      <rect x="540" y="282" width="3" height="56" fill="#C9A227"/>
+      <text class="hd" x="556" y="304">Gold — uma pergunta de negócio por view</text>
+      <text class="ln" x="556" y="322">carga mensal por submercado · parque gerador · câmbio · IPCA · funil comercial</text>
+
+      <!-- destino -->
+      <rect class="bx" x="960" y="70" width="220" height="58" rx="2"/>
+      <rect x="960" y="70" width="3" height="58" fill="#00ADE8"/>
+      <text class="hd" x="976" y="92">Portal MVP</text>
+      <text class="ln" x="976" y="110">autenticado · uma view Gold</text>
+      <text class="svc" x="976" y="124">Cloud Run</text>
+
+      <rect class="bx" x="960" y="146" width="220" height="58" rx="2"/>
+      <rect x="960" y="146" width="3" height="58" fill="#00ADE8"/>
+      <text class="hd" x="976" y="168">Ferramenta de BI</text>
+      <text class="ln" x="976" y="186">a definir pelo cliente</text>
+      <text class="svc" x="976" y="200">Looker Studio? Power BI?</text>
+
+      <rect class="bx" x="960" y="222" width="220" height="58" rx="2"/>
+      <rect x="960" y="222" width="3" height="58" fill="#00ADE8"/>
+      <text class="hd" x="976" y="244">Catálogo e linhagem</text>
+      <text class="ln" x="976" y="262">Onda 4</text>
+      <text class="svc" x="976" y="276">Dataplex</text>
+
+      <!-- setas -->
+      <path class="fl" d="M250 142 H292"/>
+      <path class="fl" d="M490 118 H532"/>
+      <path class="fl" d="M490 224 C512 224 512 150 532 150"/>
+      <path class="fl" d="M722 166 H732"/>
+      <path class="fl" d="M831 262 V274"/>
+      <path class="fl" d="M922 310 C940 310 946 260 952 251"/>
+      <path class="fl" d="M922 300 C940 300 946 190 952 176"/>
+      <path class="fl" d="M922 292 C940 292 946 110 952 99"/>
+    </svg>
+    </div>
+    <div class="callout rv" style="margin-top:clamp(18px,2.6vh,30px)">
+      <strong>Uma só CLI atravessa tudo.</strong> O mesmo comando (<code>alupdata ingerir &lt;fonte&gt; --de --ate</code>)
+      roda no laptop, no Cloud Run Job e, quando o Composer entrar na Onda 3, dentro da DAG.
+      Não existe caminho de execução que só funcione em produção.
+    </div>
+  </div>
+  <span class="pagenum">04</span>
+</section>
+
+<!-- 05 DIVISOR ORIGEM -->
+<section class="slide dark divider" data-t="Origem">
+  <span class="wordmark">ness<i>.</i></span><span class="tag">Parte I</span>
+  <div class="inner">
+    <p class="kicker rv">Parte I</p>
+    <h2 class="display rv">Origem</h2>
+    <p class="lead rv">Treze fontes em quatro naturezas diferentes: API pública, API com credencial,
+      banco de sistema legado atrás de VPN e planilha editada por pessoa.
+      A que dá mais trabalho não é a maior — é a menos documentada.</p>
+  </div>
+  <span class="pagenum">05</span>
+</section>
+
+<!-- 06 CATÁLOGO DE FONTES -->
+<section class="slide" data-t="Catálogo de fontes">
+  <span class="wordmark">ness<i>.</i></span><span class="tag">04 · Origem</span>
+  <div class="inner">
+    <p class="num rv">CATÁLOGO</p>
+    <h2 class="rv">As 13 fontes e o que cada uma exige</h2>
+    <hr class="rule rv">
+    <div class="scrollx rv">
+    <table>
+      <thead><tr>
+        <th>Fonte</th><th>Natureza</th><th>Formato</th><th class="nw">Frequência</th>
+        <th>Acesso</th><th>Situação</th>
+      </tr></thead>
+      <tbody>
+        <tr><td><b>BCB / PTAX</b></td><td>API pública</td><td>JSON diário</td><td>diária, 9h</td><td>anônimo</td><td class="ok">Concluída · verificada</td></tr>
+        <tr><td><b>IBGE / IPCA</b></td><td>API pública</td><td>JSON aninhado</td><td>mensal, dia 12</td><td>anônimo</td><td class="ok">Concluída · verificada</td></tr>
+        <tr><td><b>ANEEL / SIGA</b></td><td>API pública</td><td>cadastro paginado</td><td>semanal</td><td>anônimo</td><td class="ok">Concluída · 25.263 registros</td></tr>
+        <tr><td><b>ONS / carga</b></td><td>API pública</td><td>CSV anual por subsistema</td><td>diária, 8h</td><td>anônimo</td><td class="ok">Concluída · verificada</td></tr>
+        <tr><td><b>CCEE InfoMercado</b></td><td>Portal público</td><td>CKAN / arquivo</td><td>mensal</td><td>anônimo</td><td class="blk">HTTP 403 a acesso automatizado</td></tr>
+        <tr><td><b>Hubspot</b></td><td>API credenciada</td><td>JSON paginado</td><td>a cada 6h</td><td>token private app</td><td class="wait">Código pronto · nunca falou com a API</td></tr>
+        <tr><td><b>CCEE agente</b></td><td>API credenciada</td><td>a confirmar</td><td>mensal</td><td>credencial de agente</td><td class="blk">Sem documentação alcançável</td></tr>
+        <tr><td><b>BBCE</b></td><td>API credenciada</td><td>a confirmar</td><td>intradiária</td><td>token + contrato</td><td class="blk">Nenhum endpoint público encontrado</td></tr>
+        <tr><td><b>TempoOK</b></td><td>API credenciada</td><td>a confirmar</td><td>diária</td><td>token + contrato</td><td class="blk">Sem contrato de API descoberto</td></tr>
+        <tr><td><b>Oracle FMB</b></td><td>Banco interno</td><td>tabelas / views</td><td>diária</td><td>VPN + read-only</td><td class="wait">Caminho de banco pronto · sem VPN</td></tr>
+        <tr><td><b>Portal Alup</b></td><td>Banco interno</td><td>MySQL + NoSQL + Storage</td><td>diária</td><td>VPN + read-only</td><td class="wait">Aguarda credencial</td></tr>
+        <tr><td><b>MySQL RDS comercialização</b></td><td>Banco interno</td><td>tabelas</td><td>diária</td><td>VPN ou peering</td><td class="wait">Aguarda credencial</td></tr>
+        <tr><td><b>RM / TOTVS</b></td><td>ERP</td><td>API ou view</td><td>a definir</td><td>endpoint + credencial</td><td class="wait">Aguarda definição</td></tr>
+      </tbody>
+    </table>
+    </div>
+    <div class="callout rv" style="margin-top:clamp(18px,2.4vh,28px)">
+      <strong>Mais uma, surgida como contexto e registrada como decisão:</strong> a Alup já mantém um
+      <strong>SQL Server</strong> com o realizado do Balanço Energético da CCEE, alimentado por processo
+      mensal manual. Vira uma quarta via para o dado da CCEE — e possivelmente a origem da única
+      dimensão comum hoje órfã. O framework hoje fala Oracle e MySQL; SQL Server pede driver novo.
+    </div>
+  </div>
+  <span class="pagenum">06</span>
+</section>
+
+<!-- 07 CONTRATO DE DADOS -->
+<section class="slide mist" data-t="Contrato de dados">
+  <span class="wordmark">ness<i>.</i></span><span class="tag">05 · Origem</span>
+  <div class="inner">
+    <p class="num rv">CONTRATO DE DADOS</p>
+    <h2 class="rv">Como tratamos fonte sem contrato estável</h2>
+    <hr class="rule rv">
+    <p class="sub rv">CCEE e ONS não publicam contrato de API versionado. Layout muda entre períodos, e isso é normal.</p>
+    <div class="cols rv" style="--c:3">
+      <div class="card"><h3>Schema declarado, não inferido</h3>
+        <p>Cada fonte tem um modelo <b>Pydantic</b> com <code>schema_versao</code>. Registro que não valida
+           é descartado e <b>contado</b>, nunca carregado torto. Mudança de layout aparece como pico de
+           inválidos no painel, não como número errado num relatório meses depois.</p></div>
+      <div class="card"><h3>Raw antes do parsing</h3>
+        <p>O payload cru vai para o Cloud Storage <b>antes</b> de qualquer interpretação. Bug de parser
+           se corrige com <code>reprocessar-raw</code>, sem bater de novo na origem — importante para
+           fonte com rate limit ou retenção curta.</p></div>
+      <div class="card"><h3>Janela sempre explícita</h3>
+        <p>Nenhum conector decide "hoje" sozinho. A janela de datas é parâmetro, e reprocessar é
+           passar outra janela. As janelas de agendamento são largas de propósito
+           (30 dias no ONS, 90 no IBGE) porque essas fontes <b>revisam</b> dado publicado.</p></div>
+    </div>
+    <div class="cols rv" style="--c:2;margin-top:clamp(22px,3vh,36px)">
+      <div>
+        <p class="codecap">Layout canônico do raw no Cloud Storage</p>
+        <pre>gs://&lt;projeto&gt;-raw/<b>{fonte}</b>/<b>{entidade}</b>/dt=<b>{AAAA-MM-DD}</b>/<b>{ingestao_id}</b>.json.gz
+
+<i># bucket com versioning, acesso público bloqueado, UBLA</i>
+<i># lifecycle: 90 dias → Nearline</i>
+<i># teto de 100 MB comprimido, conferido pelos metadados antes do download</i></pre>
+      </div>
+      <div class="callout ask">
+        <strong>Pergunta ao Google:</strong> para as fontes de arquivo (ONS CSV anual, InfoMercado, planilhas),
+        vale manter esse padrão de <em>raw imutável + carga</em>, ou o desenho melhora com
+        <strong>tabela externa / BigLake</strong> sobre o bucket e transformação só no BigQuery?
+        Nosso viés foi carregar, para ter partição, clustering e custo previsível.
+      </div>
+    </div>
+  </div>
+  <span class="pagenum">07</span>
+</section>
+
+<!-- 08 CCEE -->
+<section class="slide" data-t="Bloqueio CCEE">
+  <span class="wordmark">ness<i>.</i></span><span class="tag">06 · Origem</span>
+  <div class="inner">
+    <p class="num rv">O CASO DIFÍCIL</p>
+    <h2 class="rv">CCEE: a origem que responde 403</h2>
+    <hr class="rule rv">
+    <p class="sub rv">A câmara de comercialização é a fonte mais importante do domínio — e a única que recusa acesso programático.</p>
+    <div class="cols rv" style="--c:2">
+      <div>
+        <ul>
+          <li><b>O sintoma</b>: <code>www.ccee.org.br</code> e <code>dadosabertos.ccee.org.br</code> devolvem
+            HTTP 403 a requisição automatizada. O TLS conecta; o bloqueio vem do servidor, com página de
+            proteção. Atinge a API CKAN, a página do InfoMercado e o portal de dados abertos —
+            inclusive a documentação.</li>
+          <li><b>O efeito colateral que importa</b>: <code>agente_ccee</code> é uma das cinco dimensões
+            comuns da Silver e hoje é a <b>única sem fonte definida</b>. Sem ela, cruzar dado interno
+            com contabilização de mercado fica manual.</li>
+          <li><b>O que não fazemos</b>: contornar proteção anti-bot. Acesso a dado de terceiro se
+            resolve por via oficial, não por evasão.</li>
+        </ul>
+      </div>
+      <div>
+        <table>
+          <thead><tr><th>Via</th><th>O que exige</th><th>Efeito no desenho</th></tr></thead>
+          <tbody>
+            <tr><td><b>a. IP liberado</b></td><td>A Alup pedir à CCEE a liberação do IP de saída do ambiente GCP</td><td>Conector fica igual aos outros. <b>Preferida</b> — e pede IP de saída estável (NAT)</td></tr>
+            <tr><td><b>b. Credencial de agente</b></td><td>Área credenciada da Alup, que já é agente</td><td>Aproxima a fonte da Onda 2; contrato de dados desconhecido</td></tr>
+            <tr><td><b>c. SQL Server do Balanço</b></td><td>Ler o realizado que a Alup já recebe e armazena</td><td>Não depende da CCEE. Pede driver SQL Server no framework</td></tr>
+            <tr><td><b>d. Download manual</b></td><td>Pessoa baixa; entra pelo motor de planilha</td><td>Funciona, mas não é ingestão automática — dependência de pessoa</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="callout ask rv" style="margin-top:clamp(20px,2.8vh,32px)">
+      <strong>Pergunta ao Google:</strong> existe padrão de referência para ingestão de portal público que
+      bloqueia automação — saída por NAT com IP fixo e reputação, algum caminho de acordo institucional,
+      ou a recomendação é simplesmente tratar como fonte semi-manual e investir no
+      <em>contrato de dados</em> com a origem?
+    </div>
+  </div>
+  <span class="pagenum">08</span>
+</section>
+
+<!-- 09 DIVISOR TRATAMENTO -->
+<section class="slide dark divider" data-t="Tratamento">
+  <span class="wordmark">ness<i>.</i></span><span class="tag">Parte II</span>
+  <div class="inner">
+    <p class="kicker rv">Parte II</p>
+    <h2 class="display rv">Tratamento</h2>
+    <p class="lead rv">Um runner único, quatro formatos absorvidos sem alterar o framework,
+      e três camadas com uma regra cada: Bronze não mente, Silver não duplica, Gold responde pergunta.</p>
+  </div>
+  <span class="pagenum">09</span>
+</section>
+
+<!-- 10 O RUNNER -->
+<section class="slide" data-t="O runner">
+  <span class="wordmark">ness<i>.</i></span><span class="tag">07 · Tratamento</span>
+  <div class="inner">
+    <p class="num rv">INGESTÃO</p>
+    <h2 class="rv">O que é do framework e o que é da fonte</h2>
+    <hr class="rule rv">
+    <p class="sub rv">Um conector novo implementa duas funções. As outras nove etapas são do runner, iguais para as 13 fontes.</p>
+    <div class="steps rv">
+      <div class="it"><b>Particiona a janela</b><span>Respeita o limite da fonte (<code>max_dias_por_requisicao</code>) sem o conector saber disso.</span></div>
+      <div class="it"><b>extrair() — da fonte</b><span>Fala HTTP, driver de banco ou arquivo. É a única parte que conhece a origem.</span></div>
+      <div class="it"><b>Grava o raw no GCS</b><span>JSONL gzip, antes de qualquer parsing. Habilita o replay.</span></div>
+      <div class="it"><b>transformar() — da fonte</b><span>Renomeia campo, normaliza número BR, achata payload aninhado.</span></div>
+      <div class="it"><b>Valida com Pydantic</b><span>Registro inválido é descartado e contado; o valor rejeitado não entra no log.</span></div>
+      <div class="it"><b>Acrescenta colunas técnicas</b><span><code>_ingestao_id</code>, <code>_ingestao_timestamp</code>, <code>_fonte</code>, <code>_schema_versao</code>.</span></div>
+      <div class="it"><b>Carrega no Bronze</b><span>Load job com <code>WRITE_APPEND</code> e adição de campo permitida.</span></div>
+      <div class="it"><b>Registra a execução</b><span>Uma linha em <code>bronze._execucoes</code>. Falha em registrar é falha, não detalhe.</span></div>
+      <div class="it"><b>Sanitiza o erro</b><span>DSN, Bearer e parâmetro sensível são removidos antes de logar ou persistir.</span></div>
+    </div>
+    <div class="cols rv" style="--c:2;margin-top:clamp(22px,3vh,34px)">
+      <div>
+        <p class="codecap">O contrato inteiro de um conector novo</p>
+        <pre>class OnsCarga(Conector):
+    fonte = "ons"; entidade = "carga"
+    schema = RegistroCarga
+
+    def <b>extrair</b>(self, janela) -&gt; Iterator[dict]:
+        <i># fala com a origem, devolve dicionários brutos</i>
+
+    def <b>transformar</b>(self, bruto) -&gt; dict:
+        <i># ajusta o registro ao schema</i></pre>
+      </div>
+      <div class="callout">
+        <strong>A prova de que o desenho aguenta:</strong> as quatro fontes concluídas exercitam formatos
+        deliberadamente diferentes — JSON diário, JSON aninhado mensal, cadastro paginado de 25 mil linhas
+        e CSV anual remoto. <strong>O framework absorveu as quatro sem alteração</strong>; só
+        <code>extrair()</code> e <code>transformar()</code> mudaram. Na Onda 3, <code>extrair()</code>
+        passa a falar com driver de banco e o contrato continua o mesmo.
+      </div>
+    </div>
+  </div>
+  <span class="pagenum">10</span>
+</section>
+
+<!-- 11 ORQUESTRAÇÃO -->
+<section class="slide mist" data-t="Orquestração">
+  <span class="wordmark">ness<i>.</i></span><span class="tag">08 · Tratamento</span>
+  <div class="inner">
+    <p class="num rv">ORQUESTRAÇÃO</p>
+    <h2 class="rv">Cloud Run Jobs agora, Composer quando houver dependência</h2>
+    <hr class="rule rv">
+    <div class="cols rv" style="--c:2">
+      <div class="scrollx">
+        <table>
+          <thead><tr><th>Ingestão</th><th class="nw">Cron (America/Sao_Paulo)</th><th class="nw">Janela</th><th>Por quê</th></tr></thead>
+          <tbody>
+            <tr><td><b>bcb_cambio_ptax</b></td><td class="nw">0 9 * * *</td><td class="nw">3 dias</td><td>após o boletim de fechamento; cobre feriado e republicação</td></tr>
+            <tr><td><b>ons_carga</b></td><td class="nw">0 8 * * *</td><td class="nw">30 dias</td><td>o ONS revisa dado já publicado</td></tr>
+            <tr><td><b>aneel_siga</b></td><td class="nw">0 7 * * 1</td><td class="nw">cadastro</td><td>cadastro muda devagar; semanal basta</td></tr>
+            <tr><td><b>ibge_ipca</b></td><td class="nw">0 10 12 * *</td><td class="nw">90 dias</td><td>IPCA sai por volta do dia 10 e a série é revisada</td></tr>
+            <tr><td><b>hubspot_negocios</b></td><td class="nw">0 */6 * * *</td><td class="nw">2 dias</td><td>CRM muda ao longo do dia, mas varrer o funil todo é caro</td></tr>
+          </tbody>
+        </table>
+        <p style="margin-top:14px;color:var(--gray)">Cada linha é um <b>Cloud Run Job</b> (<code>max_retries 2</code>, timeout 30 min)
+          e um <b>Cloud Scheduler</b> com OAuth token, tudo declarado em Terraform. O job executa
+          a mesma CLI do repositório.</p>
+      </div>
+      <div>
+        <div class="callout">
+          <strong>A decisão registrada (ADR 004):</strong> Composer cobra por ambiente ligado, 24×7, e o
+          custo de infra é do cliente. Pagar isso desde a semana 3 para agendar cinco extrações diárias
+          independentes não se justifica. <strong>O gatilho da migração está escrito</strong>: quando
+          aparecer dependência real entre pipelines — Onda 3, sistemas internos alimentando views que
+          cruzam fontes. A CLI única torna a migração barata: a DAG passa a chamar o mesmo comando.
+        </div>
+        <div class="callout ask" style="margin-top:18px">
+          <strong>Pergunta ao Google:</strong> nesse meio de caminho — dependência entre pipelines, mas longe
+          de precisar de Airflow — <strong>Cloud Workflows</strong> é o degrau natural, ou o salto direto
+          para Composer sai mais barato em manutenção? E existe caso em que
+          <strong>Dataflow</strong> ou <strong>Datastream</strong> substituiria o conector Python
+          com vantagem clara, sendo 13 fontes heterogêneas e volume modesto?
+        </div>
+      </div>
+    </div>
+  </div>
+  <span class="pagenum">11</span>
+</section>
+
+<!-- 12 MEDALLION -->
+<section class="slide" data-t="Medallion">
+  <span class="wordmark">ness<i>.</i></span><span class="tag">09 · Tratamento</span>
+  <div class="inner">
+    <p class="num rv">CAMADAS</p>
+    <h2 class="rv">Uma regra por camada, sem exceção</h2>
+    <hr class="rule rv">
+    <div class="flow rv">
+      <div class="step s0"><div class="t">Raw</div><div class="d">Cloud Storage. Objeto imutável, o que a fonte devolveu, gravado antes do parsing. Só isso.</div></div>
+      <div class="step s1"><div class="t">Bronze</div><div class="d"><b>Tabela append-only.</b> Fiel à origem, sem regra de negócio. Particionada por data de ingestão, clusterizada pelas chaves de consulta.</div></div>
+      <div class="step s2"><div class="t">Silver</div><div class="d"><b>View.</b> Tipagem, unidade, deduplicação por <code>QUALIFY ROW_NUMBER()</code> e as cinco dimensões comuns.</div></div>
+      <div class="step s3"><div class="t">Gold</div><div class="d"><b>View.</b> Uma pergunta de negócio nomeada por view. Teste de CI exige que só leia da Silver.</div></div>
+    </div>
+    <div class="cols rv" style="--c:3;margin-top:clamp(22px,3vh,34px)">
+      <div>
+        <p class="codecap">Bronze — sem partição o custo é do cliente</p>
+        <pre>CREATE TABLE IF NOT EXISTS
+  `${projeto}.bronze.ons_carga` (
+  data_referencia DATE NOT NULL,
+  submercado      STRING NOT NULL,
+  carga_mwmed     NUMERIC NOT NULL,
+  <i>_ingestao_id, _ingestao_timestamp,</i>
+  <i>_fonte, _schema_versao</i>
+)
+<b>PARTITION BY</b> DATE(_ingestao_timestamp)
+<b>CLUSTER BY</b> data_referencia, submercado;</pre>
+      </div>
+      <div>
+        <p class="codecap">Silver — a dedup vive aqui</p>
+        <pre>CREATE OR REPLACE VIEW
+  `${projeto}.silver.ons_carga` AS
+SELECT data_referencia, submercado,
+       carga_mwmed, ...
+FROM `${projeto}.bronze.ons_carga`
+<b>QUALIFY ROW_NUMBER() OVER (</b>
+  PARTITION BY data_referencia, submercado
+  ORDER BY _ingestao_timestamp <b>DESC</b>
+) = 1;
+
+<i>-- a ingestão mais recente vence:</i>
+<i>-- o ONS revisa o que publicou</i></pre>
+      </div>
+      <div>
+        <p class="codecap">Gold — responde uma pergunta</p>
+        <pre>CREATE OR REPLACE VIEW
+  `${projeto}.gold.carga_mensal_submercado` AS
+SELECT periodo_apuracao, submercado,
+  AVG(carga_mwmed) AS carga_media_mwmed,
+  MAX(carga_mwmed) AS carga_maxima_mwmed,
+  MIN(carga_mwmed) AS carga_minima_mwmed
+FROM `${projeto}.silver.ons_carga`
+GROUP BY periodo_apuracao, submercado;</pre>
+      </div>
+    </div>
+    <div class="callout ask rv" style="margin-top:clamp(18px,2.4vh,28px)">
+      <strong>Pergunta ao Google:</strong> Silver e Gold são <strong>views, não tabelas materializadas</strong> —
+      escolha deliberada para a Fase 1 (volume modesto, custo de armazenamento zero, nada para reprocessar).
+      Onde é o ponto de virada para <strong>materialized views</strong> ou tabelas agendadas: volume,
+      concorrência de leitura pelo BI, ou custo de varredura repetida?
+    </div>
+  </div>
+  <span class="pagenum">12</span>
+</section>
+
+<!-- 13 DIMENSÕES COMUNS -->
+<section class="slide mist" data-t="Dimensões comuns">
+  <span class="wordmark">ness<i>.</i></span><span class="tag">10 · Tratamento</span>
+  <div class="inner">
+    <p class="num rv">DIMENSÕES COMUNS</p>
+    <h2 class="rv">Cinco colunas que tornam o cruzamento possível</h2>
+    <hr class="rule rv">
+    <p class="sub rv">Toda view Silver expõe as mesmas cinco dimensões — inclusive como NULL, quando a granularidade da fonte não as tem.</p>
+    <div class="cols rv" style="--c:2">
+      <div class="scrollx">
+        <table>
+          <thead><tr><th>Dimensão</th><th>Dona</th><th>Situação</th></tr></thead>
+          <tbody>
+            <tr><td><b>data_referencia</b></td><td>todas as fontes</td><td class="ok">Fechada</td></tr>
+            <tr><td><b>periodo_apuracao</b></td><td>derivada na Silver</td><td class="ok">Fechada</td></tr>
+            <tr><td><b>codigo_usina</b></td><td>ANEEL/SIGA — CodCEG</td><td class="ok">Fechada</td></tr>
+            <tr><td><b>submercado</b></td><td>ONS — N, NE, S, SE</td><td class="ok">Fechada</td></tr>
+            <tr><td><b>agente_ccee</b></td><td>CCEE</td><td class="blk">Órfã — depende do desbloqueio</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div>
+        <ul class="tight">
+          <li><b>Dimensão tem dona nomeada.</b> Uma fonte é a autoridade de cada dimensão; as outras
+            se conformam a ela. Sem isso, duas fontes divergem no código da usina e ninguém sabe qual está certa.</li>
+          <li><b>NULL declarado é melhor que coluna ausente.</b> A carga do ONS é agregada por subsistema,
+            então <code>codigo_usina</code> e <code>agente_ccee</code> saem como NULL <b>com comentário</b> —
+            e o cruzamento não quebra.</li>
+          <li><b>Retificação é questão aberta de negócio</b>, não técnica: quando a CCEE recontabiliza
+            um mês fechado, sobrescreve-se ou versiona-se? Está no questionário enviado ao cliente,
+            e a resposta muda o desenho da Silver.</li>
+        </ul>
+        <div class="callout ask" style="margin-top:6px">
+          <strong>Pergunta ao Google:</strong> conformar dimensão dentro de cada view Silver escala até
+          13 fontes, ou vale um <strong>conjunto de dimensões conformadas</strong> próprio
+          (tabelas de dimensão versionadas, com SCD tipo 2 para usina que troca de coligada)?
+        </div>
+      </div>
+    </div>
+  </div>
+  <span class="pagenum">13</span>
+</section>
+
+<!-- 14 SQL PURO -->
+<section class="slide" data-t="SQL sem dbt">
+  <span class="wordmark">ness<i>.</i></span><span class="tag">11 · Tratamento</span>
+  <div class="inner">
+    <p class="num rv">TRANSFORMAÇÃO</p>
+    <h2 class="rv">SQL versionado, sem framework de transformação</h2>
+    <hr class="rule rv">
+    <div class="cols rv" style="--c:2">
+      <div>
+        <ul>
+          <li><b>O que é</b>: arquivos <code>.sql</code> em <code>sql/{bronze,silver,gold}/</code>,
+            aplicados por um deploy idempotente — <code>CREATE TABLE IF NOT EXISTS</code> no Bronze,
+            <code>CREATE OR REPLACE VIEW</code> nas demais. Sem dbt e sem Dataform na Fase 1.</li>
+          <li><b>Por quê</b>: o contrato não pede; o handoff ao time do cliente fica com uma peça a menos
+            para operar; e o volume da Fase 1 é de <b>views</b>, não de um grafo com centenas de modelos.
+            Tudo é legível por quem sabe SQL, sem ferramenta intermediária.</li>
+          <li><b>O custo que assumimos, por escrito</b>: teste de dado e linhagem automática — que uma
+            ferramenta daria de graça — ficam por nossa conta. A linhagem é o componente 07
+            (dicionário de dados, um por fonte) e o Dataplex entra na Onda 4.</li>
+          <li><b>O que o CI garante hoje</b>: teste que exige que toda view Gold leia da Silver,
+            com exceção estreita e nomeada para as views de sistema (<code>_execucoes</code> e
+            <code>INFORMATION_SCHEMA</code>).</li>
+        </ul>
+      </div>
+      <div>
+        <div class="callout">
+          <strong>A cláusula de saída está escrita:</strong> se o número de views crescer muito além do
+          previsto, reavaliar a decisão vira um ADR novo — não um remendo. É exatamente o tipo de
+          gatilho que gostaríamos de calibrar com quem já viu isso dar errado.
+        </div>
+        <div class="callout ask" style="margin-top:18px">
+          <strong>Pergunta ao Google:</strong> <strong>Dataform</strong> é nativo do BigQuery e não cobra
+          ambiente ligado — o argumento de custo que vale contra o Composer não vale contra ele.
+          A pergunta é de handoff e de peso operacional: em um projeto de ~15 views que será operado por
+          um time pequeno, Dataform paga o próprio custo de aprendizado pelos testes de dado e
+          pela linhagem que traz? E qual é o caminho de migração de SQL solto para Dataform depois,
+          se a Fase 2 crescer?
+        </div>
+      </div>
+    </div>
+  </div>
+  <span class="pagenum">14</span>
+</section>
+
+<!-- 15 DIVISOR DESTINO -->
+<section class="slide dark divider" data-t="Destino">
+  <span class="wordmark">ness<i>.</i></span><span class="tag">Parte III</span>
+  <div class="inner">
+    <p class="kicker rv">Parte III</p>
+    <h2 class="display rv">Destino</h2>
+    <p class="lead rv">Oito views Gold, um portal autenticado, uma ferramenta de BI ainda por definir
+      e um catálogo na última onda. É a parte do desenho com mais espaço para crítica —
+      porque é a que menos depende de nós.</p>
+  </div>
+  <span class="pagenum">15</span>
+</section>
+
+<!-- 16 GOLD E CONSUMO -->
+<section class="slide" data-t="Gold e consumo">
+  <span class="wordmark">ness<i>.</i></span><span class="tag">12 · Destino</span>
+  <div class="inner">
+    <p class="num rv">CONSUMO</p>
+    <h2 class="rv">O que a Gold entrega hoje</h2>
+    <hr class="rule rv">
+    <div class="cols rv" style="--c:2">
+      <div class="scrollx">
+        <table>
+          <thead><tr><th>View Gold</th><th>Pergunta que responde</th><th>Origem</th></tr></thead>
+          <tbody>
+            <tr><td><b>carga_mensal_submercado</b></td><td>Como a carga se comporta entre submercados e ao longo do ano?</td><td>ONS</td></tr>
+            <tr><td><b>parque_gerador</b></td><td>Quanta potência existe por UF e fonte, e quanto ainda está em construção?</td><td>ANEEL</td></tr>
+            <tr><td><b>cambio_mensal</b></td><td>Qual a taxa de fechamento para converter contrato indexado em dólar?</td><td>BCB</td></tr>
+            <tr><td><b>inflacao_mensal</b></td><td>Qual o índice para reajuste de contrato e deflacionamento de série?</td><td>IBGE</td></tr>
+            <tr><td><b>funil_comercial</b></td><td>Onde o pipeline comercial está travado, e há quanto tempo?</td><td>Hubspot</td></tr>
+            <tr><td><b>saude_ingestao</b></td><td>O dado está fresco e dá para confiar nele?</td><td><i>_execucoes</i></td></tr>
+            <tr><td><b>volumetria_lake</b></td><td>Quanto dado entrou por conector, e a tendência?</td><td><i>_execucoes</i></td></tr>
+            <tr><td><b>custo_consultas</b></td><td>Quanto o lake custou, em quê, e o que mudou?</td><td><i>INFORMATION_SCHEMA</i></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div>
+        <ul class="tight">
+          <li><b>Portal MVP</b> — aplicação autenticada em Cloud Run, escopo cravado em ADR:
+            login e views Gold visíveis. A tela existe e roda com provedor de identidade simulado;
+            falta ligar no BigQuery real.</li>
+          <li><b>Ferramenta de BI</b> — <b>ainda não definida pelo cliente</b>. É pendência aberta,
+            e ela decide se a Gold precisa ser view, materialized view ou extração agendada.</li>
+          <li><b>Dataplex</b> — catálogo e linhagem na Onda 4, quando todas as fontes estiverem carregadas.</li>
+          <li><b>As três últimas linhas da tabela não são BI</b>: são observabilidade do próprio pipeline,
+            e por isso leem log de sistema em vez de dado de negócio. A separação é regra de CI,
+            não convenção.</li>
+        </ul>
+        <div class="callout ask">
+          <strong>Pergunta ao Google:</strong> os 8 domínios analíticos do cliente ainda estão sendo
+          definidos, e o consumidor final não está escolhido. Vale <strong>esperar</strong> a escolha do BI
+          para desenhar o formato da Gold, ou existe forma de servir que não te prende
+          (view + <strong>BI Engine</strong>, ou <strong>Looker Studio</strong> como default reversível)?
+        </div>
+      </div>
+    </div>
+  </div>
+  <span class="pagenum">16</span>
+</section>
+
+<!-- 17 OBSERVABILIDADE -->
+<section class="slide mist" data-t="Observabilidade">
+  <span class="wordmark">ness<i>.</i></span><span class="tag">13 · Operação</span>
+  <div class="inner">
+    <p class="num rv">CONFIABILIDADE</p>
+    <h2 class="rv">Como se sabe que o dado de ontem entrou</h2>
+    <hr class="rule rv">
+    <div class="cols rv" style="--c:2">
+      <div>
+        <p class="codecap">bronze._execucoes — o log que é também evidência de homologação</p>
+        <pre>ingestao_id · fonte · entidade
+<b>modo</b>            <i>FONTE | REPLAY</i>
+<b>origem_ingestao_id</b>  <i>execução cujo raw gerou o replay</i>
+janela_inicio · janela_fim
+<b>status</b>          <i>SUCESSO | ERRO | EM_EXECUCAO</i>
+linhas_extraidas · <b>linhas_invalidas</b> · linhas_carregadas
+iniciada_em · encerrada_em · duracao_segundos · erro
+
+<b>PARTITION BY</b> DATE(iniciada_em)  <b>CLUSTER BY</b> fonte, status</pre>
+        <div class="callout" style="margin-top:16px">
+          <strong>Falha ao registrar é falha.</strong> Se a carga funciona mas o registro operacional não
+          é gravado, a execução não pode ser declarada sucesso — e não pode ser homologada.
+          O erro é propagado de propósito.
+        </div>
+      </div>
+      <div>
+        <ul class="tight">
+          <li><b>Log estruturado com correlação</b> por <code>ingestao_id</code>, alimentando Cloud Logging
+            e Error Reporting. Toda linha de log de uma execução é filtrável por um único identificador.</li>
+          <li><b>Três alertas em Terraform</b>: falha de ingestão, <b>silêncio</b> (a fonte deixou de
+            reportar) e inválidos em alta. O terceiro é o que pega mudança de layout na origem
+            antes de o número aparecer errado.</li>
+          <li><b>Painel de saúde</b> por fonte — frescor, confiabilidade e volumetria — sobre a view
+            <code>saude_ingestao</code>. Monitoramento, não BI.</li>
+          <li><b>Replay auditável</b>: reprocessar do raw grava uma execução nova com
+            <code>modo=REPLAY</code> e ponteiro para a execução original. O histórico não é reescrito.</li>
+          <li><b>Idempotência é teste</b>: carregar a mesma janela duas vezes é caso de teste em cada fonte.
+            Bronze duplica de propósito; a Silver é quem resolve.</li>
+        </ul>
+        <div class="callout ask">
+          <strong>Pergunta ao Google:</strong> vale trocar esse log próprio por <strong>Dataplex data quality</strong> /
+          <strong>data profiling</strong>, ou os dois convivem — um para "a carga rodou",
+          outro para "o dado faz sentido"?
+        </div>
+      </div>
+    </div>
+  </div>
+  <span class="pagenum">17</span>
+</section>
+
+<!-- 18 CUSTO -->
+<section class="slide" data-t="Custo">
+  <span class="wordmark">ness<i>.</i></span><span class="tag">14 · Operação</span>
+  <div class="inner">
+    <p class="num rv">CUSTO</p>
+    <h2 class="rv">A conta é do cliente — e a janela para acertar é agora</h2>
+    <hr class="rule rv">
+    <p class="sub rv">Custo já gasto não se rateia depois. O rateio se apoia em rótulo aplicado no momento do consumo.</p>
+    <div class="cols rv" style="--c:3">
+      <div class="card"><h3>Rotular antes do primeiro apply</h3>
+        <p>Datasets, bucket, jobs e secrets já carregam <code>projeto</code>, <code>ambiente</code> e
+          <code>camada</code>. Recurso sem rótulo entra na fatura como massa indistinta, e nenhum
+          relatório recupera isso retroativamente. Como o ambiente ainda não existe, estamos no único
+          momento em que isso sai de graça.</p></div>
+      <div class="card"><h3>Particionar e clusterizar sempre</h3>
+        <p>É regra do projeto, não otimização posterior: toda tabela Bronze é particionada por data de
+          ingestão e clusterizada pelas chaves de consulta. Sem isso, o custo cresce por varredura completa.</p></div>
+      <div class="card"><h3>Medir o próprio gasto</h3>
+        <p>Uma view Gold sobre <code>INFORMATION_SCHEMA.JOBS</code> e <code>TABLE_STORAGE</code> responde
+          "quanto o lake custou, em quê, e o que mudou". Mais um orçamento com alerta, em Terraform.
+          Retenção do raw: 90 dias até Nearline.</p></div>
+    </div>
+    <div class="cols rv" style="--c:2;margin-top:clamp(22px,3vh,34px)">
+      <div class="callout">
+        <strong>Uma exceção honesta ao nosso próprio processo:</strong> a regra do projeto é
+        "recurso GCP que não está no Terraform não existe". O <strong>billing export</strong> parece ser
+        configuração da conta de faturamento, sem recurso Terraform equivalente. Se confirmado, vira passo
+        manual de runbook com dono nomeado — exceção documentada, não furo descoberto em produção.
+        <strong>Gostaríamos de confirmar isso com vocês.</strong>
+      </div>
+      <div class="callout ask">
+        <strong>Perguntas ao Google:</strong> (1) o volume da Fase 1 é modesto, mas se a granularidade do ONS
+        virar semi-horária com histórico longo, o volume muda de ordem — em que ponto sai de
+        <strong>on-demand</strong> para <strong>slots/edition</strong>? (2) faz sentido
+        <strong>partition expiration</strong> no Bronze, dado que o raw no GCS já é a memória longa?
+        (3) o eixo de rótulo por <strong>fonte de dado</strong> é o certo para atribuir custo por conector,
+        ou existe recorte melhor?
+      </div>
+    </div>
+  </div>
+  <span class="pagenum">18</span>
+</section>
+
+<!-- 19 SEGURANÇA -->
+<section class="slide mist" data-t="Segurança">
+  <span class="wordmark">ness<i>.</i></span><span class="tag">15 · Operação</span>
+  <div class="inner">
+    <p class="num rv">SEGURANÇA</p>
+    <h2 class="rv">Menor privilégio, por recurso</h2>
+    <hr class="rule rv">
+    <div class="cols rv" style="--c:2">
+      <div>
+        <ul class="tight">
+          <li><b>Credencial só no Secret Manager</b>, concedida por <b>secret</b>, nunca no projeto inteiro.
+            Nada em código, <code>.env</code> versionado, fixture, log ou mensagem de erro — nem
+            "temporariamente".</li>
+          <li><b>Uma service account de ingestão</b>, com um único papel no nível do projeto
+            (<code>bigquery.jobUser</code>, que é inevitável para criar job). Editar dado é permissão
+            <b>do dataset Bronze</b>; o bucket dá criar e ler objeto, sem administrar bucket;
+            invocar Cloud Run é concedido <b>por job</b>.</li>
+          <li><b>Deploy por Workload Identity Federation</b> — o CI não guarda chave de service account.</li>
+          <li><b>Erro sanitizado antes de sair</b>: DSN, Bearer e parâmetro sensível são removidos
+            antes de logar ou persistir. Erro de validação não carrega o valor rejeitado.</li>
+          <li><b>Banco interno com credencial read-only na origem</b> e DSN única no Secret Manager,
+            com driver puro-Python — sem cliente nativo para instalar no container.</li>
+        </ul>
+      </div>
+      <div>
+        <div class="scrollx">
+          <table>
+            <thead><tr><th>Portão no CI</th><th>O que barra</th><th>Quando roda</th></tr></thead>
+            <tbody>
+              <tr><td><b>Bandit</b></td><td>SAST no código Python</td><td>todo PR</td></tr>
+              <tr><td><b>pip-audit</b></td><td>vulnerabilidade em dependência</td><td>todo PR + semanal</td></tr>
+              <tr><td><b>Gitleaks</b></td><td>credencial no código e no histórico</td><td>todo PR</td></tr>
+              <tr><td><b>Ruff</b></td><td>lint e formatação</td><td>todo PR</td></tr>
+              <tr><td><b>Terraform validate</b></td><td>infra que não converge</td><td>todo PR</td></tr>
+              <tr><td><b>pytest</b></td><td>226 testes · 92% de cobertura</td><td>todo PR</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="callout ask" style="margin-top:18px">
+          <strong>Perguntas ao Google:</strong> o dado é operacional e de mercado, sem dado pessoal
+          relevante — nesse cenário, <strong>VPC Service Controls</strong> é exagero ou é o padrão que
+          você recomendaria de saída? E para os quatro sistemas internos atrás de VPN, o caminho de
+          referência é <strong>Cloud VPN + Serverless VPC Access</strong>, ou vale
+          <strong>Private Service Connect</strong>?
+        </div>
+      </div>
+    </div>
+  </div>
+  <span class="pagenum">19</span>
+</section>
+
+<!-- 20 ESTADO REAL -->
+<section class="slide dark" data-t="Estado real">
+  <span class="wordmark">ness<i>.</i></span><span class="tag">16 · Situação</span>
+  <div class="inner">
+    <p class="num rv">ESTADO REAL</p>
+    <h2 class="rv">O que está provado e o que não está</h2>
+    <hr class="rule rv">
+    <div class="cols rv" style="--c:2">
+      <div>
+        <h3 style="color:#fff;font-size:clamp(14px,1.2vw,17px);margin:0 0 14px">Provado</h3>
+        <ul class="tight">
+          <li>Framework de ingestão completo: janela, raw no GCS, validação, colunas técnicas, carga, log —
+            <b>226 testes, 92% de cobertura</b>.</li>
+          <li><b>Quatro fontes públicas verificadas contra as APIs reais</b> em dry-run, incluindo
+            25.263 registros da ANEEL com zero inválidos em 28 segundos.</li>
+          <li>Terraform completo: datasets, bucket, secrets, Cloud Run Job, Scheduler, IAM por recurso,
+            alertas e orçamento — <code>fmt</code> e <code>validate</code> limpos.</li>
+          <li>CI/CD com seis portões verdes; deploy de views idempotente; replay do raw; caminho de
+            banco relacional pronto para a Onda 3.</li>
+        </ul>
+      </div>
+      <div>
+        <h3 style="color:#fff;font-size:clamp(14px,1.2vw,17px);margin:0 0 14px">Não provado — e é aqui que aparecem os erros que teste local não pega</h3>
+        <ul class="tight">
+          <li><b>Nenhuma linha chegou a um BigQuery real.</b> O projeto GCP do cliente ainda não foi
+            provisionado.</li>
+          <li>Primeiro <code>terraform apply</code>, primeira imagem publicada e primeira carga
+            ponta a ponta: pendentes. É onde surgem IAM insuficiente, cota de API, permissão de bucket
+            e formato que o BigQuery recusa.</li>
+          <li>Replay contra objeto real no GCS e linhagem conferida no BigQuery: pendentes.</li>
+          <li>Cinco fontes com credencial ou VPN pendente; a CCEE bloqueada por 403.</li>
+        </ul>
+        <div class="callout" style="margin-top:6px">
+          <strong>Por isso esta sessão é agora.</strong> Crítica que chega antes do primeiro
+          <code>apply</code> é reprojeto de graça. Depois da Onda 2, é migração.
+        </div>
+      </div>
+    </div>
+  </div>
+  <span class="pagenum">20</span>
+</section>
+
+<!-- 21 ALTERNATIVAS -->
+<section class="slide" data-t="Alternativas">
+  <span class="wordmark">ness<i>.</i></span><span class="tag">17 · Crítica</span>
+  <div class="inner">
+    <p class="num rv">ALTERNATIVAS</p>
+    <h2 class="rv">O que consideramos e por que descartamos</h2>
+    <hr class="rule rv">
+    <p class="sub rv">Cada linha é um convite. Se o argumento não se sustenta na sua experiência, é a hora de dizer.</p>
+    <div class="scrollx rv">
+    <table>
+      <thead><tr><th>Alternativa</th><th>Nossa escolha</th><th>O argumento que usamos</th><th>Onde ele pode estar errado</th></tr></thead>
+      <tbody>
+        <tr><td><b>Cloud Composer</b> desde o início</td><td>Cloud Run Jobs + Scheduler</td>
+          <td>Composer cobra ambiente ligado 24×7; a Fase 1 tem cinco extrações diárias independentes, sem dependência entre elas</td>
+          <td>Se a Onda 3 chegar com muita dependência de uma vez, migrar cinco pipelines já em produção pode custar mais que ter começado no Composer</td></tr>
+        <tr><td><b>Dataflow</b> / Beam</td><td>Conector Python em container</td>
+          <td>Volume modesto e 13 fontes heterogêneas; o custo aqui é de <em>integração</em>, não de processamento distribuído</td>
+          <td>Se alguma fonte interna trouxer volume grande ou exigir streaming, o conector simples não estica</td></tr>
+        <tr><td><b>Datastream</b> para os bancos internos</td><td>Extração por janela via driver read-only</td>
+          <td>Ainda não conhecemos os schemas; a operação do cliente tem janela restrita para extração</td>
+          <td><b>É a nossa maior dúvida.</b> CDC gerenciado pode ser melhor que <code>SELECT</code> por janela em Oracle e MySQL — e evita discussão de janela de carga</td></tr>
+        <tr><td><b>dbt</b> ou <b>Dataform</b></td><td>SQL versionado, deploy idempotente</td>
+          <td>~15 views, não centenas de modelos; handoff a time pequeno fica com uma peça a menos</td>
+          <td>Perdemos teste de dado e linhagem automática de graça, e assumimos isso por escrito</td></tr>
+        <tr><td><b>Tabela externa / BigLake</b> sobre o raw</td><td>Carga no Bronze</td>
+          <td>Tabela nativa dá partição, clustering e custo previsível; o raw fica como memória longa e base do replay</td>
+          <td>Duplica o armazenamento do que já está no bucket, e para fonte de arquivo puro pode ser desnecessário</td></tr>
+        <tr><td><b>Data Fusion</b> / integração visual</td><td>Código Python versionado</td>
+          <td>O contrato exige entrega em repositório com teste e revisão; pipeline visual não passa por code review</td>
+          <td>Menos código para o cliente manter depois do handoff</td></tr>
+        <tr><td><b>Tabelas materializadas</b> na Silver/Gold</td><td>Views</td>
+          <td>Volume modesto; view não tem custo de armazenamento nem estado para reprocessar</td>
+          <td>Concorrência de leitura pelo BI pode tornar a varredura repetida mais cara que materializar</td></tr>
+      </tbody>
+    </table>
+    </div>
+  </div>
+  <span class="pagenum">21</span>
+</section>
+
+<!-- 22 AS PERGUNTAS -->
+<section class="slide dark" data-t="Perguntas">
+  <span class="wordmark">ness<i>.</i></span><span class="tag">18 · Agenda da crítica</span>
+  <div class="inner">
+    <p class="num rv">A PAUTA</p>
+    <h2 class="rv">Oito perguntas que valem mais que uma aprovação</h2>
+    <hr class="rule rv">
+    <div class="qgrid rv">
+      <div class="q"><div class="n2">01</div><div><b>Ingestão</b>
+        <span>Conector Python em Cloud Run é o padrão certo para 13 fontes heterogêneas de baixo volume,
+          ou há serviço gerenciado que reduz código sem aumentar acoplamento?</span></div></div>
+      <div class="q"><div class="n2">02</div><div><b>Bancos internos</b>
+        <span>Datastream com CDC ou extração por janela via driver? A operação do cliente tem janela
+          restrita — isso muda a resposta?</span></div></div>
+      <div class="q"><div class="n2">03</div><div><b>Orquestração</b>
+        <span>Cloud Workflows como degrau entre Scheduler e Composer, ou é um passo intermediário
+          que só adiciona uma peça?</span></div></div>
+      <div class="q"><div class="n2">04</div><div><b>Transformação</b>
+        <span>SQL versionado ou Dataform? O que muda no handoff a um time pequeno,
+          e qual o caminho de migração depois?</span></div></div>
+      <div class="q"><div class="n2">05</div><div><b>Camadas</b>
+        <span>Bronze append-only com dedup na view Silver: aguenta 13 fontes,
+          ou o ponto de virada para materializar chega antes do que pensamos?</span></div></div>
+      <div class="q"><div class="n2">06</div><div><b>Custo</b>
+        <span>Taxonomia de rótulo, partição, retenção do raw e o ponto de saída de on-demand
+          para slots — o que faríamos diferente <em>antes</em> do primeiro apply?</span></div></div>
+      <div class="q"><div class="n2">07</div><div><b>Governança</b>
+        <span>Dataplex na Onda 4 é tarde? Catálogo, linhagem e qualidade deveriam entrar
+          junto com a primeira fonte?</span></div></div>
+      <div class="q"><div class="n2">08</div><div><b>Origem bloqueada</b>
+        <span>Existe padrão de referência para portal público que recusa automação —
+          IP de saída estável, acordo institucional, ou aceitar a via semi-manual?</span></div></div>
+    </div>
+    <div class="callout rv" style="margin-top:clamp(22px,3vh,36px)">
+      <strong>O que pedimos concretamente:</strong> para cada pergunta, o nome do serviço que você usaria,
+      o trade-off que aceitaria e — se houver — o caso em que viu essa escolha dar errado.
+      Vamos registrar as respostas como decisões de arquitetura no repositório, com a devida atribuição.
+    </div>
+  </div>
+  <span class="pagenum">22</span>
+</section>
+
+<!-- 23 ENCERRAMENTO -->
+<section class="slide" data-t="Encerramento">
+  <span class="wordmark">ness<i>.</i></span><span class="tag">Encerramento</span>
+  <div class="inner">
+    <p class="num rv">PRÓXIMOS PASSOS</p>
+    <h2 class="rv">O que acontece depois desta sessão</h2>
+    <hr class="rule rv">
+    <div class="steps rv" style="grid-template-columns:repeat(4,minmax(0,1fr))">
+      <div class="it"><b>Registrar</b><span>Cada recomendação vira ADR novo ou revisão de ADR existente,
+        com o argumento que a motivou.</span></div>
+      <div class="it"><b>Reprojetar o que couber</b><span>Antes do primeiro <code>terraform apply</code>.
+        É a janela em que mudar de desenho não custa migração.</span></div>
+      <div class="it"><b>Aplicar</b><span>Primeiro apply com a taxonomia de custo já definida,
+        primeira carga ponta a ponta, três dias consecutivos de sucesso.</span></div>
+      <div class="it"><b>Voltar</b><span>Revisão nova quando a Onda 3 abrir os sistemas internos —
+        é onde o desenho encontra o dado difícil.</span></div>
+    </div>
+    <div class="callout rv" style="margin-top:clamp(26px,3.6vh,44px)">
+      <strong>Uma última nota sobre método.</strong> Toda decisão estrutural deste projeto está escrita
+      como ADR, com contexto, decisão e <em>consequência assumida</em>. Não pedimos que você concorde
+      com as oito decisões — pedimos que aponte quais delas você desfaria, para que a consequência
+      deixe de ser assumida e passe a ser corrigida.
+    </div>
+    <p class="lead rv" style="margin-top:clamp(24px,3.4vh,40px);max-width:34em">
+      Obrigado. As perguntas do slide 22 são a pauta; o resto do baralho é contexto para respondê-las.</p>
+  </div>
+  <span class="pagenum">ness. Processos e Tecnologia · AlupData Fase 1</span>
+</section>
+
+</main>
+
+<script>
+(function(){
+  var deck=document.getElementById('deck');
+  var slides=Array.prototype.slice.call(deck.querySelectorAll('.slide'));
+  var dots=document.getElementById('dots');
+  var bar=document.getElementById('bar');
+
+  slides.forEach(function(s,i){
+    var b=document.createElement('button');
+    b.type='button';
+    b.title=s.dataset.t||('Slide '+(i+1));
+    b.setAttribute('aria-label','Ir para: '+b.title);
+    b.addEventListener('click',function(){go(i)});
+    dots.appendChild(b);
+  });
+
+  var current=0;
+  function go(i){
+    i=Math.max(0,Math.min(slides.length-1,i));
+    slides[i].scrollIntoView({behavior:'smooth',block:'start'});
+  }
+  function mark(i){
+    current=i;
+    Array.prototype.forEach.call(dots.children,function(d,j){
+      d.setAttribute('aria-current',j===i?'true':'false');
+    });
+  }
+  mark(0);
+
+  var io=new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if(e.isIntersecting){
+        e.target.classList.add('on');
+        countUp(e.target);
+        mark(slides.indexOf(e.target));
+      }
+    });
+  },{threshold:.55});
+  slides.forEach(function(s){io.observe(s)});
+
+  deck.addEventListener('scroll',function(){
+    var max=deck.scrollHeight-deck.clientHeight;
+    bar.style.width=(max>0?(deck.scrollTop/max*100):0)+'%';
+  },{passive:true});
+
+  var reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function countUp(slide){
+    slide.querySelectorAll('.count').forEach(function(el){
+      if(el.dataset.done)return;
+      el.dataset.done='1';
+      var to=parseInt(el.dataset.to,10)||0;
+      if(reduce){el.textContent=to;return}
+      var t0=null,dur=900;
+      requestAnimationFrame(function step(ts){
+        if(t0===null)t0=ts;
+        var p=Math.min(1,(ts-t0)/dur);
+        el.textContent=Math.round(to*(1-Math.pow(1-p,3)));
+        if(p<1)requestAnimationFrame(step);
+      });
+    });
+  }
+
+  document.addEventListener('keydown',function(e){
+    if(e.metaKey||e.ctrlKey||e.altKey)return;
+    switch(e.key){
+      case 'ArrowRight': case 'PageDown': case ' ':
+        e.preventDefault();go(current+1);break;
+      case 'ArrowLeft': case 'PageUp':
+        e.preventDefault();go(current-1);break;
+      case 'ArrowDown': e.preventDefault();go(current+1);break;
+      case 'ArrowUp': e.preventDefault();go(current-1);break;
+      case 'Home': e.preventDefault();go(0);break;
+      case 'End': e.preventDefault();go(slides.length-1);break;
+      case 'f': case 'F':
+        if(document.fullscreenElement)document.exitFullscreen();
+        else document.documentElement.requestFullscreen&&document.documentElement.requestFullscreen();
+        break;
+    }
+  });
+  deck.focus({preventScroll:true});
+})();
+</script>
+</body>
+</html>

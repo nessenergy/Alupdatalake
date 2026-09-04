@@ -8,6 +8,7 @@ que a fonte devolveu em cada execução.
 from __future__ import annotations
 
 import logging
+import re
 from typing import TYPE_CHECKING, Any
 
 from src.core.config import get_settings
@@ -19,6 +20,37 @@ if TYPE_CHECKING:
 logger = logging.getLogger(__name__)
 
 TABELA_EXECUCOES = "_execucoes"
+
+# Rótulo do BigQuery aceita minúscula, dígito, sublinhado e hífen, até 63
+# caracteres. Valor fora disso faz o job inteiro ser recusado, então o que não
+# encaixa vira hífen em vez de quebrar a carga.
+_FORA_DO_ROTULO = re.compile(r"[^a-z0-9_-]")
+
+
+def _sanear(valor: str) -> str:
+    return _FORA_DO_ROTULO.sub("-", valor.lower())[:63]
+
+
+def rotulos(execucao: Execucao, camada: str = "bronze") -> dict[str, str]:
+    """Rótulos do job — é o que atribui custo de varredura por fonte.
+
+    Rótulo de *recurso* é fixo por recurso, e existe um único Cloud Run Job
+    para as 13 fontes: por isso o compute sai correto no total e não se separa
+    por fonte. O que se separa é byte varrido no BigQuery, e isso se resolve
+    rotulando o **job**, que o cliente monta em tempo de execução — a saída 3
+    de `docs/arquitetura/portal-finops.md` §4.
+
+    Precisa existir desde o primeiro `apply`: custo já gasto não se rateia
+    depois, porque o rateio se apoia no rótulo aplicado no momento do consumo.
+    """
+    return {
+        "projeto": "alupdata",
+        "fonte": _sanear(execucao.fonte),
+        "entidade": _sanear(execucao.entidade),
+        "camada": _sanear(camada),
+        "modo": _sanear(execucao.modo),
+        "ingestao_id": _sanear(execucao.ingestao_id),
+    }
 
 
 class RegistroExecucaoError(RuntimeError):
@@ -51,6 +83,7 @@ def carregar_bronze(execucao: Execucao, linhas: list[dict[str, Any]]) -> int:
         job_config=bigquery.LoadJobConfig(
             write_disposition=bigquery.WriteDisposition.WRITE_APPEND,
             schema_update_options=[bigquery.SchemaUpdateOption.ALLOW_FIELD_ADDITION],
+            labels=rotulos(execucao),
         ),
     )
     job.result()

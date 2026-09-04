@@ -18,7 +18,7 @@ contexto para agentes, em [`../AGENTS.md`](../AGENTS.md).
 
 | Item | Onde | Verificação |
 |---|---|---|
-| Runner de ingestão (janela, raw no GCS, validação, colunas técnicas, carga, log) | `src/core/` | 241 testes aprovados, 92% de cobertura (suíte inteira) |
+| Runner de ingestão (janela, raw no GCS, validação, colunas técnicas, carga, log) | `src/core/` | 246 testes aprovados, 92% de cobertura (suíte inteira) |
 | Caminho de banco relacional (Oracle/MySQL) para a Onda 3 | `src/core/banco.py` | ADR 008; 16 testes sem rede; **nenhuma conexão real** — depende de VPN (A7) |
 | Replay do raw sem nova chamada à fonte | `alupdata reprocessar-raw`, `src/core/storage.py` | testes locais com JSONL gzip; falta validar contra GCS real |
 | CLI única (`alupdata listar` / `ingerir`) | `src/cli.py` | executada contra as 4 fontes |
@@ -33,6 +33,7 @@ contexto para agentes, em [`../AGENTS.md`](../AGENTS.md).
 | CI/CD: lint, testes, Bandit, pip-audit, Gitleaks, Terraform | `.github/workflows/` | workflow de deploy ordenado; 7 jobs verdes no Actions |
 | Imagem da CLI | `Dockerfile` | build local não executado: Docker Desktop sem daemon ativo |
 | Campos de acompanhamento semanal do GitHub Projects | `scripts/campos_projeto.py`, `runbook/acompanhamento-semanal.md` | 12 testes; script idempotente. **Campos ainda não criados no quadro** — ver N6 |
+| **FinOps F0** — rótulo de custo por fonte no job do BigQuery | `src/core/bigquery.py` (`rotulos()`) | 6 testes; precisa existir **antes** do 1º apply, custo gasto não se rateia depois |
 
 ### Conectores (7 componentes cada, exceto onde indicado)
 

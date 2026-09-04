@@ -1,6 +1,6 @@
 # Plano semanal — próximas 4 semanas
 
-Emitido em **2026-08-27** · S1 revisada em **2026-08-31** · `main` em `db94412` ·
+Emitido em **2026-08-27** · S1 revisada em **2026-08-31** e em **2026-09-04** ·
 Escopo e estimativa por onda: [`plano-execucao.md`](plano-execucao.md) ·
 Situação atual: [`status.md`](status.md)
 
@@ -26,10 +26,12 @@ Semanas contadas de segunda a sexta. S1 começa em **2026-08-31**.
 
 ## S1 · 31/08 – 04/09 · Ambiente e contrato de dados
 
-> Revisado em **31/08**, primeiro dia da semana. Dois itens previstos aqui já
-> foram entregues antes de a semana começar (PRs #61 a #65): o runbook do
-> primeiro deploy e o Questionário de Gaps. Em compensação, dois bloqueios
-> novos apareceram — ver "Descobertas" abaixo.
+> Revisado em **31/08**, primeiro dia da semana, e de novo em **04/09**, no
+> último. Dois itens previstos aqui já tinham sido entregues antes de a semana
+> começar (PRs #61 a #65): o runbook do primeiro deploy e o Questionário de
+> Gaps. Ao longo da semana entraram três entregas não previstas — a revisão
+> arquitetural para o Google e o instrumental de acompanhamento semanal — e
+> apareceram dois bloqueios novos; ver "Descobertas".
 
 ### Já entregue, antes do prazo
 
@@ -39,12 +41,15 @@ Semanas contadas de segunda a sexta. S1 começa em **2026-08-31**.
 | Questionário de Gaps: 47 perguntas, 7 blocos, prazos escalonados | [`questionario-gaps.md`](questionario-gaps.md) · PDF em `envio/` |
 | Caminho de banco relacional da Onda 3 | `src/core/banco.py` (ADR 008) |
 | Replay de raw, sanitização de credencial, IAM por recurso | PR #64 |
+| **Questionário de Gaps enviado à Alup** — 47 perguntas, emitido em 31/08 | `envio/Questionario-de-Gaps-AlupData.pdf` · issue [#8](https://github.com/nessenergy/Alupdatalake/issues/8) |
+| **Revisão arquitetural para o Google: baralho confeccionado e enviado** | [`apresentacoes/revisao-arquitetural-gcp.html`](apresentacoes/revisao-arquitetural-gcp.html) · PR #74 |
+| Campos de acompanhamento semanal versionados (Horas, Semana, Validado, Correções, Atraso) | `scripts/campos_projeto.py` · [runbook](runbook/acompanhamento-semanal.md) · PR #75 |
+| Fila de execução com dono e comando por item | [`proximos-passos.md`](proximos-passos.md) · PR #75 |
 
 ### O que esta semana precisa produzir
 
 | Dia | Item | Entregável verificável |
 |---|---|---|
-| **Seg 31/08** | **Enviar o Questionário de Gaps à Alup** | e-mail enviado, com data, hora e destinatários registrados na issue [#8](https://github.com/nessenergy/Alupdatalake/issues/8) |
 | **Seg 31/08** | Cobrar A3 por escrito, pedindo **data com responsável nomeado** | registro na issue [#55](https://github.com/nessenergy/Alupdatalake/issues/55) |
 | **Seg 31/08** | **Decidir a região** do ambiente: `us-east1` (valor atual em `dev.tfvars`) ou `southamerica-east1` (o que a pergunta E7 assume) | `dev.tfvars` e `prod.tfvars` coerentes com a decisão |
 | Ter–Qua | Build da imagem da CLI e execução local do job | `docker run` da imagem executando `alupdata listar` |
@@ -52,16 +57,39 @@ Semanas contadas de segunda a sexta. S1 começa em **2026-08-31**.
 | Qui–Sex | Variáveis do GitHub preenchidas assim que A3 der os valores | `gh api .../actions/variables` devolvendo as quatro |
 | Qui–Sex | Issues das lacunas de rastreamento criadas e ligadas ao Project | trabalho das PRs #62–#65 rastreável na medição |
 
-### Destrava (ação da Alup)
+### Destrava (ação de terceiro)
 
-| Insumo | Prazo | Issue |
-|---|---|---|
-| **A3** — projeto GCP `dev`, 10 APIs, IAM, WIF, Artifact Registry, bucket de state | **04/09** | [#55](https://github.com/nessenergy/Alupdatalake/issues/55), [#1](https://github.com/nessenergy/Alupdatalake/issues/1) |
-| **A9** — token Hubspot no secret `alupdata-hubspot-api-token` | 11/09 | [#24](https://github.com/nessenergy/Alupdatalake/issues/24) |
+| Insumo | Responsável | Prazo | Issue |
+|---|---|---|---|
+| **A3** — projeto GCP `dev`, 10 APIs, IAM, WIF, Artifact Registry, bucket de state | Alup | **04/09** | [#55](https://github.com/nessenergy/Alupdatalake/issues/55), [#1](https://github.com/nessenergy/Alupdatalake/issues/1) |
+| **A9** — token Hubspot no secret `alupdata-hubspot-api-token` | Alup | 11/09 | [#24](https://github.com/nessenergy/Alupdatalake/issues/24) |
+| **A4** — Questionário de Gaps **respondido** (enviado em 31/08, está com eles) | Alup | 11/09 | [#8](https://github.com/nessenergy/Alupdatalake/issues/8) |
+| **G1** — **resposta do Google à revisão arquitetural** (enviada em 04/09) | Google | a definir — ver abaixo | — |
 
 > Se A3 não chegar até **04/09**, começa a contagem da cláusula 3ª (atraso > 5
 > dias úteis posterga o cronograma). Registrar a data do pedido no dia em que o
 > atraso começa.
+
+#### G1 e A3 estão em corrida — e é o A3 que decide o valor da resposta
+
+O baralho enviado ao Google argumenta que o modelo está completo em código e
+**ainda não foi instanciado**: por isso uma recomendação de arquitetura se
+aplica como reprojeto, e não como migração. Esse argumento tem prazo de
+validade — ele vale até o primeiro `terraform apply`.
+
+Daí a corrida, e as duas ordens possíveis:
+
+- **G1 antes do apply** (cenário bom): a crítica entra como ajuste de desenho,
+  vira ADR novo ou revisão de ADR, e o ambiente sobe já com ela.
+- **A3 antes de G1** (cenário provável, se a Alup destravar esta semana): o
+  ambiente sobe com o desenho atual. A crítica continua útil, mas passa a
+  custar migração de recurso já criado — e alguns itens ficam caros de reverter,
+  como a **região do dataset**, que não muda depois de criada.
+
+**Não paramos o apply esperando o Google**: A3 já é o gargalo do contrato e
+segurá-lo dispararia a cláusula 3ª contra nós mesmos. O que se faz é o
+inverso: **cobrar G1 com data**, para que a resposta chegue enquanto a janela
+existe. Sem prazo pactuado, G1 não é dependência de cronograma — é torcida.
 
 ### Descobertas de 31/08
 
@@ -97,6 +125,7 @@ escorrega inteiro e a semana vira ociosidade.
 | Entregamos | Destinatários dos alertas e `billing_account` do orçamento preenchidos | alerta de teste recebido por e-mail |
 | Destrava | **A4** respondido (Questionário de Gaps) | sem ele, S3 não tem alvo |
 | Destrava | **A5** (RACI e data owners) e **A6** (ferramenta de BI) | |
+| Destrava | **G1** — resposta do Google à revisão arquitetural | idealmente **antes** do `apply` desta semana; depois dele, a crítica passa a custar migração |
 
 ---
 
@@ -138,6 +167,7 @@ escorrega inteiro e a semana vira ociosidade.
 | A9 · token Hubspot | 11/09 | conector pronto fica parado; item 2.3 não fecha |
 | A4 · Questionário de Gaps | 11/09 | sem os 8 domínios, a Gold da Onda 1 fica sem alvo |
 | A5/A6 · RACI e BI | 11/09 | dúvida de regra de negócio sem dono; Portal sem consumidor definido |
+| G1 · resposta do Google | a definir | sem data pactuada, a crítica chega depois do `apply` e vira migração em vez de reprojeto |
 | A2 · decisão CCEE | 18/09 | 32h da Onda 1 seguem paradas |
 | A7 · tokens e VPN | 25/09 | Onda 3 dispara ociosidade de 4h/dia (R$ 256/h) |
 | A8 · docs BBCE/TempoOK | 25/09 | Onda 2 só começa depois do token, em vez de antes |

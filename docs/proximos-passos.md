@@ -34,16 +34,20 @@ Hoje é **04/09**, prazo de dois insumos. Ambos vencem *hoje*, não amanhã.
 | # | Ação | Como | Pronto quando |
 |---|---|---|---|
 | 2.1 | **Criar os 5 campos no GitHub Projects** | PAT clássico com escopo `project`, depois `make campos-projeto owner=nessenergy numero=<n>` — ver [runbook](runbook/acompanhamento-semanal.md) | Horas, Semana, Validado, Correções e Atraso visíveis e preenchíveis no quadro |
-| 2.2 | **Passar o baralho do Google uma vez**, em tela cheia (`F`) | `docs/apresentacoes/revisao-arquitetural-gcp.html` | Você sabe onde está cada uma das 8 perguntas da pauta |
-| 2.3 | **Marcar a sessão com o Google** | — | Data na agenda, antes do primeiro `terraform apply` |
+| 2.2 | **Cobrar do Google uma data de resposta** (G1) — o baralho já foi enviado em 04/09 | — | Data pactuada, de preferência antes do primeiro `terraform apply` |
 
-### Por que 2.3 tem pressa
+### Por que 2.2 tem pressa
 
 O argumento do baralho é que o modelo está completo em código **e ainda não foi
 instanciado** — recomendação que chega agora se aplica como reprojeto, não como
 migração. Essa janela fecha no dia em que o A3 destravar e o primeiro `apply`
-subir. Se o GCP vier antes da reunião, o baralho continua correto, mas perde a
-melhor parte do argumento.
+subir.
+
+**G1 e A3 estão em corrida**, e não se resolve segurando o apply: A3 já é o
+gargalo do contrato, e atrasá-lo de propósito dispararia a cláusula 3ª contra
+nós. O que resolve é a resposta ter data. Sem prazo pactuado, G1 não é
+dependência de cronograma — é torcida. Detalhe em
+[`plano-semanal.md`](plano-semanal.md), S1.
 
 ---
 
@@ -97,7 +101,8 @@ lá é a que vale.
 | Prazo | Insumo | Efeito de passar |
 |---|---|---|
 | **04/09** | A3 · projeto GCP | posterga o cronograma |
-| 11/09 | A9 token Hubspot · A4 Questionário · A5 RACI · A6 ferramenta de BI · destinatários de alerta e `billing_account` | Gold sem alvo, Portal sem consumidor, alertas sem quem notificar |
+| a definir | **G1 · resposta do Google** à revisão arquitetural (enviada em 04/09) | a crítica chega depois do `apply` e vira migração em vez de reprojeto |
+| 11/09 | A9 token Hubspot · A4 Questionário (já está com eles desde 31/08) · A5 RACI · A6 ferramenta de BI · destinatários de alerta e `billing_account` | Gold sem alvo, Portal sem consumidor, alertas sem quem notificar |
 | 18/09 | A2 · decisão sobre a CCEE | 32h da Onda 1 seguem paradas |
 | 25/09 | A7 tokens e VPN · A8 documentação BBCE/TempoOK | **ociosidade de 4h/dia** — o maior risco financeiro do contrato |
 

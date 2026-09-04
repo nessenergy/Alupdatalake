@@ -67,9 +67,9 @@ de primeiro deploy e de acompanhamento semanal ·
 `AGENTS.md` como contexto canônico · skills do projeto e shortlist do Google.
 
 Material de reunião: baralho de kickoff e **baralho de revisão arquitetural em
-GCP** (`apresentacoes/revisao-arquitetural-gcp.html`), este último para a sessão
-de validação conceitual do modelo com o Google — origem, tratamento e destino,
-com os oito invariantes e a pauta de perguntas.
+GCP** (`apresentacoes/revisao-arquitetural-gcp.html`) — origem, tratamento e
+destino, com os oito invariantes e a pauta de perguntas. **Enviado ao Google em
+04/09**; a resposta é a pendência G1 do painel §6.
 
 ---
 
@@ -173,6 +173,7 @@ Ordenado por data em que o atraso passa a custar. Prazos derivados do
 | — | Destinatários de alerta e `billing_account` | Alup | 11/09 | alertas e orçamento existem mas não notificam ninguém |
 | — | Branch protection na `main` + variáveis do GitHub | ness./Alup | 04/09 | deploy não autentica; `main` aceita push direto |
 | A2 | Decisão sobre a CCEE | Alup | 18/09 | 32h da Onda 1 seguem paradas |
+| G1 | **Resposta do Google à revisão arquitetural** (enviada em 04/09) | Google | **a definir** | sem data pactuada, a crítica chega depois do primeiro `apply` e passa a custar migração em vez de reprojeto — ver `plano-semanal.md`, S1 |
 | A7 | Pedidos de token (Onda 2) e VPN/credencial (Onda 3) **abertos** | Alup | 25/09 | maior risco financeiro: ociosidade de 4h/dia (R$ 256/h) |
 | A8 | Documentação técnica de BBCE e TempoOK | Alup | 25/09 | Onda 2 só começa depois do token, em vez de antes |
 

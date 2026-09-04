@@ -35,8 +35,8 @@ e de marco de faturamento. Detalhes e feriados:
 
 O contexto completo — regras que não se negociam, como escrever um conector,
 comandos, convenções e o estado atual — está em **[`AGENTS.md`](AGENTS.md)**.
-Leia aquele arquivo antes de mudar qualquer coisa; ele vale para Claude Code,
-Codex, Cursor, Gemini, Cline e Copilot.
+Leia aquele arquivo antes de mudar qualquer coisa; ele vale para qualquer
+agente de código, seja qual for a ferramenta.
 
 Atalho: uma fonte nova começa com `make novo-conector fonte=X entidade=Y` e
 termina com os 7 componentes da cláusula 2ª. O framework em `src/core/` já faz

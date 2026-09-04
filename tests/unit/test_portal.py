@@ -328,3 +328,72 @@ def test_modo_real_com_identidade_do_iap_passa(monkeypatch: pytest.MonkeyPatch) 
 def test_modo_simulado_nao_e_travado(cliente) -> None:
     """Desenvolvimento local não tem IAP na frente e não serve dado real."""
     assert cliente.get("/").status_code == 200
+
+
+# ------------------------------------------------- endurecimento das respostas
+
+
+def test_toda_resposta_leva_os_cabecalhos_de_seguranca(cliente) -> None:
+    resposta = cliente.get("/saude")
+
+    assert resposta.headers["X-Content-Type-Options"] == "nosniff"
+    assert resposta.headers["X-Frame-Options"] == "DENY"
+    assert resposta.headers["Referrer-Policy"] == "no-referrer"
+    assert resposta.headers["Cache-Control"] == "no-store"
+    assert "noindex" in resposta.headers["X-Robots-Tag"]
+
+
+def test_politica_proibe_script_porque_o_portal_nao_tem_nenhum(cliente) -> None:
+    """`default-src 'none'` sem `script-src` é afirmação, não descrição."""
+    csp = cliente.get("/saude").headers["Content-Security-Policy"]
+
+    assert "default-src 'none'" in csp
+    assert "frame-ancestors 'none'" in csp
+    assert "'unsafe-eval'" not in csp
+    assert "script-src" not in csp, "sem script-src explícito, herda o default-src 'none'"
+
+
+def test_recusa_por_falta_de_identidade_tambem_e_endurecida(cliente, monkeypatch) -> None:
+    """403 é resposta como outra e não pode sair sem cabeçalho."""
+    from src.core import config
+
+    monkeypatch.setattr(config, "get_settings", lambda: _cfg_real())
+    from src.portal import app as modulo
+
+    monkeypatch.setattr(modulo, "get_settings", lambda: _cfg_real())
+
+    resposta = cliente.get("/")
+
+    assert resposta.status_code == 403
+    assert resposta.headers["X-Content-Type-Options"] == "nosniff"
+    assert resposta.headers["Content-Security-Policy"].startswith("default-src 'none'")
+
+
+def _cfg_real():
+    """Cópia das settings com o provedor real, para acionar a trava do IAP."""
+    from src.core.config import Settings
+
+    return Settings(portal_provedor="bigquery")
+
+
+def test_falha_do_provedor_nao_vaza_o_motivo_na_tela(cliente, monkeypatch) -> None:
+    """Erro do BigQuery traz projeto, dataset e por vezes o SQL — nada disso vai à tela."""
+    from src.portal import app as modulo
+
+    def explodir():
+        raise RuntimeError("403 Access Denied: Table alupdata-dev:bronze._execucoes")
+
+    monkeypatch.setattr(modulo, "obter_provedor", explodir)
+    # TESTING=True propaga a exceção e passaria por cima do handler; aqui
+    # queremos justamente exercitar o handler, como em produção.
+    cliente.application.config.update(TESTING=False, PROPAGATE_EXCEPTIONS=False)
+    try:
+        resposta = cliente.get("/")
+        corpo = resposta.get_data(as_text=True)
+    finally:
+        cliente.application.config.update(TESTING=True, PROPAGATE_EXCEPTIONS=None)
+
+    assert resposta.status_code == 500
+    assert "alupdata-dev" not in corpo
+    assert "Access Denied" not in corpo
+    assert "registrada" in corpo

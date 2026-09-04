@@ -30,10 +30,11 @@ def arquivos(camadas: list[str]) -> list[Path]:
 
 
 def renderizar(caminho: Path) -> str:
-    """Substitui ${projeto}/${bronze}/${silver}/${gold} pela configuração."""
+    """Substitui ${projeto}/${regiao}/${bronze}/${silver}/${gold} pela configuração."""
     cfg = get_settings()
     return Template(caminho.read_text(encoding="utf-8")).substitute(
         projeto=cfg.gcp_project_id,
+        regiao=cfg.gcp_region,
         bronze=cfg.bq_dataset_bronze,
         silver=cfg.bq_dataset_silver,
         gold=cfg.bq_dataset_gold,

@@ -16,6 +16,11 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
     gcp_project_id: str = "alupdata-dev"
+    gcp_region: str = Field(
+        default="southamerica-east1",
+        description="Região dos recursos (ADR 009). O INFORMATION_SCHEMA do BigQuery é por região: "
+        "apontar para a região errada devolve zero linhas em silêncio",
+    )
 
     bq_dataset_bronze: str = "bronze"
     bq_dataset_silver: str = "silver"

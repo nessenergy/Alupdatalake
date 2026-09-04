@@ -45,13 +45,13 @@ Semanas contadas de segunda a sexta. S1 começa em **2026-08-31**.
 | **Revisão arquitetural para o Google: baralho confeccionado e enviado** | [`apresentacoes/revisao-arquitetural-gcp.html`](apresentacoes/revisao-arquitetural-gcp.html) · PR #74 |
 | Campos de acompanhamento semanal versionados (Horas, Semana, Validado, Correções, Atraso) | `scripts/campos_projeto.py` · [runbook](runbook/acompanhamento-semanal.md) · PR #75 |
 | Fila de execução com dono e comando por item | [`proximos-passos.md`](proximos-passos.md) · PR #75 |
+| **Região do ambiente decidida**: `southamerica-east1` | [ADR 009](arquitetura/decisoes/009-regiao-do-ambiente.md) · `dev.tfvars`, `prod.tfvars` e `variables.tf` coerentes |
 
 ### O que esta semana precisa produzir
 
 | Dia | Item | Entregável verificável |
 |---|---|---|
 | **Seg 31/08** | Cobrar A3 por escrito, pedindo **data com responsável nomeado** | registro na issue [#55](https://github.com/nessenergy/Alupdatalake/issues/55) |
-| **Seg 31/08** | **Decidir a região** do ambiente: `us-east1` (valor atual em `dev.tfvars`) ou `southamerica-east1` (o que a pergunta E7 assume) | `dev.tfvars` e `prod.tfvars` coerentes com a decisão |
 | Ter–Qua | Build da imagem da CLI e execução local do job | `docker run` da imagem executando `alupdata listar` |
 | Ter–Qua | `banco.py` exercitado contra Oracle XE e MySQL em contêiner | uma consulta real por driver, com paginação verificada |
 | Qui–Sex | Variáveis do GitHub preenchidas assim que A3 der os valores | `gh api .../actions/variables` devolvendo as quatro |
@@ -70,26 +70,40 @@ Semanas contadas de segunda a sexta. S1 começa em **2026-08-31**.
 > dias úteis posterga o cronograma). Registrar a data do pedido no dia em que o
 > atraso começa.
 
-#### G1 e A3 estão em corrida — e é o A3 que decide o valor da resposta
+#### Registro de 04/09: A3 não chegou, e agora depende de G1
 
-O baralho enviado ao Google argumenta que o modelo está completo em código e
-**ainda não foi instanciado**: por isso uma recomendação de arquitetura se
-aplica como reprojeto, e não como migração. Esse argumento tem prazo de
-validade — ele vale até o primeiro `terraform apply`.
+**A3 venceu hoje e não foi entregue.** A contagem da cláusula 3ª começa nesta
+data. Enquanto o insumo não chegar, os prazos que dependem dele ficam
+postergados: a ness. segue executando o que independe do ambiente, mas **não
+responde por marcos cujo insumo não foi disponibilizado** — S2 (primeiro deploy
+real) e S3 (fechar a Onda 0) escorregam pelo tempo que A3 demorar.
 
-Daí a corrida, e as duas ordens possíveis:
+**A Alup informou que condicionou A3 à resposta do Google.** Isso muda a forma
+da dependência: G1 e A3 não estão em corrida, estão **em série**.
 
-- **G1 antes do apply** (cenário bom): a crítica entra como ajuste de desenho,
-  vira ADR novo ou revisão de ADR, e o ambiente sobe já com ela.
-- **A3 antes de G1** (cenário provável, se a Alup destravar esta semana): o
-  ambiente sobe com o desenho atual. A crítica continua útil, mas passa a
-  custar migração de recurso já criado — e alguns itens ficam caros de reverter,
-  como a **região do dataset**, que não muda depois de criada.
+    G1 (Google responde) → A3 (ambiente GCP) → 1º apply → Onda 0 homologada
 
-**Não paramos o apply esperando o Google**: A3 já é o gargalo do contrato e
-segurá-lo dispararia a cláusula 3ª contra nós mesmos. O que se faz é o
-inverso: **cobrar G1 com data**, para que a resposta chegue enquanto a janela
-existe. Sem prazo pactuado, G1 não é dependência de cronograma — é torcida.
+Três consequências que precisam estar escritas:
+
+1. **O gargalo mestre deixou de ser a Alup e passou a ser um terceiro sem
+   prazo acordado.** A3 ao menos tinha data; G1 não tem. Enquanto G1 não tiver
+   data, o cronograma inteiro não tem previsão — e isso não é uma estimativa
+   pessimista, é a ausência de um prazo.
+2. **Condicionar A3 a G1 não pausa a cláusula 3ª.** O contrato conta o atraso
+   do insumo, não o motivo do atraso. A decisão de esperar o Google é legítima
+   e pode ser boa tecnicamente, mas o efeito contratual do atraso continua
+   correndo — e é por isso que fica registrado por escrito, hoje.
+3. **O argumento do baralho ganhou força.** Ele dizia que a crítica chegaria
+   antes do `apply`; agora é certo que sim, porque o `apply` espera por ela. A
+   recomendação do Google entra como reprojeto, não como migração — inclusive
+   sobre a região, que a ADR 009 fixou em `southamerica-east1` justamente por
+   ser irreversível depois do primeiro `apply`.
+
+**O que a ness. faz enquanto isso**: tudo que não depende do ambiente. A lista
+viva está em [`proximos-passos.md`](proximos-passos.md); o que sobra sem GCP é
+documentação, contrato de dados das fontes ainda não integradas, instrumental
+de acompanhamento e preparação do primeiro deploy. Trabalho útil, mas nenhum
+deles fecha onda — fechar onda exige carga real.
 
 ### Descobertas de 31/08
 

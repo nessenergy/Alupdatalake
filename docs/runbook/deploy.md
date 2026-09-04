@@ -40,8 +40,8 @@ Recurso criado no console não existe: some no próximo `apply`.
 |---|---|
 | `GCP_WIF_PROVIDER` | `projects/123/locations/global/workloadIdentityPools/github/providers/alupdata` |
 | `GCP_DEPLOY_SA` | `alupdata-deploy@alupdata-dev.iam.gserviceaccount.com` |
-| `GCP_REGION` | `us-east1` |
-| `IMAGEM_INGESTAO` | `us-east1-docker.pkg.dev/alupdata-dev/alupdata/cli` (sem tag) |
+| `GCP_REGION` | `southamerica-east1` |
+| `IMAGEM_INGESTAO` | `southamerica-east1-docker.pkg.dev/alupdata-dev/alupdata/cli` (sem tag) |
 
 ## Deploy
 

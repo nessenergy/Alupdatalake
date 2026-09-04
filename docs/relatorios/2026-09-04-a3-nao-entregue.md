@@ -6,8 +6,9 @@
 Prezados,
 
 Este relatório registra a situação do insumo **A3 — provisionamento do ambiente
-GCP `dev`** na data de hoje, seu efeito sobre o cronograma, e o que a ness.
-segue entregando enquanto ele não chega.
+GCP `dev`** na data de hoje e seu efeito sobre o cronograma. Registra também,
+com o mesmo destaque, o estado da entrega: quatro das cinco ondas já têm
+trabalho concluído, e é importante que as duas leituras cheguem juntas.
 
 Emitimos o registro no dia em que a situação se configura, e não mais adiante,
 porque é assim que a cláusula 3ª funciona: ela sustenta a postergação de prazos
@@ -63,22 +64,50 @@ planejar.
   que **condicionar A3 a G1 não interrompe a contagem** prevista na cláusula
   3ª, uma vez que o contrato considera o atraso do insumo e não o seu motivo.
 
-## 4. O que seguimos entregando
+## 4. O outro lado do quadro: a entrega está adiantada
 
-O trabalho que não depende do ambiente continua sem interrupção:
+Este relatório trata de um atraso, e por isso pedimos atenção a um dado que a
+leitura isolada esconde: **no quinto dia da primeira onda, quatro das cinco já
+têm entrega**.
+
+| Onda | Janela contratual | O que já existe |
+|---|---|---|
+| **1** — Mercado base | 14/09 – 16/10 | **4 de 5 fontes completas**, com os 7 componentes cada: BCB/PTAX, IBGE/IPCA, ANEEL/SIGA (25.263 registros verificados) e ONS/carga. Só a CCEE falta, bloqueada na origem |
+| **2** — APIs credenciadas | 19/10 – 13/11 | **Hubspot completo**, os 7 componentes, escritos contra a documentação pública antes do token |
+| **3** — Sistemas internos | 16/11 – 18/12 | **Caminho de acesso a bancos pronto** — Oracle, MySQL e SQL Server, com credencial em cofre e leitura paginada |
+| **4** — Planilhas e handoff | 21/12 – 08/01 | **Motor de ingestão de planilhas** pronto; faltam os templates, que dependem do Questionário de Gaps |
+
+A fonte do adiantamento é simples: sempre que uma frente não dependia de insumo
+da Alup, ela foi puxada para frente. O motor de planilha, cuja janela abre em
+21/12, está pronto desde 26/08 — três meses e meio de antecedência.
+
+O efeito prático disso aparece justamente no item de maior risco financeiro do
+contrato. Quando a VPN e as credenciais da Onda 3 chegarem, a tarefa será
+apontar a conexão e escrever as consultas, **não construir a capacidade de ler
+banco**. O que se perde esperando deixou de ser desenvolvimento pendente.
+
+### Outras frentes concluídas fora do escopo faturado
 
 | Frente | Situação |
 |---|---|
-| Framework, CLI, 5 conectores, motor de planilha, Portal MVP | entregues · 246 testes, 92% de cobertura, CI verde |
-| Terraform completo — datasets, bucket, secrets, job, scheduler, IAM, alertas | escrito e validado; aguarda apenas o `apply` |
+| Framework, CLI e reprocessamento de dado bruto | entregues · **279 testes**, 92% de cobertura, CI verde |
+| Terraform completo — datasets, bucket, secrets, job, agendamento, IAM, alertas | escrito e validado; aguarda apenas o `apply` |
+| Permissões restringidas por recurso, credencial removida de log e de erro | cláusula 8ª · conta de serviço deixou de ter acesso amplo ao projeto |
 | **Região do ambiente definida** — `southamerica-east1` | [ADR 009](../arquitetura/decisoes/009-regiao-do-ambiente.md), emitida hoje |
-| **Rótulo de custo por fonte** no job do BigQuery | implementado hoje; precisa existir antes do 1º apply, pois custo já gasto não se rateia depois |
-| Revisão arquitetural para o Google | enviada em 04/09 |
-| Instrumental de acompanhamento semanal — 5 campos e runbook | versionado; falta criar os campos no quadro |
+| **Atribuição de custo por fonte** no BigQuery | precisa existir **antes** do 1º apply: custo já gasto não se rateia depois |
+| Portal MVP com painéis de saúde e de custo | roda com provedor simulado; aguarda o ambiente |
+| Instrumental de acompanhamento semanal | cinco campos criados no quadro hoje |
 
-Vale a transparência: **nenhuma dessas frentes fecha onda.** Fechar onda exige
-dado real em BigQuery real. O que elas garantem é que, no dia em que A3 chegar,
-a tarefa seja executar — e não começar.
+### A ressalva que pedimos que fique registrada
+
+**Nenhuma dessas frentes fecha onda.** Fechar onda exige dado real em BigQuery
+real, e isso depende do ambiente.
+
+As duas coisas são verdadeiras ao mesmo tempo e não se anulam: o projeto está
+**adiantado em entrega e parado em homologação**. Relatar só a primeira metade
+seria vender progresso que não fecha marco; relatar só a segunda esconderia
+trabalho já feito e pago. É o segundo lado que define quando o marco pode ser
+medido.
 
 ## 5. Como podemos ajudar a destravar
 

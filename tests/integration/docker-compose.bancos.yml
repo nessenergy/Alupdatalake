@@ -1,0 +1,46 @@
+# Bancos locais para exercitar `src/core/banco.py` sem VPN e sem dado da Alup.
+#
+# O objetivo é provar que o caminho relacional funciona ponta a ponta — conexão,
+# paginação no cursor, colunas em minúscula, recusa de escrita — antes de a
+# credencial da Onda 3 chegar. Nenhum destes contêineres vê dado de cliente.
+#
+#     docker compose -f tests/integration/docker-compose.bancos.yml up -d
+#     ALUPDATA_INTEGRACAO_BANCOS=1 uv run pytest tests/integration -q
+#     docker compose -f tests/integration/docker-compose.bancos.yml down -v
+#
+# Senhas aqui são de descarte e valem só no laptop: o banco não é exposto para
+# fora de localhost e o contêiner é destruído com `down -v`.
+
+services:
+  mysql:
+    image: mysql:8.4
+    environment:
+      MYSQL_ROOT_PASSWORD: alupdata-local
+      MYSQL_DATABASE: comercializacao
+    ports: ["127.0.0.1:3306:3306"]
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-palupdata-local"]
+      interval: 5s
+      retries: 20
+
+  oracle:
+    # A imagem free da Oracle é a única distribuível sem aceite manual.
+    image: gvenzl/oracle-free:23-slim
+    environment:
+      ORACLE_PASSWORD: alupdata-local
+      APP_USER: leitor
+      APP_USER_PASSWORD: alupdata-local
+    ports: ["127.0.0.1:1521:1521"]
+    healthcheck:
+      test: ["CMD", "healthcheck.sh"]
+      interval: 10s
+      retries: 30
+
+  sqlserver:
+    # Via (c) do adendo ao C4 — o Balanço Energético vem de um SQL Server.
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: Alupdata-local1
+      MSSQL_PID: Developer
+    ports: ["127.0.0.1:1433:1433"]

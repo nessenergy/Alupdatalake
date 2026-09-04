@@ -25,6 +25,7 @@ dependencies = [
 bancos = [
     { name = "oracledb" },
     { name = "pymysql" },
+    { name = "python-tds" },
 ]
 dev = [
     { name = "bandit" },
@@ -56,6 +57,7 @@ requires-dist = [
     { name = "pymysql", marker = "extra == 'bancos'", specifier = ">=1.1" },
     { name = "pytest", marker = "extra == 'dev'", specifier = ">=8.3" },
     { name = "pytest-cov", marker = "extra == 'dev'", specifier = ">=5.0" },
+    { name = "python-tds", marker = "extra == 'bancos'", specifier = ">=1.15" },
     { name = "requests", specifier = ">=2.32" },
     { name = "ruff", marker = "extra == 'dev'", specifier = ">=0.8" },
 ]
@@ -1441,6 +1443,15 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/6a/53/ed9d74092561d4b01a2ef1349d52cdbc135e526c245f366b089cfca6de49/python_dotenv-1.2.3.tar.gz", hash = "sha256:a20a594dabeaa385725aa239d5244871c143ecb356add8a20fcf23773a6c3a35", size = 58945, upload-time = "2026-08-16T16:54:54.067Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/0d/17/c5c6b53ddc18f297992099b3d9ec16c855c0ccc83263a21fe4d1c625ec6c/python_dotenv-1.2.3-py3-none-any.whl", hash = "sha256:904552145e8bfed22162c09dab1c2b9b54fefa7b23ba780f4f26ca0316b0f0d9", size = 22780, upload-time = "2026-08-16T16:54:52.473Z" },
+]
+
+[[package]]
+name = "python-tds"
+version = "1.17.1"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/ae/8a/cf778bd80d142d4b3c39f9879485e2e93e4ace2ae9aabae77e07e8117f41/python_tds-1.17.1.tar.gz", hash = "sha256:c97483a9adf1dcab8bee66e83429acc502753f389d134553edd818348b94ced0", size = 82208, upload-time = "2025-09-13T12:57:37.909Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/bf/8f/c7344075a9ea4458e5d52cf2e16dc7e70777807c96ba9d429f16f27b1acc/python_tds-1.17.1-py3-none-any.whl", hash = "sha256:35cb210b1a54e5ccc91570a83d4e9a2a16682cbeb00bede06fd6cdf9afa9762f", size = 86635, upload-time = "2025-09-13T12:57:36.877Z" },
 ]
 
 [[package]]

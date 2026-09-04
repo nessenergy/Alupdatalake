@@ -1,0 +1,270 @@
+<!doctype html><html lang='pt-BR'><head><meta charset='utf-8'><title>Questionário de Gaps — AlupData</title><link rel='preconnect' href='https://fonts.googleapis.com'><link href='https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&display=swap' rel='stylesheet'><style>
+@page { size: A4; margin: 16mm 14mm 16mm 14mm; }
+
+/* Só a versão de tela: no PDF a margem é da @page. */
+@media screen {
+  body { max-width: 900px; margin: 0 auto; padding: 32px 24px 64px; font-size: 15px; }
+  table { font-size: 14px; }
+}
+
+:root {
+  --tinta: #12161a;
+  --suave: #5c6772;
+  --linha: #dfe4e9;
+  --ness: #00ade8;
+  --alerta: #b3261e;
+  --fundo-alerta: #fdf3f2;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: Montserrat, "Segoe UI", system-ui, sans-serif;
+  font-size: 9.4pt;
+  line-height: 1.5;
+  color: var(--tinta);
+  margin: 0;
+}
+
+/* ---------------------------------------------------------------- cabeçalho */
+
+.marca {
+  font-weight: 600;
+  font-size: 15pt;
+  letter-spacing: -0.02em;
+  margin: 0 0 2mm;
+}
+.marca span { color: var(--ness); }
+
+h1 {
+  font-size: 17pt;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  margin: 0 0 1mm;
+  padding-bottom: 3mm;
+  border-bottom: 2px solid var(--ness);
+}
+
+h2 {
+  font-size: 11.5pt;
+  font-weight: 600;
+  margin: 8mm 0 2.5mm;
+  padding-top: 3mm;
+  border-top: 1px solid var(--linha);
+  /* Um bloco não deve abrir no rodapé e continuar na página seguinte. */
+  break-after: avoid;
+}
+
+h3 { font-size: 10pt; font-weight: 600; margin: 5mm 0 2mm; break-after: avoid; }
+
+p { margin: 0 0 2.5mm; }
+strong { font-weight: 600; }
+code {
+  font-family: "Cascadia Mono", Consolas, monospace;
+  font-size: 8.6pt;
+  background: #f2f4f6;
+  padding: 0.3mm 1mm;
+  border-radius: 2px;
+}
+
+/* -------------------------------------------------------------------- tabela */
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0 0 4mm;
+  font-size: 8.8pt;
+}
+th {
+  text-align: left;
+  font-weight: 600;
+  font-size: 7.8pt;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--suave);
+  border-bottom: 1.5px solid var(--tinta);
+  padding: 1.6mm 2mm;
+}
+td {
+  border-bottom: 1px solid var(--linha);
+  padding: 2.4mm 2mm;
+  vertical-align: top;
+}
+/* Uma pergunta não se parte entre páginas. */
+tr { break-inside: avoid; }
+thead { display: table-header-group; }
+
+/* Larguras de coluna do formulário: código estreito, "Resposta" com espaço de
+   escrita. Valem só no questionário — num relatório espremeriam a 1ª coluna e
+   pintariam a última sem motivo. */
+.questionario td:first-child { width: 7%; font-weight: 600; font-variant-numeric: tabular-nums; }
+.questionario th:last-child, .questionario td:last-child { width: 30%; background: #fafbfc; }
+.questionario td:nth-child(3) { width: 15%; color: var(--suave); font-size: 8.2pt; }
+
+/* --------------------------------------------------------------- destaques */
+
+.bloqueia {
+  display: inline-block;
+  background: var(--alerta);
+  color: #fff;
+  font-size: 6.8pt;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  padding: 0.4mm 1.4mm;
+  border-radius: 2px;
+  margin-right: 1.2mm;
+  vertical-align: 1px;
+}
+
+blockquote {
+  margin: 0 0 3mm;
+  padding: 2.5mm 3mm;
+  background: var(--fundo-alerta);
+  border-left: 3px solid var(--alerta);
+}
+blockquote p:last-child { margin-bottom: 0; }
+
+/* O `---` do Markdown separa as seções na fonte, mas no PDF a borda de `h2` já
+   faz esse trabalho: manter os dois empilha traços. */
+hr { display: none; }
+hr + h2 { margin-top: 7mm; }
+
+ul { margin: 0 0 3mm; padding-left: 5mm; }
+li { margin-bottom: 1.2mm; }
+
+.rodape {
+  margin-top: 8mm;
+  padding-top: 3mm;
+  border-top: 1px solid var(--linha);
+  font-size: 7.6pt;
+  color: var(--suave);
+}
+</style></head><body class='relatorio'><p class="marca">ness<span>.</span></p><h1>Situação do ambiente GCP e do cronograma da Onda 0</h1>
+<p><strong>Emitido em 04/09/2026</strong> · Contrato CPS-01025/2026 · Marco em jogo: Onda 0 ·
+15,52% · R$ 23.040,00</p>
+<p>Prezados,</p>
+<p>Este relatório registra a situação do insumo <strong>A3 — provisionamento do ambiente
+GCP <code>dev</code></strong> na data de hoje, seu efeito sobre o cronograma, e o que a ness.
+segue entregando enquanto ele não chega.</p>
+<p>Emitimos o registro no dia em que a situação se configura, e não mais adiante,
+porque é assim que a cláusula 3ª funciona: ela sustenta a postergação de prazos
+quando as datas estão anotadas quando ocorrem. Não se trata de formalizar uma
+cobrança — trata-se de manter o histórico do projeto íntegro para os dois lados,
+inclusive para nós, que precisamos justificar como as horas foram alocadas.</p>
+<hr />
+<h2>1. Onde estamos</h2>
+<p>O insumo <strong>A3</strong> tinha prazo útil em <strong>04/09/2026</strong> e não foi disponibilizado até
+esta data. Ele compreende o projeto GCP criado, as APIs habilitadas, o IAM
+concedido, o Workload Identity Federation configurado, o Artifact Registry e o
+bucket de state do Terraform.</p>
+<p>O pedido está registrado nas issues
+<a href="https://github.com/nessenergy/Alupdatalake/issues/1">#1</a> e
+<a href="https://github.com/nessenergy/Alupdatalake/issues/55">#55</a>, com cobrança por
+escrito em 31/08.</p>
+<h2>2. A informação nova, e por que ela muda o quadro</h2>
+<p>A Alup nos informou que optou por <strong>condicionar A3 à resposta do Google</strong> à
+revisão arquitetural que enviamos hoje (pendência <strong>G1</strong>,
+<a href="https://github.com/nessenergy/Alupdatalake/issues/77">issue #77</a>).</p>
+<p>Compreendemos a escolha e a consideramos tecnicamente defensável: é melhor
+receber a crítica antes de instanciar o ambiente do que depois. Nosso próprio
+material foi escrito com esse argumento.</p>
+<p>O que precisamos registrar é o efeito da escolha sobre a forma da dependência.
+O que eram duas esperas paralelas passou a ser uma cadeia em série:</p>
+<pre><code>G1 (Google responde) → A3 (ambiente GCP) → 1º apply → Onda 0 homologada
+</code></pre>
+<p>E aqui está o ponto que pedimos atenção: <strong>G1 não tem prazo acordado</strong>. A3 ao
+menos tinha data. Enquanto G1 não tiver, o cronograma não fica com uma previsão
+ruim — fica sem previsão, que é uma situação diferente e mais difícil de
+planejar.</p>
+<h2>3. Efeito sobre o cronograma</h2>
+<ul>
+<li>Os prazos que dependem de A3 ficam <strong>postergados pelo tempo do atraso</strong>, e a
+  ness. não responde pelos marcos cujo insumo não pôde ser disponibilizado.</li>
+<li><strong>S2</strong> (07–11/09, primeiro deploy real) e <strong>S3</strong> (14–18/09, fechamento da
+  Onda 0) escorregam integralmente enquanto o ambiente não existir.</li>
+<li>A <strong>Onda 0 não pode ser homologada</strong> sem carga real. Entrega técnica não é
+  homologação: é o primeiro <code>apply</code> que revela IAM insuficiente, cota de API,
+  permissão de bucket e formato recusado pelo BigQuery — e é justamente por
+  isso que insistimos nele.</li>
+<li>Registramos, sem que isso implique qualquer objeção à decisão de aguardar,
+  que <strong>condicionar A3 a G1 não interrompe a contagem</strong> prevista na cláusula
+  3ª, uma vez que o contrato considera o atraso do insumo e não o seu motivo.</li>
+</ul>
+<h2>4. O que seguimos entregando</h2>
+<p>O trabalho que não depende do ambiente continua sem interrupção:</p>
+<table>
+<thead>
+<tr>
+<th>Frente</th>
+<th>Situação</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Framework, CLI, 5 conectores, motor de planilha, Portal MVP</td>
+<td>entregues · 246 testes, 92% de cobertura, CI verde</td>
+</tr>
+<tr>
+<td>Terraform completo — datasets, bucket, secrets, job, scheduler, IAM, alertas</td>
+<td>escrito e validado; aguarda apenas o <code>apply</code></td>
+</tr>
+<tr>
+<td><strong>Região do ambiente definida</strong> — <code>southamerica-east1</code></td>
+<td><a href="../arquitetura/decisoes/009-regiao-do-ambiente.md">ADR 009</a>, emitida hoje</td>
+</tr>
+<tr>
+<td><strong>Rótulo de custo por fonte</strong> no job do BigQuery</td>
+<td>implementado hoje; precisa existir antes do 1º apply, pois custo já gasto não se rateia depois</td>
+</tr>
+<tr>
+<td>Revisão arquitetural para o Google</td>
+<td>enviada em 04/09</td>
+</tr>
+<tr>
+<td>Instrumental de acompanhamento semanal — 5 campos e runbook</td>
+<td>versionado; falta criar os campos no quadro</td>
+</tr>
+</tbody>
+</table>
+<p>Vale a transparência: <strong>nenhuma dessas frentes fecha onda.</strong> Fechar onda exige
+dado real em BigQuery real. O que elas garantem é que, no dia em que A3 chegar,
+a tarefa seja executar — e não começar.</p>
+<h2>5. Como podemos ajudar a destravar</h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Insumo</th>
+<th>Com quem</th>
+<th>Situação</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>G1</strong></td>
+<td>Uma data para a resposta do Google</td>
+<td>Alup / Google</td>
+<td>sem prazo acordado — é o item que hoje precede todo o resto</td>
+</tr>
+<tr>
+<td><strong>A3</strong></td>
+<td>Ambiente GCP <code>dev</code> provisionado</td>
+<td>Alup</td>
+<td>vencido em 04/09, condicionado a G1</td>
+</tr>
+<tr>
+<td><strong>A1</strong></td>
+<td>WIF no lado do GitHub (<code>GCP_WIF_PROVIDER</code>, <code>GCP_DEPLOY_SA</code>)</td>
+<td>Alup</td>
+<td>sem ele o deploy não autentica, mesmo com A3 pronto</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Nosso pedido é modesto: uma data para G1.</strong> Não a resposta completa — apenas
+a data. Com ela, a postergação passa a ser calculável e voltamos a planejar as
+semanas seguintes com previsibilidade.</p>
+<p>Permanecemos à disposição para participar da conversa com o Google, preparar
+material adicional ou antecipar qualquer frente que ajude a encurtar o caminho.</p>
+<p>Atenciosamente,</p>
+<p><strong>Ricardo Esper</strong>
+ness. Processos e Tecnologia</p><p class="rodape">ness. Processos e Tecnologia Ltda. · CNPJ 72.027.097/0001-37 · Contrato CPS-01025/2026 — AlupData Fase 1: DataLake</p></body></html>

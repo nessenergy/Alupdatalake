@@ -18,8 +18,8 @@ contexto para agentes, em [`../AGENTS.md`](../AGENTS.md).
 
 | Item | Onde | Verificação |
 |---|---|---|
-| Runner de ingestão (janela, raw no GCS, validação, colunas técnicas, carga, log) | `src/core/` | 246 testes aprovados, 92% de cobertura (suíte inteira) |
-| Caminho de banco relacional (Oracle/MySQL) para a Onda 3 | `src/core/banco.py` | ADR 008; 16 testes sem rede; **nenhuma conexão real** — depende de VPN (A7) |
+| Runner de ingestão (janela, raw no GCS, validação, colunas técnicas, carga, log) | `src/core/` | 250 testes aprovados, 92% de cobertura (suíte inteira) |
+| Caminho de banco relacional (Oracle/MySQL/**SQL Server**) para a Onda 3 | `src/core/banco.py` | ADR 008 e adendo de 04/09; 20 testes sem rede; **nenhuma conexão real** — depende de VPN (A7). Compose e testes de integração prontos em `tests/integration/` |
 | Replay do raw sem nova chamada à fonte | `alupdata reprocessar-raw`, `src/core/storage.py` | testes locais com JSONL gzip; falta validar contra GCS real |
 | CLI única (`alupdata listar` / `ingerir`) | `src/cli.py` | executada contra as 4 fontes |
 | Scaffolding dos 7 componentes | `make novo-conector` | usado nas fontes novas |

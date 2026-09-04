@@ -4,8 +4,8 @@ O equivalente de `http.py` para fonte que não fala HTTP: abre conexão a partir
 de uma DSN guardada no Secret Manager e devolve linhas como dicionários, no
 mesmo formato que `extrair()` já entrega ao runner.
 
-Drivers em modo puro-Python (`oracledb` *thin*, `pymysql`): a imagem não precisa
-de Oracle Instant Client nem de `libmysqlclient`. Ficam em
+Drivers em modo puro-Python (`oracledb` *thin*, `pymysql`, `pytds`): a imagem
+não precisa de Oracle Instant Client, `libmysqlclient` nem driver ODBC. Ficam em
 `[project.optional-dependencies].bancos` — conector de API pública não paga por
 eles.
 
@@ -13,6 +13,13 @@ Formato da DSN, uma linha no secret `alupdata-<fonte>-dsn`:
 
     oracle://usuario:senha@host:1521/SERVICO
     mysql://usuario:senha@host:3306/base
+    sqlserver://usuario:senha@host:1433/base
+
+O SQL Server entrou pela via (c) do adendo ao C4: a Alup já mantém o realizado
+do Balanço Energético da CCEE num SQL Server, alimentado por processo mensal
+manual. Ler dali não depende do desbloqueio do portal da CCEE, e pode dar origem
+à dimensão `agente_ccee`. Escolhemos `pytds` por ser puro-Python; a alternativa
+usual (`pyodbc`) exigiria driver de sistema na imagem.
 
 Limite conhecido: `Conector._ingerir` materializa o resultado de `extrair()`
 numa lista antes de validar. `consultar()` pagina no cursor — o que protege o
@@ -37,7 +44,7 @@ if TYPE_CHECKING:
 
 logger = logging.getLogger(__name__)
 
-PORTA_PADRAO = {"oracle": 1521, "mysql": 3306}
+PORTA_PADRAO = {"oracle": 1521, "mysql": 3306, "sqlserver": 1433}
 _SOMENTE_LEITURA = re.compile(r"^\s*(?:--[^\n]*\n\s*)*(SELECT|WITH)\b", re.IGNORECASE)
 
 
@@ -74,8 +81,21 @@ def conectar(dsn: str) -> Any:
             connect_timeout=int(cfg.banco_timeout),
         )
 
+    if url.scheme == "sqlserver":
+        import pytds
+
+        return pytds.connect(
+            server=url.hostname,
+            port=porta,
+            user=unquote(url.username or ""),
+            password=unquote(url.password or ""),
+            database=base,
+            login_timeout=int(cfg.banco_timeout),
+            as_dict=False,  # `consultar()` monta o dicionário a partir de cursor.description
+        )
+
     # Só o esquema entra na mensagem — usuário, host e senha ficam de fora.
-    raise ValueError(f"driver não suportado: {url.scheme!r}; use 'oracle' ou 'mysql'")
+    raise ValueError(f"driver não suportado: {url.scheme!r}; use 'oracle', 'mysql' ou 'sqlserver'")
 
 
 def criar_conexao(fonte: str, campo: str = "dsn") -> Any:

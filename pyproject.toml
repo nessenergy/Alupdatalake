@@ -22,6 +22,7 @@ dependencies = [
 bancos = [
     "oracledb>=2.5",
     "pymysql>=1.1",
+    "python-tds>=1.15",
 ]
 dev = [
     "pytest>=8.3",

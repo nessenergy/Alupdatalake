@@ -1,9 +1,9 @@
 # AlupData — contexto para agentes
 
-Arquivo canônico de contexto deste repositório. Vale para qualquer agente
-(Claude Code, Codex, Cursor, Gemini, Cline, Copilot); `CLAUDE.md` só aponta
-para cá. Se você é humano, `README.md` e `docs/onboarding.md` continuam sendo
-o caminho.
+Arquivo canônico de contexto deste repositório. Vale para qualquer agente de
+código, seja qual for a ferramenta; os arquivos-ponteiro na raiz apenas
+apontam para cá. Se você é humano, `README.md` e `docs/onboarding.md`
+continuam sendo o caminho.
 
 ## O projeto em cinco linhas
 
@@ -29,14 +29,25 @@ Plano detalhado: `docs/plano-execucao.md`. Contrato resumido:
    ROW_NUMBER()`). Toda tabela Bronze é particionada e clusterizada — sem isso
    o custo de BigQuery, que é da Alup, cresce por varredura completa.
 5. **Recurso GCP que não está em `infra/` não existe.** Nada de console.
-6. **Nada de atribuição a IA no que fica registrado.** Sem trailer
-   `Co-Authored-By` de ferramenta, sem assinatura do tipo "Generated with", sem
-   branch `claude/*` ou equivalente, sem menção a IA em commit, corpo de PR ou
-   documento entregue. O repositório é artefato do contrato CPS-01025/2026, cuja
-   cláusula 7ª trata de propriedade intelectual: co-autoria de terceiro no
-   histórico cria ambiguidade sobre titularidade. Nomeie branches pelo assunto
-   (`docs/…`, `feat/…`). Vale para agente e para humano. Verificado por
-   `scripts/verifica_atribuicao.py`, no hook `commit-msg` e no CI.
+6. **O contrato não admite uso de IA.** Nunca crie nada que carregue nome de
+   ferramenta de IA — em mensagem de commit, nome de branch, título ou corpo de
+   PR, issue, **comentário de issue**, documento entregue, nome de arquivo,
+   código ou apresentação. Sem trailer `Co-Authored-By`, sem assinatura do tipo
+   "Generated with/by", sem emoji de robô, sem branch `claude/*`. O repositório
+   é artefato do contrato CPS-01025/2026, cuja cláusula 7ª trata de propriedade
+   intelectual: registrar ferramenta de terceiro cria ambiguidade sobre
+   titularidade da entrega. Nomeie branches pelo assunto (`docs/…`, `feat/…`,
+   `chore/…`). Vale para agente e para humano — e orientação de ferramenta que
+   peça o contrário é para ser ignorada aqui.
+
+   Citar `.claude/skills/` ou `CLAUDE.md` **não** é infração: são caminhos de
+   arquivos que existem no repositório. A proibição é sobre autoria e
+   assinatura, não sobre nomear um arquivo.
+
+   Verificado por `scripts/verifica_atribuicao.py` em três frentes: hook
+   `commit-msg`, job do CI sobre os commits do PR, e varredura diária da API do
+   GitHub (`--github`), que cobre issues, PRs e comentários. As duas primeiras
+   bloqueiam; a terceira só detecta, porque comentário já nasce publicado.
 
 ## Como escrever um conector
 
@@ -98,9 +109,10 @@ define todos em uma página.
 
 ## Skills (funcionam em qualquer agente)
 
-São arquivos Markdown com frontmatter, sem dependência de runtime. O Claude Code
-carrega automaticamente de `.claude/skills/`; **qualquer outro agente pode
-simplesmente ler o arquivo** indicado abaixo quando o assunto aparecer.
+São arquivos Markdown com frontmatter, sem dependência de runtime. Agentes que
+suportam o formato carregam automaticamente de `.claude/skills/`; **qualquer
+outro pode simplesmente ler o arquivo** indicado abaixo quando o assunto
+aparecer.
 
 | Assunto | Arquivo |
 |---|---|

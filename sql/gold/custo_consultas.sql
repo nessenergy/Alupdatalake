@@ -27,7 +27,7 @@ jobs AS (
     IFNULL((SELECT value FROM UNNEST(j.labels) WHERE key = 'consulta'), j.statement_type) AS consulta,
     GREATEST(IFNULL(j.total_bytes_billed, 0), (SELECT minimo_bytes_faturados FROM tarifas)) AS bytes_faturados,
     IFNULL(j.total_bytes_processed, 0) AS bytes_varridos
-  FROM `${projeto}.region-us`.INFORMATION_SCHEMA.JOBS_BY_PROJECT AS j
+  FROM `${projeto}.region-${regiao}`.INFORMATION_SCHEMA.JOBS_BY_PROJECT AS j
   WHERE j.job_type = 'QUERY'
     AND j.state = 'DONE'
     AND j.error_result IS NULL
@@ -55,7 +55,7 @@ armazenamento AS (
     s.table_name AS fonte,
     SUM(s.active_logical_bytes) / POW(1024, 3)
       * (SELECT usd_por_gib_mes_ativo FROM tarifas) / 30 AS custo_armazenamento_dia_usd
-  FROM `${projeto}.region-us`.INFORMATION_SCHEMA.TABLE_STORAGE AS s
+  FROM `${projeto}.region-${regiao}`.INFORMATION_SCHEMA.TABLE_STORAGE AS s
   WHERE s.table_schema = '${bronze}' AND NOT STARTS_WITH(s.table_name, '_')
   GROUP BY fonte
 ),

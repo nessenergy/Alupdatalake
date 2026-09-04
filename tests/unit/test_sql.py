@@ -90,3 +90,23 @@ def test_toda_camada_tem_o_mesmo_conjunto_de_fontes():
     bronze = {c.stem for c in (RAIZ_SQL / "bronze").glob("*.sql") if not c.stem.startswith("_")}
     silver = {c.stem for c in (RAIZ_SQL / "silver").glob("*.sql")}
     assert bronze == silver, f"Bronze e Silver divergem: só em Bronze {bronze - silver}, só em Silver {silver - bronze}"
+
+
+def test_information_schema_usa_a_regiao_configurada():
+    """Região fixa no SQL devolve zero linhas em silêncio, não erro.
+
+    O `INFORMATION_SCHEMA` do BigQuery é escopado por região. Uma view que
+    consulte `region-us` num projeto em `southamerica-east1` (ADR 009) não
+    falha: devolve vazio. O painel de custo mostraria R$ 0,00 para sempre,
+    parecendo funcionar — que é pior do que quebrar.
+    """
+    for arquivo in arquivos(list(CAMADAS)):
+        bruto = arquivo.read_text(encoding="utf-8")
+        if "INFORMATION_SCHEMA" not in bruto:
+            continue
+        assert "region-${regiao}" in bruto, (
+            f"{arquivo.name} consulta INFORMATION_SCHEMA com região fora da configuração; "
+            "use `region-${regiao}` para acompanhar o ambiente"
+        )
+        # E o valor renderizado precisa ser a região de verdade, não o literal.
+        assert "region-southamerica-east1" in renderizar(arquivo)

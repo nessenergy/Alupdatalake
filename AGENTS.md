@@ -138,21 +138,29 @@ dizem como *este contrato* usa o produto.
 | 006 | Painel de saúde `/lake`: monitoramento não é BI |
 | 007 | Painel de custo `/custo`: observabilidade de custo é sustentação, não faturada (PR #56) |
 | 008 | Acesso a bancos relacionais: drivers puro-Python, DSN única no Secret Manager |
+| 009 | Região do ambiente: `southamerica-east1`, irreversível depois do primeiro apply |
 
 Se você for propor algo que contraria um ADR, escreva um ADR novo — não um
 remendo. Em particular: o framework em `src/core/` é mais estrutura do que 13
 scripts soltos **de propósito** (ADR 003, 13 fontes / 19 semanas / handoff).
 
-## Estado atual (2026-08-30)
+## Estado atual (2026-09-04)
 
 > Quadro completo, com pendências e dono de cada uma, em
 > [`docs/status.md`](docs/status.md).
 
-Concluído: framework, CLI, replay do raw, caminho relacional e **quatro
-conectores completos** — BCB/PTAX (diário),
-IBGE/IPCA (mensal, aninhado), ANEEL/SIGA (cadastro paginado, ~25 mil registros)
-e ONS/carga (CSV anual por subsistema) —, Terraform, CI/CD, scaffolding,
-ADRs 003–008, runbook de deploy e de primeiro deploy, e plano de execução.
+Concluído: framework, CLI, replay do raw, sanitização de credencial em log,
+IAM por recurso e **cinco conectores com os 7 componentes** — BCB/PTAX
+(diário), IBGE/IPCA (mensal, aninhado), ANEEL/SIGA (cadastro paginado, ~25 mil
+registros), ONS/carga (CSV anual por subsistema) e Hubspot/negócios (escrito
+antes do token, nunca executado) —, Terraform, CI/CD, scaffolding, ADRs
+003–009, runbooks de deploy e de primeiro deploy, e plano de execução.
+
+**Há entrega adiantada de quatro ondas**, no quinto dia da primeira: o caminho
+de banco relacional é escopo da Onda 3 (ADR 008 — Oracle, MySQL e SQL Server),
+e o motor de planilha S2 Data Intake é da Onda 4. Ambos foram feitos por não
+dependerem de insumo da Alup. Isso não antecipa marco: onda fecha por
+homologação e carga real, não por volume de código.
 
 As dimensões comuns já têm dono: `codigo_usina` vem do ANEEL/SIGA e
 `submercado` vem do ONS.

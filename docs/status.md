@@ -115,9 +115,15 @@ destino, com os oito invariantes e a pauta de perguntas. **Enviado ao Google em
 |---|---|---|
 | 0 — Fundação | 90h · marco 15,52% | Técnico concluído; **falta o que depende da Alup** (A3–A6) para homologar |
 | 1 — Mercado base | 120h · marco 20,69% | **4 de 5 fontes concluídas**; CCEE bloqueada (A2) |
-| 2 — APIs credenciadas | 110h · marco 18,97% | Não iniciada; bloqueada por token (A7) |
-| 3 — Sistemas internos | 155h · marco 26,72% | Caminho de banco pronto (ADR 008); **nenhuma fonte iniciada** — bloqueada por VPN (A7) |
-| 4 — Planilhas e handoff | 105h · marco 18,10% | Não iniciada |
+| 2 — APIs credenciadas | 110h · marco 18,97% | **Hubspot com os 7 componentes**, escrito antes do token; falta rodar contra a API real (A9). Demais fontes bloqueadas por token e por documentação (A7, A8) |
+| 3 — Sistemas internos | 155h · marco 26,72% | Caminho de banco pronto (ADR 008: Oracle, MySQL e SQL Server); **nenhuma fonte iniciada** — bloqueada por VPN e credencial (A7) |
+| 4 — Planilhas e handoff | 105h · marco 18,10% | **Motor S2 Data Intake pronto** (item 4.1), adiantado por não depender de insumo; templates concretos dependem de A4. Governança e handoff não iniciados |
+
+> **Leitura da tabela.** Quatro das cinco ondas já têm entrega, no quinto dia
+> da primeira. O que nenhuma linha acima mede é homologação: onda fecha por
+> aceitação e carga real, não por volume de código. O projeto está
+> simultaneamente adiantado em entrega e parado em homologação — e o segundo
+> é o que define o marco.
 
 ---
 

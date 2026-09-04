@@ -1,4 +1,4 @@
-.PHONY: install lint format test security audit all clean novo-conector deploy-views listar sync-skills
+.PHONY: install lint format test security audit all clean novo-conector deploy-views listar sync-skills campos-projeto
 
 install:
 	uv sync --extra dev
@@ -29,6 +29,11 @@ novo-conector:
 	@test -n "$(fonte)" || (echo "uso: make novo-conector fonte=ons entidade=carga"; exit 1)
 	@test -n "$(entidade)" || (echo "uso: make novo-conector fonte=ons entidade=carga"; exit 1)
 	uv run python -m scripts.novo_conector --fonte $(fonte) --entidade $(entidade)
+
+campos-projeto: ## Cria os campos de acompanhamento semanal no GitHub Projects
+	@test -n "$(owner)" || (echo "uso: make campos-projeto owner=nessenergy numero=1"; exit 1)
+	@test -n "$(numero)" || (echo "uso: make campos-projeto owner=nessenergy numero=1"; exit 1)
+	uv run python -m scripts.campos_projeto --owner $(owner) --numero $(numero)
 
 sync-skills:
 	uv run python -m scripts.sync_skills_google

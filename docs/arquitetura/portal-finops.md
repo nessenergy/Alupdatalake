@@ -57,9 +57,15 @@ no único momento em que dá para acertar isso de graça.** Se o primeiro
 nasce sem atribuição.
 
 Estado atual do repositório: `bigquery`, `storage`, `scheduler` e `secrets` já
-aplicam `projeto`, `ambiente` e (no BigQuery) `camada`. Falta o eixo que
-interessa para FinOps — **por fonte de dado** — e ele tem uma dificuldade real
-descrita em §4.
+aplicam `projeto`, `ambiente` e (no BigQuery) `camada`.
+
+**O eixo por fonte de dado foi implementado em 04/09**, pela saída 3 da §4:
+`src/core/bigquery.rotulos()` monta os rótulos em tempo de execução e o job de
+carga vai para o BigQuery com `projeto`, `fonte`, `entidade`, `camada`, `modo`
+e `ingestao_id`. Valor fora do que o BigQuery aceita é saneado em vez de
+derrubar a carga, e `modo` separa a varredura de um replay da carga original.
+Compute segue no agregado, como recomendado — não se separa por fonte enquanto
+houver um único Cloud Run Job para as 13.
 
 ---
 

@@ -162,3 +162,71 @@ def test_erro_de_dsn_nao_vaza_a_senha() -> None:
 
     assert "SENHA_SECRETA" not in str(exc.value)
     assert "usuario" not in str(exc.value)
+
+
+# ------------------------------------------------------------------ SQL Server
+# Via (c) do adendo ao C4: ler o Balanço Energético do SQL Server da Alup, sem
+# depender do desbloqueio do portal da CCEE.
+
+
+def test_conectar_traduz_dsn_sqlserver_para_o_driver(monkeypatch: pytest.MonkeyPatch) -> None:
+    capturado: dict[str, Any] = {}
+
+    class TdsFalso:
+        @staticmethod
+        def connect(**kwargs: Any) -> str:
+            capturado.update(kwargs)
+            return "conexao"
+
+    monkeypatch.setitem(sys.modules, "pytds", TdsFalso)
+
+    assert banco.conectar("sqlserver://leitor:s%40nha@balanco.alup:1533/BALANCO") == "conexao"
+    assert capturado["server"] == "balanco.alup"
+    assert capturado["port"] == 1533
+    assert capturado["user"] == "leitor"
+    assert capturado["password"] == "s@nha"  # noqa: S105 — valor de teste, não credencial
+    assert capturado["database"] == "BALANCO"
+    assert capturado["login_timeout"] > 0
+
+
+def test_sqlserver_usa_porta_padrao_1433(monkeypatch: pytest.MonkeyPatch) -> None:
+    capturado: dict[str, Any] = {}
+
+    class TdsFalso:
+        @staticmethod
+        def connect(**kwargs: Any) -> str:
+            capturado.update(kwargs)
+            return "conexao"
+
+    monkeypatch.setitem(sys.modules, "pytds", TdsFalso)
+    banco.conectar("sqlserver://app:senha@balanco.alup/BALANCO")
+
+    assert capturado["port"] == 1433
+
+
+def test_sqlserver_devolve_tupla_e_nao_dicionario(monkeypatch: pytest.MonkeyPatch) -> None:
+    """`consultar()` monta o dicionário a partir de `cursor.description`.
+
+    Com `as_dict=True` o driver devolveria dicionários e o `zip` de `consultar`
+    quebraria — por isso o modo é fixado aqui, não deixado no padrão do driver.
+    """
+    capturado: dict[str, Any] = {}
+
+    class TdsFalso:
+        @staticmethod
+        def connect(**kwargs: Any) -> str:
+            capturado.update(kwargs)
+            return "conexao"
+
+    monkeypatch.setitem(sys.modules, "pytds", TdsFalso)
+    banco.conectar("sqlserver://app:senha@balanco.alup/BALANCO")
+
+    assert capturado["as_dict"] is False
+
+
+def test_mensagem_de_driver_desconhecido_lista_os_tres_suportados() -> None:
+    with pytest.raises(ValueError) as exc:
+        banco.conectar("postgres://u:s@h/b")
+
+    for esquema in ("oracle", "mysql", "sqlserver"):
+        assert esquema in str(exc.value)

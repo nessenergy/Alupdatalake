@@ -1,7 +1,8 @@
 # Estado do projeto
 
-Atualizado em **2026-09-04** · `main` em `2a568e1` · baralho de revisão
-arquitetural mesclado; campos de acompanhamento semanal versionados
+Atualizado em **2026-09-04** · **A3 não chegou no prazo — contagem da cláusula
+3ª iniciada nesta data**; região decidida (ADR 009); baralho de revisão
+arquitetural enviado ao Google
 
 Este arquivo responde "onde estamos e o que trava o próximo passo". Detalhe de
 escopo e estimativa fica em [`plano-execucao.md`](plano-execucao.md); o que sai
@@ -17,14 +18,15 @@ contexto para agentes, em [`../AGENTS.md`](../AGENTS.md).
 
 | Item | Onde | Verificação |
 |---|---|---|
-| Runner de ingestão (janela, raw no GCS, validação, colunas técnicas, carga, log) | `src/core/` | 241 testes aprovados, 92% de cobertura (suíte inteira) |
-| Caminho de banco relacional (Oracle/MySQL) para a Onda 3 | `src/core/banco.py` | ADR 008; 16 testes sem rede; **nenhuma conexão real** — depende de VPN (A7) |
+| Runner de ingestão (janela, raw no GCS, validação, colunas técnicas, carga, log) | `src/core/` | 257 testes aprovados, 92% de cobertura (suíte inteira) |
+| Caminho de banco relacional (Oracle/MySQL/**SQL Server**) para a Onda 3 | `src/core/banco.py` | ADR 008 e adendo de 04/09; 20 testes sem rede; **nenhuma conexão real** — depende de VPN (A7). Compose e testes de integração prontos em `tests/integration/` |
 | Replay do raw sem nova chamada à fonte | `alupdata reprocessar-raw`, `src/core/storage.py` | testes locais com JSONL gzip; falta validar contra GCS real |
 | CLI única (`alupdata listar` / `ingerir`) | `src/cli.py` | executada contra as 4 fontes |
 | Scaffolding dos 7 componentes | `make novo-conector` | usado nas fontes novas |
 | Deploy de views idempotente | `make deploy-views` | `--dry-run` conferido |
 | Motor S2 Data Intake (planilha CSV/XLSX sob template) | `src/core/planilha.py`, `src/conectores/planilha.py` | 19 testes; templates concretos dependem de A4 |
 | Painel de saúde do lake (frescor, confiabilidade, volumetria) | `sql/gold/saude_ingestao.sql`, rota `/lake` | ADR 006; ferramenta de sustentação, não escopo faturado |
+| Portal falha fechado sem identidade do IAP | `src/portal/app.py` | 7 testes; deploy sem autenticação ou IAP mal configurado devolve 403 em vez de servir dado |
 | Log estruturado com correlação por execução | `src/core/observabilidade.py` | 8 testes; verificado contra a API do BCB |
 | Alertas (falha, silêncio, inválidos em alta) | `infra/modules/monitoramento` | `terraform validate` limpo; **sem destinatário** — ver runbook |
 | Painel no Cloud Monitoring e orçamento com alerta de custo | `infra/modules/monitoramento` | orçamento precisa do `billing_account` da Alup (A3) |
@@ -32,6 +34,7 @@ contexto para agentes, em [`../AGENTS.md`](../AGENTS.md).
 | CI/CD: lint, testes, Bandit, pip-audit, Gitleaks, Terraform | `.github/workflows/` | workflow de deploy ordenado; 7 jobs verdes no Actions |
 | Imagem da CLI | `Dockerfile` | build local não executado: Docker Desktop sem daemon ativo |
 | Campos de acompanhamento semanal do GitHub Projects | `scripts/campos_projeto.py`, `runbook/acompanhamento-semanal.md` | 12 testes; script idempotente. **Campos ainda não criados no quadro** — ver N6 |
+| **FinOps F0** — rótulo de custo por fonte no job do BigQuery | `src/core/bigquery.py` (`rotulos()`) | 6 testes; precisa existir **antes** do 1º apply, custo gasto não se rateia depois |
 
 ### Conectores (7 componentes cada, exceto onde indicado)
 
@@ -61,15 +64,15 @@ BigQuery de verdade — o projeto GCP ainda não existe.
 
 ### Documentação
 
-ADRs 001–008 · 5 dicionários de dados · plano de execução · runbook de deploy,
+ADRs 001–009 · 6 dicionários de dados com [índice e linhagem](dicionario-dados/README.md) · plano de execução · runbook de deploy,
 de primeiro deploy e de acompanhamento semanal ·
 [`proximos-passos.md`](proximos-passos.md) como fila de execução ·
 `AGENTS.md` como contexto canônico · skills do projeto e shortlist do Google.
 
 Material de reunião: baralho de kickoff e **baralho de revisão arquitetural em
-GCP** (`apresentacoes/revisao-arquitetural-gcp.html`), este último para a sessão
-de validação conceitual do modelo com o Google — origem, tratamento e destino,
-com os oito invariantes e a pauta de perguntas.
+GCP** (`apresentacoes/revisao-arquitetural-gcp.html`) — origem, tratamento e
+destino, com os oito invariantes e a pauta de perguntas. **Enviado ao Google em
+04/09**; a resposta é a pendência G1 do painel §6.
 
 ---
 
@@ -165,7 +168,7 @@ Ordenado por data em que o atraso passa a custar. Prazos derivados do
 
 | # | Insumo | Responsável | Prazo útil | Efeito de passar do prazo |
 |---|---|---|---|---|
-| A3 | Projeto GCP `dev`, APIs, IAM, WIF, Artifact Registry, state | Alup | **04/09** | S2 e S3 escorregam inteiras; Onda 0 não homologa; > 5 dias úteis posterga o cronograma |
+| A3 | Projeto GCP `dev`, APIs, IAM, WIF, Artifact Registry, state | Alup | **04/09 — vencido** | **Não entregue. Atraso registrado em 04/09.** A Alup condicionou A3 à resposta do Google (G1). S2 e S3 escorregam inteiras; Onda 0 não homologa; > 5 dias úteis posterga o cronograma |
 | A9 | Token Hubspot no secret `alupdata-hubspot-api-token` | Alup | 11/09 | conector pronto segue parado; item 2.3 não fecha |
 | A4 | Questionário de Gaps respondido | Alup | 11/09 | sem os 8 domínios, a Gold da Onda 1 fica sem alvo |
 | A5 | Matriz RACI e data owners | Alup | 11/09 | dúvida de regra de negócio sem destinatário |
@@ -173,6 +176,7 @@ Ordenado por data em que o atraso passa a custar. Prazos derivados do
 | — | Destinatários de alerta e `billing_account` | Alup | 11/09 | alertas e orçamento existem mas não notificam ninguém |
 | — | Branch protection na `main` + variáveis do GitHub | ness./Alup | 04/09 | deploy não autentica; `main` aceita push direto |
 | A2 | Decisão sobre a CCEE | Alup | 18/09 | 32h da Onda 1 seguem paradas |
+| G1 | **Resposta do Google à revisão arquitetural** (enviada em 04/09) | Google | **a definir** | **Precede A3 por decisão da Alup**, e portanto precede todo o cronograma técnico. Sem data pactuada, a postergação passa a depender de terceiro sem prazo acordado — ver `plano-semanal.md`, S1 |
 | A7 | Pedidos de token (Onda 2) e VPN/credencial (Onda 3) **abertos** | Alup | 25/09 | maior risco financeiro: ociosidade de 4h/dia (R$ 256/h) |
 | A8 | Documentação técnica de BBCE e TempoOK | Alup | 25/09 | Onda 2 só começa depois do token, em vez de antes |
 

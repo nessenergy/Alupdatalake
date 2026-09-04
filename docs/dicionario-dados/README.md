@@ -1,0 +1,72 @@
+# Dicionário de dados — índice e linhagem
+
+O **componente 07** do contrato: cada fonte entrega, junto do conector e das
+views, a documentação de campos e a linhagem origem → Bronze → Silver → Gold.
+Este índice diz o que já existe, o que falta e — importante — **por que falta**.
+
+## O que existe
+
+| Fonte | Documento | Onda | Dimensão comum que alimenta | Gold que sustenta |
+|---|---|---|---|---|
+| ONS — carga | [`ons_carga.md`](ons_carga.md) | 1 | **`submercado`** | `carga_mensal_submercado` |
+| ANEEL — SIGA | [`aneel_siga.md`](aneel_siga.md) | 1 | **`codigo_usina`** | `parque_gerador` |
+| BCB — PTAX | [`bcb_cambio_ptax.md`](bcb_cambio_ptax.md) | 0 | — | `cambio_mensal` |
+| IBGE — IPCA | [`ibge_ipca.md`](ibge_ipca.md) | 1 | — | `inflacao_mensal` |
+| Hubspot — negócios | [`hubspot_negocios.md`](hubspot_negocios.md) | 2 | — | `funil_comercial` |
+| Log de execução | [`_execucoes.md`](_execucoes.md) | 0 | — | `saude_ingestao`, `volumetria_lake` |
+
+## A linhagem, em uma figura
+
+O caminho é o mesmo para todas as fontes — é essa uniformidade que faz o
+componente 07 ser barato de manter:
+
+```
+origem                       o que muda por fonte
+  │
+  ├─ extrair()               HTTP, arquivo, driver de banco ou planilha
+  ├─ raw no GCS              gs://<projeto>-raw/{fonte}/{entidade}/dt=…/{id}.json.gz
+  ├─ transformar()           renomeia campo, normaliza número, achata aninhado
+  ├─ schema Pydantic         registro inválido é descartado e contado
+  │
+  ▼                          daqui em diante, idêntico para as 13
+bronze.<fonte>_<entidade>    tabela append-only, particionada e clusterizada
+  ▼
+silver.<fonte>_<entidade>    view: tipagem, dedup por QUALIFY, 5 dimensões comuns
+  ▼
+gold.<pergunta_de_negocio>   view: uma pergunta nomeada por view
+```
+
+## O que falta, e por quê
+
+As sete fontes abaixo **não têm dicionário, e não deveriam ter ainda**. A regra
+do projeto é explícita: *schema por adivinhação continua proibido*. Documentar
+campo que ninguém viu produz retrabalho com aparência de progresso — e o
+dicionário é justamente o artefato que não pode mentir.
+
+| Fonte | Onda | O que falta para escrever |
+|---|---|---|
+| CCEE — InfoMercado | 1 | Portal responde 403 a acesso automatizado, inclusive na documentação (A2 / [#52](https://github.com/nessenergy/Alupdatalake/issues/52)) |
+| CCEE — agente credenciado | 2 | Credencial de agente; contrato de dados desconhecido |
+| BBCE | 2 | Documentação técnica (A8) — nenhum endpoint público encontrado |
+| TempoOK | 2 | Documentação técnica (A8) — sem contrato de API descoberto |
+| Oracle FMB | 3 | VPN e schema documentado (A7 / [#12](https://github.com/nessenergy/Alupdatalake/issues/12)) |
+| Portal Alup | 3 | Credenciais read-only; quais bases exatamente (A7 / [#13](https://github.com/nessenergy/Alupdatalake/issues/13)) |
+| MySQL RDS — comercialização | 3 | Conectividade e usuário read-only (A7 / [#14](https://github.com/nessenergy/Alupdatalake/issues/14)) |
+| RM / TOTVS | 3 | Definição de integração: API, view ou exportação (A7 / [#15](https://github.com/nessenergy/Alupdatalake/issues/15)) |
+
+O **Hubspot** é a exceção que mostra a regra: a documentação era pública, então
+o dicionário foi escrito antes do token — e o que não se pôde verificar sem
+credencial está listado no fim do próprio documento, em vez de omitido.
+
+O **motor de planilha** (S2 Data Intake) também não aparece na primeira tabela,
+e por outro motivo: ele é uma *base* de conector, não uma fonte. Ganha
+dicionário quando os templates concretos forem declarados, o que depende das
+respostas do Questionário de Gaps (A4).
+
+## Convenção
+
+- Um arquivo por fonte, nomeado como o rótulo do conector (`fonte_entidade.md`).
+- Sempre com: cabeçalho de identificação, particularidades que explicam decisões
+  do conector, tabela de campos com a transformação aplicada, e a linhagem.
+- **Sem dado real de cliente** — nem em exemplo. Vale a mesma regra do resto do
+  repositório.

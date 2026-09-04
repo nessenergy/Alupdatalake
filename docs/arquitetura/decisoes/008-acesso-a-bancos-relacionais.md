@@ -93,3 +93,29 @@ medição de volume real do FMB.
   aparência de progresso).
 - RM/TOTVS pode não ser banco e sim API ou exportação — pergunta C7 do
   Questionário de Gaps. Se for HTTP, usa `http.py` e não este caminho.
+
+---
+
+## Adendo de 2026-09-04 — SQL Server
+
+O adendo ao C4 do Questionário de Gaps registrou que a Alup já mantém um **SQL
+Server com o realizado do Balanço Energético da CCEE**, alimentado por processo
+mensal manual. Isso abriu a via (c) para o dado da CCEE: ler de lá não depende
+do desbloqueio do portal, e a tabela pode dar origem à dimensão `agente_ccee`,
+hoje a única das cinco dimensões comuns sem fonte definida.
+
+O adendo também dizia que o framework não falava SQL Server e que o trabalho
+precisava ser **dimensionado antes de a opção ser escolhida, não depois**. Foi o
+que se fez: `sqlserver://` passa a ser um esquema aceito por `conectar()`, com
+porta padrão 1433 e o mesmo contrato dos outros dois — a decisão (c) deixa de
+ter custo técnico desconhecido.
+
+O driver é **`python-tds`**, puro-Python como os demais. A alternativa usual,
+`pyodbc`, exigiria driver ODBC de sistema na imagem, o que contraria a razão de
+`bancos` ser um extra leve. Fica fixado `as_dict=False`: `consultar()` monta o
+dicionário a partir de `cursor.description`, e o modo dicionário do driver
+quebraria esse contrato.
+
+**O que isto não decide.** Habilitar o driver não escolhe a via (c) — a escolha
+segue sendo da Alup, na resposta ao C4. O que muda é que a opção agora custa
+apontar uma DSN, e não estimar um trabalho desconhecido no meio da onda.

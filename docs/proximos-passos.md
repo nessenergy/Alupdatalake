@@ -40,9 +40,8 @@ A cadeia hoje é **em série**, e a ponta dela é a única sem prazo:
 | # | Ação | Como | Pronto quando |
 |---|---|---|---|
 | 2.1 | **Cobrar a data do Google** | [issue #77](https://github.com/nessenergy/Alupdatalake/issues/77) tem o texto pronto para a conversa | Data registrada na issue |
-| 2.2 | **Criar os 5 campos no GitHub Projects** | PAT clássico com escopo `project`, depois `make campos-projeto owner=nessenergy numero=<n>` — ver [runbook](runbook/acompanhamento-semanal.md) | Horas, Semana, Validado, Correções e Atraso preenchíveis no quadro |
-| 2.3 | **Enviar o relatório de 04/09 à Alup** | `.md` e `.html` prontos em [`relatorios/`](relatorios/) | Registro na mão da contratante |
-| 2.4 | **Decidir a região com a Alup** | resposta à pergunta E7 do questionário | Confirmação de `southamerica-east1`, ou inversão enquanto ainda dá tempo |
+| 2.2 | **Enviar o relatório de 04/09 à Alup** | `.md` e `.html` prontos em [`relatorios/`](relatorios/) | Registro na mão da contratante |
+| 2.3 | **Decidir a região com a Alup** | resposta à pergunta E7 do questionário | Confirmação de `southamerica-east1`, ou inversão enquanto ainda dá tempo |
 
 ### Por que 2.1 tem pressa
 

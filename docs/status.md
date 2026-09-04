@@ -33,7 +33,7 @@ contexto para agentes, em [`../AGENTS.md`](../AGENTS.md).
 | Terraform: datasets, bucket raw, secrets, Cloud Run Job + Scheduler, IAM | `infra/` | IAM restringido por recurso; Terraform 1.15.8 `fmt` e `validate` limpos |
 | CI/CD: lint, testes, Bandit, pip-audit, Gitleaks, Terraform | `.github/workflows/` | workflow de deploy ordenado; 7 jobs verdes no Actions |
 | Imagem da CLI | `Dockerfile` | build local não executado: Docker Desktop sem daemon ativo |
-| Campos de acompanhamento semanal do GitHub Projects | `scripts/campos_projeto.py`, `runbook/acompanhamento-semanal.md` | 12 testes; script idempotente. **Campos ainda não criados no quadro** — ver N6 |
+| Campos de acompanhamento semanal do GitHub Projects | `scripts/campos_projeto.py`, `runbook/acompanhamento-semanal.md` | 12 testes; script idempotente. **Os cinco campos criados no quadro em 04/09** — Horas, Semana, Validado, Correções e Atraso |
 | **FinOps F0** — rótulo de custo por fonte no job do BigQuery | `src/core/bigquery.py` (`rotulos()`) | 6 testes; precisa existir **antes** do 1º apply, custo gasto não se rateia depois |
 
 ### Conectores (7 componentes cada, exceto onde indicado)
@@ -85,7 +85,6 @@ destino, com os oito invariantes e a pauta de perguntas. **Enviado ao Google em
 | N3 | Primeiro `terraform apply` real e primeiro deploy da imagem | ambiente GCP (A3) |
 | N4 | Validar replay contra objeto real no GCS e conferir linhagem no BigQuery | ambiente GCP (A3) |
 | N5 | Construir e executar a imagem no ambiente de desenvolvimento | Docker Desktop não disponibilizou o daemon nesta estação |
-| N6 | Criar os 5 campos de acompanhamento no GitHub Projects (Horas, Semana, Validado, Correções, Atraso) | PAT clássico com escopo `project`; o script está pronto e é idempotente — `make campos-projeto` |
 
 ---
 

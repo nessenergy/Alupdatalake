@@ -1,7 +1,7 @@
 # Estado do projeto
 
-Atualizado em **2026-08-30** · `main` em `249ec2b` · lote de replay,
-sanitização, IAM e CI commitado
+Atualizado em **2026-09-04** · `main` em `2a568e1` · baralho de revisão
+arquitetural mesclado; campos de acompanhamento semanal versionados
 
 Este arquivo responde "onde estamos e o que trava o próximo passo". Detalhe de
 escopo e estimativa fica em [`plano-execucao.md`](plano-execucao.md); o que sai
@@ -17,7 +17,7 @@ contexto para agentes, em [`../AGENTS.md`](../AGENTS.md).
 
 | Item | Onde | Verificação |
 |---|---|---|
-| Runner de ingestão (janela, raw no GCS, validação, colunas técnicas, carga, log) | `src/core/` | 226 testes aprovados, 92% de cobertura (suíte inteira) |
+| Runner de ingestão (janela, raw no GCS, validação, colunas técnicas, carga, log) | `src/core/` | 241 testes aprovados, 92% de cobertura (suíte inteira) |
 | Caminho de banco relacional (Oracle/MySQL) para a Onda 3 | `src/core/banco.py` | ADR 008; 16 testes sem rede; **nenhuma conexão real** — depende de VPN (A7) |
 | Replay do raw sem nova chamada à fonte | `alupdata reprocessar-raw`, `src/core/storage.py` | testes locais com JSONL gzip; falta validar contra GCS real |
 | CLI única (`alupdata listar` / `ingerir`) | `src/cli.py` | executada contra as 4 fontes |
@@ -31,6 +31,7 @@ contexto para agentes, em [`../AGENTS.md`](../AGENTS.md).
 | Terraform: datasets, bucket raw, secrets, Cloud Run Job + Scheduler, IAM | `infra/` | IAM restringido por recurso; Terraform 1.15.8 `fmt` e `validate` limpos |
 | CI/CD: lint, testes, Bandit, pip-audit, Gitleaks, Terraform | `.github/workflows/` | workflow de deploy ordenado; 7 jobs verdes no Actions |
 | Imagem da CLI | `Dockerfile` | build local não executado: Docker Desktop sem daemon ativo |
+| Campos de acompanhamento semanal do GitHub Projects | `scripts/campos_projeto.py`, `runbook/acompanhamento-semanal.md` | 12 testes; script idempotente. **Campos ainda não criados no quadro** — ver N6 |
 
 ### Conectores (7 componentes cada, exceto onde indicado)
 
@@ -60,8 +61,15 @@ BigQuery de verdade — o projeto GCP ainda não existe.
 
 ### Documentação
 
-ADRs 001–008 · 5 dicionários de dados · plano de execução · runbook de deploy ·
+ADRs 001–008 · 5 dicionários de dados · plano de execução · runbook de deploy,
+de primeiro deploy e de acompanhamento semanal ·
+[`proximos-passos.md`](proximos-passos.md) como fila de execução ·
 `AGENTS.md` como contexto canônico · skills do projeto e shortlist do Google.
+
+Material de reunião: baralho de kickoff e **baralho de revisão arquitetural em
+GCP** (`apresentacoes/revisao-arquitetural-gcp.html`), este último para a sessão
+de validação conceitual do modelo com o Google — origem, tratamento e destino,
+com os oito invariantes e a pauta de perguntas.
 
 ---
 
@@ -74,6 +82,7 @@ ADRs 001–008 · 5 dicionários de dados · plano de execução · runbook de d
 | N3 | Primeiro `terraform apply` real e primeiro deploy da imagem | ambiente GCP (A3) |
 | N4 | Validar replay contra objeto real no GCS e conferir linhagem no BigQuery | ambiente GCP (A3) |
 | N5 | Construir e executar a imagem no ambiente de desenvolvimento | Docker Desktop não disponibilizou o daemon nesta estação |
+| N6 | Criar os 5 campos de acompanhamento no GitHub Projects (Horas, Semana, Validado, Correções, Atraso) | PAT clássico com escopo `project`; o script está pronto e é idempotente — `make campos-projeto` |
 
 ---
 

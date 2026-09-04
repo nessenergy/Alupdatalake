@@ -1,7 +1,7 @@
 # Próximos passos — fila de execução
 
 Documento **vivo**: é para riscar linha, não para arquivar. Atualizado em
-**2026-09-04**, `main` em `2a568e1`.
+**2026-09-04**.
 
 Ele existe para responder uma pergunta que os outros três não respondem em uma
 tela: **qual é a próxima ação, de quem é, e qual comando a executa.**
@@ -34,11 +34,10 @@ Hoje é **04/09**, prazo de dois insumos. Ambos vencem *hoje*, não amanhã.
 | # | Ação | Como | Pronto quando |
 |---|---|---|---|
 | 2.1 | **Criar os 5 campos no GitHub Projects** | PAT clássico com escopo `project`, depois `make campos-projeto owner=nessenergy numero=<n>` — ver [runbook](runbook/acompanhamento-semanal.md) | Horas, Semana, Validado, Correções e Atraso visíveis e preenchíveis no quadro |
-| 2.2 | **Revisar e mesclar o PR #75** (está em rascunho) | CI verde em `40dc73a` | Script e runbook na `main` |
-| 2.3 | **Passar o baralho do Google uma vez**, em tela cheia (`F`) | `docs/apresentacoes/revisao-arquitetural-gcp.html` | Você sabe onde está cada uma das 8 perguntas da pauta |
-| 2.4 | **Marcar a sessão com o Google** | — | Data na agenda, antes do primeiro `terraform apply` |
+| 2.2 | **Passar o baralho do Google uma vez**, em tela cheia (`F`) | `docs/apresentacoes/revisao-arquitetural-gcp.html` | Você sabe onde está cada uma das 8 perguntas da pauta |
+| 2.3 | **Marcar a sessão com o Google** | — | Data na agenda, antes do primeiro `terraform apply` |
 
-### Por que 2.4 tem pressa
+### Por que 2.3 tem pressa
 
 O argumento do baralho é que o modelo está completo em código **e ainda não foi
 instanciado** — recomendação que chega agora se aplica como reprojeto, não como
@@ -63,10 +62,9 @@ melhor parte do argumento.
 
 | # | Ação | Depende de |
 |---|---|---|
-| 4.1 | Atualizar o `status.md`: a suíte está em **241 testes** (o documento ainda diz 226, de 30/08), e a apresentação e os campos de acompanhamento não constam | nada — é só dizer |
-| 4.2 | Renomear o branch e reabrir o PR | decisão 3.2 |
-| 4.3 | Versão em inglês do baralho | decisão 3.3 |
-| 4.4 | Emitir o relatório de situação da semana em `docs/relatorios/` | fechamento da S2 (11/09) |
+| 4.1 | Renomear o branch e reabrir o PR | decisão 3.2 |
+| 4.2 | Versão em inglês do baralho | decisão 3.3 |
+| 4.3 | Emitir o relatório de situação da semana em `docs/relatorios/` | fechamento da S2 (11/09) |
 
 ---
 

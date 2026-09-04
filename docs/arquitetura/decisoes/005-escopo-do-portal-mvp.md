@@ -75,3 +75,30 @@ caminho, não para substituí-la.
 - Qualquer item da tabela "não é" que a Alup pedir entra como mudança de escopo,
   com estimativa própria. Registrar o pedido por escrito no dia em que ele
   chega, não quando o cronograma aperta.
+
+---
+
+## Adendo de 2026-09-04 — endurecimento, sem mudar o escopo
+
+O Portal continua sendo exatamente o que esta ADR define. O que mudou é como
+ele se comporta quando algo dá errado, e o que ele declara ao navegador.
+
+**Cabeçalhos de segurança em toda resposta**, inclusive nas de erro e na recusa
+por falta de identidade. A política de conteúdo é estrita porque pode ser:
+o Portal **não tem uma linha de JavaScript** — as três visões são HTML e SVG
+embutido. Isso permite `default-src 'none'` sem `script-src`, que não descreve
+o estado atual, e sim impede que ele mude sem alguém perceber.
+
+`style-src` precisa de `'unsafe-inline'`, porque a folha de estilo vai embutida
+na página. Separá-la em arquivo estático renderia política mais estrita, mas
+exigiria rota nova para servir estático — complexidade que a tela única não
+paga.
+
+**Falha fechada, com o motivo no log e não na tela.** Antes, uma exceção do
+BigQuery subia até o handler padrão do Flask. Mensagem de erro do BigQuery
+costuma trazer projeto, dataset e às vezes o SQL; agora ela passa pelo mesmo
+sanitizador que o restante do projeto aplica nas fronteiras de log (cláusula
+8.5), e o usuário vê uma página neutra.
+
+Nada disso adiciona funcionalidade: não há tela nova, rota nova nem dado novo.
+As exclusões de escopo da tabela acima seguem valendo integralmente.

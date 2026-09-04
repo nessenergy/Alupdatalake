@@ -27,6 +27,7 @@ from typing import TYPE_CHECKING, Any
 from flask import Flask, Response, request
 from src.core.config import get_settings
 from src.core.observabilidade import configurar_logging
+from src.core.seguranca import sanitizar
 from src.portal.dados import Painel, SaudeConector, SerieVolumetria, obter_provedor
 from src.portal.grafico import _milhar, area, barras_custo, cor_do_conector, legenda_custo, tabela, usd
 
@@ -65,6 +66,59 @@ def exigir_identidade() -> Response | None:
             mimetype="text/html",
         )
     return None
+
+
+# O Portal não tem uma linha de JavaScript — as três visões são HTML e SVG
+# embutido (ADR 005 e 006). Isso permite `script-src 'none'`, que é uma
+# afirmação forte: não é "não usamos script", é "script não executa aqui".
+#
+# `style-src` precisa de 'unsafe-inline' porque a folha de estilo vai embutida
+# na página; separá-la em arquivo estático renderia uma política mais estrita,
+# mas o Portal é uma tela só e servir estático exigiria rota nova.
+CSP = (
+    "default-src 'none'; "
+    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
+    "font-src https://fonts.gstatic.com; "
+    "img-src 'none'; "
+    "form-action 'none'; "
+    "frame-ancestors 'none'; "
+    "base-uri 'none'"
+)
+
+CABECALHOS_SEGURANCA = {
+    "Content-Security-Policy": CSP,
+    "X-Content-Type-Options": "nosniff",
+    "Referrer-Policy": "no-referrer",
+    # O Portal expõe dado operacional da contratante: não deve ser emoldurado
+    # por terceiro nem indexado.
+    "X-Frame-Options": "DENY",
+    "X-Robots-Tag": "noindex, nofollow",
+    "Cache-Control": "no-store",
+}
+
+
+@app.after_request
+def _aplicar_cabecalhos(resposta: Response) -> Response:
+    """Endurece toda resposta, inclusive as de erro."""
+    for nome, valor in CABECALHOS_SEGURANCA.items():
+        resposta.headers.setdefault(nome, valor)
+    return resposta
+
+
+@app.errorhandler(Exception)
+def _falha(exc: Exception) -> tuple[str, int]:
+    """Falha fechada: registra o motivo, não o mostra.
+
+    Sem isto, uma exceção do BigQuery sobe até o handler padrão do Flask e o
+    texto do erro — que costuma trazer projeto, dataset e às vezes o SQL —
+    chega ao navegador ou ao log sem passar pelo sanitizador que o resto do
+    projeto aplica (cláusula 8.5).
+    """
+    logger.error("falha ao responder %s: %s", request.path, sanitizar(f"{type(exc).__name__}: {exc}"))
+    return (
+        "<h1>500</h1><p>Não foi possível carregar os dados agora. A falha foi registrada.</p>",
+        500,
+    )
 
 
 @app.get("/")

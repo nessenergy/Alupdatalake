@@ -8,12 +8,18 @@ IAP, e a identidade chega no cabeçalho `X-Goog-Authenticated-User-Email` — a
 plataforma faz isso melhor do que qualquer login que escrevêssemos em 8h, e
 sem guardar senha nenhuma.
 
+Delegar não é confiar cegamente: em modo real o portal **falha fechado** se a
+identidade não chegar. Sem essa trava, um deploy com `--allow-unauthenticated`,
+ou um IAP mal configurado, serviria dado do lake a qualquer visitante — e a
+tela apenas o rotularia como "não autenticado" em vez de recusá-lo.
+
     uv run flask --app src.portal.app run    # local, provedor simulado
 """
 
 from __future__ import annotations
 
 import html
+import logging
 from datetime import datetime
 from decimal import Decimal
 from typing import TYPE_CHECKING, Any
@@ -28,9 +34,37 @@ if TYPE_CHECKING:
     from src.portal.custo import PainelCusto
 
 configurar_logging()
+logger = logging.getLogger("portal")
 app = Flask(__name__)
 
 CABECALHO_IDENTIDADE = "X-Goog-Authenticated-User-Email"
+
+# Rotas que respondem sem identidade: o health check do Cloud Run é chamado
+# pela própria plataforma, antes e fora de qualquer sessão de usuário.
+ROTAS_PUBLICAS = frozenset({"/saude"})
+
+
+@app.before_request
+def exigir_identidade() -> Response | None:
+    """Recusa a requisição quando o modo é real e o IAP não identificou ninguém.
+
+    Em modo simulado a trava não se aplica — é o desenvolvimento na máquina de
+    quem escreve, sem dado real na frente. Em modo `bigquery` a ausência do
+    cabeçalho significa que a requisição não passou pelo IAP, e a resposta certa
+    é 403, não uma página rotulada.
+    """
+    if request.path in ROTAS_PUBLICAS:
+        return None
+    if get_settings().portal_provedor != "bigquery":
+        return None
+    if not request.headers.get(CABECALHO_IDENTIDADE):
+        logger.warning("requisição sem identidade recusada em %s", request.path)
+        return Response(
+            "<h1>403</h1><p>Acesso restrito. Esta aplicação exige autenticação pela plataforma.</p>",
+            status=403,
+            mimetype="text/html",
+        )
+    return None
 
 
 @app.get("/")

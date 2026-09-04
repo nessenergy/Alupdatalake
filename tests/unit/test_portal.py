@@ -10,6 +10,7 @@ from decimal import Decimal
 
 import pytest
 from src.core.config import get_settings
+from src.portal import app as portal_app
 from src.portal.app import CABECALHO_IDENTIDADE, app
 from src.portal.dados import Painel, ProvedorSimulado, obter_provedor
 
@@ -281,3 +282,49 @@ def test_cada_barra_do_custo_tem_rotulo_para_leitor_de_tela() -> None:
     svg = barras_custo(ProvedorSimulado().custo().dias)
     assert svg.count("<title>") == 30
     assert "US$" in svg
+
+
+# ------------------------------------------------- falha fechado sem identidade
+# A ADR 005 diz que a autenticação é da plataforma. Delegar não é confiar
+# cegamente: se o IAP não identificar ninguém, o portal recusa em vez de servir.
+
+
+def _cliente_em_modo_real(monkeypatch: pytest.MonkeyPatch):
+    monkeypatch.setenv("PORTAL_PROVEDOR", "bigquery")
+    get_settings.cache_clear()
+    return app.test_client()
+
+
+def test_modo_real_sem_identidade_responde_403(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Deploy com --allow-unauthenticated ou IAP mal configurado não serve dado."""
+    resposta = _cliente_em_modo_real(monkeypatch).get("/")
+    assert resposta.status_code == 403
+    assert b"Acesso restrito" in resposta.data
+
+
+@pytest.mark.parametrize("rota", ["/", "/lake", "/custo"])
+def test_a_trava_vale_para_toda_tela_com_dado(monkeypatch: pytest.MonkeyPatch, rota: str) -> None:
+    assert _cliente_em_modo_real(monkeypatch).get(rota).status_code == 403
+
+
+def test_health_check_responde_sem_identidade(monkeypatch: pytest.MonkeyPatch) -> None:
+    """O Cloud Run chama /saude fora de qualquer sessão de usuário."""
+    assert _cliente_em_modo_real(monkeypatch).get("/saude").status_code == 200
+
+
+def test_modo_real_com_identidade_do_iap_passa(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Testa o portão isolado: com identidade ele não interrompe a requisição.
+
+    Exercitar a rota inteira exigiria BigQuery real — o que este teste não quer
+    nem precisa. O que importa aqui é a decisão do `before_request`.
+    """
+    monkeypatch.setenv("PORTAL_PROVEDOR", "bigquery")
+    get_settings.cache_clear()
+    cabecalho = {"X-Goog-Authenticated-User-Email": "accounts.google.com:pessoa@alupar.com"}
+    with app.test_request_context("/", headers=cabecalho):
+        assert portal_app.exigir_identidade() is None, "identidade presente não pode ser recusada"
+
+
+def test_modo_simulado_nao_e_travado(cliente) -> None:
+    """Desenvolvimento local não tem IAP na frente e não serve dado real."""
+    assert cliente.get("/").status_code == 200

@@ -15,7 +15,7 @@ Situação corrente e viva fica em [`../status.md`](../status.md); este diretór
 | 30/08/2026 | [Preparação local sem GCP](2026-08-30-preparacao-local-sem-gcp.md) | Prontidão técnica | GCP, Docker, Terraform e integrações reais ainda pendentes |
 | 31/08/2026 | [Início da Onda 0](2026-08-31-inicio-onda-0.md) · [versão HTML](2026-08-31-inicio-onda-0.html) | Onda 0 · 15,52% · 11/09 | 7 · com [#67](https://github.com/nessenergy/Alupdatalake/issues/67) (região) e [#68](https://github.com/nessenergy/Alupdatalake/issues/68) (revisão na main) abertas hoje |
 | 04/09/2026 | [Situação do ambiente GCP e do cronograma da Onda 0](2026-09-04-a3-nao-entregue.md) | Onda 0 · 15,52% · **postergada** | 1 · **G1** ([#77](https://github.com/nessenergy/Alupdatalake/issues/77)), resposta do Google, sem prazo acordado — precede A3 por decisão da Alup |
-| 08/09/2026 | [A semana do primeiro deploy sem o ambiente, e uma correção no nosso quadro](2026-09-08-s2-sem-ambiente.md) · [versão HTML](2026-09-08-s2-sem-ambiente.html) | Onda 0 · 15,52% · S2 escorrega inteira | 6 · A3, G1, A4, A9, A5/A6 e A2 · 1º dia útil de atraso de A3 |
+| 08/09/2026 | [Situação dos insumos pendentes e do cronograma da Onda 0](2026-09-08-s2-sem-ambiente.md) · [versão HTML](2026-09-08-s2-sem-ambiente.html) | Onda 0 · 15,52% · S2 integralmente postergada | 6 · A3, G1, A4, A9, A5/A6 e A2 · 1º dia útil de atraso de A3 |
 
 ## Convenções
 

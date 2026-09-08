@@ -287,50 +287,115 @@ code, td, th { overflow-wrap: anywhere; }
   /* Link impresso vira texto: sublinhado só polui o papel. */
   a { text-decoration: none; color: var(--tinta); }
 }
-</style></head><body class='relatorio'><p class="marca">ness<span>.</span></p><h1>A semana do primeiro deploy sem o ambiente, e uma correção no nosso quadro</h1><section class='identificacao'><div class='id-rotulo'>Documento</div><div class='id-valor'>Relatório de situação</div><div class='id-rotulo'>Referência</div><div class='id-valor'>REL-2026-09-08 · AlupData Fase 1</div><div class='id-rotulo'>Data de emissão</div><div class='id-valor'>08 de setembro de 2026</div><div class='id-rotulo'>Emitente</div><div class='id-valor'>ness. Processos e Tecnologia Ltda.</div><div class='id-rotulo'>Destinatário</div><div class='id-valor'>Alup</div><div class='id-rotulo'>Contrato</div><div class='id-valor'>CPS-01025/2026 — AlupData Fase 1: DataLake</div><div class='id-rotulo'>Marco em jogo</div><div class='id-valor'>Onda 0 · 15,52% · R$ 23.040,00</div><div class='id-rotulo'>Responsável técnico</div><div class='id-valor'>Ricardo Esper</div><div class='id-rotulo'>Classificação</div><div class='id-valor'>Confidencial — uso restrito das partes</div></section>
-<p>Prezados,</p>
-<p>Este relatório cobre o primeiro dia útil da semana <strong>S2 (07/09 – 11/09)</strong>, que o
-plano reservava para o primeiro deploy real, e registra três coisas: o estado do
-insumo <strong>A3</strong>, os prazos que vencem em 11/09 e uma <strong>correção que fizemos no
-nosso próprio quadro de acompanhamento</strong>, que vinha superestimando o avanço do
-projeto.</p>
-<p>O terceiro ponto é o que mais nos importa comunicar hoje. A informação errada
-estava a nosso favor, foi encontrada por nós e está corrigida — mas ela chegou a
-ficar visível, e vocês precisam saber disso antes que qualquer número seja levado
-à diretoria.</p>
-<hr />
-<h2>1. O insumo A3 segue pendente</h2>
+</style></head><body class='relatorio'><p class="marca">ness<span>.</span></p><h1>Situação dos insumos pendentes e do cronograma da Onda 0</h1><section class='identificacao'><div class='id-rotulo'>Documento</div><div class='id-valor'>Relatório de situação</div><div class='id-rotulo'>Referência</div><div class='id-valor'>REL-2026-09-08 · AlupData Fase 1</div><div class='id-rotulo'>Data de emissão</div><div class='id-valor'>08 de setembro de 2026</div><div class='id-rotulo'>Emitente</div><div class='id-valor'>ness. Processos e Tecnologia Ltda.</div><div class='id-rotulo'>Destinatário</div><div class='id-valor'>Alup</div><div class='id-rotulo'>Contrato</div><div class='id-valor'>CPS-01025/2026 — AlupData Fase 1: DataLake</div><div class='id-rotulo'>Marco em jogo</div><div class='id-valor'>Onda 0 · 15,52% · R$ 23.040,00</div><div class='id-rotulo'>Responsável técnico</div><div class='id-valor'>Ricardo Esper</div><div class='id-rotulo'>Classificação</div><div class='id-valor'>Confidencial — uso restrito das partes</div></section>
+<h2>1. Objeto</h2>
+<p>Registro da situação em 08/09/2026, primeiro dia útil da semana S2
+(07/09 – 11/09), abrangendo: o estado do insumo A3, a contagem de prazos da
+cláusula 3ª, os insumos com vencimento em 11/09, o escopo da S2 e a posição
+atual da entrega.</p>
+<h2>2. Insumo A3 — ambiente GCP</h2>
 <p>O ambiente GCP <code>dev</code> tinha prazo útil em <strong>04/09/2026</strong> e não foi
-disponibilizado até hoje. O registro do atraso foi emitido na própria data, em
-<a href="2026-09-04-a3-nao-entregue.md">relatório de 04/09</a>, e a situação não mudou
-desde então.</p>
-<p>Como 05 e 06 recaíram sobre o fim de semana e 07 foi feriado nacional, <strong>hoje é
-o primeiro dia útil de atraso</strong>. Não houve, portanto, perda de tempo útil entre
-um relatório e outro, razão pela qual o assunto pode ser tratado agora sem
-caráter de urgência.</p>
-<p>A pendência <strong>G1</strong>, resposta do Google à revisão arquitetural que enviamos em
-04/09, permanece <strong>sem prazo acordado</strong>
-(<a href="https://github.com/nessenergy/Alupdatalake/issues/77">issue #77</a>). Como a Alup
-optou por condicionar A3 a G1, a cadeia continua em série:</p>
+disponibilizado. O atraso foi registrado na própria data, em
+<a href="2026-09-04-a3-nao-entregue.md">relatório de 04/09</a>, e a situação permanece
+inalterada.</p>
+<p>Como 05 e 06 recaíram sobre o fim de semana e 07 foi feriado nacional, <strong>08/09 é
+o primeiro dia útil de atraso</strong>.</p>
+<p>A pendência <strong>G1</strong> — resposta do Google à revisão arquitetural enviada em
+04/09 — permanece <strong>sem prazo acordado</strong>
+(<a href="https://github.com/nessenergy/Alupdatalake/issues/77">issue #77</a>). Com a
+decisão da Alup de condicionar A3 a G1, a dependência é sequencial:</p>
 <pre><code>G1 (Google responde) → A3 (ambiente GCP) → 1º apply → Onda 0 homologada
 </code></pre>
-<p>Seguimos considerando a escolha defensável: é preferível receber a análise
-antes de instanciar o ambiente do que depois dele constituído. O que
-solicitamos é que G1 receba uma data definida, qualquer que seja. Uma previsão
-distante permite planejamento; a ausência de previsão, não.</p>
-<h2>2. O que a S2 previa, e o que acontece sem o ambiente</h2>
-<p>O plano semanal condiciona integralmente esta semana à disponibilização de A3.
-Todo o conteúdo previsto depende do ambiente:</p>
+<p><strong>Solicitação:</strong> definição de uma data para G1. Sem ela, o cronograma não
+admite previsão.</p>
+<h2>3. Contagem de prazos — cláusula 3ª</h2>
 <table>
 <thead>
 <tr>
-<th>Item previsto para a S2</th>
+<th>Marco</th>
+<th>Data</th>
+<th>Efeito</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1º dia útil de atraso de A3</td>
+<td><strong>08/09/2026</strong></td>
+<td>contagem em curso</td>
+</tr>
+<tr>
+<td>5º dia útil</td>
+<td><strong>14/09/2026</strong></td>
+<td>postergação dos prazos dependentes de A3</td>
+</tr>
+<tr>
+<td>20 dias corridos</td>
+<td><strong>24/09/2026</strong></td>
+<td>hipótese de suspensão dos serviços</td>
+</tr>
+</tbody>
+</table>
+<p>Conforme registrado em 04/09, o condicionamento de A3 a G1 não interrompe a
+contagem: o contrato considera o atraso do insumo, não o seu motivo.</p>
+<h2>4. Insumos com vencimento em 11/09/2026</h2>
+<p>Prazo restante: <strong>três dias úteis</strong>.</p>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Insumo</th>
+<th>Efeito da não disponibilização</th>
+<th>Issue</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A4</td>
+<td>Questionário de Gaps respondido (47 perguntas)</td>
+<td>os 8 domínios analíticos não se definem; a camada Gold fica sem alvo</td>
+<td><a href="https://github.com/nessenergy/Alupdatalake/issues/8">#8</a></td>
+</tr>
+<tr>
+<td>A9</td>
+<td>Token do Hubspot</td>
+<td>conector concluído permanece sem execução; nenhum registro de CRM é ingerido</td>
+<td><a href="https://github.com/nessenergy/Alupdatalake/issues/11">#11</a></td>
+</tr>
+<tr>
+<td>A5</td>
+<td>Matriz RACI e data owners</td>
+<td>questões de regra de negócio sem destinatário definido</td>
+<td><a href="https://github.com/nessenergy/Alupdatalake/issues/9">#9</a></td>
+</tr>
+<tr>
+<td>A6</td>
+<td>Ferramenta de BI definida</td>
+<td>Portal MVP e views Gold sem consumidor definido</td>
+<td><a href="https://github.com/nessenergy/Alupdatalake/issues/10">#10</a></td>
+</tr>
+<tr>
+<td>—</td>
+<td>Destinatários de alerta e <code>billing_account</code></td>
+<td>alertas e orçamento configurados, sem destinatário</td>
+<td><a href="https://github.com/nessenergy/Alupdatalake/issues/87">#87</a></td>
+</tr>
+</tbody>
+</table>
+<p><strong>A4 é o único insumo desta lista que não depende do ambiente GCP.</strong> Ainda que
+A3 e G1 sejam resolvidos de imediato, sem as respostas do questionário a semana
+S3 fica sem escopo executável, por ausência de alvo para a camada Gold.</p>
+<h2>5. Escopo previsto para a S2</h2>
+<p>O plano semanal condiciona a totalidade desta semana à disponibilização de A3.</p>
+<table>
+<thead>
+<tr>
+<th>Item previsto</th>
 <th>Situação</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><code>terraform apply</code> real — datasets, bucket, secrets, IAM, Cloud Run Job, Scheduler</td>
+<td><code>terraform apply</code> — datasets, bucket, secrets, IAM, Cloud Run Job, Scheduler</td>
 <td>postergado</td>
 </tr>
 <tr>
@@ -346,119 +411,26 @@ Todo o conteúdo previsto depende do ambiente:</p>
 <td>depende de A9</td>
 </tr>
 <tr>
-<td>Destinatários de alerta e <code>billing_account</code> preenchidos</td>
+<td>Destinatários de alerta e <code>billing_account</code></td>
 <td>depende da Alup</td>
 </tr>
 </tbody>
 </table>
-<p>Enquanto o ambiente não existir, esta frente não produz entregável verificável.
-Temos redirecionado o tempo para trabalho que não depende de insumo — foi assim
-que quatro das cinco ondas chegaram a ter entrega —, mas a reserva de trabalho
-independente de insumo é limitada e já se encontra substancialmente consumida.</p>
-<h2>3. Contagem de prazos da cláusula 3ª</h2>
-<p>Registramos as datas para que os dois lados tenham o mesmo quadro, não para
-formalizar cobrança:</p>
+<p>Sem o ambiente, esta frente não produz entregável verificável. O tempo tem sido
+redirecionado para trabalho independente de insumo, mas essa reserva é limitada
+e encontra-se substancialmente consumida.</p>
+<h2>6. Posição da entrega</h2>
+<h3>6.1 Concluído</h3>
 <table>
 <thead>
 <tr>
-<th>Marco da cláusula 3ª</th>
-<th>Data</th>
-<th>Efeito</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>1º dia útil de atraso de A3</td>
-<td><strong>08/09</strong> (hoje)</td>
-<td>contagem em curso</td>
-</tr>
-<tr>
-<td>5º dia útil</td>
-<td><strong>14/09</strong></td>
-<td>a partir daí, postergação dos prazos que dependem de A3</td>
-</tr>
-<tr>
-<td>20 dias corridos</td>
-<td><strong>24/09</strong></td>
-<td>hipótese de suspensão dos serviços</td>
-</tr>
-</tbody>
-</table>
-<p>Vale repetir o que dissemos em 04/09: condicionar A3 a G1 não interrompe a
-contagem, porque o contrato considera o atraso do insumo e não o seu motivo.
-Isso não é uma objeção à decisão de aguardar o Google — é o registro que
-protege os dois lados na medição.</p>
-<h2>4. Os prazos que vencem em 11/09</h2>
-<p>Faltam <strong>três dias úteis</strong> para cinco itens:</p>
-<table>
-<thead>
-<tr>
-<th>#</th>
-<th>Item</th>
-<th>Efeito da não disponibilização</th>
-<th>Issue</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>A4</td>
-<td>Questionário de Gaps respondido (47 perguntas)</td>
-<td>os 8 domínios analíticos não se definem, e a camada Gold fica sem alvo</td>
-<td><a href="https://github.com/nessenergy/Alupdatalake/issues/8">#8</a></td>
-</tr>
-<tr>
-<td>A9</td>
-<td>Token do Hubspot</td>
-<td>o conector concluído permanece sem execução; nenhum registro de CRM é ingerido</td>
-<td><a href="https://github.com/nessenergy/Alupdatalake/issues/11">#11</a></td>
-</tr>
-<tr>
-<td>A5</td>
-<td>Matriz RACI e data owners</td>
-<td>questões de regra de negócio ficam sem destinatário definido</td>
-<td><a href="https://github.com/nessenergy/Alupdatalake/issues/9">#9</a></td>
-</tr>
-<tr>
-<td>A6</td>
-<td>Ferramenta de BI definida</td>
-<td>Portal MVP e views Gold ficam sem consumidor definido</td>
-<td><a href="https://github.com/nessenergy/Alupdatalake/issues/10">#10</a></td>
-</tr>
-<tr>
-<td>—</td>
-<td>Destinatários de alerta e <code>billing_account</code></td>
-<td>alertas e orçamento estão configurados, porém sem destinatário definido</td>
-<td><a href="https://github.com/nessenergy/Alupdatalake/issues/87">#87</a></td>
-</tr>
-</tbody>
-</table>
-<p>Chamamos atenção especial para <strong>A4</strong>. Ele é o único da lista que <strong>não depende
-do ambiente GCP</strong>: mesmo que A3 e G1 se resolvam amanhã, sem as respostas do
-questionário a semana S3 não tem conteúdo, porque não há alvo para a camada
-Gold. A4 é, hoje, o insumo com melhor relação entre esforço de vocês e
-volume de trabalho liberado do nosso lado.</p>
-<h2>5. Correção no quadro de acompanhamento</h2>
-<p>Em 24/08, ao popular o GitHub Projects, uma carga automática foi executada duas vezes e
-criou <strong>15 itens duplicados</strong>. Em 27/08 fizemos a limpeza fechando uma cópia de
-cada par — e é neste ponto que se produziu o erro: no GitHub Projects, <strong>issue fechada conta
-automaticamente como entrega concluída</strong>. A limpeza produziu 15 conclusões que
-não correspondiam a trabalho realizado.</p>
-<p>O efeito era material. O quadro exibia <strong>24 entregas quando o realizado eram
-9</strong>, e apresentava as Ondas 3 e 4 como tendo itens concluídos — incluindo
-conectores de sistemas internos cujas credenciais sequer chegaram.</p>
-<p><strong>Corrigido hoje.</strong> Os 15 itens duplicados foram arquivados; o quadro passou de
-58 para 43 itens e de 24 para <strong>9 conclusões</strong>, que são as reais. Uma décima
-foi registrada ainda hoje, com o registro da decisão tratada na seção 6:</p>
-<table>
-<thead>
-<tr>
-<th>Entrega concluída</th>
+<th>Entrega</th>
 <th>Onda</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>Setup Terraform — módulos base</td>
+<td>Terraform — módulos base</td>
 <td>0</td>
 </tr>
 <tr>
@@ -470,96 +442,109 @@ foi registrada ainda hoje, com o registro da decisão tratada na seção 6:</p>
 <td>0</td>
 </tr>
 <tr>
-<td>Conector Câmbio BCB, de referência</td>
+<td>Conector BCB/PTAX, de referência</td>
 <td>0</td>
-</tr>
-<tr>
-<td>Conectores ONS, ANEEL e IBGE</td>
-<td>1</td>
 </tr>
 <tr>
 <td>Decisão de região do ambiente (ADR 009)</td>
 <td>0</td>
 </tr>
 <tr>
-<td>Campos de acompanhamento semanal do quadro</td>
-<td>0</td>
-</tr>
-<tr>
-<td>Registro da decisão sobre revisão obrigatória na <code>main</code> (ADR 010)</td>
-<td>0</td>
+<td>Conectores ONS, ANEEL e IBGE</td>
+<td>1</td>
 </tr>
 </tbody>
 </table>
-<p>Nenhuma issue foi excluída e o arquivamento é reversível — o histórico está
-íntegro para auditoria.</p>
-<p>Duas observações que consideramos devidas. A primeira: o erro favorecia a
-ness., e foi encontrado e corrigido por nós, sem que houvesse apontamento externo.
-A segunda: ele demonstra por que o campo <strong>Validado</strong> existe no quadro. Entrega
-técnica não é homologação. <strong>Nenhum dos itens acima foi conferido pela Alup</strong> —
-todos estão marcados <code>Validado = Não</code> no quadro, e nenhum deles deve ser interpretado
-como onda encerrada.</p>
-<h2>6. Registro sobre a cláusula 8ª</h2>
-<p>A <code>main</code> deste repositório não pode ter revisão obrigatória: o plano GitHub da
-organização não oferece o recurso. O CI executa SAST e SCA em toda alteração —
-Ruff, pytest, Bandit, pip-audit, Gitleaks e Terraform, sete verificações —, mas
-não impede um envio direto.</p>
-<p>Registramos formalmente a decisão em ADR, com os gatilhos que a reabrem, e
-consignamos aqui o que dela decorre: <strong>o dossiê de homologação da Onda 0 não
-afirmará que existe barreira preventiva de SAST e SCA</strong>. Descreverá o arranjo
-real — varredura sistemática em toda alteração, mais o aceite de risco
-registrado. Preferimos a descrição exata a uma afirmação confortável.</p>
-<h2>7. O outro lado do quadro</h2>
-<p>Este relatório trata de um atraso e de uma correção desfavorável a nós. Cabe,
-por isso, repetir o dado que a leitura isolada esconde: <strong>a entrega segue
-adiantada em relação ao cronograma contratual</strong>.</p>
+<h3>6.2 Antecipado em relação à janela contratual</h3>
 <table>
 <thead>
 <tr>
 <th>Onda</th>
 <th>Janela contratual</th>
-<th>O que já existe</th>
+<th>Situação</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><strong>1</strong> — Mercado base</td>
+<td>1 — Mercado base</td>
 <td>14/09 – 16/10</td>
 <td><strong>4 de 5 fontes completas</strong>, com os 7 componentes cada: BCB/PTAX, IBGE/IPCA, ANEEL/SIGA (25.263 registros verificados, 0 inválidos) e ONS/carga. Resta a CCEE, bloqueada na origem</td>
 </tr>
 <tr>
-<td><strong>2</strong> — APIs credenciadas</td>
+<td>2 — APIs credenciadas</td>
 <td>19/10 – 13/11</td>
 <td><strong>Hubspot completo</strong>, os 7 componentes, escritos antes do token</td>
 </tr>
 <tr>
-<td><strong>3</strong> — Sistemas internos</td>
+<td>3 — Sistemas internos</td>
 <td>16/11 – 18/12</td>
 <td><strong>Caminho de acesso a bancos concluído</strong> — Oracle, MySQL e SQL Server</td>
 </tr>
 <tr>
-<td><strong>4</strong> — Planilhas e handoff</td>
+<td>4 — Planilhas e handoff</td>
 <td>21/12 – 08/01</td>
 <td><strong>Motor de ingestão de planilhas</strong> concluído; templates dependem de A4</td>
 </tr>
 </tbody>
 </table>
-<p>Com a ressalva que fazemos desde o início e que a correção da seção 5 só torna
-mais importante: <strong>nada foi validado contra um ambiente GCP real</strong>, porque ele
-ainda não existe. Onda 0 não deve ser declarada homologada antes do primeiro
-<code>apply</code> e da primeira carga real.</p>
-<h2>8. O que pedimos</h2>
-<ol>
-<li><strong>Uma data para G1</strong>, ainda que distante — <a href="https://github.com/nessenergy/Alupdatalake/issues/77">issue #77</a>.</li>
-<li><strong>A4 respondido até 11/09</strong> — é o insumo que libera mais trabalho com menor esforço,
-   e o único que não depende do ambiente.</li>
-<li><strong>A3 provisionado</strong> assim que a resposta do Google permitir — <a href="https://github.com/nessenergy/Alupdatalake/issues/55">issue #55</a>.</li>
-<li><strong>A9, A5 e A6 até 11/09</strong>, conforme a seção 4.</li>
-<li><strong>Decisão sobre a CCEE até 18/09</strong> — 32 horas da Onda 1 permanecem sem execução
-   (<a href="https://github.com/nessenergy/Alupdatalake/issues/52">issue #52</a>).</li>
-</ol>
-<p>Permanecemos à disposição para tratar de qualquer ponto deste registro, e
-agradecemos a atenção de sempre.</p>
+<h3>6.3 Ressalva</h3>
+<p><strong>Nenhuma entrega foi validada contra ambiente GCP real</strong>, uma vez que ele não
+existe. Nenhum dos itens acima foi conferido pela Alup. Entrega técnica não
+constitui homologação: a Onda 0 não deve ser declarada homologada antes do
+primeiro <code>apply</code> e da primeira carga real.</p>
+<h2>7. Registro sobre a cláusula 8ª</h2>
+<p>A <code>main</code> do repositório não admite revisão obrigatória, por indisponibilidade
+do recurso no plano GitHub da organização. O CI executa SAST e SCA em toda
+alteração — Ruff, pytest, Bandit, pip-audit, Gitleaks e Terraform, sete
+verificações —, sem impedir envio direto.</p>
+<p>A decisão está formalizada em ADR, com os gatilhos de reabertura. Decorre dela
+que <strong>o dossiê de homologação da Onda 0 não afirmará a existência de barreira
+preventiva de SAST e SCA</strong>, descrevendo o arranjo efetivo: varredura
+sistemática em toda alteração, acrescida do aceite de risco registrado.</p>
+<h2>8. Solicitações</h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Solicitação</th>
+<th>Prazo</th>
+<th>Issue</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Definição de data para G1</td>
+<td>imediato</td>
+<td><a href="https://github.com/nessenergy/Alupdatalake/issues/77">#77</a></td>
+</tr>
+<tr>
+<td>2</td>
+<td>A4 — Questionário de Gaps respondido</td>
+<td>11/09</td>
+<td><a href="https://github.com/nessenergy/Alupdatalake/issues/8">#8</a></td>
+</tr>
+<tr>
+<td>3</td>
+<td>A9, A5 e A6, conforme seção 4</td>
+<td>11/09</td>
+<td><a href="https://github.com/nessenergy/Alupdatalake/issues/11">#11</a>, <a href="https://github.com/nessenergy/Alupdatalake/issues/9">#9</a>, <a href="https://github.com/nessenergy/Alupdatalake/issues/10">#10</a></td>
+</tr>
+<tr>
+<td>4</td>
+<td>A3 — provisionamento do ambiente GCP</td>
+<td>condicionado a G1</td>
+<td><a href="https://github.com/nessenergy/Alupdatalake/issues/55">#55</a></td>
+</tr>
+<tr>
+<td>5</td>
+<td>Decisão sobre a CCEE — 32h da Onda 1 sem execução</td>
+<td>18/09</td>
+<td><a href="https://github.com/nessenergy/Alupdatalake/issues/52">#52</a></td>
+</tr>
+</tbody>
+</table>
+<p>Permanecemos à disposição para esclarecimentos.</p>
 <hr />
 <p><em>Situação corrente em <a href="../status.md"><code>../status.md</code></a>. Questões abertas
 acompanhadas na <a href="https://github.com/nessenergy/Alupdatalake/issues/57">issue #57</a>.</em></p><section class='assinatura'><p class=local-data>08 de setembro de 2026</p><div class='linha-assinatura'></div><p class='assina-nome'>Ricardo Esper</p><p class='assina-org'>ness. Processos e Tecnologia Ltda.</p></section><p class="rodape">ness. Processos e Tecnologia Ltda. · CNPJ 72.027.097/0001-37 · Contrato CPS-01025/2026 — AlupData Fase 1: DataLake</p></body></html>

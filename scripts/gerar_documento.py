@@ -124,6 +124,62 @@ h1 + p {
   margin-bottom: 5mm;
 }
 
+/* ------------------------------------------------- identificação do documento */
+
+/* Ficha do documento: quem emite, para quem, sob qual contrato, em que data.
+   Fica logo abaixo do título e não se parte entre páginas — um documento
+   contratual precisa ser identificável pela primeira folha, isolada. */
+.identificacao {
+  display: grid;
+  /* Largura suficiente para "RESPONSÁVEL TÉCNICO" caber em uma linha. */
+  grid-template-columns: 37mm 1fr;
+  gap: 1.2mm 4mm;
+  margin: 4mm 0 6mm;
+  padding: 3.5mm 4mm;
+  background: var(--zebra);
+  border-left: 2px solid var(--ness);
+  font-size: 8.4pt;
+  break-inside: avoid;
+}
+.id-rotulo {
+  font-family: var(--titulo);
+  font-size: 7.2pt;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--suave);
+  padding-top: 0.4mm;
+}
+.id-valor { color: var(--tinta); }
+
+/* ------------------------------------------------------------- fecho assinado */
+
+.assinatura {
+  margin-top: 12mm;
+  break-inside: avoid;
+}
+.assinatura .local-data {
+  font-size: 8.6pt;
+  color: var(--suave);
+  margin-bottom: 12mm;
+}
+.linha-assinatura {
+  width: 68mm;
+  border-top: 1px solid var(--tinta);
+  margin-bottom: 1.6mm;
+}
+.assina-nome {
+  font-family: var(--titulo);
+  font-weight: 500;
+  font-size: 9.4pt;
+  margin: 0;
+}
+.assina-org {
+  font-size: 8pt;
+  color: var(--suave);
+  margin: 0.4mm 0 0;
+}
+
 h2 {
   font-family: var(--titulo);
   font-size: 11.5pt;
@@ -279,19 +335,105 @@ def encontrar_navegador() -> Path:
     raise SystemExit("Chrome ou Edge não encontrado; nenhum deles está instalado num caminho conhecido.")
 
 
+# Ordem em que os campos de identificação aparecem no documento. Chave do
+# front-matter à esquerda, rótulo impresso à direita. Campo ausente na fonte
+# simplesmente não é impresso — nenhum documento é obrigado a ter todos.
+CAMPOS_IDENTIFICACAO = (
+    ("documento", "Documento"),
+    ("referencia", "Referência"),
+    ("emitido_em", "Data de emissão"),
+    ("emitente", "Emitente"),
+    ("destinatario", "Destinatário"),
+    ("contrato", "Contrato"),
+    ("marco", "Marco em jogo"),
+    ("responsavel", "Responsável técnico"),
+    ("classificacao", "Classificação"),
+)
+
+
+def separar_frontmatter(texto: str) -> tuple[dict[str, str], str]:
+    """Extrai o bloco `---` de metadados do topo, se houver.
+
+    Sem front-matter o documento segue como antes: nada de identificação é
+    inventado a partir do corpo, porque metadado adivinhado num documento
+    contratual é pior que metadado ausente.
+    """
+    if not texto.startswith("---\n"):
+        return {}, texto
+    fim = texto.find("\n---\n", 4)
+    if fim == -1:
+        return {}, texto
+    meta = {}
+    for linha in texto[4:fim].splitlines():
+        if ":" in linha:
+            chave, _, valor = linha.partition(":")
+            meta[chave.strip()] = valor.strip()
+    return meta, texto[fim + 5 :].lstrip("\n")
+
+
+def titulo_do_corpo(texto_md: str) -> str:
+    """Título da aba e do PDF quando o front-matter não declara um.
+
+    Vem do próprio `# ` do documento — antes esta função não existia e todo
+    arquivo gerado saía com o título do questionário na aba do navegador e nos
+    metadados do PDF, inclusive os relatórios.
+    """
+    for linha in texto_md.splitlines():
+        if linha.startswith("# "):
+            titulo = linha[2:].strip()
+            # Título que já se nomeia não recebe o sufixo de novo.
+            return titulo if "AlupData" in titulo else f"{titulo} — AlupData"
+    return "Documento — AlupData"
+
+
+def bloco_identificacao(meta: dict[str, str]) -> str:
+    """Tabela de identificação do documento, logo abaixo do título."""
+    linhas = [
+        f"<div class='id-rotulo'>{rotulo}</div><div class='id-valor'>{meta[chave]}</div>"
+        for chave, rotulo in CAMPOS_IDENTIFICACAO
+        if meta.get(chave)
+    ]
+    return f"<section class='identificacao'>{''.join(linhas)}</section>" if linhas else ""
+
+
+def bloco_assinatura(meta: dict[str, str]) -> str:
+    """Fecho com responsável e local/data — um relatório emitido tem emissor."""
+    if not meta.get("responsavel"):
+        return ""
+    local_data = meta.get("local_data", "")
+    return (
+        "<section class='assinatura'>"
+        f"{f'<p class=local-data>{local_data}</p>' if local_data else ''}"
+        "<div class='linha-assinatura'></div>"
+        f"<p class='assina-nome'>{meta['responsavel']}</p>"
+        f"<p class='assina-org'>{meta.get('emitente', '')}</p>"
+        "</section>"
+    )
+
+
 def montar_html(texto_md: str, *, classe: str = "relatorio") -> str:
+    meta, texto_md = separar_frontmatter(texto_md)
     corpo = markdown.markdown(texto_md, extensions=["tables", "attr_list"])
     # O marcador textual vira etiqueta visual — quem lê precisa achar as
     # perguntas que travam trabalho sem ler as 47.
     corpo = corpo.replace("[BLOQUEIA]", '<span class="bloqueia">BLOQUEIA</span>')
+    # A identificação entra depois do <h1>, não antes: o leitor vê primeiro do
+    # que se trata, depois a ficha do documento.
+    identificacao = bloco_identificacao(meta)
+    if identificacao and "</h1>" in corpo:
+        corpo = corpo.replace("</h1>", "</h1>" + identificacao, 1)
+    else:
+        corpo = identificacao + corpo
+    corpo += bloco_assinatura(meta)
     marca = '<p class="marca">ness<span>.</span></p>'
+    titulo = meta.get("titulo") or meta.get("documento") or titulo_do_corpo(texto_md)
     rodape = (
         '<p class="rodape">ness. Processos e Tecnologia Ltda. · CNPJ 72.027.097/0001-37 · '
         "Contrato CPS-01025/2026 — AlupData Fase 1: DataLake</p>"
     )
     return (
         "<!doctype html><html lang='pt-BR'><head><meta charset='utf-8'>"
-        "<title>Questionário de Gaps — AlupData</title>"
+        f"<title>{titulo}</title>"
         "<link rel='preconnect' href='https://fonts.googleapis.com'>"
         "<link rel='preconnect' href='https://fonts.gstatic.com' crossorigin>"
         "<link href='https://fonts.googleapis.com/css2?"

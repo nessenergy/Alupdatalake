@@ -242,31 +242,31 @@ nosso próprio quadro de acompanhamento</strong>, que vinha superestimando o ava
 projeto.</p>
 <p>O terceiro ponto é o que mais nos importa comunicar hoje. A informação errada
 estava a nosso favor, foi encontrada por nós e está corrigida — mas ela chegou a
-ficar visível, e vocês precisam saber disso antes de qualquer número subir para
-a diretoria.</p>
+ficar visível, e vocês precisam saber disso antes que qualquer número seja levado
+à diretoria.</p>
 <hr />
 <h2>1. O insumo A3 segue pendente</h2>
 <p>O ambiente GCP <code>dev</code> tinha prazo útil em <strong>04/09/2026</strong> e não foi
 disponibilizado até hoje. O registro do atraso foi emitido na própria data, em
 <a href="2026-09-04-a3-nao-entregue.md">relatório de 04/09</a>, e a situação não mudou
 desde então.</p>
-<p>Como 05 e 06 caíram no fim de semana e 07 foi feriado nacional, <strong>hoje é o
-primeiro dia útil de atraso</strong>. Não houve, portanto, perda de tempo útil entre um
-relatório e outro — e é justamente por isso que este é um bom momento para
-tratar do assunto sem urgência.</p>
+<p>Como 05 e 06 recaíram sobre o fim de semana e 07 foi feriado nacional, <strong>hoje é
+o primeiro dia útil de atraso</strong>. Não houve, portanto, perda de tempo útil entre
+um relatório e outro, razão pela qual o assunto pode ser tratado agora sem
+caráter de urgência.</p>
 <p>A pendência <strong>G1</strong>, resposta do Google à revisão arquitetural que enviamos em
 04/09, permanece <strong>sem prazo acordado</strong>
 (<a href="https://github.com/nessenergy/Alupdatalake/issues/77">issue #77</a>). Como a Alup
 optou por condicionar A3 a G1, a cadeia continua em série:</p>
 <pre><code>G1 (Google responde) → A3 (ambiente GCP) → 1º apply → Onda 0 homologada
 </code></pre>
-<p>Seguimos considerando a escolha defensável — receber a crítica antes de
-instanciar o ambiente é melhor que depois. O que pedimos é apenas que G1 ganhe
-uma data, qualquer que seja. Uma previsão distante permite planejar; a ausência
-de previsão, não.</p>
+<p>Seguimos considerando a escolha defensável: é preferível receber a análise
+antes de instanciar o ambiente do que depois dele constituído. O que
+solicitamos é que G1 receba uma data definida, qualquer que seja. Uma previsão
+distante permite planejamento; a ausência de previsão, não.</p>
 <h2>2. O que a S2 previa, e o que acontece sem o ambiente</h2>
-<p>O plano semanal é explícito quanto a esta semana: <em>"Esta semana só existe se A3
-chegou."</em> O conteúdo previsto era todo dependente do ambiente:</p>
+<p>O plano semanal condiciona integralmente esta semana à disponibilização de A3.
+Todo o conteúdo previsto depende do ambiente:</p>
 <table>
 <thead>
 <tr>
@@ -277,18 +277,18 @@ chegou."</em> O conteúdo previsto era todo dependente do ambiente:</p>
 <tbody>
 <tr>
 <td><code>terraform apply</code> real — datasets, bucket, secrets, IAM, Cloud Run Job, Scheduler</td>
-<td>escorrega</td>
+<td>postergado</td>
 </tr>
 <tr>
 <td>Imagem da CLI no Artifact Registry e job executado contra o BCB</td>
-<td>escorrega</td>
+<td>postergado</td>
 </tr>
 <tr>
-<td><code>make deploy-views</code> — views Silver e Gold das 5 fontes existindo de verdade</td>
-<td>escorrega</td>
+<td><code>make deploy-views</code> — views Silver e Gold das 5 fontes aplicadas no ambiente</td>
+<td>postergado</td>
 </tr>
 <tr>
-<td>Hubspot rodado contra a API real</td>
+<td>Hubspot executado contra a API real</td>
 <td>depende de A9</td>
 </tr>
 <tr>
@@ -299,9 +299,9 @@ chegou."</em> O conteúdo previsto era todo dependente do ambiente:</p>
 </table>
 <p>Enquanto o ambiente não existir, esta frente não produz entregável verificável.
 Temos redirecionado o tempo para trabalho que não depende de insumo — foi assim
-que quatro das cinco ondas chegaram a ter entrega —, mas esse estoque de
-trabalho independente é finito e já está bastante consumido.</p>
-<h2>3. O relógio da cláusula 3ª</h2>
+que quatro das cinco ondas chegaram a ter entrega —, mas a reserva de trabalho
+independente de insumo é limitada e já se encontra substancialmente consumida.</p>
+<h2>3. Contagem de prazos da cláusula 3ª</h2>
 <p>Registramos as datas para que os dois lados tenham o mesmo quadro, não para
 formalizar cobrança:</p>
 <table>
@@ -341,7 +341,7 @@ protege os dois lados na medição.</p>
 <tr>
 <th>#</th>
 <th>Item</th>
-<th>Efeito de não chegar</th>
+<th>Efeito da não disponibilização</th>
 <th>Issue</th>
 </tr>
 </thead>
@@ -355,13 +355,13 @@ protege os dois lados na medição.</p>
 <tr>
 <td>A9</td>
 <td>Token do Hubspot</td>
-<td>conector pronto segue parado; nenhuma linha de CRM entra no lake</td>
+<td>o conector concluído permanece sem execução; nenhum registro de CRM é ingerido</td>
 <td><a href="https://github.com/nessenergy/Alupdatalake/issues/11">#11</a></td>
 </tr>
 <tr>
 <td>A5</td>
 <td>Matriz RACI e data owners</td>
-<td>dúvida de regra de negócio não tem destinatário</td>
+<td>questões de regra de negócio ficam sem destinatário definido</td>
 <td><a href="https://github.com/nessenergy/Alupdatalake/issues/9">#9</a></td>
 </tr>
 <tr>
@@ -373,7 +373,7 @@ protege os dois lados na medição.</p>
 <tr>
 <td>—</td>
 <td>Destinatários de alerta e <code>billing_account</code></td>
-<td>alertas e orçamento existem, mas não notificam ninguém</td>
+<td>alertas e orçamento estão configurados, porém sem destinatário definido</td>
 <td><a href="https://github.com/nessenergy/Alupdatalake/issues/87">#87</a></td>
 </tr>
 </tbody>
@@ -382,11 +382,11 @@ protege os dois lados na medição.</p>
 do ambiente GCP</strong>: mesmo que A3 e G1 se resolvam amanhã, sem as respostas do
 questionário a semana S3 não tem conteúdo, porque não há alvo para a camada
 Gold. A4 é, hoje, o insumo com melhor relação entre esforço de vocês e
-destravamento do nosso lado.</p>
+volume de trabalho liberado do nosso lado.</p>
 <h2>5. Correção no quadro de acompanhamento</h2>
-<p>Em 24/08, ao popular o GitHub Projects, uma carga automática rodou duas vezes e
+<p>Em 24/08, ao popular o GitHub Projects, uma carga automática foi executada duas vezes e
 criou <strong>15 itens duplicados</strong>. Em 27/08 fizemos a limpeza fechando uma cópia de
-cada par — e aqui está o erro: no GitHub Projects, <strong>issue fechada conta
+cada par — e é neste ponto que se produziu o erro: no GitHub Projects, <strong>issue fechada conta
 automaticamente como entrega concluída</strong>. A limpeza produziu 15 conclusões que
 não correspondiam a trabalho realizado.</p>
 <p>O efeito era material. O quadro exibia <strong>24 entregas quando o realizado eram
@@ -394,7 +394,7 @@ não correspondiam a trabalho realizado.</p>
 conectores de sistemas internos cujas credenciais sequer chegaram.</p>
 <p><strong>Corrigido hoje.</strong> Os 15 itens duplicados foram arquivados; o quadro passou de
 58 para 43 itens e de 24 para <strong>9 conclusões</strong>, que são as reais. Uma décima
-entrou ainda hoje, com o registro da decisão tratada na seção 6:</p>
+foi registrada ainda hoje, com o registro da decisão tratada na seção 6:</p>
 <table>
 <thead>
 <tr>
@@ -440,11 +440,11 @@ entrou ainda hoje, com o registro da decisão tratada na seção 6:</p>
 <p>Nenhuma issue foi excluída e o arquivamento é reversível — o histórico está
 íntegro para auditoria.</p>
 <p>Duas observações que consideramos devidas. A primeira: o erro favorecia a
-ness., e foi encontrado e corrigido por nós, sem que ninguém o apontasse.
+ness., e foi encontrado e corrigido por nós, sem que houvesse apontamento externo.
 A segunda: ele demonstra por que o campo <strong>Validado</strong> existe no quadro. Entrega
 técnica não é homologação. <strong>Nenhum dos itens acima foi conferido pela Alup</strong> —
-todos estão marcados <code>Validado = Não</code> no quadro, e nenhum deles deve ser lido
-como onda fechada.</p>
+todos estão marcados <code>Validado = Não</code> no quadro, e nenhum deles deve ser interpretado
+como onda encerrada.</p>
 <h2>6. Registro sobre a cláusula 8ª</h2>
 <p>A <code>main</code> deste repositório não pode ter revisão obrigatória: o plano GitHub da
 organização não oferece o recurso. O CI executa SAST e SCA em toda alteração —
@@ -471,7 +471,7 @@ adiantada em relação ao cronograma contratual</strong>.</p>
 <tr>
 <td><strong>1</strong> — Mercado base</td>
 <td>14/09 – 16/10</td>
-<td><strong>4 de 5 fontes completas</strong>, com os 7 componentes cada: BCB/PTAX, IBGE/IPCA, ANEEL/SIGA (25.263 registros verificados, 0 inválidos) e ONS/carga. Falta a CCEE, bloqueada na origem</td>
+<td><strong>4 de 5 fontes completas</strong>, com os 7 componentes cada: BCB/PTAX, IBGE/IPCA, ANEEL/SIGA (25.263 registros verificados, 0 inválidos) e ONS/carga. Resta a CCEE, bloqueada na origem</td>
 </tr>
 <tr>
 <td><strong>2</strong> — APIs credenciadas</td>
@@ -481,12 +481,12 @@ adiantada em relação ao cronograma contratual</strong>.</p>
 <tr>
 <td><strong>3</strong> — Sistemas internos</td>
 <td>16/11 – 18/12</td>
-<td><strong>Caminho de acesso a bancos pronto</strong> — Oracle, MySQL e SQL Server</td>
+<td><strong>Caminho de acesso a bancos concluído</strong> — Oracle, MySQL e SQL Server</td>
 </tr>
 <tr>
 <td><strong>4</strong> — Planilhas e handoff</td>
 <td>21/12 – 08/01</td>
-<td><strong>Motor de ingestão de planilhas</strong> pronto; templates dependem de A4</td>
+<td><strong>Motor de ingestão de planilhas</strong> concluído; templates dependem de A4</td>
 </tr>
 </tbody>
 </table>
@@ -497,15 +497,15 @@ ainda não existe. Onda 0 não deve ser declarada homologada antes do primeiro
 <h2>8. O que pedimos</h2>
 <ol>
 <li><strong>Uma data para G1</strong>, ainda que distante — <a href="https://github.com/nessenergy/Alupdatalake/issues/77">issue #77</a>.</li>
-<li><strong>A4 respondido até 11/09</strong> — é o insumo que mais destrava por menos esforço,
+<li><strong>A4 respondido até 11/09</strong> — é o insumo que libera mais trabalho com menor esforço,
    e o único que não depende do ambiente.</li>
 <li><strong>A3 provisionado</strong> assim que a resposta do Google permitir — <a href="https://github.com/nessenergy/Alupdatalake/issues/55">issue #55</a>.</li>
 <li><strong>A9, A5 e A6 até 11/09</strong>, conforme a seção 4.</li>
-<li><strong>Decisão sobre a CCEE até 18/09</strong> — 32 horas da Onda 1 seguem paradas
+<li><strong>Decisão sobre a CCEE até 18/09</strong> — 32 horas da Onda 1 permanecem sem execução
    (<a href="https://github.com/nessenergy/Alupdatalake/issues/52">issue #52</a>).</li>
 </ol>
 <p>Permanecemos à disposição para tratar de qualquer ponto deste registro, e
 agradecemos a atenção de sempre.</p>
 <hr />
-<p><em>Situação corrente e viva em <a href="../status.md"><code>../status.md</code></a>. Questões abertas
+<p><em>Situação corrente em <a href="../status.md"><code>../status.md</code></a>. Questões abertas
 acompanhadas na <a href="https://github.com/nessenergy/Alupdatalake/issues/57">issue #57</a>.</em></p><p class="rodape">ness. Processos e Tecnologia Ltda. · CNPJ 72.027.097/0001-37 · Contrato CPS-01025/2026 — AlupData Fase 1: DataLake</p></body></html>

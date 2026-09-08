@@ -86,7 +86,7 @@ Faltam **três dias úteis** para cinco itens:
 | A9 | Token do Hubspot | conector pronto segue parado; nenhuma linha de CRM entra no lake | [#11](https://github.com/nessenergy/Alupdatalake/issues/11) |
 | A5 | Matriz RACI e data owners | dúvida de regra de negócio não tem destinatário | [#9](https://github.com/nessenergy/Alupdatalake/issues/9) |
 | A6 | Ferramenta de BI definida | Portal MVP e views Gold ficam sem consumidor definido | [#10](https://github.com/nessenergy/Alupdatalake/issues/10) |
-| — | Destinatários de alerta e `billing_account` | alertas e orçamento existem, mas não notificam ninguém | — |
+| — | Destinatários de alerta e `billing_account` | alertas e orçamento existem, mas não notificam ninguém | [#87](https://github.com/nessenergy/Alupdatalake/issues/87) |
 
 Chamamos atenção especial para **A4**. Ele é o único da lista que **não depende
 do ambiente GCP**: mesmo que A3 e G1 se resolvam amanhã, sem as respostas do

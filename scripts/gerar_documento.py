@@ -240,10 +240,14 @@ th {
   font-weight: 600;
   font-size: 7.6pt;
   text-transform: uppercase;
-  letter-spacing: 0.07em;
+  /* Tracking discreto: em coluna estreita, cada 0,01em a mais é uma quebra
+     de linha a mais no cabeçalho. */
+  letter-spacing: 0.04em;
   color: var(--suave);
   border-bottom: 1.5px solid var(--tinta);
   padding: 1.6mm 2mm;
+  /* Cabeçalho de coluna se lê como rótulo: melhor uma linha que duas. */
+  text-wrap: balance;
 }
 td {
   border-bottom: 1px solid var(--linha-fina);
@@ -307,9 +311,21 @@ li { margin-bottom: 1.2mm; }
 
 /* ---------------------------------------------------------------- impressão */
 
-/* Token longo — URL, nome de secret, identificador — não pode estourar a
-   largura da A4 e sumir na borda do papel. */
-code, td, th { overflow-wrap: anywhere; }
+/* Token longo — URL, nome de secret, identificador — não pode ultrapassar a
+   largura da A4 e sumir na borda do papel. `anywhere` só no `code`, onde o
+   token não tem espaço por onde quebrar; em texto corrido ele partiria
+   palavra no meio, inclusive em cabeçalho de tabela. `break-word` quebra
+   apenas a palavra que sozinha não caberia na linha. */
+code { overflow-wrap: anywhere; }
+td, th, .id-valor { overflow-wrap: break-word; }
+
+/* Nenhuma hifenização automática: em documento contratual, palavra partida
+   por hífen inventado atrapalha a leitura e a busca no PDF. */
+* { hyphens: none; }
+
+/* Título distribui o texto entre as linhas em vez de deixar uma palavra órfã
+   na última — vale para o título do documento e para os de seção. */
+h1, h2, h3 { text-wrap: balance; }
 
 @media print {
   /* Uma linha solta no pé ou no topo da página é o defeito mais visível de um

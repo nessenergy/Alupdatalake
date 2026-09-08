@@ -6,7 +6,9 @@ de situação, que por convenção existem em `.md` e `.html`
 (ver `docs/relatorios/README.md`).
 
 O HTML é autocontido — abre direto no navegador, sem servidor e sem dependência
-externa além da fonte Montserrat. O PDF sai do Chrome/Edge headless, a mesma
+externa além das fontes da identidade: Montserrat nos títulos e na marca, Inter
+no corpo e JetBrains Mono no dado técnico. Sem elas o documento continua legível
+nos fallbacks declarados. O PDF sai do Chrome/Edge headless, a mesma
 engine em que o documento é revisado, o que evita divergência entre o que se vê
 em tela e o que o cliente recebe.
 
@@ -34,53 +36,89 @@ NAVEGADORES = (
 ESTILO = """
 @page { size: A4; margin: 16mm 14mm 16mm 14mm; }
 
-/* Só a versão de tela: no PDF a margem é da @page. */
+/* O documento existe para virar A4. Declarar o esquema claro impede o
+   navegador de escurecer por conta própria e descolar tela de papel. */
+:root { color-scheme: light; }
+
+/* Só a versão de tela: no PDF a margem é da @page. Em tela o documento se
+   apresenta como folha sobre fundo, que é como ele será lido e impresso. */
 @media screen {
-  body { max-width: 900px; margin: 0 auto; padding: 32px 24px 64px; font-size: 15px; }
+  html { background: var(--zebra); }
+  body {
+    max-width: 940px;
+    margin: 0 auto;
+    padding: 56px 56px 72px;
+    font-size: 15px;
+    background: #fff;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04),
+                0 10px 15px -3px rgba(15, 23, 42, 0.06);
+  }
   table { font-size: 14px; }
 }
 
 :root {
-  --tinta: #12161a;
-  --suave: #5c6772;
-  --linha: #dfe4e9;
+  --tinta: #0f172a;
+  --suave: #475569;
+  --tenue: #94a3b8;
+  --linha: #e2e8f0;
+  --linha-fina: #eef2f6;
+  --zebra: #f8fafc;
   --ness: #00ade8;
   --alerta: #b3261e;
   --fundo-alerta: #fdf3f2;
+  /* Corpo em Inter, títulos e marca em Montserrat, dado técnico em mono. */
+  --texto: Inter, "Segoe UI", system-ui, sans-serif;
+  --titulo: Montserrat, "Segoe UI", system-ui, sans-serif;
+  --mono: "JetBrains Mono", "Cascadia Mono", Consolas, monospace;
 }
 
 * { box-sizing: border-box; }
 
 body {
-  font-family: Montserrat, "Segoe UI", system-ui, sans-serif;
+  font-family: var(--texto);
   font-size: 9.4pt;
-  line-height: 1.5;
+  line-height: 1.55;
   color: var(--tinta);
   margin: 0;
+  -webkit-font-smoothing: antialiased;
 }
 
 /* ---------------------------------------------------------------- cabeçalho */
 
 .marca {
-  font-weight: 600;
+  font-family: var(--titulo);
+  font-weight: 500;
   font-size: 15pt;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.01em;
   margin: 0 0 2mm;
 }
+/* O ponto da marca é sempre BlueDot, em qualquer fundo. */
 .marca span { color: var(--ness); }
 
 h1 {
+  font-family: var(--titulo);
   font-size: 17pt;
   font-weight: 600;
   letter-spacing: -0.02em;
+  line-height: 1.25;
   margin: 0 0 1mm;
   padding-bottom: 3mm;
   border-bottom: 2px solid var(--ness);
 }
 
+/* A primeira linha depois do h1 é a tarja de identificação do documento —
+   emissão, contrato, marco. Ela se lê como etiqueta, não como parágrafo. */
+h1 + p {
+  font-size: 8.4pt;
+  color: var(--suave);
+  margin-bottom: 5mm;
+}
+
 h2 {
+  font-family: var(--titulo);
   font-size: 11.5pt;
-  font-weight: 600;
+  font-weight: 500;
+  letter-spacing: -0.01em;
   margin: 8mm 0 2.5mm;
   padding-top: 3mm;
   border-top: 1px solid var(--linha);
@@ -88,14 +126,34 @@ h2 {
   break-after: avoid;
 }
 
-h3 { font-size: 10pt; font-weight: 600; margin: 5mm 0 2mm; break-after: avoid; }
+/* Marcador BlueDot antes do título de seção: assinatura discreta, custo zero
+   de espaço, e dá ao olho um ponto de entrada por seção. */
+h2::before {
+  content: "";
+  display: inline-block;
+  width: 1.4mm;
+  height: 1.4mm;
+  border-radius: 50%;
+  background: var(--ness);
+  margin-right: 1.8mm;
+  vertical-align: 0.4mm;
+}
+
+h3 {
+  font-family: var(--titulo);
+  font-size: 10pt;
+  font-weight: 500;
+  margin: 5mm 0 2mm;
+  break-after: avoid;
+}
 
 p { margin: 0 0 2.5mm; }
 strong { font-weight: 600; }
 code {
-  font-family: "Cascadia Mono", Consolas, monospace;
-  font-size: 8.6pt;
-  background: #f2f4f6;
+  font-family: var(--mono);
+  font-size: 8.3pt;
+  background: var(--zebra);
+  border: 0.2mm solid var(--linha-fina);
   padding: 0.3mm 1mm;
   border-radius: 2px;
 }
@@ -107,22 +165,30 @@ table {
   border-collapse: collapse;
   margin: 0 0 4mm;
   font-size: 8.8pt;
+  /* Número em coluna alinha por dígito, não por forma da letra. */
+  font-variant-numeric: tabular-nums;
 }
 th {
   text-align: left;
+  font-family: var(--titulo);
   font-weight: 600;
-  font-size: 7.8pt;
+  font-size: 7.6pt;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.07em;
   color: var(--suave);
   border-bottom: 1.5px solid var(--tinta);
   padding: 1.6mm 2mm;
 }
 td {
-  border-bottom: 1px solid var(--linha);
+  border-bottom: 1px solid var(--linha-fina);
   padding: 2.4mm 2mm;
   vertical-align: top;
 }
+/* Faixa alternada: em tabela densa, o olho perde a linha sem ela. Tom baixo
+   o bastante para não competir com o texto nem pesar na impressão. */
+tbody tr:nth-child(even) td { background: var(--zebra); }
+/* A primeira coluna costuma ser a chave da linha — onda, item, código. */
+tbody td:first-child { font-weight: 500; }
 /* Uma pergunta não se parte entre páginas. */
 tr { break-inside: avoid; }
 thead { display: table-header-group; }
@@ -199,7 +265,11 @@ def montar_html(texto_md: str, *, classe: str = "relatorio") -> str:
         "<!doctype html><html lang='pt-BR'><head><meta charset='utf-8'>"
         "<title>Questionário de Gaps — AlupData</title>"
         "<link rel='preconnect' href='https://fonts.googleapis.com'>"
-        "<link href='https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&display=swap' "
+        "<link rel='preconnect' href='https://fonts.gstatic.com' crossorigin>"
+        "<link href='https://fonts.googleapis.com/css2?"
+        "family=Montserrat:wght@500;600&"
+        "family=Inter:wght@400;500;600&"
+        "family=JetBrains+Mono:wght@400;500&display=swap' "
         "rel='stylesheet'>"
         f"<style>{ESTILO}</style></head>"
         f"<body class='{classe}'>{marca}{corpo}{rodape}</body></html>"

@@ -1,0 +1,554 @@
+<!doctype html><html lang='pt-BR'><head><meta charset='utf-8'><title>Questionário de Gaps — AlupData</title><link rel='preconnect' href='https://fonts.googleapis.com'><link rel='preconnect' href='https://fonts.gstatic.com' crossorigin><link href='https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap' rel='stylesheet'><style>
+@page { size: A4; margin: 16mm 14mm 16mm 14mm; }
+
+/* O documento existe para virar A4. Declarar o esquema claro impede o
+   navegador de escurecer por conta própria e descolar tela de papel. */
+:root { color-scheme: light; }
+
+/* Só a versão de tela: no PDF a margem é da @page. Em tela o documento se
+   apresenta como folha sobre fundo, que é como ele será lido e impresso. */
+@media screen {
+  html { background: var(--zebra); }
+  body {
+    max-width: 940px;
+    margin: 0 auto;
+    padding: 56px 56px 72px;
+    font-size: 15px;
+    background: #fff;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04),
+                0 10px 15px -3px rgba(15, 23, 42, 0.06);
+  }
+  table { font-size: 14px; }
+}
+
+:root {
+  --tinta: #0f172a;
+  --suave: #475569;
+  --tenue: #94a3b8;
+  --linha: #e2e8f0;
+  --linha-fina: #eef2f6;
+  --zebra: #f8fafc;
+  --ness: #00ade8;
+  --alerta: #b3261e;
+  --fundo-alerta: #fdf3f2;
+  /* Corpo em Inter, títulos e marca em Montserrat, dado técnico em mono. */
+  --texto: Inter, "Segoe UI", system-ui, sans-serif;
+  --titulo: Montserrat, "Segoe UI", system-ui, sans-serif;
+  --mono: "JetBrains Mono", "Cascadia Mono", Consolas, monospace;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: var(--texto);
+  font-size: 9.4pt;
+  line-height: 1.55;
+  color: var(--tinta);
+  margin: 0;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ---------------------------------------------------------------- cabeçalho */
+
+.marca {
+  font-family: var(--titulo);
+  font-weight: 500;
+  font-size: 15pt;
+  letter-spacing: -0.01em;
+  margin: 0 0 2mm;
+}
+/* O ponto da marca é sempre BlueDot, em qualquer fundo. */
+.marca span { color: var(--ness); }
+
+h1 {
+  font-family: var(--titulo);
+  font-size: 17pt;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+  margin: 0 0 1mm;
+  padding-bottom: 3mm;
+  border-bottom: 2px solid var(--ness);
+}
+
+/* A primeira linha depois do h1 é a tarja de identificação do documento —
+   emissão, contrato, marco. Ela se lê como etiqueta, não como parágrafo. */
+h1 + p {
+  font-size: 8.4pt;
+  color: var(--suave);
+  margin-bottom: 5mm;
+}
+
+h2 {
+  font-family: var(--titulo);
+  font-size: 11.5pt;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  margin: 8mm 0 2.5mm;
+  padding-top: 3mm;
+  border-top: 1px solid var(--linha);
+  /* Um bloco não deve abrir no rodapé e continuar na página seguinte. */
+  break-after: avoid;
+}
+
+/* Marcador BlueDot antes do título de seção: assinatura discreta, custo zero
+   de espaço, e dá ao olho um ponto de entrada por seção. */
+h2::before {
+  content: "";
+  display: inline-block;
+  width: 1.4mm;
+  height: 1.4mm;
+  border-radius: 50%;
+  background: var(--ness);
+  margin-right: 1.8mm;
+  vertical-align: 0.4mm;
+}
+
+h3 {
+  font-family: var(--titulo);
+  font-size: 10pt;
+  font-weight: 500;
+  margin: 5mm 0 2mm;
+  break-after: avoid;
+}
+
+p { margin: 0 0 2.5mm; }
+strong { font-weight: 600; }
+code {
+  font-family: var(--mono);
+  font-size: 8.3pt;
+  background: var(--zebra);
+  border: 0.2mm solid var(--linha-fina);
+  padding: 0.3mm 1mm;
+  border-radius: 2px;
+}
+
+/* -------------------------------------------------------------------- tabela */
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0 0 4mm;
+  font-size: 8.8pt;
+  /* Número em coluna alinha por dígito, não por forma da letra. */
+  font-variant-numeric: tabular-nums;
+}
+th {
+  text-align: left;
+  font-family: var(--titulo);
+  font-weight: 600;
+  font-size: 7.6pt;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--suave);
+  border-bottom: 1.5px solid var(--tinta);
+  padding: 1.6mm 2mm;
+}
+td {
+  border-bottom: 1px solid var(--linha-fina);
+  padding: 2.4mm 2mm;
+  vertical-align: top;
+}
+/* Faixa alternada: em tabela densa, o olho perde a linha sem ela. Tom baixo
+   o bastante para não competir com o texto nem pesar na impressão. */
+tbody tr:nth-child(even) td { background: var(--zebra); }
+/* A primeira coluna costuma ser a chave da linha — onda, item, código. */
+tbody td:first-child { font-weight: 500; }
+/* Uma pergunta não se parte entre páginas. */
+tr { break-inside: avoid; }
+thead { display: table-header-group; }
+
+/* Larguras de coluna do formulário: código estreito, "Resposta" com espaço de
+   escrita. Valem só no questionário — num relatório espremeriam a 1ª coluna e
+   pintariam a última sem motivo. */
+.questionario td:first-child { width: 7%; font-weight: 600; font-variant-numeric: tabular-nums; }
+.questionario th:last-child, .questionario td:last-child { width: 30%; background: #fafbfc; }
+.questionario td:nth-child(3) { width: 15%; color: var(--suave); font-size: 8.2pt; }
+
+/* --------------------------------------------------------------- destaques */
+
+.bloqueia {
+  display: inline-block;
+  background: var(--alerta);
+  color: #fff;
+  font-size: 6.8pt;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  padding: 0.4mm 1.4mm;
+  border-radius: 2px;
+  margin-right: 1.2mm;
+  vertical-align: 1px;
+}
+
+blockquote {
+  margin: 0 0 3mm;
+  padding: 2.5mm 3mm;
+  background: var(--fundo-alerta);
+  border-left: 3px solid var(--alerta);
+}
+blockquote p:last-child { margin-bottom: 0; }
+
+/* O `---` do Markdown separa as seções na fonte, mas no PDF a borda de `h2` já
+   faz esse trabalho: manter os dois empilha traços. */
+hr { display: none; }
+hr + h2 { margin-top: 7mm; }
+
+ul { margin: 0 0 3mm; padding-left: 5mm; }
+li { margin-bottom: 1.2mm; }
+
+.rodape {
+  margin-top: 8mm;
+  padding-top: 3mm;
+  border-top: 1px solid var(--linha);
+  font-size: 7.6pt;
+  color: var(--suave);
+}
+</style></head><body class='relatorio'><p class="marca">ness<span>.</span></p><h1>A semana do primeiro deploy sem o ambiente, e uma correção no nosso quadro</h1>
+<p><strong>Emitido em 08/09/2026</strong> · Contrato CPS-01025/2026 · Marco em jogo: Onda 0 ·
+15,52% · R$ 23.040,00</p>
+<p>Prezados,</p>
+<p>Este relatório cobre o primeiro dia útil da semana <strong>S2 (07/09 – 11/09)</strong>, que o
+plano reservava para o primeiro deploy real, e registra três coisas: o estado do
+insumo <strong>A3</strong>, os prazos que vencem em 11/09 e uma <strong>correção que fizemos no
+nosso próprio quadro de acompanhamento</strong>, que vinha superestimando o avanço do
+projeto.</p>
+<p>O terceiro ponto é o que mais nos importa comunicar hoje. A informação errada
+estava a nosso favor, foi encontrada por nós e está corrigida — mas ela chegou a
+ficar visível, e vocês precisam saber disso antes de qualquer número subir para
+a diretoria.</p>
+<hr />
+<h2>1. O insumo A3 segue pendente</h2>
+<p>O ambiente GCP <code>dev</code> tinha prazo útil em <strong>04/09/2026</strong> e não foi
+disponibilizado até hoje. O registro do atraso foi emitido na própria data, em
+<a href="2026-09-04-a3-nao-entregue.md">relatório de 04/09</a>, e a situação não mudou
+desde então.</p>
+<p>Como 05 e 06 caíram no fim de semana e 07 foi feriado nacional, <strong>hoje é o
+primeiro dia útil de atraso</strong>. Não houve, portanto, perda de tempo útil entre um
+relatório e outro — e é justamente por isso que este é um bom momento para
+tratar do assunto sem urgência.</p>
+<p>A pendência <strong>G1</strong>, resposta do Google à revisão arquitetural que enviamos em
+04/09, permanece <strong>sem prazo acordado</strong>
+(<a href="https://github.com/nessenergy/Alupdatalake/issues/77">issue #77</a>). Como a Alup
+optou por condicionar A3 a G1, a cadeia continua em série:</p>
+<pre><code>G1 (Google responde) → A3 (ambiente GCP) → 1º apply → Onda 0 homologada
+</code></pre>
+<p>Seguimos considerando a escolha defensável — receber a crítica antes de
+instanciar o ambiente é melhor que depois. O que pedimos é apenas que G1 ganhe
+uma data, qualquer que seja. Uma previsão distante permite planejar; a ausência
+de previsão, não.</p>
+<h2>2. O que a S2 previa, e o que acontece sem o ambiente</h2>
+<p>O plano semanal é explícito quanto a esta semana: <em>"Esta semana só existe se A3
+chegou."</em> O conteúdo previsto era todo dependente do ambiente:</p>
+<table>
+<thead>
+<tr>
+<th>Item previsto para a S2</th>
+<th>Situação</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>terraform apply</code> real — datasets, bucket, secrets, IAM, Cloud Run Job, Scheduler</td>
+<td>escorrega</td>
+</tr>
+<tr>
+<td>Imagem da CLI no Artifact Registry e job executado contra o BCB</td>
+<td>escorrega</td>
+</tr>
+<tr>
+<td><code>make deploy-views</code> — views Silver e Gold das 5 fontes existindo de verdade</td>
+<td>escorrega</td>
+</tr>
+<tr>
+<td>Hubspot rodado contra a API real</td>
+<td>depende de A9</td>
+</tr>
+<tr>
+<td>Destinatários de alerta e <code>billing_account</code> preenchidos</td>
+<td>depende da Alup</td>
+</tr>
+</tbody>
+</table>
+<p>Enquanto o ambiente não existir, esta frente não produz entregável verificável.
+Temos redirecionado o tempo para trabalho que não depende de insumo — foi assim
+que quatro das cinco ondas chegaram a ter entrega —, mas esse estoque de
+trabalho independente é finito e já está bastante consumido.</p>
+<h2>3. O relógio da cláusula 3ª</h2>
+<p>Registramos as datas para que os dois lados tenham o mesmo quadro, não para
+formalizar cobrança:</p>
+<table>
+<thead>
+<tr>
+<th>Marco da cláusula 3ª</th>
+<th>Data</th>
+<th>Efeito</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1º dia útil de atraso de A3</td>
+<td><strong>08/09</strong> (hoje)</td>
+<td>contagem em curso</td>
+</tr>
+<tr>
+<td>5º dia útil</td>
+<td><strong>14/09</strong></td>
+<td>a partir daí, postergação dos prazos que dependem de A3</td>
+</tr>
+<tr>
+<td>20 dias corridos</td>
+<td><strong>24/09</strong></td>
+<td>hipótese de suspensão dos serviços</td>
+</tr>
+</tbody>
+</table>
+<p>Vale repetir o que dissemos em 04/09: condicionar A3 a G1 não interrompe a
+contagem, porque o contrato considera o atraso do insumo e não o seu motivo.
+Isso não é uma objeção à decisão de aguardar o Google — é o registro que
+protege os dois lados na medição.</p>
+<h2>4. Os prazos que vencem em 11/09</h2>
+<p>Faltam <strong>três dias úteis</strong> para cinco itens:</p>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Item</th>
+<th>Efeito de não chegar</th>
+<th>Issue</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A4</td>
+<td>Questionário de Gaps respondido (47 perguntas)</td>
+<td>os 8 domínios analíticos não se definem, e a camada Gold fica sem alvo</td>
+<td><a href="https://github.com/nessenergy/Alupdatalake/issues/8">#8</a></td>
+</tr>
+<tr>
+<td>A9</td>
+<td>Token do Hubspot</td>
+<td>conector pronto segue parado; nenhuma linha de CRM entra no lake</td>
+<td><a href="https://github.com/nessenergy/Alupdatalake/issues/11">#11</a></td>
+</tr>
+<tr>
+<td>A5</td>
+<td>Matriz RACI e data owners</td>
+<td>dúvida de regra de negócio não tem destinatário</td>
+<td><a href="https://github.com/nessenergy/Alupdatalake/issues/9">#9</a></td>
+</tr>
+<tr>
+<td>A6</td>
+<td>Ferramenta de BI definida</td>
+<td>Portal MVP e views Gold ficam sem consumidor definido</td>
+<td><a href="https://github.com/nessenergy/Alupdatalake/issues/10">#10</a></td>
+</tr>
+<tr>
+<td>—</td>
+<td>Destinatários de alerta e <code>billing_account</code></td>
+<td>alertas e orçamento existem, mas não notificam ninguém</td>
+<td><a href="https://github.com/nessenergy/Alupdatalake/issues/87">#87</a></td>
+</tr>
+</tbody>
+</table>
+<p>Chamamos atenção especial para <strong>A4</strong>. Ele é o único da lista que <strong>não depende
+do ambiente GCP</strong>: mesmo que A3 e G1 se resolvam amanhã, sem as respostas do
+questionário a semana S3 não tem conteúdo, porque não há alvo para a camada
+Gold. A4 é, hoje, o insumo com melhor relação entre esforço de vocês e
+destravamento do nosso lado.</p>
+<h2>5. Correção no quadro de acompanhamento</h2>
+<p>Em 24/08, ao popular o GitHub Projects, uma carga automática rodou duas vezes e
+criou <strong>15 itens duplicados</strong>. Em 27/08 fizemos a limpeza fechando uma cópia de
+cada par — e aqui está o erro: no GitHub Projects, <strong>issue fechada conta
+automaticamente como entrega concluída</strong>. A limpeza produziu 15 conclusões que
+não correspondiam a trabalho realizado.</p>
+<p>O efeito era material. O quadro exibia <strong>24 entregas quando o realizado eram
+9</strong>, e apresentava as Ondas 3 e 4 como tendo itens concluídos — incluindo
+conectores de sistemas internos cujas credenciais sequer chegaram.</p>
+<p><strong>Corrigido hoje.</strong> Os 15 itens duplicados foram arquivados; o quadro passou de
+58 para 43 itens e de 24 para <strong>9 conclusões</strong>, que são as reais. Uma décima
+entrou ainda hoje, com o registro da decisão tratada na seção 7:</p>
+<table>
+<thead>
+<tr>
+<th>Entrega concluída</th>
+<th>Onda</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Setup Terraform — módulos base</td>
+<td>0</td>
+</tr>
+<tr>
+<td>CI/CD em GitHub Actions</td>
+<td>0</td>
+</tr>
+<tr>
+<td>Documentação da arquitetura Medallion</td>
+<td>0</td>
+</tr>
+<tr>
+<td>Conectores ONS, ANEEL, IBGE e Câmbio BCB</td>
+<td>1</td>
+</tr>
+<tr>
+<td>Decisão de região do ambiente (ADR 009)</td>
+<td>0</td>
+</tr>
+<tr>
+<td>Campos de acompanhamento semanal do quadro</td>
+<td>0</td>
+</tr>
+<tr>
+<td>Registro da decisão sobre revisão obrigatória na <code>main</code> (ADR 010)</td>
+<td>0</td>
+</tr>
+</tbody>
+</table>
+<p>Nenhuma issue foi excluída e o arquivamento é reversível — o histórico está
+íntegro para auditoria.</p>
+<p>Duas observações que consideramos devidas. A primeira: o erro favorecia a
+ness., e foi encontrado e corrigido por nós, sem que ninguém o apontasse.
+A segunda: ele demonstra por que o campo <strong>Validado</strong> existe no quadro. Entrega
+técnica não é homologação. <strong>Nenhum dos itens acima foi conferido pela Alup</strong> —
+todos estão marcados <code>Validado = Não</code> no quadro, e nenhum deles deve ser lido
+como onda fechada.</p>
+<h2>6. O quadro de acompanhamento está pronto para uso</h2>
+<p>Atendendo à solicitação de acompanhamento semanal, o quadro agora expõe as
+colunas de controle, que existiam mas não estavam visíveis nas visualizações:</p>
+<ul>
+<li><strong>Acompanhamento semanal</strong> — tabela com Semana, Início, Término, Horas,
+  Validado, Correções e Atraso;</li>
+<li><strong>Status semanal</strong> — quadro com as três raias: concluídas, em andamento e a
+  iniciar.</li>
+</ul>
+<p>O campo <strong><code>Validado</code></strong> já está preenchido: todas as entregas concluídas estão
+marcadas como <strong>não validadas</strong>, porque nenhuma foi conferida pela Alup até
+aqui. Filtrar o quadro por <code>Validado = Não</code> dá, portanto, a <strong>fila de
+homologação</strong> — é a lista do que depende de alguém da Alup para que uma onda
+possa ser fechada.</p>
+<p>O quadro passou a carregar também as <strong>horas previstas por item</strong>, transcritas
+do plano de execução. Elas fecham <strong>580 horas exatas</strong>, e fecham por onda:</p>
+<table>
+<thead>
+<tr>
+<th>Onda</th>
+<th>Contratado</th>
+<th>No quadro</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0 — Fundação</td>
+<td>90h</td>
+<td>90h</td>
+</tr>
+<tr>
+<td>1 — Mercado base</td>
+<td>120h</td>
+<td>120h</td>
+</tr>
+<tr>
+<td>2 — APIs credenciadas</td>
+<td>110h</td>
+<td>110h</td>
+</tr>
+<tr>
+<td>3 — Sistemas internos</td>
+<td>155h</td>
+<td>155h</td>
+</tr>
+<tr>
+<td>4 — Planilhas e handoff</td>
+<td>105h</td>
+<td>105h</td>
+</tr>
+<tr>
+<td><strong>Total</strong></td>
+<td><strong>580h</strong></td>
+<td><strong>580h</strong></td>
+</tr>
+</tbody>
+</table>
+<p>Chegar a esse fechamento revelou duas lacunas, ambas corrigidas:</p>
+<ul>
+<li><strong>121 horas de escopo contratado não tinham item no quadro</strong> — as views Gold
+  de cada onda, o agendamento e monitoramento das fontes da Onda 1, a migração
+  da orquestração para o Cloud Composer, a reserva de ajustes do framework, a
+  reserva de fontes remanescentes e o primeiro deploy real. Eram 21% do
+  contrato sem rastreio. Foram abertas oito issues, de #88 a #95, e agora todo
+  item do plano tem correspondente no quadro.</li>
+<li><strong>O conector de câmbio do BCB estava atribuído à Onda 1</strong>, quando o plano o
+  registra como concluído na Onda 0, na condição de conector de referência.
+  Corrigido — era o que deslocava 10 horas entre as duas ondas.</li>
+</ul>
+<p><strong><code>Horas</code> — o realizado — segue em branco, e deliberadamente.</strong> É campo
+distinto do previsto, e é ele que alimenta a medição. Preenchê-lo com
+estimativa apresentaria previsão como apontamento, o que não faremos. Propomos
+consolidar o realizado na próxima reunião de acompanhamento e mantê-lo semanal
+a partir daí. O mesmo vale para <code>Semana</code>, que registra período de
+desenvolvimento e não período planejado.</p>
+<h2>7. Registro sobre a cláusula 8ª</h2>
+<p>A <code>main</code> deste repositório não pode ter revisão obrigatória: o plano GitHub da
+organização não oferece o recurso. O CI executa SAST e SCA em toda alteração —
+Ruff, pytest, Bandit, pip-audit, Gitleaks e Terraform, sete verificações —, mas
+não impede um envio direto.</p>
+<p>Registramos formalmente a decisão em ADR, com os gatilhos que a reabrem, e
+consignamos aqui o que dela decorre: <strong>o dossiê de homologação da Onda 0 não
+afirmará que existe barreira preventiva de SAST e SCA</strong>. Descreverá o arranjo
+real — varredura sistemática em toda alteração, mais o aceite de risco
+registrado. Preferimos a descrição exata a uma afirmação confortável.</p>
+<h2>8. O outro lado do quadro</h2>
+<p>Este relatório trata de um atraso e de uma correção desfavorável a nós. Cabe,
+por isso, repetir o dado que a leitura isolada esconde: <strong>a entrega segue
+adiantada em relação ao cronograma contratual</strong>.</p>
+<table>
+<thead>
+<tr>
+<th>Onda</th>
+<th>Janela contratual</th>
+<th>O que já existe</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>1</strong> — Mercado base</td>
+<td>14/09 – 16/10</td>
+<td><strong>4 de 5 fontes completas</strong>, com os 7 componentes cada: BCB/PTAX, IBGE/IPCA, ANEEL/SIGA (25.263 registros verificados, 0 inválidos) e ONS/carga. Falta a CCEE, bloqueada na origem</td>
+</tr>
+<tr>
+<td><strong>2</strong> — APIs credenciadas</td>
+<td>19/10 – 13/11</td>
+<td><strong>Hubspot completo</strong>, os 7 componentes, escritos antes do token</td>
+</tr>
+<tr>
+<td><strong>3</strong> — Sistemas internos</td>
+<td>16/11 – 18/12</td>
+<td><strong>Caminho de acesso a bancos pronto</strong> — Oracle, MySQL e SQL Server</td>
+</tr>
+<tr>
+<td><strong>4</strong> — Planilhas e handoff</td>
+<td>21/12 – 08/01</td>
+<td><strong>Motor de ingestão de planilhas</strong> pronto; templates dependem de A4</td>
+</tr>
+</tbody>
+</table>
+<p>Com a ressalva que fazemos desde o início e que a correção da seção 5 só torna
+mais importante: <strong>nada foi validado contra um ambiente GCP real</strong>, porque ele
+ainda não existe. Onda 0 não deve ser declarada homologada antes do primeiro
+<code>apply</code> e da primeira carga real.</p>
+<h2>9. O que pedimos</h2>
+<ol>
+<li><strong>Uma data para G1</strong>, ainda que distante — <a href="https://github.com/nessenergy/Alupdatalake/issues/77">issue #77</a>.</li>
+<li><strong>A4 respondido até 11/09</strong> — é o insumo que mais destrava por menos esforço,
+   e o único que não depende do ambiente.</li>
+<li><strong>A3 provisionado</strong> assim que a resposta do Google permitir — <a href="https://github.com/nessenergy/Alupdatalake/issues/55">issue #55</a>.</li>
+<li><strong>A9, A5 e A6 até 11/09</strong>, conforme a seção 4.</li>
+<li><strong>Decisão sobre a CCEE até 18/09</strong> — 32 horas da Onda 1 seguem paradas
+   (<a href="https://github.com/nessenergy/Alupdatalake/issues/52">issue #52</a>).</li>
+</ol>
+<p>Permanecemos à disposição para tratar de qualquer ponto deste registro, e
+agradecemos a atenção de sempre.</p>
+<hr />
+<p><em>Situação corrente e viva em <a href="../status.md"><code>../status.md</code></a>. Questões abertas
+acompanhadas na <a href="https://github.com/nessenergy/Alupdatalake/issues/57">issue #57</a>.</em></p><p class="rodape">ness. Processos e Tecnologia Ltda. · CNPJ 72.027.097/0001-37 · Contrato CPS-01025/2026 — AlupData Fase 1: DataLake</p></body></html>

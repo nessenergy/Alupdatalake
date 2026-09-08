@@ -108,14 +108,15 @@ conectores de sistemas internos cujas credenciais sequer chegaram.
 
 **Corrigido hoje.** Os 15 itens duplicados foram arquivados; o quadro passou de
 58 para 43 itens e de 24 para **9 conclusões**, que são as reais. Uma décima
-entrou ainda hoje, com o registro da decisão tratada na seção 7:
+entrou ainda hoje, com o registro da decisão tratada na seção 6:
 
 | Entrega concluída | Onda |
 |---|---|
 | Setup Terraform — módulos base | 0 |
 | CI/CD em GitHub Actions | 0 |
 | Documentação da arquitetura Medallion | 0 |
-| Conectores ONS, ANEEL, IBGE e Câmbio BCB | 1 |
+| Conector Câmbio BCB, de referência | 0 |
+| Conectores ONS, ANEEL e IBGE | 1 |
 | Decisão de região do ambiente (ADR 009) | 0 |
 | Campos de acompanhamento semanal do quadro | 0 |
 | Registro da decisão sobre revisão obrigatória na `main` (ADR 010) | 0 |
@@ -130,54 +131,7 @@ técnica não é homologação. **Nenhum dos itens acima foi conferido pela Alup
 todos estão marcados `Validado = Não` no quadro, e nenhum deles deve ser lido
 como onda fechada.
 
-## 6. O quadro de acompanhamento está pronto para uso
-
-Atendendo à solicitação de acompanhamento semanal, o quadro agora expõe as
-colunas de controle, que existiam mas não estavam visíveis nas visualizações:
-
-- **Acompanhamento semanal** — tabela com Semana, Início, Término, Horas,
-  Validado, Correções e Atraso;
-- **Status semanal** — quadro com as três raias: concluídas, em andamento e a
-  iniciar.
-
-O campo **`Validado`** já está preenchido: todas as entregas concluídas estão
-marcadas como **não validadas**, porque nenhuma foi conferida pela Alup até
-aqui. Filtrar o quadro por `Validado = Não` dá, portanto, a **fila de
-homologação** — é a lista do que depende de alguém da Alup para que uma onda
-possa ser fechada.
-
-O quadro passou a carregar também as **horas previstas por item**, transcritas
-do plano de execução. Elas fecham **580 horas exatas**, e fecham por onda:
-
-| Onda | Contratado | No quadro |
-|---|---|---|
-| 0 — Fundação | 90h | 90h |
-| 1 — Mercado base | 120h | 120h |
-| 2 — APIs credenciadas | 110h | 110h |
-| 3 — Sistemas internos | 155h | 155h |
-| 4 — Planilhas e handoff | 105h | 105h |
-| **Total** | **580h** | **580h** |
-
-Chegar a esse fechamento revelou duas lacunas, ambas corrigidas:
-
-- **121 horas de escopo contratado não tinham item no quadro** — as views Gold
-  de cada onda, o agendamento e monitoramento das fontes da Onda 1, a migração
-  da orquestração para o Cloud Composer, a reserva de ajustes do framework, a
-  reserva de fontes remanescentes e o primeiro deploy real. Eram 21% do
-  contrato sem rastreio. Foram abertas oito issues, de #88 a #95, e agora todo
-  item do plano tem correspondente no quadro.
-- **O conector de câmbio do BCB estava atribuído à Onda 1**, quando o plano o
-  registra como concluído na Onda 0, na condição de conector de referência.
-  Corrigido — era o que deslocava 10 horas entre as duas ondas.
-
-**`Horas` — o realizado — segue em branco, e deliberadamente.** É campo
-distinto do previsto, e é ele que alimenta a medição. Preenchê-lo com
-estimativa apresentaria previsão como apontamento, o que não faremos. Propomos
-consolidar o realizado na próxima reunião de acompanhamento e mantê-lo semanal
-a partir daí. O mesmo vale para `Semana`, que registra período de
-desenvolvimento e não período planejado.
-
-## 7. Registro sobre a cláusula 8ª
+## 6. Registro sobre a cláusula 8ª
 
 A `main` deste repositório não pode ter revisão obrigatória: o plano GitHub da
 organização não oferece o recurso. O CI executa SAST e SCA em toda alteração —
@@ -190,7 +144,7 @@ afirmará que existe barreira preventiva de SAST e SCA**. Descreverá o arranjo
 real — varredura sistemática em toda alteração, mais o aceite de risco
 registrado. Preferimos a descrição exata a uma afirmação confortável.
 
-## 8. O outro lado do quadro
+## 7. O outro lado do quadro
 
 Este relatório trata de um atraso e de uma correção desfavorável a nós. Cabe,
 por isso, repetir o dado que a leitura isolada esconde: **a entrega segue
@@ -208,7 +162,7 @@ mais importante: **nada foi validado contra um ambiente GCP real**, porque ele
 ainda não existe. Onda 0 não deve ser declarada homologada antes do primeiro
 `apply` e da primeira carga real.
 
-## 9. O que pedimos
+## 8. O que pedimos
 
 1. **Uma data para G1**, ainda que distante — [issue #77](https://github.com/nessenergy/Alupdatalake/issues/77).
 2. **A4 respondido até 11/09** — é o insumo que mais destrava por menos esforço,

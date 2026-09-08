@@ -205,10 +205,14 @@ th {
   font-weight: 600;
   font-size: 7.6pt;
   text-transform: uppercase;
-  letter-spacing: 0.07em;
+  /* Tracking discreto: em coluna estreita, cada 0,01em a mais é uma quebra
+     de linha a mais no cabeçalho. */
+  letter-spacing: 0.04em;
   color: var(--suave);
   border-bottom: 1.5px solid var(--tinta);
   padding: 1.6mm 2mm;
+  /* Cabeçalho de coluna se lê como rótulo: melhor uma linha que duas. */
+  text-wrap: balance;
 }
 td {
   border-bottom: 1px solid var(--linha-fina);
@@ -272,9 +276,21 @@ li { margin-bottom: 1.2mm; }
 
 /* ---------------------------------------------------------------- impressão */
 
-/* Token longo — URL, nome de secret, identificador — não pode estourar a
-   largura da A4 e sumir na borda do papel. */
-code, td, th { overflow-wrap: anywhere; }
+/* Token longo — URL, nome de secret, identificador — não pode ultrapassar a
+   largura da A4 e sumir na borda do papel. `anywhere` só no `code`, onde o
+   token não tem espaço por onde quebrar; em texto corrido ele partiria
+   palavra no meio, inclusive em cabeçalho de tabela. `break-word` quebra
+   apenas a palavra que sozinha não caberia na linha. */
+code { overflow-wrap: anywhere; }
+td, th, .id-valor { overflow-wrap: break-word; }
+
+/* Nenhuma hifenização automática: em documento contratual, palavra partida
+   por hífen inventado atrapalha a leitura e a busca no PDF. */
+* { hyphens: none; }
+
+/* Título distribui o texto entre as linhas em vez de deixar uma palavra órfã
+   na última — vale para o título do documento e para os de seção. */
+h1, h2, h3 { text-wrap: balance; }
 
 @media print {
   /* Uma linha solta no pé ou no topo da página é o defeito mais visível de um
@@ -459,30 +475,25 @@ e encontra-se substancialmente consumida.</p>
 <table>
 <thead>
 <tr>
-<th>Onda</th>
-<th>Janela contratual</th>
+<th>Onda e janela</th>
 <th>Situação</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>1 — Mercado base</td>
-<td>14/09 – 16/10</td>
+<td><strong>1 — Mercado base</strong> 14/09 a 16/10</td>
 <td><strong>4 de 5 fontes completas</strong>, com os 7 componentes cada: BCB/PTAX, IBGE/IPCA, ANEEL/SIGA (25.263 registros verificados, 0 inválidos) e ONS/carga. Resta a CCEE, bloqueada na origem</td>
 </tr>
 <tr>
-<td>2 — APIs credenciadas</td>
-<td>19/10 – 13/11</td>
+<td><strong>2 — APIs credenciadas</strong> 19/10 a 13/11</td>
 <td><strong>Hubspot completo</strong>, os 7 componentes, escritos antes do token</td>
 </tr>
 <tr>
-<td>3 — Sistemas internos</td>
-<td>16/11 – 18/12</td>
+<td><strong>3 — Sistemas internos</strong> 16/11 a 18/12</td>
 <td><strong>Caminho de acesso a bancos concluído</strong> — Oracle, MySQL e SQL Server</td>
 </tr>
 <tr>
-<td>4 — Planilhas e handoff</td>
-<td>21/12 – 08/01</td>
+<td><strong>4 — Planilhas e handoff</strong> 21/12 a 08/01</td>
 <td><strong>Motor de ingestão de planilhas</strong> concluído; templates dependem de A4</td>
 </tr>
 </tbody>

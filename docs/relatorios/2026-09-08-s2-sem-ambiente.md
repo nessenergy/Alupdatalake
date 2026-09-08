@@ -99,12 +99,12 @@ e encontra-se substancialmente consumida.
 
 ### 6.2 Antecipado em relação à janela contratual
 
-| Onda | Janela contratual | Situação |
-|---|---|---|
-| 1 — Mercado base | 14/09 – 16/10 | **4 de 5 fontes completas**, com os 7 componentes cada: BCB/PTAX, IBGE/IPCA, ANEEL/SIGA (25.263 registros verificados, 0 inválidos) e ONS/carga. Resta a CCEE, bloqueada na origem |
-| 2 — APIs credenciadas | 19/10 – 13/11 | **Hubspot completo**, os 7 componentes, escritos antes do token |
-| 3 — Sistemas internos | 16/11 – 18/12 | **Caminho de acesso a bancos concluído** — Oracle, MySQL e SQL Server |
-| 4 — Planilhas e handoff | 21/12 – 08/01 | **Motor de ingestão de planilhas** concluído; templates dependem de A4 |
+| Onda e janela | Situação |
+|---|---|
+| **1 — Mercado base** 14/09 a 16/10 | **4 de 5 fontes completas**, com os 7 componentes cada: BCB/PTAX, IBGE/IPCA, ANEEL/SIGA (25.263 registros verificados, 0 inválidos) e ONS/carga. Resta a CCEE, bloqueada na origem |
+| **2 — APIs credenciadas** 19/10 a 13/11 | **Hubspot completo**, os 7 componentes, escritos antes do token |
+| **3 — Sistemas internos** 16/11 a 18/12 | **Caminho de acesso a bancos concluído** — Oracle, MySQL e SQL Server |
+| **4 — Planilhas e handoff** 21/12 a 08/01 | **Motor de ingestão de planilhas** concluído; templates dependem de A4 |
 
 ### 6.3 Ressalva
 

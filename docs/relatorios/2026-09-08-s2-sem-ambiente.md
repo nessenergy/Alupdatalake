@@ -146,11 +146,36 @@ aqui. Filtrar o quadro por `Validado = Não` dá, portanto, a **fila de
 homologação** — é a lista do que depende de alguém da Alup para que uma onda
 possa ser fechada.
 
-`Horas` e `Semana` serão preenchidos a partir do realizado, e não estimados
-retroativamente — lançar número que não corresponde a apontamento seria pior
-que deixar em branco, porque esses campos alimentam a medição. Propomos
-consolidá-los na próxima reunião de acompanhamento e mantê-los semanais a
-partir daí.
+O quadro passou a carregar também as **horas previstas por item**, transcritas
+do plano de execução. Elas fecham **580 horas exatas**, e fecham por onda:
+
+| Onda | Contratado | No quadro |
+|---|---|---|
+| 0 — Fundação | 90h | 90h |
+| 1 — Mercado base | 120h | 120h |
+| 2 — APIs credenciadas | 110h | 110h |
+| 3 — Sistemas internos | 155h | 155h |
+| 4 — Planilhas e handoff | 105h | 105h |
+| **Total** | **580h** | **580h** |
+
+Chegar a esse fechamento revelou duas lacunas, ambas corrigidas:
+
+- **121 horas de escopo contratado não tinham item no quadro** — as views Gold
+  de cada onda, o agendamento e monitoramento das fontes da Onda 1, a migração
+  da orquestração para o Cloud Composer, a reserva de ajustes do framework, a
+  reserva de fontes remanescentes e o primeiro deploy real. Eram 21% do
+  contrato sem rastreio. Foram abertas oito issues, de #88 a #95, e agora todo
+  item do plano tem correspondente no quadro.
+- **O conector de câmbio do BCB estava atribuído à Onda 1**, quando o plano o
+  registra como concluído na Onda 0, na condição de conector de referência.
+  Corrigido — era o que deslocava 10 horas entre as duas ondas.
+
+**`Horas` — o realizado — segue em branco, e deliberadamente.** É campo
+distinto do previsto, e é ele que alimenta a medição. Preenchê-lo com
+estimativa apresentaria previsão como apontamento, o que não faremos. Propomos
+consolidar o realizado na próxima reunião de acompanhamento e mantê-lo semanal
+a partir daí. O mesmo vale para `Semana`, que registra período de
+desenvolvimento e não período planejado.
 
 ## 7. Registro sobre a cláusula 8ª
 

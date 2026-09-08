@@ -87,25 +87,22 @@ recortes são o esqueleto dele nas semanas sem reunião.
 
 ## Base do lançamento de horas realizadas
 
-Não há apontamento de horas por pessoa neste projeto. As horas realizadas
-lançadas até aqui seguem uma base declarada, e quem auditar a medição precisa
-saber qual é:
+O contrato é por alocação de horas, e a medição se faz por item. A regra do
+lançamento é uma só:
 
 > **Hora contratada atribuída a entrega verificada.** Um item concluído recebe
 > as horas que o `plano-execucao.md` lhe orçou, e só depois de conferido que a
 > entrega existe de fato no repositório.
+
+O que qualifica a hora, portanto, é a entrega — não a passagem do tempo. Item
+sem entrega conferida não recebe hora, ainda que esteja marcado como concluído
+no quadro.
 
 A conferência não é a leitura do status no quadro — é a checagem dos artefatos.
 Para fonte de dados, os **7 componentes** da cláusula 2ª, um a um: conector,
 tabela Bronze, view Silver, view Gold, testes, agendamento e dicionário com
 linhagem. Para item de infraestrutura ou documentação, o artefato
 correspondente versionado.
-
-**O que esta base não é:** não é registro de tempo gasto. Se o esforço real de
-um item divergir do orçado, o número aqui não mostra — ele mostra alocação
-contratual consumida pela entrega. Enquanto não houver apontamento, é o dado
-defensável disponível, e a diferença entre os dois deve ser dita a quem for ler
-a medição.
 
 **Lançamento de 08/09/2026** — 100h, sobre sete itens conferidos:
 

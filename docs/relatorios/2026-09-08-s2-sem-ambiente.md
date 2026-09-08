@@ -107,7 +107,8 @@ O efeito era material. O quadro exibia **24 entregas quando o realizado eram
 conectores de sistemas internos cujas credenciais sequer chegaram.
 
 **Corrigido hoje.** Os 15 itens duplicados foram arquivados; o quadro passou de
-58 para 43 itens e de 24 para **9 conclusões**, que são as reais:
+58 para 43 itens e de 24 para **9 conclusões**, que são as reais. Uma décima
+entrou ainda hoje, com o registro da decisão tratada na seção 7:
 
 | Entrega concluída | Onda |
 |---|---|
@@ -117,6 +118,7 @@ conectores de sistemas internos cujas credenciais sequer chegaram.
 | Conectores ONS, ANEEL, IBGE e Câmbio BCB | 1 |
 | Decisão de região do ambiente (ADR 009) | 0 |
 | Campos de acompanhamento semanal do quadro | 0 |
+| Registro da decisão sobre revisão obrigatória na `main` (ADR 010) | 0 |
 
 Nenhuma issue foi excluída e o arquivamento é reversível — o histórico está
 íntegro para auditoria.
@@ -124,8 +126,9 @@ Nenhuma issue foi excluída e o arquivamento é reversível — o histórico est
 Duas observações que consideramos devidas. A primeira: o erro favorecia a
 ness., e foi encontrado e corrigido por nós, sem que ninguém o apontasse.
 A segunda: ele demonstra por que o campo **Validado** existe no quadro. Entrega
-técnica não é homologação. Nenhum dos 9 itens acima foi conferido pela Alup, e
-nenhum deles deve ser lido como onda fechada.
+técnica não é homologação. **Nenhum dos itens acima foi conferido pela Alup** —
+todos estão marcados `Validado = Não` no quadro, e nenhum deles deve ser lido
+como onda fechada.
 
 ## 6. O quadro de acompanhamento está pronto para uso
 
@@ -136,6 +139,12 @@ colunas de controle, que existiam mas não estavam visíveis nas visualizações
   Validado, Correções e Atraso;
 - **Status semanal** — quadro com as três raias: concluídas, em andamento e a
   iniciar.
+
+O campo **`Validado`** já está preenchido: todas as entregas concluídas estão
+marcadas como **não validadas**, porque nenhuma foi conferida pela Alup até
+aqui. Filtrar o quadro por `Validado = Não` dá, portanto, a **fila de
+homologação** — é a lista do que depende de alguém da Alup para que uma onda
+possa ser fechada.
 
 `Horas` e `Semana` serão preenchidos a partir do realizado, e não estimados
 retroativamente — lançar número que não corresponde a apontamento seria pior

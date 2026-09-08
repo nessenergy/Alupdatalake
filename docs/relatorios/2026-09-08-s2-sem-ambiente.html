@@ -301,7 +301,8 @@ não correspondiam a trabalho realizado.</p>
 9</strong>, e apresentava as Ondas 3 e 4 como tendo itens concluídos — incluindo
 conectores de sistemas internos cujas credenciais sequer chegaram.</p>
 <p><strong>Corrigido hoje.</strong> Os 15 itens duplicados foram arquivados; o quadro passou de
-58 para 43 itens e de 24 para <strong>9 conclusões</strong>, que são as reais:</p>
+58 para 43 itens e de 24 para <strong>9 conclusões</strong>, que são as reais. Uma décima
+entrou ainda hoje, com o registro da decisão tratada na seção 7:</p>
 <table>
 <thead>
 <tr>
@@ -334,6 +335,10 @@ conectores de sistemas internos cujas credenciais sequer chegaram.</p>
 <td>Campos de acompanhamento semanal do quadro</td>
 <td>0</td>
 </tr>
+<tr>
+<td>Registro da decisão sobre revisão obrigatória na <code>main</code> (ADR 010)</td>
+<td>0</td>
+</tr>
 </tbody>
 </table>
 <p>Nenhuma issue foi excluída e o arquivamento é reversível — o histórico está
@@ -341,8 +346,9 @@ conectores de sistemas internos cujas credenciais sequer chegaram.</p>
 <p>Duas observações que consideramos devidas. A primeira: o erro favorecia a
 ness., e foi encontrado e corrigido por nós, sem que ninguém o apontasse.
 A segunda: ele demonstra por que o campo <strong>Validado</strong> existe no quadro. Entrega
-técnica não é homologação. Nenhum dos 9 itens acima foi conferido pela Alup, e
-nenhum deles deve ser lido como onda fechada.</p>
+técnica não é homologação. <strong>Nenhum dos itens acima foi conferido pela Alup</strong> —
+todos estão marcados <code>Validado = Não</code> no quadro, e nenhum deles deve ser lido
+como onda fechada.</p>
 <h2>6. O quadro de acompanhamento está pronto para uso</h2>
 <p>Atendendo à solicitação de acompanhamento semanal, o quadro agora expõe as
 colunas de controle, que existiam mas não estavam visíveis nas visualizações:</p>
@@ -352,6 +358,11 @@ colunas de controle, que existiam mas não estavam visíveis nas visualizações
 <li><strong>Status semanal</strong> — quadro com as três raias: concluídas, em andamento e a
   iniciar.</li>
 </ul>
+<p>O campo <strong><code>Validado</code></strong> já está preenchido: todas as entregas concluídas estão
+marcadas como <strong>não validadas</strong>, porque nenhuma foi conferida pela Alup até
+aqui. Filtrar o quadro por <code>Validado = Não</code> dá, portanto, a <strong>fila de
+homologação</strong> — é a lista do que depende de alguém da Alup para que uma onda
+possa ser fechada.</p>
 <p><code>Horas</code> e <code>Semana</code> serão preenchidos a partir do realizado, e não estimados
 retroativamente — lançar número que não corresponde a apontamento seria pior
 que deixar em branco, porque esses campos alimentam a medição. Propomos

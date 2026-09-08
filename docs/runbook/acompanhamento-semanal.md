@@ -77,7 +77,44 @@ recortes são o esqueleto dele nas semanas sem reunião.
 
 - **Horas** entra no fim do item, não no começo. Estimativa vai no plano; aqui
   é o realizado.
+- **Horas previstas** é campo separado, transcrito do
+  [`plano-execucao.md`](../plano-execucao.md). Os dois nunca se misturam: um é
+  orçamento, o outro é medição.
 - **Validado** só vira `Sim` com nome e data de quem validou registrados no
   item. "Alguém falou que estava ok" não é validação.
 - **Atraso** é do item, não da pessoa. Um item bloqueado por insumo da Alup
   entra como `Sim` — é justamente o caso que o contrato quer ver registrado.
+
+## Base do lançamento de horas realizadas
+
+Não há apontamento de horas por pessoa neste projeto. As horas realizadas
+lançadas até aqui seguem uma base declarada, e quem auditar a medição precisa
+saber qual é:
+
+> **Hora contratada atribuída a entrega verificada.** Um item concluído recebe
+> as horas que o `plano-execucao.md` lhe orçou, e só depois de conferido que a
+> entrega existe de fato no repositório.
+
+A conferência não é a leitura do status no quadro — é a checagem dos artefatos.
+Para fonte de dados, os **7 componentes** da cláusula 2ª, um a um: conector,
+tabela Bronze, view Silver, view Gold, testes, agendamento e dicionário com
+linhagem. Para item de infraestrutura ou documentação, o artefato
+correspondente versionado.
+
+**O que esta base não é:** não é registro de tempo gasto. Se o esforço real de
+um item divergir do orçado, o número aqui não mostra — ele mostra alocação
+contratual consumida pela entrega. Enquanto não houver apontamento, é o dado
+defensável disponível, e a diferença entre os dois deve ser dita a quem for ler
+a medição.
+
+**Lançamento de 08/09/2026** — 100h, sobre sete itens conferidos:
+
+| Onda | Itens | Horas |
+|---|---|---:|
+| 0 — Fundação | Terraform (#2), CI/CD (#3), arquitetura Medallion (#7), conector BCB/PTAX (#21) | 40h |
+| 1 — Mercado base | conectores ONS (#18), ANEEL (#19) e IBGE (#20) | 60h |
+
+Os demais itens concluídos — região do ambiente (#67), revisão na `main` (#68)
+e campos do quadro (#78) — **não receberam horas**: são decisões e
+instrumentação, não constam do plano de execução e portanto não têm alocação
+contratual a consumir.

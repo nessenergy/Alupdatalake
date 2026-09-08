@@ -5,6 +5,16 @@
    navegador de escurecer por conta própria e descolar tela de papel. */
 :root { color-scheme: light; }
 
+/* Imprimir do navegador (Ctrl+P → Salvar como PDF) vem com "gráficos de plano
+   de fundo" DESLIGADO por padrão. Sem isto, a faixa alternada das tabelas, o
+   fundo do `code` e o bloco de alerta somem no papel — e a etiqueta vermelha
+   do questionário vira texto branco sobre branco, isto é, invisível.
+   Forçar aqui garante que tela, --print-to-pdf e impressão manual coincidam. */
+html {
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
 /* Só a versão de tela: no PDF a margem é da @page. Em tela o documento se
    apresenta como folha sobre fundo, que é como ele será lido e impresso. */
 @media screen {
@@ -203,6 +213,24 @@ li { margin-bottom: 1.2mm; }
   font-size: 7.6pt;
   color: var(--suave);
 }
+
+/* ---------------------------------------------------------------- impressão */
+
+/* Token longo — URL, nome de secret, identificador — não pode estourar a
+   largura da A4 e sumir na borda do papel. */
+code, td, th { overflow-wrap: anywhere; }
+
+@media print {
+  /* Uma linha solta no pé ou no topo da página é o defeito mais visível de um
+     documento impresso. Três linhas é o mínimo que se lê como parágrafo. */
+  p, li { orphans: 3; widows: 3; }
+  h1, h2, h3 { break-after: avoid; break-inside: avoid; }
+  /* Título de seção seguido de tabela: os dois andam juntos ou nenhum anda. */
+  h2 + table, h3 + table, h2 + p, h3 + p { break-before: avoid; }
+  table, blockquote { break-inside: auto; }
+  /* Link impresso vira texto: sublinhado só polui o papel. */
+  a { text-decoration: none; color: var(--tinta); }
+}
 </style></head><body class='relatorio'><p class="marca">ness<span>.</span></p><h1>A semana do primeiro deploy sem o ambiente, e uma correção no nosso quadro</h1>
 <p><strong>Emitido em 08/09/2026</strong> · Contrato CPS-01025/2026 · Marco em jogo: Onda 0 ·
 15,52% · R$ 23.040,00</p>
@@ -366,7 +394,7 @@ não correspondiam a trabalho realizado.</p>
 conectores de sistemas internos cujas credenciais sequer chegaram.</p>
 <p><strong>Corrigido hoje.</strong> Os 15 itens duplicados foram arquivados; o quadro passou de
 58 para 43 itens e de 24 para <strong>9 conclusões</strong>, que são as reais. Uma décima
-entrou ainda hoje, com o registro da decisão tratada na seção 7:</p>
+entrou ainda hoje, com o registro da decisão tratada na seção 6:</p>
 <table>
 <thead>
 <tr>
@@ -388,7 +416,11 @@ entrou ainda hoje, com o registro da decisão tratada na seção 7:</p>
 <td>0</td>
 </tr>
 <tr>
-<td>Conectores ONS, ANEEL, IBGE e Câmbio BCB</td>
+<td>Conector Câmbio BCB, de referência</td>
+<td>0</td>
+</tr>
+<tr>
+<td>Conectores ONS, ANEEL e IBGE</td>
 <td>1</td>
 </tr>
 <tr>
@@ -413,82 +445,7 @@ A segunda: ele demonstra por que o campo <strong>Validado</strong> existe no qua
 técnica não é homologação. <strong>Nenhum dos itens acima foi conferido pela Alup</strong> —
 todos estão marcados <code>Validado = Não</code> no quadro, e nenhum deles deve ser lido
 como onda fechada.</p>
-<h2>6. O quadro de acompanhamento está pronto para uso</h2>
-<p>Atendendo à solicitação de acompanhamento semanal, o quadro agora expõe as
-colunas de controle, que existiam mas não estavam visíveis nas visualizações:</p>
-<ul>
-<li><strong>Acompanhamento semanal</strong> — tabela com Semana, Início, Término, Horas,
-  Validado, Correções e Atraso;</li>
-<li><strong>Status semanal</strong> — quadro com as três raias: concluídas, em andamento e a
-  iniciar.</li>
-</ul>
-<p>O campo <strong><code>Validado</code></strong> já está preenchido: todas as entregas concluídas estão
-marcadas como <strong>não validadas</strong>, porque nenhuma foi conferida pela Alup até
-aqui. Filtrar o quadro por <code>Validado = Não</code> dá, portanto, a <strong>fila de
-homologação</strong> — é a lista do que depende de alguém da Alup para que uma onda
-possa ser fechada.</p>
-<p>O quadro passou a carregar também as <strong>horas previstas por item</strong>, transcritas
-do plano de execução. Elas fecham <strong>580 horas exatas</strong>, e fecham por onda:</p>
-<table>
-<thead>
-<tr>
-<th>Onda</th>
-<th>Contratado</th>
-<th>No quadro</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>0 — Fundação</td>
-<td>90h</td>
-<td>90h</td>
-</tr>
-<tr>
-<td>1 — Mercado base</td>
-<td>120h</td>
-<td>120h</td>
-</tr>
-<tr>
-<td>2 — APIs credenciadas</td>
-<td>110h</td>
-<td>110h</td>
-</tr>
-<tr>
-<td>3 — Sistemas internos</td>
-<td>155h</td>
-<td>155h</td>
-</tr>
-<tr>
-<td>4 — Planilhas e handoff</td>
-<td>105h</td>
-<td>105h</td>
-</tr>
-<tr>
-<td><strong>Total</strong></td>
-<td><strong>580h</strong></td>
-<td><strong>580h</strong></td>
-</tr>
-</tbody>
-</table>
-<p>Chegar a esse fechamento revelou duas lacunas, ambas corrigidas:</p>
-<ul>
-<li><strong>121 horas de escopo contratado não tinham item no quadro</strong> — as views Gold
-  de cada onda, o agendamento e monitoramento das fontes da Onda 1, a migração
-  da orquestração para o Cloud Composer, a reserva de ajustes do framework, a
-  reserva de fontes remanescentes e o primeiro deploy real. Eram 21% do
-  contrato sem rastreio. Foram abertas oito issues, de #88 a #95, e agora todo
-  item do plano tem correspondente no quadro.</li>
-<li><strong>O conector de câmbio do BCB estava atribuído à Onda 1</strong>, quando o plano o
-  registra como concluído na Onda 0, na condição de conector de referência.
-  Corrigido — era o que deslocava 10 horas entre as duas ondas.</li>
-</ul>
-<p><strong><code>Horas</code> — o realizado — segue em branco, e deliberadamente.</strong> É campo
-distinto do previsto, e é ele que alimenta a medição. Preenchê-lo com
-estimativa apresentaria previsão como apontamento, o que não faremos. Propomos
-consolidar o realizado na próxima reunião de acompanhamento e mantê-lo semanal
-a partir daí. O mesmo vale para <code>Semana</code>, que registra período de
-desenvolvimento e não período planejado.</p>
-<h2>7. Registro sobre a cláusula 8ª</h2>
+<h2>6. Registro sobre a cláusula 8ª</h2>
 <p>A <code>main</code> deste repositório não pode ter revisão obrigatória: o plano GitHub da
 organização não oferece o recurso. O CI executa SAST e SCA em toda alteração —
 Ruff, pytest, Bandit, pip-audit, Gitleaks e Terraform, sete verificações —, mas
@@ -498,7 +455,7 @@ consignamos aqui o que dela decorre: <strong>o dossiê de homologação da Onda 
 afirmará que existe barreira preventiva de SAST e SCA</strong>. Descreverá o arranjo
 real — varredura sistemática em toda alteração, mais o aceite de risco
 registrado. Preferimos a descrição exata a uma afirmação confortável.</p>
-<h2>8. O outro lado do quadro</h2>
+<h2>7. O outro lado do quadro</h2>
 <p>Este relatório trata de um atraso e de uma correção desfavorável a nós. Cabe,
 por isso, repetir o dado que a leitura isolada esconde: <strong>a entrega segue
 adiantada em relação ao cronograma contratual</strong>.</p>
@@ -537,7 +494,7 @@ adiantada em relação ao cronograma contratual</strong>.</p>
 mais importante: <strong>nada foi validado contra um ambiente GCP real</strong>, porque ele
 ainda não existe. Onda 0 não deve ser declarada homologada antes do primeiro
 <code>apply</code> e da primeira carga real.</p>
-<h2>9. O que pedimos</h2>
+<h2>8. O que pedimos</h2>
 <ol>
 <li><strong>Uma data para G1</strong>, ainda que distante — <a href="https://github.com/nessenergy/Alupdatalake/issues/77">issue #77</a>.</li>
 <li><strong>A4 respondido até 11/09</strong> — é o insumo que mais destrava por menos esforço,

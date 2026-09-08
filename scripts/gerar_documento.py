@@ -40,6 +40,16 @@ ESTILO = """
    navegador de escurecer por conta própria e descolar tela de papel. */
 :root { color-scheme: light; }
 
+/* Imprimir do navegador (Ctrl+P → Salvar como PDF) vem com "gráficos de plano
+   de fundo" DESLIGADO por padrão. Sem isto, a faixa alternada das tabelas, o
+   fundo do `code` e o bloco de alerta somem no papel — e a etiqueta vermelha
+   do questionário vira texto branco sobre branco, isto é, invisível.
+   Forçar aqui garante que tela, --print-to-pdf e impressão manual coincidam. */
+html {
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
 /* Só a versão de tela: no PDF a margem é da @page. Em tela o documento se
    apresenta como folha sobre fundo, que é como ele será lido e impresso. */
 @media screen {
@@ -237,6 +247,24 @@ li { margin-bottom: 1.2mm; }
   border-top: 1px solid var(--linha);
   font-size: 7.6pt;
   color: var(--suave);
+}
+
+/* ---------------------------------------------------------------- impressão */
+
+/* Token longo — URL, nome de secret, identificador — não pode estourar a
+   largura da A4 e sumir na borda do papel. */
+code, td, th { overflow-wrap: anywhere; }
+
+@media print {
+  /* Uma linha solta no pé ou no topo da página é o defeito mais visível de um
+     documento impresso. Três linhas é o mínimo que se lê como parágrafo. */
+  p, li { orphans: 3; widows: 3; }
+  h1, h2, h3 { break-after: avoid; break-inside: avoid; }
+  /* Título de seção seguido de tabela: os dois andam juntos ou nenhum anda. */
+  h2 + table, h3 + table, h2 + p, h3 + p { break-before: avoid; }
+  table, blockquote { break-inside: auto; }
+  /* Link impresso vira texto: sublinhado só polui o papel. */
+  a { text-decoration: none; color: var(--tinta); }
 }
 """
 

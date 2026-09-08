@@ -21,6 +21,30 @@ Situação corrente e viva fica em [`../status.md`](../status.md); este diretór
 
 - **Nome do arquivo**: `AAAA-MM-DD-assunto.md`, data de emissão.
 - **Como gerar o HTML**: `make relatorio ARQ=docs/relatorios/AAAA-MM-DD-assunto.md`.
+- **Identificação do documento**: o `.md` abre com um bloco `---` de
+  metadados, que vira a ficha impressa abaixo do título e o fecho assinado no
+  fim. Documento emitido à contratante precisa dizer, na própria folha, o que
+  é, sob qual contrato, para quem, em que data e sob responsabilidade de quem.
+
+  ```yaml
+  ---
+  titulo: Relatório de situação AAAA-MM-DD — AlupData Fase 1
+  documento: Relatório de situação
+  referencia: REL-AAAA-MM-DD · AlupData Fase 1
+  emitido_em: DD de mês de AAAA
+  emitente: ness. Processos e Tecnologia Ltda.
+  destinatario: Alup
+  contrato: CPS-01025/2026 — AlupData Fase 1: DataLake
+  marco: Onda N · X% · R$ …
+  responsavel: Nome de quem emite
+  classificacao: Confidencial — uso restrito das partes
+  local_data: DD de mês de AAAA
+  ---
+  ```
+
+  Campo ausente não é impresso, e documento sem o bloco continua gerando como
+  antes — a mudança é retrocompatível. `titulo` alimenta a aba do navegador e
+  os metadados do PDF; sem ele, o gerador usa o `#` do documento.
 - **Dois formatos**: o `.md` é a fonte e o que se lê no GitHub; o `.html` é a
   mesma coisa com a identidade ness. aplicada, para enviar à contratante ou
   imprimir em PDF. O HTML é autocontido — abre direto no navegador, sem

@@ -1,4 +1,4 @@
-<!doctype html><html lang='pt-BR'><head><meta charset='utf-8'><title>Questionário de Gaps — AlupData</title><link rel='preconnect' href='https://fonts.googleapis.com'><link rel='preconnect' href='https://fonts.gstatic.com' crossorigin><link href='https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap' rel='stylesheet'><style>
+<!doctype html><html lang='pt-BR'><head><meta charset='utf-8'><title>Relatório de situação 08/09/2026 — AlupData Fase 1</title><link rel='preconnect' href='https://fonts.googleapis.com'><link rel='preconnect' href='https://fonts.gstatic.com' crossorigin><link href='https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap' rel='stylesheet'><style>
 @page { size: A4; margin: 16mm 14mm 16mm 14mm; }
 
 /* O documento existe para virar A4. Declarar o esquema claro impede o
@@ -87,6 +87,62 @@ h1 + p {
   font-size: 8.4pt;
   color: var(--suave);
   margin-bottom: 5mm;
+}
+
+/* ------------------------------------------------- identificação do documento */
+
+/* Ficha do documento: quem emite, para quem, sob qual contrato, em que data.
+   Fica logo abaixo do título e não se parte entre páginas — um documento
+   contratual precisa ser identificável pela primeira folha, isolada. */
+.identificacao {
+  display: grid;
+  /* Largura suficiente para "RESPONSÁVEL TÉCNICO" caber em uma linha. */
+  grid-template-columns: 37mm 1fr;
+  gap: 1.2mm 4mm;
+  margin: 4mm 0 6mm;
+  padding: 3.5mm 4mm;
+  background: var(--zebra);
+  border-left: 2px solid var(--ness);
+  font-size: 8.4pt;
+  break-inside: avoid;
+}
+.id-rotulo {
+  font-family: var(--titulo);
+  font-size: 7.2pt;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--suave);
+  padding-top: 0.4mm;
+}
+.id-valor { color: var(--tinta); }
+
+/* ------------------------------------------------------------- fecho assinado */
+
+.assinatura {
+  margin-top: 12mm;
+  break-inside: avoid;
+}
+.assinatura .local-data {
+  font-size: 8.6pt;
+  color: var(--suave);
+  margin-bottom: 12mm;
+}
+.linha-assinatura {
+  width: 68mm;
+  border-top: 1px solid var(--tinta);
+  margin-bottom: 1.6mm;
+}
+.assina-nome {
+  font-family: var(--titulo);
+  font-weight: 500;
+  font-size: 9.4pt;
+  margin: 0;
+}
+.assina-org {
+  font-size: 8pt;
+  color: var(--suave);
+  margin: 0.4mm 0 0;
 }
 
 h2 {
@@ -231,9 +287,7 @@ code, td, th { overflow-wrap: anywhere; }
   /* Link impresso vira texto: sublinhado só polui o papel. */
   a { text-decoration: none; color: var(--tinta); }
 }
-</style></head><body class='relatorio'><p class="marca">ness<span>.</span></p><h1>A semana do primeiro deploy sem o ambiente, e uma correção no nosso quadro</h1>
-<p><strong>Emitido em 08/09/2026</strong> · Contrato CPS-01025/2026 · Marco em jogo: Onda 0 ·
-15,52% · R$ 23.040,00</p>
+</style></head><body class='relatorio'><p class="marca">ness<span>.</span></p><h1>A semana do primeiro deploy sem o ambiente, e uma correção no nosso quadro</h1><section class='identificacao'><div class='id-rotulo'>Documento</div><div class='id-valor'>Relatório de situação</div><div class='id-rotulo'>Referência</div><div class='id-valor'>REL-2026-09-08 · AlupData Fase 1</div><div class='id-rotulo'>Data de emissão</div><div class='id-valor'>08 de setembro de 2026</div><div class='id-rotulo'>Emitente</div><div class='id-valor'>ness. Processos e Tecnologia Ltda.</div><div class='id-rotulo'>Destinatário</div><div class='id-valor'>Alup</div><div class='id-rotulo'>Contrato</div><div class='id-valor'>CPS-01025/2026 — AlupData Fase 1: DataLake</div><div class='id-rotulo'>Marco em jogo</div><div class='id-valor'>Onda 0 · 15,52% · R$ 23.040,00</div><div class='id-rotulo'>Responsável técnico</div><div class='id-valor'>Ricardo Esper</div><div class='id-rotulo'>Classificação</div><div class='id-valor'>Confidencial — uso restrito das partes</div></section>
 <p>Prezados,</p>
 <p>Este relatório cobre o primeiro dia útil da semana <strong>S2 (07/09 – 11/09)</strong>, que o
 plano reservava para o primeiro deploy real, e registra três coisas: o estado do
@@ -508,4 +562,4 @@ ainda não existe. Onda 0 não deve ser declarada homologada antes do primeiro
 agradecemos a atenção de sempre.</p>
 <hr />
 <p><em>Situação corrente em <a href="../status.md"><code>../status.md</code></a>. Questões abertas
-acompanhadas na <a href="https://github.com/nessenergy/Alupdatalake/issues/57">issue #57</a>.</em></p><p class="rodape">ness. Processos e Tecnologia Ltda. · CNPJ 72.027.097/0001-37 · Contrato CPS-01025/2026 — AlupData Fase 1: DataLake</p></body></html>
+acompanhadas na <a href="https://github.com/nessenergy/Alupdatalake/issues/57">issue #57</a>.</em></p><section class='assinatura'><p class=local-data>08 de setembro de 2026</p><div class='linha-assinatura'></div><p class='assina-nome'>Ricardo Esper</p><p class='assina-org'>ness. Processos e Tecnologia Ltda.</p></section><p class="rodape">ness. Processos e Tecnologia Ltda. · CNPJ 72.027.097/0001-37 · Contrato CPS-01025/2026 — AlupData Fase 1: DataLake</p></body></html>

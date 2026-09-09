@@ -132,8 +132,8 @@ Onda 0 não homologa. Todo o cronograma pendura nesta linha.
 
 | # | Pergunta | Quem | Resposta |
 |---|---|---|---|
-| E1 | **[BLOQUEIA]** Qual a **data e o responsável** pela criação do projeto GCP `dev`? Precisamos de data com nome, não de estimativa. | TI | |
-| E2 | **[BLOQUEIA]** Qual a `billing_account` a ser vinculada, e qual o teto mensal de custo aceitável para o alerta de orçamento? | Controladoria / TI | |
+| E1 | **[BLOQUEIA]** Qual a **data e o responsável** pela criação do projeto GCP `dev`? Precisamos de data com nome, não de estimativa. | TI | **Atribuição esclarecida em 09/09**: a criação cabe à Alup, administradora da organização GCP — a ness. não tem, e não deve ter, permissão de criar projeto na organização da contratante ([issue #55](https://github.com/nessenergy/Alupdatalake/issues/55), [registro de 09/09](relatorios/2026-09-09-esclarecimento-e1-e2.md)). **Data e nome do responsável seguem pendentes.** |
+| E2 | **[BLOQUEIA]** Qual a `billing_account` a ser vinculada, e qual o teto mensal de custo aceitável para o alerta de orçamento? | Controladoria / TI | **Atribuição esclarecida em 09/09**: a conta é da Alup — a cláusula 5ª exclui do escopo da ness. os custos de infraestrutura GCP. Teto sugerido: R$ 500/mês em `dev` (estimativa de US$ 5–15/mês nas Ondas 0–2; US$ 420–500 a partir da Onda 3). **Conta e teto seguem pendentes** ([issue #87](https://github.com/nessenergy/Alupdatalake/issues/87)). |
 | E3 | **[BLOQUEIA]** Quem recebe os alertas de falha de ingestão? Envie e-mails ou canal (a infraestrutura de alerta existe e está sem destinatário). | TI | |
 | E4 | A Alup provisiona também o projeto de **produção** agora, ou só `dev` nesta fase? | TI | |
 | E5 | Existe organização/pasta GCP e política de nomenclatura corporativa que devemos seguir? | TI | |

@@ -1,7 +1,7 @@
 # Próximos passos — fila de execução
 
 Documento **vivo**: é para riscar linha, não para arquivar. Atualizado em
-**2026-09-04**, fim do dia.
+**2026-09-09**.
 
 Ele existe para responder uma pergunta que os outros três não respondem em uma
 tela: **qual é a próxima ação, de quem é, e qual comando a executa.**
@@ -24,7 +24,7 @@ A cadeia hoje é **em série**, e a ponta dela é a única sem prazo:
 | # | Ação | Dono | Situação |
 |---|---|---|---|
 | 1.1 | **Obter uma data para a resposta do Google** — [issue #77](https://github.com/nessenergy/Alupdatalake/issues/77) | Alup / Google | **sem prazo acordado.** É o item que precede todo o resto |
-| 1.2 | **Projeto GCP `dev`** (A3) | Alup | **vencido em 04/09**, atraso registrado, condicionado a G1 |
+| 1.2 | **Projeto GCP `dev`** (A3) | Alup | **vencido em 04/09**, atraso registrado, condicionado a G1. Quem cria (E1) e de quem é a `billing_account` (E2) foi perguntado pela Alup em 09/09 e **esclarecido no mesmo dia**: ambos são da Alup |
 | 1.3 | **Branch protection na `main`** + variáveis `GCP_WIF_PROVIDER` e `GCP_DEPLOY_SA` (A1) | ness./Alup | impossível no plano GitHub Free — decidir entre Team pago ou risco assumido por escrito |
 
 > O atraso de A3 está registrado em
@@ -42,6 +42,9 @@ A cadeia hoje é **em série**, e a ponta dela é a única sem prazo:
 | 2.1 | **Cobrar a data do Google** | [issue #77](https://github.com/nessenergy/Alupdatalake/issues/77) tem o texto pronto para a conversa | Data registrada na issue |
 | 2.2 | **Enviar o relatório de 04/09 à Alup** | `.md` e `.html` prontos em [`relatorios/`](relatorios/) | Registro na mão da contratante |
 | 2.3 | **Decidir a região com a Alup** | resposta à pergunta E7 do questionário | Confirmação de `southamerica-east1`, ou inversão enquanto ainda dá tempo |
+| 2.4 | **Enviar à Alup o registro de 09/09 sobre E1 e E2** | `.md` e `.html` prontos em [`relatorios/`](relatorios/) | Registro na mão da contratante |
+| 2.5 | **Obter a data e o nome do responsável por A3** | a atribuição já está esclarecida; falta a data — [issue #55](https://github.com/nessenergy/Alupdatalake/issues/55) | E1 respondido com data e nome |
+| 2.6 | **Obter a `billing_account` e o teto do alerta** | sugestão de R$ 500/mês em `dev` — [issue #87](https://github.com/nessenergy/Alupdatalake/issues/87) | E2 e E3 respondidos |
 
 ### Por que 2.1 tem pressa
 

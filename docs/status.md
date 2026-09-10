@@ -96,7 +96,7 @@ destino, com os oito invariantes e a pauta de perguntas. **Enviado ao Google em
 | A2 | **Decidir sobre a CCEE InfoMercado** — portal responde 403 a acesso automatizado | 32h da Onda 1 paradas; `agente_ccee` sem fonte | [issue #52](https://github.com/nessenergy/Alupdatalake/issues/52), plano §3.1 |
 | A3 | **Projeto GCP `dev`**: criar, habilitar APIs, IAM, Artifact Registry, bucket de state | nada sobe; Onda 0 não homologa | plano 2.2 (0.13) |
 | A4 | **Questionário de Gaps** (47 perguntas) | os 8 domínios analíticos não se definem; a Gold fica sem alvo | plano 2.2 (0.9) |
-| A5 | **RACI e data owners** por domínio | sem dono, dúvida de regra de negócio não tem para quem ir | plano 2.2 (0.12) |
+| A5 | **RACI e data owners** por domínio | sem dono, dúvida de regra de negócio não tem para quem ir | plano 2.2 (0.12); interlocutores já conhecidos em [`interlocutores.md`](interlocutores.md) |
 | A6 | **Ferramenta de BI** definida | o Portal MVP e as views Gold ficam sem consumidor definido | contrato, cláusula 3ª |
 | A7 | Abrir **já** os pedidos de token (Onda 2) e VPN/credencial (Onda 3) | é o maior risco do contrato: atraso dispara ociosidade de 4h/dia | plano §7 |
 | A8 | **Documentação técnica de BBCE e TempoOK** (a Alup é contratante desses serviços) | sem ela não dá nem para preparar o contrato de dados antes do token — ver §5 | §5 |

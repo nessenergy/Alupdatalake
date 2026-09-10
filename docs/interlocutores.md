@@ -26,17 +26,12 @@ estão na mesa; lá ficará quem responde por cada domínio analítico.
 | Nome | Papel | Contato |
 |---|---|---|
 | Ricardo Esper | Project Leader · assina os relatórios emitidos à contratante | `resper@ness.com.br` |
-| Gabriel Teodoro da Paz | PMO | `gpaz@ness.com.br` |
+| Gabriel Teodoro da Paz | Product Owner do projeto · divisão DevArch | `gpaz@ness.com.br` |
 | Thiago Bertuzzi | Líder Técnico | `bertuzzi@ness.com.br` |
-| Gabriela Paula Torres | Dev Líder | `gabi@bekaa.eu` |
+| Gabriela Paula Torres | Dev Líder | `gptorres@ness.com.br` |
 
 > **Sobre o patrocinador.** Eduardo Pires não tem função direta na execução.
 > Entra em cópia para acompanhamento; pedido operacional não se dirige a ele.
-
-> **Sobre o endereço da Gabriela.** É de domínio próprio (`bekaa.eu`), e não de
-> `ness.com.br` como o do restante da equipe. Registrado como está. Vale decidir
-> qual endereço deve aparecer em correspondência dirigida à contratante, já que
-> a Alup contrata a ness.
 
 ---
 
@@ -48,7 +43,7 @@ estão na mesa; lá ficará quem responde por cada domínio analítico.
 | Liberação de VPN, credencial de banco e token de API | Saulo (TI Alup) | dependência **A7**, bloco C |
 | Priorização de escopo, regra de negócio, domínios analíticos | Leonardo (PO), com Taina e Mauricio (co-owners) | blocos A, B e D |
 | Balanço Energético e o SQL Server que o recebe | Leonardo (PO Alup) | C11 e o adendo ao C4 |
-| Cronograma, medição, marcos e relatórios de situação | Gabriel (PMO ness.) e Ricardo | [`plano-semanal.md`](plano-semanal.md), [`relatorios/`](relatorios/) |
+| Cronograma, medição, marcos e relatórios de situação | Gabriel (PO ness.) e Ricardo | [`plano-semanal.md`](plano-semanal.md), [`relatorios/`](relatorios/) |
 | Arquitetura e decisões técnicas | Thiago (líder técnico) e Ricardo | [`arquitetura/decisoes/`](arquitetura/decisoes/) |
 | Código, conectores e entrega técnica | Gabriela (dev líder) e Thiago | [`AGENTS.md`](../AGENTS.md), [`plano-semanal.md`](plano-semanal.md) |
 

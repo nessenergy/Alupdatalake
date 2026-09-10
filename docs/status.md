@@ -1,8 +1,10 @@
 # Estado do projeto
 
-Atualizado em **2026-09-04** · **A3 não chegou no prazo — contagem da cláusula
-3ª iniciada nesta data**; região decidida (ADR 009); baralho de revisão
-arquitetural enviado ao Google
+Atualizado em **2026-09-09** · **A3 não chegou no prazo** — vencido em 04/09,
+primeiro dia útil de atraso em 08/09, contagem da cláusula 3ª em curso; a Alup
+levantou dúvida sobre a atribuição de E1 e E2 em 09/09, **esclarecida no mesmo
+dia**; região decidida (ADR 009); baralho de revisão arquitetural com o Google,
+sem prazo de resposta
 
 Este arquivo responde "onde estamos e o que trava o próximo passo". Detalhe de
 escopo e estimativa fica em [`plano-execucao.md`](plano-execucao.md); o que sai
@@ -94,7 +96,7 @@ destino, com os oito invariantes e a pauta de perguntas. **Enviado ao Google em
 |---|---|---|---|
 | A1 | **Configurar Workload Identity Federation** (`GCP_WIF_PROVIDER`, `GCP_DEPLOY_SA`) | o workflow de deploy falha na autenticação | `runbook/deploy.md` |
 | A2 | **Decidir sobre a CCEE InfoMercado** — portal responde 403 a acesso automatizado | 32h da Onda 1 paradas; `agente_ccee` sem fonte | [issue #52](https://github.com/nessenergy/Alupdatalake/issues/52), plano §3.1 |
-| A3 | **Projeto GCP `dev`**: criar, habilitar APIs, IAM, Artifact Registry, bucket de state | nada sobe; Onda 0 não homologa | plano 2.2 (0.13) |
+| A3 | **Projeto GCP `dev`**: criar, habilitar APIs, IAM, Artifact Registry, bucket de state — criação e `billing_account` são da Alup, esclarecido em 09/09 | nada sobe; Onda 0 não homologa | plano 2.2 (0.13), [registro de 09/09](relatorios/2026-09-09-esclarecimento-e1-e2.md) |
 | A4 | **Questionário de Gaps** (47 perguntas) | os 8 domínios analíticos não se definem; a Gold fica sem alvo | plano 2.2 (0.9) |
 | A5 | **RACI e data owners** por domínio | sem dono, dúvida de regra de negócio não tem para quem ir | plano 2.2 (0.12); interlocutores já conhecidos em [`interlocutores.md`](interlocutores.md) |
 | A6 | **Ferramenta de BI** definida | o Portal MVP e as views Gold ficam sem consumidor definido | contrato, cláusula 3ª |
@@ -173,7 +175,7 @@ Ordenado por data em que o atraso passa a custar. Prazos derivados do
 
 | # | Insumo | Responsável | Prazo útil | Efeito de passar do prazo |
 |---|---|---|---|---|
-| A3 | Projeto GCP `dev`, APIs, IAM, WIF, Artifact Registry, state | Alup | **04/09 — vencido** | **Não entregue. Atraso registrado em 04/09.** A Alup condicionou A3 à resposta do Google (G1). S2 e S3 escorregam inteiras; Onda 0 não homologa; > 5 dias úteis posterga o cronograma |
+| A3 | Projeto GCP `dev`, APIs, IAM, WIF, Artifact Registry, state | Alup | **04/09 — vencido** | **Não entregue. Atraso registrado em 04/09**; 1º dia útil de atraso em 08/09, 5º em 14/09. A Alup condicionou A3 à resposta do Google (G1). Em 09/09 a Alup levantou dúvida sobre quem cria o projeto (E1) e de quem é a `billing_account` (E2); **ambas são da Alup, esclarecido no mesmo dia** — ver [registro de 09/09](relatorios/2026-09-09-esclarecimento-e1-e2.md). S2 e S3 escorregam inteiras; Onda 0 não homologa; > 5 dias úteis posterga o cronograma |
 | A9 | Token Hubspot no secret `alupdata-hubspot-api-token` | Alup | 11/09 | conector pronto segue parado; item 2.3 não fecha |
 | A4 | Questionário de Gaps respondido | Alup | 11/09 | sem os 8 domínios, a Gold da Onda 1 fica sem alvo |
 | A5 | Matriz RACI e data owners | Alup | 11/09 | dúvida de regra de negócio sem destinatário |
@@ -190,6 +192,12 @@ Acompanhamento consolidado destas linhas na [issue #57](https://github.com/nesse
 **Registro de atraso**: a data de cada pedido deve ser anotada no dia em que o
 atraso começa, não quando vira problema. É o que sustenta postergação,
 ociosidade ou suspensão numa medição.
+
+**Registro de esclarecimento**: dúvida da contratante também tem data. A
+consulta sobre E1 e E2 chegou em 09/09 e foi respondida em 09/09; sem esse
+registro, a espera por A3 poderia ser lida depois como decisão pendente de
+alguém, quando parte dela era atribuição a esclarecer — e a resposta da ness.
+não consumiu dia útil.
 
 ---
 

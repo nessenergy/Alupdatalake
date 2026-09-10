@@ -24,9 +24,9 @@ estão na mesa; lá ficará quem responde por cada domínio analítico.
 
 | Nome | Papel | Contato |
 |---|---|---|
-| Ricardo Esper | Project Leader · responsável técnico | `resper@ness.com.br` |
+| Ricardo Esper | Project Leader · assina os relatórios emitidos à contratante | `resper@ness.com.br` |
 | Gabriel Teodoro da Paz | PMO | `gpaz@ness.com.br` |
-| Thiago Bertuzzi | **papel a confirmar** | `bertuzzi@ness.com.br` |
+| Thiago Bertuzzi | Líder Técnico | `bertuzzi@ness.com.br` |
 
 > **Sobre a grafia do endereço do Saulo.** Veio como `srodrugues@`. Os demais
 > endereços da Alup seguem inicial do primeiro nome mais sobrenome —
@@ -35,7 +35,7 @@ estão na mesa; lá ficará quem responde por cada domínio analítico.
 > aparência de certo é pior que um marcado como pendente. Confirmar antes do
 > primeiro envio.
 
-> **Papéis a confirmar.** Taina, Mauricio e Thiago aparecem na correspondência do
+> **Papéis a confirmar.** Taina e Mauricio aparecem na correspondência do
 > projeto, mas o papel de cada um não foi declarado. Ficam registrados com o
 > papel em aberto em vez de deduzido pela posição no cabeçalho da mensagem.
 
@@ -50,7 +50,7 @@ estão na mesa; lá ficará quem responde por cada domínio analítico.
 | Priorização de escopo, regra de negócio, domínios analíticos | Leonardo (PO Alup) | blocos A, B e D |
 | Balanço Energético e o SQL Server que o recebe | Leonardo (PO Alup) | C11 e o adendo ao C4 |
 | Cronograma, medição, marcos e relatórios de situação | Gabriel (PMO ness.) e Ricardo | [`plano-semanal.md`](plano-semanal.md), [`relatorios/`](relatorios/) |
-| Arquitetura, decisões técnicas, código e entrega | Ricardo (ness.) | [`arquitetura/decisoes/`](arquitetura/decisoes/) |
+| Arquitetura, decisões técnicas, código e entrega | Thiago (líder técnico) e Ricardo | [`arquitetura/decisoes/`](arquitetura/decisoes/) |
 
 ---
 
@@ -65,7 +65,7 @@ lado:
 | 2 | **Matriz RACI e data owners** por domínio | dúvida de regra de negócio hoje não tem destinatário definido | **A5**, prazo 11/09 |
 | 3 | **Quem administra o Workload Identity Federation** | é o único item do provisionamento que exige familiaridade com OIDC | E6 |
 | 4 | **Quem recebe os alertas** de falha de ingestão | os alertas existem e não notificam ninguém | E3, [issue #87](https://github.com/nessenergy/Alupdatalake/issues/87) |
-| 5 | **Papel de Taina, Mauricio e Thiago** | estão na correspondência do projeto sem papel declarado; não dá para saber o que levar a cada um | — |
+| 5 | **Papel de Taina e Mauricio** | estão na correspondência do projeto sem papel declarado; não dá para saber o que levar a cada um | — |
 
 Preferência registrada para a lacuna 4: **grupo, não pessoa nominal.** Pessoa
 sai de férias; grupo não.

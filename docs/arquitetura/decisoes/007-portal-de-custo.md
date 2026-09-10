@@ -87,3 +87,47 @@ crescer o bastante para pagar a complexidade. Não é hoje.
 - A tarifa vive em dois lugares — na view e em `src/portal/custo.py`, para o
   provedor simulado. Divergirão se alguém mudar só um. Quando o billing export
   entrar, a view passa a ser a única fonte e o módulo perde as constantes.
+
+---
+
+## Adendo de 2026-09-10 — billing export ligado no primeiro `apply`
+
+A camada F2 previa ligar o billing export depois. Com a região definida pela
+[ADR 011](011-regiao-us-east1.md), **esperar passa a custar histórico**: a
+exportação do faturamento para dataset **regional** (`us-east1`) só recebe dado
+a partir do dia em que é ligada — não há carga retroativa, que existe apenas
+para dataset multirregião. Export desligado no início é histórico perdido de
+forma permanente.
+
+### Decisão
+
+- **O export é ligado no mesmo dia do primeiro `apply`.** O que a F2 constrói
+  sobre ele — a view de custo lendo a fatura em vez do log do BigQuery — segue
+  no seu tempo; o que se antecipa é só o interruptor.
+- **O dataset de destino e o IAM ficam em `infra/`**, em `us-east1`. O
+  interruptor, não: a exportação só se configura pelo console, sem recurso
+  Terraform, comando `gcloud` ou API (verificado em 10/09). É a **primeira
+  exceção documentada à regra 5**, prevista no
+  [`finops-complemento.md`](../finops-complemento.md) §1: vira passo de runbook,
+  executado por quem tem papel de *Billing Account Costs Manager* ou
+  *Billing Account Administrator* na conta de faturamento da Alup.
+- **O export traz todos os projetos pagos pela mesma conta de faturamento.** Se
+  a conta da Alup paga outros projetos, o custo deles também chega ao dataset.
+  Por isso o dataset bruto tem leitura restrita, fora do alcance do Portal, e
+  a view Gold filtra pelos projetos do DataLake. Usar uma conta ou subconta de
+  faturamento só para o DataLake é alternativa válida, e a escolha é da Alup.
+
+### O que fica de fora
+
+- **Orçamento com teto que pausa serviço** (*spend cap*): pararia a ingestão
+  sem aviso. O `google_billing_budget` do módulo `monitoramento` avisa e não
+  corta, de propósito.
+- **Desconto por uso comprometido**: gasto de US$ 5–15/mês e ainda sem padrão.
+  Reavaliar quando o Airflow entrar, na Onda 3.
+- **Notificação programática de orçamento**: não há resposta automática que
+  valha a peça hoje.
+
+Anomalias de custo, FinOps hub, relatórios de faturamento e os recursos de IA
+do Cloud Billing são ferramentas de quem opera a plataforma — a Alup — e não
+exigem nada da ness. Seguem a mesma distinção da
+[ADR 014](014-knowledge-catalog.md): recurso do produto, usado pela operação.

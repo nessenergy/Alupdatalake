@@ -17,15 +17,14 @@ cláusula 5ª.
 
 ---
 
-## 1. O billing export pode ser a primeira exceção legítima à regra 5
+## 1. O billing export é a primeira exceção legítima à regra 5
 
 O plano (§6) já diz que habilitar o billing export exige papel na conta de
-faturamento, separado de A3. Falta dizer **onde o interruptor mora**: até onde
-apuramos, ligar o export para o BigQuery é configuração da *conta de
-faturamento*, feita no console, **sem recurso Terraform equivalente**.
+faturamento, separado de A3. Falta dizer **onde o interruptor mora**: ligar o
+export para o BigQuery é configuração da *conta de faturamento*, feita no
+console, **sem recurso Terraform equivalente**.
 
-Se confirmado na hora de fazer a F2, isso tem duas consequências que precisam
-estar ditas antes, não depois:
+Isso tem duas consequências que precisam estar ditas antes, não depois:
 
 - O dataset de destino e o IAM ficam no Terraform; **o interruptor do export,
   não** — e essa é a primeira exceção legítima à regra 5 do projeto ("recurso
@@ -35,8 +34,12 @@ estar ditas antes, não depois:
   já está escrito no módulo `monitoramento` depende do mesmo `billing_account`,
   então os dois destravam juntos.
 
-**A verificar antes de fechar a F2**: se existe caminho Terraform para o export
-(recurso ou módulo de terceiro). Se existir, esta ressalva cai.
+**Verificado em 10/09**: não há caminho por código. A documentação do Google
+descreve só o console, não existe comando `gcloud` nem recurso no provider do
+Terraform ([issue #4848](https://github.com/hashicorp/terraform-provider-google/issues/4848)),
+e o módulo de terceiro que existe cria apenas o dataset, deixando a ligação
+para o console. A ressalva virou decisão: a ADR 007, no adendo de 10/09, liga o
+export no primeiro `apply`, porque dataset regional não recebe carga retroativa.
 
 ## 2. As views de custo precisam de uma exceção no teste de camadas
 

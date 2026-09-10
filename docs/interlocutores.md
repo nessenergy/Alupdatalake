@@ -19,7 +19,7 @@ estão na mesa; lá ficará quem responde por cada domínio analítico.
 | Saulo Rodrigues | TI | `srodrigues@alupar.com.br` |
 | Taina Ulhoa Mota | Co-Owner | `tmota@alupar.com.br` |
 | Mauricio Wilhelm Rios Cardoso | Co-Owner | `mwcardoso@alupar.com.br` |
-| Eduardo Pires | **papel a confirmar** | `epires@alupar.com.br` |
+| Eduardo Pires | Diretor · patrocinador do projeto | `epires@alupar.com.br` |
 
 ### ness. — contratada
 
@@ -29,9 +29,8 @@ estão na mesa; lá ficará quem responde por cada domínio analítico.
 | Gabriel Teodoro da Paz | PMO | `gpaz@ness.com.br` |
 | Thiago Bertuzzi | Líder Técnico | `bertuzzi@ness.com.br` |
 
-> **Papel a confirmar.** Eduardo Pires aparece na correspondência do projeto,
-> mas o papel não foi declarado. Fica registrado com o papel em aberto em vez de
-> deduzido pela posição no cabeçalho da mensagem.
+> **Sobre o patrocinador.** Eduardo Pires não tem função direta na execução.
+> Entra em cópia para acompanhamento; pedido operacional não se dirige a ele.
 
 ---
 
@@ -59,7 +58,6 @@ lado:
 | 2 | **Matriz RACI e data owners** por domínio | dúvida de regra de negócio hoje não tem destinatário definido | **A5**, prazo 11/09 |
 | 3 | **Quem administra o Workload Identity Federation** | é o único item do provisionamento que exige familiaridade com OIDC | E6 |
 | 4 | **Quem recebe os alertas** de falha de ingestão | os alertas existem e não notificam ninguém | E3, [issue #87](https://github.com/nessenergy/Alupdatalake/issues/87) |
-| 5 | **Papel de Eduardo Pires** | está na correspondência do projeto sem papel declarado; não dá para saber o que levar a ele | — |
 
 Preferência registrada para a lacuna 4: **grupo, não pessoa nominal.** Pessoa
 sai de férias; grupo não.

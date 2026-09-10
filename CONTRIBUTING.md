@@ -69,8 +69,9 @@ bem-vindo — mas a forma de discordar é **escrever um ADR novo**, não abrir u
 exceção pontual no código.
 
 Em particular: o framework em `src/core/` é deliberadamente mais estrutura do
-que 13 scripts soltos (ADR 003), e a transformação é SQL puro sem dbt, com
-Cloud Run Jobs antes do Composer (ADR 004).
+que 13 scripts soltos (ADR 003), a transformação é Dataform (ADR 012), a
+ingestão é em lote, sem CDC nem Dataflow (ADR 013), e o agendamento é Cloud
+Run Jobs com Scheduler antes do Airflow (ADR 004).
 
 ## Segurança
 

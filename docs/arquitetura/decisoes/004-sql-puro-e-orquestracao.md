@@ -1,6 +1,8 @@
 # ADR 004 — SQL versionado sem dbt; Cloud Run Jobs antes de Composer
 
-**Status**: aceito · **Data**: 2026-08-25
+**Status**: aceito · **Data**: 2026-08-25 · **Parcialmente substituído** em
+2026-09-10: a decisão de transformação passou para a
+[ADR 012](012-dataform.md) (Dataform); a de orquestração segue valendo.
 
 ## Contexto
 

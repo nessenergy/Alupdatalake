@@ -17,8 +17,9 @@ estão na mesa; lá ficará quem responde por cada domínio analítico.
 |---|---|---|
 | Leonardo Guiel Marques | Product Owner | `lgmarques@alupar.com.br` |
 | Saulo Rodrigues | TI | `srodrigues@alupar.com.br` |
-| Taina Ulhoa Mota | **papel a confirmar** | `tmota@alupar.com.br` |
-| Mauricio Wilhelm Rios Cardoso | **papel a confirmar** | `mwcardoso@alupar.com.br` |
+| Taina Ulhoa Mota | Co-Owner | `tmota@alupar.com.br` |
+| Mauricio Wilhelm Rios Cardoso | Co-Owner | `mwcardoso@alupar.com.br` |
+| Eduardo Pires | **papel a confirmar** | `epires@alupar.com.br` |
 
 ### ness. — contratada
 
@@ -28,9 +29,9 @@ estão na mesa; lá ficará quem responde por cada domínio analítico.
 | Gabriel Teodoro da Paz | PMO | `gpaz@ness.com.br` |
 | Thiago Bertuzzi | Líder Técnico | `bertuzzi@ness.com.br` |
 
-> **Papéis a confirmar.** Taina e Mauricio aparecem na correspondência do
-> projeto, mas o papel de cada um não foi declarado. Ficam registrados com o
-> papel em aberto em vez de deduzido pela posição no cabeçalho da mensagem.
+> **Papel a confirmar.** Eduardo Pires aparece na correspondência do projeto,
+> mas o papel não foi declarado. Fica registrado com o papel em aberto em vez de
+> deduzido pela posição no cabeçalho da mensagem.
 
 ---
 
@@ -40,7 +41,7 @@ estão na mesa; lá ficará quem responde por cada domínio analítico.
 |---|---|---|
 | Criação do projeto GCP, IAM, Workload Identity Federation, `billing_account` | Saulo (TI Alup) | [issue #55](https://github.com/nessenergy/Alupdatalake/issues/55), bloco E do questionário |
 | Liberação de VPN, credencial de banco e token de API | Saulo (TI Alup) | dependência **A7**, bloco C |
-| Priorização de escopo, regra de negócio, domínios analíticos | Leonardo (PO Alup) | blocos A, B e D |
+| Priorização de escopo, regra de negócio, domínios analíticos | Leonardo (PO), com Taina e Mauricio (co-owners) | blocos A, B e D |
 | Balanço Energético e o SQL Server que o recebe | Leonardo (PO Alup) | C11 e o adendo ao C4 |
 | Cronograma, medição, marcos e relatórios de situação | Gabriel (PMO ness.) e Ricardo | [`plano-semanal.md`](plano-semanal.md), [`relatorios/`](relatorios/) |
 | Arquitetura, decisões técnicas, código e entrega | Thiago (líder técnico) e Ricardo | [`arquitetura/decisoes/`](arquitetura/decisoes/) |
@@ -58,7 +59,7 @@ lado:
 | 2 | **Matriz RACI e data owners** por domínio | dúvida de regra de negócio hoje não tem destinatário definido | **A5**, prazo 11/09 |
 | 3 | **Quem administra o Workload Identity Federation** | é o único item do provisionamento que exige familiaridade com OIDC | E6 |
 | 4 | **Quem recebe os alertas** de falha de ingestão | os alertas existem e não notificam ninguém | E3, [issue #87](https://github.com/nessenergy/Alupdatalake/issues/87) |
-| 5 | **Papel de Taina e Mauricio** | estão na correspondência do projeto sem papel declarado; não dá para saber o que levar a cada um | — |
+| 5 | **Papel de Eduardo Pires** | está na correspondência do projeto sem papel declarado; não dá para saber o que levar a ele | — |
 
 Preferência registrada para a lacuna 4: **grupo, não pessoa nominal.** Pessoa
 sai de férias; grupo não.

@@ -11,16 +11,33 @@ estão na mesa; lá ficará quem responde por cada domínio analítico.
 
 ## Quadro
 
-| Nome | Organização | Papel | Contato |
-|---|---|---|---|
-| Leonardo Guiel Marques | Alup | Product Owner | — |
-| Saulo Rodrigues | Alup | TI | `srodrugues@alupar.com.br` — **grafia a confirmar** |
-| Gabriel Teodoro | ness. | PMO | — |
-| Ricardo Esper | ness. | Project Leader · responsável técnico | `resper@ness.com.br` |
+### Alup — contratante
 
-> A grafia do endereço do Saulo veio como `srodrugues@`, que parece transposição
-> de `srodrigues@`. Registrada como recebida, para não trocar um dado por um
-> palpite — confirmar antes do primeiro envio.
+| Nome | Papel | Contato |
+|---|---|---|
+| Leonardo Guiel Marques | Product Owner | `lgmarques@alupar.com.br` |
+| Saulo Rodrigues | TI | `srodrugues@alupar.com.br` — **grafia a confirmar** |
+| Taina Ulhoa Mota | **papel a confirmar** | `tmota@alupar.com.br` |
+| Mauricio Wilhelm Rios Cardoso | **papel a confirmar** | `mwcardoso@alupar.com.br` |
+
+### ness. — contratada
+
+| Nome | Papel | Contato |
+|---|---|---|
+| Ricardo Esper | Project Leader · responsável técnico | `resper@ness.com.br` |
+| Gabriel Teodoro da Paz | PMO | `gpaz@ness.com.br` |
+| Thiago Bertuzzi | **papel a confirmar** | `bertuzzi@ness.com.br` |
+
+> **Sobre a grafia do endereço do Saulo.** Veio como `srodrugues@`. Os demais
+> endereços da Alup seguem inicial do primeiro nome mais sobrenome —
+> `lgmarques`, `mwcardoso`, `tmota` —, o que sugere `srodrigues@`. Mantido como
+> recebido, porque padrão observado não é confirmação: um endereço errado com
+> aparência de certo é pior que um marcado como pendente. Confirmar antes do
+> primeiro envio.
+
+> **Papéis a confirmar.** Taina, Mauricio e Thiago aparecem na correspondência do
+> projeto, mas o papel de cada um não foi declarado. Ficam registrados com o
+> papel em aberto em vez de deduzido pela posição no cabeçalho da mensagem.
 
 ---
 
@@ -48,6 +65,7 @@ lado:
 | 2 | **Matriz RACI e data owners** por domínio | dúvida de regra de negócio hoje não tem destinatário definido | **A5**, prazo 11/09 |
 | 3 | **Quem administra o Workload Identity Federation** | é o único item do provisionamento que exige familiaridade com OIDC | E6 |
 | 4 | **Quem recebe os alertas** de falha de ingestão | os alertas existem e não notificam ninguém | E3, [issue #87](https://github.com/nessenergy/Alupdatalake/issues/87) |
+| 5 | **Papel de Taina, Mauricio e Thiago** | estão na correspondência do projeto sem papel declarado; não dá para saber o que levar a cada um | — |
 
 Preferência registrada para a lacuna 4: **grupo, não pessoa nominal.** Pessoa
 sai de férias; grupo não.

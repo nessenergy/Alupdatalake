@@ -16,7 +16,7 @@ estão na mesa; lá ficará quem responde por cada domínio analítico.
 | Nome | Papel | Contato |
 |---|---|---|
 | Leonardo Guiel Marques | Product Owner | `lgmarques@alupar.com.br` |
-| Saulo Rodrigues | TI | `srodrugues@alupar.com.br` — **grafia a confirmar** |
+| Saulo Rodrigues | TI | `srodrigues@alupar.com.br` |
 | Taina Ulhoa Mota | **papel a confirmar** | `tmota@alupar.com.br` |
 | Mauricio Wilhelm Rios Cardoso | **papel a confirmar** | `mwcardoso@alupar.com.br` |
 
@@ -27,13 +27,6 @@ estão na mesa; lá ficará quem responde por cada domínio analítico.
 | Ricardo Esper | Project Leader · assina os relatórios emitidos à contratante | `resper@ness.com.br` |
 | Gabriel Teodoro da Paz | PMO | `gpaz@ness.com.br` |
 | Thiago Bertuzzi | Líder Técnico | `bertuzzi@ness.com.br` |
-
-> **Sobre a grafia do endereço do Saulo.** Veio como `srodrugues@`. Os demais
-> endereços da Alup seguem inicial do primeiro nome mais sobrenome —
-> `lgmarques`, `mwcardoso`, `tmota` —, o que sugere `srodrigues@`. Mantido como
-> recebido, porque padrão observado não é confirmação: um endereço errado com
-> aparência de certo é pior que um marcado como pendente. Confirmar antes do
-> primeiro envio.
 
 > **Papéis a confirmar.** Taina e Mauricio aparecem na correspondência do
 > projeto, mas o papel de cada um não foi declarado. Ficam registrados com o

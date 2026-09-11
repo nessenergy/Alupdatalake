@@ -1,6 +1,6 @@
 # RoPA — Registro das Operações de Tratamento da plataforma AlupData
 
-**Versão** 0.1 · **Data** 2026-09-11 · **Situação**: minuta técnica, para
+**Versão** 0.2 · **Data** 2026-09-11 · **Situação**: minuta técnica, para
 revisão e aprovação da controladora
 
 Registro exigido pelo art. 37 da LGPD. Minuta elaborada pela ness. no contrato
@@ -13,8 +13,8 @@ no [registro do DPA](dpa.md).
 
 | Papel | Quem |
 |---|---|
-| Controladora | Alup |
-| Encarregada | Rosimeire Miler dos Santos |
+| Controladora | ACE Comercializadora Ltda., nome fantasia Alup — CNPJ 14.402.579/0001-23 |
+| Encarregada | Rosimeire Miler dos Santos — privacidade@alupar.com.br |
 | Operadora (desenvolvimento) | ness. Processos e Tecnologia Ltda., CNPJ 72.027.097/0001-37 — até o handoff |
 | Suboperador (infraestrutura) | Google Cloud, sob o DPA do contrato de nuvem da Alupar |
 
@@ -42,16 +42,16 @@ empreendimento.
 | Campo | Registro |
 |---|---|
 | Finalidade | Acompanhar o funil comercial: negócios por *pipeline*, estágio, valor e data |
-| Hipótese legal | Legítimo interesse (art. 7º, IX) para o dono do negócio; execução de contrato ou procedimentos preliminares (art. 7º, V) para a pessoa física que seja parte do negócio. Análise no RIPD, item g |
-| Titulares | Colaboradores da Alup donos de negócio no Hubspot; pessoas físicas eventualmente citadas no nome do negócio |
-| Dados pessoais | `proprietario_id` (identificador do usuário do Hubspot); `nome` do negócio, texto livre |
+| Hipótese legal | Execução de contrato ou procedimentos preliminares (art. 7º, V) para a pessoa física que seja parte do negócio; nos demais casos, legítimo interesse (art. 7º, IX). Análise no RIPD, item g |
+| Titulares | Pessoas físicas eventualmente citadas no nome do negócio |
+| Dados pessoais | `nome` do negócio, texto livre. O dono do negócio (`proprietario_id`) foi retirado do conector em 11/09 |
 | Dados sensíveis | Nenhum |
 | Fonte | Hubspot, objeto `deals`. Contatos não são lidos |
 | Sistemas | Conector `hubspot_negocios` → raw → `bronze.hubspot_negocios` → `silver.hubspot_negocios` → `gold.funil_comercial`, que agrega sem nome nem dono |
 | Compartilhamento | Nenhum além dos agentes acima |
 | Retenção | Raw: 90 dias. Bronze: 5 anos. Proposta na política de retenção |
 | Periodicidade | A cada 6 horas, janela de 2 dias |
-| Observação | Nenhuma tabela Gold usa `proprietario_id`. O RIPD recomenda retirá-lo do conector, a menos que a Alup defina um uso |
+| Observação | Decisão de 11/09: `proprietario_id` retirado do conector, porque nenhuma tabela Gold o usava (RIPD, item g) |
 
 ## OP-02 · Controle de acesso e segurança da plataforma
 
@@ -111,10 +111,11 @@ empreendimento.
 |---|---|---|
 | Elaboração | ness. | 11/09/2026 |
 | Encarregada | Rosimeire Miler dos Santos | |
-| Controladora | Alup | |
+| Controladora | ACE Comercializadora Ltda. (Alup) | |
 
 ## Histórico
 
 | Versão | Data | Mudança |
 |---|---|---|
 | 0.1 | 11/09/2026 | Minuta técnica inicial, pela ness. |
+| 0.2 | 11/09/2026 | Dados cadastrais da controladora e canal da encarregada; `proprietario_id` fora da OP-01 |

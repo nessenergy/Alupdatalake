@@ -85,4 +85,4 @@ a exceção, sempre registrada:
 |---|---|---|
 | Proposta | ness. | 11/09/2026 |
 | Encarregada | Rosimeire Miler dos Santos | |
-| Controladora | Alup | |
+| Controladora | ACE Comercializadora Ltda. (Alup) | |

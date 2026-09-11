@@ -1,6 +1,6 @@
 # RIPD — Relatório de Impacto à Proteção de Dados Pessoais da plataforma AlupData
 
-**Versão** 0.2 · **Data** 2026-09-11 · **Situação**: minuta técnica, para
+**Versão** 0.3 · **Data** 2026-09-11 · **Situação**: minuta técnica, para
 revisão e aprovação da controladora
 
 Minuta elaborada pela ness. no âmbito do contrato CPS-01025/2026, conforme a
@@ -28,10 +28,10 @@ Documentos relacionados, em `docs/lgpd/`:
 
 | Papel | Quem | Observação |
 |---|---|---|
-| Controladora | Alup | Definido em 11/09. **[ALUP]** razão social e CNPJ |
+| Controladora | ACE Comercializadora Ltda., nome fantasia Alup — CNPJ 14.402.579/0001-23; Rua Gomes de Carvalho, 1996, 16º andar, conj. 162, sala B, Vila Olímpia, São Paulo/SP, CEP 04547-905 | Definida em 11/09; dados cadastrais conferidos na Receita Federal em 11/09. As contratantes do CPS-01025/2026 são seis coligadas do Grupo Alupar; a controladora da plataforma é a ACE |
 | Operadora (desenvolvimento) | ness. Processos e Tecnologia Ltda., CNPJ 72.027.097/0001-37 | Desenvolve a plataforma. O acesso a dado pessoal real fica restrito ao período de desenvolvimento e homologação (ADR 011) |
 | Suboperador (infraestrutura) | Google Cloud | Processa o dado em `us-east1`, sob o DPA do contrato de nuvem da Alupar ([dpa.md](dpa.md)). A entidade contratante é a indicada nesse contrato |
-| Encarregada | Rosimeire Miler dos Santos | **[ALUP]** contato público do canal da encarregada (art. 41, § 1º) |
+| Encarregada | Rosimeire Miler dos Santos | Canal público: privacidade@alupar.com.br (art. 41, § 1º) |
 
 As fontes de onde o dado é lido — Hubspot, o Portal Alup hospedado na AWS e os
 sistemas internos — são tratamentos já existentes da controladora e ficam fora
@@ -106,7 +106,7 @@ primeiro `apply`.
 
 | Origem | Dado pessoal | Situação |
 |---|---|---|
-| Hubspot — negócios (A9) | `proprietario_id` — identificador do usuário do Hubspot dono do negócio, colaborador da Alup | Confirmado no código (`src/conectores/hubspot_negocios.py`) |
+| Hubspot — negócios (A9) | `proprietario_id` — identificador do usuário do Hubspot dono do negócio | **Retirado do conector** por decisão de 11/09 (item g); deixa de ser tratado |
 | Hubspot — negócios (A9) | `nome` do negócio — texto livre, que pode conter nome de pessoa física | Confirmado no código |
 | Usuários da plataforma | E-mail corporativo de quem acessa o Portal, recebido do IAP e exibido na tela | Confirmado no código (`src/portal/app.py`) |
 | Usuários da plataforma | E-mail de quem executa consultas, nos logs de *jobs* do BigQuery; lido pelo Knowledge Catalog (ADR 014). A view `gold.custo_consultas` não o seleciona | Característica do serviço |
@@ -116,7 +116,8 @@ primeiro `apply`.
 | Fontes públicas (BCB, IBGE, ONS, ANEEL, CCEE, BBCE, TempoOK) | Nenhum. A ANEEL SIGA lê só dados do empreendimento | Confirmado nos dicionários de dados |
 
 **Contatos do Hubspot não são lidos.** O conector lê só o objeto `deals`, com
-oito propriedades.
+sete propriedades — sem contatos e, desde a decisão de 11/09, sem o dono do
+negócio.
 
 ### iii. Dados sensíveis
 
@@ -125,8 +126,7 @@ de recursos humanos e folha, que costumam conter dado sensível. Ver R06.
 
 ### iv. Categorias de titulares
 
-- Colaboradores da Alup: donos de negócio no Hubspot e usuários do Portal e do
-  BigQuery.
+- Colaboradores da Alup usuários do Portal e do BigQuery.
 - Pessoas físicas eventualmente citadas no nome livre de um negócio.
 - **[ALUP]** Titulares do Portal Alup e dos sistemas internos.
 
@@ -183,7 +183,7 @@ Análise proposta pela ness. **[ALUP]** Validação do jurídico e da encarregad
 
 | Finalidade | Dado | Titular | Hipótese proposta |
 |---|---|---|---|
-| F1 | `proprietario_id` | Colaborador dono do negócio | Legítimo interesse (art. 7º, IX) |
+| F1 | `proprietario_id` | Colaborador dono do negócio | Não se aplica: retirado do conector em 11/09 |
 | F1 | `nome` do negócio | Pessoa física citada | Execução de contrato ou procedimentos preliminares (art. 7º, V), quando ela é parte do negócio; nos demais casos, legítimo interesse |
 | F2 | E-mail e registros de acesso e consulta | Usuário da plataforma | Legítimo interesse (art. 7º, IX) |
 | F3 | Metadados e logs de consulta | Usuário da plataforma, indiretamente | Legítimo interesse (art. 7º, IX) |
@@ -207,9 +207,9 @@ Modelo do Guia Orientativo da ANPD sobre legítimo interesse (fevereiro de
 3. **Balanceamento.** O titular espera que o CRM corporativo seja usado para
    gestão comercial; o impacto é baixo.
 
-**Recomendação:** retirar `proprietario_id` do conector, a menos que a Alup
-defina um uso — por exemplo, funil por responsável. Nesse caso, a Gold passa a
-usá-lo, e o teste fecha. **[ALUP]** decidir.
+**Decisão de 11/09:** recomendação acatada. `proprietario_id` sai do conector,
+e o dado deixa de ser tratado. Se a Alup quiser, no futuro, funil por
+responsável, o dado volta com essa finalidade e com este teste refeito.
 
 **F2 — controle de acesso e segurança**
 
@@ -232,15 +232,15 @@ usá-lo, e o teste fecha. **[ALUP]** decidir.
    marcado `origem = automatica` e não homologa (ADR 014).
 
 **Transparência (art. 10, § 2º).** **[ALUP]** Informar os colaboradores, em
-aviso interno de privacidade, sobre o uso de dados de F1 e F2.
+aviso interno de privacidade, sobre o uso de dados de F2 e F3.
 
 ## h) Princípios da LGPD (art. 6º)
 
 | Princípio | Como a plataforma atende | Lacuna |
 |---|---|---|
 | Finalidade e adequação | Finalidades F1 a F3 declaradas no RoPA | Onda 3 a definir |
-| Necessidade | O Hubspot lê só 8 propriedades de negócios, sem contatos; a Gold não expõe nome nem dono; prazos propostos na política de retenção | `proprietario_id` sem uso (item g) |
-| Livre acesso | Canal da encarregada, Rosimeire Miler dos Santos; eliminação a pedido na política de retenção | **[ALUP]** publicar o contato |
+| Necessidade | O Hubspot lê só 7 propriedades de negócios, sem contatos nem dono do negócio; a Gold não expõe o nome; prazos propostos na política de retenção | — |
+| Livre acesso | Canal da encarregada, privacidade@alupar.com.br; eliminação a pedido na política de retenção | — |
 | Qualidade | Validação na carga, deduplicação na Silver, *assertions* do Dataform | — |
 | Transparência | Dicionário de dados, linhagem por fonte, este relatório e o RoPA | Aviso interno aos colaboradores (item g) |
 | Segurança e prevenção | Ver item k | R01, R07 |
@@ -297,7 +297,7 @@ de 1 a 2, **médio** de 3 a 4, **alto** de 6 a 9. Avaliação proposta pela ness
 | R03 | DPA do contrato de nuvem da Alupar ([dpa.md](dpa.md)) | E |
 | R04 | A Gold não expõe `nome` nem `proprietario_id`: `funil_comercial` só agrega | E |
 | R04 | Colunas com dado pessoal marcadas no catálogo e cobertas pela *policy tag* de R01 | P |
-| R04 | Retirar `proprietario_id` do conector, se a Alup não definir uso (item g) | P |
+| R04 | `proprietario_id` retirado do conector, por decisão de 11/09 (item g); branch `fix/hubspot-sem-proprietario` | P |
 | R05 | O assistente do Dataform só entra por PR e não é apontado para tabela com dado pessoal (ADR 012); conteúdo gerado no catálogo fica `origem = automatica` e não homologa (ADR 014) | E |
 | R05 | Manter o assistente fora das tabelas com colunas marcadas como pessoais **também depois** da aprovação deste relatório | P |
 | R06 | Antes de cada conector da Onda 3: inventário de colunas com o dono do dado; seleção explícita de colunas, nunca `SELECT *`; módulos de RH e folha fora do escopo de leitura; hipótese legal e prazo definidos; revisão deste relatório e do RoPA | P |
@@ -310,22 +310,22 @@ de 1 a 2, **médio** de 3 a 4, **alto** de 6 a 9. Avaliação proposta pela ness
 
 | Papel | Nome | Data | Parecer |
 |---|---|---|---|
-| Elaboração da minuta técnica | ness. | 11/09/2026 | Versão 0.2 |
+| Elaboração da minuta técnica | ness. | 11/09/2026 | Versão 0.3 |
 | Encarregada | Rosimeire Miler dos Santos | | |
-| Controladora | Alup | | |
+| Controladora | ACE Comercializadora Ltda. (Alup) | | |
 
 ---
 
 ## Pendências para fechar a versão 1.0
 
-1. Razão social e CNPJ da controladora; contato público da encarregada (item a).
-2. Validação das hipóteses legais e do teste de balanceamento (item g).
-3. Decisão sobre `proprietario_id`: retirar ou definir uso (item g).
-4. Aprovação da política de retenção (item f.x, R02).
-5. Dado pessoal do Portal Alup e das demais fontes da Onda 3 — perguntas C6 e F1
+1. Validação das hipóteses legais e do teste de balanceamento (item g).
+2. Aprovação da política de retenção (item f.x, R02).
+3. Dado pessoal do Portal Alup e das demais fontes da Onda 3 — perguntas C6 e F1
    (itens f.ii, R06).
-6. Aviso interno de privacidade aos colaboradores (item g).
-7. Validação da avaliação de risco (item j).
+4. Aviso interno de privacidade aos colaboradores (item g).
+5. Validação da avaliação de risco (item j).
+6. Entidade Google contratante e destinatário das notificações de
+   subprocessador ([registro do DPA](dpa.md)).
 
 ## Histórico
 
@@ -333,3 +333,4 @@ de 1 a 2, **médio** de 3 a 4, **alto** de 6 a 9. Avaliação proposta pela ness
 |---|---|---|
 | 0.1 | 11/09/2026 | Minuta técnica inicial, pela ness. |
 | 0.2 | 11/09/2026 | Controladora e encarregada definidas; análise de hipótese legal com teste de balanceamento; política de retenção e DPA referenciados; R03 reavaliado |
+| 0.3 | 11/09/2026 | Dados cadastrais da controladora (Receita Federal) e canal da encarregada; `proprietario_id` retirado do conector por decisão da Alup |

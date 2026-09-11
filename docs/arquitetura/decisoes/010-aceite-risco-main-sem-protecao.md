@@ -1,6 +1,7 @@
 # ADR 010 — Aceite formal do risco de `main` sem proteção obrigatória
 
-**Status**: aceito · **Data**: 2026-09-08
+**Status**: **encerrado** pela revisão de 2026-09-11 — a `main` passou a ser
+protegida · **Data**: 2026-09-08
 
 ## Contexto
 
@@ -86,6 +87,38 @@ mesclada, e execução agendada da mesma varredura de SAST e SCA contra a `main`
 Não substitui o portão — detecta em vez de impedir —, mas fecha a lacuna de
 não haver nenhuma verificação após um eventual push direto. Fica como item de
 fila, não como parte do aceite.
+
+## Revisão de 2026-09-11 — o aceite de risco está encerrado
+
+A condição que justificava o aceite caiu: a organização `nessenergy` passou a
+usar **GitHub Enterprise**, e com isso `rulesets` funcionam em repositório
+privado. O que respondia 403 em 08/09 hoje responde.
+
+A `main` passou a ser protegida pelo ruleset `main_protect-alupdata`, ativo:
+
+- **pull request obrigatória**, com zero aprovações exigidas — o portão é o CI,
+  não a revisão por terceiro, que continua sem quem a exerça;
+- **seis verificações obrigatórias**: Testes pytest, Lint & Formatação, SAST
+  (Bandit), Detecção de Secrets, Terraform Validate e Dataform Compile;
+- **force push e exclusão bloqueados**;
+- **lista de exceção vazia**: a regra vale inclusive para administradores.
+
+O que isso muda:
+
+- **Push direto na `main` deixou de ser possível.** O que era convenção virou
+  imposição da plataforma, e o gatilho 3 desta ADR perde o objeto.
+- **O dossiê de homologação muda de redação.** Passa a existir portão
+  preventivo de SAST e SCA para o que entra por PR, e a cláusula 8ª é atendida
+  por bloqueio, não só por varredura. A ressalva honesta de 08/09 sobre
+  "varredura sem bloqueio" deixa de valer para os seis jobs exigidos.
+- **Duas verificações continuam detectivas, não preventivas:** "Commits sem
+  atribuição a IA" e "Auditoria de Dependências" ficaram fora da lista de
+  obrigatórias porque são puladas em alguns contextos e travariam a fila de PR
+  esperando por um resultado que não vem. Elas seguem rodando e reprovando a PR
+  quando encontram problema, mas não impedem o merge sozinhas. Torná-las
+  obrigatórias exige antes ajustar os workflows para sempre reportar.
+- **O gatilho 1 continua valendo:** com um segundo desenvolvedor, cabe revisar
+  se a exigência passa a ser de uma aprovação por terceiro.
 
 ## Referências
 

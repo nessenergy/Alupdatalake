@@ -1,0 +1,114 @@
+name: Quadro — sincronização automática
+
+# Mantém o quadro de acompanhamento (Project 2) em dia sem depender de alguém
+# lembrar de rodar `make quadro-aplicar`. O token é de um GitHub App, com a
+# chave privada no Secret Manager (regra 2), lida via WIF como no deploy.
+# Enquanto o projeto GCP (A3) e o App não existem, o job avisa e sai com
+# sucesso; passa a sincronizar sozinho quando os dois existirem.
+# Passo a passo em docs/runbook/acompanhamento-semanal.md.
+
+on:
+  # Depois de cada deploy que termina bem: o que acabou de entrar muda o quadro.
+  workflow_run:
+    workflows: ["Deploy GCP"]
+    types: [completed]
+  # Dias úteis, 08h em Brasília. O cron do GitHub é em UTC, e Brasília fica em
+  # UTC-3 o ano todo (sem horário de verão desde 2019): 11h UTC = 08h. Feriado
+  # não é filtrado aqui; o script já conta dia útil para o atraso.
+  schedule:
+    - cron: "0 11 * * 1-5"
+  workflow_dispatch:
+    inputs:
+      simular:
+        description: "Só simular: mostra o que mudaria, sem gravar nem comentar"
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+  id-token: write
+
+# Duas sincronizações simultâneas gravariam os mesmos itens e poderiam postar o
+# mesmo comentário de atraso duas vezes. A que chega depois espera a que está
+# gravando, em vez de cancelá-la no meio.
+concurrency:
+  group: quadro
+  cancel-in-progress: false
+
+jobs:
+  sincronizar:
+    name: "Sincronizar o quadro"
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    # Sem `environment:` de propósito: a org está no plano Free e o repositório é
+    # privado, e nesse caso o GitHub não oferece ambientes. As variáveis de WIF
+    # ficam no repositório, com os valores do projeto dev.
+    steps:
+      # Sem GCP ou sem App, não há de onde tirar o token. Um agendamento que
+      # falha todo dia por pendência conhecida ensina a ignorar falha.
+      - id: guarda
+        env:
+          WIF_PROVIDER: ${{ vars.GCP_WIF_PROVIDER }}
+          DEPLOY_SA: ${{ vars.GCP_DEPLOY_SA }}
+          APP_CLIENT_ID: ${{ vars.QUADRO_APP_CLIENT_ID }}
+        run: |
+          if [ -z "$WIF_PROVIDER" ] || [ -z "$DEPLOY_SA" ] || [ -z "$APP_CLIENT_ID" ]; then
+            echo "::notice::Quadro não sincronizado: faltam as variáveis do repositório GCP_WIF_PROVIDER/GCP_DEPLOY_SA (A3) ou QUADRO_APP_CLIENT_ID (GitHub App). Ver docs/runbook/acompanhamento-semanal.md."
+            echo "pronto=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "pronto=true" >> "$GITHUB_OUTPUT"
+          fi
+      - if: steps.guarda.outputs.pronto == 'true'
+        uses: actions/checkout@v4
+      - if: steps.guarda.outputs.pronto == 'true'
+        uses: google-github-actions/auth@v2
+        with:
+          # Workload Identity Federation: nenhuma chave JSON de service account
+          # no repositório ou nos secrets do GitHub.
+          workload_identity_provider: ${{ vars.GCP_WIF_PROVIDER }}
+          service_account: ${{ vars.GCP_DEPLOY_SA }}
+      - if: steps.guarda.outputs.pronto == 'true'
+        uses: google-github-actions/setup-gcloud@v2
+      # A chave vai do Secret Manager direto para a saída deste passo, que só
+      # existe dentro do job: nunca para o log, o ambiente do job ou artefato.
+      # `::add-mask::` cobre uma linha por vez, então cada linha do PEM é
+      # mascarada antes de qualquer uso.
+      - id: chave
+        if: steps.guarda.outputs.pronto == 'true'
+        run: |
+          chave="$(gcloud secrets versions access latest --secret=alupdata-github-quadro-app-key)"
+          while IFS= read -r linha; do
+            if [ -n "$linha" ]; then echo "::add-mask::$linha"; fi
+          done <<< "$chave"
+          fim="FIM_$(openssl rand -hex 16)"
+          { echo "valor<<$fim"; echo "$chave"; echo "$fim"; } >> "$GITHUB_OUTPUT"
+      # Token de instalação, revogado pela própria action ao fim do job. O
+      # Project 2 é da organização, daí o `owner`; as permissões pedidas são o
+      # subconjunto que o script usa.
+      - id: token
+        if: steps.guarda.outputs.pronto == 'true'
+        uses: actions/create-github-app-token@v3
+        with:
+          client-id: ${{ vars.QUADRO_APP_CLIENT_ID }}
+          private-key: ${{ steps.chave.outputs.valor }}
+          owner: ${{ github.repository_owner }}
+          permission-organization-projects: write
+          permission-issues: write
+          permission-pull-requests: read
+      - if: steps.guarda.outputs.pronto == 'true'
+        uses: astral-sh/setup-uv@v4
+        with:
+          version: "0.5.11"
+      - if: steps.guarda.outputs.pronto == 'true'
+        run: uv sync --frozen --no-dev
+      - if: steps.guarda.outputs.pronto == 'true'
+        env:
+          GITHUB_TOKEN: ${{ steps.token.outputs.token }}
+          SIMULAR: ${{ inputs.simular }}
+        run: |
+          if [ "$SIMULAR" = "true" ]; then
+            uv run python -m scripts.quadro
+          else
+            uv run python -m scripts.quadro --aplicar
+          fi

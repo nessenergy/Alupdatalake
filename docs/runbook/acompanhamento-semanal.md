@@ -83,6 +83,71 @@ Por padrão ele só simula, porque cada gravação e cada comentário ficam vis�
 para a Alup. Issue nova no quadro entra no `quadro.toml`; sem isso, o comando a
 lista como sem onda.
 
+### Sincronização automática
+
+O workflow `.github/workflows/quadro.yml` roda o mesmo comando, com `--aplicar`,
+em três situações:
+
+| Gatilho | Quando |
+|---|---|
+| `workflow_run` | ao fim de cada execução do **Deploy GCP**, só se ela terminou com sucesso |
+| `schedule` | dias úteis às 08h de Brasília (`0 11 * * 1-5`, em UTC) |
+| `workflow_dispatch` | à mão, na aba Actions; a opção **simular** roda sem gravar |
+
+Nunca rodam duas sincronizações ao mesmo tempo: a que chega depois espera.
+
+O token é de um **GitHub App**, não de um PAT: não depende da conta de uma
+pessoa e expira em uma hora. A chave privada do App fica no Secret Manager
+(regra 2), no secret `alupdata-github-quadro-app-key` declarado em
+`infra/modules/secrets`. Só a service account de deploy, que o GitHub assume
+via WIF, pode lê-la. O workflow autentica no GCP como o deploy, com as
+variáveis do repositório, lê a chave, mascara cada linha e gera o token de
+instalação com
+`actions/create-github-app-token`.
+
+**Enquanto o projeto GCP (A3) e o App não existirem**, o job registra um aviso
+e termina com sucesso. Ele começa a sincronizar sozinho quando as três
+variáveis abaixo estiverem preenchidas e a chave estiver gravada. Não é preciso
+mudar nenhum arquivo.
+
+**Configuração, uma vez (fora do repositório):**
+
+1. **Criar o App na organização**: *nessenergy → Settings → Developer settings
+   → GitHub Apps → New GitHub App*. Webhook desligado. Permissões mínimas:
+   - *Organization → Projects*: **Read and write**;
+   - *Repository → Issues*: **Read and write** (comentário de atraso);
+   - *Repository → Pull requests*: **Read-only**. O quadro tem PRs e o
+     repositório é privado: sem essa permissão, o `mergedAt` não aparece;
+   - *Repository → Metadata*: **Read-only** (obrigatória, já vem marcada).
+
+   Em *Where can this GitHub App be installed?*, **Only on this account**.
+2. **Instalar o App**: na página do App, *Install App → nessenergy → Only
+   select repositories → Alupdatalake*.
+3. **Gerar a chave privada**: na página do App, *Private keys → Generate a
+   private key*. O `.pem` baixado é gravado no Secret Manager e depois apagado
+   do disco:
+
+   ```bash
+   gcloud secrets versions add alupdata-github-quadro-app-key \
+     --project=<projeto> --data-file=chave.pem
+   rm chave.pem
+   ```
+
+   O secret só existe depois do primeiro `terraform apply`. Para trocar a chave,
+   gere uma nova, grave-a como nova versão e revogue a antiga no App: o workflow
+   sempre lê `latest`.
+4. **Variáveis no GitHub**:
+   - `QUADRO_APP_CLIENT_ID`, variável do repositório com o *Client ID* do App.
+     Não é segredo. O `create-github-app-token` v3 recomenda o Client ID no
+     lugar do App ID, que está em desuso.
+   - `GCP_WIF_PROVIDER` e `GCP_DEPLOY_SA` como variáveis **do repositório**,
+     com os valores do projeto `dev` ([`deploy.md`](deploy.md)). A organização
+     está no plano Free e o repositório é privado: nesse caso o GitHub não
+     oferece ambientes, e uma variável de ambiente nunca chegaria ao job.
+
+`make quadro` e `make quadro-aplicar` continuam valendo para rodar à mão, com o
+token de quem roda.
+
 ---
 
 ## Como isso vira o relatório semanal

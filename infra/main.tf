@@ -149,6 +149,8 @@ module "secrets" {
   region                = var.region
   environment           = var.environment
   service_account_email = google_service_account.ingestao.email
+  # A SA do deploy é a que o GitHub assume via WIF; o quadro a reutiliza.
+  github_service_account = var.deploy_service_account
 }
 
 # Alertas. `emails_alerta` vazio cria as políticas sem destinatário — ver o

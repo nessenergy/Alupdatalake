@@ -1,6 +1,7 @@
 # ADR 011 — Região do ambiente: `us-east1`
 
-**Status**: aceito · **Data**: 2026-09-10 · **Substitui** a [ADR 009](009-regiao-do-ambiente.md)
+**Status**: aceito · **Data**: 2026-09-10 · **Revisada** em 2026-09-11
+(prazo de RoPA e RIPD) · **Substitui** a [ADR 009](009-regiao-do-ambiente.md)
 
 ## Contexto
 
@@ -70,7 +71,8 @@ padrão de `variable "region"`.
   RoPA e RIPD são documentos da controladora: a ness. entrega a minuta técnica
   (quais dados, onde ficam, quem acessa, fluxo e linhagem) e a Alup assume e
   assina. A minuta registra que o acesso da ness. a dado pessoal real fica
-  restrito ao período de desenvolvimento e homologação.
+  restrito ao período de desenvolvimento e homologação. **A minuta é entregue
+  quando o ambiente entrar em produção** (decidido em 11/09).
 - **Verificações antes do primeiro `apply`:**
   1. a organização da Alupar não tem a restrição `gcp.resourceLocations`
      limitando recursos ao Brasil — se tiver, o `apply` falha;

@@ -12,7 +12,7 @@ from decimal import Decimal
 from pathlib import Path
 
 import pytest
-from src.conectores.hubspot_negocios import HubspotNegocios, Negocio, _epoch_ms
+from src.conectores.hubspot_negocios import PROPRIEDADES, HubspotNegocios, Negocio, _epoch_ms
 from src.core.execucao import Janela
 
 FIXTURE = json.loads((Path(__file__).parents[2] / "fixtures" / "hubspot_negocios.json").read_text(encoding="utf-8"))
@@ -30,14 +30,23 @@ def test_transformar_negocio_completo(conector: HubspotNegocios) -> None:
     assert linha.nome == "PPA Cliente Exemplo 2027"
     assert linha.valor == Decimal("1250000.00")
     assert linha.data_fechamento == date(2026, 11, 30)
-    assert linha.proprietario_id == "77001"
+
+
+def test_dono_do_negocio_nao_e_tratado(conector: HubspotNegocios) -> None:
+    """RIPD, item g: nenhuma Gold usa o dono do negócio, então ele não é lido.
+
+    A fixture ainda traz `hubspot_owner_id`: mesmo que a API o devolva, o
+    conector não o repassa.
+    """
+    assert "hubspot_owner_id" not in PROPRIEDADES
+    assert "proprietario_id" not in conector.transformar(FIXTURE["results"][0])
+    assert "proprietario_id" not in Negocio.model_fields
 
 
 def test_campos_vazios_viram_nulo_nao_string_vazia(conector: HubspotNegocios) -> None:
     linha = Negocio.model_validate(conector.transformar(FIXTURE["results"][1]))
     assert linha.valor is None
     assert linha.data_fechamento is None
-    assert linha.proprietario_id is None
     assert linha.nome == "(sem nome)"  # dealname nulo não pode quebrar a carga
 
 

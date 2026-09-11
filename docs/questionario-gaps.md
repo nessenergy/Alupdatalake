@@ -23,7 +23,6 @@ Continuam pendentes:
 | C5 | Versão do Oracle FMB e existência de réplica de leitura | não informado |
 | C7 | Forma de integração do RM/TOTVS e ambiente de homologação | 25/09 |
 | E1 | Conta de faturamento, em acerto com a QI Network; nome do responsável não informado | 18/09 |
-| F1 | Se contatos e empresas do Hubspot entram no escopo | a definir |
 | G3 | Exemplos reais das planilhas | 18/09 |
 
 ---
@@ -200,7 +199,7 @@ Cláusula 8ª. Perguntas cuja resposta muda o desenho, não só a operação.
 
 | # | Pergunta | Quem | Resposta |
 |---|---|---|---|
-| F1 | Alguma das fontes contém **dado pessoal** (CPF, nome, contato — o Hubspot muito provavelmente sim)? Quais campos? | Compliance / DPO | **11/09**: sim. O Hubspot tem dados sensíveis: CNPJ, CPF, endereço e valor de contrato. Também são confidenciais o consumo por cliente, vindo da CCEE, e as planilhas e dados internos (premissas de GSF, preço, balanço energético). **Pendente**: se contatos e empresas do Hubspot entram no escopo. Tratamento em [`lgpd/`](lgpd/ripd.md). |
+| F1 | Alguma das fontes contém **dado pessoal** (CPF, nome, contato — o Hubspot muito provavelmente sim)? Quais campos? | Compliance / DPO | **11/09**: sim. O Hubspot tem dados sensíveis: CNPJ, CPF, endereço e valor de contrato. Também são confidenciais o consumo por cliente, vindo da CCEE, e as planilhas e dados internos (premissas de GSF, preço, balanço energético). **Complemento de 11/09**: contatos e empresas do Hubspot ficam **fora do escopo** — o que não é lido não faz parte do escopo —, e o CPF não é tratado. Tratamento em [`lgpd/`](lgpd/ripd.md). |
 | F2 | Se sim, qual a base legal e o tratamento exigido: mascarar, pseudonimizar, ou restringir acesso por IAM? | DPO | **11/09**: não aplicar tratamento (mascaramento ou pseudonimização); restringir o acesso por tipo de usuário. |
 | F3 | Qual a política de retenção por camada (Bronze bruto, Silver, Gold)? Há obrigação regulatória de guardar por N anos? | Compliance | **11/09**: respondida; detalhe na [política de retenção](lgpd/politica-de-retencao.md). A retenção conta a partir de 2027 (G5). |
 | F4 | Há classificação de informação corporativa (público/interno/confidencial) que devemos aplicar aos datasets? | Segurança | **11/09**: datasets classificados como internos. |

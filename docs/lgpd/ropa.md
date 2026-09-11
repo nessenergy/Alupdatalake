@@ -1,6 +1,6 @@
 # RoPA — Registro das Operações de Tratamento da plataforma AlupData
 
-**Versão** 0.3 · **Data** 2026-09-11 · **Situação**: minuta técnica, para
+**Versão** 0.4 · **Data** 2026-09-11 · **Situação**: minuta técnica, para
 revisão e aprovação da controladora
 
 Registro exigido pelo art. 37 da LGPD. Minuta elaborada pela ness. no contrato
@@ -54,14 +54,14 @@ SIGA lê só dados do empreendimento.
 | Hipótese legal | Execução de contrato ou procedimentos preliminares (art. 7º, V) para a pessoa física que seja parte do negócio; nos demais casos, legítimo interesse (art. 7º, IX). Análise no RIPD, item g |
 | Titulares | Pessoas físicas citadas no nome do negócio ou partes dele |
 | Dados pessoais | `nome` do negócio, texto livre; `valor` do negócio, quando o negócio identifica pessoa física. O dono do negócio (`proprietario_id`) foi retirado do conector em 11/09 |
-| Dados confidenciais (pergunta F1) | Valor de contrato, lido hoje. CNPJ, CPF e endereço estão no Hubspot da Alup, mas nos objetos de empresa e de contato, que o conector não lê |
+| Dados confidenciais (pergunta F1) | Valor de contrato, lido hoje. CNPJ, CPF e endereço estão no Hubspot da Alup, mas nos objetos de empresa e de contato, que o conector não lê e que ficam **fora do escopo** (decisão de 11/09) |
 | Dados sensíveis (art. 5º, II) | Nenhum. O que a pergunta F1 chama de sensível é confidencial; ver RIPD, item f.iii |
 | Fonte | Hubspot, objeto `deals`. Contatos e empresas não são lidos |
 | Sistemas | Conector `hubspot_negocios` → raw → `bronze.hubspot_negocios` → `silver.hubspot_negocios` → `gold.funil_comercial`, que agrega sem nome nem dono |
 | Compartilhamento | Nenhum além dos agentes acima |
 | Retenção | Raw: 5 anos, contados de 2027, em classe fria (recomendação; a alternativa de 90 dias está em decisão). Bronze: 5 anos, contados de 2027. Gold: recalculada a partir da Bronze |
 | Periodicidade | A cada 6 horas, janela de 2 dias |
-| Observação | Decisão de 11/09: `proprietario_id` retirado do conector, porque nenhuma tabela Gold o usava (RIPD, item g). **O escopo de contatos e empresas do Hubspot está em confirmação com a Alup.** Se entrar, o CPF passa a ser tratado, e este registro e o RIPD são revistos antes do conector |
+| Observação | Decisão de 11/09: `proprietario_id` retirado do conector, porque nenhuma tabela Gold o usava (RIPD, item g). **Contatos e empresas do Hubspot ficam fora do escopo**, por decisão da Alup em 11/09, e o CPF não é tratado. Ampliar isso seria escopo novo, com revisão deste registro e do RIPD antes do conector |
 
 ## OP-02 · Controle de acesso e segurança da plataforma
 
@@ -149,3 +149,4 @@ SIGA lê só dados do empreendimento.
 | 0.1 | 11/09/2026 | Minuta técnica inicial, pela ness. |
 | 0.2 | 11/09/2026 | Dados cadastrais da controladora e canal da encarregada; `proprietario_id` fora da OP-01 |
 | 0.3 | 11/09/2026 | Respostas da Alup de 11/09: dados confidenciais na OP-01, com o escopo de contatos e empresas do Hubspot em confirmação; nova OP-07 para o consumo por cliente; planilhas e dados internos confidenciais nas OP-05 e OP-06; retenções pela política 0.2; classificação interna; controle de acesso por tipo de usuário como requisito; três ambientes |
+| 0.4 | 11/09/2026 | Contatos e empresas do Hubspot ficam fora do escopo, por decisão da Alup: o CPF não é tratado |

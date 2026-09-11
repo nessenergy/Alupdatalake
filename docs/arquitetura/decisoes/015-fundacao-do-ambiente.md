@@ -107,8 +107,9 @@ São seis papéis predefinidos, concedidos no projeto. Nenhum é papel básico:
 | `roles/iam.serviceAccountAdmin` | criar a conta de serviço de deploy e permitir que o GitHub a personifique |
 | `roles/resourcemanager.projectIamAdmin` | conceder à conta de deploy os papéis de projeto que o `infra/` exige |
 
-Os papéis são concedidos às contas da ness. que aplicam o bootstrap, de
-preferência por um grupo. Nenhum dos seis dá leitura de dataset do BigQuery
+Os papéis são concedidos **a contas nominais** da ness. que aplicam o
+bootstrap, nunca a grupo (decisão de 11/09): cada concessão e cada uso ficam
+rastreáveis a uma pessoa no log de auditoria. Nenhum dos seis dá leitura de dataset do BigQuery
 nem de segredo. O `storage.admin` lê objeto em qualquer bucket do projeto: no
 bootstrap, só existe o de state; depois do primeiro `apply`, existe também o
 bucket raw.

@@ -15,6 +15,9 @@ Para a primeira implantação, use também a checklist
 | Service account `alupdata-ingestao` e seu IAM | `infra/main.tf` |
 | Repositório Dataform, release config `main`, workflow config `diario` e SA `alupdata-dataform` | `infra/modules/dataform` |
 | Dataset `qualidade` (assertions do Dataform) | `infra/modules/bigquery` |
+| Serviço `alupdata-portal` no Cloud Run, IAP e SA `alupdata-portal` | `infra/modules/portal` |
+| Leitura de pessoas por grupo (R01 do RIPD) | `infra/main.tf` |
+| Log de auditoria de acesso a dado do BigQuery e do Cloud Storage (R07 do RIPD) | `infra/main.tf` |
 
 IAM da identidade de ingestão:
 
@@ -34,12 +37,66 @@ IAM do lado do Dataform (ADR 012):
 | SA de deploy | `roles/dataform.editor` no repositório `alupdata`; `roles/iam.serviceAccountUser` na SA do Dataform |
 | Agente de serviço do Dataform | `roles/iam.serviceAccountTokenCreator` e `roles/iam.serviceAccountUser` na SA do Dataform; `roles/secretmanager.secretAccessor` no secret do token |
 
+IAM do Portal ([`portal.md`](portal.md)):
+
+| Identidade | Papel |
+|---|---|
+| SA `alupdata-portal` | `roles/bigquery.dataViewer` em `bronze`, `silver` e `gold`; `roles/bigquery.jobUser`, `roles/bigquery.resourceViewer` e `roles/bigquery.metadataViewer` no projeto |
+| Agente de serviço do IAP | `roles/run.invoker` no serviço `alupdata-portal` — o único invocador |
+| Membros de `portal_acesso` | `roles/iap.httpsResourceAccessor` no serviço |
+
+Acesso de pessoas (R01 do RIPD). Os grupos são da Alup e entram pelo `.tfvars`
+do ambiente; **com as variáveis vazias, que é o padrão, nenhuma pessoa recebe
+papel algum**:
+
+| Variável | Papel |
+|---|---|
+| `grupo_consumidores` (e-mail do grupo) | `roles/bigquery.dataViewer` em `gold`; `roles/bigquery.jobUser` no projeto |
+| `grupo_operacao` (e-mail do grupo) | `roles/bigquery.dataViewer` em `bronze`, `silver` e `gold`; `roles/bigquery.jobUser` no projeto |
+| `portal_acesso` (`group:` ou `domain:`) | acesso ao Portal pelo IAP |
+
+> As views da Gold leem Silver e Bronze e não são views autorizadas. Até isso
+> ser decidido, quem está só em `grupo_consumidores` vê a Gold, mas a consulta
+> falha por falta de acesso às camadas de baixo.
+
 Recurso criado no console não existe: some no próximo `apply`.
+
+## Log de auditoria de acesso a dado (R07 do RIPD)
+
+`DATA_READ` e `DATA_WRITE` ficam ligados para `bigquery.googleapis.com` e
+`storage.googleapis.com`: toda consulta, leitura de tabela e leitura ou gravação
+de objeto no bucket raw deixa registro de quem fez. No BigQuery esse log já vem
+ligado por padrão; a declaração em `infra/` o torna explícito. No Cloud Storage
+ele só existe por causa dela.
+
+- **Retenção**: a padrão do bucket `_Default` do Cloud Logging, 30 dias. O RIPD
+  propõe 1 ano, mas bucket de log dedicado e prazo dependem da política de
+  retenção, ainda não aprovada.
+- **Custo, da Alup**: o Cloud Logging cobra por GiB gravado acima da franquia
+  mensal gratuita do projeto (preço na página de preços do Google Cloud
+  Observability). O volume cresce com o número de consultas (ingestões,
+  Dataform, Portal e uso da Alup) e de objetos lidos ou gravados no bucket.
+  Acompanhe o volume de log do projeto nas primeiras semanas depois do apply.
+- **`ADMIN_READ` fica desligado**: registra leitura de metadado e configuração
+  (listar datasets, ler schema e IAM), não de dado, e multiplicaria o volume a
+  cada navegação no console, compilação do Dataform e varredura do catálogo.
+- **Efeito colateral no Cloud Storage**: com o log de acesso a objetos ligado,
+  download autenticado pelo navegador em `storage.cloud.google.com` pode
+  responder 403. Baixe pelo `gcloud storage cp`.
+
+Quem leu o quê:
+
+```
+logName="projects/<projeto>/logs/cloudaudit.googleapis.com%2Fdata_access"
+protoPayload.serviceName="bigquery.googleapis.com"
+```
 
 ## Pré-requisitos (uma vez por ambiente)
 
 1. Projeto GCP criado, APIs habilitadas: BigQuery, Cloud Storage, Secret
-   Manager, Cloud Run, Cloud Scheduler, Artifact Registry, Dataform, Data Lineage, Dataplex.
+   Manager, Cloud Run, Cloud Scheduler, Artifact Registry, Dataform, Data Lineage, Dataplex,
+   Identity-Aware Proxy. A SA de deploy precisa administrar o IAP do serviço do
+   Portal (por exemplo `roles/iap.admin`).
 2. Bucket de state do Terraform, criado em `us-east1` (ADR 011), e o
    `backend "gcs"` descomentado em `infra/main.tf`.
 3. Repositório no Artifact Registry para a imagem da CLI, criado em

@@ -63,6 +63,69 @@ resource "google_bigquery_dataset_iam_member" "ingestao_bronze" {
   member     = "serviceAccount:${google_service_account.ingestao.email}"
 }
 
+# --------------------------------------------------------------------- pessoas
+
+# R01 do RIPD: pessoa entra por grupo Google da Alup, nunca por e-mail
+# individual. Os grupos são da Alup; com o e-mail vazio (padrão), nada é
+# concedido.
+#
+# As views da Gold leem Silver e Bronze e não são views autorizadas: até isso
+# ser decidido, o grupo de consumidores enxerga a Gold mas a consulta falha por
+# falta de acesso às camadas de baixo. Autorizar exige trocar o IAM aditivo por
+# `google_bigquery_dataset_access`, que o provider diz não conviver com
+# `google_bigquery_dataset_iam_member` no mesmo dataset.
+locals {
+  camadas_por_grupo = {
+    consumidores = { grupo = var.grupo_consumidores, camadas = ["gold"] }
+    operacao     = { grupo = var.grupo_operacao, camadas = ["bronze", "silver", "gold"] }
+  }
+
+  leitura_pessoas = merge([
+    for nome, g in local.camadas_por_grupo : {
+      for camada in g.camadas : "${nome}_${camada}" => { grupo = g.grupo, camada = camada }
+    } if g.grupo != ""
+  ]...)
+}
+
+resource "google_bigquery_dataset_iam_member" "pessoas" {
+  for_each = local.leitura_pessoas
+
+  project    = var.project_id
+  dataset_id = module.bigquery.dataset_ids[each.value.camada]
+  role       = "roles/bigquery.dataViewer"
+  member     = "group:${each.value.grupo}"
+}
+
+# jobUser não dá acesso a dado: só permite rodar consulta neste projeto.
+resource "google_project_iam_member" "pessoas_jobs" {
+  for_each = toset([for g in local.camadas_por_grupo : g.grupo if g.grupo != ""])
+
+  project = var.project_id
+  role    = "roles/bigquery.jobUser"
+  member  = "group:${each.value}"
+}
+
+# ------------------------------------------------------------------- auditoria
+
+# R07 do RIPD: quem leu e quem gravou dado no BigQuery e no Cloud Storage. O
+# log vai para o bucket _Default, com a retenção padrão do Cloud Logging, até a
+# política de retenção ser aprovada. O volume é cobrado da Alup pelo Cloud
+# Logging (docs/runbook/deploy.md). ADMIN_READ fica de fora: é leitura de
+# metadado, não de dado, e multiplicaria o volume.
+resource "google_project_iam_audit_config" "acesso_dados" {
+  for_each = toset(["bigquery.googleapis.com", "storage.googleapis.com"])
+
+  project = var.project_id
+  service = each.value
+
+  audit_log_config {
+    log_type = "DATA_READ"
+  }
+  audit_log_config {
+    log_type = "DATA_WRITE"
+  }
+}
+
 # --------------------------------------------------------------------- módulos
 
 module "bigquery" {
@@ -109,6 +172,20 @@ module "scheduler" {
   environment           = var.environment
   imagem                = var.imagem_ingestao
   service_account_email = google_service_account.ingestao.email
+}
+
+# Portal atrás do IAP (R01). Sobe com a imagem publicada, que é a mesma da CLI;
+# `portal_acesso` vazio publica o serviço sem ninguém autorizado.
+module "portal" {
+  count = var.imagem_ingestao == "" ? 0 : 1
+
+  source      = "./modules/portal"
+  project_id  = var.project_id
+  region      = var.region
+  environment = var.environment
+  imagem      = var.imagem_ingestao
+  datasets    = values(module.bigquery.dataset_ids)
+  acesso      = var.portal_acesso
 }
 
 module "dataform" {

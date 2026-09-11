@@ -28,6 +28,11 @@ output "jobs_ingestao" {
   value       = try(module.scheduler[0].jobs, [])
 }
 
+output "url_portal" {
+  description = "URL do Portal, atrás do IAP (vazio até existir imagem publicada)"
+  value       = try(module.portal[0].url, "")
+}
+
 output "dataset_faturamento" {
   description = "Destino do billing export — ligado no console pela Alup (ADR 007)"
   value       = module.bigquery.dataset_faturamento

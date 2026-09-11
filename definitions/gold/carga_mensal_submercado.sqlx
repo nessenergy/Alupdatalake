@@ -1,5 +1,5 @@
 config {
-  type: "view",
+  type: "table",
   schema: "gold",
   tags: ["gold"]
 }

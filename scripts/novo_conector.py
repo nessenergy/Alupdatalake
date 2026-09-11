@@ -2,7 +2,7 @@
 
     uv run python -m scripts.novo_conector --fonte ons --entidade carga
 
-Cria conector, DDL Bronze e views Silver/Gold (Dataform), teste e dicionário de dados.
+Cria conector, DDL Bronze, view Silver e tabela Gold (Dataform), teste e dicionário de dados.
 Nenhum arquivo existente é sobrescrito.
 """
 
@@ -109,12 +109,12 @@ QUALIFY ROW_NUMBER() OVER (
 """
 
 GOLD = """config {{
-  type: "view",
+  type: "table",
   schema: "gold",
   tags: ["gold"]
 }}
 
--- Gold: TODO — nomeie pela pergunta de negócio que a view responde.
+-- Gold: TODO — nomeie pela pergunta de negócio que a tabela responde.
 -- Se for um SELECT * da Silver, ela não deveria existir.
 SELECT *
 FROM ${{ref("silver", "{rotulo}")}}

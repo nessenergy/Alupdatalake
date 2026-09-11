@@ -11,6 +11,10 @@ pergunta pesa sobre a Onda 3, cujas fontes — Oracle FMB, MySQL do Portal Alup,
 MySQL RDS de Comercialização, SQL Server do Balanço Energético e RM/TOTVS —
 são sistemas transacionais.
 
+Na reunião de 10/09 com o Google, o template *JDBC to BigQuery* foi bem
+recebido como forma de dispensar código nas fontes relacionais. A decisão
+abaixo foi confirmada em 11/09, depois de pesada contra a cláusula 2.2.
+
 Havia três caminhos para trazê-las ao Bronze:
 
 1. **Datastream (CDC)** — replicação contínua a partir do log de alterações do

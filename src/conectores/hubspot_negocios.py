@@ -46,8 +46,9 @@ PROPRIEDADES = [
     "closedate",
     "createdate",
     "hs_lastmodifieddate",
-    "hubspot_owner_id",
 ]
+# `hubspot_owner_id` fica de fora de propósito: nenhuma Gold usa o dono do
+# negócio, e sem finalidade o dado pessoal não é tratado (RIPD, item g).
 
 
 class Negocio(BaseModel):
@@ -61,7 +62,6 @@ class Negocio(BaseModel):
     data_fechamento: date | None = None
     criado_em: datetime
     modificado_em: datetime
-    proprietario_id: str | None = None
 
     @field_validator("negocio_id", "estagio", "pipeline")
     @classmethod
@@ -135,7 +135,6 @@ class HubspotNegocios(Conector):
             "data_fechamento": (props.get("closedate") or None) and props["closedate"][:10],
             "criado_em": props.get("createdate"),
             "modificado_em": props.get("hs_lastmodifieddate"),
-            "proprietario_id": props.get("hubspot_owner_id") or None,
         }
 
 

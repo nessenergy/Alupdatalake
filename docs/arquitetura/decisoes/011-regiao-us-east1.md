@@ -60,8 +60,8 @@ padrão de `variable "region"`.
   (ADR 007) mostra o efeito desde o primeiro mês.
 - **Transferência internacional de dado pessoal (LGPD, art. 33) — aceita, não
   bloqueia o `apply`.** A maior parte do dado é de mercado e de operação; o dado
-  pessoal previsto está no Hubspot (contatos, A9) e possivelmente no Portal
-  Alup. A transferência fica documentada em três peças, em `docs/lgpd/`:
+  pessoal previsto está no Hubspot (dono e nome livre dos negócios, A9 —
+  contatos não são lidos) e possivelmente no Portal Alup. A transferência fica documentada em três peças, em `docs/lgpd/`:
   - **DPA** — o *Cloud Data Processing Addendum* do Google, aceito pela Alupar
     no contrato de nuvem;
   - **RoPA** — registro das operações de tratamento (art. 37);

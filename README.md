@@ -72,7 +72,7 @@ graph LR
 ```
 alupdatalake/
 ├── src/ # Código Python (conectores + core)
-├── definitions/          # Dataform: DDL Bronze, views Silver/Gold (ADR 012)
+├── definitions/          # Dataform: DDL Bronze, view Silver, tabela Gold (ADR 012)
 ├── dags/ # DAGs Cloud Composer/Airflow
 ├── infra/ # Terraform (IaC GCP)
 ├── tests/ # Testes pytest

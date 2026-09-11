@@ -6,8 +6,17 @@ Use esta lista apenas quando A3 estiver entregue. Ela complementa
 ## 1. Pré-condições
 
 - [ ] Projeto, região e conta de faturamento confirmados pela Alup.
-- [ ] APIs de BigQuery, Storage, Secret Manager, Cloud Run, Scheduler e
-  Artifact Registry habilitadas.
+- [ ] APIs de BigQuery, Storage, Secret Manager, Cloud Run, Scheduler,
+  Artifact Registry, Dataform, Data Lineage e Dataplex habilitadas.
+- [ ] Política `gcp.resourceLocations` efetiva da organização Alupar permite
+  `us-east1` (ADR 011) — por exemplo `in:us-locations` ou
+  `in:us-east1-locations`: `gcloud resource-manager org-policies describe
+  constraints/gcp.resourceLocations --project=<projeto> --effective`.
+- [ ] Quem liga o billing export combinado: pessoa da Alup com papel *Billing
+  Account Costs Manager* ou *Billing Account Administrator* na conta de
+  faturamento, **e** papel *BigQuery User* (`roles/bigquery.user`) no projeto
+  que hospeda o dataset `faturamento` — o Google exige os dois papéis, um na
+  conta de faturamento e outro no projeto.
 - [ ] Backend GCS do Terraform criado e configurado.
 - [ ] Artifact Registry criado.
 - [ ] WIF e service account de deploy configurados.
@@ -29,6 +38,20 @@ Use esta lista apenas quando A3 estiver entregue. Ela complementa
 - [ ] Executar o workflow `Deploy GCP`, módulo `all`, ambiente `dev`.
 - [ ] Confirmar imagem publicada com tag igual ao SHA completo.
 - [ ] Confirmar que Terraform usa a mesma tag imutável.
+- [ ] **No mesmo dia do apply**, a Alup liga no console o billing export
+  (*Faturamento → Exportação de faturamento → BigQuery*: custo padrão e
+  detalhado) apontando para o dataset `faturamento` do **primeiro ambiente
+  aplicado (`dev`)** (ADR 007, adendo de 10/09). Dataset regional só recebe
+  dado a partir do dia em que o export é ligado. O export traz **todos** os
+  projetos pagos pela mesma conta: o dataset bruto não é exposto ao Portal.
+  O export **não é movido** quando `prod` existir: o Cloud Billing não
+  transfere histórico entre datasets, e mover o destino dividiria a série. A
+  camada F2 lê deste dataset; o `faturamento` dos demais ambientes fica
+  vazio.
+- [ ] Conferir a ACL do dataset `faturamento`: a conta
+  `billing-export-bigquery@system.gserviceaccount.com` como *owner* e nenhuma
+  concessão além das herdadas do projeto — o export traz o faturamento de
+  todos os projetos pagos pela conta.
 - [ ] Confirmar aplicação das tabelas Bronze e views Silver/Gold.
 - [ ] Guardar logs dos três passos.
 

@@ -8,8 +8,8 @@
 -- com o billing export (camada F2) — esta view não os enxerga e não finge que
 -- enxerga. Ver `docs/arquitetura/portal-finops.md`.
 --
--- As tarifas são premissa declarada aqui, num lugar só. Quando a Alup fechar
--- preço com desconto por uso comprometido, muda-se a constante — não a lógica.
+-- As tarifas são premissa declarada aqui, num lugar só: preço de lista dos EUA
+-- adotado para us-east1 em 2026-09-10, conferência na tabela oficial pendente.
 CREATE OR REPLACE VIEW `${projeto}.${gold}.custo_consultas` AS
 WITH tarifas AS (
   SELECT

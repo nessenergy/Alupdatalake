@@ -96,8 +96,8 @@ def test_information_schema_usa_a_regiao_configurada():
     """Região fixa no SQL devolve zero linhas em silêncio, não erro.
 
     O `INFORMATION_SCHEMA` do BigQuery é escopado por região. Uma view que
-    consulte `region-us` num projeto em `southamerica-east1` (ADR 009) não
-    falha: devolve vazio. O painel de custo mostraria R$ 0,00 para sempre,
+    consulte `region-us` num projeto em `us-east1` (ADR 011) não falha:
+    devolve vazio. O painel de custo mostraria R$ 0,00 para sempre,
     parecendo funcionar — que é pior do que quebrar.
     """
     for arquivo in arquivos(list(CAMADAS)):
@@ -109,4 +109,4 @@ def test_information_schema_usa_a_regiao_configurada():
             "use `region-${regiao}` para acompanhar o ambiente"
         )
         # E o valor renderizado precisa ser a região de verdade, não o literal.
-        assert "region-southamerica-east1" in renderizar(arquivo)
+        assert "region-us-east1" in renderizar(arquivo)

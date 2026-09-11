@@ -17,7 +17,7 @@ Tudo em GCP, arquitetura Medallion, infraestrutura por Terraform. Recurso criado
 
 ## Ambientes
 
-Dois: `dev` e `prod` (`infra/variables.tf` valida). Região padrão `southamerica-east1` (São Paulo) — ver ADR 009.
+Dois: `dev` e `prod` (`infra/variables.tf` valida). Região padrão `us-east1` (Carolina do Sul) — ver ADR 011, que substitui a 009.
 Variáveis por ambiente em `infra/environments/{dev,prod}.tfvars`. Nunca aponte
 código para `prod` por default — `src/core/config.py` cai em `alupdata-dev`.
 

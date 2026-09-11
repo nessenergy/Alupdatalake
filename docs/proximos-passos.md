@@ -41,7 +41,7 @@ A cadeia hoje é **em série**, e a ponta dela é a única sem prazo:
 |---|---|---|---|
 | 2.1 | **Cobrar a data do Google** | [issue #77](https://github.com/nessenergy/Alupdatalake/issues/77) tem o texto pronto para a conversa | Data registrada na issue |
 | 2.2 | **Enviar o relatório de 04/09 à Alup** | `.md` e `.html` prontos em [`relatorios/`](relatorios/) | Registro na mão da contratante |
-| 2.3 | **Decidir a região com a Alup** | resposta à pergunta E7 do questionário | Confirmação de `southamerica-east1`, ou inversão enquanto ainda dá tempo |
+| 2.3 | ~~Decidir a região com a Alup~~ | resposta à pergunta E7 do questionário | **Decidido em 10/09**: `us-east1` ([ADR 011](arquitetura/decisoes/011-regiao-us-east1.md)) |
 | 2.4 | **Enviar à Alup o registro de 09/09 sobre E1 e E2** | `.md` e `.html` prontos em [`relatorios/`](relatorios/) | Registro na mão da contratante |
 | 2.5 | **Obter a data e o nome do responsável por A3** | a atribuição já está esclarecida; falta a data — [issue #55](https://github.com/nessenergy/Alupdatalake/issues/55) | E1 respondido com data e nome |
 | 2.6 | **Obter a `billing_account` e o teto do alerta** | sugestão de R$ 500/mês em `dev` — [issue #87](https://github.com/nessenergy/Alupdatalake/issues/87) | E2 e E3 respondidos |
@@ -66,7 +66,9 @@ fica sem previsão.
 | 3.4 | **Paralelos restantes** | dicionário de dados das fontes que faltam · endurecer o Portal MVP · outra coisa | São as duas frentes úteis que sobraram sem GCP |
 | 3.5 | **Branch protection** | GitHub Team pago por usuário, ou assumir o risco por escrito | Hoje a `main` aceita push direto, o que contraria o SSDLC da cláusula 8ª |
 
-Decisões já tomadas hoje: **região** `southamerica-east1` ([ADR 009](arquitetura/decisoes/009-regiao-do-ambiente.md)) e **tom cordial** nos relatórios (convenção no [README](relatorios/README.md) do diretório).
+Decisões já tomadas hoje: **região** `southamerica-east1` ([ADR 009](arquitetura/decisoes/009-regiao-do-ambiente.md)),
+substituída em 10/09 por **região** `us-east1` ([ADR 011](arquitetura/decisoes/011-regiao-us-east1.md)), e **tom cordial**
+nos relatórios (convenção no [README](relatorios/README.md) do diretório).
 
 ---
 
@@ -79,6 +81,7 @@ Decisões já tomadas hoje: **região** `southamerica-east1` ([ADR 009](arquitet
 | 4.3 | Versão em inglês do baralho | decisão 3.2 |
 | 4.4 | Apagar `docs/fluxo-execucao` e o branch de trabalho, já mesclados; arquivar os dois `backup/*` como tag | permissão — daqui o `git push --delete` e a API respondem 403 |
 | 4.5 | Emitir o relatório de situação da semana | fechamento da S2 (11/09) |
+| 4.6 | Conferir as tarifas-premissa de `us-east1` na tabela oficial de preços do BigQuery e atualizar `src/portal/custo.py` e `sql/gold/custo_consultas.sql` se diferirem de US$ 6,25 por TiB varrido e US$ 0,02 por GiB·mês | acesso à tabela oficial de preços |
 
 ### Uma pendência técnica do próprio repositório
 

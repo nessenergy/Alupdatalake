@@ -8,6 +8,7 @@ Para a primeira implantação, use também a checklist
 | Recurso | Onde é declarado |
 |---|---|
 | Datasets `bronze`, `silver`, `gold` | `infra/modules/bigquery` |
+| Dataset `faturamento` (destino do billing export) | `infra/modules/bigquery` |
 | Bucket `<projeto>-raw` | `infra/modules/storage` |
 | Secrets das fontes credenciadas (vazios) | `infra/modules/secrets` |
 | Cloud Run Job + Cloud Scheduler por conector | `infra/modules/scheduler` |
@@ -28,10 +29,11 @@ Recurso criado no console não existe: some no próximo `apply`.
 ## Pré-requisitos (uma vez por ambiente)
 
 1. Projeto GCP criado, APIs habilitadas: BigQuery, Cloud Storage, Secret
-   Manager, Cloud Run, Cloud Scheduler, Artifact Registry.
-2. Bucket de state do Terraform e o `backend "gcs"` descomentado em
-   `infra/main.tf`.
-3. Repositório no Artifact Registry para a imagem da CLI.
+   Manager, Cloud Run, Cloud Scheduler, Artifact Registry, Dataform, Data Lineage, Dataplex.
+2. Bucket de state do Terraform, criado em `us-east1` (ADR 011), e o
+   `backend "gcs"` descomentado em `infra/main.tf`.
+3. Repositório no Artifact Registry para a imagem da CLI, criado em
+   `us-east1` (ADR 011).
 4. **Workload Identity Federation** entre o GitHub e o GCP — o deploy **não**
    usa chave JSON de service account (cláusula 8.5).
 5. Variáveis do repositório/ambiente no GitHub:
@@ -40,8 +42,8 @@ Recurso criado no console não existe: some no próximo `apply`.
 |---|---|
 | `GCP_WIF_PROVIDER` | `projects/123/locations/global/workloadIdentityPools/github/providers/alupdata` |
 | `GCP_DEPLOY_SA` | `alupdata-deploy@alupdata-dev.iam.gserviceaccount.com` |
-| `GCP_REGION` | `southamerica-east1` |
-| `IMAGEM_INGESTAO` | `southamerica-east1-docker.pkg.dev/alupdata-dev/alupdata/cli` (sem tag) |
+| `GCP_REGION` | `us-east1` |
+| `IMAGEM_INGESTAO` | `us-east1-docker.pkg.dev/alupdata-dev/alupdata/cli` (sem tag) |
 
 ## Deploy
 

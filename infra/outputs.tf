@@ -27,3 +27,8 @@ output "jobs_ingestao" {
   description = "Cloud Run Jobs agendados (vazio até existir imagem publicada)"
   value       = try(module.scheduler[0].jobs, [])
 }
+
+output "dataset_faturamento" {
+  description = "Destino do billing export — ligado no console pela Alup (ADR 007)"
+  value       = module.bigquery.dataset_faturamento
+}

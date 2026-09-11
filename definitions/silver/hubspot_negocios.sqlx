@@ -24,7 +24,6 @@ SELECT
   data_fechamento,
   criado_em,
   modificado_em,
-  proprietario_id,
   _ingestao_id,
   _ingestao_timestamp
 FROM ${ref("bronze", "hubspot_negocios")}

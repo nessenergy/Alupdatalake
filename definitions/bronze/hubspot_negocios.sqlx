@@ -17,7 +17,6 @@ CREATE TABLE IF NOT EXISTS ${self()} (
   data_fechamento     DATE               OPTIONS(description="closedate; nulo enquanto o negócio está aberto"),
   criado_em           TIMESTAMP NOT NULL OPTIONS(description="createdate"),
   modificado_em       TIMESTAMP NOT NULL OPTIONS(description="hs_lastmodifieddate — é por ele que a janela filtra"),
-  proprietario_id     STRING             OPTIONS(description="hubspot_owner_id"),
 
   _ingestao_id        STRING    NOT NULL OPTIONS(description="Identificador da execução de ingestão"),
   _ingestao_timestamp TIMESTAMP NOT NULL OPTIONS(description="Quando o registro entrou no lake"),

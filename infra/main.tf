@@ -44,6 +44,7 @@ resource "google_service_account" "ingestao" {
 locals {
   papeis_ingestao = [
     "roles/bigquery.jobUser",
+    "roles/datalineage.producer",
   ]
 }
 

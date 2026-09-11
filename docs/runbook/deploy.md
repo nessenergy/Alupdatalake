@@ -23,7 +23,7 @@ IAM da identidade de ingestão:
 
 | Escopo | Papel |
 |---|---|
-| Projeto | `roles/bigquery.jobUser` |
+| Projeto | `roles/bigquery.jobUser`, `roles/datalineage.producer` |
 | Dataset Bronze | `roles/bigquery.dataEditor` |
 | Bucket raw | `roles/storage.objectCreator` e `roles/storage.objectViewer` |
 | Cada secret declarado | `roles/secretmanager.secretAccessor` |

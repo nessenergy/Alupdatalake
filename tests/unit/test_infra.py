@@ -19,6 +19,8 @@ def test_ingestao_nao_recebe_editor_bigquery_nem_secrets_no_projeto() -> None:
     ]
 
     assert '"roles/bigquery.jobUser"' in bloco_projeto
+    # Linhagem é gravada no projeto; não há recurso mais estreito (ADR 013).
+    assert '"roles/datalineage.producer"' in bloco_projeto
     assert '"roles/bigquery.dataEditor"' not in bloco_projeto
     assert '"roles/secretmanager.secretAccessor"' not in bloco_projeto
     assert 'resource "google_bigquery_dataset_iam_member" "ingestao_bronze"' in principal
@@ -165,6 +167,12 @@ def test_dataform_compila_a_main_na_regiao_do_ambiente() -> None:
     assert _tem(r"regiao\s*=\s*var\.region", modulo)
     assert _tem(r'assertion_schema\s*=\s*"qualidade"', modulo)
     assert 'resource "google_bigquery_dataset" "qualidade"' in _ler("infra/modules/bigquery/main.tf")
+
+
+def test_scheduler_repassa_a_regiao_para_o_cloud_run_job() -> None:
+    """A regiao decide onde a linhagem e gravada e qual INFORMATION_SCHEMA e lido (ADR 013)."""
+    modulo = _ler("infra/modules/scheduler/main.tf")
+    assert _tem(r'name\s*=\s*"GCP_REGION"[^}]*value\s*=\s*var\.region', modulo)
 
 
 def test_deploy_edita_so_o_repositorio_dataform_nao_o_projeto() -> None:

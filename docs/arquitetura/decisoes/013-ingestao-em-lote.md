@@ -69,6 +69,10 @@ em `src/core/`, que vale para as 13 fontes — HTTP, banco e planilha.
 Falha ao emitir linhagem não falha a ingestão: vira aviso no log. Linhagem é
 metadado; o dado já está no Bronze.
 
+O *replay* (`alupdata reprocessar-raw`) não emite — ele lê o raw já arquivado e
+não toca a origem; a aresta origem → Bronze é a da ingestão que produziu
+aquele raw (sujeita à retenção descrita no adendo da ADR 014).
+
 ### Válvula de escape
 
 A ADR 008 registra que o executor mantém em memória as linhas da janela. Se o

@@ -90,6 +90,9 @@ Use esta lista apenas quando A3 estiver entregue. Ela complementa
 - [ ] Confirmar deduplicação e dimensões comuns na Silver.
 - [ ] Confirmar agregação na Gold.
 - [ ] Confirmar execução `FONTE` em `bronze._execucoes`.
+- [ ] Confirmar no Knowledge Catalog a linhagem da tabela
+  `bronze.bcb_cambio_ptax`: a origem `custom:bcb.cambio_ptax` à esquerda
+  (ADR 013) e a view Silver e a tabela Gold do Dataform à direita (ADR 012).
 - [ ] Conferir `/lake` e `/custo` usando o provedor BigQuery, pela URL de
   `terraform output url_portal`.
 - [ ] Abrir o Portal com uma conta fora de `portal_acesso`: o IAP recusa.

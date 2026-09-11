@@ -110,3 +110,13 @@ Descrição de ativo passa a carregar o *aspect* `origem`, com valor `curada` ou
   `us-east1`: a página de localizações do produto não informa (ADR 011).
 - Operação do catálogo e decisão de manter ou desligar os recursos de IA depois
   do handoff são da Alup.
+
+## Adendo de 2026-09-11 — retenção da linhagem
+
+A documentação do Google informa que toda informação de linhagem fica retida
+por 30 dias. Ligar a API no primeiro `apply` não acumula histórico além
+disso — garante que a linhagem exista desde a primeira carga e se renove a
+cada execução. A aresta origem → Bronze de uma fonte fica visível enquanto
+ela rodar ao menos uma vez a cada 30 dias, e fontes mensais ou esporádicas (o
+IPCA, por exemplo) podem ficar sem ela no intervalo. O dicionário de dados
+(componente 07) continua sendo o registro permanente da linhagem.

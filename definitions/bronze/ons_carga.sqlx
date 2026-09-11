@@ -1,5 +1,12 @@
+config {
+  type: "operations",
+  schema: "bronze",
+  hasOutput: true,
+  tags: ["bronze"]
+}
+
 -- Bronze: carga de energia diária por subsistema (ONS).
-CREATE TABLE IF NOT EXISTS `${projeto}.${bronze}.ons_carga` (
+CREATE TABLE IF NOT EXISTS ${self()} (
   data_referencia     DATE      NOT NULL OPTIONS(description="Dia da carga"),
   submercado          STRING    NOT NULL OPTIONS(description="N, NE, S, SE"),
   nome_subsistema     STRING    NOT NULL,

@@ -60,3 +60,25 @@ output "dataset_faturamento" {
   description = "Dataset de destino do billing export"
   value       = google_bigquery_dataset.faturamento.dataset_id
 }
+
+# Resultado das assertions do Dataform (ADR 012). Separado das camadas: é
+# evidência de qualidade, não dado de negócio.
+resource "google_bigquery_dataset" "qualidade" {
+  dataset_id  = "qualidade"
+  project     = var.project_id
+  location    = var.region
+  description = "Assertions do Dataform — linhas que violaram uma regra de qualidade"
+
+  delete_contents_on_destroy = var.environment == "dev"
+
+  labels = {
+    projeto  = "alupdata"
+    camada   = "qualidade"
+    ambiente = var.environment
+  }
+}
+
+output "dataset_qualidade" {
+  description = "Dataset das assertions do Dataform"
+  value       = google_bigquery_dataset.qualidade.dataset_id
+}

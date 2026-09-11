@@ -1,6 +1,13 @@
+config {
+  type: "operations",
+  schema: "bronze",
+  hasOutput: true,
+  tags: ["bronze"]
+}
+
 -- Log operacional de toda ingestão. Responde "o dado de ontem entrou?" sem
 -- abrir o orquestrador, e é evidência de homologação de onda.
-CREATE TABLE IF NOT EXISTS `${projeto}.${bronze}._execucoes` (
+CREATE TABLE IF NOT EXISTS ${self()} (
   ingestao_id      STRING    NOT NULL,
   fonte            STRING    NOT NULL,
   entidade         STRING    NOT NULL,

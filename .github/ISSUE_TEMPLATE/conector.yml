@@ -37,9 +37,9 @@ body:
  label: "Checklist dos 7 Componentes (critério de aceitação)"
  options:
  - label: "01 — Conector Python (extrator em src/conectores/<fonte>/)"
- - label: "02 — Tabela Bronze (DDL append-only em sql/bronze/)"
- - label: "03 — View Silver (dados higienizados em sql/silver/)"
- - label: "04 — View Gold (KPIs e regras de negócio em sql/gold/)"
+ - label: "02 — Tabela Bronze (DDL append-only em definitions/bronze/)"
+ - label: "03 — View Silver (dados higienizados em definitions/silver/)"
+ - label: "04 — View Gold (KPIs e regras de negócio em definitions/gold/)"
  - label: "05 — Testes pytest (unitários + integração em tests/)"
  - label: "06 — Agendamento GCP (DAG ou Cloud Scheduler em dags/)"
  - label: "07 — Documentação & Linhagem (README + dicionário de dados)"

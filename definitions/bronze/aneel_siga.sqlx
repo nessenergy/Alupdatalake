@@ -1,6 +1,13 @@
+config {
+  type: "operations",
+  schema: "bronze",
+  hasOutput: true,
+  tags: ["bronze"]
+}
+
 -- Bronze: cadastro de empreendimentos de geração (ANEEL/SIGA).
 -- Snapshot completo a cada execução; append-only preserva o histórico do cadastro.
-CREATE TABLE IF NOT EXISTS `${projeto}.${bronze}.aneel_siga` (
+CREATE TABLE IF NOT EXISTS ${self()} (
   data_referencia         DATE      NOT NULL OPTIONS(description="Data do conjunto declarada pela ANEEL"),
   codigo_usina            STRING    NOT NULL OPTIONS(description="CodCEG — chave única do empreendimento"),
   nome                    STRING    NOT NULL,

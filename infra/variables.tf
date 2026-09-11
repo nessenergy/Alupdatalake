@@ -35,3 +35,15 @@ variable "billing_account" {
   type        = string
   default     = ""
 }
+
+variable "dataform_git_token_versao" {
+  description = "Versão do secret alupdata-dataform-git-token; vazio não cria o repositório Dataform"
+  type        = string
+  default     = ""
+}
+
+variable "deploy_service_account" {
+  description = "SA do workflow Deploy GCP, que dispara o Dataform após o apply"
+  type        = string
+  default     = ""
+}

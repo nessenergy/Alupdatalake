@@ -30,13 +30,19 @@ def test_bucket_e_secrets_tem_iam_no_proprio_recurso() -> None:
     assert 'resource "google_secret_manager_secret_iam_member"' in _ler("infra/modules/secrets/main.tf")
 
 
-def test_deploy_all_publica_imagem_antes_do_terraform() -> None:
+def test_deploy_all_publica_imagem_antes_do_terraform_e_executa_o_dataform_depois() -> None:
     workflow = _ler(".github/workflows/deploy.yml")
     bloco_terraform = workflow[workflow.index("  terraform:") : workflow.index("  sync-dags:")]
 
     assert "needs: imagem" in bloco_terraform
     assert 'TAG="${GITHUB_SHA}"' in bloco_terraform
-    assert "scripts.deploy_views" in bloco_terraform
+    # A carga nunca cria tabela Bronze: o Dataform precisa rodar antes da primeira ingestão.
+    assert bloco_terraform.index("terraform apply") < bloco_terraform.index("scripts.executar_dataform")
+    assert "scripts.deploy_views" not in workflow
+    # Sem repositório (primeiro apply, token ainda não gravado), falha explícita.
+    assert "repositorio_dataform" in bloco_terraform
+    assert "::error::" in bloco_terraform
+    assert "--repositorio" in bloco_terraform
 
 
 def _tem(padrao: str, texto: str) -> bool:
@@ -98,3 +104,74 @@ def test_dataset_do_billing_export_existe_sem_acesso_da_ingestao() -> None:
         texto = caminho.read_text(encoding="utf-8")
         for iam in re.finditer(r'resource "google_bigquery_dataset_iam_\w+" "\w+" \{.*?\n\}', texto, re.DOTALL):
             assert "faturamento" not in iam.group(0), caminho
+
+
+def test_projeto_dataform_na_raiz_com_versao_e_regiao_fixas() -> None:
+    """ADR 012: o Dataform lê o projeto só a partir da raiz do repositório Git."""
+    settings = _ler("workflow_settings.yaml")
+    assert _tem(r"dataformCoreVersion:\s*3\.0\.69", settings)
+    assert _tem(r"defaultLocation:\s*us-east1", settings)
+    assert _tem(r"regiao:\s*us-east1", settings)
+    assert _tem(r"defaultAssertionDataset:\s*qualidade", settings)
+
+
+def test_ci_e_makefile_compilam_o_dataform_na_mesma_versao() -> None:
+    assert "dataform-compile:" in _ler(".github/workflows/ci.yml")
+    assert "@dataform/cli@3.0.69 compile" in _ler(".github/workflows/ci.yml")
+    assert "@dataform/cli@3.0.69 compile" in _ler("Makefile")
+
+
+def test_dataform_executa_com_service_account_propria() -> None:
+    """Strict act-as: o agente do Dataform personifica uma SA do projeto."""
+    modulo = _ler("infra/modules/dataform/main.tf")
+    assert 'resource "google_service_account" "dataform"' in modulo
+    assert _tem(r"service_account\s*=\s*google_service_account\.dataform\.email", modulo)
+    assert '"roles/iam.serviceAccountTokenCreator"' in modulo
+    assert 'resource "google_project_service_identity" "dataform"' in modulo
+    assert _tem(r'service\s*=\s*"dataform\.googleapis\.com"', modulo)
+    assert "local.agente_dataform" in modulo
+
+
+def test_repositorio_dataform_roda_como_a_propria_service_account() -> None:
+    """A execução herda o IAM da SA do Dataform, não do agente de serviço."""
+    modulo = _ler("infra/modules/dataform/main.tf")
+    inicio = modulo.index('resource "google_dataform_repository" "alupdata"')
+    bloco = modulo[inicio : modulo.index("\n}\n", inicio)]
+    assert _tem(r"service_account\s*=\s*google_service_account\.dataform\.email", bloco)
+
+
+def test_dataform_le_metadados_do_projeto_para_a_view_de_custo() -> None:
+    """gold.custo_consultas le JOBS_BY_PROJECT e TABLE_STORAGE: metadado, nunca dado (regra 2)."""
+    modulo = _ler("infra/modules/dataform/main.tf")
+    inicio = modulo.index('resource "google_project_iam_member" "dataform_metadados"')
+    bloco = modulo[inicio : modulo.index("\n}\n", inicio)]
+    assert "for_each" in bloco
+    assert '"roles/bigquery.resourceViewer"' in bloco
+    assert '"roles/bigquery.metadataViewer"' in bloco
+    assert "google_service_account.dataform.email" in bloco
+
+
+def test_token_do_git_so_e_legivel_pelo_agente_do_dataform() -> None:
+    modulo = _ler("infra/modules/dataform/main.tf")
+    assert _tem(r'secret_id\s*=\s*"alupdata-dataform-git-token"', modulo)
+    assert "google_secret_manager_secret_version" not in modulo  # valor fora do Terraform (regra 2)
+    assert "alupdata-dataform-git-token" not in _ler("infra/modules/secrets/main.tf")  # a ingestão não lê
+
+
+def test_dataform_compila_a_main_na_regiao_do_ambiente() -> None:
+    modulo = _ler("infra/modules/dataform/main.tf")
+    assert _tem(r'git_commitish\s*=\s*"main"', modulo)
+    assert _tem(r"default_location\s*=\s*var\.region", modulo)
+    assert _tem(r"regiao\s*=\s*var\.region", modulo)
+    assert _tem(r'assertion_schema\s*=\s*"qualidade"', modulo)
+    assert 'resource "google_bigquery_dataset" "qualidade"' in _ler("infra/modules/bigquery/main.tf")
+
+
+def test_deploy_edita_so_o_repositorio_dataform_nao_o_projeto() -> None:
+    """Least privilege: o deploy so precisa compilar e executar o repositorio alupdata."""
+    modulo = _ler("infra/modules/dataform/main.tf")
+    assert 'resource "google_dataform_repository_iam_member" "deploy_dataform"' in modulo
+    assert '"roles/dataform.editor"' in modulo
+
+    for bloco in re.finditer(r'resource "google_project_iam_member" "\w+" \{.*?\n\}', modulo, re.DOTALL):
+        assert "roles/dataform.editor" not in bloco.group(0)

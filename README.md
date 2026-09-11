@@ -72,7 +72,7 @@ graph LR
 ```
 alupdatalake/
 ├── src/ # Código Python (conectores + core)
-├── sql/ # DDL Bronze, Views Silver/Gold
+├── definitions/          # Dataform: DDL Bronze, views Silver/Gold (ADR 012)
 ├── dags/ # DAGs Cloud Composer/Airflow
 ├── infra/ # Terraform (IaC GCP)
 ├── tests/ # Testes pytest
@@ -111,7 +111,7 @@ uv run alupdata ingerir ons_carga --de 2026-01-01 --ate 2026-01-31 --dry-run
 |---|---|
 | `make all` | lint + testes + Bandit + pip-audit — antes de todo PR |
 | `make novo-conector fonte=X entidade=Y` | esqueleto dos 7 componentes |
-| `make deploy-views` | aplica o SQL de `sql/` no BigQuery |
+| `make dataform-compile` | compila o projeto Dataform de `definitions/`, sem credencial |
 | `make sync-skills` | atualiza as skills vendorizadas do Google |
 | `alupdata reprocessar-raw ...` | revalida um raw do GCS sem chamar novamente a fonte |
 

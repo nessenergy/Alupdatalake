@@ -47,3 +47,7 @@ bandit-report.json
 
 # Requirements exportado temporariamente pelo `make audit`
 .requirements.txt
+
+# Dataform
+node_modules/
+.df-credentials.json

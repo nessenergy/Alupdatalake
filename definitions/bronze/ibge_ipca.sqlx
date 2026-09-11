@@ -1,6 +1,13 @@
+config {
+  type: "operations",
+  schema: "bronze",
+  hasOutput: true,
+  tags: ["bronze"]
+}
+
 -- Bronze: IPCA (IBGE/SIDRA, agregado 1737).
 -- Append-only: reprocessar a mesma janela insere de novo; a Silver deduplica.
-CREATE TABLE IF NOT EXISTS `${projeto}.${bronze}.ibge_ipca` (
+CREATE TABLE IF NOT EXISTS ${self()} (
   data_referencia     DATE      NOT NULL OPTIONS(description="Primeiro dia do mês de referência"),
   periodo             STRING    NOT NULL OPTIONS(description="AAAAMM, como o IBGE devolve"),
   variavel_id         STRING    NOT NULL OPTIONS(description="63 = variação mensal; 69 = acumulada no ano"),

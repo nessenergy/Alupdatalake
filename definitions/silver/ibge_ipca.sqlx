@@ -1,7 +1,16 @@
+config {
+  type: "view",
+  schema: "silver",
+  tags: ["silver"],
+  assertions: {
+    uniqueKey: ["data_referencia", "variavel_id"],
+    nonNull: ["data_referencia", "variavel_id"]
+  }
+}
+
 -- Silver: IPCA higienizado e deduplicado, com as dimensões comuns.
 -- Dedup: para cada (data_referencia, variavel_id), vence a ingestão mais recente.
 -- O IBGE revisa série publicada, então a última ingestão é a versão correta.
-CREATE OR REPLACE VIEW `${projeto}.${silver}.ibge_ipca` AS
 SELECT
   data_referencia,
   CAST(NULL AS STRING) AS submercado,     -- índice nacional, não é dado de submercado
@@ -14,8 +23,8 @@ SELECT
   valor,
   _ingestao_id,
   _ingestao_timestamp
-FROM `${projeto}.${bronze}.ibge_ipca`
+FROM ${ref("bronze", "ibge_ipca")}
 QUALIFY ROW_NUMBER() OVER (
   PARTITION BY data_referencia, variavel_id
   ORDER BY _ingestao_timestamp DESC
-) = 1;
+) = 1

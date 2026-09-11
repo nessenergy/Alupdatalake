@@ -1,6 +1,15 @@
+config {
+  type: "view",
+  schema: "silver",
+  tags: ["silver"],
+  assertions: {
+    uniqueKey: ["data_referencia", "tipo_boletim"],
+    nonNull: ["data_referencia", "tipo_boletim"]
+  }
+}
+
 -- Silver: PTAX higienizada, deduplicada e com as dimensões comuns.
 -- Dedup: para cada (data_referencia, tipo_boletim), vence a ingestão mais recente.
-CREATE OR REPLACE VIEW `${projeto}.${silver}.bcb_cambio_ptax` AS
 SELECT
   data_referencia,
   CAST(NULL AS STRING)  AS submercado,      -- câmbio não é dado de submercado
@@ -14,8 +23,8 @@ SELECT
   (cotacao_compra + cotacao_venda) / 2 AS cotacao_media,
   _ingestao_id,
   _ingestao_timestamp
-FROM `${projeto}.${bronze}.bcb_cambio_ptax`
+FROM ${ref("bronze", "bcb_cambio_ptax")}
 QUALIFY ROW_NUMBER() OVER (
   PARTITION BY data_referencia, tipo_boletim
   ORDER BY _ingestao_timestamp DESC
-) = 1;
+) = 1

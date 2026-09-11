@@ -13,6 +13,8 @@ Para a primeira implantação, use também a checklist
 | Secrets das fontes credenciadas (vazios) | `infra/modules/secrets` |
 | Cloud Run Job + Cloud Scheduler por conector | `infra/modules/scheduler` |
 | Service account `alupdata-ingestao` e seu IAM | `infra/main.tf` |
+| Repositório Dataform, release config `main`, workflow config `diario` e SA `alupdata-dataform` | `infra/modules/dataform` |
+| Dataset `qualidade` (assertions do Dataform) | `infra/modules/bigquery` |
 
 IAM da identidade de ingestão:
 
@@ -23,6 +25,14 @@ IAM da identidade de ingestão:
 | Bucket raw | `roles/storage.objectCreator` e `roles/storage.objectViewer` |
 | Cada secret declarado | `roles/secretmanager.secretAccessor` |
 | Cada Cloud Run Job | `roles/run.invoker` |
+
+IAM do lado do Dataform (ADR 012):
+
+| Identidade | Papel |
+|---|---|
+| SA `alupdata-dataform` | `roles/bigquery.jobUser`, `roles/bigquery.resourceViewer` e `roles/bigquery.metadataViewer` no projeto; `roles/bigquery.dataEditor` em `bronze`, `silver`, `gold` e `qualidade` |
+| SA de deploy | `roles/dataform.editor` no repositório `alupdata`; `roles/iam.serviceAccountUser` na SA do Dataform |
+| Agente de serviço do Dataform | `roles/iam.serviceAccountTokenCreator` e `roles/iam.serviceAccountUser` na SA do Dataform; `roles/secretmanager.secretAccessor` no secret do token |
 
 Recurso criado no console não existe: some no próximo `apply`.
 
@@ -44,6 +54,7 @@ Recurso criado no console não existe: some no próximo `apply`.
 | `GCP_DEPLOY_SA` | `alupdata-deploy@alupdata-dev.iam.gserviceaccount.com` |
 | `GCP_REGION` | `us-east1` |
 | `IMAGEM_INGESTAO` | `us-east1-docker.pkg.dev/alupdata-dev/alupdata/cli` (sem tag) |
+| `DATAFORM_GIT_TOKEN_VERSAO` | `1` (versão do secret `alupdata-dataform-git-token`) |
 
 ## Deploy
 
@@ -58,14 +69,17 @@ No fluxo `all`, o job Terraform depende explicitamente do job de imagem. Isso
 impede o primeiro `apply` de disputar com o primeiro push. O estado guarda a tag
 imutável do commit; `latest` permanece apenas como conveniência operacional.
 
-## Views
+## SQL das camadas (Dataform)
 
-O SQL de `sql/` não é aplicado pelo Terraform:
+O SQL de `definitions/` é compilado pelo Dataform a partir da `main` (ADR 012):
 
 ```bash
-make deploy-views                          # aplica bronze, silver e gold
-uv run python -m scripts.deploy_views --dry-run   # revisa antes
+make dataform-compile                                   # valida localmente, sem credencial
+uv run python -m scripts.executar_dataform --service-account alupdata-dataform@<projeto>.iam.gserviceaccount.com
 ```
+
+O deploy `all`/`infra` executa o segundo comando logo após o `apply`. Depois
+disso, a *workflow config* `diario` roda às 11h (horário de Brasília).
 
 ## Verificar uma ingestão
 
@@ -104,3 +118,9 @@ gcloud secrets versions add alupdata-ccee-api-token --data-file=-
 
 Enquanto a Alup não entrega o token, o secret existe sem versão — e o conector
 da onda correspondente falha explicitamente, em vez de silenciar.
+
+O Dataform lê o repositório com um token *fine-grained* do GitHub restrito a
+`nessenergy/Alupdatalake`, permissão *Contents: Read-only*:
+`gcloud secrets versions add alupdata-dataform-git-token --data-file=-`. Sem
+ele, o deploy falha no passo do Dataform — de propósito: sem Dataform não há
+tabela Bronze.

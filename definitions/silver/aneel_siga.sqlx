@@ -1,7 +1,16 @@
+config {
+  type: "view",
+  schema: "silver",
+  tags: ["silver"],
+  assertions: {
+    uniqueKey: ["codigo_usina"],
+    nonNull: ["codigo_usina"]
+  }
+}
+
 -- Silver: cadastro vigente de usinas — uma linha por empreendimento.
 -- Dedup por codigo_usina: vence a ingestão mais recente. É esta view que
 -- fornece `codigo_usina` como dimensão comum para as demais fontes.
-CREATE OR REPLACE VIEW `${projeto}.${silver}.aneel_siga` AS
 SELECT
   data_referencia,
   CAST(NULL AS STRING) AS submercado,   -- a ANEEL publica UF, não submercado
@@ -20,8 +29,8 @@ SELECT
   garantia_fisica_kw,
   _ingestao_id,
   _ingestao_timestamp
-FROM `${projeto}.${bronze}.aneel_siga`
+FROM ${ref("bronze", "aneel_siga")}
 QUALIFY ROW_NUMBER() OVER (
   PARTITION BY codigo_usina
   ORDER BY _ingestao_timestamp DESC
-) = 1;
+) = 1

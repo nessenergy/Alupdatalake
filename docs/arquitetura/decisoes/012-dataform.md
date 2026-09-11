@@ -99,7 +99,7 @@ usado como **rascunho** de descrição de tabela e coluna, sob três condições
    recebe o *aspect* `origem = curada` (ADR 014) e conta como documentação do
    componente 07. O que nunca passou por PR segue `automatica`.
 3. **Sem dado pessoal na amostra.** Para sugerir, o assistente lê uma amostra
-   real da tabela. Ele não é apontado para tabela com dado pessoal (contatos
+   real da tabela. Ele não é apontado para tabela com dado pessoal (negócios
    do Hubspot, Portal Alup) antes de o RIPD estar assinado (ADR 011).
 
 A habilitação do recurso no projeto é declarada em `infra/` (regra 5).

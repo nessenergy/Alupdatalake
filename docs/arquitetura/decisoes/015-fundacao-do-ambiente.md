@@ -1,4 +1,4 @@
-# ADR 015 — Fundação do ambiente: dois ambientes, construída pela ness., chave gerenciada pelo Google
+# ADR 015 — Fundação do ambiente: dois ambientes, bootstrap da Alup, chave gerenciada pelo Google
 
 **Status**: aceito · **Data**: 2026-09-11 · **Complementa** a
 [ADR 011](011-regiao-us-east1.md)
@@ -27,19 +27,23 @@ sugerido na reunião não é adotado: cada ambiente a mais é um projeto a mais
 para a Alup criar (E1) e faturar (E2), e um conjunto a mais de recursos para
 manter em Terraform.
 
-### A fundação é da ness., toda em `infra/`
+### Bootstrap da Alup; o restante da fundação é da ness., em `infra/`
 
-Tudo o que existe dentro dos projetos — APIs, IAM, contas de serviço, rede,
-datasets, buckets, Artifact Registry, Dataform, Knowledge Catalog,
-agendamentos e a esteira de CI/CD — é declarado no `infra/` deste repositório e
-construído pela ness. Não há Terraform paralelo nem recurso criado pelo
-console. As tarefas de fundação que a reunião atribuiu ao Google passam para a
-ness.
+A fronteira com a Alup continua a esclarecida em 09/09 e a do pedido A3 de
+04/09 ([issue #55](https://github.com/nessenergy/Alupdatalake/issues/55)):
+**a Alup cria os projetos na organização, vincula a conta de faturamento (E1 e
+E2) e faz o bootstrap** — APIs habilitadas, bucket de state do Terraform,
+repositório do Artifact Registry, Workload Identity Federation e conta de
+serviço de deploy. A ness. não tem, e não deve ter, permissão de criar projeto
+na organização da contratante. A ness. acompanha a abertura da conta de
+faturamento junto à Qi.
 
-A fronteira com a Alup continua a esclarecida em 09/09: **criar os projetos na
-organização e vincular a conta de faturamento é da Alup** (E1 e E2). A ness.
-não tem, e não deve ter, permissão de criar projeto na organização da
-contratante. A ness. acompanha a abertura da conta de faturamento junto à Qi.
+A partir do bootstrap, tudo o que existe dentro dos projetos — IAM, contas de
+serviço de execução, rede, datasets, buckets, Dataform, Knowledge Catalog,
+agendamentos, Portal e a esteira de CI/CD — é declarado no `infra/` deste
+repositório e construído pela ness. Não há Terraform paralelo nem recurso
+criado pelo console. As tarefas de fundação que a reunião atribuiu ao Google
+passam para a ness.
 
 ### Criptografia com chave gerenciada pelo Google
 
@@ -54,5 +58,5 @@ pesou mais do que a restrição adicional de acesso que a chave própria daria.
 
 - O `infra/` continua com dois `.tfvars`, `dev` e `prod`; nada muda no código.
 - Nenhum recurso de KMS entra em `infra/`. Adotar CMEK depois é ADR própria.
-- O primeiro `apply` segue dependendo da Alup criar o projeto `dev` (A3) e
-  vincular a conta de faturamento.
+- O primeiro `apply` segue dependendo da Alup criar o projeto `dev`, vincular
+  a conta de faturamento e fazer o bootstrap (A3).

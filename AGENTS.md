@@ -77,7 +77,7 @@ make all              # lint + testes + Bandit + pip-audit — rode antes de tod
 make test             # pytest
 make lint             # ruff check + format --check
 make novo-conector fonte=X entidade=Y
-make deploy-views     # aplica o SQL de sql/ no BigQuery (idempotente)
+make dataform-compile  # compila o projeto Dataform (definitions/), sem credencial
 make sync-skills      # atualiza as skills vendorizadas do Google
 
 alupdata listar
@@ -91,13 +91,13 @@ alupdata ingerir bcb_cambio_ptax --de 2026-01-01 --ate 2026-01-31 --dry-run
 | `src/core/` | framework de ingestão — runner, janela, registry, GCS, BigQuery, secrets, HTTP, banco |
 | `src/conectores/` | um módulo por fonte |
 | `src/cli.py` | CLI única: laptop, Cloud Run Job e DAG usam o mesmo comando |
-| `sql/{bronze,silver,gold}/` | DDL e views versionadas, aplicadas por `make deploy-views` — migram para `definitions/` (Dataform) pela ADR 012 |
+| `definitions/{bronze,silver,gold}/` e `workflow_settings.yaml` | projeto Dataform: DDL Bronze e views Silver/Gold (ADR 012) |
 | `infra/` | Terraform: datasets, bucket raw, secrets, Cloud Run Job + Scheduler, IAM |
 | `dags/` | vazio até a Onda 3 (ADR 004) |
 | `docs/arquitetura/decisoes/` | ADRs — leia antes de propor mudança estrutural |
 | `docs/dicionario-dados/` | componente 07 de cada fonte |
 | `docs/runbook/` | deploy e operação |
-| `scripts/` | deploy de views, scaffolding, sync de skills |
+| `scripts/` | execução do Dataform no deploy, scaffolding, sync de skills |
 
 ## Vocabulário do setor
 
@@ -149,7 +149,7 @@ dizem como *este contrato* usa o produto.
 | 009 | Região `southamerica-east1` — **substituída pela 011** |
 | 010 | Aceite formal do risco de `main` sem proteção obrigatória (GitHub Free) |
 | 011 | Região do ambiente: `us-east1`, irreversível depois do primeiro apply; transferência internacional documentada (DPA, RoPA, RIPD) |
-| 012 | Dataform para o SQL das três camadas, projeto na raiz; substitui `sql/` e `deploy_views.py` |
+| 012 | Dataform para o SQL das três camadas, projeto na raiz; substitui o SQL solto e o script de deploy antigo |
 | 013 | Ingestão em lote pelos conectores Python, sem CDC nem Dataflow; linhagem OpenLineage no executor |
 | 014 | Knowledge Catalog na Onda 4, linhagem desde o 1º apply; recursos de IA do produto sob aviso |
 

@@ -81,7 +81,7 @@ nos relatórios (convenção no [README](relatorios/README.md) do diretório).
 | 4.3 | Versão em inglês do baralho | decisão 3.2 |
 | 4.4 | Apagar `docs/fluxo-execucao` e o branch de trabalho, já mesclados; arquivar os dois `backup/*` como tag | permissão — daqui o `git push --delete` e a API respondem 403 |
 | 4.5 | Emitir o relatório de situação da semana | fechamento da S2 (11/09) |
-| 4.6 | Conferir as tarifas-premissa de `us-east1` na tabela oficial de preços do BigQuery e atualizar `src/portal/custo.py` e `sql/gold/custo_consultas.sql` se diferirem de US$ 6,25 por TiB varrido e US$ 0,02 por GiB·mês | acesso à tabela oficial de preços |
+| 4.6 | Conferir as tarifas-premissa de `us-east1` na tabela oficial de preços do BigQuery e atualizar `src/portal/custo.py` e `definitions/gold/custo_consultas.sqlx` se diferirem de US$ 6,25 por TiB varrido e US$ 0,02 por GiB·mês | acesso à tabela oficial de preços |
 
 ### Uma pendência técnica do próprio repositório
 
@@ -104,7 +104,7 @@ Sequência, não lista — cada item depende do anterior. Detalhe em
 2. **Rótulos de custo** já estão prontos (FinOps F0, implementado em 04/09) —
    conferir que entraram no `apply`, não depois dele.
 3. `terraform apply` no ambiente `dev` — datasets, bucket, secrets, IAM.
-4. `make deploy-views` — DDL do Bronze e views Silver/Gold.
+4. Dataform executado pelo deploy logo após o apply — DDL do Bronze e views Silver/Gold (ADR 012).
 5. Publicar a imagem e subir o Cloud Run Job + Scheduler.
 6. **Três dias consecutivos com `status = SUCESSO`** em `bronze._execucoes`.
 7. Validar o replay do raw contra objeto real no GCS.

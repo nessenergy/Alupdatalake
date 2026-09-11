@@ -24,9 +24,9 @@ parcial — é retrabalho na medição.
 | # | Onde vive | Critério de pronto |
 |---|-----------|--------------------|
 | 01 | `src/conectores/<fonte>/` | extração + transporte, sem lógica de negócio |
-| 02 | `sql/bronze/<fonte>.sql` | append-only, schema versionado, log de ingestão |
-| 03 | `sql/silver/<fonte>.sql` | tipado, deduplicado, com as dimensões comuns |
-| 04 | `sql/gold/<fonte>.sql` | regra de negócio / KPI, não repete Silver |
+| 02 | `definitions/bronze/<fonte>.sqlx` | append-only, schema versionado, log de ingestão |
+| 03 | `definitions/silver/<fonte>.sqlx` | tipado, deduplicado, com *assertion* na chave de deduplicação |
+| 04 | `definitions/gold/<fonte>.sqlx` | regra de negócio / KPI, não repete Silver |
 | 05 | `tests/unit/conectores/` + `tests/integration/` | unitário sem rede; e2e marcado |
 | 06 | `dags/<fonte>_dag.py` ou Cloud Scheduler via `infra/` | idempotente e reexecutável |
 | 07 | `docs/dicionario-dados/<fonte>.md` | campos, tipos, origem→destino, linhagem |

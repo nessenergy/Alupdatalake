@@ -61,6 +61,46 @@ papel algum**:
 
 Recurso criado no console não existe: some no próximo `apply`.
 
+IAM da SA de deploy — concedido pelo bootstrap (`infra/bootstrap/`, ADR 015),
+um papel por tipo de recurso que o `infra/` declara
+(`tests/unit/test_bootstrap.py` confere):
+
+| Escopo | Papel | Para quê |
+|---|---|---|
+| Projeto | `roles/bigquery.dataOwner` | datasets e o IAM de cada um |
+| Projeto | `roles/storage.admin` | bucket raw, o IAM dele e o state do Terraform |
+| Projeto | `roles/secretmanager.admin` | secrets vazios e o IAM de cada um |
+| Projeto | `roles/run.admin` | Cloud Run Jobs, Portal e o IAM de cada um |
+| Projeto | `roles/cloudscheduler.admin` | disparos das ingestões |
+| Projeto | `roles/dataform.admin` | repositório, configs e o IAM do repositório |
+| Projeto | `roles/iap.admin` | quem passa pelo IAP do Portal |
+| Projeto | `roles/monitoring.editor` | canais, alertas e painel |
+| Projeto | `roles/logging.configWriter` | métricas de log |
+| Projeto | `roles/iam.serviceAccountAdmin` | SAs de ingestão, Dataform e Portal, e o IAM delas |
+| Projeto | `roles/iam.serviceAccountUser` | Cloud Run, Scheduler e Dataform agem como essas SAs |
+| Projeto | `roles/resourcemanager.projectIamAdmin` | papéis de projeto e log de auditoria |
+| Projeto | `roles/serviceusage.serviceUsageConsumer` | agentes de serviço do Dataform e do IAP |
+| Repositório do Artifact Registry do ambiente | `roles/artifactregistry.writer` | publicar a imagem |
+| Conta de faturamento — da Alup, só com `billing_account` preenchido | *Billing Account Costs Manager* | orçamento |
+
+Quem personifica a SA de deploy: só o WIF do repositório
+`nessenergy/Alupdatalake`; em `hml` e `prod`, só job no ambiente do GitHub de
+mesmo nome. Não há chave.
+
+## Ambiente `hml`
+
+Homologação das ondas, no custo mínimo (E2). `hml.tfvars` traz
+`agendamentos_ativos = false`: não existem os disparos do Cloud Scheduler, que
+cobra por job existente, pausado ou não, nem o workflow `diario` do Dataform.
+Os Cloud Run Jobs existem e rodam sob demanda:
+
+```bash
+gcloud run jobs execute ingestao-bcb-cambio-ptax --region us-east1 --project <projeto-hml>
+```
+
+Na janela de homologação de uma onda, `agendamentos_ativos = true` em PR e
+deploy `infra` em `hml`; ao fim dela, de volta a `false`.
+
 ## Log de auditoria de acesso a dado (R07 do RIPD)
 
 `DATA_READ` e `DATA_WRITE` ficam ligados para `bigquery.googleapis.com` e
@@ -93,25 +133,32 @@ protoPayload.serviceName="bigquery.googleapis.com"
 
 ## Pré-requisitos (uma vez por ambiente)
 
-1. Projeto GCP criado, APIs habilitadas: BigQuery, Cloud Storage, Secret
-   Manager, Cloud Run, Cloud Scheduler, Artifact Registry, Dataform, Data Lineage, Dataplex,
-   Identity-Aware Proxy. A SA de deploy precisa administrar o IAP do serviço do
-   Portal (por exemplo `roles/iap.admin`).
-2. Bucket de state do Terraform, criado em `us-east1` (ADR 011), e o
-   `backend "gcs"` descomentado em `infra/main.tf`.
-3. Repositório no Artifact Registry para a imagem da CLI, criado em
-   `us-east1` (ADR 011).
-4. **Workload Identity Federation** entre o GitHub e o GCP — o deploy **não**
-   usa chave JSON de service account (cláusula 8.5).
-5. Variáveis do repositório/ambiente no GitHub:
+São três ambientes, um projeto GCP cada: `dev`, `hml` (homologação das ondas)
+e `prod` (ADR 015).
 
-| Variável | Exemplo |
-|---|---|
-| `GCP_WIF_PROVIDER` | `projects/123/locations/global/workloadIdentityPools/github/providers/alupdata` |
-| `GCP_DEPLOY_SA` | `alupdata-deploy@alupdata-dev.iam.gserviceaccount.com` |
-| `GCP_REGION` | `us-east1` |
-| `IMAGEM_INGESTAO` | `us-east1-docker.pkg.dev/alupdata-dev/alupdata/cli` (sem tag) |
-| `DATAFORM_GIT_TOKEN_VERSAO` | `1` (versão do secret `alupdata-dataform-git-token`) |
+1. **Da Alup**: o projeto criado na organização dela, vinculado à conta de
+   faturamento, e os papéis de bootstrap concedidos à ness. no projeto — a
+   lista está na ADR 015.
+2. **Da ness.**: o bootstrap aplicado (`infra/bootstrap/`, passo a passo em
+   [`primeiro-deploy.md`](primeiro-deploy.md) §0). Ele habilita as APIs, cria o
+   bucket de state e o repositório do Artifact Registry em `us-east1` (ADR
+   011), o **Workload Identity Federation** e a SA de deploy — o deploy **não**
+   usa chave JSON de service account (cláusula 8.5).
+3. Um ambiente do GitHub com o nome do ambiente e as variáveis abaixo. Os
+   valores saem de `terraform output` do bootstrap:
+
+| Variável | Saída do bootstrap | Exemplo |
+|---|---|---|
+| `GCP_WIF_PROVIDER` | `workload_identity_provider` | `projects/123/locations/global/workloadIdentityPools/github/providers/alupdata` |
+| `GCP_DEPLOY_SA` | `service_account_deploy` | `alupdata-deploy@alupdata-dev.iam.gserviceaccount.com` |
+| `TF_STATE_BUCKET` | `bucket_state` | `alupdata-dev-tfstate` |
+| `GCP_REGION` | `region` | `us-east1` |
+| `IMAGEM_INGESTAO` | `imagem_ingestao` | `us-east1-docker.pkg.dev/alupdata-dev/alupdata/cli` (sem tag) |
+| `DATAFORM_GIT_TOKEN_VERSAO` | — | `1` (versão do secret `alupdata-dataform-git-token`) |
+
+Em `dev`, `GCP_WIF_PROVIDER` e `GCP_DEPLOY_SA` ficam também como variáveis do
+repositório: o quadro (`quadro.yml`) roda sem ambiente do GitHub. Em `hml` e
+`prod`, o WIF só aceita token de job que roda no ambiente de mesmo nome.
 
 ## Deploy
 

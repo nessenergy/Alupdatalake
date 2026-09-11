@@ -37,6 +37,12 @@ variable "deploy_service_account" {
   default     = ""
 }
 
+variable "agendar" {
+  description = "Cria o workflow config `diario`; false deixa o Dataform só sob demanda, disparado pelo deploy"
+  type        = bool
+  default     = true
+}
+
 # Agente de serviço do Dataform: existe só depois que a API é habilitada, daí
 # vir de um recurso, e não de uma convenção de nome montada à mão.
 resource "google_project_service_identity" "dataform" {
@@ -194,8 +200,11 @@ resource "google_dataform_repository_release_config" "main" {
 # cada 6h, então suas cargas de 12h e 18h só são conferidas por este workflow
 # no dia seguinte. Na Onda 3 o Airflow assume o disparo, com dependência real
 # em vez de horário (ADR 004).
+#
+# Sem `agendar` (hml fora da homologação), o workflow não existe: o deploy
+# continua executando o Dataform pela release config `main`.
 resource "google_dataform_repository_workflow_config" "diario" {
-  count    = local.criar ? 1 : 0
+  count    = local.criar && var.agendar ? 1 : 0
   provider = google-beta
 
   project        = var.project_id

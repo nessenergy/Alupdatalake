@@ -111,6 +111,11 @@ jobs:
           terraform init -backend=false
           terraform fmt -check -recursive
           terraform validate
+      # Raiz separada, aplicada pela ness. uma vez por projeto (ADR 015).
+      - run: |
+          cd infra/bootstrap
+          terraform init -backend=false
+          terraform validate
 
   dataform-compile:
     name: "Dataform Compile"

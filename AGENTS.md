@@ -93,7 +93,8 @@ alupdata ingerir bcb_cambio_ptax --de 2026-01-01 --ate 2026-01-31 --dry-run
 | `src/conectores/` | um módulo por fonte |
 | `src/cli.py` | CLI única: laptop, Cloud Run Job e DAG usam o mesmo comando |
 | `definitions/{bronze,silver,gold}/` e `workflow_settings.yaml` | projeto Dataform: DDL Bronze, view Silver, tabela Gold (ADR 012) |
-| `infra/` | Terraform: datasets, bucket raw, secrets, Cloud Run Job + Scheduler, IAM |
+| `infra/` | Terraform: datasets, bucket raw, secrets, Cloud Run Job + Scheduler, IAM — um `.tfvars` por ambiente (`dev`, `hml`, `prod`) |
+| `infra/bootstrap/` | Terraform do bootstrap de cada projeto — APIs, bucket de state, Artifact Registry, WIF e SA de deploy —, aplicado pela ness. com state local (ADR 015) |
 | `dags/` | vazio até a Onda 3 (ADR 004) |
 | `docs/arquitetura/decisoes/` | ADRs — leia antes de propor mudança estrutural |
 | `docs/dicionario-dados/` | componente 07 de cada fonte |
@@ -153,6 +154,7 @@ dizem como *este contrato* usa o produto.
 | 012 | Dataform para o SQL das três camadas, projeto na raiz; substitui o SQL solto e o script de deploy antigo |
 | 013 | Ingestão em lote pelos conectores Python, sem CDC nem Dataflow; linhagem OpenLineage no executor |
 | 014 | Knowledge Catalog na Onda 4, linhagem desde o 1º apply; recursos de IA do produto sob aviso |
+| 015 | Três ambientes (`dev`, `hml`, `prod`), um projeto cada; bootstrap de cada projeto pela ness. em `infra/bootstrap/`, com os papéis que a Alup concede; chave gerenciada pelo Google |
 
 Se você for propor algo que contraria um ADR, escreva um ADR novo — não um
 remendo. Em particular: o framework em `src/core/` é mais estrutura do que 13

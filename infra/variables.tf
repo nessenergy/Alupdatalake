@@ -10,12 +10,18 @@ variable "region" {
 }
 
 variable "environment" {
-  description = "Ambiente: dev ou prod"
+  description = "Ambiente: dev, hml (homologação) ou prod — ADR 015"
   type        = string
   validation {
-    condition     = contains(["dev", "prod"], var.environment)
-    error_message = "Ambiente deve ser 'dev' ou 'prod'."
+    condition     = contains(["dev", "hml", "prod"], var.environment)
+    error_message = "Ambiente deve ser 'dev', 'hml' ou 'prod'."
   }
+}
+
+variable "agendamentos_ativos" {
+  description = "Cria os agendamentos: Scheduler das ingestões e workflow diário do Dataform. Em hml, false fora da homologação (E2)"
+  type        = bool
+  default     = true
 }
 
 variable "imagem_ingestao" {

@@ -39,7 +39,7 @@ As decisões estão registradas em ADR, no
 | Tema | Decisão | Registro |
 |---|---|---|
 | Região do ambiente | **`us-east1`** (Carolina do Sul), em `dev` e `prod`; substitui `southamerica-east1` | ADR 011 |
-| Fundação do ambiente | **Dois ambientes, `dev` e `prod`**, sem projeto de homologação; a Alup cria os projetos, os vincula ao faturamento (E1 e E2) e faz o bootstrap — APIs, bucket de state, Artifact Registry e WIF —, e a ness. constrói o restante da fundação em `infra/`; criptografia com chave gerenciada pelo Google, sem CMEK | ADR 015 |
+| Fundação do ambiente | **Três ambientes, `dev`, `hml` e `prod`**, com a homologação das ondas em `hml`; a Alup cria os projetos, os vincula ao faturamento (E1 e E2) e concede à ness. o papel para o bootstrap; **a ness. faz o bootstrap** — APIs, bucket de state, Artifact Registry e WIF — e constrói o restante da fundação em `infra/`; criptografia com chave gerenciada pelo Google, sem CMEK | ADR 015, revista em 11/09 |
 | Transformação Silver e Gold | **Dataform**, com testes de dado e linhagem nativos; Gold de negócio materializada como tabela, Gold operacional em view | ADR 012, revista em 11/09 |
 | Ingestão dos sistemas internos | **Em lote**, pelos conectores Python; sem CDC e sem Dataflow, porque o dado consumido é consolidado, não transacional | ADR 013 |
 | Orquestração | Cloud Scheduler agora; **Airflow na Onda 3**, quando houver dependência entre pipelines | ADR 004, mantida |
@@ -67,18 +67,21 @@ passa a ser:
 
     A3 (ambiente GCP) → 1º apply → Onda 0 homologada
 
-As decisões acima alteram o que precisa ser provisionado. Pela ADR 015, a Alup
-cria o projeto, o vincula ao faturamento e faz o bootstrap (itens 1 a 5); a
-ness. constrói o restante em `infra/` — IAM, Dataform, linhagem, IAP do Portal
-e log de auditoria de acesso a dados. A lista completa, atualizada, é esta:
+As decisões acima alteram o que precisa ser provisionado. Pela ADR 015, revista
+em 11/09 com as respostas E4 e E6 do Questionário de Gaps, são **três
+ambientes — `dev`, `hml` e `prod` —**, cada um em um projeto: a Alup cria os
+projetos, os vincula ao faturamento e concede à ness. o papel para o bootstrap
+(item 1); **a ness. faz o bootstrap de cada projeto** (itens 3 a 5) e constrói
+o restante em `infra/` — IAM, Dataform, linhagem, IAP do Portal e log de
+auditoria de acesso a dados. A lista completa, atualizada, é esta:
 
 | # | Item | Responsável |
 |---|---|---|
-| 1 | Projeto GCP `dev` criado na organização da Alupar e vinculado à conta de faturamento da Alup (E1 e E2, esclarecidos em 09/09), com acesso da ness. ao projeto para construir a fundação | TI Alup |
+| 1 | Projeto GCP `dev` criado na organização da Alupar, vinculado à conta de faturamento da Alup (E1 e E2, esclarecidos em 09/09) e com papel concedido à ness. no projeto para o bootstrap — os papéis estão listados na ADR 015; em seguida, da mesma forma, `hml` e `prod` | TI Alup |
 | 2 | Política de localização da organização (`gcp.resourceLocations`) **permitindo `us-east1`** — se ela restringir recursos ao Brasil, o primeiro `apply` falha | TI Alup |
-| 3 | APIs habilitadas: BigQuery, Cloud Storage, Secret Manager, Cloud Run, Cloud Scheduler, Artifact Registry **e, agora, Dataform, Data Lineage, Dataplex e Identity-Aware Proxy** | TI Alup |
-| 4 | Bucket de state do Terraform e repositório do Artifact Registry **em `us-east1`** | TI Alup |
-| 5 | Workload Identity Federation e service account de deploy, como já descrito na [issue #55](https://github.com/nessenergy/Alupdatalake/issues/55) | TI Alup |
+| 3 | APIs habilitadas: BigQuery, Cloud Storage, Secret Manager, Cloud Run, Cloud Scheduler, Artifact Registry **e, agora, Dataform, Data Lineage, Dataplex e Identity-Aware Proxy** | ness. |
+| 4 | Bucket de state do Terraform e repositório do Artifact Registry **em `us-east1`** | ness. |
+| 5 | Workload Identity Federation e service account de deploy, como já descrito na [issue #55](https://github.com/nessenergy/Alupdatalake/issues/55) | ness. |
 | 6 | Uma pessoa com papel *Billing Account Costs Manager* (ou *Administrator*) na conta de faturamento **e** *BigQuery User* no projeto, para ligar a exportação do faturamento **no mesmo dia do primeiro `apply`** — dataset regional não recebe carga retroativa | Alup |
 | 7 | Destinatários dos alertas (preferencialmente um grupo) e teto do orçamento — sugestão de R$ 500/mês em `dev`, conforme o [registro de 09/09](2026-09-09-esclarecimento-e1-e2.md) | Alup |
 | 8 | Grupos Google da Alup que leem a Gold (consumidores) e as três camadas (operação), e quem acessa o Portal pelo IAP — não bloqueiam o primeiro `apply`: vazios, ninguém recebe acesso a dado (R01 do RIPD) | Alup |

@@ -336,8 +336,8 @@ exigiria migrar dados, e não apenas ajustar configuração.</p>
 </tr>
 <tr>
 <td>Fundação do ambiente</td>
-<td><strong>Dois ambientes, <code>dev</code> e <code>prod</code></strong>, sem projeto de homologação; a Alup cria os projetos, os vincula ao faturamento (E1 e E2) e faz o bootstrap — APIs, bucket de state, Artifact Registry e WIF —, e a ness. constrói o restante da fundação em <code>infra/</code>; criptografia com chave gerenciada pelo Google, sem CMEK</td>
-<td>ADR 015</td>
+<td><strong>Três ambientes, <code>dev</code>, <code>hml</code> e <code>prod</code></strong>, com a homologação das ondas em <code>hml</code>; a Alup cria os projetos, os vincula ao faturamento (E1 e E2) e concede à ness. o papel para o bootstrap; <strong>a ness. faz o bootstrap</strong> — APIs, bucket de state, Artifact Registry e WIF — e constrói o restante da fundação em <code>infra/</code>; criptografia com chave gerenciada pelo Google, sem CMEK</td>
+<td>ADR 015, revista em 11/09</td>
 </tr>
 <tr>
 <td>Transformação Silver e Gold</td>
@@ -385,10 +385,13 @@ exigiria migrar dados, e não apenas ajustar configuração.</p>
 passa a ser:</p>
 <pre><code>A3 (ambiente GCP) → 1º apply → Onda 0 homologada
 </code></pre>
-<p>As decisões acima alteram o que precisa ser provisionado. Pela ADR 015, a Alup
-cria o projeto, o vincula ao faturamento e faz o bootstrap (itens 1 a 5); a
-ness. constrói o restante em <code>infra/</code> — IAM, Dataform, linhagem, IAP do Portal
-e log de auditoria de acesso a dados. A lista completa, atualizada, é esta:</p>
+<p>As decisões acima alteram o que precisa ser provisionado. Pela ADR 015, revista
+em 11/09 com as respostas E4 e E6 do Questionário de Gaps, são <strong>três
+ambientes — <code>dev</code>, <code>hml</code> e <code>prod</code> —</strong>, cada um em um projeto: a Alup cria os
+projetos, os vincula ao faturamento e concede à ness. o papel para o bootstrap
+(item 1); <strong>a ness. faz o bootstrap de cada projeto</strong> (itens 3 a 5) e constrói
+o restante em <code>infra/</code> — IAM, Dataform, linhagem, IAP do Portal e log de
+auditoria de acesso a dados. A lista completa, atualizada, é esta:</p>
 <table>
 <thead>
 <tr>
@@ -400,7 +403,7 @@ e log de auditoria de acesso a dados. A lista completa, atualizada, é esta:</p>
 <tbody>
 <tr>
 <td>1</td>
-<td>Projeto GCP <code>dev</code> criado na organização da Alupar e vinculado à conta de faturamento da Alup (E1 e E2, esclarecidos em 09/09), com acesso da ness. ao projeto para construir a fundação</td>
+<td>Projeto GCP <code>dev</code> criado na organização da Alupar, vinculado à conta de faturamento da Alup (E1 e E2, esclarecidos em 09/09) e com papel concedido à ness. no projeto para o bootstrap — os papéis estão listados na ADR 015; em seguida, da mesma forma, <code>hml</code> e <code>prod</code></td>
 <td>TI Alup</td>
 </tr>
 <tr>
@@ -411,17 +414,17 @@ e log de auditoria de acesso a dados. A lista completa, atualizada, é esta:</p>
 <tr>
 <td>3</td>
 <td>APIs habilitadas: BigQuery, Cloud Storage, Secret Manager, Cloud Run, Cloud Scheduler, Artifact Registry <strong>e, agora, Dataform, Data Lineage, Dataplex e Identity-Aware Proxy</strong></td>
-<td>TI Alup</td>
+<td>ness.</td>
 </tr>
 <tr>
 <td>4</td>
 <td>Bucket de state do Terraform e repositório do Artifact Registry <strong>em <code>us-east1</code></strong></td>
-<td>TI Alup</td>
+<td>ness.</td>
 </tr>
 <tr>
 <td>5</td>
 <td>Workload Identity Federation e service account de deploy, como já descrito na <a href="https://github.com/nessenergy/Alupdatalake/issues/55">issue #55</a></td>
-<td>TI Alup</td>
+<td>ness.</td>
 </tr>
 <tr>
 <td>6</td>

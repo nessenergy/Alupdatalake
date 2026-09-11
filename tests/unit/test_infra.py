@@ -19,6 +19,8 @@ def test_ingestao_nao_recebe_editor_bigquery_nem_secrets_no_projeto() -> None:
     ]
 
     assert '"roles/bigquery.jobUser"' in bloco_projeto
+    # Linhagem é gravada no projeto; não há recurso mais estreito (ADR 013).
+    assert '"roles/datalineage.producer"' in bloco_projeto
     assert '"roles/bigquery.dataEditor"' not in bloco_projeto
     assert '"roles/secretmanager.secretAccessor"' not in bloco_projeto
     assert 'resource "google_bigquery_dataset_iam_member" "ingestao_bronze"' in principal

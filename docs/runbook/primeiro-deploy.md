@@ -83,6 +83,9 @@ Use esta lista apenas quando A3 estiver entregue. Ela complementa
 - [ ] Confirmar deduplicação e dimensões comuns na Silver.
 - [ ] Confirmar agregação na Gold.
 - [ ] Confirmar execução `FONTE` em `bronze._execucoes`.
+- [ ] Confirmar no Knowledge Catalog a linhagem da tabela
+  `bronze.bcb_cambio_ptax`: a origem `custom:bcb.cambio_ptax` à esquerda
+  (ADR 013) e as views Silver e Gold do Dataform à direita (ADR 012).
 - [ ] Conferir `/lake` e `/custo` usando o provedor BigQuery.
 
 ## 5. Replay e recuperação

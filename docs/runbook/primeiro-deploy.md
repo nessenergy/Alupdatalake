@@ -7,7 +7,10 @@ Use esta lista apenas quando A3 estiver entregue. Ela complementa
 
 - [ ] Projeto, região e conta de faturamento confirmados pela Alup.
 - [ ] APIs de BigQuery, Storage, Secret Manager, Cloud Run, Scheduler,
-  Artifact Registry, Dataform, Data Lineage e Dataplex habilitadas.
+  Artifact Registry, Dataform, Data Lineage, Dataplex e Identity-Aware Proxy
+  habilitadas.
+- [ ] Grupos Google de consumidores e de operação, e quem acessa o Portal,
+  informados pela Alup — ou deliberadamente vazios (R01 do RIPD).
 - [ ] Política `gcp.resourceLocations` efetiva da organização Alupar permite
   `us-east1` (ADR 011) — por exemplo `in:us-locations` ou
   `in:us-east1-locations`: `gcloud resource-manager org-policies describe
@@ -35,6 +38,10 @@ Use esta lista apenas quando A3 estiver entregue. Ela complementa
 - [ ] Confirmar que a identidade de ingestão só edita o Bronze.
 - [ ] Confirmar IAM do bucket raw, secrets e jobs no próprio recurso.
 - [ ] Confirmar que nenhum secret possui versão criada pelo Terraform.
+- [ ] Confirmar que o plano não concede papel a `user:`, e que `group:` e
+  `domain:` só aparecem com as variáveis de acesso preenchidas.
+- [ ] Confirmar `google_project_iam_audit_config` para BigQuery e Cloud
+  Storage (R07) e o serviço `alupdata-portal` com `iap_enabled = true`.
 - [ ] Revisar recursos destrutivos ou substituições antes do apply.
 
 ## 3. Implantação
@@ -83,7 +90,11 @@ Use esta lista apenas quando A3 estiver entregue. Ela complementa
 - [ ] Confirmar deduplicação e dimensões comuns na Silver.
 - [ ] Confirmar agregação na Gold.
 - [ ] Confirmar execução `FONTE` em `bronze._execucoes`.
-- [ ] Conferir `/lake` e `/custo` usando o provedor BigQuery.
+- [ ] Conferir `/lake` e `/custo` usando o provedor BigQuery, pela URL de
+  `terraform output url_portal`.
+- [ ] Abrir o Portal com uma conta fora de `portal_acesso`: o IAP recusa.
+- [ ] Encontrar no Cloud Logging o registro `data_access` da consulta e do
+  objeto raw do smoke test (R07).
 
 ## 5. Replay e recuperação
 

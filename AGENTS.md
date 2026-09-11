@@ -79,6 +79,7 @@ make lint             # ruff check + format --check
 make novo-conector fonte=X entidade=Y
 make dataform-compile  # compila o projeto Dataform (definitions/), sem credencial
 make sync-skills      # atualiza as skills vendorizadas do Google
+make quadro           # simula a sincronização do quadro de acompanhamento; make quadro-aplicar grava
 
 alupdata listar
 alupdata ingerir bcb_cambio_ptax --de 2026-01-01 --ate 2026-01-31 --dry-run

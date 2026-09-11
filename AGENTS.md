@@ -91,7 +91,7 @@ alupdata ingerir bcb_cambio_ptax --de 2026-01-01 --ate 2026-01-31 --dry-run
 | `src/core/` | framework de ingestão — runner, janela, registry, GCS, BigQuery, secrets, HTTP, banco |
 | `src/conectores/` | um módulo por fonte |
 | `src/cli.py` | CLI única: laptop, Cloud Run Job e DAG usam o mesmo comando |
-| `definitions/{bronze,silver,gold}/` e `workflow_settings.yaml` | projeto Dataform: DDL Bronze e views Silver/Gold (ADR 012) |
+| `definitions/{bronze,silver,gold}/` e `workflow_settings.yaml` | projeto Dataform: DDL Bronze, view Silver, tabela Gold (ADR 012) |
 | `infra/` | Terraform: datasets, bucket raw, secrets, Cloud Run Job + Scheduler, IAM |
 | `dags/` | vazio até a Onda 3 (ADR 004) |
 | `docs/arquitetura/decisoes/` | ADRs — leia antes de propor mudança estrutural |

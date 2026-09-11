@@ -169,6 +169,85 @@ def test_dataform_compila_a_main_na_regiao_do_ambiente() -> None:
     assert 'resource "google_bigquery_dataset" "qualidade"' in _ler("infra/modules/bigquery/main.tf")
 
 
+def test_chave_do_app_do_quadro_so_e_legivel_pela_conta_do_github() -> None:
+    """Regra 2: a chave do GitHub App do quadro vive no Secret Manager, lida só pelo WIF do GitHub."""
+    modulo = _ler("infra/modules/secrets/main.tf")
+    assert _tem(r'secret_id\s*=\s*"alupdata-github-quadro-app-key"', modulo)
+    assert "google_secret_manager_secret_version" not in modulo  # valor fora do Terraform
+
+    # Fora da lista das fontes: o for_each da ingestão não pode alcançá-lo.
+    segredos = _bloco(modulo, 'variable "segredos"')
+    assert "alupdata-github-quadro-app-key" not in segredos
+
+    acessos = [
+        bloco.group(0)
+        for bloco in re.finditer(r'resource "google_secret_manager_secret_iam_\w+" "\w+" \{.*?\n\}', modulo, re.DOTALL)
+        if "quadro" in bloco.group(0)
+    ]
+    assert len(acessos) == 1
+    assert '"roles/secretmanager.secretAccessor"' in acessos[0]
+    assert _tem(r'member\s*=\s*"serviceAccount:\$\{var\.github_service_account\}"', acessos[0])
+    assert _tem(r'count\s*=\s*var\.github_service_account == "" \? 0 : 1', acessos[0])
+
+    # A conta do GitHub é a do WIF do deploy, não a da ingestão.
+    bloco = _bloco(_ler("infra/main.tf"), 'module "secrets" {')
+    assert _tem(r"github_service_account\s*=\s*var\.deploy_service_account", bloco)
+
+
+def _quadro() -> str:
+    return _ler(".github/workflows/quadro.yml")
+
+
+def test_quadro_dispara_apos_deploy_com_sucesso_em_dia_util_e_a_mao() -> None:
+    workflow = _quadro()
+    nome_deploy = re.search(r"^name:\s*(.+)$", _ler(".github/workflows/deploy.yml"), re.MULTILINE).group(1).strip()
+
+    assert _tem(
+        rf'workflow_run:\s*\n\s*workflows:\s*\["{re.escape(nome_deploy)}"\]\s*\n\s*types:\s*\[completed\]', workflow
+    )
+    assert "github.event.workflow_run.conclusion == 'success'" in workflow
+    assert _tem(r'schedule:\s*\n\s*-\s*cron:\s*"0 11 \* \* 1-5"', workflow)
+    assert _tem(r"workflow_dispatch:\s*\n\s*inputs:\s*\n\s*simular:[^\n]*\n(\s+\w+:.*\n)*?\s*type:\s*boolean", workflow)
+
+
+def test_quadro_tem_permissoes_minimas_e_nunca_roda_em_paralelo() -> None:
+    workflow = _quadro()
+    permissoes = re.search(r"^permissions:\n((?:  .+\n)+)", workflow, re.MULTILINE).group(1)
+    assert sorted(linha.strip() for linha in permissoes.splitlines()) == ["contents: read", "id-token: write"]
+    assert _tem(r"(?m)^concurrency:\n\s+group:\s*\S+\n\s+cancel-in-progress:\s*false", workflow)
+
+
+def test_quadro_le_a_chave_do_secret_manager_e_mascara_sem_gravar_no_ambiente() -> None:
+    workflow = _quadro()
+    assert "google-github-actions/auth@v2" in workflow
+    # A org está no plano Free e o repositório é privado: ambiente do GitHub
+    # não existe nesse caso, e variável de ambiente nunca chegaria ao job.
+    assert not _tem(r"(?m)^\s*environment:", workflow), "as variáveis do quadro ficam no repositório, não em ambiente"
+    assert "gcloud secrets versions access latest --secret=alupdata-github-quadro-app-key" in workflow
+    assert "::add-mask::" in workflow
+    assert "actions/create-github-app-token@v3" in workflow
+    assert "GITHUB_ENV" not in workflow
+    assert "upload-artifact" not in workflow
+    assert "secrets." not in workflow  # nada de chave nos secrets do GitHub (regra 2)
+    assert "python -m scripts.quadro --aplicar" in workflow
+    assert "GITHUB_TOKEN: ${{ steps.token.outputs.token }}" in workflow
+
+
+def test_quadro_sem_gcp_ou_app_avisa_e_termina_com_sucesso() -> None:
+    """Enquanto A3 e o App não existem, o agendamento não pode falhar todo dia."""
+    workflow = _quadro()
+    guarda = workflow[workflow.index("id: guarda") :]
+    for variavel in ("vars.GCP_WIF_PROVIDER", "vars.GCP_DEPLOY_SA", "vars.QUADRO_APP_CLIENT_ID"):
+        assert variavel in guarda
+    assert "::notice::" in guarda
+    assert "exit 1" not in guarda
+    # Todo passo depois da guarda depende dela.
+    passos = re.split(r"\n      - ", guarda)[1:]
+    assert passos
+    for passo in passos:
+        assert "steps.guarda.outputs.pronto == 'true'" in passo, passo
+
+
 def test_scheduler_repassa_a_regiao_para_o_cloud_run_job() -> None:
     """A regiao decide onde a linhagem e gravada e qual INFORMATION_SCHEMA e lido (ADR 013)."""
     modulo = _ler("infra/modules/scheduler/main.tf")

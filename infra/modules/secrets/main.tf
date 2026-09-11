@@ -54,6 +54,44 @@ resource "google_secret_manager_secret" "fonte" {
   }
 }
 
+# Chave privada do GitHub App que sincroniza o quadro de acompanhamento
+# (.github/workflows/quadro.yml). Não é credencial de fonte: fica fora de
+# `segredos` para que a ingestão não a leia. O valor entra fora do Terraform:
+#   gcloud secrets versions add alupdata-github-quadro-app-key --data-file=chave.pem
+variable "github_service_account" {
+  description = "SA que o GitHub usa via WIF (a do deploy); vazio não concede"
+  type        = string
+  default     = ""
+}
+
+resource "google_secret_manager_secret" "quadro_app_key" {
+  secret_id = "alupdata-github-quadro-app-key"
+  project   = var.project_id
+
+  # Réplica só na região do ambiente (ADR 011), como os secrets das fontes.
+  replication {
+    user_managed {
+      replicas {
+        location = var.region
+      }
+    }
+  }
+
+  labels = {
+    projeto  = "alupdata"
+    ambiente = var.environment
+  }
+}
+
+resource "google_secret_manager_secret_iam_member" "github_le_chave_quadro" {
+  count = var.github_service_account == "" ? 0 : 1
+
+  project   = var.project_id
+  secret_id = google_secret_manager_secret.quadro_app_key.secret_id
+  role      = "roles/secretmanager.secretAccessor"
+  member    = "serviceAccount:${var.github_service_account}"
+}
+
 output "secret_ids" {
   description = "Ids dos secrets criados"
   value       = [for s in google_secret_manager_secret.fonte : s.secret_id]

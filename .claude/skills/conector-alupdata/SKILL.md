@@ -105,9 +105,10 @@ dicionário — não invente valor nem omita a coluna.
 
 ## Gold (04)
 
-Só regra de negócio e KPI consolidado. Se a view Gold é um `SELECT *` da
+Só regra de negócio e KPI consolidado. Se a Gold é um `SELECT *` da
 Silver, ela não deveria existir. Nomeie pela pergunta que responde
-(`gold_preco_medio_submercado`), não pela fonte.
+(`gold_preco_medio_submercado`), não pela fonte. É `type: "table"`, recarregada
+inteira a cada execução — não `incremental` (ADR 012).
 
 ## Testes (05)
 

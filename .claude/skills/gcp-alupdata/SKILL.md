@@ -48,8 +48,11 @@ Sem partição, cada consulta varre a tabela inteira e a conta de BigQuery é da
 Alup (cláusula 5ª: infra é custo da contratante — desperdício aparece na fatura
 dela, e volta como problema nosso).
 
-**Views** — Silver e Gold são views (ou materialized views quando o custo de
-recomputar justificar). Nunca duplique dado entre camadas sem necessidade.
+**Views e tabelas** (ADR 012) — Silver é view. Gold de negócio é tabela,
+recarregada inteira a cada execução do Dataform; Gold operacional
+(`saude_ingestao`, `volumetria_lake`, `custo_consultas`) segue view, porque os
+painéis do Portal precisam de dado atual. Nunca duplique dado entre camadas sem
+necessidade.
 Sempre filtre por partição nas consultas: `WHERE DATE(_ingestao_timestamp) >= …`.
 
 **Custo**: prefira `SELECT` com colunas explícitas a `SELECT *`; use

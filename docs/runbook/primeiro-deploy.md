@@ -62,13 +62,13 @@ Use esta lista apenas quando A3 estiver entregue. Ela complementa
 - [ ] `gcloud secrets versions add alupdata-dataform-git-token --data-file=-`
   com o token do GitHub do item 1, definir `DATAFORM_GIT_TOKEN_VERSAO` no
   ambiente do GitHub e reexecutar o deploy (módulo `infra`): agora o passo do
-  Dataform cria as tabelas Bronze e as views Silver/Gold.
+  Dataform cria as tabelas Bronze, as views Silver e a Gold.
 - [ ] Ingestões agendadas que dispararem entre as duas execuções falham — a
   tabela Bronze ainda não existe — e são reprocessadas por janela depois que
   o Dataform rodar.
 - [ ] Se o passo do Dataform falhar com 403 logo após o primeiro `apply`
   (propagação de IAM), reexecutar o passo.
-- [ ] Confirmar aplicação das tabelas Bronze e views Silver/Gold.
+- [ ] Confirmar aplicação das tabelas Bronze, das views Silver e da Gold.
 - [ ] Guardar logs dos três passos.
 
 > Uma vez definido, `DATAFORM_GIT_TOKEN_VERSAO` precisa continuar definido em

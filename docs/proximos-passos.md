@@ -105,7 +105,7 @@ Sequência, não lista — cada item depende do anterior. Detalhe em
 2. **Rótulos de custo** já estão prontos (FinOps F0, implementado em 04/09) —
    conferir que entraram no `apply`, não depois dele.
 3. `terraform apply` no ambiente `dev` — datasets, bucket, secrets, IAM.
-4. Dataform executado pelo deploy logo após o apply — DDL do Bronze e views Silver/Gold (ADR 012).
+4. Dataform executado pelo deploy logo após o apply — DDL do Bronze, views Silver e tabelas Gold (ADR 012).
 5. Publicar a imagem e subir o Cloud Run Job + Scheduler.
 6. **Três dias consecutivos com `status = SUCESSO`** em `bronze._execucoes`.
 7. Validar o replay do raw contra objeto real no GCS.

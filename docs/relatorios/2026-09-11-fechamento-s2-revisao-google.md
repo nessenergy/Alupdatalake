@@ -39,7 +39,7 @@ As decisões estão registradas em ADR, no
 | Tema | Decisão | Registro |
 |---|---|---|
 | Região do ambiente | **`us-east1`** (Carolina do Sul), em `dev` e `prod`; substitui `southamerica-east1` | ADR 011 |
-| Fundação do ambiente | **Dois ambientes, `dev` e `prod`**, sem projeto de homologação; a ness. constrói tudo o que fica dentro dos projetos, e a Alup cria os projetos e os vincula ao faturamento (E1 e E2); criptografia com chave gerenciada pelo Google, sem CMEK | ADR 015 |
+| Fundação do ambiente | **Dois ambientes, `dev` e `prod`**, sem projeto de homologação; a Alup cria os projetos, os vincula ao faturamento (E1 e E2) e faz o bootstrap — APIs, bucket de state, Artifact Registry e WIF —, e a ness. constrói o restante da fundação em `infra/`; criptografia com chave gerenciada pelo Google, sem CMEK | ADR 015 |
 | Transformação Silver e Gold | **Dataform**, com testes de dado e linhagem nativos; Gold de negócio materializada como tabela, Gold operacional em view | ADR 012, revista em 11/09 |
 | Ingestão dos sistemas internos | **Em lote**, pelos conectores Python; sem CDC e sem Dataflow, porque o dado consumido é consolidado, não transacional | ADR 013 |
 | Orquestração | Cloud Scheduler agora; **Airflow na Onda 3**, quando houver dependência entre pipelines | ADR 004, mantida |
@@ -67,18 +67,18 @@ passa a ser:
 
     A3 (ambiente GCP) → 1º apply → Onda 0 homologada
 
-As decisões acima alteram o que precisa ser provisionado e por quem: pela
-ADR 015, a Alup cria o projeto e o vincula ao faturamento, e a ness. constrói
-tudo o que fica dentro dele — APIs, IAM, Dataform, linhagem, IAP do Portal e
-log de auditoria de acesso a dados. A lista completa, atualizada, é esta:
+As decisões acima alteram o que precisa ser provisionado. Pela ADR 015, a Alup
+cria o projeto, o vincula ao faturamento e faz o bootstrap (itens 1 a 5); a
+ness. constrói o restante em `infra/` — IAM, Dataform, linhagem, IAP do Portal
+e log de auditoria de acesso a dados. A lista completa, atualizada, é esta:
 
 | # | Item | Responsável |
 |---|---|---|
 | 1 | Projeto GCP `dev` criado na organização da Alupar e vinculado à conta de faturamento da Alup (E1 e E2, esclarecidos em 09/09), com acesso da ness. ao projeto para construir a fundação | TI Alup |
 | 2 | Política de localização da organização (`gcp.resourceLocations`) **permitindo `us-east1`** — se ela restringir recursos ao Brasil, o primeiro `apply` falha | TI Alup |
-| 3 | APIs habilitadas: BigQuery, Cloud Storage, Secret Manager, Cloud Run, Cloud Scheduler, Artifact Registry **e, agora, Dataform, Data Lineage, Dataplex e Identity-Aware Proxy** | ness. |
-| 4 | Bucket de state do Terraform e repositório do Artifact Registry **em `us-east1`** | ness. |
-| 5 | Workload Identity Federation e service account de deploy, como já descrito na [issue #55](https://github.com/nessenergy/Alupdatalake/issues/55) | ness. |
+| 3 | APIs habilitadas: BigQuery, Cloud Storage, Secret Manager, Cloud Run, Cloud Scheduler, Artifact Registry **e, agora, Dataform, Data Lineage, Dataplex e Identity-Aware Proxy** | TI Alup |
+| 4 | Bucket de state do Terraform e repositório do Artifact Registry **em `us-east1`** | TI Alup |
+| 5 | Workload Identity Federation e service account de deploy, como já descrito na [issue #55](https://github.com/nessenergy/Alupdatalake/issues/55) | TI Alup |
 | 6 | Uma pessoa com papel *Billing Account Costs Manager* (ou *Administrator*) na conta de faturamento **e** *BigQuery User* no projeto, para ligar a exportação do faturamento **no mesmo dia do primeiro `apply`** — dataset regional não recebe carga retroativa | Alup |
 | 7 | Destinatários dos alertas (preferencialmente um grupo) e teto do orçamento — sugestão de R$ 500/mês em `dev`, conforme o [registro de 09/09](2026-09-09-esclarecimento-e1-e2.md) | Alup |
 | 8 | Grupos Google da Alup que leem a Gold (consumidores) e as três camadas (operação), e quem acessa o Portal pelo IAP — não bloqueiam o primeiro `apply`: vazios, ninguém recebe acesso a dado (R01 do RIPD) | Alup |
@@ -151,6 +151,9 @@ Entrega técnica não constitui homologação.
 | 2 | A4 — Questionário de Gaps respondido, incluindo o registro por escrito da concordância com a região (E7) | imediato | [#8](https://github.com/nessenergy/Alupdatalake/issues/8) |
 | 3 | A9, A5, A6 e destinatários de alerta, conforme a seção 5 | imediato | [#11](https://github.com/nessenergy/Alupdatalake/issues/11), [#9](https://github.com/nessenergy/Alupdatalake/issues/9), [#10](https://github.com/nessenergy/Alupdatalake/issues/10), [#87](https://github.com/nessenergy/Alupdatalake/issues/87) |
 | 4 | Decisão sobre a CCEE — 32h da Onda 1 sem execução | 18/09 | [#52](https://github.com/nessenergy/Alupdatalake/issues/52) |
+| 5 | Aceite por escrito de que o componente "View Gold" da cláusula 2.2 é atendido pela camada Gold materializada pelo Dataform (ADR 012) | antes da homologação da Onda 1 | — |
+| 6 | Aprovação das minutas de LGPD em `docs/lgpd/` — RIPD, RoPA, política de retenção e registro do DPA — pela controladora e pela encarregada | a combinar | — |
+| 7 | Itens marcados **[ALUP]** nas minutas de LGPD, como a validação das hipóteses legais, o dado pessoal do Portal Alup e das fontes da Onda 3 (C6 e F1) e a entidade Google contratante | com o item 6 | — |
 
 Agradecemos, mais uma vez, o empenho da Alup em viabilizar a revisão com o
 Google. Permanecemos à disposição para a conversa proposta na seção 3 e para

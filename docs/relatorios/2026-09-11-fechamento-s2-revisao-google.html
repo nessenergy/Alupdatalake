@@ -336,7 +336,7 @@ exigiria migrar dados, e não apenas ajustar configuração.</p>
 </tr>
 <tr>
 <td>Fundação do ambiente</td>
-<td><strong>Dois ambientes, <code>dev</code> e <code>prod</code></strong>, sem projeto de homologação; a ness. constrói tudo o que fica dentro dos projetos, e a Alup cria os projetos e os vincula ao faturamento (E1 e E2); criptografia com chave gerenciada pelo Google, sem CMEK</td>
+<td><strong>Dois ambientes, <code>dev</code> e <code>prod</code></strong>, sem projeto de homologação; a Alup cria os projetos, os vincula ao faturamento (E1 e E2) e faz o bootstrap — APIs, bucket de state, Artifact Registry e WIF —, e a ness. constrói o restante da fundação em <code>infra/</code>; criptografia com chave gerenciada pelo Google, sem CMEK</td>
 <td>ADR 015</td>
 </tr>
 <tr>
@@ -385,10 +385,10 @@ exigiria migrar dados, e não apenas ajustar configuração.</p>
 passa a ser:</p>
 <pre><code>A3 (ambiente GCP) → 1º apply → Onda 0 homologada
 </code></pre>
-<p>As decisões acima alteram o que precisa ser provisionado e por quem: pela
-ADR 015, a Alup cria o projeto e o vincula ao faturamento, e a ness. constrói
-tudo o que fica dentro dele — APIs, IAM, Dataform, linhagem, IAP do Portal e
-log de auditoria de acesso a dados. A lista completa, atualizada, é esta:</p>
+<p>As decisões acima alteram o que precisa ser provisionado. Pela ADR 015, a Alup
+cria o projeto, o vincula ao faturamento e faz o bootstrap (itens 1 a 5); a
+ness. constrói o restante em <code>infra/</code> — IAM, Dataform, linhagem, IAP do Portal
+e log de auditoria de acesso a dados. A lista completa, atualizada, é esta:</p>
 <table>
 <thead>
 <tr>
@@ -411,17 +411,17 @@ log de auditoria de acesso a dados. A lista completa, atualizada, é esta:</p>
 <tr>
 <td>3</td>
 <td>APIs habilitadas: BigQuery, Cloud Storage, Secret Manager, Cloud Run, Cloud Scheduler, Artifact Registry <strong>e, agora, Dataform, Data Lineage, Dataplex e Identity-Aware Proxy</strong></td>
-<td>ness.</td>
+<td>TI Alup</td>
 </tr>
 <tr>
 <td>4</td>
 <td>Bucket de state do Terraform e repositório do Artifact Registry <strong>em <code>us-east1</code></strong></td>
-<td>ness.</td>
+<td>TI Alup</td>
 </tr>
 <tr>
 <td>5</td>
 <td>Workload Identity Federation e service account de deploy, como já descrito na <a href="https://github.com/nessenergy/Alupdatalake/issues/55">issue #55</a></td>
-<td>ness.</td>
+<td>TI Alup</td>
 </tr>
 <tr>
 <td>6</td>
@@ -613,6 +613,24 @@ Entrega técnica não constitui homologação.</p>
 <td>Decisão sobre a CCEE — 32h da Onda 1 sem execução</td>
 <td>18/09</td>
 <td><a href="https://github.com/nessenergy/Alupdatalake/issues/52">#52</a></td>
+</tr>
+<tr>
+<td>5</td>
+<td>Aceite por escrito de que o componente "View Gold" da cláusula 2.2 é atendido pela camada Gold materializada pelo Dataform (ADR 012)</td>
+<td>antes da homologação da Onda 1</td>
+<td>—</td>
+</tr>
+<tr>
+<td>6</td>
+<td>Aprovação das minutas de LGPD em <code>docs/lgpd/</code> — RIPD, RoPA, política de retenção e registro do DPA — pela controladora e pela encarregada</td>
+<td>a combinar</td>
+<td>—</td>
+</tr>
+<tr>
+<td>7</td>
+<td>Itens marcados <strong>[ALUP]</strong> nas minutas de LGPD, como a validação das hipóteses legais, o dado pessoal do Portal Alup e das fontes da Onda 3 (C6 e F1) e a entidade Google contratante</td>
+<td>com o item 6</td>
+<td>—</td>
 </tr>
 </tbody>
 </table>

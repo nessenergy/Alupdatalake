@@ -22,9 +22,9 @@ abaixo.
 | Taina Ulhoa Mota | Co-Owner · data owner (B1) · aprova a homologação e assina a medição (B4) | `tmota@alupar.com.br` |
 | Mauricio Wilhelm Rios Cardoso | Co-Owner · substituto do ponto focal técnico (B2) | `mwcardoso@alupar.com.br` |
 | Eduardo Pires | Diretor · patrocinador do projeto | `epires@alupar.com.br` |
-| Letícia Ferreira | Data owner (B1) · Gestão de Portfólio e Back-Office | recebido em 11/09, a transcrever |
-| Tahigo Santos | Data owner (B1) · Comercial | recebido em 11/09, a transcrever |
-| Gabriel Barreto | Data owner (B1) · Trading | recebido em 11/09, a transcrever |
+| Letícia Ferreira | Data owner (B1) · Gestão de Portfólio e Back-Office | `lcferreira@alupar.com.br` |
+| Tahigo Santos | Data owner (B1) · Comercial | `tasantos@alupar.com.br` |
+| Gabriel Barreto | Data owner (B1) · Trading | `gbsantos@alupar.com.br` |
 | Alertas (grupo) | Falha de ingestão (E3) e relatório semanal de SAST/SCA (F5) | `alup.alertas@alupar.com.br` |
 
 ### ness. — contratada

@@ -38,8 +38,8 @@ output "dataset_ids" {
 # Destino do billing export (ADR 007, adendo de 10/09). O Terraform cria o
 # dataset; ligar o export é passo de console na conta de faturamento da Alup —
 # ver docs/runbook/primeiro-deploy.md. Nenhum bloco `access` aqui: ao ligar o
-# export, o Cloud Billing concede a si mesmo escrita no dataset, e um bloco
-# autoritativo apagaria essa permissão no apply seguinte.
+# export, o Cloud Billing se adiciona como OWNER (proprietário) do dataset, e
+# um bloco autoritativo apagaria essa concessão no apply seguinte.
 resource "google_bigquery_dataset" "faturamento" {
   dataset_id  = "faturamento"
   project     = var.project_id

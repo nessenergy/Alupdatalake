@@ -30,9 +30,10 @@ Recurso criado no console não existe: some no próximo `apply`.
 
 1. Projeto GCP criado, APIs habilitadas: BigQuery, Cloud Storage, Secret
    Manager, Cloud Run, Cloud Scheduler, Artifact Registry, Dataform, Data Lineage, Dataplex.
-2. Bucket de state do Terraform e o `backend "gcs"` descomentado em
-   `infra/main.tf`.
-3. Repositório no Artifact Registry para a imagem da CLI.
+2. Bucket de state do Terraform, criado em `us-east1` (ADR 011), e o
+   `backend "gcs"` descomentado em `infra/main.tf`.
+3. Repositório no Artifact Registry para a imagem da CLI, criado em
+   `us-east1` (ADR 011).
 4. **Workload Identity Federation** entre o GitHub e o GCP — o deploy **não**
    usa chave JSON de service account (cláusula 8.5).
 5. Variáveis do repositório/ambiente no GitHub:

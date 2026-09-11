@@ -46,9 +46,22 @@ def _tem(padrao: str, texto: str) -> bool:
 
 def test_regiao_padrao_e_us_east1_em_todo_o_ambiente() -> None:
     """ADR 011: dataset do BigQuery não muda de região depois do primeiro apply."""
-    assert _tem(r'default\s*=\s*"us-east1"', _ler("infra/variables.tf"))
+    assert _tem(r'variable "region" \{[^}]*default\s*=\s*"us-east1"', _ler("infra/variables.tf"))
     for ambiente in ("dev", "prod"):
         assert _tem(r'region\s*=\s*"us-east1"', _ler(f"infra/environments/{ambiente}.tfvars"))
+
+
+def test_secrets_ficam_na_regiao_do_ambiente() -> None:
+    """ADR 011: réplica só na região do ambiente, sem depender de `global` na política de localização."""
+    modulo = _ler("infra/modules/secrets/main.tf")
+    assert "user_managed" in modulo
+    assert _tem(r"location\s*=\s*var\.region", modulo)
+    assert "auto {}" not in modulo
+
+    principal = _ler("infra/main.tf")
+    inicio = principal.index('module "secrets" {')
+    bloco = principal[inicio : principal.index("\n}\n", inicio)]
+    assert _tem(r"region\s*=\s*var\.region", bloco)
 
 
 def test_nenhuma_regiao_antiga_sobrou_na_infra() -> None:
@@ -74,8 +87,14 @@ def test_dataset_do_billing_export_existe_sem_acesso_da_ingestao() -> None:
     assert _tem(r'dataset_id\s*=\s*"faturamento"', bloco)
     assert _tem(r"location\s*=\s*var\.region", bloco)
     assert _tem(r"delete_contents_on_destroy\s*=\s*false", bloco)
-    # IAM aditivo: bloco `access` autoritativo apagaria a escrita que o Cloud
-    # Billing concede a si mesmo quando o export é ligado.
+    # IAM aditivo: bloco `access` autoritativo apagaria o OWNER que o Cloud
+    # Billing se concede no dataset quando o export é ligado.
     assert "access {" not in bloco
-    # A ingestão não lê a fatura, que traz todos os projetos da conta.
-    assert "faturamento" not in _ler("infra/main.tf")
+
+    # A ingestão não recebe IAM sobre a fatura, que traz todos os projetos da conta.
+    for caminho in (RAIZ / "infra").rglob("*.tf*"):
+        if ".terraform" in caminho.parts:
+            continue
+        texto = caminho.read_text(encoding="utf-8")
+        for iam in re.finditer(r'resource "google_bigquery_dataset_iam_\w+" "\w+" \{.*?\n\}', texto, re.DOTALL):
+            assert "faturamento" not in iam.group(0), caminho

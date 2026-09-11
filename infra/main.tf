@@ -72,6 +72,7 @@ module "storage" {
 module "secrets" {
   source                = "./modules/secrets"
   project_id            = var.project_id
+  region                = var.region
   environment           = var.environment
   service_account_email = google_service_account.ingestao.email
 }

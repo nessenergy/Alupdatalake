@@ -88,6 +88,22 @@ O **pytest continua sendo o componente 5** — a cláusula 2.2 o cita
 nominalmente. Ele segue cobrindo conectores e executor, e o CI passa a rodar
 também `dataform compile`.
 
+### Descrições de tabela e coluna
+
+Decidido em 11/09. O assistente do espaço de trabalho do Dataform pode ser
+usado como **rascunho** de descrição de tabela e coluna, sob três condições:
+
+1. **Só entra por PR.** O rascunho gerado na interface é levado para o branch;
+   nada é commitado pela interface (ver *Deploy e execução*).
+2. **Revisada no PR é `curada`.** A descrição que passou por revisão de PR
+   recebe o *aspect* `origem = curada` (ADR 014) e conta como documentação do
+   componente 07. O que nunca passou por PR segue `automatica`.
+3. **Sem dado pessoal na amostra.** Para sugerir, o assistente lê uma amostra
+   real da tabela. Ele não é apontado para tabela com dado pessoal (contatos
+   do Hubspot, Portal Alup) antes de o RIPD estar assinado (ADR 011).
+
+A habilitação do recurso no projeto é declarada em `infra/` (regra 5).
+
 ### Deploy e execução
 
 - `scripts/deploy_views.py` e `make deploy-views` são **removidos**. Todo o SQL

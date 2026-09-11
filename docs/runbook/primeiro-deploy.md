@@ -6,8 +6,15 @@ Use esta lista apenas quando A3 estiver entregue. Ela complementa
 ## 1. Pré-condições
 
 - [ ] Projeto, região e conta de faturamento confirmados pela Alup.
-- [ ] APIs de BigQuery, Storage, Secret Manager, Cloud Run, Scheduler e
-  Artifact Registry habilitadas.
+- [ ] APIs de BigQuery, Storage, Secret Manager, Cloud Run, Scheduler,
+  Artifact Registry, Dataform, Data Lineage e Dataplex habilitadas.
+- [ ] Organização da Alupar sem restrição de localização que barre `us-east1`
+  (ADR 011): `gcloud resource-manager org-policies describe
+  constraints/gcp.resourceLocations --project=<projeto> --effective` não pode
+  listar apenas locais do Brasil.
+- [ ] Quem liga o billing export combinado: pessoa da Alup com papel *Billing
+  Account Costs Manager* ou *Billing Account Administrator* na conta de
+  faturamento.
 - [ ] Backend GCS do Terraform criado e configurado.
 - [ ] Artifact Registry criado.
 - [ ] WIF e service account de deploy configurados.
@@ -29,6 +36,12 @@ Use esta lista apenas quando A3 estiver entregue. Ela complementa
 - [ ] Executar o workflow `Deploy GCP`, módulo `all`, ambiente `dev`.
 - [ ] Confirmar imagem publicada com tag igual ao SHA completo.
 - [ ] Confirmar que Terraform usa a mesma tag imutável.
+- [ ] **No mesmo dia do apply**, a Alup liga no console o billing export
+  (*Faturamento → Exportação de faturamento → BigQuery*: custo padrão e
+  detalhado) apontando para o dataset `faturamento` (ADR 007, adendo de
+  10/09). Dataset regional só recebe dado a partir do dia em que o export é
+  ligado. O export traz **todos** os projetos pagos pela mesma conta: o
+  dataset bruto não é exposto ao Portal.
 - [ ] Confirmar aplicação das tabelas Bronze e views Silver/Gold.
 - [ ] Guardar logs dos três passos.
 

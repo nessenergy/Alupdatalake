@@ -8,6 +8,7 @@ Para a primeira implantação, use também a checklist
 | Recurso | Onde é declarado |
 |---|---|
 | Datasets `bronze`, `silver`, `gold` | `infra/modules/bigquery` |
+| Dataset `faturamento` (destino do billing export) | `infra/modules/bigquery` |
 | Bucket `<projeto>-raw` | `infra/modules/storage` |
 | Secrets das fontes credenciadas (vazios) | `infra/modules/secrets` |
 | Cloud Run Job + Cloud Scheduler por conector | `infra/modules/scheduler` |
@@ -28,7 +29,7 @@ Recurso criado no console não existe: some no próximo `apply`.
 ## Pré-requisitos (uma vez por ambiente)
 
 1. Projeto GCP criado, APIs habilitadas: BigQuery, Cloud Storage, Secret
-   Manager, Cloud Run, Cloud Scheduler, Artifact Registry.
+   Manager, Cloud Run, Cloud Scheduler, Artifact Registry, Dataform, Data Lineage, Dataplex.
 2. Bucket de state do Terraform e o `backend "gcs"` descomentado em
    `infra/main.tf`.
 3. Repositório no Artifact Registry para a imagem da CLI.

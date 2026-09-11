@@ -63,3 +63,19 @@ def test_config_aponta_para_a_regiao_do_ambiente() -> None:
     from src.core.config import Settings
 
     assert Settings.model_fields["gcp_region"].default == "us-east1"
+
+
+def test_dataset_do_billing_export_existe_sem_acesso_da_ingestao() -> None:
+    """ADR 007, adendo de 10/09: dataset regional não recebe carga retroativa."""
+    modulo = _ler("infra/modules/bigquery/main.tf")
+    inicio = modulo.index('resource "google_bigquery_dataset" "faturamento"')
+    bloco = modulo[inicio : modulo.index("\n}\n", inicio)]
+
+    assert _tem(r'dataset_id\s*=\s*"faturamento"', bloco)
+    assert _tem(r"location\s*=\s*var\.region", bloco)
+    assert _tem(r"delete_contents_on_destroy\s*=\s*false", bloco)
+    # IAM aditivo: bloco `access` autoritativo apagaria a escrita que o Cloud
+    # Billing concede a si mesmo quando o export é ligado.
+    assert "access {" not in bloco
+    # A ingestão não lê a fatura, que traz todos os projetos da conta.
+    assert "faturamento" not in _ler("infra/main.tf")

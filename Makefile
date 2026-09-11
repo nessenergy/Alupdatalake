@@ -1,4 +1,4 @@
-.PHONY: install lint format test security audit all clean novo-conector deploy-views listar sync-skills campos-projeto
+.PHONY: install lint format test security audit all clean novo-conector deploy-views listar sync-skills campos-projeto quadro quadro-aplicar
 
 install:
 	uv sync --extra dev
@@ -34,6 +34,12 @@ campos-projeto: ## Cria os campos de acompanhamento semanal no GitHub Projects
 	@test -n "$(owner)" || (echo "uso: make campos-projeto owner=nessenergy numero=1"; exit 1)
 	@test -n "$(numero)" || (echo "uso: make campos-projeto owner=nessenergy numero=1"; exit 1)
 	uv run python -m scripts.campos_projeto --owner $(owner) --numero $(numero)
+
+quadro: ## Simula a sincronização do quadro de acompanhamento (Project 2)
+	uv run python -m scripts.quadro
+
+quadro-aplicar: ## Grava a sincronização no quadro e comenta os atrasos novos
+	uv run python -m scripts.quadro --aplicar
 
 sync-skills:
 	uv run python -m scripts.sync_skills_google

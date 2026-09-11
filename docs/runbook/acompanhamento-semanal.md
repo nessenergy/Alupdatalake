@@ -55,6 +55,36 @@ cria só o que falta.
 
 ---
 
+## Sincronização semanal
+
+O que se deduz do repositório não é preenchido à mão. `scripts/quadro.py` lê o
+quadro e acerta, a partir do mapa em `scripts/quadro.toml`:
+
+| Campo | Regra |
+|---|---|
+| Onda | a onda do item no mapa; item fora do mapa é listado, não classificado |
+| Responsável | Alup para os itens listados em `alup`; ness. para os demais |
+| Status | Done quando a issue é fechada ou o PR é mesclado; item aberto não é tocado |
+| Semana | a semana da data de conclusão (S1 a S19, contadas de 31/08), só se estiver vazia |
+| Atraso | Sim a partir do primeiro dia útil após o vencimento registrado em `vencimentos`, com um comentário datado na issue; Não enquanto não vence |
+| Correções e Validado | Não, só se estiverem vazios, no item concluído |
+
+O comando **nunca** mexe em Horas e **nunca** desfaz Validado = Sim, Correções
+= Sim ou Atraso = Sim: são decisões humanas. Os feriados nacionais ficam no
+mesmo arquivo, porque a cláusula 3ª conta dia útil.
+
+```bash
+export GITHUB_TOKEN=$(gh auth token)   # PAT com escopo `project`
+make quadro            # simula: mostra o que mudaria e os comentários que seriam postados
+make quadro-aplicar    # grava e posta os comentários de atraso novos
+```
+
+Por padrão ele só simula, porque cada gravação e cada comentário ficam visíveis
+para a Alup. Issue nova no quadro entra no `quadro.toml`; sem isso, o comando a
+lista como sem onda.
+
+---
+
 ## Como isso vira o relatório semanal
 
 Na sexta-feira, com o quadro filtrado por `Semana = S<n>`:

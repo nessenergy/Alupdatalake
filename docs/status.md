@@ -94,7 +94,7 @@ destino, com os oito invariantes e a pauta de perguntas. **Enviado ao Google em
 
 | # | Item | Efeito enquanto não vier | Referência |
 |---|---|---|---|
-| A1 | **Configurar Workload Identity Federation** (`GCP_WIF_PROVIDER`, `GCP_DEPLOY_SA`) | o workflow de deploy falha na autenticação | `runbook/deploy.md` |
+| A1 | **Conceder à ness. os papéis de bootstrap** em cada projeto (ADR 015, revista em 11/09): com eles a ness. configura o WIF (`GCP_WIF_PROVIDER`, `GCP_DEPLOY_SA`), o bucket de state, o Artifact Registry e a SA de deploy | o bootstrap não roda e o workflow de deploy não autentica | ADR 015, `runbook/primeiro-deploy.md` §0 |
 | A2 | **Decidir sobre a CCEE InfoMercado** — portal responde 403 a acesso automatizado | 32h da Onda 1 paradas; `agente_ccee` sem fonte | [issue #52](https://github.com/nessenergy/Alupdatalake/issues/52), plano §3.1 |
 | A3 | **Projeto GCP `dev`**: criar, habilitar APIs, IAM, Artifact Registry, bucket de state — criação e `billing_account` são da Alup, esclarecido em 09/09 | nada sobe; Onda 0 não homologa | plano 2.2 (0.13), [registro de 09/09](relatorios/2026-09-09-esclarecimento-e1-e2.md) |
 | A4 | **Questionário de Gaps** (47 perguntas) | os 8 domínios analíticos não se definem; a Gold fica sem alvo | plano 2.2 (0.9) |
@@ -175,7 +175,7 @@ Ordenado por data em que o atraso passa a custar. Prazos derivados do
 
 | # | Insumo | Responsável | Prazo útil | Efeito de passar do prazo |
 |---|---|---|---|---|
-| A3 | Projeto GCP `dev`, APIs, IAM, WIF, Artifact Registry, state | Alup | **04/09 — vencido** | **Não entregue. Atraso registrado em 04/09**; 1º dia útil de atraso em 08/09, 5º em 14/09. A Alup condicionou A3 à resposta do Google (G1). Em 09/09 a Alup levantou dúvida sobre quem cria o projeto (E1) e de quem é a `billing_account` (E2); **ambas são da Alup, esclarecido no mesmo dia** — ver [registro de 09/09](relatorios/2026-09-09-esclarecimento-e1-e2.md). S2 e S3 escorregam inteiras; Onda 0 não homologa; > 5 dias úteis posterga o cronograma |
+| A3 | Projetos GCP (`dev` primeiro, depois `hml` e `prod`) criados, vinculados ao faturamento e com os papéis de bootstrap concedidos à ness. — APIs, IAM, WIF, Artifact Registry e state passaram à ness. em 11/09 (ADR 015) | Alup | **04/09 — vencido** | **Não entregue. Atraso registrado em 04/09**; 1º dia útil de atraso em 08/09, 5º em 14/09. A Alup condicionou A3 à resposta do Google (G1). Em 09/09 a Alup levantou dúvida sobre quem cria o projeto (E1) e de quem é a `billing_account` (E2); **ambas são da Alup, esclarecido no mesmo dia** — ver [registro de 09/09](relatorios/2026-09-09-esclarecimento-e1-e2.md). S2 e S3 escorregam inteiras; Onda 0 não homologa; > 5 dias úteis posterga o cronograma |
 | A9 | Token Hubspot no secret `alupdata-hubspot-api-token` | Alup | 11/09 | conector pronto segue parado; item 2.3 não fecha |
 | A4 | Questionário de Gaps respondido | Alup | 11/09 | sem os 8 domínios, a Gold da Onda 1 fica sem alvo |
 | A5 | Matriz RACI e data owners | Alup | 11/09 | dúvida de regra de negócio sem destinatário |

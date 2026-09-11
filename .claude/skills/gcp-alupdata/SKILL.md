@@ -17,9 +17,17 @@ Tudo em GCP, arquitetura Medallion, infraestrutura por Terraform. Recurso criado
 
 ## Ambientes
 
-Dois: `dev` e `prod` (`infra/variables.tf` valida). Região padrão `us-east1` (Carolina do Sul) — ver ADR 011, que substitui a 009.
-Variáveis por ambiente em `infra/environments/{dev,prod}.tfvars`. Nunca aponte
-código para `prod` por default — `src/core/config.py` cai em `alupdata-dev`.
+Três, um projeto GCP cada: `dev`, `hml` (homologação das ondas) e `prod`
+(`infra/variables.tf` valida; ADR 015). Região padrão `us-east1` (Carolina do
+Sul) — ver ADR 011, que substitui a 009. Variáveis por ambiente em
+`infra/environments/{dev,hml,prod}.tfvars`; `hml` nasce com
+`agendamentos_ativos = false` (custo). Nunca aponte código para `prod` por
+default — `src/core/config.py` cai em `alupdata-dev`.
+
+APIs, bucket de state, Artifact Registry, WIF e SA de deploy vêm do bootstrap
+(`infra/bootstrap/`), aplicado pela ness. uma vez por projeto. Papel novo para
+a SA de deploy ou API nova entra na lista de lá — os testes de
+`tests/unit/test_bootstrap.py` cobram.
 
 ## BigQuery
 
@@ -102,14 +110,16 @@ Módulos em `infra/modules/`: `bigquery`, `storage`, `secrets`, `composer`,
 
 ```bash
 cd infra
-terraform init
+terraform init -backend-config="bucket=<projeto>-tfstate"   # bucket criado pelo bootstrap
 terraform plan  -var-file=environments/dev.tfvars
 terraform apply -var-file=environments/dev.tfvars
 ```
 
 Regras: `plan` revisado antes de qualquer `apply`; backend GCS remoto para o
-state (nunca state local commitado); nenhum valor sensível em `.tfvars`
-versionado — use Secret Manager e referencie.
+state, um bucket por projeto (nunca state local commitado — o bootstrap, que
+cria esse bucket, é a única raiz com state local, fora do git e copiado para o
+bucket depois do apply); nenhum valor sensível em `.tfvars` versionado — use
+Secret Manager e referencie.
 
 ## Antes de abrir PR que toca GCP
 

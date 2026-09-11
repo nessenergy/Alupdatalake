@@ -1,14 +1,66 @@
 # Checklist do primeiro deploy no GCP
 
-Use esta lista apenas quando A3 estiver entregue. Ela complementa
-[`deploy.md`](deploy.md) e produz as evidências para homologação da Onda 0.
+Use esta lista quando A3 estiver entregue para o ambiente — projeto criado,
+vinculado ao faturamento e papéis de bootstrap concedidos à ness. (ADR 015).
+Ela complementa [`deploy.md`](deploy.md) e produz as evidências para
+homologação da Onda 0. O primeiro ambiente é `dev`; `hml` e `prod` seguem a
+mesma lista, com o `.tfvars` e o ambiente do GitHub de cada um.
+
+## 0. Bootstrap do projeto (ness.)
+
+Uma vez por projeto, antes de qualquer deploy. O que ele cria existe porque
+está em `infra/bootstrap/` (regra 5).
+
+Da Alup, antes:
+
+- [ ] Projeto `<ambiente>` criado na organização da Alupar e vinculado à conta
+  de faturamento.
+- [ ] Papéis concedidos à ness. no projeto (ADR 015):
+  `roles/serviceusage.serviceUsageAdmin`, `roles/storage.admin`,
+  `roles/artifactregistry.admin`, `roles/iam.workloadIdentityPoolAdmin`,
+  `roles/iam.serviceAccountAdmin` e `roles/resourcemanager.projectIamAdmin`.
+- [ ] Políticas da organização conferidas: `iam.allowedPolicyMemberDomains`
+  admite as contas da ness.; `iam.workloadIdentityPoolProviders`, se
+  restringir emissores, admite `https://token.actions.githubusercontent.com`.
+
+Da ness.:
+
+```bash
+gcloud auth application-default login
+cd infra/bootstrap
+terraform init
+terraform workspace select -or-create <ambiente>
+terraform plan -var-file=environments/<ambiente>.tfvars -out=tfplan
+terraform apply tfplan
+terraform output
+```
+
+- [ ] Conferir no `plan`: as APIs, o bucket `<projeto>-tfstate` em
+  `us-east1`, o repositório `alupdata`, o pool `github` e o provedor
+  `alupdata` com a condição do repositório, e a SA `alupdata-deploy` sem
+  chave.
+- [ ] Se o projeto veio sem as APIs padrão e o `apply` falhar ao habilitar
+  serviços, habilitar antes as duas de que o Terraform depende e reaplicar:
+  `gcloud services enable serviceusage.googleapis.com cloudresourcemanager.googleapis.com --project=<projeto>`.
+  As duas estão na lista do bootstrap.
+- [ ] Guardar a cópia do state no bucket que ele criou:
+  `gcloud storage cp terraform.tfstate.d/<ambiente>/terraform.tfstate gs://<projeto>-tfstate/bootstrap/terraform.tfstate`.
+  O state não contém segredo — a SA de deploy não tem chave.
+- [ ] Criar o ambiente `<ambiente>` no GitHub e gravar as variáveis com as
+  saídas ([`deploy.md`](deploy.md), pré-requisitos). Em `dev`, também as
+  variáveis de repositório do quadro.
+- [ ] Recomendado: preencher `github_repositorio_id` no `.tfvars` com o ID
+  numérico do repositório e reaplicar — o Google recomenda exigir o ID, que
+  não se reutiliza, contra repositório homônimo.
+- [ ] Avisar a Alup de que os papéis de bootstrap podem ser revogados (ADR 015).
+
+> Não destrua o bootstrap para recriá-lo: pool de WIF apagado fica em exclusão
+> reversível por 30 dias, e o ID não pode ser reutilizado nesse período.
+> Mudança é `plan` e `apply` no mesmo workspace.
 
 ## 1. Pré-condições
 
-- [ ] Projeto, região e conta de faturamento confirmados pela Alup.
-- [ ] APIs de BigQuery, Storage, Secret Manager, Cloud Run, Scheduler,
-  Artifact Registry, Dataform, Data Lineage, Dataplex e Identity-Aware Proxy
-  habilitadas.
+- [ ] Bootstrap do projeto aplicado (§0).
 - [ ] Grupos Google de consumidores e de operação, e quem acessa o Portal,
   informados pela Alup — ou deliberadamente vazios (R01 do RIPD).
 - [ ] Política `gcp.resourceLocations` efetiva da organização Alupar permite
@@ -20,11 +72,9 @@ Use esta lista apenas quando A3 estiver entregue. Ela complementa
   faturamento, **e** papel *BigQuery User* (`roles/bigquery.user`) no projeto
   que hospeda o dataset `faturamento` — o Google exige os dois papéis, um na
   conta de faturamento e outro no projeto.
-- [ ] Backend GCS do Terraform criado e configurado.
-- [ ] Artifact Registry criado.
-- [ ] WIF e service account de deploy configurados.
-- [ ] Variáveis `GCP_WIF_PROVIDER`, `GCP_DEPLOY_SA`, `GCP_REGION` e
-  `IMAGEM_INGESTAO` presentes no ambiente GitHub `dev`.
+- [ ] Variáveis `GCP_WIF_PROVIDER`, `GCP_DEPLOY_SA`, `TF_STATE_BUCKET`,
+  `GCP_REGION` e `IMAGEM_INGESTAO` presentes no ambiente GitHub `dev`, com as
+  saídas do bootstrap.
 - [ ] Destinatários de alerta e `billing_account` confirmados.
 - [ ] `make all`, Gitleaks e `terraform validate` aprovados no commit candidato.
 - [ ] Token do GitHub *fine-grained*, restrito a `nessenergy/Alupdatalake`,

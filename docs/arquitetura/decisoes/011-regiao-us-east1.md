@@ -25,8 +25,9 @@ plataforma; a operação e o custo são da Alup.
 Todo o ambiente — datasets Bronze/Silver/Gold, bucket raw, Cloud Run Jobs,
 Scheduler, secrets, Artifact Registry, repositório Dataform (ADR 012), lake do
 Knowledge Catalog (ADR 014) e, na Onda 3, o ambiente Airflow — fica em
-**`us-east1`** (Carolina do Sul), em `dev` e em `prod`. O valor passa a ser o
-padrão de `variable "region"`.
+**`us-east1`** (Carolina do Sul), nos três ambientes — `dev`, `hml` e `prod`
+([ADR 015](015-fundacao-do-ambiente.md), revista em 11/09). O valor passa a ser
+o padrão de `variable "region"`.
 
 ### Por que `us-east1` entre as regiões americanas
 

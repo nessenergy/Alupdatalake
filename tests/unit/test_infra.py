@@ -30,13 +30,15 @@ def test_bucket_e_secrets_tem_iam_no_proprio_recurso() -> None:
     assert 'resource "google_secret_manager_secret_iam_member"' in _ler("infra/modules/secrets/main.tf")
 
 
-def test_deploy_all_publica_imagem_antes_do_terraform() -> None:
+def test_deploy_all_publica_imagem_antes_do_terraform_e_executa_o_dataform_depois() -> None:
     workflow = _ler(".github/workflows/deploy.yml")
     bloco_terraform = workflow[workflow.index("  terraform:") : workflow.index("  sync-dags:")]
 
     assert "needs: imagem" in bloco_terraform
     assert 'TAG="${GITHUB_SHA}"' in bloco_terraform
-    assert "scripts.deploy_views" in bloco_terraform
+    # A carga nunca cria tabela Bronze: o Dataform precisa rodar antes da primeira ingestão.
+    assert bloco_terraform.index("terraform apply") < bloco_terraform.index("scripts.executar_dataform")
+    assert "scripts.deploy_views" not in workflow
 
 
 def _tem(padrao: str, texto: str) -> bool:

@@ -69,13 +69,25 @@ jobs:
           cd infra
           terraform init
           terraform plan -var-file="environments/${{ inputs.environment }}.tfvars" \
-            -var="imagem_ingestao=${{ vars.IMAGEM_INGESTAO }}:${TAG}" -out=tfplan
+            -var="imagem_ingestao=${{ vars.IMAGEM_INGESTAO }}:${TAG}" \
+            -var="deploy_service_account=${{ vars.GCP_DEPLOY_SA }}" \
+            -var="dataform_git_token_versao=${{ vars.DATAFORM_GIT_TOKEN_VERSAO }}" \
+            -out=tfplan
           terraform apply tfplan
       - uses: astral-sh/setup-uv@v4
         with:
           version: "0.5.11"
       - run: uv sync --frozen --no-dev
-      - run: uv run python -m scripts.deploy_views
+      # Bronze, Silver e Gold vêm do Dataform (ADR 012). Roda logo após o apply:
+      # a carga nunca cria tabela Bronze. Projeto e região saem do state, e não
+      # do padrão da configuração, para que um deploy de prod não caia em dev.
+      - run: |
+          cd infra
+          export GCP_PROJECT_ID="$(terraform output -raw project_id)"
+          export GCP_REGION="$(terraform output -raw region)"
+          SA="$(terraform output -raw service_account_dataform)"
+          cd ..
+          uv run python -m scripts.executar_dataform --service-account "$SA"
 
   sync-dags:
     name: "Sync DAGs (${{ inputs.environment }})"

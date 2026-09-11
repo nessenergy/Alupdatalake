@@ -138,3 +138,13 @@ def test_dataform_compila_a_main_na_regiao_do_ambiente() -> None:
     assert _tem(r"regiao\s*=\s*var\.region", modulo)
     assert _tem(r'assertion_schema\s*=\s*"qualidade"', modulo)
     assert 'resource "google_bigquery_dataset" "qualidade"' in _ler("infra/modules/bigquery/main.tf")
+
+
+def test_deploy_edita_so_o_repositorio_dataform_nao_o_projeto() -> None:
+    """Least privilege: o deploy so precisa compilar e executar o repositorio alupdata."""
+    modulo = _ler("infra/modules/dataform/main.tf")
+    assert 'resource "google_dataform_repository_iam_member" "deploy_dataform"' in modulo
+    assert '"roles/dataform.editor"' in modulo
+
+    for bloco in re.finditer(r'resource "google_project_iam_member" "\w+" \{.*?\n\}', modulo, re.DOTALL):
+        assert "roles/dataform.editor" not in bloco.group(0)

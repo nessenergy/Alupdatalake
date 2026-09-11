@@ -87,12 +87,17 @@ resource "google_service_account_iam_member" "deploy_age_como_dataform" {
   member             = "serviceAccount:${var.deploy_service_account}"
 }
 
-resource "google_project_iam_member" "deploy_dataform" {
-  count = var.deploy_service_account == "" ? 0 : 1
+# O deploy só precisa compilar e executar este repositório, não qualquer
+# repositório Dataform do projeto.
+resource "google_dataform_repository_iam_member" "deploy_dataform" {
+  count    = local.criar && var.deploy_service_account != "" ? 1 : 0
+  provider = google-beta
 
-  project = var.project_id
-  role    = "roles/dataform.editor"
-  member  = "serviceAccount:${var.deploy_service_account}"
+  project    = var.project_id
+  region     = var.region
+  repository = google_dataform_repository.alupdata[0].name
+  role       = "roles/dataform.editor"
+  member     = "serviceAccount:${var.deploy_service_account}"
 }
 
 # ------------------------------------------------------------------ Git

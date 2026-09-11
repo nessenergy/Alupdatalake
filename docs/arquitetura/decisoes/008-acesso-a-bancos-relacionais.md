@@ -119,3 +119,31 @@ quebraria esse contrato.
 **O que isto não decide.** Habilitar o driver não escolhe a via (c) — a escolha
 segue sendo da Alup, na resposta ao C4. O que muda é que a opção agora custa
 apontar uma DSN, e não estimar um trabalho desconhecido no meio da onda.
+
+---
+
+## Adendo de 2026-09-11 — SQL Server descontinuado
+
+Na resposta ao Questionário de Gaps, a Alup informou que **o SQL Server não
+será usado**: houve migração para a AWS (C11). O Balanço Energético, que o
+adendo de 04/09 situava nesse SQL Server, está hoje no **MySQL RDS na AWS**,
+alimentado por automação sob demanda (C4).
+
+A mesma resposta separou os dados: InfoMercado e Balanço Energético são dados
+diferentes, os dois da CCEE. O InfoMercado é público e segue pela CCEE, com a
+requisição ajustada; a via (c), como alternativa ao portal, deixa de existir.
+
+Efeitos:
+
+- O Balanço Energético se lê pelo esquema `mysql://`, já suportado, com a mesma
+  DSN única no Secret Manager. Nenhum driver novo.
+- O esquema `sqlserver://` e o `python-tds` **seguem suportados, mas sem
+  fonte**. Manter custa uma dependência opcional do extra `bancos`; remover
+  custaria reescrevê-los se outra fonte vier em SQL Server. Reavaliar no
+  handoff.
+- A origem da dimensão `agente_ccee` passa a depender de a tabela do Balanço no
+  MySQL RDS trazer o código de agente — a mesma pergunta do adendo de 04/09, em
+  outro banco.
+- O MySQL RDS dispensa VPN (C8). Rede e TLS estão na revisão de 11/09 da
+  [ADR 013](013-ingestao-em-lote.md); o versionamento das recontabilizações da
+  CCEE, na [ADR 016](016-versionamento-de-recontabilizacao.md), proposta.

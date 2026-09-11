@@ -1,8 +1,8 @@
 # ADR 012 — Dataform para o SQL das três camadas
 
 **Status**: aceito · **Data**: 2026-09-10 · **Revisada** em 2026-09-11
-(materialização da Gold) · **Substitui** a decisão de transformação da
-[ADR 004](004-sql-puro-e-orquestracao.md)
+(materialização da Gold; Gold na Fase 1) · **Substitui** a decisão de
+transformação da [ADR 004](004-sql-puro-e-orquestracao.md)
 
 ## Contexto
 
@@ -122,6 +122,56 @@ A habilitação do recurso no projeto é declarada em `infra/` (regra 5).
 - O Node entra **só no CI e no ambiente de desenvolvimento**, para compilar.
   A imagem dos conectores continua só Python.
 
+## Gold na Fase 1
+
+Acrescentado em 2026-09-11, com as respostas da Alup ao
+[Questionário de Gaps](../../questionario-gaps.md).
+
+A Alup respondeu que não existe KPI formalizado (A5, A6) e que defini-los **não
+é objetivo desta fase**: o objetivo agora é ter os dados organizados e a
+estrutura do datalake funcionando. Os indicadores serão definidos no projeto de
+front da Fase 2.
+
+### O que a Gold entrega nesta fase
+
+- **Tabelas prontas para consumo, por domínio** — os domínios de dado do B1,
+  cada um com seu data owner. A Gold consolida e agrega; não calcula indicador
+  com fórmula de negócio.
+- **Na granularidade de A7**, que depende do dado: usina, para o portfólio da
+  Alup; usina, estado ou submercado, para o SIN. A Gold não agrega acima disso —
+  agregar no consumo é fácil, desagregar é impossível.
+- **Com unidade explícita (D6)**: energia em MWh ou MWmed; valor em R$, milhares
+  de R$ ou milhões de R$. A unidade vai no nome da coluna, como já faz
+  `carga_media_mwmed`, e na descrição (componente 07).
+- **R$/MWh com duas casas decimais (D7).** O arredondamento é o último passo:
+  somas e médias partem do valor sem arredondar, e a Silver guarda a precisão
+  da fonte.
+- **Com as dimensões comuns da Silver** (usina, submercado, agente CCEE e
+  período de apuração), nos dois calendários que a Alup usa, mês civil e mês
+  CCEE (D4). A sigla interna das empresas (D1) entra como atributo da dimensão
+  de usina; o de-para entre sigla, CEG e os nomes da CCEE e do ONS é trabalho
+  da dimensão, não de cada Gold.
+
+### KPIs ficam para a Fase 2
+
+Indicador — fórmula, meta, comparação entre coligadas — é construído no front
+da Fase 2 (Looker Studio ou fronts internos, G1), lendo a Gold. Se um indicador
+precisar voltar ao lake depois, entra como Gold nova, com dono (B1) e fórmula
+por escrito.
+
+### Leitura do componente 04
+
+O resumo do contrato descreve o componente 04 da cláusula 2.2 ("View Gold")
+como "regras de negócio complexas e KPIs consolidados"
+([resumo do contrato](../../contrato/resumo-contrato.md)). Sem KPI nesta fase,
+por decisão da própria Alup, o componente passa a ser lido como "tabelas Gold
+de consumo por domínio, publicadas pelo Dataform e materializadas".
+
+Essa leitura exige **aceite da Alup por escrito**, no mesmo documento que aceita
+a Gold materializada (acima, *Equivalência contratual*), antes da homologação
+da Onda 1. Sem esse aceite, a medição pode cobrar KPI que a Alup declarou fora
+da fase.
+
 ## Consequências
 
 - Linhagem entre camadas e teste de dado deixam de ser código nosso.
@@ -140,3 +190,6 @@ A habilitação do recurso no projeto é declarada em `infra/` (regra 5).
   gera a Gold como `table`.
 - A migração é feita **antes do primeiro `apply`**: com o ambiente vazio, não há
   view publicada por `deploy_views.py` para conviver com as do Dataform.
+- A seção *Gold na Fase 1* não reescreve as cinco Gold de negócio existentes:
+  conferir unidade no nome da coluna e arredondamento de R$/MWh entra na
+  homologação de cada fonte.

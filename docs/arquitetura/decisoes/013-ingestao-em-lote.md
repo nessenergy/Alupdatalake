@@ -1,7 +1,8 @@
 # ADR 013 — Ingestão em lote: sem CDC e sem Dataflow
 
 **Status**: aceito · **Data**: 2026-09-10 · **Complementa** as ADRs
-[003](003-framework-de-conectores.md) e [008](008-acesso-a-bancos-relacionais.md)
+[003](003-framework-de-conectores.md) e [008](008-acesso-a-bancos-relacionais.md) ·
+**Revisada** em 2026-09-11 (rede e janela de extração das fontes internas)
 
 ## Contexto
 
@@ -89,3 +90,67 @@ se vier, é ADR próprio.
   da Onda 3 — depende de A7.
 - O executor ganha a emissão de linhagem, testada como qualquer outra parte do
   framework.
+
+---
+
+## Revisão de 2026-09-11 — rede e janela das fontes internas
+
+As respostas da Alup ao [Questionário de Gaps](../../questionario-gaps.md), em
+11/09, mudam duas premissas desta ADR. A decisão — lote, por janela, pelo
+executor único — não muda.
+
+### O MySQL RDS de Comercialização dispensa VPN (C8)
+
+O banco está na AWS, em Norte da Virgínia (`us-east-1`), e **não precisa de
+peering nem de VPN**; o acesso será concedido pelo Leonardo. A frase "qualquer
+uma delas precisa da VPN da Alup ligada a uma VPC", acima, deixa de valer para
+essa fonte. O Balanço Energético, que saiu do SQL Server (C11, adendo de 11/09
+da [ADR 008](008-acesso-a-bancos-relacionais.md)), também está no MySQL RDS.
+
+Sem VPN, a conexão atravessa a internet até o endpoint do RDS. Duas
+consequências:
+
+1. **IP de saída fixo, se a liberação for por lista de IPs — a confirmar com o
+   Leonardo.** O Cloud Run não tem IP de saída estável. Se o acesso ao RDS
+   exigir lista de origens, o Cloud Run Job precisa sair pela VPC (*Direct VPC
+   egress*, já previsto em `infra/modules/networking`) e por um **Cloud NAT com
+   IP reservado**, declarado em `infra/` (regra 5). Se a liberação for por
+   outro meio, nada disso entra.
+2. **TLS na conexão.** Credencial e dado passam pela internet. Hoje `banco.py`
+   não repassa opção de TLS ao `pymysql` — a parte de consulta da DSN é
+   ignorada. Habilitar e exigir TLS no caminho `mysql://`, com teste, vem antes
+   da primeira leitura do RDS.
+
+### O caminho de rede do Oracle FMB segue a confirmar (C5)
+
+A Alup liberou acesso somente às views e informou host, porta e schema —
+recebidos em 11/09 e guardados fora do repositório, na DSN do Secret Manager
+(regra 2). Não informou se o banco é alcançável sem VPN. Até isso ser
+confirmado, a VPN ligada à VPC continua sendo a premissa para o FMB.
+
+O mesmo vale para o Portal Alup — cujas bases (Aurora, DynamoDB e S3, C6)
+indicam que também está na AWS — e para o RM/TOTVS (C7, até 25/09).
+
+### Janela de extração: das 22h às 6h (C9)
+
+Os sistemas internos só podem ser lidos das 22h às 6h. É janela de **horário de
+execução**, e não se confunde com a janela de datas da regra 3.
+
+- O agendamento das fontes da Onda 3 cai dentro dela. O Cloud Scheduler agenda
+  com fuso explícito; a resposta não informou o fuso, e supor o de Brasília
+  precisa de confirmação.
+- A execução do Dataform vem depois da ingestão (ADR 012), também dentro da
+  janela ou logo após o seu fim.
+- Consequência para o consumo: dado de sistema interno chega à Gold no máximo
+  uma vez por dia, com a leitura da noite anterior. O "quase em tempo real"
+  pedido em A1 e A2 vale, para essas fontes, como atualização diária —
+  expectativa a alinhar com a Alup.
+
+### Consequências da revisão
+
+- `infra/modules/networking`: sem VPN para o MySQL RDS; Cloud NAT com IP
+  reservado só se a liberação for por lista de IPs. VPN segue prevista para o
+  FMB até confirmação.
+- `src/core/banco.py`: TLS no caminho `mysql://`, com teste, antes da Onda 3.
+- Para o MySQL RDS, a dependência A7 deixa de ser VPN e passa a ser credencial
+  somente leitura e liberação de acesso pelo Leonardo.

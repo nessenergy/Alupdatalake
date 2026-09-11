@@ -32,3 +32,13 @@ output "dataset_faturamento" {
   description = "Destino do billing export — ligado no console pela Alup (ADR 007)"
   value       = module.bigquery.dataset_faturamento
 }
+
+output "service_account_dataform" {
+  description = "SA que executa o Dataform"
+  value       = module.dataform.service_account
+}
+
+output "repositorio_dataform" {
+  description = "Repositório Dataform (vazio enquanto não houver token do GitHub)"
+  value       = module.dataform.repositorio
+}

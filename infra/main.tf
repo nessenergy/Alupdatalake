@@ -6,6 +6,10 @@ terraform {
       source  = "hashicorp/google"
       version = "~> 6.0"
     }
+    google-beta = {
+      source  = "hashicorp/google-beta"
+      version = "~> 6.0"
+    }
   }
 
   # Backend será configurado por ambiente
@@ -16,6 +20,12 @@ terraform {
 }
 
 provider "google" {
+  project = var.project_id
+  region  = var.region
+}
+
+# Release e workflow configs do Dataform só existem no provider beta.
+provider "google-beta" {
   project = var.project_id
   region  = var.region
 }
@@ -98,4 +108,14 @@ module "scheduler" {
   environment           = var.environment
   imagem                = var.imagem_ingestao
   service_account_email = google_service_account.ingestao.email
+}
+
+module "dataform" {
+  source                 = "./modules/dataform"
+  project_id             = var.project_id
+  region                 = var.region
+  environment            = var.environment
+  datasets               = concat(values(module.bigquery.dataset_ids), [module.bigquery.dataset_qualidade])
+  git_token_versao       = var.dataform_git_token_versao
+  deploy_service_account = var.deploy_service_account
 }

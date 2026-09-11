@@ -113,3 +113,28 @@ def test_ci_e_makefile_compilam_o_dataform_na_mesma_versao() -> None:
     assert "dataform-compile:" in _ler(".github/workflows/ci.yml")
     assert "@dataform/cli@3.0.69 compile" in _ler(".github/workflows/ci.yml")
     assert "@dataform/cli@3.0.69 compile" in _ler("Makefile")
+
+
+def test_dataform_executa_com_service_account_propria() -> None:
+    """Strict act-as: o agente do Dataform personifica uma SA do projeto."""
+    modulo = _ler("infra/modules/dataform/main.tf")
+    assert 'resource "google_service_account" "dataform"' in modulo
+    assert _tem(r"service_account\s*=\s*google_service_account\.dataform\.email", modulo)
+    assert '"roles/iam.serviceAccountTokenCreator"' in modulo
+    assert "gcp-sa-dataform.iam.gserviceaccount.com" in modulo
+
+
+def test_token_do_git_so_e_legivel_pelo_agente_do_dataform() -> None:
+    modulo = _ler("infra/modules/dataform/main.tf")
+    assert _tem(r'secret_id\s*=\s*"alupdata-dataform-git-token"', modulo)
+    assert "google_secret_manager_secret_version" not in modulo  # valor fora do Terraform (regra 2)
+    assert "alupdata-dataform-git-token" not in _ler("infra/modules/secrets/main.tf")  # a ingestão não lê
+
+
+def test_dataform_compila_a_main_na_regiao_do_ambiente() -> None:
+    modulo = _ler("infra/modules/dataform/main.tf")
+    assert _tem(r'git_commitish\s*=\s*"main"', modulo)
+    assert _tem(r"default_location\s*=\s*var\.region", modulo)
+    assert _tem(r"regiao\s*=\s*var\.region", modulo)
+    assert _tem(r'assertion_schema\s*=\s*"qualidade"', modulo)
+    assert 'resource "google_bigquery_dataset" "qualidade"' in _ler("infra/modules/bigquery/main.tf")

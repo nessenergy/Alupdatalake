@@ -289,19 +289,19 @@ de 1 a 2, **médio** de 3 a 4, **alto** de 6 a 9. Avaliação proposta pela ness
 | # | Medida | Tipo |
 |---|---|---|
 | R01 | Contas de serviço com privilégio mínimo, verificado em teste (`tests/unit/test_infra.py`); Portal atrás do IAP, restrito ao domínio da Alup, que recusa requisição sem identidade | E |
-| R01 | Acesso de pessoas por grupo, declarado em `infra/`: consumidores leem a Gold; Bronze e Silver só para quem opera | P |
-| R01 | Trazer o IAP e o serviço do Portal para o Terraform | P |
+| R01 | Acesso de pessoas por grupo, declarado em `infra/`: consumidores leem a Gold; Bronze e Silver só para quem opera — PR #118 | P |
+| R01 | IAP e serviço do Portal no Terraform, com conta de serviço própria — PR #118 | P |
 | R01 | Controle de acesso por coluna (*policy tags* do BigQuery) nas colunas com dado pessoal | P |
 | R02 | Prazos da [política de retenção](politica-de-retencao.md) declarados em `infra/`: exclusão no bucket raw, exclusão de versões antigas, expiração de partição na Bronze | P |
 | R02 | Procedimento de eliminação a pedido do titular e da cláusula 8.3, no runbook | P |
 | R03 | DPA do contrato de nuvem da Alupar ([dpa.md](dpa.md)) | E |
 | R04 | A Gold não expõe `nome` nem `proprietario_id`: `funil_comercial` só agrega | E |
 | R04 | Colunas com dado pessoal marcadas no catálogo e cobertas pela *policy tag* de R01 | P |
-| R04 | `proprietario_id` retirado do conector, por decisão de 11/09 (item g); branch `fix/hubspot-sem-proprietario` | P |
+| R04 | `proprietario_id` retirado do conector, por decisão de 11/09 (item g) — PR #116 | P |
 | R05 | O assistente do Dataform só entra por PR e não é apontado para tabela com dado pessoal (ADR 012); conteúdo gerado no catálogo fica `origem = automatica` e não homologa (ADR 014) | E |
 | R05 | Manter o assistente fora das tabelas com colunas marcadas como pessoais **também depois** da aprovação deste relatório | P |
 | R06 | Antes de cada conector da Onda 3: inventário de colunas com o dono do dado; seleção explícita de colunas, nunca `SELECT *`; módulos de RH e folha fora do escopo de leitura; hipótese legal e prazo definidos; revisão deste relatório e do RoPA | P |
-| R07 | Log de auditoria de acesso a dados (*Data Access audit logs*) do BigQuery e do Cloud Storage, declarado em `infra/`, com retenção de 1 ano. O custo é da Alup | P |
+| R07 | Log de auditoria de acesso a dados (*Data Access audit logs*) do BigQuery e do Cloud Storage, declarado em `infra/` — PR #118. Retenção padrão de 30 dias; 1 ano depende da política de retenção. O custo é da Alup | P |
 | R08 | Acesso da ness. por grupo, com revogação na homologação final e no handoff (cláusula 8.3) | P |
 | R09 | Credenciais só no Secret Manager; deploy via WIF, sem chave; gitleaks no CI e no pre-commit; teste que impede a senha de aparecer em mensagem de erro | E |
 | R10 | Regra de não ter dado real no repositório (`AGENTS.md`, `SECURITY.md`); fixtures sintéticos | E |

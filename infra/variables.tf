@@ -47,3 +47,35 @@ variable "deploy_service_account" {
   type        = string
   default     = ""
 }
+
+# Acesso de pessoas (R01 do RIPD). Os grupos são da Alup; vazio não concede nada.
+
+variable "grupo_consumidores" {
+  description = "E-mail do grupo Google da Alup que lê a Gold; vazio não concede nada"
+  type        = string
+  default     = ""
+  validation {
+    condition     = var.grupo_consumidores == "" || can(regex("^[^@:\\s]+@[^@:\\s]+$", var.grupo_consumidores))
+    error_message = "Informe só o e-mail do grupo, sem o prefixo group:."
+  }
+}
+
+variable "grupo_operacao" {
+  description = "E-mail do grupo Google da Alup que lê Bronze, Silver e Gold; vazio não concede nada"
+  type        = string
+  default     = ""
+  validation {
+    condition     = var.grupo_operacao == "" || can(regex("^[^@:\\s]+@[^@:\\s]+$", var.grupo_operacao))
+    error_message = "Informe só o e-mail do grupo, sem o prefixo group:."
+  }
+}
+
+variable "portal_acesso" {
+  description = "Quem passa pelo IAP do Portal: group:<e-mail> ou domain:<domínio> da Alup; vazio não libera ninguém"
+  type        = list(string)
+  default     = []
+  validation {
+    condition     = alltrue([for m in var.portal_acesso : can(regex("^(group|domain):[^\\s]+$", m))])
+    error_message = "Use só group:<e-mail> ou domain:<domínio>; acesso individual (user:) não entra."
+  }
+}

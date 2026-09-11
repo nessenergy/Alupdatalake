@@ -4,9 +4,13 @@ from __future__ import annotations
 
 import logging
 import uuid
+from datetime import date
+from decimal import Decimal
 from typing import TYPE_CHECKING
 
+from pydantic import BaseModel
 from src.core import linhagem
+from src.core.conector import Conector
 from src.core.config import get_settings
 from src.core.execucao import Execucao, Janela
 
@@ -85,3 +89,47 @@ def test_falha_ao_emitir_nao_derruba_e_nao_vaza_credencial(monkeypatch, caplog):
 
     assert "linhagem não registrada" in caplog.text
     assert marcador not in caplog.text
+
+
+class Registro(BaseModel):
+    data_referencia: date
+    valor: Decimal
+
+
+class ConectorTeste(Conector):
+    fonte = "teste"
+    entidade = "medicao"
+    schema = Registro
+
+    def extrair(self, janela):
+        del janela
+        yield {"data_referencia": "2026-01-01", "valor": "1.5"}
+
+
+def _silenciar_gcp(monkeypatch):
+    monkeypatch.setattr("src.core.conector.gravar_raw", lambda *_a: None)
+    monkeypatch.setattr("src.core.conector.carregar_bronze", lambda _e, linhas: len(linhas))
+    monkeypatch.setattr("src.core.conector.registrar_execucao", lambda _e: None)
+
+
+def test_ingestao_bem_sucedida_emite_uma_vez(monkeypatch):
+    emitidos = []
+    _silenciar_gcp(monkeypatch)
+    monkeypatch.setattr("src.core.conector.emitir_linhagem", lambda e, origem: emitidos.append((e, origem)))
+
+    execucao = ConectorTeste().ingerir(Janela.de_texto("2026-01-01", "2026-01-01"))
+
+    assert emitidos == [(execucao, "teste.medicao")]
+
+
+def test_replay_nao_emite(monkeypatch):
+    emitidos = []
+    _silenciar_gcp(monkeypatch)
+    monkeypatch.setattr("src.core.conector.ler_raw", lambda _uri: [{"data_referencia": "2026-01-01", "valor": "1"}])
+    monkeypatch.setattr("src.core.conector.emitir_linhagem", lambda *a: emitidos.append(a))
+
+    ConectorTeste().reprocessar_raw(
+        "gs://lake-raw/teste/medicao/dt=2026-01-01/origem123.json.gz", Janela.de_texto("2026-01-01", "2026-01-01")
+    )
+
+    assert emitidos == []

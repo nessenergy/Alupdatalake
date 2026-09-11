@@ -15,6 +15,7 @@ from pydantic import BaseModel, ValidationError
 
 from src.core.bigquery import carregar_bronze, registrar_execucao
 from src.core.execucao import Execucao, Janela
+from src.core.linhagem import emitir as emitir_linhagem
 from src.core.observabilidade import contexto_execucao
 from src.core.seguranca import sanitizar
 from src.core.storage import gravar_raw, identificar_raw, ler_raw
@@ -93,6 +94,9 @@ class Conector(ABC):
             raise
 
         registrar_execucao(execucao)
+        # Replay não passa por aqui: a aresta origem → Bronze já foi registrada
+        # pela ingestão original (ADR 013).
+        emitir_linhagem(execucao, self.origem_linhagem)
         logger.info(
             "[%s] %s: %d extraídos, %d inválidos, %d carregados em %.1fs",
             self.rotulo,
@@ -156,3 +160,8 @@ class Conector(ABC):
     def rotulo(self) -> str:
         """`fonte_entidade` — o nome pelo qual o conector é registrado e chamado."""
         return f"{self.fonte}_{self.entidade}"
+
+    @property
+    def origem_linhagem(self) -> str:
+        """Nome da origem no Knowledge Catalog (`custom:<este valor>`). Sobrescreva se houver nome melhor."""
+        return f"{self.fonte}.{self.entidade}"

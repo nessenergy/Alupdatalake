@@ -45,6 +45,12 @@ variable "conectores" {
   }
 }
 
+variable "agendar" {
+  description = "Cria os disparos do Cloud Scheduler; false deixa só os Cloud Run Jobs, para execução manual"
+  type        = bool
+  default     = true
+}
+
 resource "google_cloud_run_v2_job" "ingestao" {
   for_each = var.conectores
 
@@ -83,8 +89,10 @@ resource "google_cloud_run_v2_job" "ingestao" {
   }
 }
 
+# Sem `agendar`, nenhum disparo existe: o Scheduler cobra por job existente,
+# pausado ou não. O Cloud Run Job acima continua disponível para execução manual.
 resource "google_cloud_scheduler_job" "ingestao" {
-  for_each = var.conectores
+  for_each = var.agendar ? var.conectores : {}
 
   name     = "ingestao-${replace(each.key, "_", "-")}"
   project  = var.project_id

@@ -12,11 +12,13 @@ terraform {
     }
   }
 
-  # Backend será configurado por ambiente
-  # backend "gcs" {
-  #   bucket = "alupdata-terraform-state"
-  #   prefix = "terraform/state"
-  # }
+  # Um bucket de state por projeto, criado pelo bootstrap (infra/bootstrap). O
+  # nome entra no init — `terraform init -backend-config="bucket=<bucket>"`,
+  # variável TF_STATE_BUCKET do ambiente no GitHub. O CI valida com
+  # `-backend=false`.
+  backend "gcs" {
+    prefix = "infra"
+  }
 }
 
 provider "google" {
@@ -174,6 +176,7 @@ module "scheduler" {
   environment           = var.environment
   imagem                = var.imagem_ingestao
   service_account_email = google_service_account.ingestao.email
+  agendar               = var.agendamentos_ativos
 }
 
 # Portal atrás do IAP (R01). Sobe com a imagem publicada, que é a mesma da CLI;
@@ -198,4 +201,5 @@ module "dataform" {
   datasets               = concat(values(module.bigquery.dataset_ids), [module.bigquery.dataset_qualidade])
   git_token_versao       = var.dataform_git_token_versao
   deploy_service_account = var.deploy_service_account
+  agendar                = var.agendamentos_ativos
 }

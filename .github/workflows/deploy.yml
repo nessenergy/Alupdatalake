@@ -9,6 +9,7 @@ on:
         type: choice
         options:
           - dev
+          - hml
           - prod
       module:
         description: 'Módulo a deployar'
@@ -67,7 +68,8 @@ jobs:
           TAG="latest"
           if [ "${{ inputs.module }}" = "all" ]; then TAG="${GITHUB_SHA}"; fi
           cd infra
-          terraform init
+          # State no bucket do próprio projeto, criado pelo bootstrap.
+          terraform init -backend-config="bucket=${{ vars.TF_STATE_BUCKET }}"
           terraform plan -var-file="environments/${{ inputs.environment }}.tfvars" \
             -var="imagem_ingestao=${{ vars.IMAGEM_INGESTAO }}:${TAG}" \
             -var="deploy_service_account=${{ vars.GCP_DEPLOY_SA }}" \

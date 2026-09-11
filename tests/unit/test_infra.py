@@ -52,11 +52,68 @@ def _tem(padrao: str, texto: str) -> bool:
     return re.search(padrao, texto) is not None
 
 
+AMBIENTES = ("dev", "hml", "prod")
+
+
 def test_regiao_padrao_e_us_east1_em_todo_o_ambiente() -> None:
     """ADR 011: dataset do BigQuery não muda de região depois do primeiro apply."""
     assert _tem(r'variable "region" \{[^}]*default\s*=\s*"us-east1"', _ler("infra/variables.tf"))
+    for ambiente in AMBIENTES:
+        tfvars = _ler(f"infra/environments/{ambiente}.tfvars")
+        assert _tem(r'region\s*=\s*"us-east1"', tfvars), ambiente
+        assert _tem(rf'environment\s*=\s*"{ambiente}"', tfvars), ambiente
+
+
+def test_infra_aceita_os_tres_ambientes() -> None:
+    """ADR 015, revisão de 11/09 (E4): dev, hml e prod, cada um no seu projeto."""
+    variavel = _bloco(_ler("infra/variables.tf"), 'variable "environment"')
+    assert _tem(r'contains\(\["dev", "hml", "prod"\], var\.environment\)', variavel)
+
+
+def test_deploy_oferece_os_tres_ambientes() -> None:
+    workflow = _ler(".github/workflows/deploy.yml")
+    entrada = workflow[workflow.index("      environment:") : workflow.index("      module:")]
+    assert re.findall(r"^\s+- (\w+)$", entrada, re.MULTILINE) == list(AMBIENTES)
+
+
+def test_state_do_infra_fica_no_bucket_do_proprio_ambiente() -> None:
+    """Um bucket de state por projeto, criado pelo bootstrap; o nome vem do GitHub."""
+    principal = _ler("infra/main.tf")
+    backend = re.search(r'(?m)^  backend "gcs" \{(.*?)\n  \}', principal, re.DOTALL)
+    assert backend, "backend gcs precisa estar declarado, não comentado"
+    assert "bucket" not in backend.group(1)  # configuração parcial: vem no init
+    assert _tem(r'prefix\s*=\s*"infra"', backend.group(1))
+
+    workflow = _ler(".github/workflows/deploy.yml")
+    bloco_terraform = workflow[workflow.index("  terraform:") : workflow.index("  sync-dags:")]
+    assert 'terraform init -backend-config="bucket=${{ vars.TF_STATE_BUCKET }}"' in bloco_terraform
+    # O CI valida sem credencial.
+    assert "terraform init -backend=false" in _ler(".github/workflows/ci.yml")
+
+
+def test_hml_nasce_sem_agendamento() -> None:
+    """E2: hml é barato — Scheduler cobra por job existente, pausado ou não."""
+    assert _tem(r"agendamentos_ativos\s*=\s*false", _ler("infra/environments/hml.tfvars"))
     for ambiente in ("dev", "prod"):
-        assert _tem(r'region\s*=\s*"us-east1"', _ler(f"infra/environments/{ambiente}.tfvars"))
+        assert "agendamentos_ativos" not in _ler(f"infra/environments/{ambiente}.tfvars")
+
+    variavel = _bloco(_ler("infra/variables.tf"), 'variable "agendamentos_ativos"')
+    assert _tem(r"type\s*=\s*bool", variavel)
+    assert _tem(r"default\s*=\s*true", variavel)
+
+    principal = _ler("infra/main.tf")
+    for modulo in ('module "scheduler" {', 'module "dataform" {'):
+        assert _tem(r"agendar\s*=\s*var\.agendamentos_ativos", _bloco(principal, modulo)), modulo
+
+    # Sem agendamento, o Cloud Run Job continua existindo para execução manual.
+    scheduler = _ler("infra/modules/scheduler/main.tf")
+    disparo = _bloco(scheduler, 'resource "google_cloud_scheduler_job" "ingestao"')
+    assert _tem(r"for_each\s*=\s*var\.agendar \? var\.conectores : \{\}", disparo)
+    job = _bloco(scheduler, 'resource "google_cloud_run_v2_job" "ingestao"')
+    assert _tem(r"for_each\s*=\s*var\.conectores", job)
+
+    dataform = _ler("infra/modules/dataform/main.tf")
+    assert "var.agendar" in _bloco(dataform, 'resource "google_dataform_repository_workflow_config" "diario"')
 
 
 def test_secrets_ficam_na_regiao_do_ambiente() -> None:
@@ -334,7 +391,9 @@ def test_nenhum_binding_humano_existe_com_os_defaults() -> None:
             bloco = recurso.group(0)
             membro = re.search(r"\n\s*members?\s*=\s*(.+)", bloco)
             assert membro, (caminho, bloco)
-            if "serviceAccount:" not in membro.group(1):
+            # `principalSet://` é a identidade federada do GitHub (bootstrap),
+            # carga de trabalho e não pessoa: restrita ao repositório pela condição do WIF.
+            if "serviceAccount:" not in membro.group(1) and "principalSet://" not in membro.group(1):
                 assert _tem(r"\n\s*(for_each|count)\s*=", bloco), (caminho, bloco)
 
 

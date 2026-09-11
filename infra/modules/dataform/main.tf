@@ -37,12 +37,16 @@ variable "deploy_service_account" {
   default     = ""
 }
 
-data "google_project" "atual" {
-  project_id = var.project_id
+# Agente de serviço do Dataform: existe só depois que a API é habilitada, daí
+# vir de um recurso, e não de uma convenção de nome montada à mão.
+resource "google_project_service_identity" "dataform" {
+  provider = google-beta
+  project  = var.project_id
+  service  = "dataform.googleapis.com"
 }
 
 locals {
-  agente_dataform = "service-${data.google_project.atual.number}@gcp-sa-dataform.iam.gserviceaccount.com"
+  agente_dataform = google_project_service_identity.dataform.email
   criar           = var.git_token_versao != ""
 }
 
@@ -67,6 +71,17 @@ resource "google_bigquery_dataset_iam_member" "dataform" {
   dataset_id = each.value
   role       = "roles/bigquery.dataEditor"
   member     = "serviceAccount:${google_service_account.dataform.email}"
+}
+
+# Só metadado, nunca dado: `gold.custo_consultas` lê quem rodou cada consulta
+# (INFORMATION_SCHEMA.JOBS_BY_PROJECT, exige `bigquery.jobs.listAll`) e o
+# tamanho de cada tabela (INFORMATION_SCHEMA.TABLE_STORAGE) do projeto inteiro.
+resource "google_project_iam_member" "dataform_metadados" {
+  for_each = toset(["roles/bigquery.resourceViewer", "roles/bigquery.metadataViewer"])
+
+  project = var.project_id
+  role    = each.value
+  member  = "serviceAccount:${google_service_account.dataform.email}"
 }
 
 # O agente de serviço personifica a SA nas execuções (strict act-as).
@@ -134,9 +149,10 @@ resource "google_dataform_repository" "alupdata" {
   count    = local.criar ? 1 : 0
   provider = google-beta
 
-  name    = "alupdata"
-  project = var.project_id
-  region  = var.region
+  name            = "alupdata"
+  project         = var.project_id
+  region          = var.region
+  service_account = google_service_account.dataform.email
 
   git_remote_settings {
     url                                 = var.git_url
@@ -144,7 +160,11 @@ resource "google_dataform_repository" "alupdata" {
     authentication_token_secret_version = "${google_secret_manager_secret.git_token.id}/versions/${var.git_token_versao}"
   }
 
-  depends_on = [google_secret_manager_secret_iam_member.agente_le_token]
+  depends_on = [
+    google_secret_manager_secret_iam_member.agente_le_token,
+    google_service_account_iam_member.agente_personifica,
+    google_service_account_iam_member.deploy_age_como_dataform,
+  ]
 }
 
 resource "google_dataform_repository_release_config" "main" {
@@ -170,8 +190,10 @@ resource "google_dataform_repository_release_config" "main" {
   }
 }
 
-# Depois da janela de ingestão (07h–10h). Na Onda 3 o Airflow assume o disparo,
-# com dependência real em vez de horário (ADR 004).
+# As ingestões diárias da manhã rodam entre 07h e 10h; o Hubspot, porém, roda a
+# cada 6h, então suas cargas de 12h e 18h só são conferidas por este workflow
+# no dia seguinte. Na Onda 3 o Airflow assume o disparo, com dependência real
+# em vez de horário (ADR 004).
 resource "google_dataform_repository_workflow_config" "diario" {
   count    = local.criar ? 1 : 0
   provider = google-beta
@@ -188,6 +210,11 @@ resource "google_dataform_repository_workflow_config" "diario" {
     transitive_dependencies_included = true
     service_account                  = google_service_account.dataform.email
   }
+
+  depends_on = [
+    google_service_account_iam_member.agente_personifica,
+    google_service_account_iam_member.deploy_age_como_dataform,
+  ]
 }
 
 output "service_account" {

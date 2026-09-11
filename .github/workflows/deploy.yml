@@ -86,8 +86,13 @@ jobs:
           export GCP_PROJECT_ID="$(terraform output -raw project_id)"
           export GCP_REGION="$(terraform output -raw region)"
           SA="$(terraform output -raw service_account_dataform)"
+          REPO="$(terraform output -raw repositorio_dataform)"
           cd ..
-          uv run python -m scripts.executar_dataform --service-account "$SA"
+          if [ -z "$REPO" ]; then
+            echo "::error::Repositorio Dataform ainda nao existe: grave o token do GitHub no secret alupdata-dataform-git-token e defina DATAFORM_GIT_TOKEN_VERSAO no ambiente do GitHub (docs/runbook/primeiro-deploy.md), depois reexecute o deploy."
+            exit 1
+          fi
+          uv run python -m scripts.executar_dataform --service-account "$SA" --repositorio "$REPO"
 
   sync-dags:
     name: "Sync DAGs (${{ inputs.environment }})"

@@ -82,6 +82,7 @@ nos relatórios (convenção no [README](relatorios/README.md) do diretório).
 | 4.4 | Apagar `docs/fluxo-execucao` e o branch de trabalho, já mesclados; arquivar os dois `backup/*` como tag | permissão — daqui o `git push --delete` e a API respondem 403 |
 | 4.5 | Emitir o relatório de situação da semana | fechamento da S2 (11/09) |
 | 4.6 | Conferir as tarifas-premissa de `us-east1` na tabela oficial de preços do BigQuery e atualizar `src/portal/custo.py` e `definitions/gold/custo_consultas.sqlx` se diferirem de US$ 6,25 por TiB varrido e US$ 0,02 por GiB·mês | acesso à tabela oficial de preços |
+| 4.7 | Asserções de faixa por fonte (`rowConditions`, ex.: `cotacao_compra > 0`, `submercado IN ('N','NE','S','SE')`) e alerta de falha do workflow do Dataform; hoje o portão (`uniqueKey`/`nonNull`) repete o `QUALIFY` da Silver e os `NOT NULL` do Bronze (ADR 012) | dicionário de dados de cada fonte |
 
 ### Uma pendência técnica do próprio repositório
 

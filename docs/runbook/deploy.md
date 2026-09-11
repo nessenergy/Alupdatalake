@@ -13,6 +13,8 @@ Para a primeira implantação, use também a checklist
 | Secrets das fontes credenciadas (vazios) | `infra/modules/secrets` |
 | Cloud Run Job + Cloud Scheduler por conector | `infra/modules/scheduler` |
 | Service account `alupdata-ingestao` e seu IAM | `infra/main.tf` |
+| Repositório Dataform, release config `main`, workflow config `diario` e SA `alupdata-dataform` | `infra/modules/dataform` |
+| Dataset `qualidade` (assertions do Dataform) | `infra/modules/bigquery` |
 
 IAM da identidade de ingestão:
 
@@ -23,6 +25,14 @@ IAM da identidade de ingestão:
 | Bucket raw | `roles/storage.objectCreator` e `roles/storage.objectViewer` |
 | Cada secret declarado | `roles/secretmanager.secretAccessor` |
 | Cada Cloud Run Job | `roles/run.invoker` |
+
+IAM do lado do Dataform (ADR 012):
+
+| Identidade | Papel |
+|---|---|
+| SA `alupdata-dataform` | `roles/bigquery.jobUser`, `roles/bigquery.resourceViewer` e `roles/bigquery.metadataViewer` no projeto; `roles/bigquery.dataEditor` em `bronze`, `silver`, `gold` e `qualidade` |
+| SA de deploy | `roles/dataform.editor` no repositório `alupdata`; `roles/iam.serviceAccountUser` na SA do Dataform |
+| Agente de serviço do Dataform | `roles/iam.serviceAccountTokenCreator` e `roles/iam.serviceAccountUser` na SA do Dataform; `roles/secretmanager.secretAccessor` no secret do token |
 
 Recurso criado no console não existe: some no próximo `apply`.
 

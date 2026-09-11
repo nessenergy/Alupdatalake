@@ -39,6 +39,10 @@ def test_deploy_all_publica_imagem_antes_do_terraform_e_executa_o_dataform_depoi
     # A carga nunca cria tabela Bronze: o Dataform precisa rodar antes da primeira ingestão.
     assert bloco_terraform.index("terraform apply") < bloco_terraform.index("scripts.executar_dataform")
     assert "scripts.deploy_views" not in workflow
+    # Sem repositório (primeiro apply, token ainda não gravado), falha explícita.
+    assert "repositorio_dataform" in bloco_terraform
+    assert "::error::" in bloco_terraform
+    assert "--repositorio" in bloco_terraform
 
 
 def _tem(padrao: str, texto: str) -> bool:
@@ -123,7 +127,28 @@ def test_dataform_executa_com_service_account_propria() -> None:
     assert 'resource "google_service_account" "dataform"' in modulo
     assert _tem(r"service_account\s*=\s*google_service_account\.dataform\.email", modulo)
     assert '"roles/iam.serviceAccountTokenCreator"' in modulo
-    assert "gcp-sa-dataform.iam.gserviceaccount.com" in modulo
+    assert 'resource "google_project_service_identity" "dataform"' in modulo
+    assert _tem(r'service\s*=\s*"dataform\.googleapis\.com"', modulo)
+    assert "local.agente_dataform" in modulo
+
+
+def test_repositorio_dataform_roda_como_a_propria_service_account() -> None:
+    """A execução herda o IAM da SA do Dataform, não do agente de serviço."""
+    modulo = _ler("infra/modules/dataform/main.tf")
+    inicio = modulo.index('resource "google_dataform_repository" "alupdata"')
+    bloco = modulo[inicio : modulo.index("\n}\n", inicio)]
+    assert _tem(r"service_account\s*=\s*google_service_account\.dataform\.email", bloco)
+
+
+def test_dataform_le_metadados_do_projeto_para_a_view_de_custo() -> None:
+    """gold.custo_consultas le JOBS_BY_PROJECT e TABLE_STORAGE: metadado, nunca dado (regra 2)."""
+    modulo = _ler("infra/modules/dataform/main.tf")
+    inicio = modulo.index('resource "google_project_iam_member" "dataform_metadados"')
+    bloco = modulo[inicio : modulo.index("\n}\n", inicio)]
+    assert "for_each" in bloco
+    assert '"roles/bigquery.resourceViewer"' in bloco
+    assert '"roles/bigquery.metadataViewer"' in bloco
+    assert "google_service_account.dataform.email" in bloco
 
 
 def test_token_do_git_so_e_legivel_pelo_agente_do_dataform() -> None:

@@ -17,6 +17,7 @@ from typing import Any
 
 from src.core.config import get_settings
 from src.core.observabilidade import configurar_logging
+from src.core.seguranca import sanitizar
 
 configurar_logging()
 logger = logging.getLogger("executar-dataform")
@@ -35,10 +36,19 @@ def erros_de_compilacao(resultado: dict[str, Any]) -> list[str]:
     return [f"{e.get('path', '?')}: {e.get('message', '')}" for e in resultado.get("compilationErrors", [])]
 
 
+def _verificar(resposta: Any) -> None:
+    """Propaga erro HTTP, registrando antes o corpo da resposta (nunca a credencial, regra 2)."""
+    try:
+        resposta.raise_for_status()
+    except Exception:
+        logger.error("Dataform respondeu com erro: %s", sanitizar(str(getattr(resposta, "text", ""))))
+        raise
+
+
 def executar(sessao: Any, repo: str, service_account: str, intervalo: float = 10.0, limite: float = 1800.0) -> str:
     """Compila a release `main`, executa tudo e devolve o estado terminal."""
     compilacao = sessao.post(f"{API}/{repo}/compilationResults", json={"releaseConfig": f"{repo}/releaseConfigs/main"})
-    compilacao.raise_for_status()
+    _verificar(compilacao)
     resultado = compilacao.json()
     if erros := erros_de_compilacao(resultado):
         raise RuntimeError("compilação do Dataform falhou:\n" + "\n".join(erros))
@@ -47,14 +57,14 @@ def executar(sessao: Any, repo: str, service_account: str, intervalo: float = 10
         f"{API}/{repo}/workflowInvocations",
         json={"compilationResult": resultado["name"], "invocationConfig": {"serviceAccount": service_account}},
     )
-    invocacao.raise_for_status()
+    _verificar(invocacao)
     nome = invocacao.json()["name"]
     logger.info("execução do Dataform iniciada: %s", nome)
 
     inicio = time.monotonic()
     while True:
         resposta = sessao.get(f"{API}/{nome}")
-        resposta.raise_for_status()
+        _verificar(resposta)
         estado = resposta.json().get("state", "STATE_UNSPECIFIED")
         if estado in TERMINAIS:
             return estado
@@ -66,6 +76,7 @@ def executar(sessao: Any, repo: str, service_account: str, intervalo: float = 10
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Executa o Dataform a partir da release main")
     parser.add_argument("--service-account", required=True, help="SA que executa o Dataform (strict act-as)")
+    parser.add_argument("--repositorio", default="alupdata", help="Nome do repositório Dataform criado pelo Terraform")
     args = parser.parse_args(argv)
 
     import google.auth
@@ -73,7 +84,7 @@ def main(argv: list[str] | None = None) -> int:
 
     credenciais, _ = google.auth.default(scopes=["https://www.googleapis.com/auth/cloud-platform"])
     cfg = get_settings()
-    repo = repositorio(cfg.gcp_project_id, cfg.gcp_region)
+    repo = repositorio(cfg.gcp_project_id, cfg.gcp_region, args.repositorio)
     estado = executar(AuthorizedSession(credenciais), repo, args.service_account)
     logger.info("Dataform terminou em %s", estado)
     return 0 if estado == "SUCCEEDED" else 1

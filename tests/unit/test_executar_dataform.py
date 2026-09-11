@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import logging
+
 import pytest
 from scripts.executar_dataform import erros_de_compilacao, executar, repositorio
 
@@ -76,3 +78,34 @@ def test_execucao_sem_fim_estoura_o_limite() -> None:
 
 def test_erros_de_compilacao_vazio_quando_nao_ha_erro() -> None:
     assert erros_de_compilacao({"name": "c1"}) == []
+
+
+def test_repositorio_aceita_nome_customizado() -> None:
+    assert (
+        repositorio("alupdata-test", "us-east1", "outro")
+        == "projects/alupdata-test/locations/us-east1/repositories/outro"
+    )
+
+
+class RespostaComErro:
+    """Simula uma resposta HTTP de erro, com corpo de mensagem da API."""
+
+    def __init__(self, texto: str) -> None:
+        self.text = texto
+
+    def raise_for_status(self) -> None:
+        raise RuntimeError("HTTP 400")
+
+    def json(self) -> dict:
+        return {}
+
+
+def test_erro_http_registra_o_corpo_da_resposta_no_log(caplog: pytest.LogCaptureFixture) -> None:
+    class SessaoComErro:
+        def post(self, url: str, json: dict) -> RespostaComErro:
+            return RespostaComErro("mensagem de erro da API do Dataform")
+
+    with caplog.at_level(logging.ERROR, logger="executar-dataform"), pytest.raises(RuntimeError):
+        executar(SessaoComErro(), REPO, "sa", intervalo=0)
+
+    assert "mensagem de erro da API do Dataform" in caplog.text

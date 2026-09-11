@@ -25,6 +25,7 @@ logger = logging.getLogger(__name__)
 
 API = "https://datalineage.googleapis.com/v1"
 PRODUTOR = "https://github.com/nessenergy/Alupdatalake"
+ESQUEMA = "https://openlineage.io/spec/1-0-5/OpenLineage.json#/$defs/RunEvent"
 
 
 def evento(execucao: Execucao, origem: str, tabela_bronze: str) -> dict[str, Any]:
@@ -33,6 +34,7 @@ def evento(execucao: Execucao, origem: str, tabela_bronze: str) -> dict[str, Any
         "eventType": "COMPLETE" if execucao.status == "SUCESSO" else "FAIL",
         "eventTime": (execucao.encerrada_em or datetime.now(UTC)).isoformat(),
         "producer": PRODUTOR,
+        "schemaURL": ESQUEMA,
         # O ingestao_id é um UUID sem hífens; o OpenLineage espera o formato canônico.
         "run": {"runId": str(uuid.UUID(execucao.ingestao_id))},
         "job": {"namespace": "alupdata", "name": f"ingestao.{execucao.fonte}_{execucao.entidade}"},
@@ -56,10 +58,15 @@ def emitir(execucao: Execucao, origem: str, sessao: Any | None = None) -> None:
         logger.info("dry-run: linhagem não emitida (%s)", execucao.ingestao_id)
         return
 
-    corpo = evento(execucao, origem, cfg.tabela_bronze(execucao.fonte, execucao.entidade))
-    url = f"{API}/projects/{cfg.gcp_project_id}/locations/{cfg.gcp_region}:processOpenLineageRunEvent"
     try:
+        corpo = evento(execucao, origem, cfg.tabela_bronze(execucao.fonte, execucao.entidade))
+        url = f"{API}/projects/{cfg.gcp_project_id}/locations/{cfg.gcp_region}:processOpenLineageRunEvent"
         resposta = (sessao or _sessao()).post(url, json=corpo, timeout=cfg.http_timeout)
         resposta.raise_for_status()
     except Exception as exc:  # noqa: BLE001 — linhagem é metadado; não derruba a ingestão
-        logger.warning("linhagem não registrada para %s: %s", execucao.ingestao_id, sanitizar(str(exc)))
+        detalhe = sanitizar(str(exc))
+        corpo_resposta = getattr(exc, "response", None)
+        texto_resposta = getattr(corpo_resposta, "text", None)
+        if texto_resposta:
+            detalhe = f"{detalhe} | resposta da API: {sanitizar(texto_resposta, limite=500)}"
+        logger.warning("linhagem não registrada para %s: %s", execucao.ingestao_id, detalhe)

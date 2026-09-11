@@ -36,6 +36,7 @@ def test_evento_liga_a_origem_custom_a_tabela_bronze():
     assert uuid.UUID(corpo["run"]["runId"]).hex == execucao.ingestao_id
     assert corpo["eventTime"] == execucao.encerrada_em.isoformat()
     assert corpo["producer"].startswith("https://")
+    assert corpo["schemaURL"] == linhagem.ESQUEMA
 
 
 def test_evento_de_execucao_com_erro_e_fail():
@@ -72,6 +73,7 @@ def test_envia_para_o_endpoint_da_regiao(monkeypatch: pytest.MonkeyPatch):
         "https://datalineage.googleapis.com/v1/projects/alupdata-test/locations/us-east1:processOpenLineageRunEvent"
     )
     assert enviado["corpo"]["outputs"][0]["name"] == "alupdata-test.bronze.bcb_cambio_ptax"
+    assert enviado["timeout"] == get_settings().http_timeout
 
 
 def test_falha_ao_emitir_nao_derruba_e_nao_vaza_credencial(monkeypatch, caplog):
@@ -89,6 +91,29 @@ def test_falha_ao_emitir_nao_derruba_e_nao_vaza_credencial(monkeypatch, caplog):
 
     assert "linhagem não registrada" in caplog.text
     assert marcador not in caplog.text
+
+
+def test_falha_com_corpo_da_resposta_aparece_no_aviso(monkeypatch, caplog):
+    class Resposta:
+        text = "IAM_PERMISSION_DENIED: a service account não tem roles/datalineage.producer"
+
+        def raise_for_status(self):
+            erro = RuntimeError("400 Bad Request")
+            erro.response = self
+            raise erro
+
+    class Sessao:
+        def post(self, *_a, **_k):
+            return Resposta()
+
+    monkeypatch.setenv("DRY_RUN", "false")
+    get_settings.cache_clear()
+
+    with caplog.at_level(logging.WARNING, logger="src.core.linhagem"):
+        linhagem.emitir(_execucao(), "bcb.cambio_ptax", sessao=Sessao())
+
+    assert "linhagem não registrada" in caplog.text
+    assert "IAM_PERMISSION_DENIED" in caplog.text
 
 
 class Registro(BaseModel):

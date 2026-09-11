@@ -169,6 +169,12 @@ def test_dataform_compila_a_main_na_regiao_do_ambiente() -> None:
     assert 'resource "google_bigquery_dataset" "qualidade"' in _ler("infra/modules/bigquery/main.tf")
 
 
+def test_scheduler_repassa_a_regiao_para_o_cloud_run_job() -> None:
+    """A regiao decide onde a linhagem e gravada e qual INFORMATION_SCHEMA e lido (ADR 013)."""
+    modulo = _ler("infra/modules/scheduler/main.tf")
+    assert _tem(r'name\s*=\s*"GCP_REGION"[^}]*value\s*=\s*var\.region', modulo)
+
+
 def test_deploy_edita_so_o_repositorio_dataform_nao_o_projeto() -> None:
     """Least privilege: o deploy so precisa compilar e executar o repositorio alupdata."""
     modulo = _ler("infra/modules/dataform/main.tf")

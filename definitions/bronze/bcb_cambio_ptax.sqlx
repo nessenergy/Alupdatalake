@@ -1,6 +1,13 @@
+config {
+  type: "operations",
+  schema: "bronze",
+  hasOutput: true,
+  tags: ["bronze"]
+}
+
 -- Bronze: cotação PTAX do dólar (BCB/Olinda).
 -- Append-only: reprocessar a mesma janela insere de novo; a Silver deduplica.
-CREATE TABLE IF NOT EXISTS `${projeto}.${bronze}.bcb_cambio_ptax` (
+CREATE TABLE IF NOT EXISTS ${self()} (
   data_referencia     DATE      NOT NULL OPTIONS(description="Data do boletim"),
   data_hora_cotacao   TIMESTAMP NOT NULL OPTIONS(description="Instante da cotação, conforme o BCB"),
   tipo_boletim        STRING    NOT NULL OPTIONS(description="Abertura, Intermediário, Fechamento"),

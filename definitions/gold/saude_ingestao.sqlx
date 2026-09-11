@@ -1,3 +1,9 @@
+config {
+  type: "view",
+  schema: "gold",
+  tags: ["gold"]
+}
+
 -- Gold: saúde da ingestão, uma linha por fonte.
 -- Responde "o dado está fresco, e dá para confiar nele?" — é a view que o
 -- painel de monitoramento consome. Não é relatório de negócio: a matéria-prima
@@ -7,7 +13,6 @@
 -- (mediana dos intervalos observados), não declarado. Declarar significaria
 -- repetir o cron do Terraform aqui, e as duas cópias divergiriam na primeira
 -- vez que alguém mudasse o agendamento sem lembrar desta view.
-CREATE OR REPLACE VIEW `${projeto}.${gold}.saude_ingestao` AS
 WITH execucoes AS (
   SELECT
     CONCAT(fonte, '_', entidade) AS conector,
@@ -18,7 +23,7 @@ WITH execucoes AS (
     encerrada_em,
     duracao_segundos,
     erro
-  FROM `${projeto}.${bronze}._execucoes`
+  FROM ${ref("bronze", "_execucoes")}
   WHERE encerrada_em IS NOT NULL
 ),
 intervalos AS (
@@ -80,4 +85,4 @@ SELECT
     ELSE 'OK'
   END AS situacao
 FROM agregado a
-LEFT JOIN cadencia c USING (conector);
+LEFT JOIN cadencia c USING (conector)

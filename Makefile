@@ -1,4 +1,4 @@
-.PHONY: install lint format test security audit all clean novo-conector deploy-views listar sync-skills campos-projeto dataform-compile
+.PHONY: install lint format test security audit all clean novo-conector listar sync-skills campos-projeto dataform-compile
 
 install:
 	uv sync --extra dev
@@ -37,9 +37,6 @@ campos-projeto: ## Cria os campos de acompanhamento semanal no GitHub Projects
 
 sync-skills:
 	uv run python -m scripts.sync_skills_google
-
-deploy-views:
-	uv run python -m scripts.deploy_views
 
 listar:
 	uv run alupdata listar

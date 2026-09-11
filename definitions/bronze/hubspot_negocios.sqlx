@@ -1,7 +1,14 @@
+config {
+  type: "operations",
+  schema: "bronze",
+  hasOutput: true,
+  tags: ["bronze"]
+}
+
 -- Bronze: negócios do CRM Hubspot.
 -- Append-only: cada execução insere a versão do negócio lida naquele momento;
 -- a Silver fica com a mais recente por `negocio_id`.
-CREATE TABLE IF NOT EXISTS `${projeto}.${bronze}.hubspot_negocios` (
+CREATE TABLE IF NOT EXISTS ${self()} (
   negocio_id          STRING    NOT NULL OPTIONS(description="Id do deal no Hubspot"),
   nome                STRING    NOT NULL OPTIONS(description="dealname"),
   estagio             STRING    NOT NULL OPTIONS(description="dealstage — estágio no funil"),

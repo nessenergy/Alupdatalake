@@ -1,3 +1,9 @@
+config {
+  type: "view",
+  schema: "gold",
+  tags: ["gold"]
+}
+
 -- Gold: custo de nuvem por dia, fonte e camada.
 -- Responde "quanto o lake custou, em quê, e o que mudou" — matéria-prima é o
 -- log de jobs do próprio BigQuery, não dado de negócio. Mesma natureza da
@@ -10,7 +16,6 @@
 --
 -- As tarifas são premissa declarada aqui, num lugar só: preço de lista dos EUA
 -- adotado para us-east1 em 2026-09-10, conferência na tabela oficial pendente.
-CREATE OR REPLACE VIEW `${projeto}.${gold}.custo_consultas` AS
 WITH tarifas AS (
   SELECT
     6.25 AS usd_por_tib_varrido,
@@ -27,7 +32,7 @@ jobs AS (
     IFNULL((SELECT value FROM UNNEST(j.labels) WHERE key = 'consulta'), j.statement_type) AS consulta,
     GREATEST(IFNULL(j.total_bytes_billed, 0), (SELECT minimo_bytes_faturados FROM tarifas)) AS bytes_faturados,
     IFNULL(j.total_bytes_processed, 0) AS bytes_varridos
-  FROM `${projeto}.region-${regiao}`.INFORMATION_SCHEMA.JOBS_BY_PROJECT AS j
+  FROM `${dataform.projectConfig.defaultDatabase}.region-${dataform.projectConfig.vars.regiao}`.INFORMATION_SCHEMA.JOBS_BY_PROJECT AS j
   WHERE j.job_type = 'QUERY'
     AND j.state = 'DONE'
     AND j.error_result IS NULL
@@ -55,8 +60,8 @@ armazenamento AS (
     s.table_name AS fonte,
     SUM(s.active_logical_bytes) / POW(1024, 3)
       * (SELECT usd_por_gib_mes_ativo FROM tarifas) / 30 AS custo_armazenamento_dia_usd
-  FROM `${projeto}.region-${regiao}`.INFORMATION_SCHEMA.TABLE_STORAGE AS s
-  WHERE s.table_schema = '${bronze}' AND NOT STARTS_WITH(s.table_name, '_')
+  FROM `${dataform.projectConfig.defaultDatabase}.region-${dataform.projectConfig.vars.regiao}`.INFORMATION_SCHEMA.TABLE_STORAGE AS s
+  WHERE s.table_schema = 'bronze' AND NOT STARTS_WITH(s.table_name, '_')
   GROUP BY fonte
 ),
 -- Quanto cada fonte carregou no dia: é o denominador que separa "fonte cara"
@@ -66,7 +71,7 @@ carga AS (
     DATE(encerrada_em) AS dia,
     CONCAT(fonte, '_', entidade) AS fonte,
     SUM(IFNULL(linhas_carregadas, 0)) AS linhas_carregadas
-  FROM `${projeto}.${bronze}._execucoes`
+  FROM ${ref("bronze", "_execucoes")}
   WHERE status = 'SUCESSO' AND encerrada_em IS NOT NULL
   GROUP BY dia, fonte
 )

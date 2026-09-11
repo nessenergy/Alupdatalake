@@ -22,6 +22,12 @@ PROJETO = "alupdata-test"
 REGIAO = "us-east1"
 ARQUIVOS = [c for camada in CAMADAS for c in sorted((DEFINICOES / camada).glob("*.sqlx"))]
 
+# ADR 012 (revisada em 11/09): a Gold de negócio é tabela, recarregada inteira a
+# cada execução. A operacional segue view porque alimenta painel do Portal que
+# precisa de dado atual — materializada uma vez por dia, mostraria a falha de
+# hoje só amanhã. Gold nova é de negócio até entrar nesta lista.
+GOLD_OPERACIONAL = {"saude_ingestao", "volumetria_lake", "custo_consultas"}
+
 _CONFIG = re.compile(r"^config \{.*?^\}\n", re.DOTALL | re.MULTILINE)
 _REF = re.compile(r'\$\{ref\("([a-z_]+)", "([a-z_]+)"\)\}')
 
@@ -77,6 +83,8 @@ def test_cada_camada_tem_o_tipo_e_o_dataset_certos(arquivo):
     assert f'schema: "{camada}"' in bloco
     if camada == "bronze":
         assert 'type: "operations"' in bloco and "hasOutput: true" in bloco
+    elif camada == "gold" and arquivo.stem not in GOLD_OPERACIONAL:
+        assert 'type: "table"' in bloco, "Gold de negócio é tabela, não view nem incremental (ADR 012)"
     else:
         assert 'type: "view"' in bloco
 

@@ -335,9 +335,14 @@ exigiria migrar dados, e não apenas ajustar configuração.</p>
 <td>ADR 011</td>
 </tr>
 <tr>
+<td>Fundação do ambiente</td>
+<td><strong>Dois ambientes, <code>dev</code> e <code>prod</code></strong>, sem projeto de homologação; a ness. constrói tudo o que fica dentro dos projetos, e a Alup cria os projetos e os vincula ao faturamento (E1 e E2); criptografia com chave gerenciada pelo Google, sem CMEK</td>
+<td>ADR 015</td>
+</tr>
+<tr>
 <td>Transformação Silver e Gold</td>
-<td><strong>Dataform</strong>, com testes de dado e linhagem nativos</td>
-<td>ADR 012</td>
+<td><strong>Dataform</strong>, com testes de dado e linhagem nativos; Gold de negócio materializada como tabela, Gold operacional em view</td>
+<td>ADR 012, revista em 11/09</td>
 </tr>
 <tr>
 <td>Ingestão dos sistemas internos</td>
@@ -364,11 +369,14 @@ exigiria migrar dados, e não apenas ajustar configuração.</p>
 <p>Duas consequências merecem atenção da Alup:</p>
 <ul>
 <li><strong>Transferência internacional de dado pessoal.</strong> Com o ambiente nos EUA, o
-  dado pessoal previsto (contatos do Hubspot e, possivelmente, do Portal Alup)
-  passa a ser tratado fora do país. A transferência fica documentada em DPA,
-  registro das operações de tratamento e relatório de impacto. Os dois últimos
-  são documentos da controladora: a ness. entregará a minuta técnica, para que
-  o jurídico da Alup assuma e assine. Isso não bloqueia o primeiro <code>apply</code>.</li>
+  dado pessoal previsto (o nome livre dos negócios do Hubspot — os contatos não
+  são lidos —, o e-mail de quem usa a plataforma e, possivelmente, dado do
+  Portal Alup) passa a ser tratado fora do país. A transferência fica
+  documentada em DPA, registro das operações de tratamento e relatório de
+  impacto. Os dois últimos são documentos da controladora, a ACE
+  Comercializadora Ltda., que tem como encarregada Rosimeire Miler dos Santos:
+  a ness. entregou as minutas técnicas, em <code>docs/lgpd/</code>, para que o jurídico da
+  Alup assuma e assine. Isso não bloqueia o primeiro <code>apply</code>.</li>
 <li><strong>A pergunta E7 do Questionário de Gaps</strong>, sobre a região, fica respondida
   por esta decisão.</li>
 </ul>
@@ -377,8 +385,10 @@ exigiria migrar dados, e não apenas ajustar configuração.</p>
 passa a ser:</p>
 <pre><code>A3 (ambiente GCP) → 1º apply → Onda 0 homologada
 </code></pre>
-<p>As decisões acima alteram o que precisa ser provisionado. A lista completa,
-atualizada, é esta:</p>
+<p>As decisões acima alteram o que precisa ser provisionado e por quem: pela
+ADR 015, a Alup cria o projeto e o vincula ao faturamento, e a ness. constrói
+tudo o que fica dentro dele — APIs, IAM, Dataform, linhagem, IAP do Portal e
+log de auditoria de acesso a dados. A lista completa, atualizada, é esta:</p>
 <table>
 <thead>
 <tr>
@@ -390,7 +400,7 @@ atualizada, é esta:</p>
 <tbody>
 <tr>
 <td>1</td>
-<td>Projeto GCP <code>dev</code> criado na organização da Alupar e vinculado à conta de faturamento da Alup (E1 e E2, esclarecidos em 09/09)</td>
+<td>Projeto GCP <code>dev</code> criado na organização da Alupar e vinculado à conta de faturamento da Alup (E1 e E2, esclarecidos em 09/09), com acesso da ness. ao projeto para construir a fundação</td>
 <td>TI Alup</td>
 </tr>
 <tr>
@@ -400,18 +410,18 @@ atualizada, é esta:</p>
 </tr>
 <tr>
 <td>3</td>
-<td>APIs habilitadas: BigQuery, Cloud Storage, Secret Manager, Cloud Run, Cloud Scheduler, Artifact Registry <strong>e, agora, Dataform, Data Lineage e Dataplex</strong></td>
-<td>TI Alup</td>
+<td>APIs habilitadas: BigQuery, Cloud Storage, Secret Manager, Cloud Run, Cloud Scheduler, Artifact Registry <strong>e, agora, Dataform, Data Lineage, Dataplex e Identity-Aware Proxy</strong></td>
+<td>ness.</td>
 </tr>
 <tr>
 <td>4</td>
 <td>Bucket de state do Terraform e repositório do Artifact Registry <strong>em <code>us-east1</code></strong></td>
-<td>TI Alup</td>
+<td>ness.</td>
 </tr>
 <tr>
 <td>5</td>
 <td>Workload Identity Federation e service account de deploy, como já descrito na <a href="https://github.com/nessenergy/Alupdatalake/issues/55">issue #55</a></td>
-<td>TI Alup</td>
+<td>ness.</td>
 </tr>
 <tr>
 <td>6</td>
@@ -421,6 +431,11 @@ atualizada, é esta:</p>
 <tr>
 <td>7</td>
 <td>Destinatários dos alertas (preferencialmente um grupo) e teto do orçamento — sugestão de R$ 500/mês em <code>dev</code>, conforme o <a href="2026-09-09-esclarecimento-e1-e2.md">registro de 09/09</a></td>
+<td>Alup</td>
+</tr>
+<tr>
+<td>8</td>
+<td>Grupos Google da Alup que leem a Gold (consumidores) e as três camadas (operação), e quem acessa o Portal pelo IAP — não bloqueiam o primeiro <code>apply</code>: vazios, ninguém recebe acesso a dado (R01 do RIPD)</td>
 <td>Alup</td>
 </tr>
 </tbody>
@@ -498,7 +513,7 @@ atraso será <strong>14/09</strong>.</p>
 <tr>
 <td>A6</td>
 <td>Ferramenta de BI definida</td>
-<td>Portal MVP e views Gold sem consumidor definido</td>
+<td>Portal MVP e camada Gold sem consumidor definido</td>
 <td><a href="https://github.com/nessenergy/Alupdatalake/issues/10">#10</a></td>
 </tr>
 <tr>
@@ -527,7 +542,7 @@ ainda custa código, e não migração.</p>
 <tbody>
 <tr>
 <td><a href="https://github.com/nessenergy/Alupdatalake/pull/106">#106</a></td>
-<td>ADRs 011 a 014 e adendo à ADR 007</td>
+<td>ADRs 011 a 015, adendo à ADR 007 e minutas de LGPD em <code>docs/lgpd/</code>: RIPD, RoPA, política de retenção e registro do DPA</td>
 </tr>
 <tr>
 <td><a href="https://github.com/nessenergy/Alupdatalake/pull/107">#107</a></td>
@@ -541,11 +556,26 @@ ainda custa código, e não migração.</p>
 <td><a href="https://github.com/nessenergy/Alupdatalake/pull/109">#109</a></td>
 <td>Linhagem da origem até o Bronze registrada no Knowledge Catalog</td>
 </tr>
+<tr>
+<td><a href="https://github.com/nessenergy/Alupdatalake/pull/116">#116</a></td>
+<td>Conector do Hubspot deixa de ler o dono do negócio (<code>proprietario_id</code>), dado pessoal que nenhuma tabela Gold usava</td>
+</tr>
+<tr>
+<td><a href="https://github.com/nessenergy/Alupdatalake/pull/117">#117</a></td>
+<td>Gold de negócio materializada como tabela; a Gold operacional, que alimenta os painéis de saúde e de custo, segue em view</td>
+</tr>
+<tr>
+<td><a href="https://github.com/nessenergy/Alupdatalake/pull/118">#118</a></td>
+<td>Medidas R01 e R07 do RIPD em <code>infra/</code>: acesso de pessoas por grupo, Portal atrás do IAP com conta de serviço própria e log de auditoria de acesso a dados do BigQuery e do Cloud Storage</td>
+</tr>
+<tr>
+<td><a href="https://github.com/nessenergy/Alupdatalake/pull/119">#119</a></td>
+<td>RIPD 0.4, com as medidas de R01, R04 e R07 registradas como implementadas</td>
+</tr>
 </tbody>
 </table>
-<p>Os PRs estão encadeados, cada um sobre o anterior, e aguardam revisão e
-integração nessa ordem. Cada um passou por revisão técnica e pelas
-verificações automatizadas executadas localmente.</p>
+<p>Os PRs foram integrados à <code>main</code> em 11/09. Cada um passou por revisão técnica
+e pelas verificações automatizadas executadas localmente.</p>
 <p><strong>Ressalva, mantida do registro de 08/09:</strong> nenhuma entrega foi validada contra
 ambiente GCP real, que ainda não existe, e nenhuma foi conferida pela Alup.
 Entrega técnica não constitui homologação.</p>

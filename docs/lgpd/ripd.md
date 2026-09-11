@@ -1,6 +1,6 @@
 # RIPD — Relatório de Impacto à Proteção de Dados Pessoais da plataforma AlupData
 
-**Versão** 0.5 · **Data** 2026-09-11 · **Situação**: minuta técnica, para
+**Versão** 0.6 · **Data** 2026-09-11 · **Situação**: minuta técnica, para
 revisão e aprovação da controladora
 
 Minuta elaborada pela ness. no âmbito do contrato CPS-01025/2026, conforme a
@@ -63,9 +63,8 @@ consumo por cliente da CCEE. Mesmo assim o RIPD se justifica:
 3. **Tecnologia com IA generativa.** O Knowledge Catalog tem recursos com o
    modelo Gemini ativados (ADR 014), e o assistente do Dataform pode rascunhar
    descrições (ADR 012) — ele lê amostra real das tabelas.
-4. **Dado ainda desconhecido.** As fontes da Onda 3 não têm schema, e o escopo
-   de contatos e empresas do Hubspot está em confirmação; o relatório fixa os
-   critérios antes de o dado chegar.
+4. **Dado ainda desconhecido.** As fontes da Onda 3 não têm schema; o relatório
+   fixa os critérios antes de o dado chegar.
 
 ## d) Projeto que justifica o relatório
 
@@ -126,8 +125,8 @@ variáveis calculadas pela Comercialização, e o balanço energético da empres
 | Hubspot — negócios (A9) | `nome` do negócio — texto livre | Sim | Pode conter nome de pessoa física | **Lido hoje** (`dealname`) |
 | Hubspot — negócios (A9) | `valor` do negócio — valor de contrato | Sim | Quando o negócio identifica uma pessoa física | **Lido hoje** (`amount`) |
 | Hubspot — negócios (A9) | `proprietario_id` — usuário do Hubspot dono do negócio | — | Sim | **Retirado do conector** por decisão de 11/09 (item g) — PR #116 |
-| Hubspot — empresas | CNPJ e endereço | Sim | Em regra, não: identificam pessoa jurídica. Exceção: empresário individual, em que CNPJ e endereço remetem a uma pessoa física | **Não lido.** Escopo em confirmação com a Alup |
-| Hubspot — contatos | CPF, endereço e demais dados do contato | Sim | Sim | **Não lido.** Escopo em confirmação com a Alup; se entrar, o CPF passa a ser tratado |
+| Hubspot — empresas | CNPJ e endereço | Sim | Em regra, não: identificam pessoa jurídica. Exceção: empresário individual, em que CNPJ e endereço remetem a uma pessoa física | **Fora do escopo**, por decisão da Alup em 11/09 |
+| Hubspot — contatos | CPF, endereço e demais dados do contato | Sim | Sim | **Fora do escopo**, por decisão da Alup em 11/09: o CPF não é tratado |
 | CCEE | Consumo realizado por cliente | Sim | Quando o cliente é pessoa física | **Sem conector.** A fonte exata — CCEE com credencial de agente (plano, item 2.1) ou InfoMercado (item 1.1) — está a definir |
 | Planilhas e dados internos (Ondas 3 e 4) | Premissas de GSF, preço e outras variáveis da Comercialização; balanço energético | Sim | A resposta à pergunta F1 não aponta dado pessoal | **Sem conector nem schema** (A4) |
 | Usuários da plataforma | E-mail corporativo de quem acessa o Portal, recebido do IAP e exibido na tela | — | Sim | Confirmado no código (`src/portal/app.py`) |
@@ -140,9 +139,10 @@ variáveis calculadas pela Comercialização, e o balanço energético da empres
 propriedades — sem contatos, sem empresas e, desde a decisão de 11/09, sem o
 dono do negócio. CPF e endereço ficam nos objetos de contato e de empresa: a
 resposta à pergunta F1 descreve o que o Hubspot da Alup contém, não o que a
-plataforma lê hoje. **O escopo de contatos e empresas do Hubspot está em
-confirmação com a Alup.** Se entrar, este relatório e o RoPA são revistos antes
-do conector, pela medida de R06.
+plataforma lê hoje. **Contatos e empresas do Hubspot ficam fora do escopo**,
+por decisão da Alup em 11/09: o que não é lido não faz parte do escopo. CPF e
+endereço, portanto, não são tratados. Ampliar esse escopo seria escopo novo, e
+este relatório e o RoPA seriam revistos antes do conector, pela medida de R06.
 
 ### iii. Dados sensíveis
 
@@ -244,7 +244,7 @@ Análise proposta pela ness. **[ALUP]** Validação do jurídico e da encarregad
 |---|---|---|---|
 | F1 | `proprietario_id` | Colaborador dono do negócio | Não se aplica: retirado do conector em 11/09 |
 | F1 | `nome` e `valor` do negócio | Pessoa física citada ou parte do negócio | Execução de contrato ou procedimentos preliminares (art. 7º, V), quando ela é parte do negócio; nos demais casos, legítimo interesse |
-| F1 | CPF e endereço de contato do Hubspot | Contato pessoa física | **Só se o escopo for ampliado.** Execução de contrato ou procedimentos preliminares (art. 7º, V); refazer esta análise antes do conector |
+| F1 | CPF e endereço de contato do Hubspot | Contato pessoa física | **Não se aplica:** contatos e empresas ficam fora do escopo (decisão de 11/09). Refazer esta análise se algum dia entrarem |
 | F2 | E-mail e registros de acesso e consulta | Usuário da plataforma | Legítimo interesse (art. 7º, IX) |
 | F3 | Metadados e logs de consulta | Usuário da plataforma, indiretamente | Legítimo interesse (art. 7º, IX) |
 | F4 | Consumo realizado por cliente | Cliente pessoa física | Execução de contrato (art. 7º, V): o consumo medido é o que se liquida no contrato de energia. **[ALUP]** confirmar, com o conector |
@@ -300,7 +300,7 @@ aviso interno de privacidade, sobre o uso de dados de F2 e F3.
 | Princípio | Como a plataforma atende | Lacuna |
 |---|---|---|
 | Finalidade e adequação | Finalidades F1 a F4 declaradas no RoPA | Onda 3 a definir |
-| Necessidade | O Hubspot lê só 7 propriedades de negócios, sem contatos, empresas nem dono do negócio; a Gold não expõe o nome; dado sem prazo maior pedido pela Alup sai ao fim do mínimo de 5 anos | Escopo de contatos e empresas do Hubspot em confirmação |
+| Necessidade | O Hubspot lê só 7 propriedades de negócios, sem contatos, empresas nem dono do negócio; a Gold não expõe o nome; dado sem prazo maior pedido pela Alup sai ao fim do mínimo de 5 anos | — |
 | Livre acesso | Canal da encarregada, privacidade@alupar.com.br; eliminação a pedido na política de retenção | — |
 | Qualidade | Validação na carga, deduplicação na Silver, *assertions* do Dataform | — |
 | Transparência | Dicionário de dados, linhagem por fonte, este relatório e o RoPA | Aviso interno aos colaboradores (item g) |
@@ -317,7 +317,7 @@ aviso interno de privacidade, sobre o uso de dados de F2 e F3.
 | R03 | Transferência internacional sem mecanismo adequado |
 | R04 | Dado pessoal em texto livre (nome do negócio) propagado da Bronze para a Silver e para o catálogo |
 | R05 | Dado pessoal exposto a recursos de IA: o assistente do Dataform lê amostra real, e o Knowledge Catalog processa logs de consulta com e-mails |
-| R06 | Dado pessoal ou sensível não previsto chegando por fonte ainda sem schema — Onda 3, consumo por cliente da CCEE — ou pela ampliação do escopo do Hubspot a contatos e empresas |
+| R06 | Dado pessoal ou sensível não previsto chegando por fonte ainda sem schema — Onda 3, consumo por cliente da CCEE — ou por ampliação futura de escopo |
 | R07 | Rastreabilidade insuficiente de quem leu ou gravou dado pessoal |
 | R08 | Acesso da ness. a dado real além do período de desenvolvimento e homologação |
 | R09 | Vazamento de credencial de fonte, dando acesso ao dado na origem |
@@ -353,7 +353,7 @@ no código (regra 5).
 | R01 | Contas de serviço com privilégio mínimo, verificado em teste (`tests/unit/test_infra.py`); Portal atrás do IAP, restrito ao domínio da Alup, que recusa requisição sem identidade | E |
 | R01 | Acesso de pessoas por grupo, declarado em `infra/`: consumidores leem a Gold; Bronze e Silver só para quem opera. Nenhum acesso é concedido enquanto a Alup não indicar os grupos — PR #118 | E |
 | R01 | IAP e serviço do Portal no Terraform, com conta de serviço própria — PR #118 | E |
-| R01 | **Controle de acesso por tipo de usuário** (pergunta F2): um grupo por tipo de usuário; *policy tags* do BigQuery nas colunas confidenciais e com dado pessoal — nome e valor do negócio, consumo por cliente e, se o escopo do Hubspot for ampliado, CPF e endereço —, com leitura só para os tipos autorizados; políticas de acesso por linha onde o tipo de usuário exigir. Taxonomia, grupos e marcação das colunas declarados no repositório. **[ALUP]** tipos de usuário e o que cada um vê | R |
+| R01 | **Controle de acesso por tipo de usuário** (pergunta F2): um grupo por tipo de usuário; *policy tags* do BigQuery nas colunas confidenciais e com dado pessoal — nome e valor do negócio e consumo por cliente —, com leitura só para os tipos autorizados; políticas de acesso por linha onde o tipo de usuário exigir. Taxonomia, grupos e marcação das colunas declarados no repositório. **[ALUP]** tipos de usuário e o que cada um vê | R |
 | R01 | Sem mascaramento nem pseudonimização (pergunta F2). Consequência operacional: quem não tem leitura na coluna protegida recebe erro ao consultar `SELECT *` e precisa excluir a coluna da consulta | R |
 | R01 | Datasets e bucket raw rotulados como de classificação interna (pergunta F4), em `infra/` | R |
 | R02 | Prazos da [política de retenção](politica-de-retencao.md) 0.2, pelos critérios das perguntas F3 e G5, declarados no repositório: ciclo de vida do bucket raw, expiração de partição na Bronze e na Gold de consumo, Gold mensal incremental protegida para os públicos pesados | R |
@@ -376,7 +376,7 @@ no código (regra 5).
 
 | Papel | Nome | Data | Parecer |
 |---|---|---|---|
-| Elaboração da minuta técnica | ness. | 11/09/2026 | Versão 0.5 |
+| Elaboração da minuta técnica | ness. | 11/09/2026 | Versão 0.6 |
 | Encarregada | Rosimeire Miler dos Santos | | |
 | Controladora | ACE Comercializadora Ltda. (Alup) | | |
 
@@ -388,20 +388,17 @@ no código (regra 5).
 2. Aprovação formal da política de retenção 0.2, que já incorpora os critérios
    de 11/09 — incluindo a escolha do prazo do raw com dado pessoal (item f.x,
    R02).
-3. Confirmação do escopo de contatos e empresas do Hubspot (item f.ii, R06).
-4. Tipos de usuário e o que cada um acessa, para implementar o controle de
+3. Tipos de usuário e o que cada um acessa, para implementar o controle de
    acesso por tipo de usuário (pergunta F2; item k, R01).
-5. Fonte do consumo por cliente na CCEE e confirmação da hipótese legal de F4
+4. Fonte do consumo por cliente na CCEE e confirmação da hipótese legal de F4
    (itens f.ii e g).
-6. Dado pessoal do Portal Alup e das demais fontes da Onda 3 — pergunta C6
+5. Dado pessoal do Portal Alup e das demais fontes da Onda 3 — pergunta C6
    (itens f.ii, R06).
-7. Aviso interno de privacidade aos colaboradores (item g).
-8. Validação da avaliação de risco (item j).
-9. Entidade Google contratante e destinatário das notificações de
+6. Aviso interno de privacidade aos colaboradores (item g).
+7. Validação da avaliação de risco (item j).
+8. Entidade Google contratante e destinatário das notificações de
    subprocessador ([registro do DPA](dpa.md)).
-10. Terceiro projeto, `hml` (pergunta E4): revisão da ADR 015 e declaração em
-    `infra/` (item e).
-11. Envio semanal do relatório de SAST/SCA do CI (pergunta F5; item k, R09).
+9. Envio semanal do relatório de SAST/SCA do CI (pergunta F5; item k, R09).
 
 ## Histórico
 
@@ -412,3 +409,4 @@ no código (regra 5).
 | 0.3 | 11/09/2026 | Dados cadastrais da controladora (Receita Federal) e canal da encarregada; `proprietario_id` retirado do conector por decisão da Alup |
 | 0.4 | 11/09/2026 | Medidas de R01, R04 e R07 passam a existentes, com a entrada dos PRs #116 e #118 na `main`; região e Portal descritos como estão no Terraform |
 | 0.5 | 11/09/2026 | Respostas da Alup de 11/09 às perguntas F1 a F5, G5 e E4: dados confidenciais do Hubspot, da CCEE e internos, separando o que o conector lê hoje do que depende da confirmação de escopo; distinção entre sensível no sentido legal e confidencial; finalidade F4 (consumo por cliente); controle de acesso por tipo de usuário e *policy tags* passam a requisito; classificação interna; três ambientes; retenção pela política 0.2; envio do relatório de SAST/SCA como pendência |
+| 0.6 | 11/09/2026 | Contatos e empresas do Hubspot ficam fora do escopo, por decisão da Alup: CPF e endereço não são tratados, e a pendência de escopo é encerrada |

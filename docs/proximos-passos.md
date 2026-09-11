@@ -64,12 +64,14 @@ fica sem previsão.
 | 3.2 | **Idioma do baralho** | português (atual) ou inglês | Só importa se a plateia do Google não for do Brasil |
 | 3.3 | **Redação da exclusão de escopo no baralho de kickoff** | manter ou trocar por "modelos preditivos avançados" | Exclusão legítima da Fase 3; é preferência, não correção |
 | 3.4 | **Paralelos restantes** | dicionário de dados das fontes que faltam · endurecer o Portal MVP · outra coisa | São as duas frentes úteis que sobraram sem GCP |
-| 3.5 | **Branch protection** | GitHub Team pago por usuário, ou assumir o risco por escrito | Hoje a `main` aceita push direto, o que contraria o SSDLC da cláusula 8ª |
+| 3.5 | **Branch protection** | ~~GitHub Team pago por usuário, ou assumir o risco por escrito~~ — **resolvido em 11/09** | A organização passou ao GitHub Enterprise; a `main` exige PR e seis verificações, com force push e exclusão bloqueados (ADR 010, encerrada) |
 | 3.6 | **Teto de US$ 400/mês a partir de meados de novembro** (E2) | pedir revisão do teto à Alup, ou redimensionar a orquestração gerenciada da Onda 3 | O teto fica abaixo da estimativa de US$ 420–500/mês apresentada no registro de 09/09 |
 
-Decisões já tomadas hoje: **região** `southamerica-east1` ([ADR 009](arquitetura/decisoes/009-regiao-do-ambiente.md)),
-substituída em 10/09 por **região** `us-east1` ([ADR 011](arquitetura/decisoes/011-regiao-us-east1.md)), e **tom cordial**
-nos relatórios (convenção no [README](relatorios/README.md) do diretório).
+Decisões já tomadas: **região** `us-east1` ([ADR 011](arquitetura/decisoes/011-regiao-us-east1.md), que
+substituiu a 009) e **tom cordial** nos relatórios (convenção no [README](relatorios/README.md) do
+diretório). Em 11/09, com as respostas da Alup: **três ambientes** e **bootstrap pela ness.**
+([ADR 015](arquitetura/decisoes/015-fundacao-do-ambiente.md)), **Gold sem KPI nesta fase**
+([ADR 012](arquitetura/decisoes/012-dataform.md)) e **contatos e empresas do Hubspot fora do escopo**.
 
 ---
 

@@ -181,7 +181,7 @@ Ordenado por data em que o atraso passa a custar. Prazos derivados do
 | A5 | Matriz RACI e data owners | Alup | 11/09 | dúvida de regra de negócio sem destinatário |
 | A6 | Ferramenta de BI definida | Alup | 11/09 | Portal MVP e views Gold sem consumidor definido |
 | [#87](https://github.com/nessenergy/Alupdatalake/issues/87) | Destinatários de alerta e `billing_account` | Alup | 11/09 | alertas e orçamento existem mas não notificam ninguém |
-| — | Branch protection na `main` + variáveis do GitHub | ness./Alup | 04/09 | deploy não autentica; `main` aceita push direto |
+| — | Variáveis do GitHub (`GCP_WIF_PROVIDER`, `GCP_DEPLOY_SA`) | ness. | depende de A3 | deploy não autentica. **Branch protection resolvida em 11/09**: a organização passou ao GitHub Enterprise e a `main` exige PR e seis verificações, com force push e exclusão bloqueados (ADR 010, encerrada) |
 | A2 | Decisão sobre a CCEE | Alup | 18/09 | 32h da Onda 1 seguem paradas |
 | G1 | **Resposta do Google à revisão arquitetural** (enviada em 04/09) | Google | **a definir** | **Precede A3 por decisão da Alup**, e portanto precede todo o cronograma técnico. Sem data pactuada, a postergação passa a depender de terceiro sem prazo acordado — ver `plano-semanal.md`, S1 |
 | A7 | Pedidos de token (Onda 2) e VPN/credencial (Onda 3) **abertos** | Alup | 25/09 | maior risco financeiro: ociosidade de 4h/dia (R$ 256/h) |

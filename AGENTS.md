@@ -7,7 +7,9 @@ continuam sendo o caminho.
 
 ## O projeto em cinco linhas
 
-DataLake do Grupo Alupar (6 coligadas geradoras), arquitetura Medallion
+DataLake do Grupo Alupar — as 6 coligadas contratantes, mas o dado abrange
+todos os ativos do grupo e os clientes varejistas (resposta D2, de 11/09) —,
+arquitetura Medallion
 (Bronze → Silver → Gold) em BigQuery/GCP. Fase 1 do contrato CPS-01025/2026:
 580h em 5 ondas, 19 semanas, 13 conectores de fonte de dados. Executado pela
 **ness.** para a Alup. Regime de horas — prioridade pode mudar; o padrão de
@@ -149,7 +151,7 @@ dizem como *este contrato* usa o produto.
 | 007 | Painel de custo `/custo`: observabilidade de custo é sustentação, não faturada (PR #56) |
 | 008 | Acesso a bancos relacionais: drivers puro-Python, DSN única no Secret Manager |
 | 009 | Região `southamerica-east1` — **substituída pela 011** |
-| 010 | Aceite formal do risco de `main` sem proteção obrigatória (GitHub Free) |
+| 010 | Aceite do risco de `main` sem proteção — **encerrado em 11/09**: com o GitHub Enterprise, a `main` exige PR e seis verificações |
 | 011 | Região do ambiente: `us-east1`, irreversível depois do primeiro apply; transferência internacional documentada (DPA, RoPA, RIPD) |
 | 012 | Dataform para o SQL das três camadas, projeto na raiz; substitui o SQL solto e o script de deploy antigo |
 | 013 | Ingestão em lote pelos conectores Python, sem CDC nem Dataflow; linhagem OpenLineage no executor |

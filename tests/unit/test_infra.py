@@ -98,3 +98,18 @@ def test_dataset_do_billing_export_existe_sem_acesso_da_ingestao() -> None:
         texto = caminho.read_text(encoding="utf-8")
         for iam in re.finditer(r'resource "google_bigquery_dataset_iam_\w+" "\w+" \{.*?\n\}', texto, re.DOTALL):
             assert "faturamento" not in iam.group(0), caminho
+
+
+def test_projeto_dataform_na_raiz_com_versao_e_regiao_fixas() -> None:
+    """ADR 012: o Dataform lê o projeto só a partir da raiz do repositório Git."""
+    settings = _ler("workflow_settings.yaml")
+    assert _tem(r"dataformCoreVersion:\s*3\.0\.69", settings)
+    assert _tem(r"defaultLocation:\s*us-east1", settings)
+    assert _tem(r"regiao:\s*us-east1", settings)
+    assert _tem(r"defaultAssertionDataset:\s*qualidade", settings)
+
+
+def test_ci_e_makefile_compilam_o_dataform_na_mesma_versao() -> None:
+    assert "dataform-compile:" in _ler(".github/workflows/ci.yml")
+    assert "@dataform/cli@3.0.69 compile" in _ler(".github/workflows/ci.yml")
+    assert "@dataform/cli@3.0.69 compile" in _ler("Makefile")

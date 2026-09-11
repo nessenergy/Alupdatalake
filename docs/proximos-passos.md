@@ -1,7 +1,7 @@
 # Próximos passos — fila de execução
 
 Documento **vivo**: é para riscar linha, não para arquivar. Atualizado em
-**2026-09-09**.
+**2026-09-11**.
 
 Ele existe para responder uma pergunta que os outros três não respondem em uma
 tela: **qual é a próxima ação, de quem é, e qual comando a executa.**
@@ -43,8 +43,8 @@ A cadeia hoje é **em série**, e a ponta dela é a única sem prazo:
 | 2.2 | **Enviar o relatório de 04/09 à Alup** | `.md` e `.html` prontos em [`relatorios/`](relatorios/) | Registro na mão da contratante |
 | 2.3 | ~~Decidir a região com a Alup~~ | resposta à pergunta E7 do questionário | **Decidido em 10/09**: `us-east1` ([ADR 011](arquitetura/decisoes/011-regiao-us-east1.md)) |
 | 2.4 | **Enviar à Alup o registro de 09/09 sobre E1 e E2** | `.md` e `.html` prontos em [`relatorios/`](relatorios/) | Registro na mão da contratante |
-| 2.5 | **Obter a data e o nome do responsável por A3** | a atribuição já está esclarecida; falta a data — [issue #55](https://github.com/nessenergy/Alupdatalake/issues/55) | E1 respondido com data e nome |
-| 2.6 | **Obter a `billing_account` e o teto do alerta** | sugestão de R$ 500/mês em `dev` — [issue #87](https://github.com/nessenergy/Alupdatalake/issues/87) | E2 e E3 respondidos |
+| 2.5 | **Obter a data e o nome do responsável por A3** | em 11/09 a Alup deu previsão de 18/09, com o faturamento em acerto com a QI Network; o nome não veio — [issue #55](https://github.com/nessenergy/Alupdatalake/issues/55) | E1 respondido com data e nome |
+| 2.6 | **Obter a `billing_account`** | teto e destinatário respondidos em 11/09: US$ 20/mês até novembro e até US$ 400/mês a partir de meados de novembro (E2); alertas para `alup.alertas@alupar.com.br` (E3). Falta a conta — [issue #87](https://github.com/nessenergy/Alupdatalake/issues/87) | conta vinculada, prevista para 18/09 |
 
 ### Por que 2.1 tem pressa
 
@@ -65,6 +65,7 @@ fica sem previsão.
 | 3.3 | **Redação da exclusão de escopo no baralho de kickoff** | manter ou trocar por "modelos preditivos avançados" | Exclusão legítima da Fase 3; é preferência, não correção |
 | 3.4 | **Paralelos restantes** | dicionário de dados das fontes que faltam · endurecer o Portal MVP · outra coisa | São as duas frentes úteis que sobraram sem GCP |
 | 3.5 | **Branch protection** | GitHub Team pago por usuário, ou assumir o risco por escrito | Hoje a `main` aceita push direto, o que contraria o SSDLC da cláusula 8ª |
+| 3.6 | **Teto de US$ 400/mês a partir de meados de novembro** (E2) | pedir revisão do teto à Alup, ou redimensionar a orquestração gerenciada da Onda 3 | O teto fica abaixo da estimativa de US$ 420–500/mês apresentada no registro de 09/09 |
 
 Decisões já tomadas hoje: **região** `southamerica-east1` ([ADR 009](arquitetura/decisoes/009-regiao-do-ambiente.md)),
 substituída em 10/09 por **região** `us-east1` ([ADR 011](arquitetura/decisoes/011-regiao-us-east1.md)), e **tom cordial**
@@ -126,9 +127,9 @@ Fonte: [`status.md` §6](status.md). Repetido aqui como calendário; a tabela l�
 |---|---|---|
 | **sem data** | **G1 · resposta do Google** | precede A3 por decisão da Alup — é o gargalo atual |
 | **04/09 — vencido** | A3 · projeto GCP | atraso registrado; S2 e S3 escorregam |
-| 11/09 | A9 token Hubspot · A4 Questionário (com eles desde 31/08) · A5 RACI · A6 ferramenta de BI · destinatários de alerta e `billing_account` | Gold sem alvo, Portal sem consumidor, alertas sem quem notificar |
-| 18/09 | A2 · decisão sobre a CCEE — a via (c) já não tem custo técnico desconhecido (driver SQL Server pronto) | 32h da Onda 1 paradas |
-| 25/09 | A7 tokens e VPN · A8 documentação BBCE/TempoOK | **ociosidade de 4h/dia** — maior risco financeiro do contrato |
+| 11/09 — respondido | A4 Questionário, com A5 (data owners, B1), A6 (Power BI hoje; Looker Studio ou fronts internos na Fase 2, G1) e destinatário de alerta (E3). Segue aberto: A9 token Hubspot, com chamado a partir de 14/09 (C1) | Gold da Fase 1 sem KPI ([ADR 012](arquitetura/decisoes/012-dataform.md#gold-na-fase-1)); o conector Hubspot segue parado |
+| 18/09 | `billing_account` (E1, E2, em acerto com a QI Network) · exemplos de planilha (G3). A2 (CCEE) respondido em 11/09: o InfoMercado é público e o 403 se resolve ajustando a requisição, com orientação da Alup | sem conta, sem `apply`; as 32h da Onda 1 esperam a orientação |
+| 25/09 | A7 chamados de token e acesso, abertos a partir de 14/09 (C1); o MySQL RDS dispensa VPN (C8) · C7 RM/TOTVS · A8: BBCE documentada no Postman, TempoOK sem documentação (C3) | **ociosidade de 4h/dia** — maior risco financeiro do contrato |
 
 ---
 

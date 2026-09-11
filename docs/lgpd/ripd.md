@@ -1,6 +1,6 @@
 # RIPD — Relatório de Impacto à Proteção de Dados Pessoais da plataforma AlupData
 
-**Versão** 0.3 · **Data** 2026-09-11 · **Situação**: minuta técnica, para
+**Versão** 0.4 · **Data** 2026-09-11 · **Situação**: minuta técnica, para
 revisão e aprovação da controladora
 
 Minuta elaborada pela ness. no âmbito do contrato CPS-01025/2026, conforme a
@@ -79,11 +79,9 @@ CPS-01025/2026, de 27/08/2026 a 08/01/2027.
 | Dataform | Transformação Bronze → Silver → Gold | ADR 012 |
 | Knowledge Catalog | Catálogo, linhagem e *profiling* | ADR 014 — ainda fora do Terraform |
 | Cloud Logging | Logs de execução, 30 dias | padrão do serviço |
-| Portal (Cloud Run + IAP) | Consulta das tabelas Gold, saúde e custo | ADR 005 — IAP ainda fora do Terraform |
+| Portal (Cloud Run + IAP) | Consulta das tabelas Gold, saúde e custo | `infra/modules/portal`, com conta de serviço própria (ADR 005) |
 
-A região-alvo é `us-east1` (ADR 011). No `infra/` da `main` ainda consta
-`southamerica-east1`; a troca está no PR de infraestrutura e acontece antes do
-primeiro `apply`.
+A região é `us-east1` (ADR 011), já declarada em `infra/`.
 
 ## f) Tratamento de dados
 
@@ -219,8 +217,8 @@ responsável, o dado volta com essa finalidade e com este teste refeito.
    nem rastreabilidade.
 3. **Balanceamento.** O titular é colaborador usando sistema corporativo; a
    expectativa de controle de acesso é razoável. Salvaguardas: acesso restrito
-   ao domínio da Alup, retenção limitada (30 dias de log, 1 ano de auditoria) e
-   uso restrito à segurança.
+   ao domínio da Alup, retenção limitada (30 dias de log e de auditoria, até a
+   política de retenção ser aprovada) e uso restrito à segurança.
 
 **F3 — governança**
 
@@ -243,7 +241,7 @@ aviso interno de privacidade, sobre o uso de dados de F2 e F3.
 | Livre acesso | Canal da encarregada, privacidade@alupar.com.br; eliminação a pedido na política de retenção | — |
 | Qualidade | Validação na carga, deduplicação na Silver, *assertions* do Dataform | — |
 | Transparência | Dicionário de dados, linhagem por fonte, este relatório e o RoPA | Aviso interno aos colaboradores (item g) |
-| Segurança e prevenção | Ver item k | R01, R07 |
+| Segurança e prevenção | Ver item k | Medidas ainda propostas no item k |
 | Não discriminação | Não há decisão automatizada sobre titulares | — |
 | Responsabilização | Decisões em ADRs versionadas; histórico de commits | — |
 
@@ -251,13 +249,13 @@ aviso interno de privacidade, sobre o uso de dados de F2 e F3.
 
 | # | Risco |
 |---|---|
-| R01 | Acesso indevido a dado pessoal: nenhum acesso de pessoas está declarado no Terraform, e o IAP do Portal está fora dele |
+| R01 | Acesso indevido a dado pessoal nos datasets e no Portal |
 | R02 | Retenção indefinida: o bucket raw e o BigQuery não excluem nada, e a eliminação da cláusula 8.3 não tem procedimento |
 | R03 | Transferência internacional sem mecanismo adequado |
 | R04 | Dado pessoal em texto livre (nome do negócio) propagado da Bronze para a Silver e para o catálogo |
 | R05 | Dado pessoal exposto a recursos de IA: o assistente do Dataform lê amostra real, e o Knowledge Catalog processa logs de consulta com e-mails |
 | R06 | Dado pessoal ou sensível não previsto chegando pelas fontes da Onda 3, que ainda não têm schema |
-| R07 | Rastreabilidade insuficiente: não há log de auditoria de acesso a dados configurado |
+| R07 | Rastreabilidade insuficiente de quem leu ou gravou dado pessoal |
 | R08 | Acesso da ness. a dado real além do período de desenvolvimento e homologação |
 | R09 | Vazamento de credencial de fonte, dando acesso ao dado na origem |
 | R10 | Dado real de titular gravado no repositório de código |
@@ -289,19 +287,19 @@ de 1 a 2, **médio** de 3 a 4, **alto** de 6 a 9. Avaliação proposta pela ness
 | # | Medida | Tipo |
 |---|---|---|
 | R01 | Contas de serviço com privilégio mínimo, verificado em teste (`tests/unit/test_infra.py`); Portal atrás do IAP, restrito ao domínio da Alup, que recusa requisição sem identidade | E |
-| R01 | Acesso de pessoas por grupo, declarado em `infra/`: consumidores leem a Gold; Bronze e Silver só para quem opera — PR #118 | P |
-| R01 | IAP e serviço do Portal no Terraform, com conta de serviço própria — PR #118 | P |
+| R01 | Acesso de pessoas por grupo, declarado em `infra/`: consumidores leem a Gold; Bronze e Silver só para quem opera. Nenhum acesso é concedido enquanto a Alup não indicar os grupos — PR #118 | E |
+| R01 | IAP e serviço do Portal no Terraform, com conta de serviço própria — PR #118 | E |
 | R01 | Controle de acesso por coluna (*policy tags* do BigQuery) nas colunas com dado pessoal | P |
 | R02 | Prazos da [política de retenção](politica-de-retencao.md) declarados em `infra/`: exclusão no bucket raw, exclusão de versões antigas, expiração de partição na Bronze | P |
 | R02 | Procedimento de eliminação a pedido do titular e da cláusula 8.3, no runbook | P |
 | R03 | DPA do contrato de nuvem da Alupar ([dpa.md](dpa.md)) | E |
 | R04 | A Gold não expõe `nome` nem `proprietario_id`: `funil_comercial` só agrega | E |
 | R04 | Colunas com dado pessoal marcadas no catálogo e cobertas pela *policy tag* de R01 | P |
-| R04 | `proprietario_id` retirado do conector, por decisão de 11/09 (item g) — PR #116 | P |
+| R04 | `proprietario_id` retirado do conector, por decisão de 11/09 (item g) — PR #116 | E |
 | R05 | O assistente do Dataform só entra por PR e não é apontado para tabela com dado pessoal (ADR 012); conteúdo gerado no catálogo fica `origem = automatica` e não homologa (ADR 014) | E |
 | R05 | Manter o assistente fora das tabelas com colunas marcadas como pessoais **também depois** da aprovação deste relatório | P |
 | R06 | Antes de cada conector da Onda 3: inventário de colunas com o dono do dado; seleção explícita de colunas, nunca `SELECT *`; módulos de RH e folha fora do escopo de leitura; hipótese legal e prazo definidos; revisão deste relatório e do RoPA | P |
-| R07 | Log de auditoria de acesso a dados (*Data Access audit logs*) do BigQuery e do Cloud Storage, declarado em `infra/` — PR #118. Retenção padrão de 30 dias; 1 ano depende da política de retenção. O custo é da Alup | P |
+| R07 | Log de auditoria de acesso a dados (*Data Access audit logs*) do BigQuery e do Cloud Storage, declarado em `infra/` — PR #118. Retenção padrão de 30 dias; 1 ano depende da política de retenção. O custo é da Alup | E |
 | R08 | Acesso da ness. por grupo, com revogação na homologação final e no handoff (cláusula 8.3) | P |
 | R09 | Credenciais só no Secret Manager; deploy via WIF, sem chave; gitleaks no CI e no pre-commit; teste que impede a senha de aparecer em mensagem de erro | E |
 | R10 | Regra de não ter dado real no repositório (`AGENTS.md`, `SECURITY.md`); fixtures sintéticos | E |
@@ -310,7 +308,7 @@ de 1 a 2, **médio** de 3 a 4, **alto** de 6 a 9. Avaliação proposta pela ness
 
 | Papel | Nome | Data | Parecer |
 |---|---|---|---|
-| Elaboração da minuta técnica | ness. | 11/09/2026 | Versão 0.3 |
+| Elaboração da minuta técnica | ness. | 11/09/2026 | Versão 0.4 |
 | Encarregada | Rosimeire Miler dos Santos | | |
 | Controladora | ACE Comercializadora Ltda. (Alup) | | |
 
@@ -334,3 +332,4 @@ de 1 a 2, **médio** de 3 a 4, **alto** de 6 a 9. Avaliação proposta pela ness
 | 0.1 | 11/09/2026 | Minuta técnica inicial, pela ness. |
 | 0.2 | 11/09/2026 | Controladora e encarregada definidas; análise de hipótese legal com teste de balanceamento; política de retenção e DPA referenciados; R03 reavaliado |
 | 0.3 | 11/09/2026 | Dados cadastrais da controladora (Receita Federal) e canal da encarregada; `proprietario_id` retirado do conector por decisão da Alup |
+| 0.4 | 11/09/2026 | Medidas de R01, R04 e R07 passam a existentes, com a entrada dos PRs #116 e #118 na `main`; região e Portal descritos como estão no Terraform |

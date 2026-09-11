@@ -1,3 +1,3 @@
 project_id  = "alupdata-prod"
-region      = "southamerica-east1"
+region      = "us-east1"
 environment = "prod"

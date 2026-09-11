@@ -4,9 +4,9 @@ variable "project_id" {
 }
 
 variable "region" {
-  description = "Região GCP"
+  description = "Região GCP (ADR 011) — irreversível depois do primeiro apply"
   type        = string
-  default     = "southamerica-east1"
+  default     = "us-east1"
 }
 
 variable "environment" {

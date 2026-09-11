@@ -17,8 +17,8 @@ class Settings(BaseSettings):
 
     gcp_project_id: str = "alupdata-dev"
     gcp_region: str = Field(
-        default="southamerica-east1",
-        description="Região dos recursos (ADR 009). O INFORMATION_SCHEMA do BigQuery é por região: "
+        default="us-east1",
+        description="Região dos recursos (ADR 011). O INFORMATION_SCHEMA do BigQuery é por região: "
         "apontar para a região errada devolve zero linhas em silêncio",
     )
 

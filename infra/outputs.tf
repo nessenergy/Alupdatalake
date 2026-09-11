@@ -27,3 +27,23 @@ output "jobs_ingestao" {
   description = "Cloud Run Jobs agendados (vazio até existir imagem publicada)"
   value       = try(module.scheduler[0].jobs, [])
 }
+
+output "url_portal" {
+  description = "URL do Portal, atrás do IAP (vazio até existir imagem publicada)"
+  value       = try(module.portal[0].url, "")
+}
+
+output "dataset_faturamento" {
+  description = "Destino do billing export — ligado no console pela Alup (ADR 007)"
+  value       = module.bigquery.dataset_faturamento
+}
+
+output "service_account_dataform" {
+  description = "SA que executa o Dataform"
+  value       = module.dataform.service_account
+}
+
+output "repositorio_dataform" {
+  description = "Repositório Dataform (vazio enquanto não houver token do GitHub)"
+  value       = module.dataform.repositorio
+}

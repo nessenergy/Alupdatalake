@@ -4,6 +4,7 @@
 # Enquanto a Alup não entrega o token (Ondas 2 e 3), o secret existe sem versão.
 
 variable "project_id" { type = string }
+variable "region" { type = string }
 variable "environment" { type = string }
 variable "service_account_email" { type = string }
 variable "segredos" {
@@ -36,8 +37,15 @@ resource "google_secret_manager_secret" "fonte" {
   secret_id = each.value
   project   = var.project_id
 
+  # Réplica só na região do ambiente (ADR 011). Replicação automática espalha
+  # o secret por várias regiões e exige que a política de localização da
+  # organização permita `global`.
   replication {
-    auto {}
+    user_managed {
+      replicas {
+        location = var.region
+      }
+    }
   }
 
   labels = {

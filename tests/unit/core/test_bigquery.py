@@ -104,3 +104,30 @@ def test_carga_leva_os_rotulos_para_o_job(monkeypatch):
     bq.carregar_bronze(execucao, [{"a": 1}])
     assert capturado["labels"]["fonte"] == "ons"
     assert capturado["labels"]["camada"] == "bronze"
+
+
+def test_carga_nunca_cria_a_tabela_bronze(monkeypatch):
+    """A tabela nasce do DDL do Dataform, particionada e clusterizada (regra 4).
+
+    Se a carga pudesse criá-la, uma ingestao rodando antes do Dataform geraria
+    tabela sem particao — e o CREATE TABLE IF NOT EXISTS nao a corrigiria depois.
+    """
+    from google.cloud import bigquery
+
+    capturado = {}
+
+    class FakeJob:
+        def result(self):
+            return None
+
+    class FakeCliente:
+        def load_table_from_json(self, linhas, tabela, job_config):
+            capturado["criacao"] = job_config.create_disposition
+            return FakeJob()
+
+    monkeypatch.setenv("DRY_RUN", "false")
+    get_settings.cache_clear()
+    monkeypatch.setattr(bq, "cliente", lambda: FakeCliente())
+    execucao = Execucao(fonte="ons", entidade="carga", janela=Janela.de_texto("2026-01-01", "2026-01-02"))
+    bq.carregar_bronze(execucao, [{"a": 1}])
+    assert capturado["criacao"] == bigquery.CreateDisposition.CREATE_NEVER

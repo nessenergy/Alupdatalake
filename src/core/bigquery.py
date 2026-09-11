@@ -82,6 +82,8 @@ def carregar_bronze(execucao: Execucao, linhas: list[dict[str, Any]]) -> int:
         tabela,
         job_config=bigquery.LoadJobConfig(
             write_disposition=bigquery.WriteDisposition.WRITE_APPEND,
+            # A tabela e do Dataform (ADR 012): criada aqui, nasceria sem particao.
+            create_disposition=bigquery.CreateDisposition.CREATE_NEVER,
             schema_update_options=[bigquery.SchemaUpdateOption.ALLOW_FIELD_ADDITION],
             labels=rotulos(execucao),
         ),

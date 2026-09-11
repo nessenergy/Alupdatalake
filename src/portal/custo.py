@@ -21,8 +21,8 @@ if TYPE_CHECKING:
 TIB = 1024**4
 GIB = 1024**3
 
-# Premissas de tarifa. Conferir na tabela vigente da região antes de tratar
-# qualquer número desta tela como oficial — ver docstring do módulo.
+# Premissas de tarifa: preço de lista dos EUA adotado para us-east1 (ADR 011)
+# em 2026-09-10; conferência na tabela oficial pendente. Não é número oficial.
 TARIFA_TIB_VARRIDO_USD = Decimal("6.25")
 TARIFA_GIB_MES_ATIVO_USD = Decimal("0.020")
 TARIFA_EXECUCAO_JOB_USD = Decimal("0.004")

@@ -1,17 +1,53 @@
-"""O SQL de `sql/` nunca é executado nos testes — mas pode ser lido.
+"""O SQL do Dataform (`definitions/`) nunca é executado nos testes — mas pode ser lido.
 
-Estes testes pegam erro de sintaxe e desvio de convenção **antes** do primeiro
-`make deploy-views` num BigQuery real, que é onde o erro sairia caro.
+Estes testes pegam erro de sintaxe e desvio de convenção antes da primeira
+execução num BigQuery real. A compilação de verdade (refs, dependências e
+config) é o job `dataform-compile` do CI; aqui o `.sqlx` é reduzido ao SQL
+que ele gera, o bastante para o sqlglot ler.
 """
 
+from __future__ import annotations
+
+import re
 from pathlib import Path
 
 import pytest
 import sqlglot
-from scripts.deploy_views import CAMADAS, RAIZ_SQL, arquivos, renderizar
 from sqlglot import exp
 
-ARQUIVOS = arquivos(list(CAMADAS))
+RAIZ = Path(__file__).parents[2]
+DEFINICOES = RAIZ / "definitions"
+CAMADAS = ("bronze", "silver", "gold")
+PROJETO = "alupdata-test"
+REGIAO = "us-east1"
+ARQUIVOS = [c for camada in CAMADAS for c in sorted((DEFINICOES / camada).glob("*.sqlx"))]
+
+# ADR 012 (revisada em 11/09): a Gold de negócio é tabela, recarregada inteira a
+# cada execução. A operacional segue view porque alimenta painel do Portal que
+# precisa de dado atual — materializada uma vez por dia, mostraria a falha de
+# hoje só amanhã. Gold nova é de negócio até entrar nesta lista.
+GOLD_OPERACIONAL = {"saude_ingestao", "volumetria_lake", "custo_consultas"}
+
+_CONFIG = re.compile(r"^config \{.*?^\}\n", re.DOTALL | re.MULTILINE)
+_REF = re.compile(r'\$\{ref\("([a-z_]+)", "([a-z_]+)"\)\}')
+
+
+def config(caminho: Path) -> str:
+    """O bloco `config { ... }` do arquivo."""
+    achado = _CONFIG.search(caminho.read_text(encoding="utf-8"))
+    assert achado, f"{caminho.name} sem bloco config"
+    return achado.group(0)
+
+
+def renderizar(caminho: Path) -> str:
+    """Reduz o `.sqlx` ao SQL que o Dataform geraria, com projeto e região de teste."""
+    texto = _CONFIG.sub("", caminho.read_text(encoding="utf-8"), count=1)
+    texto = _REF.sub(lambda m: f"`{PROJETO}.{m.group(1)}.{m.group(2)}`", texto)
+    return (
+        texto.replace("${self()}", f"`{PROJETO}.{caminho.parent.name}.{caminho.stem}`")
+        .replace("${dataform.projectConfig.defaultDatabase}", PROJETO)
+        .replace("${dataform.projectConfig.vars.regiao}", REGIAO)
+    )
 
 
 def _id(caminho: Path) -> str:
@@ -24,15 +60,33 @@ def arquivo(request) -> Path:
 
 
 def test_ha_sql_para_testar():
-    assert ARQUIVOS, "nenhum .sql encontrado — o teste não estaria verificando nada"
+    assert ARQUIVOS, "nenhum .sqlx encontrado — o teste não estaria verificando nada"
+
+
+def test_sql_legado_nao_volta():
+    """ADR 012: um mecanismo de deploy só."""
+    assert not (RAIZ / "sql").exists()
+    assert not (RAIZ / "scripts" / "deploy_views.py").exists()
 
 
 def test_sql_e_sintaticamente_valido_no_dialeto_bigquery(arquivo):
     sqlglot.parse(renderizar(arquivo), dialect="bigquery")
 
 
-def test_placeholders_todos_resolvidos(arquivo):
-    assert "${" not in renderizar(arquivo), "placeholder não substituído pelo deploy"
+def test_nada_fica_sem_resolver(arquivo):
+    assert "${" not in renderizar(arquivo), "expressão do Dataform que o teste não sabe resolver"
+
+
+def test_cada_camada_tem_o_tipo_e_o_dataset_certos(arquivo):
+    camada = arquivo.parent.name
+    bloco = config(arquivo)
+    assert f'schema: "{camada}"' in bloco
+    if camada == "bronze":
+        assert 'type: "operations"' in bloco and "hasOutput: true" in bloco
+    elif camada == "gold" and arquivo.stem not in GOLD_OPERACIONAL:
+        assert 'type: "table"' in bloco, "Gold de negócio é tabela, não view nem incremental (ADR 012)"
+    else:
+        assert 'type: "view"' in bloco
 
 
 def test_bronze_e_particionado_e_clusterizado(arquivo):
@@ -60,12 +114,18 @@ def test_silver_deduplica_e_expoe_as_dimensoes_comuns(arquivo):
         assert dimensao in sql, f"Silver sem a dimensão comum {dimensao}"
 
 
+def test_silver_tem_assertion_na_chave_de_deduplicacao(arquivo):
+    if arquivo.parent.name != "silver":
+        pytest.skip("regra vale só para a Silver")
+    bloco = config(arquivo)
+    assert "uniqueKey:" in bloco and "nonNull:" in bloco, "Silver sem portão de qualidade (ADR 012)"
+
+
 def test_view_referencia_a_camada_anterior(arquivo):
     """Silver lê do Bronze; Gold lê da Silver — não pula camada.
 
     Exceção: view Gold de monitoramento lê `bronze._execucoes`, o log de
-    execução. Ele não é fonte de dados e por isso não tem Silver — deduplicar
-    ou higienizar um log de execução não faz sentido.
+    execução. Ele não é fonte de dados e por isso não tem Silver.
     """
     camada = arquivo.parent.name
     if camada == "bronze":
@@ -87,26 +147,18 @@ def test_view_referencia_a_camada_anterior(arquivo):
 
 def test_toda_camada_tem_o_mesmo_conjunto_de_fontes():
     """Uma fonte com Bronze mas sem Silver é entrega incompleta (7 componentes)."""
-    bronze = {c.stem for c in (RAIZ_SQL / "bronze").glob("*.sql") if not c.stem.startswith("_")}
-    silver = {c.stem for c in (RAIZ_SQL / "silver").glob("*.sql")}
+    bronze = {c.stem for c in (DEFINICOES / "bronze").glob("*.sqlx") if not c.stem.startswith("_")}
+    silver = {c.stem for c in (DEFINICOES / "silver").glob("*.sqlx")}
     assert bronze == silver, f"Bronze e Silver divergem: só em Bronze {bronze - silver}, só em Silver {silver - bronze}"
 
 
 def test_information_schema_usa_a_regiao_configurada():
-    """Região fixa no SQL devolve zero linhas em silêncio, não erro.
-
-    O `INFORMATION_SCHEMA` do BigQuery é escopado por região. Uma view que
-    consulte `region-us` num projeto em `southamerica-east1` (ADR 009) não
-    falha: devolve vazio. O painel de custo mostraria R$ 0,00 para sempre,
-    parecendo funcionar — que é pior do que quebrar.
-    """
-    for arquivo in arquivos(list(CAMADAS)):
+    """Região fixa no SQL devolve zero linhas em silêncio, não erro (ADR 011)."""
+    for arquivo in ARQUIVOS:
         bruto = arquivo.read_text(encoding="utf-8")
         if "INFORMATION_SCHEMA" not in bruto:
             continue
-        assert "region-${regiao}" in bruto, (
-            f"{arquivo.name} consulta INFORMATION_SCHEMA com região fora da configuração; "
-            "use `region-${regiao}` para acompanhar o ambiente"
+        assert "region-${dataform.projectConfig.vars.regiao}" in bruto, (
+            f"{arquivo.name} consulta INFORMATION_SCHEMA com região fora da configuração"
         )
-        # E o valor renderizado precisa ser a região de verdade, não o literal.
-        assert "region-southamerica-east1" in renderizar(arquivo)
+        assert "region-us-east1" in renderizar(arquivo)

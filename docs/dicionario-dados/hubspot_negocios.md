@@ -39,10 +39,18 @@ porque negócio parado não precisa ser lido de novo.
 | `closedate` | `data_fechamento` | DATE | igual | truncado para data; nulo enquanto aberto |
 | `createdate` | `criado_em` | TIMESTAMP | igual | usado na idade do negócio na Gold |
 | `hs_lastmodifieddate` | `modificado_em` | TIMESTAMP | igual | filtro da janela e critério de dedup |
-| `hubspot_owner_id` | `proprietario_id` | STRING | igual | vazio vira `NULL` |
 
 Colunas técnicas (`_ingestao_id`, `_ingestao_timestamp`, `_fonte`,
 `_schema_versao`) são do runner.
+
+### O dono do negócio não é lido
+
+`hubspot_owner_id` identifica o colaborador dono do negócio — é dado pessoal.
+Nenhuma Gold o usa: `funil_comercial` agrega por *pipeline* e estágio. Sem
+finalidade que o exija, ele não passa no teste de necessidade da LGPD e fica
+fora do conector, por decisão da Alup em 11/09 ([RIPD](../lgpd/ripd.md), item
+g). Se um dia houver funil por responsável, ele volta com essa finalidade
+declarada.
 
 ### `amount` vazio vira NULL, não zero
 

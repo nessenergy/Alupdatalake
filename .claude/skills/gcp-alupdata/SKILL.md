@@ -17,7 +17,7 @@ Tudo em GCP, arquitetura Medallion, infraestrutura por Terraform. Recurso criado
 
 ## Ambientes
 
-Dois: `dev` e `prod` (`infra/variables.tf` valida). Região padrão `southamerica-east1` (São Paulo) — ver ADR 009.
+Dois: `dev` e `prod` (`infra/variables.tf` valida). Região padrão `us-east1` (Carolina do Sul) — ver ADR 011, que substitui a 009.
 Variáveis por ambiente em `infra/environments/{dev,prod}.tfvars`. Nunca aponte
 código para `prod` por default — `src/core/config.py` cai em `alupdata-dev`.
 
@@ -48,8 +48,11 @@ Sem partição, cada consulta varre a tabela inteira e a conta de BigQuery é da
 Alup (cláusula 5ª: infra é custo da contratante — desperdício aparece na fatura
 dela, e volta como problema nosso).
 
-**Views** — Silver e Gold são views (ou materialized views quando o custo de
-recomputar justificar). Nunca duplique dado entre camadas sem necessidade.
+**Views e tabelas** (ADR 012) — Silver é view. Gold de negócio é tabela,
+recarregada inteira a cada execução do Dataform; Gold operacional
+(`saude_ingestao`, `volumetria_lake`, `custo_consultas`) segue view, porque os
+painéis do Portal precisam de dado atual. Nunca duplique dado entre camadas sem
+necessidade.
 Sempre filtre por partição nas consultas: `WHERE DATE(_ingestao_timestamp) >= …`.
 
 **Custo**: prefira `SELECT` com colunas explícitas a `SELECT *`; use

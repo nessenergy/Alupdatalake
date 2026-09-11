@@ -2,7 +2,7 @@
 
     uv run python -m scripts.novo_conector --fonte ons --entidade carga
 
-Cria conector, DDL Bronze, views Silver/Gold, teste e dicionário de dados.
+Cria conector, DDL Bronze, view Silver e tabela Gold (Dataform), teste e dicionário de dados.
 Nenhum arquivo existente é sobrescrito.
 """
 
@@ -61,8 +61,15 @@ class {classe}(Conector):
         raise NotImplementedError("TODO: mapear o payload para {classe}Registro")
 '''
 
-BRONZE = """-- Bronze: {fonte}/{entidade}. Append-only; a Silver deduplica.
-CREATE TABLE IF NOT EXISTS `${{projeto}}.${{bronze}}.{rotulo}` (
+BRONZE = """config {{
+  type: "operations",
+  schema: "bronze",
+  hasOutput: true,
+  tags: ["bronze"]
+}}
+
+-- Bronze: {fonte}/{entidade}. Append-only; a Silver deduplica.
+CREATE TABLE IF NOT EXISTS ${{self()}} (
   data_referencia     DATE      NOT NULL,
   -- TODO: campos da fonte
 
@@ -75,8 +82,17 @@ PARTITION BY DATE(_ingestao_timestamp)
 CLUSTER BY data_referencia;
 """
 
-SILVER = """-- Silver: {fonte}/{entidade} higienizada, deduplicada, com dimensões comuns.
-CREATE OR REPLACE VIEW `${{projeto}}.${{silver}}.{rotulo}` AS
+SILVER = """config {{
+  type: "view",
+  schema: "silver",
+  tags: ["silver"],
+  assertions: {{
+    uniqueKey: ["data_referencia"],  // TODO: chave natural completa, igual ao PARTITION BY (JS: comentário é //)
+    nonNull: ["data_referencia"]
+  }}
+}}
+
+-- Silver: {fonte}/{entidade} higienizada, deduplicada, com dimensões comuns.
 SELECT
   data_referencia,
   CAST(NULL AS STRING) AS submercado,      -- TODO: preencher ou justificar
@@ -85,18 +101,23 @@ SELECT
   FORMAT_DATE('%Y-%m', data_referencia) AS periodo_apuracao,
   _ingestao_id,
   _ingestao_timestamp
-FROM `${{projeto}}.${{bronze}}.{rotulo}`
+FROM ${{ref("bronze", "{rotulo}")}}
 QUALIFY ROW_NUMBER() OVER (
   PARTITION BY data_referencia  -- TODO: chave natural completa
   ORDER BY _ingestao_timestamp DESC
-) = 1;
+) = 1
 """
 
-GOLD = """-- Gold: TODO — nomeie pela pergunta de negócio que a view responde.
+GOLD = """config {{
+  type: "table",
+  schema: "gold",
+  tags: ["gold"]
+}}
+
+-- Gold: TODO — nomeie pela pergunta de negócio que a tabela responde.
 -- Se for um SELECT * da Silver, ela não deveria existir.
-CREATE OR REPLACE VIEW `${{projeto}}.${{gold}}.{rotulo}` AS
 SELECT *
-FROM `${{projeto}}.${{silver}}.{rotulo}`;
+FROM ${{ref("silver", "{rotulo}")}}
 """
 
 TESTE = '''"""Testes do conector {fonte}/{entidade} — sem rede."""
@@ -180,9 +201,9 @@ def main(argv: list[str] | None = None) -> int:
 
     print(f"Conector {rotulo}:")
     escrever(RAIZ / "src" / "conectores" / f"{rotulo}.py", CONECTOR.format(**ctx))
-    escrever(RAIZ / "sql" / "bronze" / f"{rotulo}.sql", BRONZE.format(**ctx))
-    escrever(RAIZ / "sql" / "silver" / f"{rotulo}.sql", SILVER.format(**ctx))
-    escrever(RAIZ / "sql" / "gold" / f"{rotulo}.sql", GOLD.format(**ctx))
+    escrever(RAIZ / "definitions" / "bronze" / f"{rotulo}.sqlx", BRONZE.format(**ctx))
+    escrever(RAIZ / "definitions" / "silver" / f"{rotulo}.sqlx", SILVER.format(**ctx))
+    escrever(RAIZ / "definitions" / "gold" / f"{rotulo}.sqlx", GOLD.format(**ctx))
     escrever(RAIZ / "tests" / "unit" / "conectores" / f"test_{rotulo}.py", TESTE.format(**ctx))
     escrever(RAIZ / "docs" / "dicionario-dados" / f"{rotulo}.md", DICIONARIO.format(**ctx))
     print("\nFaltam os componentes 06 (agendamento) e a implementação — ver skill `conector-alupdata`.")

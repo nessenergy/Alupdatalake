@@ -1,0 +1,22 @@
+config {
+  type: "operations",
+  schema: "bronze",
+  hasOutput: true,
+  tags: ["bronze"]
+}
+
+-- Bronze: carga de energia diária por subsistema (ONS).
+CREATE TABLE IF NOT EXISTS ${self()} (
+  data_referencia     DATE      NOT NULL OPTIONS(description="Dia da carga"),
+  submercado          STRING    NOT NULL OPTIONS(description="N, NE, S, SE"),
+  nome_subsistema     STRING    NOT NULL,
+  carga_mwmed         NUMERIC   NOT NULL OPTIONS(description="Carga de energia em MW médios"),
+
+  _ingestao_id        STRING    NOT NULL,
+  _ingestao_timestamp TIMESTAMP NOT NULL,
+  _fonte              STRING    NOT NULL,
+  _schema_versao      STRING    NOT NULL
+)
+PARTITION BY DATE(_ingestao_timestamp)
+CLUSTER BY data_referencia, submercado
+OPTIONS(description="Carga diária por subsistema — camada Bronze, append-only");

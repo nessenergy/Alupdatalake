@@ -43,32 +43,41 @@ Variáveis (todas com padrão em `src/core/config.py`):
 ## Autenticação
 
 **Não há login escrito no aplicativo, e isso é deliberado.** No Cloud Run o
-acesso é restrito por IAM/IAP: quem não está autorizado não chega na aplicação.
-A identidade chega no cabeçalho `X-Goog-Authenticated-User-Email`, e o Portal só
-a exibe.
+acesso é restrito pelo IAP, ligado no próprio serviço: quem não está autorizado
+não chega na aplicação. A identidade chega no cabeçalho
+`X-Goog-Authenticated-User-Email`, e o Portal só a exibe. Em modo `bigquery`,
+requisição sem o cabeçalho recebe 403.
 
 Consequências operacionais:
 
 - Rodando local, sem o cabeçalho, a tela mostra "não autenticado (execução
   local)". Isso é o esperado — não é bug.
-- **Nunca publique o serviço com `--allow-unauthenticated`.** É o único jeito
-  de essa tela vazar para a internet, já que não existe outra barreira.
-- Restringir o acesso ao domínio da Alup é configuração de IAM, não de código.
+- **Nunca libere o serviço para `allUsers` nem desligue o IAP.** O teste de
+  infraestrutura recusa `allUsers` e `allAuthenticatedUsers` em `infra/`.
+- Quem acessa é a variável `portal_acesso` do `.tfvars` do ambiente: só
+  `group:<e-mail>` ou `domain:<domínio>` da Alup; `user:` é recusado na
+  validação. Vazia, que é o padrão, o serviço sobe sem ninguém autorizado.
 
-## Publicação (quando houver Artifact Registry)
+## Publicação
+
+O serviço, o IAP e a SA `alupdata-portal` estão em `infra/modules/portal` e
+sobem com o workflow **Deploy GCP** (`infra` ou `all`), junto com o
+agendamento, sempre que houver imagem publicada. Não publique com
+`gcloud run deploy`: recurso fora de `infra/` não existe (regra 5), e o
+próximo `apply` o sobrescreve.
 
 O Portal roda na **mesma imagem** da CLI — um artefato só para operar. O
 serviço troca o entrypoint por `gunicorn`; não há código de servidor no
-repositório para manter:
+repositório para manter. A URL sai em `terraform output url_portal`.
 
-```bash
-gcloud run deploy alupdata-portal \
-  --image <registry>/alupdata:<tag> \
-  --command gunicorn \
-  --args "--bind=:8080,--workers=2,src.portal.app:app" \
-  --no-allow-unauthenticated \
-  --set-env-vars PORTAL_PROVEDOR=bigquery,GCP_PROJECT_ID=<projeto>
-```
+A SA `alupdata-portal` só lê: `bronze`, `silver` e `gold`, mais o metadado de
+jobs e de armazenamento que `gold.custo_consultas` usa. As três camadas, e não
+só a Gold, porque as views da Gold não são views autorizadas e `/lake` lê
+`bronze._execucoes`.
+
+Se um serviço `alupdata-portal` já tiver sido criado à mão com `gcloud`,
+importe-o antes do primeiro `apply` (`terraform import`) ou apague-o: senão o
+`apply` falha com o nome já em uso.
 
 A sonda de saúde é `GET /saude`, que responde sem tocar no BigQuery — sonda que
 consulta banco derruba o serviço junto com o banco.

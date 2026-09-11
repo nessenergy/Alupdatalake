@@ -66,6 +66,13 @@ resource "google_cloud_run_v2_job" "ingestao" {
           name  = "GCP_PROJECT_ID"
           value = var.project_id
         }
+
+        # A regiao decide onde a linhagem e gravada e qual INFORMATION_SCHEMA
+        # e lido; precisa vir do Terraform, nao do default do config (ADR 013).
+        env {
+          name  = "GCP_REGION"
+          value = var.region
+        }
       }
     }
   }

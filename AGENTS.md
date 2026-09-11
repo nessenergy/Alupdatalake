@@ -44,6 +44,14 @@ Plano detalhado: `docs/plano-execucao.md`. Contrato resumido:
    arquivos que existem no repositório. A proibição é sobre autoria e
    assinatura, não sobre nomear um arquivo.
 
+   **Exceção registrada — IA no produto, não na execução.** Os recursos de IA
+   generativa do Knowledge Catalog (modelo Gemini, do Google) estão ativados na
+   plataforma, sob o aviso da [ADR 014](docs/arquitetura/decisoes/014-knowledge-catalog.md).
+   O que sustenta a exceção: quem usa esses recursos é a Alup, que opera a
+   plataforma; a ness. desenvolve e não os utiliza, e nenhum entregável é
+   produzido com eles. Ferramenta de IA para desenvolver continua proibida —
+   inclusive as sugeridas pelo próprio Google (ADR 014, alternativas).
+
    Verificado por `scripts/verifica_atribuicao.py` em três frentes: hook
    `commit-msg`, job do CI sobre os commits do PR, e varredura diária da API do
    GitHub (`--github`), que cobre issues, PRs e comentários. As duas primeiras
@@ -69,7 +77,7 @@ make all              # lint + testes + Bandit + pip-audit — rode antes de tod
 make test             # pytest
 make lint             # ruff check + format --check
 make novo-conector fonte=X entidade=Y
-make deploy-views     # aplica o SQL de sql/ no BigQuery (idempotente)
+make dataform-compile  # compila o projeto Dataform (definitions/), sem credencial
 make sync-skills      # atualiza as skills vendorizadas do Google
 make quadro           # simula a sincronização do quadro de acompanhamento; make quadro-aplicar grava
 
@@ -84,13 +92,13 @@ alupdata ingerir bcb_cambio_ptax --de 2026-01-01 --ate 2026-01-31 --dry-run
 | `src/core/` | framework de ingestão — runner, janela, registry, GCS, BigQuery, secrets, HTTP, banco |
 | `src/conectores/` | um módulo por fonte |
 | `src/cli.py` | CLI única: laptop, Cloud Run Job e DAG usam o mesmo comando |
-| `sql/{bronze,silver,gold}/` | DDL e views versionadas, aplicadas por `make deploy-views` |
+| `definitions/{bronze,silver,gold}/` e `workflow_settings.yaml` | projeto Dataform: DDL Bronze, view Silver, tabela Gold (ADR 012) |
 | `infra/` | Terraform: datasets, bucket raw, secrets, Cloud Run Job + Scheduler, IAM |
 | `dags/` | vazio até a Onda 3 (ADR 004) |
 | `docs/arquitetura/decisoes/` | ADRs — leia antes de propor mudança estrutural |
 | `docs/dicionario-dados/` | componente 07 de cada fonte |
 | `docs/runbook/` | deploy e operação |
-| `scripts/` | deploy de views, scaffolding, sync de skills |
+| `scripts/` | execução do Dataform no deploy, scaffolding, sync de skills |
 
 ## Vocabulário do setor
 
@@ -134,12 +142,17 @@ dizem como *este contrato* usa o produto.
 | 001 | Stack Python + Terraform |
 | 002 | Monorepo |
 | 003 | Framework de conectores com runner único; janela; append-only; GCS antes do BigQuery |
-| 004 | SQL versionado sem dbt; Cloud Run Jobs + Scheduler antes de Composer |
+| 004 | Cloud Run Jobs + Scheduler antes de Composer (a parte "SQL sem dbt" foi substituída pela 012) |
 | 005 | Escopo do Portal MVP cravado — o que ele é e o que não é |
 | 006 | Painel de saúde `/lake`: monitoramento não é BI |
 | 007 | Painel de custo `/custo`: observabilidade de custo é sustentação, não faturada (PR #56) |
 | 008 | Acesso a bancos relacionais: drivers puro-Python, DSN única no Secret Manager |
-| 009 | Região do ambiente: `southamerica-east1`, irreversível depois do primeiro apply |
+| 009 | Região `southamerica-east1` — **substituída pela 011** |
+| 010 | Aceite formal do risco de `main` sem proteção obrigatória (GitHub Free) |
+| 011 | Região do ambiente: `us-east1`, irreversível depois do primeiro apply; transferência internacional documentada (DPA, RoPA, RIPD) |
+| 012 | Dataform para o SQL das três camadas, projeto na raiz; substitui o SQL solto e o script de deploy antigo |
+| 013 | Ingestão em lote pelos conectores Python, sem CDC nem Dataflow; linhagem OpenLineage no executor |
+| 014 | Knowledge Catalog na Onda 4, linhagem desde o 1º apply; recursos de IA do produto sob aviso |
 
 Se você for propor algo que contraria um ADR, escreva um ADR novo — não um
 remendo. Em particular: o framework em `src/core/` é mais estrutura do que 13

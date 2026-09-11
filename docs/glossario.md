@@ -43,7 +43,7 @@ definição regulatória precisa, a fonte é a ANEEL, a CCEE ou o ONS.
 | **MW** | Potência instantânea. |
 | **MWh** | Energia — potência × tempo. |
 | **MWmed** | MW médio: a energia de um período dividida pelo tempo dele. 1 MWmed ao longo de um mês de 30 dias equivale a 720 MWh. O ONS publica carga em MWmed, e é a unidade das views de carga. |
-| **kW** | Mil watts. O cadastro da ANEEL publica potência em kW; as views Gold convertem para MW dividindo por 1.000. |
+| **kW** | Mil watts. O cadastro da ANEEL publica potência em kW; a Gold converte para MW dividindo por 1.000. |
 
 ---
 

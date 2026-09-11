@@ -111,3 +111,15 @@ jobs:
           terraform init -backend=false
           terraform fmt -check -recursive
           terraform validate
+
+  dataform-compile:
+    name: "Dataform Compile"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      # Compila sem credencial: pega ref quebrado, dependência circular e config
+      # inválida antes do merge. Versão igual à de workflow_settings.yaml.
+      - run: npx --yes @dataform/cli@3.0.69 compile

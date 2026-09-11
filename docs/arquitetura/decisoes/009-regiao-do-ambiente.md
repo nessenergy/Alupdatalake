@@ -1,6 +1,7 @@
 # ADR 009 — Região do ambiente: `southamerica-east1`
 
-**Status**: aceito · **Data**: 2026-09-04
+**Status**: substituído pela [ADR 011](011-regiao-us-east1.md) em 2026-09-10 ·
+**Data**: 2026-09-04
 
 ## Contexto
 

@@ -34,7 +34,7 @@ bronze.<fonte>_<entidade>    tabela append-only, particionada e clusterizada
   ▼
 silver.<fonte>_<entidade>    view: tipagem, dedup por QUALIFY, 5 dimensões comuns
   ▼
-gold.<pergunta_de_negocio>   view: uma pergunta nomeada por view
+gold.<pergunta_de_negocio>   tabela: uma pergunta nomeada por tabela, recarregada a cada execução
 ```
 
 ## O que falta, e por quê

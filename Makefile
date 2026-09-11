@@ -1,4 +1,4 @@
-.PHONY: install lint format test security audit all clean novo-conector deploy-views listar sync-skills campos-projeto quadro quadro-aplicar
+.PHONY: install lint format test security audit all clean novo-conector listar sync-skills campos-projeto dataform-compile quadro quadro-aplicar
 
 install:
 	uv sync --extra dev
@@ -44,9 +44,6 @@ quadro-aplicar: ## Grava a sincronização no quadro e comenta os atrasos novos
 sync-skills:
 	uv run python -m scripts.sync_skills_google
 
-deploy-views:
-	uv run python -m scripts.deploy_views
-
 listar:
 	uv run alupdata listar
 
@@ -60,3 +57,6 @@ questionario-pdf: ## Reemite o PDF de envio do Questionario de Gaps
 
 relatorio: ## Gera o HTML de um relatorio: make relatorio ARQ=docs/relatorios/AAAA-MM-DD-x.md
 	uv run --with markdown python scripts/gerar_documento.py $(ARQ) --html
+
+dataform-compile: ## Compila o projeto Dataform (definitions/) sem credencial
+	npx --yes @dataform/cli@3.0.69 compile

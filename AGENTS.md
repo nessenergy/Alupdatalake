@@ -97,7 +97,7 @@ alupdata ingerir bcb_cambio_ptax --de 2026-01-01 --ate 2026-01-31 --dry-run
 | `definitions/{bronze,silver,gold}/` e `workflow_settings.yaml` | projeto Dataform: DDL Bronze, view Silver, tabela Gold (ADR 012) |
 | `infra/` | Terraform: datasets, bucket raw, secrets, Cloud Run Job + Scheduler, IAM — um `.tfvars` por ambiente (`dev`, `hml`, `prod`) |
 | `infra/bootstrap/` | Terraform do bootstrap de cada projeto — APIs, bucket de state, Artifact Registry, WIF e SA de deploy —, aplicado pela ness. com state local (ADR 015) |
-| `dags/` | vazio até a Onda 3 (ADR 004) |
+| `dags/` | vazio, e sem destino previsto: a Onda 3 orquestra em Cloud Workflows (ADR 017) |
 | `docs/arquitetura/decisoes/` | ADRs — leia antes de propor mudança estrutural |
 | `docs/dicionario-dados/` | componente 07 de cada fonte |
 | `docs/runbook/` | deploy e operação |

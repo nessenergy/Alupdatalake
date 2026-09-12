@@ -65,13 +65,15 @@ fica sem previsão.
 | 3.3 | **Redação da exclusão de escopo no baralho de kickoff** | manter ou trocar por "modelos preditivos avançados" | Exclusão legítima da Fase 3; é preferência, não correção |
 | 3.4 | **Paralelos restantes** | dicionário de dados das fontes que faltam · endurecer o Portal MVP · outra coisa | São as duas frentes úteis que sobraram sem GCP |
 | 3.5 | **Branch protection** | ~~GitHub Team pago por usuário, ou assumir o risco por escrito~~ — **resolvido em 11/09** | A organização passou ao GitHub Enterprise; a `main` exige PR e seis verificações, com force push e exclusão bloqueados (ADR 010, encerrada) |
-| 3.6 | **Teto de US$ 400/mês a partir de meados de novembro** (E2) | pedir revisão do teto à Alup, ou redimensionar a orquestração gerenciada da Onda 3 | O teto fica abaixo da estimativa de US$ 420–500/mês apresentada no registro de 09/09 |
+| 3.6 | **Teto de US$ 400/mês a partir de meados de novembro** (E2) | ~~pedir revisão do teto à Alup, ou redimensionar a orquestração gerenciada da Onda 3~~ — **resolvido em 11/09** | Redimensionada: a Onda 3 passa a Cloud Workflows em vez de Composer ([ADR 017](arquitetura/decisoes/017-orquestracao-sem-composer.md)). Sem ambiente ligado 24×7, a estimativa volta para dentro do teto e não foi preciso pedir dinheiro à contratante |
 
 Decisões já tomadas: **região** `us-east1` ([ADR 011](arquitetura/decisoes/011-regiao-us-east1.md), que
 substituiu a 009) e **tom cordial** nos relatórios (convenção no [README](relatorios/README.md) do
 diretório). Em 11/09, com as respostas da Alup: **três ambientes** e **bootstrap pela ness.**
 ([ADR 015](arquitetura/decisoes/015-fundacao-do-ambiente.md)), **Gold sem KPI nesta fase**
 ([ADR 012](arquitetura/decisoes/012-dataform.md)) e **contatos e empresas do Hubspot fora do escopo**.
+Ainda em 11/09, diante do teto de E2: **orquestração da Onda 3 em Cloud Workflows, sem Composer**
+([ADR 017](arquitetura/decisoes/017-orquestracao-sem-composer.md)).
 
 ---
 

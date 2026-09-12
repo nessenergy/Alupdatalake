@@ -162,14 +162,16 @@ Marco 4 — 26,72% · R$ 39.680,00 · **A maior onda; bloqueada por VPN e creden
 | 3.2 | **Portal Alup** (MySQL/NoSQL/Storage) | 40h ⚠ | VPN + credenciais read-only |
 | 3.3 | **MySQL RDS Comercialização** | 30h ⚠ | VPN + usuário read-only |
 | 3.4 | **RM/TOTVS** | 25h ⚠ | Endpoints e credencial |
-| 3.5 | Migração para Cloud Composer | 10h | — |
+| 3.5 | Orquestração em Cloud Workflows | 10h | — |
 | 3.6 | Views Gold que cruzam interno × mercado | 5h | — |
 
 **Marcos técnicos desta onda**
 - É aqui que o framework encontra fontes **não-HTTP**: `extrair()` passa a falar
   com driver de banco. O contrato do conector não muda; só a implementação.
-- 3.5 é o gatilho combinado no ADR 004: quando surgir dependência real entre
-  pipelines, o Composer entra e as DAGs passam a chamar a mesma CLI.
+- 3.5 é o gatilho combinado no ADR 004 — dependência real entre pipelines —,
+  atendido por Cloud Workflows em vez de Composer desde o [ADR 017](arquitetura/decisoes/017-orquestracao-sem-composer.md):
+  o teto de US$ 400/mês informado pela Alup em E2 não comporta um ambiente
+  Composer ligado 24×7. A orquestração chama a mesma CLI, como previsto.
 
 **Riscos**
 - Estimativas ⚠ em todas as fontes: schema de sistema legado só se conhece

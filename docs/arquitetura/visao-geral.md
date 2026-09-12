@@ -62,7 +62,7 @@ Todas as views Silver compartilham estas dimensões para viabilizar cruzamentos:
 | Package Manager | uv |
 | Data Warehouse | BigQuery |
 | Storage | Cloud Storage |
-| Orquestração | Cloud Composer (Airflow) |
+| Orquestração | Cloud Workflows (ADR 017) |
 | Agendamento | Cloud Scheduler |
 | Secrets | Secret Manager |
 | IaC | Terraform >= 1.5 |

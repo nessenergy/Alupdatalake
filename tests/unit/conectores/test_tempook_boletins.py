@@ -176,3 +176,16 @@ def test_ingerir_conta_os_boletins_da_janela(conector, monkeypatch):
     assert execucao.status == "SUCESSO"
     assert execucao.linhas_extraidas == 2
     assert execucao.linhas_invalidas == 0
+
+
+def test_5xx_nao_e_ausencia_e_derruba_a_execucao(conector):
+    """Sondagem de 14/09: um caminho que respondera 200 devolveu 503 minutos depois.
+
+    503 significa "a origem falhou", não "não há boletim". Tratá-lo como
+    ausência abriria buraco silencioso na série — o dia sumiria do lake sem
+    ninguém notar. O retry da sessão já tentou; aqui a execução tem de falhar.
+    """
+    conector._sessao = _sessao_que_devolve(_Resposta(b"indisponivel", status=503))
+
+    with pytest.raises(AssertionError):  # o que raise_for_status levanta no dublê
+        conector._baixar("qualquer/caminho.pdf")

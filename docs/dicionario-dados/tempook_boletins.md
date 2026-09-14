@@ -86,28 +86,54 @@ storage.tempook.com (POST download_post)
            → gold.cobertura_boletins_tempook
 ```
 
-## O que não foi possível verificar sem credencial
+## Verificado contra a API real em 14/09/2026
 
-O conector **nunca falou com a API**. Foi escrito a partir de um exemplo de um
-único dia, como o do Hubspot foi escrito a partir da documentação pública. O
-teste de integração está `skipif` até o token existir no Secret Manager, e é
-ele que responde:
+O contrato acima **deixou de ser suposição**. A API foi sondada com o token
+recebido, em ~40 datas, com verificação de TLS ligada.
 
-1. **O template do caminho vale para toda data?** O único caminho que se sabe
-   existir é o de 2022-03-31. Se houver exceção — nome diferente em algum
-   período, pasta que mudou de nome em algum ano —, o exemplo de um dia não
-   mostra. **É o risco principal desta fonte.**
-2. **Como a origem sinaliza um dia sem boletim?** 404, corpo vazio, HTML de
-   erro com 200? O conector trata os três como ausência, mas qual deles de
-   fato ocorre é suposição.
-3. **A verificação de TLS passa?** O exemplo fornecido a desliga, o que pode
-   indicar certificado com problema. Se for o caso, o caminho é a Alup acionar
-   o TempoOK — não desligar a verificação.
-4. **O PDF de um dia é estável?** Se a origem gerar o arquivo a cada
-   requisição com carimbo de tempo dentro, o `sha256` muda a cada ingestão e a
-   detecção de republicação perde o sentido.
-5. **Qual o tamanho típico de um boletim**, e portanto o custo de armazenar a
-   série histórica no bucket raw.
+| Pergunta | Resposta |
+|---|---|
+| O template do caminho vale para toda data? | **Sim.** Confirmado ao longo de 7 meses de 2022 |
+| Como a origem sinaliza dia sem boletim? | **404** |
+| O TLS passa sem `verify=False`? | **Sim.** O `verify=False` do exemplo é desnecessário |
+| Qual o tamanho de um boletim? | **~9 MB** (31/03/2022). Um ano de dias úteis ≈ **2 GB** no bucket raw |
+| O `Content-Type` identifica o PDF? | **Não** — a origem devolve `application/octet-stream`. Por isso a guarda é pela assinatura `%PDF-`, não pelo cabeçalho |
+| O PDF de um dia é byte-a-byte estável? | **Sim.** Duas leituras do mesmo boletim deram `sha256` idêntico — a coluna detecta republicação de verdade, e não ruído |
+
+### O boletim é de dia útil
+
+A varredura diária de outubro de 2022 mostra o calendário: 404 em sábados e
+domingos, e **404 em 12/10, feriado de Nossa Senhora Aparecida**. A janela de 5
+dias do agendamento cobre um fim de semana prolongado.
+
+### 5xx não é ausência
+
+Um caminho que respondera 200 devolveu **503** minutos depois. O retry da sessão
+absorve o transitório; persistindo, a execução falha — que é o certo. Tratar
+503 como "sem boletim" faria o dia sumir do lake sem ninguém notar.
+
+## O que segue em aberto — e é da Alup
+
+**A série alcançável por este token termina em 2022-10-26.** Nenhum boletim de
+novembro ou dezembro de 2022 responde, nem nada de 2023, 2024, 2025 ou 2026.
+Sete variações plausíveis do caminho para uma data recente também devolveram
+404.
+
+Não é defeito do conector: o token funciona e o caminho está certo. As
+hipóteses, em ordem de probabilidade:
+
+1. o token é antigo e sua permissão cobre só o período contratado à época;
+2. os boletins passaram a ser publicados em outra área do storage;
+3. o produto foi descontinuado ou renomeado.
+
+**Enquanto isso não for respondido, o conector ingere zero boletins** — o
+comportamento correto para um acervo vazio, mas não o que a Onda 2 precisa
+entregar. A pergunta está no
+[registro de 14/09](../relatorios/2026-09-14-documentacao-de-apis-recebida.md).
+
+Fora isso, **o contrato de dados desta fonte está integralmente verificado.** O
+que falta para a primeira ingestão real é ambiente (A3) e acervo — não
+conhecimento da origem.
 
 ## Uma pendência de segurança
 

@@ -421,12 +421,17 @@ segue pela via pública, que já funciona.</p>
 <tr>
 <td><strong>A8</strong></td>
 <td>Documentação de BBCE e TempoOK</td>
-<td><strong>Atendida.</strong> O BBCE está documentado em detalhe; o TempoOK não possui documentação publicada, e o exemplo recebido é suficiente para escrever o conector</td>
+<td><strong>Atendida.</strong> O BBCE está documentado em detalhe; o TempoOK não possui documentação publicada, e o exemplo recebido foi suficiente — o conector está escrito e o contrato de dados, verificado contra a API real (§4.1)</td>
 </tr>
 <tr>
 <td><strong>A7</strong></td>
 <td>Credencial de leitura do BBCE</td>
 <td><strong>Em andamento</strong> — a Alup informou que o acesso somente leitura está sendo providenciado. Permanece o prazo de 25/09 e o efeito de ociosidade da cláusula 3ª</td>
+</tr>
+<tr>
+<td><strong>novo</strong></td>
+<td>Acesso do TempoOK ao acervo recente</td>
+<td><strong>Verificação junto ao fornecedor</strong> — ver §4.1. Sem isso o conector, já pronto, não tem o que ingerir</td>
 </tr>
 <tr>
 <td>—</td>
@@ -435,6 +440,37 @@ segue pela via pública, que já funciona.</p>
 </tr>
 </tbody>
 </table>
+<h3>4.1 TempoOK: o conector está pronto, mas o acervo alcançável para em 2022</h3>
+<p>O exemplo de consulta permitiu escrever o conector <strong>e verificá-lo contra a API
+real na mesma data</strong>. O contrato de dados está confirmado: o caminho do arquivo
+é derivável da data, a origem sinaliza ausência com HTTP 404, o boletim é
+publicado em dia útil — não há boletim em fim de semana nem em feriado — e a
+conexão dispensa a desativação de verificação de certificado que consta do
+exemplo.</p>
+<p>Há, porém, um ponto que <strong>depende da Alup</strong> e que a ness. não tem como
+resolver:</p>
+<blockquote>
+<p><strong>Nenhum boletim posterior a 26/10/2022 responde.</strong> Foram consultadas datas
+em dias úteis de novembro e dezembro de 2022 e ao longo de 2023, 2024, 2025 e
+2026: todas retornam 404. Sete variações plausíveis do caminho para uma data
+recente também retornam 404.</p>
+</blockquote>
+<p>O token é válido e o caminho está correto — boletins de março a outubro de 2022
+são recuperados normalmente. O que não se alcança é o acervo recente. As
+hipóteses são três:</p>
+<ol>
+<li>o token é antigo e sua permissão cobre apenas o período contratado à época;</li>
+<li>os boletins passaram a ser publicados em outra área do repositório do
+   TempoOK;</li>
+<li>o produto foi descontinuado ou renomeado.</li>
+</ol>
+<p><strong>Solicitamos à Alup que verifique junto ao TempoOK qual das três se aplica.</strong>
+Enquanto isso, o conector está correto e ingere zero boletins, que é o
+comportamento adequado a um acervo vazio — mas não é o que a Onda 2 precisa
+entregar. Resolvido o acesso, o histórico é ingerido de uma vez, bastando
+informar o período desejado.</p>
+<p>Para dimensionamento: um boletim ocupa cerca de <strong>9 MB</strong>; um ano de dias úteis
+fica na ordem de <strong>2 GB</strong> de armazenamento, dentro do teto de custo acordado.</p>
 <h2>5. Recomendação de segurança sobre a entrega de credenciais</h2>
 <p>O token do TempoOK foi entregue <strong>em texto claro no corpo do e-mail</strong>, com seis
 destinatários em cópia. A ness. registra a recomendação, em cumprimento à

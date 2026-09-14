@@ -1,8 +1,8 @@
 # ADR 019 — O boletim do TempoOK entra como arquivo, e o Bronze guarda o catálogo
 
 **Status**: aceito · **Data**: 2026-09-14 · **Complementa** a
-[ADR 003](003-framework-de-conectores.md) · **Depende de** A7 para a primeira
-execução real
+[ADR 003](003-framework-de-conectores.md) · **Verificada contra a API real** em
+2026-09-14 — ver o adendo no fim
 
 ## Contexto
 
@@ -81,13 +81,20 @@ verificação.
 
 ### 4. Ausência de boletim não é falha
 
-Não se sabe como a origem sinaliza um dia sem boletim — feriado, fim de semana,
-publicação atrasada. O conector trata como ausência **qualquer resposta que não
-comece com a assinatura `%PDF-`**, registra aviso e segue para o próximo dia.
+A origem sinaliza ausência com **404** — verificado no adendo; quando esta ADR
+foi escrita, era suposição. O conector trata como ausência tanto o 404 quanto
+**qualquer resposta que não comece com a assinatura `%PDF-`**, registra aviso e
+segue para o próximo dia.
 
-É guarda deliberada, e não desconfiança gratuita: um endpoint de download que
-devolve 200 com uma página de erro é comum, e sem essa verificação o lake
-arquivaria HTML de erro como se fosse boletim.
+A segunda guarda é deliberada, e não desconfiança gratuita: um endpoint de
+download que devolve 200 com página de erro é comum, e sem ela o lake
+arquivaria HTML de erro como se fosse boletim. O adendo mostra que ela é
+necessária por outro motivo também — a origem declara `application/octet-stream`
+para um PDF, então o `Content-Type` não serve para decidir.
+
+**5xx não é ausência.** Um 503 significa "a origem falhou", não "não há
+boletim": tratá-lo como ausência abriria buraco silencioso na série. O retry da
+sessão tenta de novo e, persistindo, a execução falha — que é o certo.
 
 ### 5. O POST pode ser repetido
 
@@ -100,15 +107,83 @@ arquivaria HTML de erro como se fosse boletim.
   cobertura — quais dias têm boletim —, não um indicador; é o que se pode
   afirmar sem conhecer o conteúdo, e é coerente com a ADR 012 (Gold sem KPI
   nesta fase).
-- **O conector não foi executado contra a API real.** Foi escrito a partir do
-  exemplo, como o `hubspot_negocios` foi escrito a partir da documentação
-  pública, e pelo mesmo motivo: a credencial não está no ambiente. O teste de
-  integração fica `skipif` até o token existir no Secret Manager.
-- O que só a primeira execução real revela está listado no fim de
-  `docs/dicionario-dados/tempook_boletins.md`. O principal: **se o template do
-  caminho vale para toda data**, ou se há exceção que o exemplo de um único dia
-  não mostra.
+- O conector foi **sondado contra a API real** em 14/09, com o token recebido —
+  ver o adendo. As quatro suposições desta ADR se confirmaram; apareceu um
+  problema de outra natureza, que é da Alup resolver.
+- O teste de integração segue `skipif`: ele lê o token do Secret Manager, que
+  não existe até A3.
 - O token vai para `alupdata-tempook-api-token`, já declarado em
   `infra/modules/secrets`. O token entregue por e-mail em 14/09 **deve ser
   rotacionado antes do primeiro uso** — a recomendação está no
   [registro de 14/09](../../relatorios/2026-09-14-documentacao-de-apis-recebida.md) §5.
+
+---
+
+## Adendo de 2026-09-14 — sondagem contra a API real
+
+O `.eml` com o token voltou a ficar acessível na mesma tarde, e a API foi
+sondada antes de a ADR ser dada por encerrada. **As quatro decisões acima se
+confirmaram, e uma quinta questão apareceu.**
+
+### O que se confirmou
+
+| Suposição | Resultado |
+|---|---|
+| O template do caminho vale para toda data, não só para o exemplo | **Confirmado.** Verificado em ~40 datas distintas ao longo de 7 meses de 2022, todas respondendo com PDF |
+| A verificação de TLS passa sem `verify=False` | **Confirmado.** Todas as requisições foram feitas com validação de certificado ligada. O `verify=False` do exemplo é desnecessário |
+| A origem sinaliza ausência de forma detectável | **Confirmado: 404.** E a ausência tem sentido — ver abaixo |
+| Tratar 5xx como falha, e não como ausência, importa | **Confirmado na prática.** Um caminho que respondera 200 devolveu **503** minutos depois. O retry da sessão absorve; tratar 503 como "sem boletim" teria criado buraco silencioso na série |
+
+### O boletim é de dia útil, e o 404 prova isso
+
+A varredura diária de outubro de 2022 desenha o calendário sozinha:
+
+| Data | Dia | Resposta |
+|---|---|---|
+| 08/10, 09/10 | sábado, domingo | 404 |
+| 10/10, 11/10 | segunda, terça | PDF |
+| **12/10** | quarta — **Nossa Senhora Aparecida** | **404** |
+| 13/10, 14/10 | quinta, sexta | PDF |
+| 15/10, 16/10 | sábado, domingo | 404 |
+| 17/10 a 20/10 | segunda a quinta | PDF |
+
+Fim de semana e feriado nacional não têm boletim. **A janela de 5 dias do
+agendamento é adequada** — cobre um fim de semana prolongado sem multiplicar
+requisições.
+
+### O `Content-Type` não serve para decidir, e a guarda por bytes estava certa
+
+A origem devolve **`application/octet-stream`**, não `application/pdf`, mesmo
+quando o corpo é um PDF íntegro. A decisão de conferir a assinatura `%PDF-` em
+vez de confiar no cabeçalho (item 4) deixou de ser precaução e passou a ser
+necessária.
+
+### A questão nova: a série acessível termina em outubro de 2022
+
+O token funciona, o caminho está certo, e **nenhum boletim posterior a
+2022-10-26 responde**. Amostragem em dias úteis de novembro e dezembro de 2022,
+e em 2023, 2024, 2025 e 2026: **404 em todos**. Sete variações plausíveis do
+caminho para uma data recente também devolveram 404.
+
+Não é defeito do conector nem do template — é o acervo alcançável por esta
+credencial. As hipóteses, em ordem de probabilidade:
+
+1. o token é antigo e sua permissão cobre apenas o período contratado à época;
+2. os boletins passaram a ser publicados em outra área do storage;
+3. o produto "Boletim Diário da Comercializadora" foi descontinuado ou
+   renomeado.
+
+**É pergunta para a Alup, não decisão de arquitetura**, e está registrada no
+[registro de 14/09](../../relatorios/2026-09-14-documentacao-de-apis-recebida.md).
+Enquanto não for respondida, o conector está correto e ingere zero boletins —
+que é o comportamento certo para um acervo vazio, mas não é o que a Onda 2
+precisa entregar.
+
+### Consequência para o histórico
+
+Se a resposta for a hipótese 1 e a Alup obtiver um token com acervo completo, o
+conector ingere o histórico de uma vez passando a janela desejada — é
+exatamente o que a regra 3 existe para permitir. O PDF de 31/03/2022 tem
+**9 MB**; a série de um ano de dias úteis fica na ordem de **2 GB no bucket
+raw**, o que é barato e cabe no teto de custo, mas merece ser dito antes de
+alguém pedir "todo o histórico".

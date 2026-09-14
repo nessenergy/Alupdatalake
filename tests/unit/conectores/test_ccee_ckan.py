@@ -183,15 +183,9 @@ class _FechaAoEsgotar(io.BytesIO):
 
     def read(self, *args, **kwargs):
         if self.tell() >= len(self.getvalue()):
+            self.close()  # o `.closed` real é o que o envelope confere, não a mensagem
             raise ValueError("read of closed file")
         return super().read(*args, **kwargs)
-
-    def readinto(self, b):
-        # io.BufferedReader lê o raw por `readinto`, não por `read` — é por
-        # aqui que o `peek()` da própria base bate no fluxo "fechado".
-        if self.tell() >= len(self.getvalue()):
-            raise ValueError("read of closed file")
-        return super().readinto(b)
 
 
 def test_conexao_fechada_pelo_servidor_apos_o_corpo_nao_derruba_a_leitura(conector, monkeypatch):
@@ -201,6 +195,31 @@ def test_conexao_fechada_pelo_servidor_apos_o_corpo_nao_derruba_a_leitura(conect
     registros = list(conector.extrair(Janela.de_texto("2026-01-01", "2026-03-31")))
 
     assert len(registros) == 3
+
+
+class _ErroAlheio(io.BytesIO):
+    """Levanta `ValueError` por outro motivo, sem nunca fechar de verdade.
+
+    O envelope só deve tratar como EOF a leitura pós-fechamento (`.closed`
+    real); qualquer outro `ValueError` — disco cheio, conexão resetada, o que
+    for — precisa subir como erro, não virar sucesso silencioso. `_SemErroAoFechar`
+    chama `.read()` no fluxo bruto (não `.readinto()`), então é `.read()` que
+    precisa levantar aqui. A primeira chamada (o `peek()` de detecção de gzip)
+    passa normalmente; a partir da segunda, sempre levanta.
+    """
+
+    def read(self, *args, **kwargs):
+        if self.tell() > 0:
+            raise ValueError("defeito qualquer, nao fechamento")
+        return super().read(*args, **kwargs)
+
+
+def test_valueerror_sem_relacao_com_fechamento_nao_vira_eof_silencioso(conector, monkeypatch):
+    comprimido = gzip.compress(CSV.encode("iso-8859-1"))
+    monkeypatch.setattr(conector, "_abrir", lambda _s: _ErroAlheio(comprimido))
+
+    with pytest.raises(ValueError, match="defeito qualquer"):
+        list(conector.extrair(Janela.de_texto("2026-01-01", "2026-03-31")))
 
 
 # --------------------------------------------------------------- descoberta

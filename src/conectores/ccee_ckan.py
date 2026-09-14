@@ -83,7 +83,14 @@ class _SemErroAoFechar:
         try:
             dado = self._bruto.read(len(b))
         except ValueError:
-            return 0
+            # Só engole a leitura pós-fechamento (confirmado contra a API real:
+            # nesse instante `self._bruto.closed` já é True). Qualquer outro
+            # `ValueError` — de origem diferente — sobe, para uma leitura
+            # truncada nunca virar EOF limpo em silêncio (regra 4: Bronze
+            # completo, não parcial-disfarçado-de-sucesso).
+            if getattr(self._bruto, "closed", False):
+                return 0
+            raise
         b[: len(dado)] = dado
         return len(dado)
 

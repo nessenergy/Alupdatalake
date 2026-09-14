@@ -254,12 +254,23 @@ def test_orcamento_sem_dia_decorrido_nao_divide_por_zero() -> None:
     assert not o.estoura
 
 
-def test_dominio_de_negocio_e_provisorio_ate_o_questionario_de_gaps(cliente) -> None:
+def test_dominio_de_negocio_usa_os_oito_documentados(cliente) -> None:
+    """Era "provisório até o Questionário de Gaps" — que foi respondido em 11/09.
+
+    A visão de diretoria passou a falar o mesmo vocabulário de
+    `docs/arquitetura/dominios-analiticos.md`; "Macroeconomia", que era
+    agrupamento por afinidade, virou "Conjuntura e indicadores macro".
+    """
+    from src.portal.custo import DOMINIOS_VALIDOS
     from src.portal.dados import ProvedorSimulado
 
     dominios = dict(ProvedorSimulado().custo().por_dominio)
-    assert "Macroeconomia" in dominios  # BCB + IBGE
-    assert "provisório" in cliente.get("/custo").get_data(as_text=True)
+
+    assert "Conjuntura e indicadores macro" in dominios  # BCB + IBGE + TempoOK
+    assert set(dominios) <= DOMINIOS_VALIDOS
+    assert "Não classificado" not in dominios
+    # A tela deixou de chamar o agrupamento de provisório.
+    assert "provisório" not in cliente.get("/custo").get_data(as_text=True)
 
 
 def test_valor_pequeno_nao_vira_zero_na_formatacao() -> None:
@@ -397,3 +408,30 @@ def test_falha_do_provedor_nao_vaza_o_motivo_na_tela(cliente, monkeypatch) -> No
     assert "alupdata-dev" not in corpo
     assert "Access Denied" not in corpo
     assert "registrada" in corpo
+
+
+# ------------------------------------------------- domínios da visão diretoria
+
+
+def test_todo_conector_registrado_tem_dominio_na_visao_de_diretoria():
+    """Fonte sem domínio cai em "Não classificado" e some da leitura da diretoria.
+
+    O mapa nasceu provisório porque os 8 domínios dependiam do Questionário
+    (A4). Ele foi respondido, os domínios estão em
+    `docs/arquitetura/dominios-analiticos.md`, e o mapa passou a ter alvo real —
+    mas quatro conectores entraram desde então sem entrar nele.
+    """
+    from src.core.registry import listar
+    from src.portal.custo import DOMINIO_ANALITICO
+
+    sem_dominio = [rotulo for rotulo in listar() if rotulo not in DOMINIO_ANALITICO]
+
+    assert not sem_dominio, f"conectores sem domínio: {', '.join(sem_dominio)}"
+
+
+def test_os_dominios_usados_sao_os_oito_documentados():
+    """Nome livre no mapa faria a visão de diretoria divergir do documento."""
+    from src.portal.custo import DOMINIO_ANALITICO, DOMINIOS_VALIDOS
+
+    assert len(DOMINIOS_VALIDOS) == 8
+    assert set(DOMINIO_ANALITICO.values()) <= DOMINIOS_VALIDOS

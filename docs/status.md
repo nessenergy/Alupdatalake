@@ -49,12 +49,14 @@ contexto para agentes, em [`../AGENTS.md`](../AGENTS.md).
 | **CCEE/PLD** | CSV anual remoto (ISO-8859-1), descoberto via CKAN | **288 registros / 3 dias**, 0 inválidos, contra a API real | mensal, dia 5 às 9h, janela 120 dias |
 | **CCEE/perfil** | cadastro CSV (ISO-8859-1), via CKAN | **60.509 registros**, 0 inválidos, contra a API real | semanal, terça 7h |
 | **Hubspot/negócios** | JSON paginado, CRM | **não executado** — sem token (A9) | a cada 6h, janela 2 dias |
+| **BBCE/curva forward** | JSON por pregão, sessão JWT | **não executado** — sem acesso (A7) | dia útil 20h, janela 7 dias |
 | **TempoOK/boletins** | PDF por download, catálogo no Bronze | **contrato verificado contra a API real**; 0 boletins ingeríveis — o acervo alcançável para em 26/10/2022 (ADR 019, adendo) | diário 11h, janela 5 dias |
 
-**Seis das sete falaram com a API real** em dry-run. O Hubspot é a única
-exceção: os 7 componentes existem, mas foram escritos contra a documentação
-pública e nunca falaram com a API — o teste de integração está `skipif` até o
-token chegar (A9).
+**Seis das nove falaram com a API real** em dry-run. Hubspot e BBCE são as
+exceções: os 7 componentes existem, escritos contra a documentação, e o teste
+de integração está `skipif` até a credencial chegar (A9 e A7). No BBCE falta
+inclusive o **host**, que não consta da documentação pública e vem junto com o
+acesso.
 
 O TempoOK é um caso à parte: **falou com a API e o contrato de dados está
 verificado** — caminho, ausência por 404, TLS, estabilidade do `sha256` —, mas
@@ -75,7 +77,7 @@ Nenhuma linha chegou a um BigQuery de verdade — o projeto GCP ainda não exist
 
 ### Documentação
 
-ADRs 001–020 · 10 dicionários de dados com [índice e linhagem](dicionario-dados/README.md) · plano de execução · runbook de deploy,
+ADRs 001–020 · 11 dicionários de dados com [índice e linhagem](dicionario-dados/README.md) · plano de execução · runbook de deploy,
 de primeiro deploy e de acompanhamento semanal ·
 [`proximos-passos.md`](proximos-passos.md) como fila de execução ·
 `AGENTS.md` como contexto canônico · skills do projeto e shortlist do Google.
@@ -127,7 +129,7 @@ destino, com os oito invariantes e a pauta de perguntas. **Enviado ao Google em
 |---|---|---|
 | 0 — Fundação | 90h · marco 15,52% | Técnico concluído; **falta o que depende da Alup** (A3–A6) para homologar |
 | 1 — Mercado base | 120h · marco 20,69% | **5 de 5 fontes com entrega**: as 4 públicas verificadas contra as APIs reais e a CCEE destravada em 14/09, com `ccee_pld` entregue pela via de dados abertos (ADR 018). As demais entidades da CCEE entram por demanda dos domínios analíticos (A4) |
-| 2 — APIs credenciadas | 110h · marco 18,97% | **Hubspot e TempoOK com os 7 componentes**, ambos escritos antes do token; falta rodar contra a API real (A9, A7). O BBCE está documentado desde 14/09 e é o próximo a ser escrito — **a onda deixou de estar bloqueada por documentação** e passou a depender só de credencial |
+| 2 — APIs credenciadas | 110h · marco 18,97% | **Hubspot, TempoOK e BBCE com os 7 componentes**, os três escritos antes da credencial; falta rodar contra a API real (A9, A7). **A onda deixou de estar bloqueada por documentação** e depende só de credencial. Resta a CCEE credenciada, que é escopo candidato e não foi pedida em A7 ([ADR 018](arquitetura/decisoes/018-vias-de-acesso-a-ccee.md)) |
 | 3 — Sistemas internos | 155h · marco 26,72% | Caminho de banco pronto (ADR 008: Oracle, MySQL e SQL Server); **nenhuma fonte iniciada** — bloqueada por VPN e credencial (A7) |
 | 4 — Planilhas e handoff | 105h · marco 18,10% | **Motor S2 Data Intake pronto** (item 4.1), adiantado por não depender de insumo; templates concretos dependem de A4. Governança e handoff não iniciados |
 

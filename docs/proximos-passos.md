@@ -84,7 +84,7 @@ Ainda em 11/09, diante do teto de E2: **orquestração da Onda 3 em Cloud Workfl
 
 | # | Ação | Depende de |
 |---|---|---|
-| 4.1 | **Conector do BBCE**, no regime do Hubspot: 7 componentes contra a documentação, integração `skipif` até a credencial | nada — é a próxima da fila, e não depende de GCP |
+| ~~4.1~~ | ~~Conector do BBCE~~ — **entregue em 14/09**: `bbce_curva_forward`, 7 componentes, 17 testes. Falta só o acesso (A7, [#23](https://github.com/nessenergy/Alupdatalake/issues/23)) — inclusive o **host**, que não consta da documentação | — |
 | 4.2 | Endurecer o Portal MVP enquanto roda com provedor simulado | decisão 3.4 |
 | 4.3 | Versão em inglês do baralho | decisão 3.2 |
 | 4.4 | Apagar `docs/fluxo-execucao` e o branch de trabalho, já mesclados; arquivar os dois `backup/*` como tag | permissão — daqui o `git push --delete` e a API respondem 403 |

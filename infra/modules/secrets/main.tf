@@ -12,7 +12,11 @@ variable "segredos" {
   type        = list(string)
   default = [
     "alupdata-ccee-api-token",
-    "alupdata-bbce-api-token",
+    # O BBCE autentica por sessão (login devolve JWT de 4h) e exige quatro
+    # credenciais mais o host, que não consta da documentação pública. Vão
+    # num JSON só, como as DSN da Onda 3: a Alup preenche uma coisa e não
+    # há estado meio-configurado.
+    "alupdata-bbce-credenciais",
     "alupdata-hubspot-api-token",
     "alupdata-tempook-api-token",
     "alupdata-fmb-dsn",

@@ -16,6 +16,7 @@ Este índice diz o que já existe, o que falta e — importante — **por que fa
 | IBGE — IPCA | [`ibge_ipca.md`](ibge_ipca.md) | 1 | — | `inflacao_mensal` |
 | Hubspot — negócios | [`hubspot_negocios.md`](hubspot_negocios.md) | 2 | — | `funil_comercial` |
 | TempoOK — boletins | [`tempook_boletins.md`](tempook_boletins.md) | 2 | — | `cobertura_boletins_tempook` |
+| BBCE — curva forward | [`bbce_curva_forward.md`](bbce_curva_forward.md) | 2 | — | `curva_forward_vigente` |
 | Log de execução | [`_execucoes.md`](_execucoes.md) | 0 | — | `saude_ingestao`, `volumetria_lake` |
 | Custo de nuvem | [`_custo_consultas.md`](_custo_consultas.md) | 0 | — | `custo_consultas` |
 
@@ -47,11 +48,11 @@ projeto é explícita: *schema por adivinhação continua proibido*. Documentar
 campo que ninguém viu produz retrabalho com aparência de progresso — e o
 dicionário é justamente o artefato que não pode mentir.
 
-Em **14/09** a documentação recebida da Alup tirou três linhas desta tabela.
+Em **14/09** a documentação recebida da Alup tirou quatro linhas desta tabela —
+BBCE incluído, escrito no mesmo dia.
 
 | Fonte | Onda | O que falta para escrever |
 |---|---|---|
-| **BBCE** | 2 | **Nada.** Documentado em Postman desde 14/09 — é a próxima fonte a escrever, antes da credencial, no regime do Hubspot |
 | CCEE — agente credenciado | 2 | Credencial de agente, que não foi pedida em A7; é escopo candidato, não escopo em curso ([ADR 018](../arquitetura/decisoes/018-vias-de-acesso-a-ccee.md)) |
 | CCEE — demais conjuntos do InfoMercado | 1 | Nada técnico: são 204 conjuntos públicos. Falta **decidir quais**, e isso depende dos domínios analíticos (A4) |
 | Oracle FMB | 3 | VPN e schema documentado (A7 / [#12](https://github.com/nessenergy/Alupdatalake/issues/12)) |

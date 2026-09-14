@@ -1,0 +1,24 @@
+config {
+  type: "operations",
+  schema: "bronze",
+  hasOutput: true,
+  tags: ["bronze"]
+}
+
+-- Bronze: PLD horário por submercado (CCEE, dados abertos).
+CREATE TABLE IF NOT EXISTS ${self()} (
+  data_referencia         DATE      NOT NULL OPTIONS(description="Dia da apuração, derivado do mês de referência e do período"),
+  hora                    INT64     NOT NULL OPTIONS(description="Hora do dia, 0 a 23, horário de Brasília"),
+  submercado              STRING    NOT NULL OPTIONS(description="N, NE, S, SE — sigla, como o ONS publica"),
+  periodo_apuracao        STRING    NOT NULL OPTIONS(description="AAAA-MM do mês de referência da CCEE"),
+  periodo_comercializacao INT64     NOT NULL OPTIONS(description="Índice da hora no mês, 1-based, como a CCEE publica — guardado para rastrear o dado até a origem"),
+  pld_reais_mwh           NUMERIC   NOT NULL OPTIONS(description="Preço de Liquidação das Diferenças em R$/MWh"),
+
+  _ingestao_id            STRING    NOT NULL,
+  _ingestao_timestamp     TIMESTAMP NOT NULL,
+  _fonte                  STRING    NOT NULL,
+  _schema_versao          STRING    NOT NULL
+)
+PARTITION BY DATE(_ingestao_timestamp)
+CLUSTER BY data_referencia, submercado
+OPTIONS(description="PLD horário por submercado — camada Bronze, append-only");

@@ -1,0 +1,26 @@
+config {
+  type: "table",
+  schema: "gold",
+  tags: ["gold"]
+}
+
+-- Gold: PLD mensal por submercado — média, pico, vale e amplitude do mês.
+--
+-- A média aritmética das horas é o número que o mercado usa para comparar
+-- meses e submercados. Ela **não** é o preço de liquidação de um contrato:
+-- liquidação pondera preço por montante horário, e o montante não está nesta
+-- fonte. Quem precisar de valor financeiro precisa cruzar com medição, que só
+-- existe nas APIs credenciadas da CCEE (ADR 018) — fora do escopo desta onda.
+--
+-- Sem KPI nesta fase, conforme ADR 012: agregação descritiva apenas, até os
+-- domínios analíticos serem definidos (A4).
+SELECT
+  periodo_apuracao,
+  submercado,
+  COUNT(*)                                     AS horas,
+  AVG(pld_reais_mwh)                           AS pld_medio_reais_mwh,
+  MAX(pld_reais_mwh)                           AS pld_maximo_reais_mwh,
+  MIN(pld_reais_mwh)                           AS pld_minimo_reais_mwh,
+  MAX(pld_reais_mwh) - MIN(pld_reais_mwh)      AS amplitude_reais_mwh
+FROM ${ref("silver", "ccee_pld")}
+GROUP BY periodo_apuracao, submercado

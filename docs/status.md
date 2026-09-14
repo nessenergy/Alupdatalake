@@ -46,7 +46,7 @@ contexto para agentes, em [`../AGENTS.md`](../AGENTS.md).
 | **IBGE/IPCA** | JSON aninhado, mensal | 12 registros / 6 meses | dia 12, janela 90 dias |
 | **ANEEL/SIGA** | cadastro paginado | **25.263 registros**, 0 inválidos, 28s | semanal, segunda 7h |
 | **ONS/carga** | CSV anual remoto | 28 registros / 7 dias | diário 8h, janela 30 dias |
-| **CCEE/PLD** | CSV anual remoto, via CKAN | verificado contra a API real em 14/09 | diário 9h30, janela 35 dias |
+| **CCEE/PLD** | CSV anual remoto (ISO-8859-1), descoberto via CKAN | **288 registros / 3 dias**, 0 inválidos, contra a API real | mensal, dia 5 às 9h, janela 120 dias |
 | **Hubspot/negócios** | JSON paginado, CRM | **não executado** — sem token (A9) | a cada 6h, janela 2 dias |
 
 As quatro primeiras foram verificadas **em dry-run contra as APIs reais**. O

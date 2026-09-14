@@ -55,3 +55,25 @@ def test_get_json_propaga_erro_http():
 
     with pytest.raises(requests.HTTPError):
         get_json(SessaoQueFalha(), "https://exemplo/api")
+
+
+# --------------------------------------------------- identificação do coletor
+# ADR 018: a CCEE recusava com 403 quem não se identificava. O cabeçalho ficou
+# no núcleo, não no conector da CCEE — identificar-se vale para toda origem, e
+# qualquer outra fonte pública pode ligar o mesmo filtro.
+
+
+def test_sessao_identifica_o_coletor_em_toda_requisicao():
+    ua = criar_sessao().headers["User-Agent"]
+
+    assert ua.startswith("Alupar-DataCollector/")
+    assert "alupar.com.br" in ua  # contato de quem opera a origem
+
+
+def test_identificacao_nao_substitui_cabecalho_do_conector():
+    """Conector que precise de outro Accept ou de Authorization continua mandando."""
+    sessao = criar_sessao()
+    sessao.headers.update({"Accept": "text/csv"})
+
+    assert sessao.headers["Accept"] == "text/csv"
+    assert sessao.headers["User-Agent"].startswith("Alupar-DataCollector/")

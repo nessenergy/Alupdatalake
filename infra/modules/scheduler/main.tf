@@ -42,6 +42,12 @@ variable "conectores" {
       cron         = "0 */6 * * *" # CRM muda ao longo do dia; 4x por dia basta
       ultimos_dias = 2             # cobre execução perdida sem varrer o funil todo
     }
+    ccee_pld = {
+      # O PLD sai por fechamento mensal, com defasagem: em 01/09/2026 o arquivo
+      # ia até julho. Rodar diariamente só varreria o mesmo CSV sem dado novo.
+      cron         = "0 9 5 * *" # dia 5, depois do fechamento do mês anterior
+      ultimos_dias = 120         # cobre a defasagem de publicação e a recontabilização (ADR 016)
+    }
   }
 }
 

@@ -4,12 +4,19 @@ config {
   tags: ["silver"],
   assertions: {
     uniqueKey: ["data_referencia", "tipo_boletim"],
-    nonNull: ["data_referencia", "tipo_boletim"]
+    nonNull: ["data_referencia", "tipo_boletim"],
+    rowConditions: [
+      "cotacao_compra > 0 AND cotacao_venda > 0",
+      "cotacao_venda >= cotacao_compra"
+    ]
   }
 }
 
 -- Silver: PTAX higienizada, deduplicada e com as dimensões comuns.
 -- Dedup: para cada (data_referencia, tipo_boletim), vence a ingestão mais recente.
+-- Faixas (issue #110): venda abaixo da compra é inversão de spread — não
+-- acontece em boletim do BCB, e se aparecer é troca de coluna na origem. O
+-- `cotacao_media` desta view sairia errado sem ninguém notar.
 SELECT
   data_referencia,
   CAST(NULL AS STRING)  AS submercado,      -- câmbio não é dado de submercado

@@ -4,7 +4,12 @@ config {
   tags: ["silver"],
   assertions: {
     uniqueKey: ["codigo_perfil"],
-    nonNull: ["codigo_perfil", "agente_ccee", "cnpj", "status_perfil"]
+    nonNull: ["codigo_perfil", "agente_ccee", "cnpj", "status_perfil"],
+    rowConditions: [
+      "LENGTH(cnpj) = 14",
+      "status_perfil IN ('ATIVO','ENCERRADO','PERFIL ESPECIFICO')",
+      "submercado IS NULL OR submercado IN ('N','NE','S','SE')"
+    ]
   }
 }
 
@@ -14,6 +19,9 @@ config {
 -- série: aqui não se quer o histórico do cadastro, se quer o cadastro de hoje.
 -- O histórico continua no Bronze, que é append-only, para quem precisar
 -- reconstituir como o cadastro estava numa data passada.
+-- Faixas (issue #110): submercado **nulo é legítimo** aqui — nem todo perfil
+-- tem um. A condição aceita nulo de propósito; trocá-la por NOT NULL
+-- descartaria comercializadores, que são justamente a contraparte de interesse.
 SELECT
   codigo_perfil,
   agente_ccee,

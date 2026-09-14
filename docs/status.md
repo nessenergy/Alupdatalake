@@ -1,10 +1,10 @@
 # Estado do projeto
 
-Atualizado em **2026-09-09** · **A3 não chegou no prazo** — vencido em 04/09,
-primeiro dia útil de atraso em 08/09, contagem da cláusula 3ª em curso; a Alup
-levantou dúvida sobre a atribuição de E1 e E2 em 09/09, **esclarecida no mesmo
-dia**; região decidida (ADR 009); baralho de revisão arquitetural com o Google,
-sem prazo de resposta
+Atualizado em **2026-09-14** · **A3 completa hoje o 5º dia útil de atraso** —
+vencido em 04/09, previsão da Alup para 18/09, contagem da cláusula 3ª em
+curso. Em 14/09 a Alup entregou a documentação das APIs: **A2 encerrada e A8
+atendida**, e as 32h da CCEE voltaram a andar sem depender da contratante
+(ADR 018)
 
 Este arquivo responde "onde estamos e o que trava o próximo passo". Detalhe de
 escopo e estimativa fica em [`plano-execucao.md`](plano-execucao.md); o que sai
@@ -46,6 +46,7 @@ contexto para agentes, em [`../AGENTS.md`](../AGENTS.md).
 | **IBGE/IPCA** | JSON aninhado, mensal | 12 registros / 6 meses | dia 12, janela 90 dias |
 | **ANEEL/SIGA** | cadastro paginado | **25.263 registros**, 0 inválidos, 28s | semanal, segunda 7h |
 | **ONS/carga** | CSV anual remoto | 28 registros / 7 dias | diário 8h, janela 30 dias |
+| **CCEE/PLD** | CSV anual remoto, via CKAN | verificado contra a API real em 14/09 | diário 9h30, janela 35 dias |
 | **Hubspot/negócios** | JSON paginado, CRM | **não executado** — sem token (A9) | a cada 6h, janela 2 dias |
 
 As quatro primeiras foram verificadas **em dry-run contra as APIs reais**. O
@@ -62,7 +63,7 @@ BigQuery de verdade — o projeto GCP ainda não existe.
 | `periodo_apuracao` | todas | ok |
 | `codigo_usina` | ANEEL/SIGA (CodCEG) | ok |
 | `submercado` | ONS (N, NE, S, SE) | ok |
-| `agente_ccee` | CCEE | **sem fonte** — depende do desbloqueio da CCEE |
+| `agente_ccee` | CCEE | **fonte identificada em 14/09** — `lista_perfil` e `lista_agente_associado`, públicos no CKAN da CCEE. Não é mais bloqueio: é a próxima entidade da fila (ADR 018) |
 
 ### Documentação
 
@@ -95,13 +96,13 @@ destino, com os oito invariantes e a pauta de perguntas. **Enviado ao Google em
 | # | Item | Efeito enquanto não vier | Referência |
 |---|---|---|---|
 | A1 | **Conceder à ness. os papéis de bootstrap** em cada projeto (ADR 015, revista em 11/09): com eles a ness. configura o WIF (`GCP_WIF_PROVIDER`, `GCP_DEPLOY_SA`), o bucket de state, o Artifact Registry e a SA de deploy | o bootstrap não roda e o workflow de deploy não autentica | ADR 015, `runbook/primeiro-deploy.md` §0 |
-| A2 | **Decidir sobre a CCEE InfoMercado** — portal responde 403 a acesso automatizado | 32h da Onda 1 paradas; `agente_ccee` sem fonte | [issue #52](https://github.com/nessenergy/Alupdatalake/issues/52), plano §3.1 |
+| ~~A2~~ | ~~**Decidir sobre a CCEE InfoMercado**~~ | **Encerrada em 14/09** — era filtro de cliente não identificado, não bloqueio de IP nem credencial. Resolvido por cabeçalho no `src/core/http.py` | [ADR 018](arquitetura/decisoes/018-vias-de-acesso-a-ccee.md), [registro de 14/09](relatorios/2026-09-14-documentacao-de-apis-recebida.md) |
 | A3 | **Projeto GCP `dev`**: criar, habilitar APIs, IAM, Artifact Registry, bucket de state — criação e `billing_account` são da Alup, esclarecido em 09/09 | nada sobe; Onda 0 não homologa | plano 2.2 (0.13), [registro de 09/09](relatorios/2026-09-09-esclarecimento-e1-e2.md) |
 | A4 | **Questionário de Gaps** (47 perguntas) | os 8 domínios analíticos não se definem; a Gold fica sem alvo | plano 2.2 (0.9) |
 | A5 | **RACI e data owners** por domínio | sem dono, dúvida de regra de negócio não tem para quem ir | plano 2.2 (0.12); interlocutores já conhecidos em [`interlocutores.md`](interlocutores.md) |
 | A6 | **Ferramenta de BI** definida | o Portal MVP e as views Gold ficam sem consumidor definido | contrato, cláusula 3ª |
 | A7 | Abrir **já** os pedidos de token (Onda 2) e VPN/credencial (Onda 3) | é o maior risco do contrato: atraso dispara ociosidade de 4h/dia | plano §7 |
-| A8 | **Documentação técnica de BBCE e TempoOK** (a Alup é contratante desses serviços) | sem ela não dá nem para preparar o contrato de dados antes do token — ver §5 | §5 |
+| ~~A8~~ | ~~**Documentação técnica de BBCE e TempoOK**~~ | **Atendida em 14/09** — BBCE documentado em Postman; TempoOK sem documentação publicada, mas com exemplo suficiente. Resta só a credencial do BBCE, que é A7 | [registro de 14/09](relatorios/2026-09-14-documentacao-de-apis-recebida.md) |
 | A9 | **Token do Hubspot** (private app) no secret `alupdata-hubspot-api-token` | o conector está pronto e parado; nenhuma linha de CRM entra no lake | plano 2.3 (2.3) |
 
 > **Cláusula 3ª**: atraso > 5 dias úteis posterga o cronograma; > 5 dias úteis em
@@ -116,7 +117,7 @@ destino, com os oito invariantes e a pauta de perguntas. **Enviado ao Google em
 | Onda | Escopo | Situação |
 |---|---|---|
 | 0 — Fundação | 90h · marco 15,52% | Técnico concluído; **falta o que depende da Alup** (A3–A6) para homologar |
-| 1 — Mercado base | 120h · marco 20,69% | **4 de 5 fontes concluídas**; CCEE bloqueada (A2) |
+| 1 — Mercado base | 120h · marco 20,69% | **5 de 5 fontes com entrega**: as 4 públicas verificadas contra as APIs reais e a CCEE destravada em 14/09, com `ccee_pld` entregue pela via de dados abertos (ADR 018). As demais entidades da CCEE entram por demanda dos domínios analíticos (A4) |
 | 2 — APIs credenciadas | 110h · marco 18,97% | **Hubspot com os 7 componentes**, escrito antes do token; falta rodar contra a API real (A9). Demais fontes bloqueadas por token e por documentação (A7, A8) |
 | 3 — Sistemas internos | 155h · marco 26,72% | Caminho de banco pronto (ADR 008: Oracle, MySQL e SQL Server); **nenhuma fonte iniciada** — bloqueada por VPN e credencial (A7) |
 | 4 — Planilhas e handoff | 105h · marco 18,10% | **Motor S2 Data Intake pronto** (item 4.1), adiantado por não depender de insumo; templates concretos dependem de A4. Governança e handoff não iniciados |
@@ -137,9 +138,9 @@ sondagem de 2026-08-25 mostra que isso **só se sustenta para uma delas**:
 
 | Fonte | Documentação/API alcançável? | Dá para escrever o contrato hoje? |
 |---|---|---|
-| CCEE InfoMercado | **não** — 403 em tudo, inclusive na página de documentação | não |
-| BBCE | **não** — nenhum endpoint público encontrado | não |
-| TempoOK | site público, mas **sem contrato de API discoverable** | não |
+| CCEE InfoMercado | **sim, desde 14/09** — o 403 era filtro de cliente não identificado; o CKAN de dados abertos expõe 204 conjuntos, sem credencial | **sim, e sem depender de token** — ADR 018 |
+| BBCE | **sim, desde 14/09** — coleção Postman completa | sim; falta só a credencial (A7) |
+| TempoOK | **sem documentação publicada**, mas com exemplo de consulta e token entregues em 14/09 | **feito** em 14/09 — ADR 019 |
 | Hubspot | sim — API e docs públicas | **feito** em 2026-08-26 — ver abaixo |
 
 O Hubspot foi entregue nesse regime em 2026-08-26: conector, Bronze, Silver,
@@ -149,9 +150,10 @@ começar. O que **não** foi possível verificar sem credencial está listado no
 fim de `dicionario-dados/hubspot_negocios.md`.
 
 Escrever schema por adivinhação seria pior que não escrever: cria retrabalho
-com aparência de progresso. **O que destrava**: a Alup fornecer a documentação
-técnica de BBCE e TempoOK (que ela tem, como contratante desses serviços) —
-isso vale tanto quanto o token, e pode vir antes dele.
+com aparência de progresso. **O que destravava era a documentação**, e ela
+chegou em 14/09 — três das quatro linhas acima mudaram de lado no mesmo dia.
+Restam bloqueadas por credencial, não por desconhecimento: BBCE (A7) e Hubspot
+(A9).
 
 ## 5.1 Ressalva importante
 
@@ -182,10 +184,10 @@ Ordenado por data em que o atraso passa a custar. Prazos derivados do
 | A6 | Ferramenta de BI definida | Alup | 11/09 | Portal MVP e views Gold sem consumidor definido |
 | [#87](https://github.com/nessenergy/Alupdatalake/issues/87) | Destinatários de alerta e `billing_account` | Alup | 11/09 | alertas e orçamento existem mas não notificam ninguém |
 | — | Variáveis do GitHub (`GCP_WIF_PROVIDER`, `GCP_DEPLOY_SA`) | ness. | depende de A3 | deploy não autentica. **Branch protection resolvida em 11/09**: a organização passou ao GitHub Enterprise e a `main` exige PR e seis verificações, com force push e exclusão bloqueados (ADR 010, encerrada) |
-| A2 | Decisão sobre a CCEE | Alup | 18/09 | 32h da Onda 1 seguem paradas |
+| ~~A2~~ | ~~Decisão sobre a CCEE~~ | Alup | ~~18/09~~ | **Encerrada em 14/09, antes do prazo.** As 32h voltaram a andar; nenhuma das quatro alternativas foi necessária ([ADR 018](arquitetura/decisoes/018-vias-de-acesso-a-ccee.md)) |
 | G1 | **Resposta do Google à revisão arquitetural** (enviada em 04/09) | Google | **a definir** | **Precede A3 por decisão da Alup**, e portanto precede todo o cronograma técnico. Sem data pactuada, a postergação passa a depender de terceiro sem prazo acordado — ver `plano-semanal.md`, S1 |
 | A7 | Pedidos de token (Onda 2) e VPN/credencial (Onda 3) **abertos** | Alup | 25/09 | maior risco financeiro: ociosidade de 4h/dia (R$ 256/h) |
-| A8 | Documentação técnica de BBCE e TempoOK | Alup | 25/09 | Onda 2 só começa depois do token, em vez de antes |
+| ~~A8~~ | ~~Documentação técnica de BBCE e TempoOK~~ | Alup | ~~25/09~~ | **Atendida em 14/09, onze dias antes do prazo.** A Onda 2 pode ser escrita antes do token, como o plano previa |
 
 Acompanhamento consolidado destas linhas na [issue #57](https://github.com/nessenergy/Alupdatalake/issues/57).
 

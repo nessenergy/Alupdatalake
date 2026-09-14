@@ -1,0 +1,502 @@
+<!doctype html><html lang='pt-BR'><head><meta charset='utf-8'><title>Registro de recebimento 14/09/2026 — documentação de APIs das fontes</title><link rel='preconnect' href='https://fonts.googleapis.com'><link rel='preconnect' href='https://fonts.gstatic.com' crossorigin><link href='https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap' rel='stylesheet'><style>
+@page { size: A4; margin: 16mm 14mm 16mm 14mm; }
+
+/* O documento existe para virar A4. Declarar o esquema claro impede o
+   navegador de escurecer por conta própria e descolar tela de papel. */
+:root { color-scheme: light; }
+
+/* Imprimir do navegador (Ctrl+P → Salvar como PDF) vem com "gráficos de plano
+   de fundo" DESLIGADO por padrão. Sem isto, a faixa alternada das tabelas, o
+   fundo do `code` e o bloco de alerta somem no papel — e a etiqueta vermelha
+   do questionário vira texto branco sobre branco, isto é, invisível.
+   Forçar aqui garante que tela, --print-to-pdf e impressão manual coincidam. */
+html {
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+/* Só a versão de tela: no PDF a margem é da @page. Em tela o documento se
+   apresenta como folha sobre fundo, que é como ele será lido e impresso. */
+@media screen {
+  html { background: var(--zebra); }
+  body {
+    max-width: 940px;
+    margin: 0 auto;
+    padding: 56px 56px 72px;
+    font-size: 15px;
+    background: #fff;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04),
+                0 10px 15px -3px rgba(15, 23, 42, 0.06);
+  }
+  table { font-size: 14px; }
+}
+
+:root {
+  --tinta: #0f172a;
+  --suave: #475569;
+  --tenue: #94a3b8;
+  --linha: #e2e8f0;
+  --linha-fina: #eef2f6;
+  --zebra: #f8fafc;
+  --ness: #00ade8;
+  --alerta: #b3261e;
+  --fundo-alerta: #fdf3f2;
+  /* Corpo em Inter, títulos e marca em Montserrat, dado técnico em mono. */
+  --texto: Inter, "Segoe UI", system-ui, sans-serif;
+  --titulo: Montserrat, "Segoe UI", system-ui, sans-serif;
+  --mono: "JetBrains Mono", "Cascadia Mono", Consolas, monospace;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: var(--texto);
+  font-size: 9.4pt;
+  line-height: 1.55;
+  color: var(--tinta);
+  margin: 0;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ---------------------------------------------------------------- cabeçalho */
+
+.marca {
+  font-family: var(--titulo);
+  font-weight: 500;
+  font-size: 15pt;
+  letter-spacing: -0.01em;
+  margin: 0 0 2mm;
+}
+/* O ponto da marca é sempre BlueDot, em qualquer fundo. */
+.marca span { color: var(--ness); }
+
+h1 {
+  font-family: var(--titulo);
+  font-size: 17pt;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+  margin: 0 0 1mm;
+  padding-bottom: 3mm;
+  border-bottom: 2px solid var(--ness);
+}
+
+/* A primeira linha depois do h1 é a tarja de identificação do documento —
+   emissão, contrato, marco. Ela se lê como etiqueta, não como parágrafo. */
+h1 + p {
+  font-size: 8.4pt;
+  color: var(--suave);
+  margin-bottom: 5mm;
+}
+
+/* ------------------------------------------------- identificação do documento */
+
+/* Ficha do documento: quem emite, para quem, sob qual contrato, em que data.
+   Fica logo abaixo do título e não se parte entre páginas — um documento
+   contratual precisa ser identificável pela primeira folha, isolada. */
+.identificacao {
+  display: grid;
+  /* Largura suficiente para "RESPONSÁVEL TÉCNICO" caber em uma linha. */
+  grid-template-columns: 37mm 1fr;
+  gap: 1.2mm 4mm;
+  margin: 4mm 0 6mm;
+  padding: 3.5mm 4mm;
+  background: var(--zebra);
+  border-left: 2px solid var(--ness);
+  font-size: 8.4pt;
+  break-inside: avoid;
+}
+.id-rotulo {
+  font-family: var(--titulo);
+  font-size: 7.2pt;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--suave);
+  padding-top: 0.4mm;
+}
+.id-valor { color: var(--tinta); }
+
+/* ------------------------------------------------------------- fecho assinado */
+
+.assinatura {
+  margin-top: 12mm;
+  break-inside: avoid;
+}
+.assinatura .local-data {
+  font-size: 8.6pt;
+  color: var(--suave);
+  margin-bottom: 12mm;
+}
+.linha-assinatura {
+  width: 68mm;
+  border-top: 1px solid var(--tinta);
+  margin-bottom: 1.6mm;
+}
+.assina-nome {
+  font-family: var(--titulo);
+  font-weight: 500;
+  font-size: 9.4pt;
+  margin: 0;
+}
+.assina-org {
+  font-size: 8pt;
+  color: var(--suave);
+  margin: 0.4mm 0 0;
+}
+
+h2 {
+  font-family: var(--titulo);
+  font-size: 11.5pt;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  margin: 8mm 0 2.5mm;
+  padding-top: 3mm;
+  border-top: 1px solid var(--linha);
+  /* Um bloco não deve abrir no rodapé e continuar na página seguinte. */
+  break-after: avoid;
+}
+
+/* Marcador BlueDot antes do título de seção: assinatura discreta, custo zero
+   de espaço, e dá ao olho um ponto de entrada por seção. */
+h2::before {
+  content: "";
+  display: inline-block;
+  width: 1.4mm;
+  height: 1.4mm;
+  border-radius: 50%;
+  background: var(--ness);
+  margin-right: 1.8mm;
+  vertical-align: 0.4mm;
+}
+
+h3 {
+  font-family: var(--titulo);
+  font-size: 10pt;
+  font-weight: 500;
+  margin: 5mm 0 2mm;
+  break-after: avoid;
+}
+
+p { margin: 0 0 2.5mm; }
+strong { font-weight: 600; }
+code {
+  font-family: var(--mono);
+  font-size: 8.3pt;
+  background: var(--zebra);
+  border: 0.2mm solid var(--linha-fina);
+  padding: 0.3mm 1mm;
+  border-radius: 2px;
+}
+
+/* -------------------------------------------------------------------- tabela */
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0 0 4mm;
+  font-size: 8.8pt;
+  /* Número em coluna alinha por dígito, não por forma da letra. */
+  font-variant-numeric: tabular-nums;
+}
+th {
+  text-align: left;
+  font-family: var(--titulo);
+  font-weight: 600;
+  font-size: 7.6pt;
+  text-transform: uppercase;
+  /* Tracking discreto: em coluna estreita, cada 0,01em a mais é uma quebra
+     de linha a mais no cabeçalho. */
+  letter-spacing: 0.04em;
+  color: var(--suave);
+  border-bottom: 1.5px solid var(--tinta);
+  padding: 1.6mm 2mm;
+  /* Cabeçalho de coluna se lê como rótulo: melhor uma linha que duas. */
+  text-wrap: balance;
+}
+td {
+  border-bottom: 1px solid var(--linha-fina);
+  padding: 2.4mm 2mm;
+  vertical-align: top;
+}
+/* Faixa alternada: em tabela densa, o olho perde a linha sem ela. Tom baixo
+   o bastante para não competir com o texto nem pesar na impressão. */
+tbody tr:nth-child(even) td { background: var(--zebra); }
+/* A primeira coluna costuma ser a chave da linha — onda, item, código. */
+tbody td:first-child { font-weight: 500; }
+/* Uma pergunta não se parte entre páginas. */
+tr { break-inside: avoid; }
+thead { display: table-header-group; }
+
+/* Larguras de coluna do formulário: código estreito, "Resposta" com espaço de
+   escrita. Valem só no questionário — num relatório espremeriam a 1ª coluna e
+   pintariam a última sem motivo. */
+.questionario td:first-child { width: 7%; font-weight: 600; font-variant-numeric: tabular-nums; }
+.questionario th:last-child, .questionario td:last-child { width: 30%; background: #fafbfc; }
+.questionario td:nth-child(3) { width: 15%; color: var(--suave); font-size: 8.2pt; }
+
+/* --------------------------------------------------------------- destaques */
+
+.bloqueia {
+  display: inline-block;
+  background: var(--alerta);
+  color: #fff;
+  font-size: 6.8pt;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  padding: 0.4mm 1.4mm;
+  border-radius: 2px;
+  margin-right: 1.2mm;
+  vertical-align: 1px;
+}
+
+blockquote {
+  margin: 0 0 3mm;
+  padding: 2.5mm 3mm;
+  background: var(--fundo-alerta);
+  border-left: 3px solid var(--alerta);
+}
+blockquote p:last-child { margin-bottom: 0; }
+
+/* O `---` do Markdown separa as seções na fonte, mas no PDF a borda de `h2` já
+   faz esse trabalho: manter os dois empilha traços. */
+hr { display: none; }
+hr + h2 { margin-top: 7mm; }
+
+ul { margin: 0 0 3mm; padding-left: 5mm; }
+li { margin-bottom: 1.2mm; }
+
+.rodape {
+  margin-top: 8mm;
+  padding-top: 3mm;
+  border-top: 1px solid var(--linha);
+  font-size: 7.6pt;
+  color: var(--suave);
+}
+
+/* ---------------------------------------------------------------- impressão */
+
+/* Token longo — URL, nome de secret, identificador — não pode ultrapassar a
+   largura da A4 e sumir na borda do papel. `anywhere` só no `code`, onde o
+   token não tem espaço por onde quebrar; em texto corrido ele partiria
+   palavra no meio, inclusive em cabeçalho de tabela. `break-word` quebra
+   apenas a palavra que sozinha não caberia na linha. */
+code { overflow-wrap: anywhere; }
+td, th, .id-valor { overflow-wrap: break-word; }
+
+/* Nenhuma hifenização automática: em documento contratual, palavra partida
+   por hífen inventado atrapalha a leitura e a busca no PDF. */
+* { hyphens: none; }
+
+/* Título distribui o texto entre as linhas em vez de deixar uma palavra órfã
+   na última — vale para o título do documento e para os de seção. */
+h1, h2, h3 { text-wrap: balance; }
+
+@media print {
+  /* Uma linha solta no pé ou no topo da página é o defeito mais visível de um
+     documento impresso. Três linhas é o mínimo que se lê como parágrafo. */
+  p, li { orphans: 3; widows: 3; }
+  h1, h2, h3 { break-after: avoid; break-inside: avoid; }
+  /* Título de seção seguido de tabela: os dois andam juntos ou nenhum anda. */
+  h2 + table, h3 + table, h2 + p, h3 + p { break-before: avoid; }
+  table, blockquote { break-inside: auto; }
+  /* Link impresso vira texto: sublinhado só polui o papel. */
+  a { text-decoration: none; color: var(--tinta); }
+}
+</style></head><body class='relatorio'><p class="marca">ness<span>.</span></p><h1>Documentação de APIs das fontes — recebimento, efeito e uma recomendação de segurança</h1><section class='identificacao'><div class='id-rotulo'>Documento</div><div class='id-valor'>Registro de recebimento de insumo</div><div class='id-rotulo'>Referência</div><div class='id-valor'>REL-2026-09-14 · AlupData Fase 1</div><div class='id-rotulo'>Data de emissão</div><div class='id-valor'>14 de setembro de 2026</div><div class='id-rotulo'>Emitente</div><div class='id-valor'>ness. Processos e Tecnologia Ltda.</div><div class='id-rotulo'>Destinatário</div><div class='id-valor'>Alup</div><div class='id-rotulo'>Contrato</div><div class='id-valor'>CPS-01025/2026 — AlupData Fase 1: DataLake</div><div class='id-rotulo'>Marco em jogo</div><div class='id-valor'>Onda 1 · 20,69% · R$ 30.720,00</div><div class='id-rotulo'>Responsável técnico</div><div class='id-valor'>Ricardo Esper</div><div class='id-rotulo'>Classificação</div><div class='id-valor'>Confidencial — uso restrito das partes</div></section>
+<h2>1. Objeto</h2>
+<p>Registro do recebimento, em <strong>14/09/2026</strong>, da documentação técnica das fontes
+CCEE, BBCE e TempoOK, encaminhada pela Inteligência de Mercado da Alup.</p>
+<p>O insumo atende integralmente a pendência <strong>A2</strong> e parcialmente a <strong>A8</strong>, e
+tem efeito imediato sobre a Onda 1: <strong>32h que estavam paradas desde 25/08
+voltaram a andar no mesmo dia</strong>. Este documento registra o que foi recebido, o
+que isso destrava, o que permanece pendente e uma recomendação de segurança
+sobre a forma de entrega de credenciais.</p>
+<h2>2. O que foi recebido</h2>
+<table>
+<thead>
+<tr>
+<th>Fonte</th>
+<th>Conteúdo</th>
+<th>Pendência atendida</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>CCEE</strong></td>
+<td>Cabeçalhos HTTP a enviar nas requisições; coleção Postman da API JSON; coleção Postman da API XML; indicação de que o restante vem dos dados abertos e de RPA</td>
+<td><strong>A2 — integralmente</strong></td>
+</tr>
+<tr>
+<td><strong>BBCE</strong></td>
+<td>Coleção Postman documentando a API; informação de que um acesso somente leitura está sendo providenciado</td>
+<td><strong>A8 — parte BBCE</strong></td>
+</tr>
+<tr>
+<td><strong>TempoOK</strong></td>
+<td>Exemplo de consulta em Python (não há documentação publicada) e o token de acesso</td>
+<td><strong>A8 — parte TempoOK</strong></td>
+</tr>
+</tbody>
+</table>
+<h2>3. Efeito sobre a Onda 1: a CCEE está destravada</h2>
+<p>A pendência A2 registrava que os domínios da CCEE respondiam <strong>HTTP 403</strong> a
+requisições automatizadas, bloqueando as 32h previstas para a fonte
+InfoMercado. A orientação recebida identificou a causa: <strong>não era bloqueio de
+IP nem exigência de credencial, e sim filtro de cliente não identificado</strong>.</p>
+<p>A ness. verificou a orientação contra a API real na mesma data, com o
+resultado abaixo:</p>
+<table>
+<thead>
+<tr>
+<th>Requisição</th>
+<th>Antes</th>
+<th>Com os cabeçalhos indicados</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Catálogo de dados abertos da CCEE</td>
+<td>403 Forbidden</td>
+<td><strong>200 OK — 204 conjuntos de dados</strong></td>
+</tr>
+<tr>
+<td>Portal <code>www.ccee.org.br</code></td>
+<td>403 Forbidden</td>
+<td><strong>200 OK</strong></td>
+</tr>
+</tbody>
+</table>
+<p><strong>A pendência A2 está encerrada e nenhuma das quatro alternativas discutidas
+(liberação de IP, credencial de agente, leitura por outro sistema ou
+remanejamento das horas) se fez necessária.</strong> A <a href="https://github.com/nessenergy/Alupdatalake/issues/52">issue #52</a>
+foi fechada, e a decisão está registrada na
+<a href="../arquitetura/decisoes/018-vias-de-acesso-a-ccee.md">ADR 018</a>.</p>
+<h3>3.1 Uma distinção que vale registrar</h3>
+<p>As três documentações da CCEE que chegaram no mesmo e-mail descrevem
+<strong>produtos diferentes</strong>, e a distinção muda o que a Onda 1 precisa esperar:</p>
+<table>
+<thead>
+<tr>
+<th>Via</th>
+<th>O que entrega</th>
+<th>Credencial</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Dados abertos (InfoMercado)</strong></td>
+<td>preço de liquidação das diferenças, consumo por submercado e por perfil, garantia física, contabilização, penalidades — 204 conjuntos</td>
+<td><strong>nenhuma</strong></td>
+</tr>
+<tr>
+<td><strong>API JSON — Abertura de Mercado</strong></td>
+<td>operação de varejista e concessionária: migração de unidade consumidora, medições, contratos, recontabilização</td>
+<td>credencial de agente</td>
+</tr>
+<tr>
+<td><strong>API XML — Plataforma de Integração</strong></td>
+<td>back office do agente: ativos, parcelas, contratos ACL/ACR, medidas, PLD</td>
+<td>credencial de agente</td>
+</tr>
+</tbody>
+</table>
+<p>As duas últimas trazem <strong>dado do agente Alupar</strong>, não dado público de mercado.
+Elas têm valor — cobrem medição e contratos, que o InfoMercado não cobre — mas
+<strong>nada na Onda 1 depende delas</strong>. Ficam registradas como escopo candidato; se a
+Alup quiser esse dado, é escopo novo, com pedido de credencial e decisão
+própria.</p>
+<p>O ponto prático: <strong>a Onda 1 não deve esperar por essas credenciais.</strong> Ela
+segue pela via pública, que já funciona.</p>
+<h2>4. O que permanece pendente</h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Pendência</th>
+<th>Situação após este insumo</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>A8</strong></td>
+<td>Documentação de BBCE e TempoOK</td>
+<td><strong>Atendida.</strong> O BBCE está documentado em detalhe; o TempoOK não possui documentação publicada, e o exemplo recebido é suficiente para escrever o conector</td>
+</tr>
+<tr>
+<td><strong>A7</strong></td>
+<td>Credencial de leitura do BBCE</td>
+<td><strong>Em andamento</strong> — a Alup informou que o acesso somente leitura está sendo providenciado. Permanece o prazo de 25/09 e o efeito de ociosidade da cláusula 3ª</td>
+</tr>
+<tr>
+<td>—</td>
+<td>Dados da CCEE sem API</td>
+<td>A orientação indica RPA. A ness. <strong>não recomenda</strong> abrir essa frente antes de saber quais indicadores os domínios analíticos exigem (A4): automação de portal é o componente mais caro de manter, e boa parte do que se buscaria por RPA já está nos 204 conjuntos públicos</td>
+</tr>
+</tbody>
+</table>
+<h2>5. Recomendação de segurança sobre a entrega de credenciais</h2>
+<p>O token do TempoOK foi entregue <strong>em texto claro no corpo do e-mail</strong>, com seis
+destinatários em cópia. A ness. registra a recomendação, em cumprimento à
+cláusula 8ª:</p>
+<ol>
+<li><strong>Rotacionar o token do TempoOK</strong> junto ao fornecedor assim que houver
+   ambiente para recebê-lo. Um segredo que trafegou por e-mail permanece nas
+   caixas postais, nos servidores de trânsito e em qualquer cópia local — e não
+   há como auditar onde parou.</li>
+<li><strong>Entregar as credenciais seguintes — a do BBCE inclusive — diretamente no
+   Google Secret Manager do projeto</strong>, sem passar por e-mail, mensagem ou
+   planilha. Os segredos já estão declarados em <code>infra/</code>, com nome definido e
+   acesso restrito à conta de serviço da ingestão; o valor é gravado por quem o
+   possui, com um comando, e nunca é visto por terceiros nem pela equipe da
+   ness.</li>
+<li>Enquanto o projeto GCP não existe (pendência <strong>A3</strong>), o token recebido é
+   mantido <strong>fora do repositório e fora de qualquer artefato versionado</strong>. Ele
+   não consta deste documento nem de qualquer arquivo entregue.</li>
+</ol>
+<p>Esta é uma recomendação de higiene, não um apontamento: a necessidade era
+legítima e o canal, o disponível no momento. O que se propõe é que, existindo o
+canal próprio a partir de A3, ele passe a ser o usado.</p>
+<h2>6. Situação do cronograma</h2>
+<p>Este insumo <strong>não altera</strong> a situação de A3, que segue sendo o item que
+determina o cronograma. O ambiente GCP venceu em 04/09 e hoje completa o
+<strong>quinto dia útil de atraso</strong>; a previsão informada pela Alup em 11/09 é 18/09.</p>
+<p>O efeito prático do insumo de hoje é outro, e positivo: <strong>a Onda 1 deixa de
+depender da contratante.</strong> Seu trabalho técnico prossegue integralmente em
+paralelo à espera por A3 — sem, contudo, poder ser homologada antes da primeira
+carga real, que depende do ambiente.</p>
+<table>
+<thead>
+<tr>
+<th>Insumo</th>
+<th>Situação em 14/09</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>A2</strong> — decisão sobre a CCEE</td>
+<td><strong>Encerrada</strong></td>
+</tr>
+<tr>
+<td><strong>A8</strong> — documentação de BBCE e TempoOK</td>
+<td><strong>Atendida</strong></td>
+</tr>
+<tr>
+<td><strong>A3</strong> — ambiente GCP</td>
+<td>Vencido em 04/09 · 5º dia útil de atraso · previsão de 18/09</td>
+</tr>
+<tr>
+<td><strong>A7</strong> — credenciais e acessos</td>
+<td>Em andamento · prazo 25/09 · ociosidade de 4h/dia se ultrapassado</td>
+</tr>
+<tr>
+<td><strong>A9</strong> — token do Hubspot</td>
+<td>Pendente</td>
+</tr>
+</tbody>
+</table>
+<h2>7. Agradecimento</h2>
+<p>A orientação sobre os cabeçalhos resolveu, em uma linha, uma pendência que
+estava aberta havia vinte dias e que se supunha exigir liberação de IP ou
+credencial. O registro fica também como reconhecimento: foi o insumo de maior
+efeito por menor esforço recebido até aqui neste contrato.</p><section class='assinatura'><p class=local-data>14 de setembro de 2026</p><div class='linha-assinatura'></div><p class='assina-nome'>Ricardo Esper</p><p class='assina-org'>ness. Processos e Tecnologia Ltda.</p></section><p class="rodape">ness. Processos e Tecnologia Ltda. · CNPJ 72.027.097/0001-37 · Contrato CPS-01025/2026 — AlupData Fase 1: DataLake</p></body></html>

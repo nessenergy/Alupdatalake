@@ -1,7 +1,7 @@
 # Próximos passos — fila de execução
 
 Documento **vivo**: é para riscar linha, não para arquivar. Atualizado em
-**2026-09-11**.
+**2026-09-14**.
 
 Ele existe para responder uma pergunta que os outros três não respondem em uma
 tela: **qual é a próxima ação, de quem é, e qual comando a executa.**
@@ -45,6 +45,8 @@ A cadeia hoje é **em série**, e a ponta dela é a única sem prazo:
 | 2.4 | **Enviar à Alup o registro de 09/09 sobre E1 e E2** | `.md` e `.html` prontos em [`relatorios/`](relatorios/) | Registro na mão da contratante |
 | 2.5 | **Obter a data e o nome do responsável por A3** | em 11/09 a Alup deu previsão de 18/09, com o faturamento em acerto com a QI Network; o nome não veio — [issue #55](https://github.com/nessenergy/Alupdatalake/issues/55) | E1 respondido com data e nome |
 | 2.6 | **Obter a `billing_account`** | teto e destinatário respondidos em 11/09: US$ 20/mês até novembro e até US$ 400/mês a partir de meados de novembro (E2); alertas para `alup.alertas@alupar.com.br` (E3). Falta a conta — [issue #87](https://github.com/nessenergy/Alupdatalake/issues/87) | conta vinculada, prevista para 18/09 |
+| 2.7 | **Pedir a rotação do token do TempoOK** e combinar o canal das credenciais seguintes | o token veio em texto claro por e-mail, com seis destinatários em cópia; o pedido está redigido no [registro de 14/09](relatorios/2026-09-14-documentacao-de-apis-recebida.md) §5 | token novo gravado no Secret Manager pela própria Alup, sem passar por e-mail |
+| 2.8 | **Enviar à Alup o registro de 14/09** | `.md` e `.html` prontos em [`relatorios/`](relatorios/) | Registro na mão da contratante |
 
 ### Por que 2.1 tem pressa
 
@@ -63,7 +65,8 @@ fica sem previsão.
 | 3.1 | **Campo Semana** | (a) manter seleção `S1`–`S19`, gerenciada pelo script; (b) iteração com datas reais, criada à mão | Iteração não é criável por API. Em (b), o script deixa de gerenciar o campo |
 | 3.2 | **Idioma do baralho** | português (atual) ou inglês | Só importa se a plateia do Google não for do Brasil |
 | 3.3 | **Redação da exclusão de escopo no baralho de kickoff** | manter ou trocar por "modelos preditivos avançados" | Exclusão legítima da Fase 3; é preferência, não correção |
-| 3.4 | **Paralelos restantes** | dicionário de dados das fontes que faltam · endurecer o Portal MVP · outra coisa | São as duas frentes úteis que sobraram sem GCP |
+| 3.4 | **Paralelos restantes** | ~~dicionário de dados · endurecer o Portal MVP~~ — **mudou em 14/09**: com a CCEE destravada, a fila de trabalho útil sem GCP voltou a ser escopo faturável | Ver 3.7 |
+| 3.7 | **Próxima entidade da CCEE** (novo em 14/09) | (a) `lista_perfil` — preenche a dimensão `agente_ccee`, hoje a única sem fonte; (b) `consumo_horario_submercado` — cruza direto com a carga do ONS; (c) esperar A4 para escolher pelos domínios analíticos | São 204 conjuntos públicos. Entregar todos não é escopo; escolher por demanda é. (a) é a recomendação: fecha uma lacuna que o `status.md` carrega desde o início |
 | 3.5 | **Branch protection** | ~~GitHub Team pago por usuário, ou assumir o risco por escrito~~ — **resolvido em 11/09** | A organização passou ao GitHub Enterprise; a `main` exige PR e seis verificações, com force push e exclusão bloqueados (ADR 010, encerrada) |
 | 3.6 | **Teto de US$ 400/mês a partir de meados de novembro** (E2) | ~~pedir revisão do teto à Alup, ou redimensionar a orquestração gerenciada da Onda 3~~ — **resolvido em 11/09** | Redimensionada: a Onda 3 passa a Cloud Workflows em vez de Composer ([ADR 017](arquitetura/decisoes/017-orquestracao-sem-composer.md)). Sem ambiente ligado 24×7, a estimativa volta para dentro do teto e não foi preciso pedir dinheiro à contratante |
 
@@ -132,8 +135,8 @@ Fonte: [`status.md` §6](status.md). Repetido aqui como calendário; a tabela l�
 | **sem data** | **G1 · resposta do Google** | precede A3 por decisão da Alup — é o gargalo atual |
 | **04/09 — vencido** | A3 · projeto GCP | atraso registrado; S2 e S3 escorregam |
 | 11/09 — respondido | A4 Questionário, com A5 (data owners, B1), A6 (Power BI hoje; Looker Studio ou fronts internos na Fase 2, G1) e destinatário de alerta (E3). Segue aberto: A9 token Hubspot, com chamado a partir de 14/09 (C1) | Gold da Fase 1 sem KPI ([ADR 012](arquitetura/decisoes/012-dataform.md#gold-na-fase-1)); o conector Hubspot segue parado |
-| 18/09 | `billing_account` (E1, E2, em acerto com a QI Network) · exemplos de planilha (G3). A2 (CCEE) respondido em 11/09: o InfoMercado é público e o 403 se resolve ajustando a requisição, com orientação da Alup | sem conta, sem `apply`; as 32h da Onda 1 esperam a orientação |
-| 25/09 | A7 chamados de token e acesso, abertos a partir de 14/09 (C1); o MySQL RDS dispensa VPN (C8) · C7 RM/TOTVS · A8: BBCE documentada no Postman, TempoOK sem documentação (C3) | **ociosidade de 4h/dia** — maior risco financeiro do contrato |
+| 18/09 | `billing_account` (E1, E2, em acerto com a QI Network) · exemplos de planilha (G3). **A2 encerrada em 14/09**: a orientação chegou, era filtro de `User-Agent`, e as 32h da Onda 1 destravaram no mesmo dia | sem conta, sem `apply` |
+| 25/09 | A7 chamados de token e acesso, abertos a partir de 14/09 (C1); o MySQL RDS dispensa VPN (C8) · C7 RM/TOTVS. **A8 saiu daqui**: documentação recebida em 14/09 | **ociosidade de 4h/dia** — maior risco financeiro do contrato |
 
 ---
 

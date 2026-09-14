@@ -47,6 +47,7 @@ contexto para agentes, em [`../AGENTS.md`](../AGENTS.md).
 | **ANEEL/SIGA** | cadastro paginado | **25.263 registros**, 0 inválidos, 28s | semanal, segunda 7h |
 | **ONS/carga** | CSV anual remoto | 28 registros / 7 dias | diário 8h, janela 30 dias |
 | **CCEE/PLD** | CSV anual remoto (ISO-8859-1), descoberto via CKAN | **288 registros / 3 dias**, 0 inválidos, contra a API real | mensal, dia 5 às 9h, janela 120 dias |
+| **CCEE/perfil** | cadastro CSV (ISO-8859-1), via CKAN | **60.509 registros**, 0 inválidos, contra a API real | semanal, terça 7h |
 | **Hubspot/negócios** | JSON paginado, CRM | **não executado** — sem token (A9) | a cada 6h, janela 2 dias |
 | **TempoOK/boletins** | PDF por download, catálogo no Bronze | **contrato verificado contra a API real**; 0 boletins ingeríveis — o acervo alcançável para em 26/10/2022 (ADR 019, adendo) | diário 11h, janela 5 dias |
 
@@ -70,11 +71,11 @@ Nenhuma linha chegou a um BigQuery de verdade — o projeto GCP ainda não exist
 | `periodo_apuracao` | todas | ok |
 | `codigo_usina` | ANEEL/SIGA (CodCEG) | ok |
 | `submercado` | ONS (N, NE, S, SE) | ok |
-| `agente_ccee` | CCEE | **fonte identificada em 14/09** — `lista_perfil` e `lista_agente_associado`, públicos no CKAN da CCEE. Não é mais bloqueio: é a próxima entidade da fila (ADR 018) |
+| `agente_ccee` | CCEE (`lista_perfil_v1`) | **ok desde 14/09** — `ccee_perfil` entregue, 60.509 perfis verificados contra a API real. **As cinco dimensões comuns têm fonte** |
 
 ### Documentação
 
-ADRs 001–020 · 9 dicionários de dados com [índice e linhagem](dicionario-dados/README.md) · plano de execução · runbook de deploy,
+ADRs 001–020 · 10 dicionários de dados com [índice e linhagem](dicionario-dados/README.md) · plano de execução · runbook de deploy,
 de primeiro deploy e de acompanhamento semanal ·
 [`proximos-passos.md`](proximos-passos.md) como fila de execução ·
 `AGENTS.md` como contexto canônico · skills do projeto e shortlist do Google.

@@ -48,6 +48,12 @@ variable "conectores" {
       cron         = "0 9 5 * *" # dia 5, depois do fechamento do mês anterior
       ultimos_dias = 120         # cobre a defasagem de publicação e a recontabilização (ADR 016)
     }
+    ccee_perfil = {
+      # Cadastro muda devagar e o retrato tem ~60 mil linhas: semanal basta, e
+      # o Bronze acumula um retrato por semana em vez de um por dia.
+      cron         = "0 7 * * 2" # terça, depois do semanal da ANEEL
+      ultimos_dias = 1           # cadastro completo; a janela não se aplica
+    }
     tempook_boletins = {
       # Boletim diário; a janela curta é deliberada, porque cada dia é uma
       # requisição própria (ADR 019) — janela larga multiplica chamadas à

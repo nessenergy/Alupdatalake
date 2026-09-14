@@ -1,0 +1,32 @@
+config {
+  type: "table",
+  schema: "gold",
+  tags: ["gold"]
+}
+
+-- Gold: a tabela de dimensão do agente da CCEE — perfis ativos.
+--
+-- Diferente das outras Gold, esta **não responde uma pergunta de negócio**: ela
+-- é o lado "um" das junções. É a materialização da dimensão comum `agente_ccee`
+-- que faltava ao projeto desde o início, e é a ela que as Gold de posição
+-- comercial (#91) e de cruzamento com dado interno (#93) vão se juntar.
+--
+-- Só perfis ATIVO. Perfil encerrado permanece na Silver e no Bronze: sai daqui
+-- porque uma tabela de dimensão que devolve linha para agente extinto produz
+-- junção que ninguém pediu.
+--
+-- Sem KPI, conforme ADR 012.
+SELECT
+  codigo_perfil,
+  agente_ccee,
+  sigla_perfil,
+  nome_empresarial,
+  cnpj,
+  classe_perfil,
+  categoria_agente,
+  submercado,
+  varejista,
+  tipo_energia,
+  data_referencia AS retrato_em
+FROM ${ref("silver", "ccee_perfil")}
+WHERE status_perfil = 'ATIVO'

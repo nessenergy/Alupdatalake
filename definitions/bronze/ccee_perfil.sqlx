@@ -1,0 +1,35 @@
+config {
+  type: "operations",
+  schema: "bronze",
+  hasOutput: true,
+  tags: ["bronze"]
+}
+
+-- Bronze: cadastro de perfis de agente da CCEE (`lista_perfil_v1`).
+--
+-- É cadastro, não série: cada execução grava o retrato completo (~60 mil
+-- linhas) e o Bronze acumula os retratos, como manda a ADR 013. A Silver fica
+-- com o mais recente.
+CREATE TABLE IF NOT EXISTS ${self()} (
+  data_referencia     DATE      NOT NULL OPTIONS(description="Data do retrato, declarada pelo CKAN da CCEE"),
+  codigo_agente       STRING    NOT NULL,
+  agente_ccee         STRING    NOT NULL OPTIONS(description="Sigla do agente — dimensão comum do projeto"),
+  nome_empresarial    STRING    NOT NULL,
+  cnpj                STRING    NOT NULL OPTIONS(description="14 dígitos, sem máscara"),
+  codigo_perfil       STRING    NOT NULL OPTIONS(description="É o perfil, não o agente, que transaciona na contabilização"),
+  sigla_perfil        STRING    NOT NULL,
+  classe_perfil       STRING    NOT NULL OPTIONS(description="Gerador, Comercializador, Consumidor Livre, Transmissor…"),
+  status_perfil       STRING    NOT NULL OPTIONS(description="ATIVO, ENCERRADO ou PERFIL ESPECIFICO"),
+  categoria_agente    STRING    NOT NULL,
+  submercado          STRING        NULL OPTIONS(description="N, NE, S, SE; nulo para perfil sem submercado"),
+  varejista           BOOL      NOT NULL,
+  tipo_energia        STRING        NULL,
+
+  _ingestao_id        STRING    NOT NULL,
+  _ingestao_timestamp TIMESTAMP NOT NULL,
+  _fonte              STRING    NOT NULL,
+  _schema_versao      STRING    NOT NULL
+)
+PARTITION BY DATE(_ingestao_timestamp)
+CLUSTER BY agente_ccee, codigo_perfil
+OPTIONS(description="Cadastro de perfis de agente da CCEE — camada Bronze, append-only");

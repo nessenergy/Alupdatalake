@@ -10,6 +10,7 @@ Este índice diz o que já existe, o que falta e — importante — **por que fa
 |---|---|---|---|---|
 | ONS — carga | [`ons_carga.md`](ons_carga.md) | 1 | **`submercado`** | `carga_mensal_submercado` |
 | CCEE — PLD | [`ccee_pld.md`](ccee_pld.md) | 1 | `submercado` | `pld_mensal_submercado` |
+| CCEE — perfis de agente | [`ccee_perfil.md`](ccee_perfil.md) | 1 | **`agente_ccee`** | `agentes_ccee` |
 | ANEEL — SIGA | [`aneel_siga.md`](aneel_siga.md) | 1 | **`codigo_usina`** | `parque_gerador` |
 | BCB — PTAX | [`bcb_cambio_ptax.md`](bcb_cambio_ptax.md) | 0 | — | `cambio_mensal` |
 | IBGE — IPCA | [`ibge_ipca.md`](ibge_ipca.md) | 1 | — | `inflacao_mensal` |
@@ -41,17 +42,18 @@ gold.<pergunta_de_negocio>   tabela: uma pergunta nomeada por tabela, recarregad
 
 ## O que falta, e por quê
 
-As sete fontes abaixo **não têm dicionário, e não deveriam ter ainda**. A regra
-do projeto é explícita: *schema por adivinhação continua proibido*. Documentar
+As fontes abaixo **não têm dicionário, e não deveriam ter ainda**. A regra do
+projeto é explícita: *schema por adivinhação continua proibido*. Documentar
 campo que ninguém viu produz retrabalho com aparência de progresso — e o
 dicionário é justamente o artefato que não pode mentir.
 
+Em **14/09** a documentação recebida da Alup tirou três linhas desta tabela.
+
 | Fonte | Onda | O que falta para escrever |
 |---|---|---|
-| CCEE — InfoMercado | 1 | Portal responde 403 a acesso automatizado, inclusive na documentação (A2 / [#52](https://github.com/nessenergy/Alupdatalake/issues/52)) |
-| CCEE — agente credenciado | 2 | Credencial de agente; contrato de dados desconhecido |
-| BBCE | 2 | Documentação técnica (A8) — nenhum endpoint público encontrado |
-| TempoOK | 2 | Documentação técnica (A8) — sem contrato de API descoberto |
+| **BBCE** | 2 | **Nada.** Documentado em Postman desde 14/09 — é a próxima fonte a escrever, antes da credencial, no regime do Hubspot |
+| CCEE — agente credenciado | 2 | Credencial de agente, que não foi pedida em A7; é escopo candidato, não escopo em curso ([ADR 018](../arquitetura/decisoes/018-vias-de-acesso-a-ccee.md)) |
+| CCEE — demais conjuntos do InfoMercado | 1 | Nada técnico: são 204 conjuntos públicos. Falta **decidir quais**, e isso depende dos domínios analíticos (A4) |
 | Oracle FMB | 3 | VPN e schema documentado (A7 / [#12](https://github.com/nessenergy/Alupdatalake/issues/12)) |
 | Portal Alup | 3 | Credenciais read-only; quais bases exatamente (A7 / [#13](https://github.com/nessenergy/Alupdatalake/issues/13)) |
 | MySQL RDS — comercialização | 3 | Conectividade e usuário read-only (A7 / [#14](https://github.com/nessenergy/Alupdatalake/issues/14)) |
@@ -59,7 +61,10 @@ dicionário é justamente o artefato que não pode mentir.
 
 O **Hubspot** é a exceção que mostra a regra: a documentação era pública, então
 o dicionário foi escrito antes do token — e o que não se pôde verificar sem
-credencial está listado no fim do próprio documento, em vez de omitido.
+credencial está listado no fim do próprio documento, em vez de omitido. O
+**TempoOK** seguiu o mesmo regime em 14/09, com uma diferença: lá o contrato foi
+depois **verificado contra a API real**, e o que sobrou em aberto não é
+conhecimento da origem, é acesso ao acervo ([#129](https://github.com/nessenergy/Alupdatalake/issues/129)).
 
 O **motor de planilha** (S2 Data Intake) também não aparece na primeira tabela,
 e por outro motivo: ele é uma *base* de conector, não uma fonte. Ganha

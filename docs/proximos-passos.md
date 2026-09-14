@@ -92,14 +92,20 @@ Ainda em 11/09, diante do teto de E2: **orquestração da Onda 3 em Cloud Workfl
 | 4.6 | Conferir as tarifas-premissa de `us-east1` na tabela oficial de preços do BigQuery e atualizar `src/portal/custo.py` e `definitions/gold/custo_consultas.sqlx` se diferirem de US$ 6,25 por TiB varrido e US$ 0,02 por GiB·mês | acesso à tabela oficial de preços |
 | 4.7 | Asserções de faixa por fonte (`rowConditions`, ex.: `cotacao_compra > 0`, `submercado IN ('N','NE','S','SE')`) e alerta de falha do workflow do Dataform; hoje o portão (`uniqueKey`/`nonNull`) repete o `QUALIFY` da Silver e os `NOT NULL` do Bronze (ADR 012) | dicionário de dados de cada fonte |
 
-### Uma pendência técnica do próprio repositório
+### Uma pendência técnica do próprio repositório — encerrada em 14/09
 
-O CI **não dispara em PR deste branch**: `ci.yml` reage a `pull_request` para
-`main` e a `push` na `main`, e os eventos de sincronização não estão gerando
-execução. O contorno tem sido validar localmente antes de cada push — `ruff`,
-suíte completa, Bandit, links — e deixar o merge disparar o CI pelo gatilho de
-`push`. Funciona, mas inverte a ordem: o CI vira conferência posterior em vez
-de portão. Vale investigar quando houver folga.
+O CI **não disparava em PR**, e o contorno era validar localmente antes de cada
+push, deixando o merge acionar o CI pelo gatilho de `push`. Isso invertia a
+ordem: o CI virava conferência posterior em vez de portão.
+
+**Deixou de valer.** O PR [#130](https://github.com/nessenergy/Alupdatalake/pull/130)
+disparou os **8 jobs**, todos verdes, antes do merge — inclusive a Auditoria de
+Dependências, que não roda nesta estação porque o `pip-audit` quebra ao decodificar
+o caminho com acento (`Área de Trabalho`). O portão preventivo da cláusula 8ª
+passou a funcionar como previsto.
+
+A causa provável é a mudança para GitHub Enterprise em 11/09, que também trouxe
+a proteção da `main` (ADR 010, encerrada).
 
 ---
 

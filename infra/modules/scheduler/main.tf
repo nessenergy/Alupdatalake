@@ -64,6 +64,13 @@ variable "conectores" {
       cron         = "0 10 6 * *" # publicação mensal; dia 6, depois do PLD
       ultimos_dias = 120          # recontabilização (ADR 016)
     }
+    ccee_contabilizacao_perfil = {
+      # 43 MB por ano, ~47 mil perfis por mês. A janela de 120 dias lê o ano
+      # corrente inteiro (o arquivo é anual), o que é o custo de ver a
+      # recontabilização (ADR 016).
+      cron         = "0 10 6 * *"
+      ultimos_dias = 120
+    }
     bbce_curva_forward = {
       # A curva sai por pregão, em dia útil. Janela curta porque cada dia é uma
       # requisição própria; 7 dias cobrem feriado prolongado e execução perdida.

@@ -1,6 +1,6 @@
 # ADR 016 — Versionamento das recontabilizações da CCEE
 
-**Status**: proposto · **Data**: 2026-09-11 · **Complementa** as ADRs
+**Status**: aceito · **Aceita em**: 2026-09-14 · **Data**: 2026-09-11 · **Complementa** as ADRs
 [003](003-framework-de-conectores.md) e [012](012-dataform.md)
 
 ## Contexto
@@ -114,6 +114,17 @@ schema por adivinhação continua proibido (`docs/status.md` §5):
 Esta ADR passa a "aceito" quando o dicionário de dados da primeira fonte da
 CCEE registrar o identificador escolhido. Mudar de opção depois disso é ADR
 nova.
+
+**Decidido com o dado na mão.** A primeira fonte da CCEE com recontabilização
+declarada é `contabilizacao_montante_perfil_agente` (Silver
+`ccee_contabilizacao_perfil`). O arquivo **não** traz número de versão; o
+metadado traz: o `last_modified` do recurso no CKAN, que muda quando a CCEE
+reescreve o ano. É o item 2 da ordem de preferência, e vira a coluna
+`versao_publicacao` em toda entidade mensal da CCEE — registrado em
+[`ccee_contabilizacao_perfil.md`](../../dicionario-dados/ccee_contabilizacao_perfil.md).
+A opção B está implementada: Silver vigente ordena por `versao_publicacao`;
+`silver.ccee_contabilizacao_perfil_historico` guarda uma linha por chave e
+versão. O Balanço Energético (MySQL RDS) segue por decidir quando houver acesso.
 
 ## Consequências
 

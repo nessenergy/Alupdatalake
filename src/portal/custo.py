@@ -76,6 +76,7 @@ DOMINIO_ANALITICO = {
     "ccee_perfil": "Mercado de Energia",
     "ccee_agente": "Mercado de Energia",
     "ccee_exposicao_financeira": "Risco e Compliance",
+    "ccee_contabilizacao_perfil": "Risco e Compliance",
     "aneel_siga": "Geração e Operacional",
     "tempook_boletins": "Meteorologia",
     "hubspot_negocios": "Comercial e Contratos",

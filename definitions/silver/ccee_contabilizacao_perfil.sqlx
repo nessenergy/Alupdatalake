@@ -1,0 +1,58 @@
+config {
+  type: "view",
+  schema: "silver",
+  tags: ["silver"],
+  assertions: {
+    uniqueKey: ["periodo_apuracao_ccee", "codigo_perfil"],
+    nonNull: ["data_referencia", "periodo_apuracao_ccee", "versao_publicacao", "codigo_agente", "codigo_perfil", "cnpj"],
+    rowConditions: [
+      "periodo_apuracao = periodo_apuracao_ccee",
+      "LENGTH(cnpj) = 14"
+    ]
+  }
+}
+
+-- Silver vigente (ADR 016, opção B): uma linha por perfil e mês, da publicação
+-- mais recente da CCEE. Vence `versao_publicacao`; a hora da leitura só
+-- desempata leituras da mesma publicação. O replay de um raw antigo não
+-- rebaixa a vigente, porque a ordem vem da fonte.
+--
+-- `agente_ccee` é nulo de propósito: a origem traz o código do agente, não a
+-- sigla. A sigla entra na Gold pela junção com `gold.agentes_ccee`.
+-- Sem faixa em valor: resultado financeiro é positivo ou negativo por natureza.
+SELECT
+  data_referencia,
+  CAST(NULL AS STRING) AS submercado,    -- o resultado é do perfil, não do submercado
+  CAST(NULL AS STRING) AS codigo_usina,  -- idem
+  CAST(NULL AS STRING) AS agente_ccee,   -- a origem traz código, não sigla; ver Gold
+  FORMAT_DATE('%Y-%m', data_referencia) AS periodo_apuracao,
+  periodo_apuracao_ccee,
+  versao_publicacao,
+  codigo_agente,
+  codigo_perfil,
+  sigla_perfil,
+  nome_empresarial,
+  cnpj,
+  valor_tm_mcp,
+  compensacao_mre,
+  valor_encargo,
+  valor_ajuste_exposicao,
+  valor_ajuste_alivio_retroativo,
+  efeito_contratos_disponibilidade,
+  efeito_contratos_cota_gf,
+  efeito_contratos_nuclear,
+  ajuste_recontab,
+  ajuste_mcsd_ex,
+  resultado_financeiro_energia_reserva,
+  efeito_ccearq,
+  efeito_contratos_itaipu,
+  efeito_repasse_risco_hidrologico,
+  efeito_deslocamento_pld_cmo,
+  resultado_final,
+  _ingestao_id,
+  _ingestao_timestamp
+FROM ${ref("bronze", "ccee_contabilizacao_perfil")}
+QUALIFY ROW_NUMBER() OVER (
+  PARTITION BY periodo_apuracao_ccee, codigo_perfil
+  ORDER BY versao_publicacao DESC, _ingestao_timestamp DESC
+) = 1

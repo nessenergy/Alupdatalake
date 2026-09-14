@@ -1,0 +1,44 @@
+config {
+  type: "operations",
+  schema: "bronze",
+  hasOutput: true,
+  tags: ["bronze"]
+}
+
+-- Bronze: resultado da contabilização por perfil de agente (CCEE, dados abertos).
+-- Append-only. A CCEE recontabiliza e reescreve o recurso do ano: cada
+-- publicação é uma leitura nova, e todas ficam aqui (ADR 016).
+CREATE TABLE IF NOT EXISTS ${self()} (
+  data_referencia                        DATE      NOT NULL OPTIONS(description="Primeiro dia do mês de apuração"),
+  periodo_apuracao_ccee                  STRING    NOT NULL OPTIONS(description="AAAA-MM, como a CCEE declara"),
+  versao_publicacao                      DATE      NOT NULL OPTIONS(description="last_modified do recurso no CKAN — identificador de versão da ADR 016"),
+  codigo_agente                          STRING    NOT NULL,
+  codigo_perfil                          STRING    NOT NULL OPTIONS(description="COD_PERF_AGENTE — o perfil é quem transaciona"),
+  sigla_perfil                           STRING    NOT NULL,
+  nome_empresarial                       STRING    NOT NULL,
+  cnpj                                   STRING    NOT NULL OPTIONS(description="14 dígitos"),
+  valor_tm_mcp                           NUMERIC            OPTIONS(description="R$"),
+  compensacao_mre                        NUMERIC            OPTIONS(description="R$"),
+  valor_encargo                          NUMERIC            OPTIONS(description="R$"),
+  valor_ajuste_exposicao                 NUMERIC            OPTIONS(description="R$"),
+  valor_ajuste_alivio_retroativo         NUMERIC            OPTIONS(description="R$"),
+  efeito_contratos_disponibilidade       NUMERIC            OPTIONS(description="R$"),
+  efeito_contratos_cota_gf               NUMERIC            OPTIONS(description="R$"),
+  efeito_contratos_nuclear               NUMERIC            OPTIONS(description="R$"),
+  ajuste_recontab                        NUMERIC            OPTIONS(description="R$ — a recontabilização, quando houve"),
+  ajuste_mcsd_ex                         NUMERIC            OPTIONS(description="R$"),
+  resultado_financeiro_energia_reserva   NUMERIC            OPTIONS(description="R$"),
+  efeito_ccearq                          NUMERIC            OPTIONS(description="R$"),
+  efeito_contratos_itaipu                NUMERIC            OPTIONS(description="R$"),
+  efeito_repasse_risco_hidrologico       NUMERIC            OPTIONS(description="R$"),
+  efeito_deslocamento_pld_cmo            NUMERIC            OPTIONS(description="R$"),
+  resultado_final                        NUMERIC            OPTIONS(description="R$ — o número que o perfil liquida"),
+
+  _ingestao_id                           STRING    NOT NULL,
+  _ingestao_timestamp                    TIMESTAMP NOT NULL,
+  _fonte                                 STRING    NOT NULL,
+  _schema_versao                         STRING    NOT NULL
+)
+PARTITION BY DATE(_ingestao_timestamp)
+CLUSTER BY data_referencia, codigo_perfil
+OPTIONS(description="Contabilização por perfil de agente — camada Bronze, append-only, todas as publicações");

@@ -153,10 +153,24 @@ def test_view_referencia_a_camada_anterior(arquivo):
 
 
 def test_toda_camada_tem_o_mesmo_conjunto_de_fontes():
-    """Uma fonte com Bronze mas sem Silver é entrega incompleta (7 componentes)."""
+    """Uma fonte com Bronze mas sem Silver é entrega incompleta (7 componentes).
+
+    A view `_historico` (ADR 016, opção B) é a segunda Silver da mesma fonte,
+    não uma fonte: fica fora da comparação.
+    """
     bronze = {c.stem for c in (DEFINICOES / "bronze").glob("*.sqlx") if not c.stem.startswith("_")}
-    silver = {c.stem for c in (DEFINICOES / "silver").glob("*.sqlx")}
+    silver = {c.stem for c in (DEFINICOES / "silver").glob("*.sqlx") if not c.stem.endswith("_historico")}
     assert bronze == silver, f"Bronze e Silver divergem: só em Bronze {bronze - silver}, só em Silver {silver - bronze}"
+
+
+def test_view_de_historico_tem_bronze_e_silver_vigente():
+    """`x_historico` só existe ao lado de `x`: histórico sem vigente é meia ADR 016."""
+    for historico in (DEFINICOES / "silver").glob("*_historico.sqlx"):
+        base = historico.stem.removesuffix("_historico")
+        assert (DEFINICOES / "silver" / f"{base}.sqlx").exists(), f"{historico.name} sem a Silver vigente {base}"
+        assert (DEFINICOES / "bronze" / f"{base}.sqlx").exists(), f"{historico.name} sem Bronze {base}"
+        bloco = config(historico)
+        assert "uniqueKey:" in bloco and "versao_publicacao" in bloco, "histórico sem assertion em (chave, versão)"
 
 
 def test_information_schema_usa_a_regiao_configurada():

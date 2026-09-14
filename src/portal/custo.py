@@ -48,20 +48,20 @@ TARIFA_EXECUCAO_JOB_USD = Decimal("0.004")
 # que é exatamente o nosso hoje.
 MINIMO_BYTES_FATURADOS = 10 * 1024**2
 
-# Os 8 domínios analíticos, definidos em 14/09 a partir das respostas ao
-# Questionário de Gaps: `docs/arquitetura/dominios-analiticos.md`. Deixou de ser
-# agrupamento provisório por afinidade — a visão de diretoria agora fala o
-# mesmo vocabulário do documento.
+# Os 8 domínios analíticos da resposta da Alup ao item B1, de 11/09:
+# `docs/arquitetura/dominios-analiticos.md`. Deixou de ser agrupamento
+# provisório por afinidade — a visão de diretoria fala o vocabulário que a
+# própria Alup usa, e cada domínio tem dono nomeado.
 DOMINIOS_VALIDOS = frozenset(
     {
-        "Preço de energia",
-        "Carga e operação do SIN",
-        "Portfólio de geração",
-        "Cadastro de agentes e contrapartes",
-        "Posição comercial e contratos",
-        "Contabilização e liquidação",
-        "Conjuntura e indicadores macro",
-        "Qualidade e rastreabilidade do dado",
+        "Mercado de Energia",
+        "Geração e Operacional",
+        "Meteorologia",
+        "Comercial e Contratos",
+        "CRM e Marketing",
+        "Risco e Compliance",
+        "Econômico",
+        "Planejamento",
     }
 )
 
@@ -69,15 +69,16 @@ DOMINIOS_VALIDOS = frozenset(
 # o teste em `tests/unit/test_portal.py` impede que isso passe despercebido
 # quando uma fonte nova entrar.
 DOMINIO_ANALITICO = {
-    "ccee_pld": "Preço de energia",
-    "bbce_curva_forward": "Preço de energia",
-    "ons_carga": "Carga e operação do SIN",
-    "aneel_siga": "Portfólio de geração",
-    "ccee_perfil": "Cadastro de agentes e contrapartes",
-    "hubspot_negocios": "Posição comercial e contratos",
-    "bcb_cambio_ptax": "Conjuntura e indicadores macro",
-    "ibge_ipca": "Conjuntura e indicadores macro",
-    "tempook_boletins": "Conjuntura e indicadores macro",
+    "ccee_pld": "Mercado de Energia",
+    "bbce_curva_forward": "Mercado de Energia",
+    "ons_carga": "Mercado de Energia",
+    # Cadastro do mercado: dá nome ao que nas outras fontes é código.
+    "ccee_perfil": "Mercado de Energia",
+    "aneel_siga": "Geração e Operacional",
+    "tempook_boletins": "Meteorologia",
+    "hubspot_negocios": "Comercial e Contratos",
+    "bcb_cambio_ptax": "Econômico",
+    "ibge_ipca": "Econômico",
 }
 
 # Quanto ocupa uma linha de cada fonte, em bytes. Estimativa de largura de

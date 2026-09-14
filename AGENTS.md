@@ -7,8 +7,10 @@ continuam sendo o caminho.
 
 ## O projeto em cinco linhas
 
-DataLake do Grupo Alupar — as 6 coligadas contratantes, mas o dado abrange
-todos os ativos do grupo e os clientes varejistas (resposta D2, de 11/09) —,
+DataLake do Grupo Alupar — as 6 coligadas respondem pelo **faturamento**, não
+delimitam o dado: o escopo é o já mapeado na planilha da proposta, com as
+usinas pela CCEE e o varejo pelo Portal Alup, e tudo isso é Fase 1
+([`docs/arquitetura/dominios-analiticos.md`](docs/arquitetura/dominios-analiticos.md), §2) —,
 arquitetura Medallion
 (Bronze → Silver → Gold) em BigQuery/GCP. Fase 1 do contrato CPS-01025/2026:
 580h em 5 ondas, 19 semanas, 13 conectores de fonte de dados. Executado pela

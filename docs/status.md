@@ -38,6 +38,7 @@ contexto para agentes, em [`../AGENTS.md`](../AGENTS.md).
 | Campos de acompanhamento semanal do GitHub Projects | `scripts/campos_projeto.py`, `runbook/acompanhamento-semanal.md` | 12 testes; script idempotente. **Os cinco campos criados no quadro em 04/09** — Horas, Semana, Validado, Correções e Atraso |
 | **FinOps F0** — rótulo de custo por fonte no job do BigQuery | `src/core/bigquery.py` (`rotulos()`) | 6 testes; precisa existir **antes** do 1º apply, custo gasto não se rateia depois |
 | **8 domínios analíticos** e dimensões comuns fechadas (plano 0.10 e 0.11) | `docs/arquitetura/dominios-analiticos.md`, `visao-geral.md` | Itens de Onda 0 que estavam desbloqueados desde 11/09. Duas lacunas nomeadas: de-para de usina (Alup) e mês CCEE (ness.) |
+| Domínios corrigidos para os do **B1**, e a abrangência do dado escrita | `docs/arquitetura/dominios-analiticos.md`, `src/portal/custo.py` | A primeira versão derivava os domínios de A1. São os do B1 — 8 domínios em 11 linhas, três com responsáveis distintos por subtema. As 6 coligadas respondem pelo faturamento e não delimitam o dado |
 
 ### Conectores (7 componentes cada, exceto onde indicado)
 

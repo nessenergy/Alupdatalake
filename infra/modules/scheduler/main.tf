@@ -60,6 +60,10 @@ variable "conectores" {
       cron         = "0 10 6 * *"
       ultimos_dias = 120 # cobre a recontabilização e a defasagem de publicação
     }
+    ccee_exposicao_financeira = {
+      cron         = "0 10 6 * *" # publicação mensal; dia 6, depois do PLD
+      ultimos_dias = 120          # recontabilização (ADR 016)
+    }
     bbce_curva_forward = {
       # A curva sai por pregão, em dia útil. Janela curta porque cada dia é uma
       # requisição própria; 7 dias cobrem feriado prolongado e execução perdida.

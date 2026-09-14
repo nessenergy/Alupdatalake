@@ -19,13 +19,14 @@ variable "conectores_criticos" {
   description = "Conectores cuja ausência de sucesso dispara alerta, e em quantas horas"
   type        = map(number)
   default = {
-    bcb_cambio_ptax = 26  # diário + folga para feriado
-    ons_carga       = 26  # diário
-    aneel_siga      = 180 # semanal + folga
-    ibge_ipca       = 780 # mensal + folga
-    ccee_pld        = 780 # mensal + folga; mede a execução, não a defasagem da CCEE
-    ccee_perfil     = 180 # semanal + folga
-    ccee_agente     = 780 # mensal + folga
+    bcb_cambio_ptax           = 26  # diário + folga para feriado
+    ons_carga                 = 26  # diário
+    aneel_siga                = 180 # semanal + folga
+    ibge_ipca                 = 780 # mensal + folga
+    ccee_pld                  = 780 # mensal + folga; mede a execução, não a defasagem da CCEE
+    ccee_perfil               = 180 # semanal + folga
+    ccee_agente               = 780 # mensal + folga
+    ccee_exposicao_financeira = 780 # mensal + folga
     # tempook_boletins fica fora enquanto não houver token (A7): alerta de
     # fonte que nunca rodou dispara todo dia e ensina a equipe a ignorá-lo.
   }

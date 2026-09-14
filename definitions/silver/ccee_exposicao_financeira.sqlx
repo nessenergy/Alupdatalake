@@ -1,0 +1,43 @@
+config {
+  type: "view",
+  schema: "silver",
+  tags: ["silver"],
+  assertions: {
+    uniqueKey: ["periodo_apuracao_ccee"],
+    nonNull: ["data_referencia", "periodo_apuracao_ccee", "versao_publicacao"],
+    rowConditions: [
+      "periodo_apuracao = periodo_apuracao_ccee",
+      "total_exposicao_negativa IS NULL OR total_exposicao_negativa >= 0",
+      "cobertura_exposicao_negativa IS NULL OR total_exposicao_negativa IS NULL OR cobertura_exposicao_negativa <= total_exposicao_negativa"
+    ]
+  }
+}
+
+-- Silver: uma linha por mês, pela publicação mais recente (ADR 016, opção B).
+-- Faixas (issue #110): exposição negativa é um total, não pode ser negativa;
+-- cobertura maior que a exposição é troca de coluna na origem.
+SELECT
+  data_referencia,
+  CAST(NULL AS STRING) AS submercado,    -- total do mercado
+  CAST(NULL AS STRING) AS codigo_usina,  -- idem
+  CAST(NULL AS STRING) AS agente_ccee,   -- idem
+  FORMAT_DATE('%Y-%m', data_referencia) AS periodo_apuracao,
+  periodo_apuracao_ccee,
+  versao_publicacao,
+  excedente_financeiro,
+  excedente_financeiro_positivo,
+  total_recurso_disponivel,
+  total_exposicao_negativa,
+  cobertura_exposicao_negativa,
+  total_exposicao_negativa_remanescente,
+  total_exposicao_negativa_liquidada,
+  total_recurso_disponivel_ef_anterior,
+  total_recurso_compensacao_ef,
+  reserva_alivio_ess,
+  _ingestao_id,
+  _ingestao_timestamp
+FROM ${ref("bronze", "ccee_exposicao_financeira")}
+QUALIFY ROW_NUMBER() OVER (
+  PARTITION BY periodo_apuracao_ccee
+  ORDER BY versao_publicacao DESC, _ingestao_timestamp DESC
+) = 1

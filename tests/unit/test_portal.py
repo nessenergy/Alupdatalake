@@ -254,6 +254,20 @@ def test_orcamento_sem_dia_decorrido_nao_divide_por_zero() -> None:
     assert not o.estoura
 
 
+def test_a_tela_avisa_que_a_camada_gratuita_nao_esta_no_modelo(cliente) -> None:
+    """O lake inteiro cabe no 1 TB/mês grátis do BigQuery: a consulta real tende a zero.
+
+    O número da tela superestima de propósito — modelar o abatimento exigiria
+    saber o que o resto do projeto da Alup consome do mesmo teto. O aviso é o
+    que impede alguém de ler a projeção como fatura, e por isso tem teste:
+    quem enxugar o parágrafo de premissas derruba aqui.
+    """
+    corpo = cliente.get("/custo").get_data(as_text=True)
+
+    assert "camada gratuita" in corpo
+    assert "1 TB" in corpo
+
+
 def test_dominio_de_negocio_usa_os_oito_documentados(cliente) -> None:
     """Era "provisório até o Questionário de Gaps" — que foi respondido em 11/09.
 

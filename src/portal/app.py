@@ -600,6 +600,9 @@ def _pagina_custo(dados: PainelCusto, usuario: str, *, simulado: bool) -> str:
 <p class="premissa"><strong>Premissas.</strong> Os valores usam a tarifa por byte varrido e por
  GiB armazenado declaradas em <code>src/portal/custo.py</code>, e não enxergam crédito nem
  desconto por uso comprometido — isso só chega com o billing export (camada F2 do plano).
- Compute aparece no agregado e não por fonte: existe um Cloud Run Job para todas elas.
+ <strong>Nem a camada gratuita:</strong> o BigQuery dá 1 TB de consulta por mês sem cobrar, e
+ o lake inteiro cabe nesse teto hoje — a linha de consulta da fatura real tende a ser zero, e
+ o número aqui superestima de propósito. Compute aparece no agregado e não por fonte: existe
+ um Cloud Run Job para todas elas.
  Plano e enquadramento em <code>docs/arquitetura/portal-finops.md</code>.</p>
 </body></html>"""

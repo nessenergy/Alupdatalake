@@ -113,9 +113,11 @@ sessão tenta de novo e, persistindo, a execução falha — que é o certo.
 - O teste de integração segue `skipif`: ele lê o token do Secret Manager, que
   não existe até A3.
 - O token vai para `alupdata-tempook-api-token`, já declarado em
-  `infra/modules/secrets`. O token entregue por e-mail em 14/09 **deve ser
-  rotacionado antes do primeiro uso** — a recomendação está no
-  [registro de 14/09](../../relatorios/2026-09-14-documentacao-de-apis-recebida.md) §5.
+  `infra/modules/secrets`. O token entregue por e-mail em 14/09 **é mantido até
+  a virada de produção**, quando é rotacionado — rotacionar antes de existir
+  Secret Manager reproduziria a mesma exposição. Decisão, alcance medido e
+  gatilhos de antecipação na
+  [ADR 020](020-token-tempook-rotacao-na-producao.md).
 
 ---
 

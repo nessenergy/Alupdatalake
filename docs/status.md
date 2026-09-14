@@ -50,11 +50,17 @@ contexto para agentes, em [`../AGENTS.md`](../AGENTS.md).
 | **Hubspot/negócios** | JSON paginado, CRM | **não executado** — sem token (A9) | a cada 6h, janela 2 dias |
 | **TempoOK/boletins** | PDF por download, catálogo no Bronze | **contrato verificado contra a API real**; 0 boletins ingeríveis — o acervo alcançável para em 26/10/2022 (ADR 019, adendo) | diário 11h, janela 5 dias |
 
-As quatro primeiras foram verificadas **em dry-run contra as APIs reais**. O
-Hubspot é a exceção: os 7 componentes existem, mas foram escritos contra a
-documentação pública e **nunca falaram com a API** — o teste de integração está
-`skipif` até o token chegar. Nenhuma linha chegou a um
-BigQuery de verdade — o projeto GCP ainda não existe.
+**Seis das sete falaram com a API real** em dry-run. O Hubspot é a única
+exceção: os 7 componentes existem, mas foram escritos contra a documentação
+pública e nunca falaram com a API — o teste de integração está `skipif` até o
+token chegar (A9).
+
+O TempoOK é um caso à parte: **falou com a API e o contrato de dados está
+verificado** — caminho, ausência por 404, TLS, estabilidade do `sha256` —, mas
+o acervo alcançável termina em 26/10/2022, então não há boletim para ingerir
+(A10).
+
+Nenhuma linha chegou a um BigQuery de verdade — o projeto GCP ainda não existe.
 
 ### Dimensões comuns
 
@@ -68,7 +74,7 @@ BigQuery de verdade — o projeto GCP ainda não existe.
 
 ### Documentação
 
-ADRs 001–019 · 9 dicionários de dados com [índice e linhagem](dicionario-dados/README.md) · plano de execução · runbook de deploy,
+ADRs 001–020 · 9 dicionários de dados com [índice e linhagem](dicionario-dados/README.md) · plano de execução · runbook de deploy,
 de primeiro deploy e de acompanhamento semanal ·
 [`proximos-passos.md`](proximos-passos.md) como fila de execução ·
 `AGENTS.md` como contexto canônico · skills do projeto e shortlist do Google.
@@ -84,7 +90,7 @@ destino, com os oito invariantes e a pauta de perguntas. **Enviado ao Google em
 
 | # | Item | Bloqueado por |
 |---|---|---|
-| N1 | Preparar contrato de dados das fontes das Ondas 2 e 3 | **inviável para 3 das 4 fontes** — ver §5 |
+| N1 | Preparar contrato de dados das fontes das Ondas 2 e 3 | **destravado em 14/09** — com a documentação recebida, o TempoOK foi entregue e o **BBCE é o próximo a escrever**, antes do token. Restam as fontes da Onda 3, que dependem de A7 |
 | N2 | Portal MVP: ligar contra o BigQuery e publicar no Cloud Run | escopo cravado na ADR 005; a tela existe e roda com provedor simulado — falta o ambiente GCP (A3) |
 | N3 | Primeiro `terraform apply` real e primeiro deploy da imagem | ambiente GCP (A3) |
 | N4 | Validar replay contra objeto real no GCS e conferir linhagem no BigQuery | ambiente GCP (A3) |
@@ -105,7 +111,7 @@ destino, com os oito invariantes e a pauta de perguntas. **Enviado ao Google em
 | A7 | Abrir **já** os pedidos de token (Onda 2) e VPN/credencial (Onda 3) | é o maior risco do contrato: atraso dispara ociosidade de 4h/dia | plano §7 |
 | ~~A8~~ | ~~**Documentação técnica de BBCE e TempoOK**~~ | **Atendida em 14/09** — BBCE documentado em Postman; TempoOK sem documentação publicada, mas com exemplo suficiente. Resta só a credencial do BBCE, que é A7 | [registro de 14/09](relatorios/2026-09-14-documentacao-de-apis-recebida.md) |
 | A9 | **Token do Hubspot** (private app) no secret `alupdata-hubspot-api-token` | o conector está pronto e parado; nenhuma linha de CRM entra no lake | plano 2.3 (2.3) |
-| A10 | **Verificar com o TempoOK o acesso ao acervo recente** — o token entregue em 14/09 alcança boletins só até 26/10/2022 | o conector está pronto e verificado, mas ingere zero boletins; a fonte não fecha na Onda 2 | [ADR 019](arquitetura/decisoes/019-boletim-do-tempook-como-arquivo.md), [registro de 14/09](relatorios/2026-09-14-documentacao-de-apis-recebida.md) §4.1 |
+| A10 | **Verificar com o TempoOK o acesso ao acervo recente** — o token entregue em 14/09 alcança boletins só até 26/10/2022 | o conector está pronto e verificado, mas ingere zero boletins; a fonte não fecha na Onda 2. **Resolver isto antecipa a rotação do token** (gatilho 1 da [ADR 020](arquitetura/decisoes/020-token-tempook-rotacao-na-producao.md)): com acervo corrente, o alcance da credencial muda de patamar | [ADR 019](arquitetura/decisoes/019-boletim-do-tempook-como-arquivo.md), [registro de 14/09](relatorios/2026-09-14-documentacao-de-apis-recebida.md) §4.1 |
 
 > **Cláusula 3ª**: atraso > 5 dias úteis posterga o cronograma; > 5 dias úteis em
 > VPN/credencial gera taxa de ociosidade de 4h/dia (R$ 256/h); > 20 dias

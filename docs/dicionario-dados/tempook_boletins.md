@@ -138,6 +138,11 @@ conhecimento da origem.
 ## Uma pendência de segurança
 
 O token foi entregue **em texto claro por e-mail**, com seis destinatários em
-cópia, em 14/09/2026. A recomendação de **rotacioná-lo antes do primeiro uso**
-está no [registro de 14/09](../relatorios/2026-09-14-documentacao-de-apis-recebida.md) §5.
-Nenhuma versão dele consta deste repositório.
+cópia, em 14/09/2026. Ele **é mantido até a virada de produção** e rotacionado
+lá — rotacionar antes de existir Secret Manager entregaria o valor novo pelo
+mesmo e-mail, renovando a exposição em vez de encerrá-la. A decisão, com dono,
+alcance medido e gatilhos que antecipam a rotação, está na
+[ADR 020](../arquitetura/decisoes/020-token-tempook-rotacao-na-producao.md).
+
+Até lá ele vive no cofre local ([runbook](../runbook/credenciais.md)), fora do
+repositório. Nenhuma versão dele consta deste repositório.

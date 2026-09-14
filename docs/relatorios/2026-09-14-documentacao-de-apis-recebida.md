@@ -124,19 +124,38 @@ O token do TempoOK foi entregue **em texto claro no corpo do e-mail**, com seis
 destinatários em cópia. A ness. registra a recomendação, em cumprimento à
 cláusula 8ª:
 
-1. **Rotacionar o token do TempoOK** junto ao fornecedor assim que houver
-   ambiente para recebê-lo. Um segredo que trafegou por e-mail permanece nas
-   caixas postais, nos servidores de trânsito e em qualquer cópia local — e não
-   há como auditar onde parou.
+1. **Rotacionar o token do TempoOK na virada de produção** — e não antes.
+
+   Um segredo que trafegou por e-mail permanece nas caixas postais, nos
+   servidores de trânsito e em qualquer cópia local, e não há como auditar onde
+   parou. A regra, portanto, é rotacionar. Mas **rotacioná-lo hoje reproduziria
+   a mesma exposição**: sem o Secret Manager, que depende do insumo A3, o valor
+   novo teria de ser entregue pelo mesmo e-mail — resultando em duas
+   credenciais expostas em vez de uma.
+
+   Rotacionar na virada de produção permite que a Alup grave o valor novo
+   diretamente no cofre do projeto, sem que ele trafegue por e-mail em momento
+   algum. É uma rotação só, e que de fato encerra a exposição.
+
+   A espera é segura porque o alcance do token foi medido (§4.1): somente
+   leitura, sem dado pessoal, e limitado a um acervo encerrado em 2022. A
+   decisão está registrada com responsável nomeado e com gatilhos que antecipam
+   a rotação — entre eles, **a própria Alup solicitá-la** ou o acervo recente
+   passar a ser alcançável.
+
 2. **Entregar as credenciais seguintes — a do BBCE inclusive — diretamente no
    Google Secret Manager do projeto**, sem passar por e-mail, mensagem ou
-   planilha. Os segredos já estão declarados em `infra/`, com nome definido e
-   acesso restrito à conta de serviço da ingestão; o valor é gravado por quem o
+   planilha. Esta recomendação **não** foi adiada e vale a partir de A3. Os
+   segredos já estão declarados em `infra/`, com nome definido e acesso
+   restrito à conta de serviço da ingestão; o valor é gravado por quem o
    possui, com um comando, e nunca é visto por terceiros nem pela equipe da
    ness.
+
 3. Enquanto o projeto GCP não existe (pendência **A3**), o token recebido é
-   mantido **fora do repositório e fora de qualquer artefato versionado**. Ele
-   não consta deste documento nem de qualquer arquivo entregue.
+   mantido **fora do repositório e fora de qualquer artefato versionado**, em
+   cofre local com recusa programática de gravação dentro do repositório e de
+   uso em ambiente de execução. Ele não consta deste documento nem de qualquer
+   arquivo entregue.
 
 Esta é uma recomendação de higiene, não um apontamento: a necessidade era
 legítima e o canal, o disponível no momento. O que se propõe é que, existindo o

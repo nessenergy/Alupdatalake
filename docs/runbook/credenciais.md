@@ -96,10 +96,37 @@ precisa ver o valor, e é melhor assim para as duas partes.
 
 ## 4. Credencial que já trafegou por e-mail
 
-**Rotacione.** Um segredo que passou por e-mail está nas caixas postais dos
-destinatários, nos servidores de trânsito e em qualquer cópia local — e não há
-como auditar onde parou. Remover a mensagem não desfaz nada.
+Um segredo que passou por e-mail está nas caixas postais dos destinatários, nos
+servidores de trânsito e em qualquer cópia local — e não há como auditar onde
+parou. Remover a mensagem não desfaz nada. **A regra é rotacionar.**
 
-Isso vale hoje para o **token do TempoOK**, recebido em 14/09 em texto claro
-com seis destinatários em cópia. A recomendação está no
-[registro de 14/09](../relatorios/2026-09-14-documentacao-de-apis-recebida.md) §5.
+Com uma ressalva que importa: **rotacionar antes de existir Secret Manager
+reproduz a exposição**, porque o valor novo teria de ser entregue pelo mesmo
+e-mail. Rotação sem destino próprio não encerra nada — renova.
+
+Por isso, para o **token do TempoOK** (recebido em 14/09), a rotação está
+marcada para a **virada de produção**, quando a Alup grava o valor novo direto
+no Secret Manager e ele nunca trafega por e-mail. A decisão, com dono, alcance
+medido e gatilhos de antecipação, está na
+[ADR 020](../arquitetura/decisoes/020-token-tempook-rotacao-na-producao.md).
+
+Para toda credencial **seguinte** — BBCE, Hubspot, bases da Onda 3 — a regra é
+a da seção 3: direto no Secret Manager, sem passar por e-mail. Isso não foi
+adiado.
+
+## 5. Checklist da virada de produção
+
+Rodar **antes** de o ambiente `prod` receber carga real:
+
+- [ ] **Rotacionar o token do TempoOK** junto ao fornecedor (ADR 020). O valor
+      novo é gravado pela Alup direto no Secret Manager de `prod` — não passa
+      por e-mail, por mensagem nem pela ness.
+- [ ] Conferir que o valor antigo foi **revogado** no fornecedor, e não apenas
+      substituído: token novo emitido não invalida o velho sozinho.
+- [ ] Repetir para toda credencial que tenha trafegado por canal não
+      controlado, mesmo que a leitura em `dev` estivesse funcionando.
+- [ ] Conferir que **nenhum cofre local sobreviveu**: `~/.alupdata/segredos.env`
+      apagado em toda estação, e `ALUPDATA_SECRETS_LOCAIS` desligado.
+- [ ] Conferir que os secrets de `prod` são **distintos** dos de `dev` e `hml`
+      (ADR 015, três ambientes) — reaproveitar valor entre ambientes anula a
+      separação.

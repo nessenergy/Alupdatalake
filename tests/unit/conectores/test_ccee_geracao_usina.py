@@ -7,7 +7,12 @@ O que estes testes protegem, lido do arquivo real de julho/2026 em 14/09:
   PLD, e `DATA` vem explícita — os dois têm de concordar, e a Silver exige isso;
 - `CODIGO_PARCELA_USINA` não é CEG: `codigo_usina` fica nulo até o de-para
   (#141);
-- geração vazia é registro inválido, não zero.
+- geração vazia é registro inválido, não zero;
+- `PERIODO_COMERCIALIZACAO` não numérico, fora de 1..744, ou `DATA` em formato
+  que não seja `dd/mm/aaaa` conta como `linhas_invalidas` — nunca derruba a
+  execução inteira (fix round 1: um `ValueError` desses escapava de
+  `transformar()` e abortava o mês inteiro antes de qualquer linha boa
+  carregar).
 """
 
 from __future__ import annotations
@@ -102,6 +107,49 @@ def test_geracao_vazia_e_registro_invalido_nao_zero(conector):
     assert execucao.linhas_extraidas == 6
     assert execucao.linhas_invalidas == 1  # a EOL BETA sem geração
     assert execucao.status == "SUCESSO"
+
+
+def _linha_fixture(indice_da_linha: int = 1) -> list[str]:
+    """Uma linha de dado da fixture real, como lista de campos (36 colunas)."""
+    linhas = FIXTURE.read_text(encoding="utf-8").splitlines()
+    return linhas[indice_da_linha].split(";")
+
+
+def _payload(*linhas_de_dado: str) -> io.BytesIO:
+    """Um recurso gzip mínimo: o cabeçalho real da fixture + as linhas dadas."""
+    cabecalho = FIXTURE.read_text(encoding="utf-8").splitlines()[0]
+    texto = "\n".join([cabecalho, *linhas_de_dado]) + "\n"
+    return io.BytesIO(gzip.compress(texto.encode("utf-8")))
+
+
+@pytest.mark.parametrize(
+    ("indice", "valor"),
+    [
+        (2, "abc"),  # PERIODO_COMERCIALIZACAO não numérico
+        (2, "745"),  # período fora do mês (julho tem 31 dias: 744 é o máximo)
+        (1, "2026-07-01"),  # DATA em ISO, não dd/mm/aaaa
+    ],
+    ids=["periodo_nao_numerico", "periodo_fora_do_mes", "data_em_formato_errado"],
+)
+def test_periodo_ou_data_malformados_contam_como_invalidos_nao_derrubam_o_mes(conector, monkeypatch, indice, valor):
+    """Regressão (fix round 1): um valor malformado não pode abortar o mês inteiro.
+
+    Antes da correção, `int(...)` e `datetime.strptime(...)` rodavam dentro de
+    `transformar()`, fora do `try/except ValidationError` do runner — um
+    `ValueError` ali escapava, e a linha discordante derrubava as ~3 milhões de
+    linhas do mês em vez de contar como `linhas_invalidas`.
+    """
+    boa = ";".join(_linha_fixture())
+    campos_ruins = _linha_fixture()
+    campos_ruins[indice] = valor
+    ruim = ";".join(campos_ruins)
+    monkeypatch.setattr(conector, "_abrir", lambda _s: _payload(boa, ruim))
+
+    execucao = conector.ingerir(Janela.de_texto("2026-07-01", "2026-07-31"))
+
+    assert execucao.status == "SUCESSO"
+    assert execucao.linhas_extraidas == 2
+    assert execucao.linhas_invalidas == 1
 
 
 def test_tipo_de_usina_desconhecido_e_rejeitado():

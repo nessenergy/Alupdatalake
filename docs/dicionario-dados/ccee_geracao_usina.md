@@ -126,6 +126,10 @@ o nome da coluna descritivo, não `_mwh`.
   desta entidade segue no padrão de 1800s.
 - Se a CCEE republicar um mês, a janela de agendamento de 70 dias (cobrindo o
   mês fechado e o anterior) alcança a nova publicação sem intervenção manual.
+- `PERIODO_COMERCIALIZACAO` não numérico ou fora do mês, e `DATA` em formato
+  diferente de `dd/mm/aaaa`, contam como `linhas_invalidas` — nunca derrubam a
+  execução inteira (a conversão e a checagem vivem no schema, não em
+  `transformar()`, exatamente para isso).
 - `(data_referencia, hora, codigo_parcela_usina)` é único na origem.
 - A unidade de `GERACAO_CENTRO_GRAVIDADE` não está documentada pela CCEE no
   catálogo; a dúvida vai ao dono do domínio (B3: 3 dias úteis).

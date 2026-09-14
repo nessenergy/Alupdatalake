@@ -19,6 +19,17 @@ Três coisas herdadas do PLD e uma diferença:
 
 `CODIGO_PARCELA_USINA` é código interno da CCEE, não o CEG da ANEEL:
 `codigo_usina` fica nulo até o de-para da Lacuna 1 (#141).
+
+`PERIODO_COMERCIALIZACAO` e `DATA` são texto vindo direto do CSV — nem sempre
+um número válido nem sempre `dd/mm/aaaa`. Por isso `transformar()` só repassa
+essas duas colunas como string; quem converte e deriva é o schema
+(`Field(ge=1, le=744)` no período, um `field_validator` no `strptime` da
+`DATA`, e um `model_validator` que chama `ccee_pld._data_e_hora` e compara).
+Um `ValueError` levantado ali dentro vira `ValidationError` — que é o único
+tipo que o runner (`Conector._validar_e_carregar`) captura por linha. Se
+`transformar()` levantasse o `ValueError` direto (como uma versão anterior
+deste conector fazia), a exceção escaparia do `try/except ValidationError` e
+derrubaria as ~3 milhões de linhas do mês inteiro por causa de uma linha.
 """
 
 from __future__ import annotations
@@ -73,11 +84,17 @@ MEDIDAS_OPCIONAIS = {
 
 
 class GeracaoHorariaUsina(BaseModel):
-    """A geração de uma parcela de usina em uma hora do mês de apuração."""
+    """A geração de uma parcela de usina em uma hora do mês de apuração.
 
-    data_referencia: date
-    data_publicada: date  # a DATA que a CCEE escreve; tem de bater com a derivada do período
-    hora: int = Field(ge=0, le=23)
+    `data_referencia` e `hora` não vêm prontos: são derivados de
+    `mes_referencia` + `periodo_comercializacao` pelo `model_validator` no fim
+    da classe, com a mesma aritmética de `ccee_pld._data_e_hora`.
+    """
+
+    mes_referencia: str = Field(exclude=True)  # AAAAMM cru — só deriva data_referencia/hora; não é coluna do lake
+    data_referencia: date | None = None  # preenchido por `_deriva_data_e_hora_e_confere_periodo`
+    data_publicada: date  # a DATA que a CCEE escreve, já parseada; tem de bater com a derivada do período
+    hora: int | None = None  # idem data_referencia
     periodo_comercializacao: int = Field(ge=1, le=744)
     periodo_apuracao_ccee: str
     versao_publicacao: date
@@ -115,6 +132,16 @@ class GeracaoHorariaUsina(BaseModel):
     garantia_fisica_rrh_modulada_ajustada_3: Decimal | None = None
     fator_risco_hidrologico: Decimal | None = None
 
+    @field_validator("data_publicada", mode="before")
+    @classmethod
+    def _parseia_data_publicada(cls, valor: Any) -> Any:
+        """`dd/mm/aaaa` cru → `date`. Formato que não bate vira `ValidationError`
+        (linha inválida, não crash) — o `ValueError` do `strptime` é capturado
+        pelo próprio pydantic, aqui dentro do validador."""
+        if isinstance(valor, str):
+            return datetime.strptime(valor, "%d/%m/%Y").date()
+        return valor
+
     @field_validator("submercado")
     @classmethod
     def _submercado_conhecido(cls, valor: str) -> str:
@@ -123,13 +150,20 @@ class GeracaoHorariaUsina(BaseModel):
         return valor
 
     @model_validator(mode="after")
-    def _data_bate_com_o_periodo(self) -> GeracaoHorariaUsina:
-        """A CCEE publica DATA e período; se discordarem, a origem mudou a regra."""
-        if self.data_publicada != self.data_referencia:
+    def _deriva_data_e_hora_e_confere_periodo(self) -> GeracaoHorariaUsina:
+        """Deriva `data_referencia`/`hora` de `mes_referencia` + `periodo_comercializacao`
+        (mesma aritmética de `ccee_pld._data_e_hora`, que também rejeita período
+        fora do mês) e confere com a `DATA` publicada; se discordarem, a origem
+        mudou a regra. As duas coisas viram `ValueError` — e, por rodar dentro
+        de um `model_validator`, o pydantic converte em `ValidationError`:
+        linha inválida, contada, sem derrubar o mês inteiro."""
+        dia, hora = _data_e_hora(self.mes_referencia, self.periodo_comercializacao)
+        if self.data_publicada != dia:
             raise ValueError(
-                f"DATA {self.data_publicada} não bate com o período "
-                f"{self.periodo_comercializacao} ({self.data_referencia})"
+                f"DATA {self.data_publicada} não bate com o período {self.periodo_comercializacao} ({dia})"
             )
+        self.data_referencia = dia
+        self.hora = hora
         return self
 
 
@@ -143,18 +177,18 @@ class CceeGeracaoUsina(CceeCsvCkan):
     recurso_por = "mes"
 
     def transformar(self, bruto: dict[str, Any]) -> dict[str, Any]:
+        # `transformar()` só repassa texto: MES_REFERENCIA já chegou validado
+        # (a base descarta linha com mês malformado antes de render aqui — ver
+        # `CceeCsvCkan._dentro`), mas PERIODO_COMERCIALIZACAO e DATA, não — quem
+        # converte e pode rejeitar essas duas é o schema, não este método (veja
+        # o docstring do módulo).
         mes = limpar(bruto["MES_REFERENCIA"])
-        periodo = int(limpar(bruto["PERIODO_COMERCIALIZACAO"]))
-        dia, hora = _data_e_hora(mes, periodo)
         nome = limpar(bruto.get("SUBMERCADO")).upper()
 
         registro: dict[str, Any] = {
-            "data_referencia": dia,
-            # A DATA publicada viaja junto: o schema exige que bata com a derivada,
-            # e a discordância vira ValidationError — contada, não fatal.
-            "data_publicada": datetime.strptime(limpar(bruto["DATA"]), "%d/%m/%Y").date(),
-            "hora": hora,
-            "periodo_comercializacao": periodo,
+            "mes_referencia": mes,
+            "periodo_comercializacao": limpar(bruto.get("PERIODO_COMERCIALIZACAO")),
+            "data_publicada": limpar(bruto.get("DATA")),
             "periodo_apuracao_ccee": periodo_ccee(mes),
             "versao_publicacao": bruto["_versao_publicacao"],
             "codigo_parcela_usina": limpar(bruto.get("CODIGO_PARCELA_USINA")),

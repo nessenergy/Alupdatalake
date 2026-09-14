@@ -33,6 +33,23 @@ sobre a forma de entrega de credenciais.
 | **BBCE** | Coleção Postman documentando a API; informação de que um acesso somente leitura está sendo providenciado | **A8 — parte BBCE** |
 | **TempoOK** | Exemplo de consulta em Python (não há documentação publicada) e o token de acesso | **A8 — parte TempoOK** |
 
+### 2.1 Endereços recebidos
+
+Transcritos aqui para que o registro seja autossuficiente — quem consultar este
+documento no futuro não deve depender da mensagem original:
+
+| Fonte | Documentação |
+|---|---|
+| CCEE — API JSON (Abertura de Mercado) | `documenter.getpostman.com/view/30322966/2sAXqqchhJ` |
+| CCEE — API XML (Plataforma de Integração) | `documenter.getpostman.com/view/12351215/UzJJucpF` |
+| **BBCE** | `documenter.getpostman.com/view/48979689/2sB3QJPWWr` |
+| TempoOK | não há documentação publicada; o contrato foi derivado do exemplo e **verificado contra a API** (§4.1) |
+
+A coleção do BBCE foi conferida e cobre autenticação, carteiras, produtos,
+curva forward, negócios, ordens, contratos, boleta eletrônica, liquidação
+financeira e RFQ. **É documentação suficiente para escrever o conector antes de
+a credencial chegar** — que era exatamente o que a pendência A8 destravava.
+
 ## 3. Efeito sobre a Onda 1: a CCEE está destravada
 
 A pendência A2 registrava que os domínios da CCEE respondiam **HTTP 403** a

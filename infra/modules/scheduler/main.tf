@@ -54,6 +54,12 @@ variable "conectores" {
       cron         = "0 7 * * 2" # terça, depois do semanal da ANEEL
       ultimos_dias = 1           # cadastro completo; a janela não se aplica
     }
+    bbce_curva_forward = {
+      # A curva sai por pregão, em dia útil. Janela curta porque cada dia é uma
+      # requisição própria; 7 dias cobrem feriado prolongado e execução perdida.
+      cron         = "0 20 * * 1-5" # após o fechamento do pregão
+      ultimos_dias = 7
+    }
     tempook_boletins = {
       # Boletim diário; a janela curta é deliberada, porque cada dia é uma
       # requisição própria (ADR 019) — janela larga multiplica chamadas à

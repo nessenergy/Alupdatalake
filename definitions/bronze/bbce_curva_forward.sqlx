@@ -1,0 +1,29 @@
+config {
+  type: "operations",
+  schema: "bronze",
+  hasOutput: true,
+  tags: ["bronze"]
+}
+
+-- Bronze: vértices da curva forward da BBCE.
+--
+-- Um registro por (data de referência, curva, vértice). O `ccee_pld` traz o
+-- preço à vista; esta tabela traz o preço negociado hoje para entrega futura.
+CREATE TABLE IF NOT EXISTS ${self()} (
+  data_referencia     DATE      NOT NULL OPTIONS(description="Pregão a que a curva se refere"),
+  curva               STRING    NOT NULL OPTIONS(description="Nome do produto na BBCE, ex.: PLD"),
+  vertice_em          DATE      NOT NULL OPTIONS(description="Data de entrega que o vértice precifica"),
+  preco_reais_mwh     NUMERIC   NOT NULL OPTIONS(description="Preço do vértice em R$/MWh"),
+  origem_dado         STRING    NOT NULL OPTIONS(description="dataSource da BBCE"),
+  identidade          STRING    NOT NULL OPTIONS(description="identity da BBCE, ex.: CURVE"),
+  id_origem           STRING    NOT NULL OPTIONS(description="Identificador do vértice na BBCE"),
+  atualizado_em       TIMESTAMP NOT NULL OPTIONS(description="updatedAt da BBCE — a curva é revisada"),
+
+  _ingestao_id        STRING    NOT NULL,
+  _ingestao_timestamp TIMESTAMP NOT NULL,
+  _fonte              STRING    NOT NULL,
+  _schema_versao      STRING    NOT NULL
+)
+PARTITION BY DATE(_ingestao_timestamp)
+CLUSTER BY data_referencia, curva, vertice_em
+OPTIONS(description="Curva forward da BBCE — camada Bronze, append-only");

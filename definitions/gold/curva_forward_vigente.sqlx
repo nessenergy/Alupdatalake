@@ -1,0 +1,37 @@
+config {
+  type: "table",
+  schema: "gold",
+  tags: ["gold"]
+}
+
+-- Gold: a curva forward vigente — o último pregão publicado, por vértice.
+--
+-- Responde "quanto o mercado está pedindo hoje para entrega em cada período
+-- futuro". É a leitura que se usa para comparar com o PLD à vista
+-- (`gold.pld_mensal_submercado`) e enxergar prêmio ou desconto.
+--
+-- Só a curva mais recente. O histórico de curvas fica na Silver, para quem
+-- quiser estudar como a expectativa se moveu ao longo do tempo — que é análise
+-- de outra natureza e merece tabela própria quando for pedida.
+--
+-- Sem KPI, conforme ADR 012: não há cálculo de prêmio aqui, porque a regra de
+-- comparação depende dos domínios analíticos (A4) e inventá-la seria escolher
+-- pelo cliente.
+WITH ultimo_pregao AS (
+  SELECT curva, MAX(data_referencia) AS data_referencia
+  FROM ${ref("silver", "bbce_curva_forward")}
+  GROUP BY curva
+)
+
+SELECT
+  c.curva,
+  c.data_referencia,
+  c.vertice_em,
+  c.vertice_periodo,
+  c.horizonte_dias,
+  c.preco_reais_mwh,
+  c.atualizado_em
+FROM ${ref("silver", "bbce_curva_forward")} AS c
+JOIN ultimo_pregao AS u
+  ON c.curva = u.curva
+ AND c.data_referencia = u.data_referencia

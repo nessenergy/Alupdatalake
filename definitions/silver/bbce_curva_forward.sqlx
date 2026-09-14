@@ -1,0 +1,38 @@
+config {
+  type: "view",
+  schema: "silver",
+  tags: ["silver"],
+  assertions: {
+    uniqueKey: ["data_referencia", "curva", "vertice_em"],
+    nonNull: ["data_referencia", "curva", "vertice_em", "preco_reais_mwh"]
+  }
+}
+
+-- Silver: curva forward higienizada e deduplicada.
+-- Dedup por (data_referencia, curva, vertice_em): a BBCE revisa a curva
+-- publicada — daí a coluna `atualizado_em` existir —, então vence a ingestão
+-- mais recente. Mesmo critério do ONS e da CCEE, pela mesma razão.
+SELECT
+  data_referencia,
+  curva,
+  vertice_em,
+  -- Quantos dias à frente o vértice olha. É o eixo que torna curvas de dias
+  -- diferentes comparáveis entre si, e o BigQuery não o deriva sozinho.
+  DATE_DIFF(vertice_em, data_referencia, DAY) AS horizonte_dias,
+  FORMAT_DATE('%Y-%m', vertice_em) AS vertice_periodo,
+  preco_reais_mwh,
+  FORMAT_DATE('%Y-%m', data_referencia) AS periodo_apuracao,
+  CAST(NULL AS STRING) AS submercado,    -- a curva publicada é do produto, não do submercado
+  CAST(NULL AS STRING) AS codigo_usina,
+  CAST(NULL AS STRING) AS agente_ccee,   -- preço de mercado, não posição de agente
+  origem_dado,
+  identidade,
+  id_origem,
+  atualizado_em,
+  _ingestao_id,
+  _ingestao_timestamp
+FROM ${ref("bronze", "bbce_curva_forward")}
+QUALIFY ROW_NUMBER() OVER (
+  PARTITION BY data_referencia, curva, vertice_em
+  ORDER BY _ingestao_timestamp DESC
+) = 1

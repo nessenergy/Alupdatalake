@@ -31,6 +31,12 @@
 - **O Brasil não observa horário de verão desde 2019**, e por isso todo mês tem
   exatamente `dias × 24` períodos. Se o horário de verão voltar, este é o ponto
   que quebra.
+- **Esta é a única fonte do lake em que a origem declara o mês.** Desde 14/09 o
+  `MES_REFERENCIA` vive em `periodo_apuracao_ccee`, e `periodo_apuracao` passou
+  a ser derivado da data como em todas as outras views — mesma coluna, mesma
+  proveniência em todo o lake. A Silver exige que os dois coincidam, e essa
+  asserção é o alarme dos dois riscos acima: período que estoura as horas do mês
+  empurra a data para o mês seguinte, e a igualdade quebra.
 - **O submercado vem por extenso** (`NORDESTE`) e é convertido para a sigla que
   o ONS publica (`NE`), para que a dimensão `submercado` cruze entre as duas
   fontes sem tradução na Silver. `SUDESTE` da CCEE e `SE` do ONS são o mesmo
@@ -50,7 +56,8 @@
 | `MES_REFERENCIA` + `PERIODO_COMERCIALIZACAO` | `data_referencia` | DATE | dia derivado: `(período − 1) ÷ 24 + 1` |
 | `MES_REFERENCIA` + `PERIODO_COMERCIALIZACAO` | `hora` | INT64 | hora derivada: `(período − 1) mod 24` |
 | `SUBMERCADO` | `submercado` | STRING | nome por extenso → sigla; validado contra a lista |
-| `MES_REFERENCIA` | `periodo_apuracao` | STRING | `AAAAMM` → `AAAA-MM` |
+| `MES_REFERENCIA` | `periodo_apuracao_ccee` | STRING | `AAAAMM` → `AAAA-MM`, **como a CCEE declara** |
+| — | `periodo_apuracao` | STRING | derivado de `data_referencia`, como em toda outra Silver |
 | `PERIODO_COMERCIALIZACAO` | `periodo_comercializacao` | INT64 | preservado para rastrear até a origem |
 | `PLD` | `pld_reais_mwh` | NUMERIC | R$/MWh; negativo é rejeitado (há piso regulatório positivo) |
 
@@ -60,7 +67,8 @@
 |---|---|---|
 | `data_referencia` | sim | dia da apuração, derivado |
 | `submercado` | **sim** | N, NE, S, SE — mesma sigla do ONS, o que permite cruzar preço com carga |
-| `periodo_apuracao` | sim | `AAAA-MM`, o mês de referência da CCEE |
+| `periodo_apuracao` | sim | `AAAA-MM` do calendário civil, derivado de `data_referencia` |
+| `periodo_apuracao_ccee` | sim | **esta é a única fonte que o preenche** — o `MES_REFERENCIA` que a CCEE declara |
 | `codigo_usina` | não | o PLD é do submercado, não da usina |
 | `agente_ccee` | não | é preço de mercado, não posição de agente. A dimensão vem de `lista_perfil` / `lista_agente_associado`, também públicos — próxima entidade da fila |
 

@@ -8,7 +8,8 @@ config {
     rowConditions: [
       "submercado IN ('N','NE','S','SE')",
       "hora BETWEEN 0 AND 23",
-      "pld_reais_mwh >= 0"
+      "pld_reais_mwh >= 0",
+      "periodo_apuracao = periodo_apuracao_ccee"
     ]
   }
 }
@@ -20,18 +21,31 @@ config {
 -- Faixas (issue #110): o PLD tem piso regulatório positivo. `hora` é derivada
 -- do PERIODO_COMERCIALIZACAO, e um off-by-one no cálculo apareceria aqui como
 -- hora 24 — é a asserção que pega o erro mais caro desta fonte.
+--
+-- Dois calendários (item D4): esta é a única fonte em que a origem **declara**
+-- o mês, no `MES_REFERENCIA`. Ele vira `periodo_apuracao_ccee`, e
+-- `periodo_apuracao` passa a ser derivado da data como em todas as outras
+-- views — mesma coluna, mesma proveniência em todo o lake.
+--
+-- A asserção `periodo_apuracao = periodo_apuracao_ccee` não é redundante:
+-- `data_referencia` é derivada do próprio `MES_REFERENCIA` mais o
+-- PERIODO_COMERCIALIZACAO, então ela só falha quando o período estoura as
+-- horas do mês e empurra a data para o mês seguinte — exatamente o off-by-one
+-- e o retorno do horário de verão que o dicionário desta fonte nomeia. É a
+-- checagem que transforma "não sabemos se os calendários divergem" em alarme.
 SELECT
   data_referencia,
   hora,
   submercado,
-  periodo_apuracao,
+  FORMAT_DATE('%Y-%m', data_referencia) AS periodo_apuracao,
+  bronze.periodo_apuracao AS periodo_apuracao_ccee,  -- qualificado: o da origem, não o derivado acima
   CAST(NULL AS STRING) AS codigo_usina,  -- o PLD é do submercado, não da usina
   CAST(NULL AS STRING) AS agente_ccee,   -- preço de mercado, não posição de agente
   periodo_comercializacao,
   pld_reais_mwh,
   _ingestao_id,
   _ingestao_timestamp
-FROM ${ref("bronze", "ccee_pld")}
+FROM ${ref("bronze", "ccee_pld")} AS bronze
 QUALIFY ROW_NUMBER() OVER (
   PARTITION BY data_referencia, hora, submercado
   ORDER BY _ingestao_timestamp DESC

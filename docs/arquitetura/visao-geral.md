@@ -44,7 +44,7 @@ graph TB
 regras de negócio que a Alup respondeu no bloco D do
 [Questionário de Gaps](../questionario-gaps.md).
 
-Toda view Silver declara as cinco colunas, mesmo quando não as preenche —
+Toda view Silver declara as seis colunas, mesmo quando não as preenche —
 `CAST(NULL AS STRING)` explícito. Coluna ausente quebraria consulta que cruza
 fontes; coluna nula diz "esta fonte não responde por essa dimensão".
 
@@ -54,7 +54,8 @@ fontes; coluna nula diz "esta fonte não responde por essa dimensão".
 | `submercado` | `ons_carga` | Sigla `N`, `NE`, `S`, `SE`. A CCEE publica por extenso e o conector converte, para as duas fontes cruzarem sem tradução na Silver | **fechada** |
 | `agente_ccee` | `ccee_perfil` | Sigla do agente. Agente e perfil são distintos: um agente tem vários perfis, e é o **perfil** que transaciona | **fechada** desde 14/09 |
 | `codigo_usina` | `aneel_siga` (CodCEG) | — | **em aberto — ver §Lacuna 1** |
-| `periodo_apuracao` | derivada | `AAAA-MM` do calendário civil | **parcial — ver §Lacuna 2** |
+| `periodo_apuracao` | derivada | `AAAA-MM` do calendário civil, em **todas** as views | **fechada desde 14/09** |
+| `periodo_apuracao_ccee` | a origem | `AAAA-MM` que a origem declara; nulo onde ela não declara. Hoje só o `ccee_pld` o preenche, pelo `MES_REFERENCIA` | **fechada desde 14/09 — ver §Lacuna 2** |
 
 ### Regras de negócio que valem na Gold
 
@@ -81,19 +82,38 @@ não cruza com posição comercial nem com contabilização.
 **Depende da Alup**: fornecer o de-para, ou a lista de siglas com o CEG
 correspondente.
 
-### Lacuna 2 — `periodo_apuracao` só cobre o calendário civil
+### Lacuna 2 — os dois calendários passaram a ser duas colunas
 
-O item **D4** diz que valem **os dois calendários**: mês civil e mês CCEE. Hoje
-toda Silver deriva `periodo_apuracao` com `FORMAT_DATE('%Y-%m', data_referencia)`,
-que é só o civil.
+**Encerrada em 14/09**, e por um caminho diferente do previsto.
 
-Os dois não coincidem no fechamento da contabilização. Enquanto a diferença não
-for modelada, agregação mensal que cruze dado da CCEE com dado interno **soma
-períodos diferentes sem avisar** — o tipo de erro que não falha, só mente.
+O item **D4** diz que valem **os dois calendários**: mês civil e mês CCEE. O
+registro anterior desta lacuna dizia que toda Silver derivava `periodo_apuracao`
+com `FORMAT_DATE`, e que definir a regra do mês CCEE era trabalho da ness.
 
-**Depende da ness.**: definir a regra do mês CCEE e acrescentar
-`periodo_apuracao_ccee` às views que o exigem. Não bloqueia nada hoje, porque
-não há dado interno carregado; **bloqueia Risco e Compliance** quando houver.
+**As duas afirmações estavam erradas.** O `ccee_pld` nunca derivou nada: ele
+trazia o `MES_REFERENCIA` que a própria CCEE declara, sob o mesmo nome de coluna
+que em toda outra view guarda um valor derivado. Mesma coluna, duas
+proveniências, sem sinal nenhum — que é pior do que a lacuna descrita.
+
+E a regra do mês CCEE não é da ness. para definir: seria inventar calendário do
+cliente, que é exatamente o que a [ADR 012](decisoes/012-dataform.md) proíbe.
+
+**O que foi feito.** `periodo_apuracao` passou a ser derivado da data em
+**todas** as views, `ccee_pld` incluído. O período que a origem declara virou
+uma sexta dimensão comum, `periodo_apuracao_ccee`, nula onde a origem não
+declara nada — o mesmo tratamento que `submercado` e `codigo_usina` já recebem.
+
+**A parte que importa é a asserção.** No `ccee_pld`, a Silver exige
+`periodo_apuracao = periodo_apuracao_ccee`. Ela não é redundante: como
+`data_referencia` nasce do próprio `MES_REFERENCIA` somado ao
+`PERIODO_COMERCIALIZACAO`, a igualdade só quebra quando o período estoura as
+horas do mês e empurra a data para o mês seguinte — o off-by-one e o retorno do
+horário de verão que o dicionário do PLD nomeia como os dois riscos da fonte.
+
+Não sabemos se o mês CCEE diverge do civil, e não vamos supor. **O dia em que
+divergir, a asserção falha e o calendário se aprende do dado real**, com o dono
+do domínio na mesa. Até lá, as duas colunas convivem e ninguém soma calendários
+diferentes sem perceber.
 
 ## 8 Domínios Analíticos
 

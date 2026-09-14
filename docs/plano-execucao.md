@@ -78,7 +78,7 @@ ela é o colchão do cronograma.
 
 | # | Fonte | Est. | Complexidade | Observações |
 |---|---|---|---|---|
-| 1.1 | **CCEE InfoMercado** | 32h ⚠ | alta | **Bloqueada — ver 3.1 abaixo** |
+| 1.1 | **CCEE InfoMercado** | 32h | alta | **Destravada em 14/09** ([ADR 018](arquitetura/decisoes/018-vias-de-acesso-a-ccee.md)): era filtro de cliente não identificado, não bloqueio de IP. `pld_horario_submercado` e `lista_perfil_v1` entregues; a fila das demais entidades está na [ADR 021](arquitetura/decisoes/021-conjuntos-da-ccee-por-dominio.md) — 24 conjuntos escolhidos por demanda dos domínios do B1 |
 | 1.2 | **ONS carga** | 28h ⚠ | alta | **Concluído.** CSV anual por subsistema; primeira fonte a preencher `submercado` |
 | 1.3 | **ANEEL SIGA** | 20h | média | **Concluído.** Cadastro de ~25 mil empreendimentos; alimenta `codigo_usina` |
 | 1.4 | **IBGE IPCA** | 12h | baixa | **Concluído.** Período mensal, payload aninhado |
@@ -91,29 +91,30 @@ ela é o colchão do cronograma.
 diferente (diário, mensal aninhado, cadastro paginado, CSV anual) e o framework
 absorveu as quatro sem alteração — só `extrair()` e `transformar()` mudaram.
 
-### 3.1 CCEE InfoMercado — bloqueada por proteção anti-bot
+### 3.1 CCEE InfoMercado — destravada em 14/09
 
-Os domínios `www.ccee.org.br` e `dadosabertos.ccee.org.br` respondem **HTTP 403**
-a requisições automatizadas (o TLS conecta; o 403 vem do servidor da CCEE, com
-página de bloqueio). Isso atinge a API CKAN, a página do InfoMercado e o portal
-de dados abertos.
+Por três semanas esta linha registrou um bloqueio: `www.ccee.org.br` e
+`dadosabertos.ccee.org.br` respondiam **HTTP 403** a requisição automatizada, e
+três caminhos estavam sobre a mesa — liberação de IP junto à CCEE, credencial
+de agente, ou download manual pelo S2 Data Intake. Todos dependiam da
+contratante.
 
-Caminhos possíveis, em ordem de preferência:
+**Nenhum foi necessário.** O 403 era filtro de cliente não identificado, não
+bloqueio de origem: com o cabeçalho de identificação em `src/core/http.py`, a
+API CKAN, o portal e os arquivos respondem normalmente
+([ADR 018](arquitetura/decisoes/018-vias-de-acesso-a-ccee.md)). A pendência A2
+foi encerrada e as 32h voltaram a andar **sem insumo da Alup**.
 
-1. **Origem permitida**: a Alup pedir à CCEE a liberação do IP de saída do
-   ambiente GCP (ou uma via oficial de acesso programático). É a solução que
-   mantém o conector igual aos outros.
-2. **Credencial de agente**: a Alup já é agente CCEE; a área credenciada pode
-   ter acesso programático com contrato — o que aproximaria esta fonte do
-   escopo da Onda 2.
-3. **Download manual + S2 Data Intake**: alguém baixa o arquivo e ele entra
-   pelo motor de planilha da Onda 4. Funciona, mas não é ingestão automática e
-   contraria o padrão dos 7 componentes.
+O que sobrou não é técnico nem contratual: é escolha. São 204 conjuntos
+públicos, e ingerir todos seria pagar 7 componentes por arquivo que ninguém
+pediu. A [ADR 021](arquitetura/decisoes/021-conjuntos-da-ccee-por-dominio.md)
+escolhe **24**, por demanda dos domínios do B1, com fila nomeada — duas
+entidades já entregues (`pld_horario_submercado` e `lista_perfil_v1`) e
+`lista_agente_associado` na frente das demais.
 
-**Enquanto não se decide, esta é uma dependência da contratante**, não um item
-técnico em aberto. As 32h continuam alocadas; a onda pode ser homologada com as
-4 fontes concluídas e a CCEE tratada como escopo remanejado, se a Alup
-concordar por escrito.
+O cabeçalho é a única dependência frágil: o filtro é da CCEE e pode mudar. Se o
+403 voltar, a investigação começa pelo que a origem passou a exigir, não pelo
+conector.
 
 **Riscos**
 - CCEE e ONS não têm contrato de API estável; mudança de layout entre períodos

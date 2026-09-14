@@ -48,6 +48,13 @@ variable "conectores" {
       cron         = "0 9 5 * *" # dia 5, depois do fechamento do mês anterior
       ultimos_dias = 120         # cobre a defasagem de publicação e a recontabilização (ADR 016)
     }
+    tempook_boletins = {
+      # Boletim diário; a janela curta é deliberada, porque cada dia é uma
+      # requisição própria (ADR 019) — janela larga multiplica chamadas à
+      # origem sem trazer dado novo. Dia sem boletim vira aviso, não falha.
+      cron         = "0 11 * * *" # depois da publicação do boletim do dia
+      ultimos_dias = 5            # cobre execução perdida e publicação atrasada
+    }
   }
 }
 

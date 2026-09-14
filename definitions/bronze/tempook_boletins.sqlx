@@ -1,0 +1,29 @@
+config {
+  type: "operations",
+  schema: "bronze",
+  hasOutput: true,
+  tags: ["bronze"]
+}
+
+-- Bronze: catálogo dos boletins diários do TempoOK (ADR 019).
+--
+-- Catálogo, não conteúdo: o PDF inteiro fica no bucket raw e esta tabela
+-- aponta para ele. Extrair os números do boletim é escopo futuro e depende de
+-- A4 — sem saber quais indicadores importam, um extrator seria adivinhação.
+CREATE TABLE IF NOT EXISTS ${self()} (
+  data_referencia     DATE      NOT NULL OPTIONS(description="Dia do boletim"),
+  caminho_origem      STRING    NOT NULL OPTIONS(description="Caminho pedido ao TempoOK, como consta na origem"),
+  nome_arquivo        STRING    NOT NULL,
+  uri_arquivo         STRING        NULL OPTIONS(description="gs:// do PDF arquivado; nulo em dry-run"),
+  tamanho_bytes       INT64     NOT NULL,
+  sha256              STRING    NOT NULL OPTIONS(description="Identifica republicação corrigida sem reabrir o PDF"),
+  content_type        STRING    NOT NULL,
+
+  _ingestao_id        STRING    NOT NULL,
+  _ingestao_timestamp TIMESTAMP NOT NULL,
+  _fonte              STRING    NOT NULL,
+  _schema_versao      STRING    NOT NULL
+)
+PARTITION BY DATE(_ingestao_timestamp)
+CLUSTER BY data_referencia
+OPTIONS(description="Catálogo de boletins diários do TempoOK — camada Bronze, append-only");

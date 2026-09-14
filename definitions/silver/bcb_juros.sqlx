@@ -1,0 +1,35 @@
+config {
+  type: "view",
+  schema: "silver",
+  tags: ["silver"],
+  assertions: {
+    uniqueKey: ["data_referencia", "serie"],
+    nonNull: ["data_referencia", "serie", "taxa_percentual_dia"],
+    rowConditions: [
+      "serie IN ('selic', 'cdi')",
+      "taxa_percentual_dia >= 0 AND taxa_percentual_dia <= 1"
+    ]
+  }
+}
+
+-- Silver: Selic e CDI higienizados, deduplicados e com as dimensões comuns.
+-- Dedup: para cada (data_referencia, serie), vence a ingestão mais recente.
+-- Faixas (issue #110): 1% ao dia é da ordem de 1.100% ao ano. Taxa acima disso
+-- não é juro, é erro da origem — e passaria despercebida depois de capitalizada
+-- em `gold.juros_mensal`, que é onde o estrago apareceria como número plausível.
+SELECT
+  data_referencia,
+  CAST(NULL AS STRING)  AS submercado,      -- juro não é dado de submercado
+  CAST(NULL AS STRING)  AS codigo_usina,    -- idem
+  CAST(NULL AS STRING)  AS agente_ccee,     -- idem
+  FORMAT_DATE('%Y-%m', data_referencia) AS periodo_apuracao,
+  CAST(NULL AS STRING) AS periodo_apuracao_ccee,  -- a origem não declara período próprio
+  serie,
+  taxa_percentual_dia,
+  _ingestao_id,
+  _ingestao_timestamp
+FROM ${ref("bronze", "bcb_juros")}
+QUALIFY ROW_NUMBER() OVER (
+  PARTITION BY data_referencia, serie
+  ORDER BY _ingestao_timestamp DESC
+) = 1

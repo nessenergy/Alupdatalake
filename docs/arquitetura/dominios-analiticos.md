@@ -198,15 +198,15 @@ calendários convivem em colunas separadas, com asserção que avisa se divergir
 
 | | |
 |---|---|
-| **Fontes hoje** | `bcb_cambio_ptax` · `ibge_ipca` |
-| **Fontes a conectar** | **Selic** e **CDI** — as duas nomeadas no B1 e ainda não conectadas |
-| **Granularidade** | diária para câmbio e Selic; mensal para IPCA |
+| **Fontes hoje** | `bcb_cambio_ptax` · `bcb_juros` (Selic e CDI) · `ibge_ipca` |
+| **Granularidade** | diária para câmbio, Selic e CDI; mensal para IPCA |
 | **Cadência** | diária e mensal |
-| **Gold hoje** | `cambio_mensal`, `inflacao_mensal` |
-| **Situação** | **parcial** — faltam Selic e CDI |
+| **Gold hoje** | `cambio_mensal`, `juros_mensal`, `inflacao_mensal` |
+| **Situação** | **pronto** — os quatro itens nomeados no B1 estão no lake |
 
-Selic e CDI saem das séries do BCB, pelo mesmo caminho já usado pelo PTAX: é
-acréscimo pequeno e destrava o domínio inteiro.
+Selic e CDI entraram em 14/09 pelas séries 11 e 12 do SGS, mesmo BCB do PTAX:
+não são fonte nova para a cláusula 2ª, são entidade nova de fonte existente
+([`bcb_juros.md`](../dicionario-dados/bcb_juros.md)).
 
 O item D6 **não cita conversão para US$** — então câmbio entra como contexto, e
 não como conversão obrigatória, até que alguém peça.

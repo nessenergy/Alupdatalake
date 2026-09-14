@@ -48,6 +48,7 @@ contexto para agentes, em [`../AGENTS.md`](../AGENTS.md).
 | Fonte | Formato | Volume verificado | Agendamento |
 |---|---|---|---|
 | **BCB/PTAX** | JSON diário | 3 registros / 3 dias | diário 9h, janela 3 dias |
+| **BCB/Selic e CDI** | JSON diário, SGS séries 11 e 12 | **16 registros / 12 dias** (8 dias úteis × 2 séries), 0 inválidos, contra a API real | diário 9h30, janela 5 dias |
 | **IBGE/IPCA** | JSON aninhado, mensal | 12 registros / 6 meses | dia 12, janela 90 dias |
 | **ANEEL/SIGA** | cadastro paginado | **25.263 registros**, 0 inválidos, 28s | semanal, segunda 7h |
 | **ONS/carga** | CSV anual remoto | 28 registros / 7 dias | diário 8h, janela 30 dias |
@@ -66,11 +67,11 @@ contexto para agentes, em [`../AGENTS.md`](../AGENTS.md).
 | **CCEE/energia de reserva (EER)** | CSV anual, série mensal sem agente, via CKAN | **7 registros / 7 meses**, 0 inválidos, contra a API real | mensal, dia 6 às 10h, janela 120 dias |
 | **CCEE/CVU estrutural** | CSV anual, delimitador vírgula, via CKAN | **805 registros / 2 meses**, 0 inválidos, contra a API real | mensal, dia 6 às 10h, janela 120 dias |
 
-**Quinze das dezoito falaram com a API real** em dry-run: as seis que já
-falavam somadas às nove entidades novas da CCEE (ADR 021), todas verificadas
-em 14/09. Hubspot e BBCE seguem as exceções: os 7 componentes existem,
-escritos contra a documentação, e o teste de integração está `skipif` até a
-credencial chegar (A9 e A7). No BBCE falta inclusive o **host**, que não
+**Dezesseis das dezenove falaram com a API real** em dry-run: as seis que já
+falavam, somadas às nove entidades novas da CCEE (ADR 021) e ao `bcb_juros`,
+todas verificadas em 14/09. Hubspot e BBCE seguem as exceções: os 7 componentes
+existem, escritos contra a documentação, e o teste de integração está `skipif`
+até a credencial chegar (A9 e A7). No BBCE falta inclusive o **host**, que não
 consta da documentação pública e vem junto com o acesso.
 
 O TempoOK é um caso à parte: **falou com a API e o contrato de dados está
@@ -132,6 +133,7 @@ destino, com os oito invariantes e a pauta de perguntas. **Enviado ao Google em
 | A9 | **Token do Hubspot** (private app) no secret `alupdata-hubspot-api-token` | o conector está pronto e parado; nenhuma linha de CRM entra no lake | plano 2.3 (2.3) |
 | A10 | **Verificar com o TempoOK o acesso ao acervo recente** — o token entregue em 14/09 alcança boletins só até 26/10/2022 | o conector está pronto e verificado, mas ingere zero boletins; a fonte não fecha na Onda 2. **Resolver isto antecipa a rotação do token** (gatilho 1 da [ADR 020](arquitetura/decisoes/020-token-tempook-rotacao-na-producao.md)): com acervo corrente, o alcance da credencial muda de patamar | [ADR 019](arquitetura/decisoes/019-boletim-do-tempook-como-arquivo.md), [registro de 14/09](relatorios/2026-09-14-documentacao-de-apis-recebida.md) §4.1 |
 | A11 | **De-para de usina** — sigla interna ↔ CEG ↔ nome CCEE ↔ nome ONS | **Agora bloqueia dado real**: `ccee_geracao_usina` e `ccee_cvu_estrutural` guardam `codigo_parcela_usina` com `codigo_usina` nulo à espera dele | Lacuna 1 (`dominios-analiticos.md` §5.1), [#141](https://github.com/nessenergy/Alupdatalake/issues/141) |
+| A12 | **Exemplos reais das planilhas** (G3, prometidos até 18/09) | além do item 4.1 da Onda 4, é o que permite conferir o escopo de dado item a item contra os 13 conectores. O escopo declarado é "o mapeado na planilha da proposta"; se a planilha nomear algo fora dos 13, é aditivo, e a distinção precisa ser feita antes da medição | [#142](https://github.com/nessenergy/Alupdatalake/issues/142), [`questionario-gaps.md`](questionario-gaps.md) G3, [`arquitetura/dominios-analiticos.md`](arquitetura/dominios-analiticos.md) §2 |
 
 > **Cláusula 3ª**: atraso > 5 dias úteis posterga o cronograma; > 5 dias úteis em
 > VPN/credencial gera taxa de ociosidade de 4h/dia (R$ 256/h); > 20 dias

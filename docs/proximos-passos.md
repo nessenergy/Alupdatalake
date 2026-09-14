@@ -89,8 +89,37 @@ Ainda em 11/09, diante do teto de E2: **orquestração da Onda 3 em Cloud Workfl
 | 4.3 | Versão em inglês do baralho | decisão 3.2 |
 | 4.4 | Apagar `docs/fluxo-execucao` e o branch de trabalho, já mesclados; arquivar os dois `backup/*` como tag | permissão — daqui o `git push --delete` e a API respondem 403 |
 | 4.5 | Emitir o relatório de situação da semana | fechamento da S2 (11/09) |
-| 4.6 | Conferir as tarifas-premissa de `us-east1` na tabela oficial de preços do BigQuery e atualizar `src/portal/custo.py` e `definitions/gold/custo_consultas.sqlx` se diferirem de US$ 6,25 por TiB varrido e US$ 0,02 por GiB·mês | acesso à tabela oficial de preços |
-| 4.7 | Asserções de faixa por fonte (`rowConditions`, ex.: `cotacao_compra > 0`, `submercado IN ('N','NE','S','SE')`) e alerta de falha do workflow do Dataform; hoje o portão (`uniqueKey`/`nonNull`) repete o `QUALIFY` da Silver e os `NOT NULL` do Bronze (ADR 012) | dicionário de dados de cada fonte |
+| ~~4.6~~ | ~~Conferir as tarifas-premissa de `us-east1`~~ — **concluído em 14/09** ([#112](https://github.com/nessenergy/Alupdatalake/pull/112) e [#147](https://github.com/nessenergy/Alupdatalake/pull/147)): armazenamento corrigido de 0,020 para 0,023 (a página cota por GiB·hora), e o preço por TiB de `us-east1` **segue sem confirmação** — o seletor de região roda no navegador. Dois caminhos independentes chegaram ao mesmo impedimento. No caminho apareceu o que faltava: **a camada gratuita de 1 TB/mês não estava no modelo**, e o lake inteiro cabe nela | — |
+| ~~4.7~~ | ~~Asserções de faixa por fonte (`rowConditions`, ex.: `cotacao_compra > 0`, `submercado IN ('N','NE','S','SE')`) e alerta de falha do workflow do Dataform; hoje o portão (`uniqueKey`/`nonNull`) repete o `QUALIFY` da Silver e os `NOT NULL` do Bronze (ADR 012)~~ — **concluído em 14/09** ([#110](https://github.com/nessenergy/Alupdatalake/pull/110)) | — |
+
+### O que entrou na fila em 14/09, depois que os domínios fecharam
+
+Nenhum destes estava na tabela acima: são consequência de os 8 domínios
+passarem a existir, e cada um destravou o seguinte.
+
+| Entrega | PR | O que destravou |
+|---|---|---|
+| Domínios corrigidos para os do **B1**, e a abrangência do dado escrita | ~~#139~~ (entrou pelo #138) | tudo abaixo |
+| **Selic e CDI**, os dois itens que faltavam no domínio Econômico | [#143](https://github.com/nessenergy/Alupdatalake/pull/143) | fecha um dos oito domínios |
+| **A7 em detalhe** no painel, e o aviso da sigla repetida | [#144](https://github.com/nessenergy/Alupdatalake/pull/144) | a linha do painel não dizia o tamanho do que está pendurado nela |
+| **ADR 021** — 24 dos 204 conjuntos da CCEE, por demanda dos domínios | [#145](https://github.com/nessenergy/Alupdatalake/pull/145) | a ADR 018 tinha deixado essa fila em aberto à espera dos domínios |
+| **Os dois calendários viram duas colunas**, com asserção que avisa | [#146](https://github.com/nessenergy/Alupdatalake/pull/146) | encerra a Lacuna 2, que a ADR 021 promoveu a bloqueio real |
+| **Camada gratuita** declarada no modelo de custo | [#147](https://github.com/nessenergy/Alupdatalake/pull/147) | achado do 4.6 |
+
+**Os cinco PRs estão abertos e verdes**, com 8 de 8 verificações. O merge
+depende de revisão — a `main` é protegida desde 11/09 (ADR 010).
+
+**Ordem sugerida de merge**: #144, #145 e #147 são independentes. Entre #143 e
+#146 há uma dependência de forma: qual entrar depois precisa da coluna
+`periodo_apuracao_ccee` na Silver nova do `bcb_juros`. O teste acusa na hora.
+
+### O que segue parado, e por quê
+
+| # | Item | Depende de |
+|---|---|---|
+| 4.2 | Endurecer o Portal MVP | **despriorizado pela decisão 3.4**: com a CCEE destravada, a fila de trabalho útil sem GCP voltou a ser escopo facturável — e foi nela que o dia de 14/09 foi gasto |
+| 4.3 | Versão em inglês do baralho | decisão **3.2**, que é sua |
+| 4.4 | Apagar branches já mescladas e arquivar os `backup/*` como tag | permissão — `git push --delete` e a API respondem 403. **Não retestado após a virada para GitHub Enterprise em 11/09**: pode ter destravado sozinho |
 
 ### Uma pendência técnica do próprio repositório — encerrada em 14/09
 

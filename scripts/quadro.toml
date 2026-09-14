@@ -26,11 +26,18 @@ feriados = [2026-09-07, 2026-10-12, 2026-11-02, 2026-11-15, 2026-11-20, 2026-12-
 [vencimentos]
 1 = 2026-09-04   # depende do ambiente GCP (A3)
 55 = 2026-09-04  # A3 — ambiente GCP
-8 = 2026-09-11   # A4 — Questionário de Gaps
-9 = 2026-09-11   # A5 — RACI e data owners
-10 = 2026-09-11  # A6 — ferramenta de BI
+# A4, A5 e A6 (#8, #9, #10) foram entregues em 11/09 e as issues ficaram
+# abertas por descuido — o que fez o quadro emitir registro de atraso indevido
+# em 14/09, retirado nas próprias issues. Os prazos ficam aqui como histórico;
+# com a issue fechada, o atraso não se recalcula.
+8 = 2026-09-11   # A4 — Questionário de Gaps · ENTREGUE em 11/09
+9 = 2026-09-11   # A5 — RACI e data owners · ENTREGUE em 11/09
+10 = 2026-09-11  # A6 — ferramenta de BI · ENTREGUE em 11/09
 11 = 2026-09-11  # A9 — token do Hubspot
-87 = 2026-09-11  # destinatários de alerta e teto do orçamento
+# A resposta da Alup de 11/09 estabeleceu 18/09 para vincular a conta; o prazo
+# original de 11/09 foi superado por ela. Metade do item (destinatários de
+# alerta) foi entregue no prazo.
+87 = 2026-09-18  # billing_account, data acordada em 11/09
 52 = 2026-09-18  # A2 — decisão sobre a CCEE
 12 = 2026-09-25  # A7 — VPN e credencial do Oracle FMB
 13 = 2026-09-25  # A7 — credenciais do Portal Alup

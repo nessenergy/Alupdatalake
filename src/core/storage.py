@@ -106,6 +106,39 @@ def caminho_raw(execucao: Execucao) -> str:
     return f"{execucao.fonte}/{execucao.entidade}/dt={dt}/{execucao.ingestao_id}.json.gz"
 
 
+_NOME_ARQUIVO = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]{0,200}$")
+
+
+def caminho_arquivo(execucao: Execucao, nome: str) -> str:
+    """Objeto de um raw que não é JSONL, ao lado do raw da mesma execução.
+
+    Fonte que entrega arquivo em vez de registros — o boletim em PDF do TempoOK
+    (ADR 019) — guarda o arquivo aqui e um ponteiro no Bronze.
+    """
+    if not _NOME_ARQUIVO.fullmatch(nome) or ".." in nome:
+        raise ValueError(f"nome de arquivo inválido: {nome!r}")
+    dt = execucao.janela.inicio.isoformat()
+    return f"{execucao.fonte}/{execucao.entidade}/dt={dt}/{execucao.ingestao_id}/{nome}"
+
+
+def gravar_arquivo(execucao: Execucao, nome: str, conteudo: bytes, content_type: str) -> str | None:
+    """Grava um arquivo da origem como veio, sem parsing. Devolve o URI gs://."""
+    cfg = get_settings()
+    caminho = caminho_arquivo(execucao, nome)
+    uri = f"gs://{cfg.bucket_raw}/{caminho}"
+
+    if cfg.dry_run:
+        logger.info("dry-run: %d bytes não gravados em %s", len(conteudo), uri)
+        return None
+
+    from google.cloud import storage  # import tardio: teste unitário não precisa do SDK
+
+    blob = storage.Client(project=cfg.gcp_project_id).bucket(cfg.bucket_raw).blob(caminho)
+    blob.upload_from_string(conteudo, content_type=content_type)
+    logger.info("arquivo gravado: %s (%d bytes)", uri, len(conteudo))
+    return uri
+
+
 def gravar_raw(execucao: Execucao, registros: list[dict[str, Any]]) -> str | None:
     """Grava os registros brutos como JSONL comprimido. Devolve o URI gs://."""
     cfg = get_settings()

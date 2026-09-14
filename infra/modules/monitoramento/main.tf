@@ -23,6 +23,10 @@ variable "conectores_criticos" {
     ons_carga       = 26  # diário
     aneel_siga      = 180 # semanal + folga
     ibge_ipca       = 780 # mensal + folga
+    ccee_pld        = 780 # mensal + folga; mede a execução, não a defasagem da CCEE
+    ccee_perfil     = 180 # semanal + folga
+    # tempook_boletins fica fora enquanto não houver token (A7): alerta de
+    # fonte que nunca rodou dispara todo dia e ensina a equipe a ignorá-lo.
   }
 }
 
@@ -64,10 +68,20 @@ resource "google_logging_metric" "ingestao_sucesso" {
       value_type  = "STRING"
       description = "Identificador da fonte de dados"
     }
+
+    # Uma fonte pode ter várias entidades (`ccee_pld` e `ccee_perfil`), com
+    # frequências diferentes. Sem este rótulo, a execução semanal de uma
+    # satisfaria o alerta mensal da outra e o silêncio passaria despercebido.
+    labels {
+      key         = "entidade"
+      value_type  = "STRING"
+      description = "Entidade ingerida dentro da fonte"
+    }
   }
 
   label_extractors = {
-    "fonte" = "EXTRACT(jsonPayload.fonte)"
+    "fonte"    = "EXTRACT(jsonPayload.fonte)"
+    "entidade" = "EXTRACT(jsonPayload.entidade)"
   }
 }
 
@@ -157,9 +171,12 @@ resource "google_monitoring_alert_policy" "fonte_sem_sucesso" {
       filter = join(" AND ", [
         "resource.type = \"cloud_run_job\"",
         "metric.type = \"logging.googleapis.com/user/${google_logging_metric.ingestao_sucesso.name}\"",
-        # A chave do mapa é o rótulo do conector (`bcb_cambio_ptax`); o campo
-        # `fonte` no log é só a primeira parte (`bcb`), por convenção do projeto.
+        # A chave do mapa é o rótulo do conector (`ccee_pld`): a `fonte` é a
+        # primeira parte e a `entidade`, o resto. As duas são necessárias —
+        # `ccee_pld` e `ccee_perfil` dividem a fonte e têm frequências
+        # diferentes.
         "metric.labels.fonte = \"${split("_", each.key)[0]}\"",
+        "metric.labels.entidade = \"${join("_", slice(split("_", each.key), 1, length(split("_", each.key))))}\"",
       ])
       duration = "${each.value * 3600}s"
 

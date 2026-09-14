@@ -1,4 +1,5 @@
-"""Sessão HTTP padrão dos conectores: timeout explícito e retry com backoff.
+"""Sessão HTTP padrão dos conectores: timeout explícito, retry com backoff e
+identificação do coletor.
 
 Requisição sem timeout pendura a task no orquestrador até o limite do
 ambiente — por isso o timeout não é opcional aqui.
@@ -15,6 +16,15 @@ from urllib3.util.retry import Retry
 from src.core.config import get_settings
 
 _METODOS_IDEMPOTENTES = frozenset({"GET", "HEAD", "OPTIONS"})
+
+# Quem está consumindo, e a quem recorrer. Não é credencial: é o cartão de
+# visita do coletor, e por isso vive no código e não no Secret Manager.
+#
+# A CCEE respondia 403 a cliente não identificado, e foi esse cabeçalho que
+# destravou a Onda 1 (ADR 018). Ele fica aqui, e não no conector da CCEE, por
+# dois motivos: identificar-se é a conduta correta com qualquer origem, e
+# qualquer outra fonte pública pode ligar o mesmo filtro amanhã.
+USER_AGENT = "Alupar-DataCollector/1.0 (+https://alupar.com.br; contato: comercializacao@alupar.com.br)"
 
 
 def criar_sessao(*, retry_post: bool = False) -> requests.Session:
@@ -33,6 +43,7 @@ def criar_sessao(*, retry_post: bool = False) -> requests.Session:
         raise_on_status=False,
     )
     sessao = requests.Session()
+    sessao.headers["User-Agent"] = USER_AGENT
     adaptador = HTTPAdapter(max_retries=retry)
     sessao.mount("https://", adaptador)
     sessao.mount("http://", adaptador)

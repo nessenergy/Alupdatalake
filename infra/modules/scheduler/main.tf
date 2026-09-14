@@ -42,6 +42,25 @@ variable "conectores" {
       cron         = "0 */6 * * *" # CRM muda ao longo do dia; 4x por dia basta
       ultimos_dias = 2             # cobre execução perdida sem varrer o funil todo
     }
+    ccee_pld = {
+      # O PLD sai por fechamento mensal, com defasagem: em 01/09/2026 o arquivo
+      # ia até julho. Rodar diariamente só varreria o mesmo CSV sem dado novo.
+      cron         = "0 9 5 * *" # dia 5, depois do fechamento do mês anterior
+      ultimos_dias = 120         # cobre a defasagem de publicação e a recontabilização (ADR 016)
+    }
+    ccee_perfil = {
+      # Cadastro muda devagar e o retrato tem ~60 mil linhas: semanal basta, e
+      # o Bronze acumula um retrato por semana em vez de um por dia.
+      cron         = "0 7 * * 2" # terça, depois do semanal da ANEEL
+      ultimos_dias = 1           # cadastro completo; a janela não se aplica
+    }
+    tempook_boletins = {
+      # Boletim diário; a janela curta é deliberada, porque cada dia é uma
+      # requisição própria (ADR 019) — janela larga multiplica chamadas à
+      # origem sem trazer dado novo. Dia sem boletim vira aviso, não falha.
+      cron         = "0 11 * * *" # depois da publicação do boletim do dia
+      ultimos_dias = 5            # cobre execução perdida e publicação atrasada
+    }
   }
 }
 

@@ -43,6 +43,11 @@ class Conector(ABC):
     schema_versao: str = "1"
     max_dias_por_requisicao: int | None = None
 
+    # Execução em curso, para o conector que precisa gravar um artefato da
+    # origem além dos registros — o boletim em PDF do TempoOK (ADR 019) grava
+    # o arquivo e devolve um ponteiro. Fonte que só devolve registros ignora.
+    _execucao: Execucao | None = None
+
     @abstractmethod
     def extrair(self, janela: Janela) -> Iterator[dict[str, Any]]:
         """Devolve os registros brutos da fonte para a janela pedida."""
@@ -74,6 +79,7 @@ class Conector(ABC):
 
     def _ingerir(self, execucao: Execucao, janela: Janela) -> Execucao:
         logger.info("[%s] ingestão %s janela=%s", self.rotulo, execucao.ingestao_id, janela)
+        self._execucao = execucao
 
         try:
             brutos: list[dict[str, Any]] = []

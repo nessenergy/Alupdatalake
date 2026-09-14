@@ -1,4 +1,4 @@
-.PHONY: install lint format test security audit all clean novo-conector listar sync-skills campos-projeto dataform-compile quadro quadro-aplicar
+.PHONY: install lint format test security audit all clean novo-conector listar sync-skills campos-projeto dataform-compile quadro quadro-aplicar migrar-segredos
 
 install:
 	uv sync --extra dev
@@ -34,6 +34,10 @@ campos-projeto: ## Cria os campos de acompanhamento semanal no GitHub Projects
 	@test -n "$(owner)" || (echo "uso: make campos-projeto owner=nessenergy numero=1"; exit 1)
 	@test -n "$(numero)" || (echo "uso: make campos-projeto owner=nessenergy numero=1"; exit 1)
 	uv run python -m scripts.campos_projeto --owner $(owner) --numero $(numero)
+
+migrar-segredos: ## Sobe o cofre local para o Secret Manager (ver runbook/credenciais.md)
+	@test -n "$(projeto)" || (echo "uso: make migrar-segredos projeto=alupdata-dev [aplicar=1]"; exit 1)
+	uv run python -m scripts.migrar_segredos --projeto $(projeto) $(if $(aplicar),--aplicar,)
 
 quadro: ## Simula a sincronização do quadro de acompanhamento (Project 2)
 	uv run python -m scripts.quadro

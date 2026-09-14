@@ -440,3 +440,24 @@ def test_portal_sobe_com_a_imagem_e_acesso_vem_de_variavel_restrita() -> None:
     assert "validation" in variavel
     assert "group:" in variavel
     assert "domain:" in variavel
+
+
+def test_alerta_de_frescor_distingue_entidades_da_mesma_fonte() -> None:
+    """`ccee_pld` e `ccee_perfil` têm a mesma `fonte`; o alerta precisa da entidade.
+
+    Sem isso, a execução semanal do cadastro satisfaria o alerta mensal do PLD:
+    a série pararia de chegar e ninguém seria avisado.
+    """
+    monitoramento = _ler("infra/modules/monitoramento/main.tf")
+
+    # a métrica precisa extrair a entidade, não só a fonte
+    assert '"entidade" = "EXTRACT(jsonPayload.entidade)"' in monitoramento
+    # e o alerta precisa filtrar pelas duas, não por uma delas
+    assert "metric.labels.fonte" in monitoramento
+    assert "metric.labels.entidade" in monitoramento
+
+    # As duas entidades da CCEE têm frequências diferentes; é o caso que o
+    # rótulo por fonte sozinho não distinguia.
+    scheduler = _ler("infra/modules/scheduler/main.tf")
+    assert "ccee_pld" in scheduler
+    assert "ccee_perfil" in scheduler

@@ -1,0 +1,30 @@
+config {
+  type: "view",
+  schema: "silver",
+  tags: ["silver"],
+  assertions: {
+    uniqueKey: ["data_referencia", "hora", "submercado"],
+    nonNull: ["data_referencia", "hora", "submercado", "pld_reais_mwh"]
+  }
+}
+
+-- Silver: PLD horário higienizado e deduplicado.
+-- Dedup por (data_referencia, hora, submercado): a CCEE recontabiliza período
+-- já publicado (ADR 016), então vence a ingestão mais recente. É o mesmo
+-- critério do ONS, pela mesma razão — origem que revisa o passado.
+SELECT
+  data_referencia,
+  hora,
+  submercado,
+  periodo_apuracao,
+  CAST(NULL AS STRING) AS codigo_usina,  -- o PLD é do submercado, não da usina
+  CAST(NULL AS STRING) AS agente_ccee,   -- preço de mercado, não posição de agente
+  periodo_comercializacao,
+  pld_reais_mwh,
+  _ingestao_id,
+  _ingestao_timestamp
+FROM ${ref("bronze", "ccee_pld")}
+QUALIFY ROW_NUMBER() OVER (
+  PARTITION BY data_referencia, hora, submercado
+  ORDER BY _ingestao_timestamp DESC
+) = 1

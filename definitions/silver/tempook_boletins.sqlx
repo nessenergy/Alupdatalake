@@ -1,0 +1,33 @@
+config {
+  type: "view",
+  schema: "silver",
+  tags: ["silver"],
+  assertions: {
+    uniqueKey: ["data_referencia"],
+    nonNull: ["data_referencia", "caminho_origem", "sha256"]
+  }
+}
+
+-- Silver: um boletim por dia, o mais recentemente arquivado.
+-- Dedup por data_referencia: reingestão da mesma janela rebaixa o boletim
+-- anterior. `sha256` distinto entre ingestões do mesmo dia significa que a
+-- origem republicou o boletim corrigido — o histórico fica no Bronze.
+SELECT
+  data_referencia,
+  FORMAT_DATE('%Y-%m', data_referencia) AS periodo_apuracao,
+  CAST(NULL AS STRING) AS submercado,    -- o boletim é nacional
+  CAST(NULL AS STRING) AS codigo_usina,  -- catálogo de documento, não de ativo
+  CAST(NULL AS STRING) AS agente_ccee,   -- idem
+  caminho_origem,
+  nome_arquivo,
+  uri_arquivo,
+  tamanho_bytes,
+  sha256,
+  content_type,
+  _ingestao_id,
+  _ingestao_timestamp
+FROM ${ref("bronze", "tempook_boletins")}
+QUALIFY ROW_NUMBER() OVER (
+  PARTITION BY data_referencia
+  ORDER BY _ingestao_timestamp DESC
+) = 1

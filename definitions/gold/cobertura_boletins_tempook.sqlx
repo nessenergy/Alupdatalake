@@ -1,0 +1,32 @@
+config {
+  type: "table",
+  schema: "gold",
+  tags: ["gold"]
+}
+
+-- Gold: cobertura mensal dos boletins do TempoOK — quantos dias do mês têm
+-- boletim arquivado, e qual foi o último.
+--
+-- É o que se pode afirmar **sem conhecer o conteúdo do PDF** (ADR 019): se a
+-- série está completa e se parou de chegar. Não é indicador de negócio, e não
+-- pretende ser — Gold sem KPI nesta fase, conforme ADR 012.
+--
+-- Quando a Alup definir quais números do boletim importam (A4), nasce uma
+-- entidade nova com o conteúdo extraído, e esta tabela continua sendo o que é:
+-- o controle de que o arquivamento não tem buraco.
+SELECT
+  periodo_apuracao,
+  COUNT(*)                                          AS dias_com_boletim,
+  MIN(data_referencia)                              AS primeiro_dia,
+  MAX(data_referencia)                              AS ultimo_dia,
+  SUM(tamanho_bytes)                                AS bytes_arquivados,
+  COUNT(DISTINCT sha256)                            AS boletins_distintos,
+  -- Dias corridos do mês que não têm boletim: fim de semana e feriado entram
+  -- aqui, então o número não é erro por si só — é o que se investiga.
+  DATE_DIFF(
+    LAST_DAY(MIN(data_referencia)),
+    DATE_TRUNC(MIN(data_referencia), MONTH),
+    DAY
+  ) + 1 - COUNT(*)                                  AS dias_sem_boletim
+FROM ${ref("silver", "tempook_boletins")}
+GROUP BY periodo_apuracao

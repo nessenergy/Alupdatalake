@@ -1,0 +1,39 @@
+config {
+  type: "view",
+  schema: "silver",
+  tags: ["silver"],
+  assertions: {
+    uniqueKey: ["codigo_perfil"],
+    nonNull: ["codigo_perfil", "agente_ccee", "cnpj", "status_perfil"]
+  }
+}
+
+-- Silver: o retrato mais recente do cadastro de perfis.
+--
+-- Dedup por `codigo_perfil`, e **não** por (data, perfil) como nas fontes de
+-- série: aqui não se quer o histórico do cadastro, se quer o cadastro de hoje.
+-- O histórico continua no Bronze, que é append-only, para quem precisar
+-- reconstituir como o cadastro estava numa data passada.
+SELECT
+  codigo_perfil,
+  agente_ccee,
+  codigo_agente,
+  sigla_perfil,
+  nome_empresarial,
+  cnpj,
+  classe_perfil,
+  status_perfil,
+  categoria_agente,
+  submercado,
+  varejista,
+  tipo_energia,
+  data_referencia,
+  FORMAT_DATE('%Y-%m', data_referencia) AS periodo_apuracao,
+  CAST(NULL AS STRING) AS codigo_usina,  -- perfil é da empresa, não da usina
+  _ingestao_id,
+  _ingestao_timestamp
+FROM ${ref("bronze", "ccee_perfil")}
+QUALIFY ROW_NUMBER() OVER (
+  PARTITION BY codigo_perfil
+  ORDER BY data_referencia DESC, _ingestao_timestamp DESC
+) = 1

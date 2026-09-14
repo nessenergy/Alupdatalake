@@ -108,9 +108,9 @@ destino, com os oito invariantes e a pauta de perguntas. **Enviado ao Google em
 | A1 | **Conceder à ness. os papéis de bootstrap** em cada projeto (ADR 015, revista em 11/09): com eles a ness. configura o WIF (`GCP_WIF_PROVIDER`, `GCP_DEPLOY_SA`), o bucket de state, o Artifact Registry e a SA de deploy | o bootstrap não roda e o workflow de deploy não autentica | ADR 015, `runbook/primeiro-deploy.md` §0 |
 | ~~A2~~ | ~~**Decidir sobre a CCEE InfoMercado**~~ | **Encerrada em 14/09** — era filtro de cliente não identificado, não bloqueio de IP nem credencial. Resolvido por cabeçalho no `src/core/http.py` | [ADR 018](arquitetura/decisoes/018-vias-de-acesso-a-ccee.md), [registro de 14/09](relatorios/2026-09-14-documentacao-de-apis-recebida.md) |
 | A3 | **Projeto GCP `dev`**: criar, habilitar APIs, IAM, Artifact Registry, bucket de state — criação e `billing_account` são da Alup, esclarecido em 09/09 | nada sobe; Onda 0 não homologa | plano 2.2 (0.13), [registro de 09/09](relatorios/2026-09-09-esclarecimento-e1-e2.md) |
-| A4 | **Questionário de Gaps** (47 perguntas) | os 8 domínios analíticos não se definem; a Gold fica sem alvo | plano 2.2 (0.9) |
-| A5 | **RACI e data owners** por domínio | sem dono, dúvida de regra de negócio não tem para quem ir | plano 2.2 (0.12); interlocutores já conhecidos em [`interlocutores.md`](interlocutores.md) |
-| A6 | **Ferramenta de BI** definida | o Portal MVP e as views Gold ficam sem consumidor definido | contrato, cláusula 3ª |
+| ~~A4~~ | ~~**Questionário de Gaps** (47 perguntas)~~ | **Respondido em 11/09.** Definir os 8 domínios a partir das respostas é tarefa da ness. (plano 0.10), não insumo pendente | [`questionario-gaps.md`](questionario-gaps.md) |
+| ~~A5~~ | ~~**RACI e data owners** por domínio~~ | **Respondido em 11/09** (item B1 do questionário) | [`interlocutores.md`](interlocutores.md) |
+| ~~A6~~ | ~~**Ferramenta de BI** definida~~ | **Respondido em 11/09**: Power BI hoje; Looker Studio ou fronts internos na Fase 2 (item G1) | [`questionario-gaps.md`](questionario-gaps.md) |
 | A7 | Abrir **já** os pedidos de token (Onda 2) e VPN/credencial (Onda 3) | é o maior risco do contrato: atraso dispara ociosidade de 4h/dia | plano §7 |
 | ~~A8~~ | ~~**Documentação técnica de BBCE e TempoOK**~~ | **Atendida em 14/09** — BBCE documentado em Postman; TempoOK sem documentação publicada, mas com exemplo suficiente. Resta só a credencial do BBCE, que é A7 | [registro de 14/09](relatorios/2026-09-14-documentacao-de-apis-recebida.md) |
 | A9 | **Token do Hubspot** (private app) no secret `alupdata-hubspot-api-token` | o conector está pronto e parado; nenhuma linha de CRM entra no lake | plano 2.3 (2.3) |
@@ -190,9 +190,9 @@ Ordenado por data em que o atraso passa a custar. Prazos derivados do
 |---|---|---|---|---|
 | A3 | Projetos GCP (`dev` primeiro, depois `hml` e `prod`) criados, vinculados ao faturamento e com os papéis de bootstrap concedidos à ness. — APIs, IAM, WIF, Artifact Registry e state passaram à ness. em 11/09 (ADR 015) | Alup | **04/09 — vencido** | **Não entregue. Atraso registrado em 04/09**; 1º dia útil de atraso em 08/09, 5º em 14/09. A Alup condicionou A3 à resposta do Google (G1). Em 09/09 a Alup levantou dúvida sobre quem cria o projeto (E1) e de quem é a `billing_account` (E2); **ambas são da Alup, esclarecido no mesmo dia** — ver [registro de 09/09](relatorios/2026-09-09-esclarecimento-e1-e2.md). S2 e S3 escorregam inteiras; Onda 0 não homologa; > 5 dias úteis posterga o cronograma |
 | A9 | Token Hubspot no secret `alupdata-hubspot-api-token` | Alup | 11/09 | conector pronto segue parado; item 2.3 não fecha |
-| A4 | Questionário de Gaps respondido | Alup | 11/09 | sem os 8 domínios, a Gold da Onda 1 fica sem alvo |
-| A5 | Matriz RACI e data owners | Alup | 11/09 | dúvida de regra de negócio sem destinatário |
-| A6 | Ferramenta de BI definida | Alup | 11/09 | Portal MVP e views Gold sem consumidor definido |
+| ~~A4~~ | ~~Questionário de Gaps respondido~~ | Alup | 11/09 | **Respondido no prazo** |
+| ~~A5~~ | ~~Matriz RACI e data owners~~ | Alup | 11/09 | **Respondido no prazo** |
+| ~~A6~~ | ~~Ferramenta de BI definida~~ | Alup | 11/09 | **Respondido no prazo**: Power BI |
 | [#87](https://github.com/nessenergy/Alupdatalake/issues/87) | Destinatários de alerta e `billing_account` | Alup | 11/09 | alertas e orçamento existem mas não notificam ninguém |
 | — | Variáveis do GitHub (`GCP_WIF_PROVIDER`, `GCP_DEPLOY_SA`) | ness. | depende de A3 | deploy não autentica. **Branch protection resolvida em 11/09**: a organização passou ao GitHub Enterprise e a `main` exige PR e seis verificações, com force push e exclusão bloqueados (ADR 010, encerrada) |
 | ~~A2~~ | ~~Decisão sobre a CCEE~~ | Alup | ~~18/09~~ | **Encerrada em 14/09, antes do prazo.** As 32h voltaram a andar; nenhuma das quatro alternativas foi necessária ([ADR 018](arquitetura/decisoes/018-vias-de-acesso-a-ccee.md)) |

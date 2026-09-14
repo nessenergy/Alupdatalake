@@ -21,10 +21,26 @@ if TYPE_CHECKING:
 TIB = 1024**4
 GIB = 1024**3
 
-# Premissas de tarifa: preço de lista dos EUA adotado para us-east1 (ADR 011)
-# em 2026-09-10; conferência na tabela oficial pendente. Não é número oficial.
+# Premissas de tarifa, conferidas na tabela oficial do BigQuery em 2026-09-14
+# (issue #112). Continuam sendo **premissa declarada**, por dois motivos
+# registrados aqui para quem ler o número depois:
+#
+# 1. A página cota armazenamento **por GiB-hora**, não por mês. A conversão usa
+#    as 730 horas que o próprio Google adota: 0,000031507 × 730 = 0,023. O
+#    valor anterior, 0,020, não corresponde a nenhuma linha de armazenamento
+#    *lógico* da tabela atual — corresponde a *físico de longo prazo*, que é
+#    outra coisa. Subestimava o armazenamento em ~15%.
+# 2. A tabela tem três preços de consulta por TiB (6,25 / 6,5625 / 6,8125),
+#    selecionados por região num seletor que roda no navegador. **Não foi
+#    possível confirmar pela página pública qual deles vale para `us-east1`**;
+#    adotamos o preço-base, que é o dos EUA. Se us-east1 estiver numa faixa
+#    superior, a conta subestima na mesma proporção (5% ou 9%).
+#
+# A conferência definitiva não é esta: é o billing export (camada F2), que vê
+# crédito e desconto por uso comprometido. Até lá, estes números servem para
+# ordem de grandeza e comparação entre fontes, não para fatura.
 TARIFA_TIB_VARRIDO_USD = Decimal("6.25")
-TARIFA_GIB_MES_ATIVO_USD = Decimal("0.020")
+TARIFA_GIB_MES_ATIVO_USD = Decimal("0.023")
 TARIFA_EXECUCAO_JOB_USD = Decimal("0.004")
 
 # O BigQuery cobra um mínimo por consulta, independente do quanto ela varreu.
@@ -32,15 +48,36 @@ TARIFA_EXECUCAO_JOB_USD = Decimal("0.004")
 # que é exatamente o nosso hoje.
 MINIMO_BYTES_FATURADOS = 10 * 1024**2
 
-# Agrupamento provisório de fontes em domínio de negócio. Os 8 domínios
-# analíticos dependem do Questionário de Gaps (pendência A4) — até lá, a visão
-# de diretoria agrupa por afinidade óbvia e diz que é provisório.
-DOMINIO_PROVISORIO = {
-    "bcb_cambio_ptax": "Macroeconomia",
-    "ibge_ipca": "Macroeconomia",
-    "ons_carga": "Operação do sistema",
-    "aneel_siga": "Ativos de geração",
-    "hubspot_negocios": "Comercial",
+# Os 8 domínios analíticos, definidos em 14/09 a partir das respostas ao
+# Questionário de Gaps: `docs/arquitetura/dominios-analiticos.md`. Deixou de ser
+# agrupamento provisório por afinidade — a visão de diretoria agora fala o
+# mesmo vocabulário do documento.
+DOMINIOS_VALIDOS = frozenset(
+    {
+        "Preço de energia",
+        "Carga e operação do SIN",
+        "Portfólio de geração",
+        "Cadastro de agentes e contrapartes",
+        "Posição comercial e contratos",
+        "Contabilização e liquidação",
+        "Conjuntura e indicadores macro",
+        "Qualidade e rastreabilidade do dado",
+    }
+)
+
+# Conector sem domínio cai em "Não classificado" e some da leitura da diretoria;
+# o teste em `tests/unit/test_portal.py` impede que isso passe despercebido
+# quando uma fonte nova entrar.
+DOMINIO_ANALITICO = {
+    "ccee_pld": "Preço de energia",
+    "bbce_curva_forward": "Preço de energia",
+    "ons_carga": "Carga e operação do SIN",
+    "aneel_siga": "Portfólio de geração",
+    "ccee_perfil": "Cadastro de agentes e contrapartes",
+    "hubspot_negocios": "Posição comercial e contratos",
+    "bcb_cambio_ptax": "Conjuntura e indicadores macro",
+    "ibge_ipca": "Conjuntura e indicadores macro",
+    "tempook_boletins": "Conjuntura e indicadores macro",
 }
 
 # Quanto ocupa uma linha de cada fonte, em bytes. Estimativa de largura de
@@ -85,7 +122,7 @@ class CustoFonte:
 
     @property
     def dominio(self) -> str:
-        return DOMINIO_PROVISORIO.get(self.fonte, "Não classificado")
+        return DOMINIO_ANALITICO.get(self.fonte, "Não classificado")
 
     @property
     def usd_por_milhao_de_linhas(self) -> Decimal | None:
@@ -162,7 +199,7 @@ class PainelCusto:
 
     @property
     def por_dominio(self) -> list[tuple[str, Decimal]]:
-        """Visão de diretoria: agrupamento provisório até A4 definir os domínios."""
+        """Visão de diretoria: agrupamento pelos 8 domínios analíticos (14/09)."""
         acumulado: dict[str, Decimal] = {}
         for fonte in self.fontes:
             acumulado[fonte.dominio] = acumulado.get(fonte.dominio, Decimal(0)) + fonte.total_usd

@@ -567,10 +567,10 @@ def _visao_diretoria(dados: PainelCusto) -> str:
     <thead><tr><th>Domínio de negócio</th><th>Custo em 30 dias</th><th>Participação</th></tr></thead>
     <tbody>{linhas}</tbody>
   </table>
-  <p class="nota"><span class="marca">provisório</span> O agrupamento por domínio é
-    provisório: os 8 domínios analíticos dependem do Questionário de Gaps
-    (pendência A4). Até lá, as fontes estão agrupadas por afinidade óbvia — serve
-    para desenhar a tela, não para levar a uma reunião de diretoria.</p>
+  <p class="nota">O agrupamento segue os <strong>8 domínios analíticos</strong> definidos
+    em 14/09 a partir do Questionário de Gaps — <code>docs/arquitetura/dominios-analiticos.md</code>.
+    Os domínios são proposta da ness. para confirmação da Alup: o questionário
+    respondeu com objetivos do programa, e a tradução para domínios é nossa.</p>
 </section>"""
 
 

@@ -1,6 +1,6 @@
 # RoPA — Registro das Operações de Tratamento da plataforma AlupData
 
-**Versão** 0.4 · **Data** 2026-09-11 · **Situação**: minuta técnica, para
+**Versão** 0.5 · **Data** 2026-09-14 · **Situação**: minuta técnica, para
 revisão e aprovação da controladora
 
 Registro exigido pelo art. 37 da LGPD. Minuta elaborada pela ness. no contrato
@@ -43,6 +43,30 @@ no [registro do DPA](dpa.md). As perguntas citadas (F1, E4 e outras) são as do
 **Fora deste registro:** as fontes públicas de mercado (BCB, IBGE, ONS, ANEEL,
 CCEE pública) e as licenciadas (BBCE, TempoOK) não trazem dado pessoal. A ANEEL
 SIGA lê só dados do empreendimento.
+
+Desde 14/09 essa afirmação deixou de ser presunção para a fonte que mais se
+aproxima do limite. O conector `ccee_perfil` ingere o **cadastro de perfis de
+agente da CCEE**, com CNPJ e razão social de ~60,5 mil perfis — identificadores
+de empresa, que não são dado pessoal (art. 5º, I, trata de pessoa natural). A
+exceção teórica seria o perfil de **pessoa física ou de empresário individual**,
+em que o identificador se refere a pessoa natural identificável.
+
+**Verificado no retrato de 01/09/2026**, e não suposto:
+
+| Verificação | Resultado |
+|---|---|
+| Documentos com 11 dígitos (CPF) | **nenhum** — os 60.509 têm 14 dígitos |
+| Razão social com marca de empresário individual, MEI ou EIRELI | 129, **todas pessoas jurídicas** (EIRELI é pessoa jurídica; ME e EPP são porte, não natureza) |
+
+**O controle que detectaria a mudança já existe**, e não depende de alguém
+repetir esta conferência: a asserção de faixa `LENGTH(cnpj) = 14` na
+`silver.ccee_perfil` (issue #110) reprova a carga se um documento de 11 dígitos
+entrar. Um perfil de pessoa física passa a falhar o portão de qualidade em vez
+de entrar em silêncio — momento em que este registro precisa de uma operação
+própria.
+
+O mesmo vale para o `ccee_pld` e o `bbce_curva_forward`, entregues em 14/09:
+são séries de preço, sem titular.
 
 ---
 
@@ -150,3 +174,4 @@ SIGA lê só dados do empreendimento.
 | 0.2 | 11/09/2026 | Dados cadastrais da controladora e canal da encarregada; `proprietario_id` fora da OP-01 |
 | 0.3 | 11/09/2026 | Respostas da Alup de 11/09: dados confidenciais na OP-01, com o escopo de contatos e empresas do Hubspot em confirmação; nova OP-07 para o consumo por cliente; planilhas e dados internos confidenciais nas OP-05 e OP-06; retenções pela política 0.2; classificação interna; controle de acesso por tipo de usuário como requisito; três ambientes |
 | 0.4 | 11/09/2026 | Contatos e empresas do Hubspot ficam fora do escopo, por decisão da Alup: o CPF não é tratado |
+| 0.5 | 14/09/2026 | Fontes públicas reconferidas contra o cadastro real da CCEE (`ccee_perfil`, 60.509 perfis): nenhum CPF, nenhuma pessoa natural. O controle que detecta a mudança é a asserção `LENGTH(cnpj) = 14` da Silver |

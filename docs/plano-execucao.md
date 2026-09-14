@@ -52,8 +52,8 @@ Marco 1 — 15,52% · R$ 23.040,00
 | # | Tarefa | Est. | Depende de | Critério de aceite |
 |---|---|---|---|---|
 | 0.9 | Questionário de Gaps (47 perguntas): enviar, conduzir e consolidar respostas | 10h | **Alup** responder | Respostas consolidadas em `docs/` e lacunas nomeadas |
-| 0.10 | Definir os **8 domínios analíticos** a partir das respostas | 8h | 0.9 | Documento com os 8 domínios, cada um com pergunta de negócio e fontes que o alimentam |
-| 0.11 | Fechar as **dimensões comuns Silver** contra fontes reais | 6h | 0.9, 0.10 | `docs/arquitetura/visao-geral.md` atualizado; regra por dimensão |
+| 0.10 | Definir os **8 domínios analíticos** a partir das respostas | 8h | 0.9 | **Concluído em 14/09** — [`arquitetura/dominios-analiticos.md`](arquitetura/dominios-analiticos.md). Os domínios são proposta da ness. para confirmação: A1 foi respondido com objetivos do programa, não com perguntas de negócio |
+| 0.11 | Fechar as **dimensões comuns Silver** contra fontes reais | 6h | 0.9, 0.10 | **Concluído em 14/09** — regra por dimensão em [`arquitetura/visao-geral.md`](arquitetura/visao-geral.md), com as regras D3 a D7 do questionário e **duas lacunas nomeadas**: o de-para de usina (Alup) e o mês CCEE (ness.) |
 | 0.12 | Matriz RACI e data owners por domínio | 4h | **Alup** nomear | RACI publicada; cada fonte com dono nomeado |
 | 0.13 | Provisionar o ambiente GCP `dev`: projeto, APIs, WIF, Artifact Registry, backend do state | 8h | **Alup** criar projeto e conceder IAM | `terraform apply` limpo; `make deploy-views` aplicado |
 | 0.14 | Primeiro deploy real: imagem publicada, job agendado, BCB rodando diariamente | 6h | 0.13 | 3 dias consecutivos com `status = SUCESSO` em `bronze._execucoes` |

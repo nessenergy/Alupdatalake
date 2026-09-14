@@ -1,0 +1,26 @@
+config {
+  type: "table",
+  schema: "gold",
+  tags: ["gold"]
+}
+
+-- Gold: quanto cada parcela de usina gerou no mês, por submercado, fonte e
+-- tipo — na granularidade de usina que o A7 fixa para dado de portfólio.
+--
+-- Soma das horas de `geracao_centro_gravidade`. A unidade não está
+-- documentada pela CCEE no catálogo (ver dicionário); o nome da coluna não
+-- afirma MWh até que o dono do domínio confirme. Sem KPI (ADR 012).
+SELECT
+  periodo_apuracao,
+  codigo_parcela_usina,
+  sigla_usina,
+  fonte_primaria,
+  tipo_usina,
+  submercado,
+  COUNT(*)                          AS horas,
+  SUM(geracao_centro_gravidade)     AS geracao_centro_gravidade_total,
+  AVG(geracao_centro_gravidade)     AS geracao_centro_gravidade_media_horaria,
+  MAX(geracao_centro_gravidade)     AS geracao_centro_gravidade_maxima_horaria,
+  MAX(versao_publicacao)            AS versao_publicacao
+FROM ${ref("silver", "ccee_geracao_usina")}
+GROUP BY periodo_apuracao, codigo_parcela_usina, sigla_usina, fonte_primaria, tipo_usina, submercado

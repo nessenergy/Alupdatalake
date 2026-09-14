@@ -1,0 +1,60 @@
+config {
+  type: "operations",
+  schema: "bronze",
+  hasOutput: true,
+  tags: ["bronze"]
+}
+
+-- Bronze: geração horária por parcela de usina (CCEE, dados abertos, gzip mensal).
+-- ~3 milhões de linhas por mês. As 25 medidas opcionais são nulas na maior
+-- parte das linhas (só hidráulicas MRE e usinas com CVU as têm) e custam quase
+-- nada no armazenamento colunar; guardá-las evita reler 61 MB por mês depois.
+CREATE TABLE IF NOT EXISTS ${self()} (
+  data_referencia                                   DATE      NOT NULL OPTIONS(description="Dia, derivado do período e conferido com a DATA publicada"),
+  hora                                              INT64     NOT NULL OPTIONS(description="0 a 23, horário de Brasília"),
+  periodo_comercializacao                           INT64     NOT NULL OPTIONS(description="Índice da hora no mês, 1..744, como a CCEE publica"),
+  periodo_apuracao_ccee                             STRING    NOT NULL OPTIONS(description="AAAA-MM, como a CCEE declara"),
+  versao_publicacao                                 DATE      NOT NULL OPTIONS(description="last_modified do recurso no CKAN (ADR 016)"),
+  data_publicada                                    DATE      NOT NULL OPTIONS(description="A coluna DATA da origem, preservada para rastreio"),
+  codigo_parcela_usina                              STRING    NOT NULL OPTIONS(description="Código interno da CCEE — NÃO é o CEG; de-para pendente (#141)"),
+  sigla_usina                                       STRING    NOT NULL,
+  fonte_primaria                                    STRING    NOT NULL,
+  submercado                                        STRING    NOT NULL OPTIONS(description="N, NE, S, SE"),
+  tipo_usina                                        STRING    NOT NULL OPTIONS(description="Hidráulicas MRE, Hidráulicas não MRE, Usinas com CVU, Biomassa, Eólicas, Demais usinas"),
+  geracao_centro_gravidade                          NUMERIC   NOT NULL OPTIONS(description="Unidade não documentada pela CCEE no catálogo; ver dicionário"),
+  fator_perda_interna                               NUMERIC   NOT NULL,
+  fator_rateio_perda_geracao                        NUMERIC   NOT NULL,
+  geracao_seguranca_energetica                      NUMERIC,
+  geracao_restricao_operativa_constrained_on        NUMERIC,
+  energia_ajustada_encargo_restricao_operativa      NUMERIC,
+  indisponibilidade_ute_ordem_merito                NUMERIC,
+  custo_declarado_parcela_usina                     NUMERIC,
+  fator_deslocamento_hidraulico                     NUMERIC,
+  geracao_verificada_ons                            NUMERIC,
+  disponibilidade_verificada_ug                     NUMERIC,
+  geracao_inflexivel                                NUMERIC,
+  geracao_substituta_compensacao_indisponibilidade  NUMERIC,
+  despacho_restricao_energetica_ex_ante             NUMERIC,
+  despacho_pagamento_encargo_restricao_operacao     NUMERIC,
+  geracao_fora_ordem_merito                         NUMERIC,
+  despacho_ordem_merito_deck_ons                    NUMERIC,
+  despacho_ordem_merito_preco                       NUMERIC,
+  despacho_ordem_merito                             NUMERIC,
+  geracao_reserva_potencia                          NUMERIC,
+  preco_encargo_reserva_potencia                    NUMERIC,
+  geracao_unit_commitment                           NUMERIC,
+  geracao_final_ordem_merito                        NUMERIC,
+  deslocamento_hidraulico_energetico_preliminar     NUMERIC,
+  garantia_fisica_ajustada_fator_disponibilidade    NUMERIC,
+  garantia_fisica_rrh_modulada_ajustada_2           NUMERIC,
+  garantia_fisica_rrh_modulada_ajustada_3           NUMERIC,
+  fator_risco_hidrologico                           NUMERIC,
+
+  _ingestao_id                                      STRING    NOT NULL,
+  _ingestao_timestamp                               TIMESTAMP NOT NULL,
+  _fonte                                            STRING    NOT NULL,
+  _schema_versao                                    STRING    NOT NULL
+)
+PARTITION BY DATE(_ingestao_timestamp)
+CLUSTER BY data_referencia, codigo_parcela_usina
+OPTIONS(description="Geração horária por parcela de usina — camada Bronze, append-only");

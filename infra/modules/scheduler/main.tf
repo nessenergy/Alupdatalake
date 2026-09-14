@@ -71,6 +71,13 @@ variable "conectores" {
       cron         = "0 10 6 * *"
       ultimos_dias = 120
     }
+    ccee_geracao_usina = {
+      # Um recurso gzip de 61 MB por mês, ~3 milhões de linhas. Roda de
+      # madrugada, um dia depois das entidades mensais leves, com janela que
+      # alcança o mês fechado e o anterior (recontabilização, ADR 016).
+      cron         = "0 3 7 * *"
+      ultimos_dias = 70
+    }
     bbce_curva_forward = {
       # A curva sai por pregão, em dia útil. Janela curta porque cada dia é uma
       # requisição própria; 7 dias cobrem feriado prolongado e execução perdida.

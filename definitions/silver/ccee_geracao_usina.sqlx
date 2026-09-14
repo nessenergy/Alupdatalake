@@ -1,0 +1,53 @@
+config {
+  type: "view",
+  schema: "silver",
+  tags: ["silver"],
+  assertions: {
+    uniqueKey: ["data_referencia", "hora", "codigo_parcela_usina"],
+    nonNull: ["data_referencia", "hora", "codigo_parcela_usina", "submercado", "geracao_centro_gravidade"],
+    rowConditions: [
+      "submercado IN ('N','NE','S','SE')",
+      "hora BETWEEN 0 AND 23",
+      "periodo_apuracao = periodo_apuracao_ccee",
+      "data_publicada = data_referencia",
+      "geracao_centro_gravidade >= 0"
+    ]
+  }
+}
+
+-- Silver: geração horária por parcela de usina, vigente pela publicação mais
+-- recente (ADR 016). `codigo_usina` é nulo: a origem usa código interno da
+-- CCEE, não o CEG — Lacuna 1, #141. `codigo_parcela_usina` e `sigla_usina`
+-- ficam prontos para o de-para.
+-- Faixas (issue #110): geração negativa não existe; DATA e período têm de
+-- concordar (a mesma regra do PLD: off-by-one apareceria aqui).
+SELECT
+  data_referencia,
+  submercado,
+  CAST(NULL AS STRING) AS codigo_usina,  -- CODIGO_PARCELA_USINA não é CEG; de-para pendente (#141)
+  CAST(NULL AS STRING) AS agente_ccee,   -- a usina não é agente; a parcela pertence a um perfil
+  FORMAT_DATE('%Y-%m', data_referencia) AS periodo_apuracao,
+  periodo_apuracao_ccee,
+  versao_publicacao,
+  hora,
+  periodo_comercializacao,
+  data_publicada,
+  codigo_parcela_usina,
+  sigla_usina,
+  fonte_primaria,
+  tipo_usina,
+  geracao_centro_gravidade,
+  fator_perda_interna,
+  fator_rateio_perda_geracao,
+  geracao_verificada_ons,
+  custo_declarado_parcela_usina,
+  despacho_ordem_merito,
+  garantia_fisica_rrh_modulada_ajustada_2,
+  fator_risco_hidrologico,
+  _ingestao_id,
+  _ingestao_timestamp
+FROM ${ref("bronze", "ccee_geracao_usina")}
+QUALIFY ROW_NUMBER() OVER (
+  PARTITION BY data_referencia, hora, codigo_parcela_usina
+  ORDER BY versao_publicacao DESC, _ingestao_timestamp DESC
+) = 1

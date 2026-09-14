@@ -77,6 +77,7 @@ DOMINIO_ANALITICO = {
     "ccee_agente": "Mercado de Energia",
     "ccee_exposicao_financeira": "Risco e Compliance",
     "ccee_contabilizacao_perfil": "Risco e Compliance",
+    "ccee_geracao_usina": "Geração e Operacional",
     "aneel_siga": "Geração e Operacional",
     "tempook_boletins": "Meteorologia",
     "hubspot_negocios": "Comercial e Contratos",
@@ -92,6 +93,7 @@ BYTES_POR_LINHA = {
     "ons_carga": 184,
     "aneel_siga": 640,
     "hubspot_negocios": 512,
+    "ccee_geracao_usina": 420,  # 36 colunas, 25 quase sempre nulas
 }
 BYTES_POR_LINHA_PADRAO = 256
 

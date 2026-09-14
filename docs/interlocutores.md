@@ -64,10 +64,14 @@ Resposta da Alup ao B1, em 11/09. **Prazo para responder dúvida de regra de
 negócio: até 3 dias úteis** (B3). Dúvida sem resposta nesse prazo é insumo em
 atraso e entra na contagem da cláusula 3ª.
 
+**São 8 domínios em 11 linhas** — três deles têm responsáveis distintos por
+subtemas. Detalhe em
+[`arquitetura/dominios-analiticos.md`](arquitetura/dominios-analiticos.md).
+
 | Domínio | Data owner |
 |---|---|
 | Mercado de Energia — PLD, EAR, ENA, CCEE (CVU, ESS, EER), ONS (carga, térmicas, geração) | Taina |
-| BBCE e prêmio | Gabriel Barreto |
+| Mercado de Energia — BBCE e prêmio | Gabriel Barreto |
 | Geração e Operacional — usinas do SIN e DESSEM | Taina |
 | Geração e Operacional — usinas da Alupar e medição | Letícia Ferreira |
 | Meteorologia — precipitação, vento, clima | Taina |

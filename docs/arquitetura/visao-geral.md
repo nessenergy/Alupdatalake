@@ -93,29 +93,33 @@ períodos diferentes sem avisar** — o tipo de erro que não falha, só mente.
 
 **Depende da ness.**: definir a regra do mês CCEE e acrescentar
 `periodo_apuracao_ccee` às views que o exigem. Não bloqueia nada hoje, porque
-não há dado interno carregado; **bloqueia o domínio D6** quando houver.
+não há dado interno carregado; **bloqueia Risco e Compliance** quando houver.
 
 ## 8 Domínios Analíticos
 
-Definidos em 2026-09-14 (item 0.10 do plano), a partir das respostas de 11/09:
-**[`dominios-analiticos.md`](dominios-analiticos.md)**.
+Os domínios da **resposta da Alup ao item B1**, em 11/09. Detalhe por domínio —
+pergunta, fontes, granularidade e Gold — em
+**[`dominios-analiticos.md`](dominios-analiticos.md)** (item 0.10 do plano).
 
-| # | Domínio | Situação |
-|---|---|---|
-| D1 | Preço de energia | pronto |
-| D2 | Carga e operação do SIN | pronto |
-| D3 | Portfólio de geração | parcial — Lacuna 1 |
-| D4 | Cadastro de agentes e contrapartes | pronto |
-| D5 | Posição comercial e contratos | bloqueado (A7) |
-| D6 | Contabilização e liquidação | não iniciado |
-| D7 | Conjuntura e indicadores macro | pronto |
-| D8 | Qualidade e rastreabilidade do dado | pronto |
+| # | Domínio | Data owner | Situação |
+|---|---|---|---|
+| 1 | Mercado de Energia | Taina Mota · Gabriel Barreto (BBCE e prêmio) | pronto no núcleo |
+| 2 | Geração e Operacional | Taina Mota · Letícia Ferreira | parcial — Lacuna 1 |
+| 3 | Meteorologia | Taina Mota | pronto como arquivo |
+| 4 | Comercial e Contratos | Letícia Ferreira · Tahigo Santos | bloqueado (A7) |
+| 5 | CRM e Marketing | Tahigo Santos | parcial — token do Hubspot |
+| 6 | Risco e Compliance | Letícia Ferreira | não iniciado |
+| 7 | Econômico | Letícia Ferreira | parcial — faltam Selic e CDI |
+| 8 | Planejamento | gestores da Comercialização | não iniciado |
 
-> **Ressalva registrada no documento**: o item A1 do questionário pediu as 8
-> perguntas de negócio e a Alup respondeu com 8 **objetivos do programa**
-> ("base única", "escalar o negócio"). São legítimos, mas não nomeiam assunto
-> sobre o qual se escreva tabela. Os domínios acima são **proposta da ness.**,
-> derivada do que é respondível, para confirmação da contratante.
+> **Por que o quadro do B1 tem 11 linhas**: três domínios — Mercado de Energia,
+> Geração e Operacional, Comercial e Contratos — aparecem em duas linhas cada,
+> porque responsáveis distintos tratam subtemas deles. São 8 domínios, não 11.
+>
+> **O item A1 não define domínio.** Ele perguntou o que o lake precisa responder
+> **como um todo**, e a Alup respondeu com objetivos do programa ("base única",
+> "escalar o negócio"). É outra pergunta, e a resposta dela ordena a entrega
+> (via A2), não o vocabulário da Gold.
 
 ## Stack Tecnológico
 

@@ -162,3 +162,43 @@ def test_information_schema_usa_a_regiao_configurada():
             f"{arquivo.name} consulta INFORMATION_SCHEMA com região fora da configuração"
         )
         assert "region-us-east1" in renderizar(arquivo)
+
+
+def _sem_comentarios(sql: str) -> str:
+    """Só o código. Os comentários citam o que foi recusado, e disparariam falso positivo."""
+    return "\n".join(linha for linha in sql.splitlines() if not linha.strip().startswith("--"))
+
+
+def test_gold_que_cruza_fontes_usa_full_outer_join():
+    """INNER JOIN faria o mês recente sumir em vez de aparecer sem preço.
+
+    A CCEE publica o PLD por fechamento, com um a dois meses de defasagem; o
+    ONS publica carga no dia seguinte. Com INNER, os meses em que só há carga
+    **desapareceriam da tabela** — sumiço silencioso, pior que lacuna visível.
+
+    Este teste existe porque a troca é uma "simplificação" tentadora para quem
+    lê o SQL sem conhecer a defasagem das duas origens.
+    """
+    sql = (DEFINICOES / "gold" / "mercado_mensal_submercado.sqlx").read_text(encoding="utf-8")
+    # Só o código: o comentário da própria view cita "INNER JOIN" ao explicar
+    # por que ele foi recusado.
+    corpo = _sem_comentarios(sql)
+
+    assert "FULL OUTER JOIN" in corpo
+    assert "INNER JOIN" not in corpo
+    # a coluna que torna a lacuna legível para quem consome
+    assert "cobertura" in corpo
+
+
+def test_gold_de_dominio_nao_calcula_razao_entre_series():
+    """ADR 012: Gold sem KPI nesta fase.
+
+    Preço alto com carga alta pode ser escassez, manutenção ou hidrologia.
+    Escolher a fórmula que traduz isso é decisão de negócio, e os itens A5 e A6
+    do Questionário dizem que ela não é objetivo desta fase.
+    """
+    sql = (DEFINICOES / "gold" / "mercado_mensal_submercado.sqlx").read_text(encoding="utf-8")
+    corpo = _sem_comentarios(sql)
+
+    assert "pld_medio_reais_mwh /" not in corpo
+    assert "/ carga_media_mwmed" not in corpo

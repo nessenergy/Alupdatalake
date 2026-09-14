@@ -81,10 +81,16 @@ para quem ir, e a ness. para de trabalhar esperando resposta.
 
 ### Resposta ao B1 — data owners por domínio
 
+**São 8 domínios em 11 linhas.** Um domínio aparece em mais de uma linha quando
+responsáveis distintos tratam subtemas dele — é o caso de Mercado de Energia,
+Geração e Operacional e Comercial e Contratos. Este quadro, e não o A1, é a
+definição dos domínios analíticos que a Gold persegue
+([`arquitetura/dominios-analiticos.md`](arquitetura/dominios-analiticos.md)).
+
 | Domínio | Data owner | Área |
 |---|---|---|
 | Mercado de Energia — PLD, EAR, ENA, CCEE (CVU, ESS, EER), ONS (carga, térmicas, geração) | Taina Mota | Inteligência de Mercado |
-| BBCE e prêmio | Gabriel Barreto | Trading |
+| Mercado de Energia — BBCE e prêmio | Gabriel Barreto | Trading |
 | Geração e Operacional — usinas do SIN e DESSEM | Taina Mota | Inteligência de Mercado |
 | Geração e Operacional — usinas da Alupar e medição | Letícia Ferreira | Gestão de Portfólio e Back-Office |
 | Meteorologia — precipitação, vento, clima | Taina Mota | Inteligência de Mercado |
@@ -167,7 +173,7 @@ significa que alguém dispara a carga.
 | # | Pergunta | Quem | Resposta |
 |---|---|---|---|
 | D1 | Como se identifica uma usina de forma única entre os sistemas? O CodCEG da ANEEL serve como chave, ou há código interno? | Engenharia | **11/09**: siglas internas identificam as empresas — FGE, FOZ, IJU, QLZ, LVR, VD8, EAP I, EAP II, PTB, EDV I a IV e X, ALP e ALUP. O CEG não é usado hoje, mas pode ser avaliado. A CCEE e o ONS usam nomes diferentes para os conjuntos de usinas. **ness.**: a dimensão de usina precisa de um de-para entre sigla, CEG, nome CCEE e nome ONS. |
-| D2 | Qual o código de agente CCEE de cada uma das 6 coligadas? | Comercial | **11/09**: não são só 6 coligadas — são todos os ativos e também os clientes varejistas. Os códigos estão nos bancos da Alup, e a Alup vai mostrar scripts de referência. |
+| D2 | Qual o código de agente CCEE de cada uma das 6 coligadas? | Comercial | **11/09**: não são só 6 coligadas — são todos os ativos e também os clientes varejistas. Os códigos estão nos bancos da Alup, e a Alup vai mostrar scripts de referência. **Precisão de 14/09**: as 6 coligadas respondem pelo faturamento do contrato e **não delimitam o dado**. O escopo de dado é o mapeado na planilha da proposta, desde antes dela — usinas pela **CCEE**, varejo pelo **Portal Alup** —, e tudo isso é **Fase 1** ([`arquitetura/dominios-analiticos.md`](arquitetura/dominios-analiticos.md), §2). |
 | D3 | Uma usina pode mudar de coligada ao longo do tempo? Se sim, o histórico deve seguir a usina ou a coligada? | Controladoria | **11/09**: não; os ativos não mudam de coligada. |
 | D4 | Qual o calendário de apuração que vale: mês civil, mês CCEE, ou ambos? | Controladoria | **11/09**: os dois calendários. |
 | D5 | Como tratar retificação de dado já publicado (ex.: CCEE recontabiliza mês fechado) — sobrescrever ou versionar? | Controladoria | **11/09**: versionar, para rastrear as recontabilizações da CCEE. Proposta de modelo em [ADR 016](arquitetura/decisoes/016-versionamento-de-recontabilizacao.md). |

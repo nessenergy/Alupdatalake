@@ -1,216 +1,282 @@
 # Os 8 domínios analíticos
 
-**Item 0.10 do plano de execução** · Elaborado em 2026-09-14, a partir das
-respostas da Alup ao [Questionário de Gaps](../questionario-gaps.md) de 11/09.
+**Item 0.10 do plano de execução** · Elaborado em 2026-09-14 a partir da
+**resposta da Alup ao item B1** do [Questionário de Gaps](../questionario-gaps.md),
+de 11/09. Revisto em 14/09 para corrigir a origem: a primeira versão derivava os
+domínios de A1, que responde outra pergunta.
 
 Este documento diz **o que o lake precisa responder**, e é o alvo contra o qual
-as views Gold são escritas. Sem ele, cada Gold nasce de uma suposição
-diferente.
+as views Gold são escritas. Sem ele, cada Gold nasce de uma suposição diferente.
 
 ---
 
-## 1. Uma ressalva que precisa vir antes de tudo
+## 1. De onde vêm os domínios
 
-O item **A1** do questionário pedia "as 8 perguntas de negócio que este DataLake
-precisa responder no primeiro ano, em linguagem de negócio". A Alup respondeu
-com oito itens:
+Os domínios são os da **resposta ao B1**. Não são proposta da ness. — são a
+divisão que a própria Alup usa, com dono nomeado para cada uma.
 
-> (1) base única e integrada; (2) automação de processos operacionais;
-> (3) relatórios e dashboards atualizados, quase em tempo real; (4) qualidade e
-> rastreabilidade do dado; (5) decisão orientada por dados; (6) escalar o
-> negócio; (7) novos produtos, serviços e negócios; (8) base preparada para IA
-> no futuro.
+O quadro do B1 tem **11 linhas para 8 domínios**. A diferença não é
+inconsistência: **um domínio aparece em mais de uma linha quando responsáveis
+distintos tratam subtemas dele**. Três domínios se dividem assim, e 8 + 3 = 11.
 
-**Esses oito são objetivos do programa, não domínios analíticos.** São
-legítimos e úteis — dizem para que o lake existe —, mas nenhum deles nomeia um
-assunto sobre o qual se possa escrever uma tabela. "Escalar o negócio" não
-define chave, granularidade nem fonte.
+| # | Domínio | Subtemas | Data owner |
+|---|---|---|---|
+| 1 | **Mercado de Energia** | PLD, EAR, ENA, CCEE (CVU, ESS, EER), ONS (carga, térmicas, geração) | Taina Mota · Inteligência de Mercado |
+| | | BBCE e prêmio | Gabriel Barreto · Trading |
+| 2 | **Geração e Operacional** | usinas do SIN e DESSEM | Taina Mota · Inteligência de Mercado |
+| | | usinas da Alupar e medição | Letícia Ferreira · Gestão de Portfólio e Back-Office |
+| 3 | **Meteorologia** | precipitação, vento, clima | Taina Mota · Inteligência de Mercado |
+| 4 | **Comercial e Contratos** | book, sazonalização, garantias | Letícia Ferreira · Gestão de Portfólio e Back-Office |
+| | | contratos de varejo e Hubspot | Tahigo Santos · Comercial |
+| 5 | **CRM e Marketing** | leads, campanhas, documentos | Tahigo Santos · Comercial |
+| 6 | **Risco e Compliance** | exposição, GSF, Proinfa | Letícia Ferreira · Gestão de Portfólio e Back-Office |
+| 7 | **Econômico** | IPCA, Selic, câmbio, CDI | Letícia Ferreira · Gestão de Portfólio e Back-Office |
+| 8 | **Planejamento** | orçamento, premissas | gestores da Comercialização: Letícia Ferreira, Tahigo Santos e Taina Mota |
 
-Registrar isso importa por dois motivos: a resposta **não está errada**, apenas
-responde outra pergunta; e derivar os domínios em silêncio, como se A1 os
-tivesse entregue, criaria um documento que parece acordado e não é.
+Contato de cada dono em [`interlocutores.md`](../interlocutores.md). O prazo do
+B3 — **3 dias úteis** para dúvida de regra de negócio — vale por domínio.
 
-**O que este documento faz, então**: propõe os oito domínios a partir do que de
-fato é respondível hoje —
+### O que A1 responde, e por que não é isto
 
-| Insumo | O que ele determina |
+O item **A1** perguntou o que o DataLake precisa responder **como um todo**, e a
+Alup respondeu com oito objetivos de programa: base única e integrada; automação
+de processos operacionais; relatórios e dashboards atualizados; qualidade e
+rastreabilidade do dado; decisão orientada por dados; escalar o negócio; novos
+produtos e negócios; base preparada para IA.
+
+São a finalidade do lake, não seus assuntos — não nomeiam chave, granularidade
+nem fonte. **A2** ordena esses objetivos (1, 2 e 3 primeiro) e é dele que sai a
+ordem de entrega da §4. Os domínios, esses, vêm do B1.
+
+---
+
+## 2. Abrangência do dado
+
+As **6 coligadas contratantes** (FGE, IJUI, FOZ, QUELUZ, LAVRINHAS, VERDE 08)
+respondem pelo **faturamento** do contrato, com rateio igualitário (cláusula 5ª).
+**Elas não delimitam o dado.**
+
+O escopo de dado é o que já estava mapeado na **planilha da proposta**, desde
+antes dela — a mesma que o G4 cita como fonte de periodicidade e manutenção de
+cada planilha. Dentro dele:
+
+| O que | Fonte de dados |
 |---|---|
-| **A2** — as 3 prioridades | a ordem de entrega |
-| **A3** — como se responde hoje | o que já existe em planilha e dashboard, e que o lake substitui |
-| **A4** — quem consome e com que frequência | a cadência de atualização de cada domínio |
-| **A7** — granularidade | usina para dado de portfólio; usina, estado ou submercado para dado do SIN |
-| **Bloco D** — regras de negócio | chave, calendário, versionamento e arredondamento |
-| **As 9 fontes já conectadas** | o que se pode responder **hoje**, e não em tese |
+| Usinas — todos os ativos do grupo, não só os das coligadas | **CCEE** |
+| Clientes varejistas | **Portal Alup** |
+| Demais itens mapeados na planilha | as fontes que a planilha já nomeia |
 
-**Isto é proposta da ness., para confirmação da Alup.** Cada domínio traz a
-pergunta que ele responde; se a pergunta não for a certa, é barato trocar agora
-e caro trocar depois da Gold escrita.
+Tudo isso é **Fase 1**. A resposta ao **D2** diz o mesmo pelo outro lado: os
+códigos de agente CCEE "não são só das 6 coligadas — são todos os ativos e
+também os clientes varejistas".
 
 ---
 
-## 2. Os oito domínios
+## 3. Os domínios, um a um
 
-Ordenados por prontidão: os que já têm fonte no lake vêm primeiro.
+Cada um traz a pergunta que responde, as fontes que o alimentam e o que já
+existe em Gold. Ordenados pelo B1.
 
-### D1 · Preço de energia
+### 1 · Mercado de Energia
 
-> **Quanto vale a energia, hoje e no futuro contratado?**
+> **Quanto vale a energia, e o que o sistema está fazendo com ela — no curto prazo, no histórico e no futuro negociado?**
 
 | | |
 |---|---|
-| **Fontes** | `ccee_pld` (à vista, horário) · `bbce_curva_forward` (futuro negociado) |
-| **Granularidade** | submercado e hora, para o PLD; vértice de entrega, para a curva |
-| **Cadência** | PLD mensal (a CCEE publica por fechamento); curva por pregão |
-| **Gold hoje** | `pld_mensal_submercado`, `curva_forward_vigente` |
-| **Situação** | **pronto** — as duas fontes verificadas contra a API real |
+| **Fontes hoje** | `ccee_pld` (à vista, horário) · `ons_carga` · `bbce_curva_forward` (futuro negociado) · `ccee_perfil` (60 mil perfis) |
+| **Fontes a conectar** | EAR e ENA (ONS) · CVU, ESS e EER (conjuntos do InfoMercado, [ADR 018](decisoes/018-vias-de-acesso-a-ccee.md)) |
+| **Granularidade** | submercado e hora, para o PLD; submercado e dia, para a carga; vértice de entrega, para a curva |
+| **Cadência** | PLD mensal, por fechamento da CCEE; carga diária; curva por pregão |
+| **Gold hoje** | `pld_mensal_submercado`, `carga_mensal_submercado`, `curva_forward_vigente`, `agentes_ccee` |
+| **Situação** | **pronto no núcleo** — as fontes verificadas contra a API real; faltam EAR, ENA, CVU, ESS e EER |
 
 É o domínio mais maduro e o que sustenta os demais: quase toda pergunta
 comercial termina comparada a um preço.
 
-### D2 · Carga e operação do SIN
+`ccee_perfil` fica aqui porque é o cadastro do mercado — é ele que dá nome ao
+que em toda outra fonte é código, e alimenta a dimensão comum `agente_ccee`
+([`visao-geral.md`](visao-geral.md)).
 
-> **Quanta energia o sistema consumiu, onde e quando?**
+**O subtema de Trading tem uma regra em aberto**: o prêmio sobre o PLD não tem
+fórmula definida, e inventá-la seria escolher pelo cliente
+([`bbce_curva_forward.md`](../dicionario-dados/bbce_curva_forward.md)). Depende
+do Gabriel Barreto.
 
-| | |
-|---|---|
-| **Fontes** | `ons_carga` · (candidatas: `consumo_horario_submercado` e `consumo_mensal_perfil_agente`, da CCEE) |
-| **Granularidade** | submercado e dia |
-| **Cadência** | diária |
-| **Gold hoje** | `carga_mensal_submercado` |
-| **Situação** | **pronto** para carga; o consumo por perfil depende de escolher entre os 204 conjuntos públicos da CCEE |
+### 2 · Geração e Operacional
 
-Cruza com D1 pela dimensão `submercado` — é esse cruzamento que explica preço
-por escassez.
-
-### D3 · Portfólio de geração
-
-> **Quais ativos a Alupar tem, com que capacidade e onde?**
+> **Quais ativos existem, quanto cada um gerou, e quanto foi medido?**
 
 | | |
 |---|---|
-| **Fontes** | `aneel_siga` (cadastro público) · **Oracle FMB** (Onda 3, interno) |
-| **Granularidade** | **usina** — é a granularidade que A7 fixa para dado de portfólio |
-| **Cadência** | semanal para o cadastro público |
+| **Fontes hoje** | `aneel_siga` (cadastro público) |
+| **Fontes a conectar** | geração e térmicas do ONS · DESSEM · **Oracle FMB** (Onda 3, medição do portfólio) |
+| **Granularidade** | **usina** — a granularidade que A7 fixa para dado de portfólio |
+| **Cadência** | semanal para o cadastro público; diária para medição, na janela das 22h às 6h (C9) |
 | **Gold hoje** | `parque_gerador` |
-| **Situação** | **parcial** — o lado público está pronto; o lado interno depende de A7 |
+| **Situação** | **parcial** — o lado público está pronto; medição e DESSEM dependem de acesso (A7) |
 
-**Tem um bloqueio nomeado**: o item D1 do questionário informa que a Alup
-identifica os ativos por **sigla interna** (FGE, FOZ, IJU, QLZ, LVR, VD8, EAP I
-e II, PTB, EDV I a IV e X, ALP, ALUP) e que **o CEG não é usado hoje**. CCEE e
-ONS usam ainda outros nomes para os mesmos conjuntos. Ver §3.
+**Tem um bloqueio nomeado**: o item D1 informa que a Alup identifica os ativos
+por **sigla interna** (FGE, FOZ, IJU, QLZ, LVR, VD8, EAP I e II, PTB, EDV I a IV
+e X, ALP, ALUP) e que **o CEG não é usado hoje**. CCEE e ONS usam ainda outros
+nomes para os mesmos conjuntos. Ver §5.1.
 
-### D4 · Cadastro de agentes e contrapartes
+### 3 · Meteorologia
 
-> **Quem são os participantes do mercado, e qual é o nosso perfil entre eles?**
-
-| | |
-|---|---|
-| **Fontes** | `ccee_perfil` (60 mil perfis) · códigos das coligadas, que a Alup enviará (D2) |
-| **Granularidade** | perfil de agente |
-| **Cadência** | semanal |
-| **Gold hoje** | `agentes_ccee` |
-| **Situação** | **pronto** do lado público |
-
-É a tabela de dimensão que dá nome a tudo que hoje é código. O item D2 informa
-que os códigos **não são só das 6 coligadas** — incluem todos os ativos e os
-clientes varejistas —, e que estão nos bancos da Alup.
-
-### D5 · Posição comercial e contratos
-
-> **O que foi comprado e vendido, com quem, a que preço e para quando?**
+> **Que chuva, vento e clima explicam a oferta que vem?**
 
 | | |
 |---|---|
-| **Fontes** | **MySQL RDS de Comercialização** · **Portal Alup** (ambos Onda 3) · `hubspot_negocios` (funil, não contrato) |
+| **Fontes hoje** | `tempook_boletins` — boletim guardado como arquivo ([ADR 019](decisoes/019-boletim-do-tempook-como-arquivo.md)) |
+| **Granularidade** | boletim |
+| **Cadência** | por publicação |
+| **Gold hoje** | `cobertura_boletins_tempook` |
+| **Situação** | **pronto como arquivo** — a extração do conteúdo do boletim é escopo futuro ([#129](https://github.com/nessenergy/Alupdatalake/issues/129)) |
+
+Enquanto o conteúdo não for extraído, o domínio responde "o boletim de tal dia
+chegou", não "choveu quanto". A diferença é grande e está registrada.
+
+### 4 · Comercial e Contratos
+
+> **O que foi comprado e vendido, com quem, a que preço e para quando — e como está sazonalizado e garantido?**
+
+| | |
+|---|---|
+| **Fontes hoje** | `hubspot_negocios` (funil, não contrato) |
+| **Fontes a conectar** | **MySQL RDS de Comercialização** · **Portal Alup** — contratos de varejo (ambos Onda 3) |
 | **Granularidade** | contrato e perfil de agente |
-| **Cadência** | diária (janela das 22h às 6h, item C9) |
-| **Gold hoje** | `funil_comercial` apenas |
-| **Situação** | **bloqueado** — depende de credencial (A7) |
+| **Cadência** | diária, na janela das 22h às 6h (C9) |
+| **Gold hoje** | `funil_comercial` |
+| **Situação** | **bloqueado** — depende de credencial (A7, C1) |
 
 É o domínio de maior valor e o menos pronto. É ele que a prioridade 1 de A2
 ("base única e integrada") mais cobra, porque hoje vive em planilha (A3).
 
-### D6 · Contabilização e liquidação
+Os dois subtemas têm donos diferentes e fontes próprias: book, sazonalização e
+garantias vêm do MySQL RDS; o varejo, do Portal Alup.
 
-> **Quanto se apurou no mercado de curto prazo, e como isso muda quando a CCEE recontabiliza?**
+### 5 · CRM e Marketing
+
+> **De onde vem o lead, o que a campanha gerou, e onde está o documento do negócio?**
 
 | | |
 |---|---|
-| **Fontes** | conjuntos de contabilização da CCEE (públicos) · **Balanço Energético**, no MySQL RDS (Onda 3) |
+| **Fontes hoje** | `hubspot_negocios` |
+| **Granularidade** | negócio |
+| **Cadência** | diária |
+| **Gold hoje** | `funil_comercial` |
+| **Situação** | **parcial, com limite de escopo declarado** |
+
+**Contatos e empresas do Hubspot ficam fora do escopo**, por decisão da Alup de
+11/09 (item F1): o que a plataforma não lê não faz parte do escopo, e CPF e
+endereço não são tratados. Leads e campanhas, portanto, entram pelo que o objeto
+de negócio carrega — não pelo cadastro de pessoa.
+
+O conector segue parado à espera do token (A9, chamado a partir de 14/09).
+
+### 6 · Risco e Compliance
+
+> **Qual a exposição, e quanto o GSF e o Proinfa mudam o resultado?**
+
+| | |
+|---|---|
+| **Fontes a conectar** | conjuntos de contabilização da CCEE (públicos) · **Balanço Energético**, no MySQL RDS (Onda 3) |
 | **Granularidade** | perfil de agente e mês de apuração |
 | **Cadência** | mensal, por fechamento |
 | **Gold hoje** | — |
-| **Situação** | **não iniciado**; a via pública existe e falta escolher os conjuntos |
+| **Situação** | **não iniciado** — a via pública existe e falta escolher os conjuntos |
 
-O item D5 do questionário já definiu a regra mais difícil deste domínio:
-**recontabilização se versiona, não se sobrescreve** — registrado na
-[ADR 016](decisoes/016-versionamento-de-recontabilizacao.md).
+O item D5 já definiu a regra mais difícil deste domínio: **recontabilização se
+versiona, não se sobrescreve** — registrado na
+[ADR 016](decisoes/016-versionamento-de-recontabilizacao.md). A lacuna do mês
+CCEE (§5.2) bloqueia este domínio quando houver dado.
 
-### D7 · Conjuntura e indicadores macro
+### 7 · Econômico
 
-> **Que contexto econômico explica o preço e corrige o valor no tempo?**
+> **Que indicador corrige valor no tempo, e que contexto macro explica o preço?**
 
 | | |
 |---|---|
-| **Fontes** | `bcb_cambio_ptax` · `ibge_ipca` · `tempook_boletins` (boletim de mercado) |
-| **Granularidade** | diária para câmbio; mensal para IPCA |
+| **Fontes hoje** | `bcb_cambio_ptax` · `ibge_ipca` |
+| **Fontes a conectar** | **Selic** e **CDI** — as duas nomeadas no B1 e ainda não conectadas |
+| **Granularidade** | diária para câmbio e Selic; mensal para IPCA |
 | **Cadência** | diária e mensal |
-| **Gold hoje** | `cambio_mensal`, `inflacao_mensal`, `cobertura_boletins_tempook` |
-| **Situação** | **pronto**, com a ressalva do TempoOK ([#129](https://github.com/nessenergy/Alupdatalake/issues/129)) |
+| **Gold hoje** | `cambio_mensal`, `inflacao_mensal` |
+| **Situação** | **parcial** — faltam Selic e CDI |
 
-O item D6 do questionário **não cita conversão para US$** — então câmbio entra
-como contexto, e não como conversão obrigatória, até que alguém peça.
+Selic e CDI saem das séries do BCB, pelo mesmo caminho já usado pelo PTAX: é
+acréscimo pequeno e destrava o domínio inteiro.
 
-### D8 · Qualidade e rastreabilidade do dado
+O item D6 **não cita conversão para US$** — então câmbio entra como contexto, e
+não como conversão obrigatória, até que alguém peça.
 
-> **O dado chegou, está completo, e de onde ele veio?**
+### 8 · Planejamento
+
+> **Qual o orçamento, quais as premissas, e o realizado bate com elas?**
 
 | | |
 |---|---|
-| **Fontes** | `bronze._execucoes` · linhagem do Knowledge Catalog · asserções do Dataform |
-| **Granularidade** | execução de ingestão |
-| **Cadência** | contínua |
-| **Gold hoje** | `saude_ingestao`, `volumetria_lake` |
-| **Situação** | **pronto** |
+| **Fontes a conectar** | **RM/TOTVS** (C7, forma de integração pendente até 25/09) · planilhas pelo **S2 Data Intake** (Onda 4) |
+| **Granularidade** | a definir com os donos |
+| **Cadência** | mensal |
+| **Gold hoje** | — |
+| **Situação** | **não iniciado** — é o último em prontidão e o de dono mais distribuído |
 
-Este é o único domínio que **veio literal de A1** (item 4). Ele não é meio: é
-entregável. Um lake que não sabe dizer se o dado de ontem chegou não substitui
-a planilha que a pessoa conferia à mão.
+É o único domínio com três donos ao mesmo tempo (os gestores da
+Comercialização). Vale confirmar, antes de escrever a primeira Gold, quem
+arbitra divergência de premissa.
 
 ---
 
-## 3. Três lacunas que este documento nomeia
+## 4. Ordem de entrega
 
-Estas não são pendências novas — são consequências das respostas de 11/09 que
-ainda não tinham sido escritas em lugar nenhum.
+A prioridade de **A2** é "base única e integrada, automação e dashboards
+atualizados". Traduzida para os domínios do B1 e cruzada com o que está
+bloqueado:
 
-### 3.1 A dimensão de usina precisa de um de-para, e ele não existe
+| Ordem | Domínio | Por quê |
+|---|---|---|
+| 1 | **Mercado de Energia**, **Econômico**, **Meteorologia** | já têm fonte no lake; é o que dá dashboard atualizado sem depender de ninguém |
+| 2 | **Geração e Operacional** (lado público) | cadastro pronto; o cruzamento depende do de-para da §5.1 |
+| 3 | **CRM e Marketing** | destrava com o token do Hubspot, insumo pequeno |
+| 4 | **Comercial e Contratos**, **Risco e Compliance** | maior valor, bloqueados em credencial (A7) |
+| 5 | **Planejamento** | depende do RM/TOTVS (25/09) e dos templates da Onda 4 |
 
-O item **D1** informa que a Alup identifica ativos por sigla interna e que o
-CEG não é usado. A CCEE e o ONS usam nomes próprios. Hoje `codigo_usina` é
+O item 1 **não depende da Alup**. É o que dá para avançar hoje.
+
+---
+
+## 5. Três lacunas que este documento nomeia
+
+Não são pendências novas — são consequências das respostas de 11/09 que ainda
+não tinham sido escritas em lugar nenhum.
+
+### 5.1 A dimensão de usina precisa de um de-para, e ele não existe
+
+O item **D1** informa que a Alup identifica ativos por sigla interna e que o CEG
+não é usado. A CCEE e o ONS usam nomes próprios. Hoje `codigo_usina` é
 preenchido **só** pelo `aneel_siga`, com o CodCEG.
 
-Sem uma tabela de correspondência entre **sigla interna ↔ CEG ↔ nome CCEE ↔
-nome ONS**, o domínio D3 não cruza com D5 nem com D6 — e é justamente esse
-cruzamento que a prioridade 1 de A2 pede.
+Sem uma tabela de correspondência entre **sigla interna ↔ CEG ↔ nome CCEE ↔ nome
+ONS**, Geração e Operacional não cruza com Comercial e Contratos nem com Risco e
+Compliance — e é justamente esse cruzamento que a prioridade 1 de A2 pede.
 
 **O que destrava**: a Alup fornecer o de-para, ou a lista de siglas com o CEG
 correspondente. É insumo pequeno e de efeito grande.
 
-### 3.2 `periodo_apuracao` só existe em calendário civil
+### 5.2 `periodo_apuracao` só existe em calendário civil
 
-O item **D4** diz que valem **os dois calendários**: mês civil e mês CCEE.
-Hoje todas as views Silver derivam `periodo_apuracao` com
+O item **D4** diz que valem **os dois calendários**: mês civil e mês CCEE. Hoje
+todas as views Silver derivam `periodo_apuracao` com
 `FORMAT_DATE('%Y-%m', data_referencia)` — que é só o civil.
 
-O mês CCEE não coincide com o civil no fechamento da contabilização. Enquanto
-a diferença não for modelada, qualquer agregação mensal que cruze dado da CCEE
-com dado interno **soma períodos diferentes sem avisar**.
+O mês CCEE não coincide com o civil no fechamento da contabilização. Enquanto a
+diferença não for modelada, qualquer agregação mensal que cruze dado da CCEE com
+dado interno **soma períodos diferentes sem avisar**.
 
 **O que destrava**: definir a regra do mês CCEE. É trabalho da ness., e entra
 como item de 0.11 — ver [`visao-geral.md`](visao-geral.md).
 
-### 3.3 "Quase em tempo real" não é alcançável para fonte interna
+### 5.3 "Quase em tempo real" não é alcançável para fonte interna
 
 O item A1 pede dashboards "quase em tempo real"; o item **C9** informa que os
 sistemas internos só podem ser lidos das **22h às 6h**. São incompatíveis.
@@ -222,25 +288,7 @@ Alup antes que um dashboard prometa outra coisa.
 
 ---
 
-## 4. Ordem de entrega
-
-A prioridade de **A2** é "base única e integrada, automação e dashboards
-atualizados". Traduzida para os domínios acima, e cruzada com o que está
-bloqueado:
-
-| Ordem | Domínio | Por quê |
-|---|---|---|
-| 1 | **D1, D2, D7** | já prontos; é o que dá dashboard atualizado sem depender de ninguém |
-| 2 | **D4** | tabela de dimensão — barata, e dá nome a tudo |
-| 3 | **D8** | é o que faz a base ser confiável, e a prioridade 1 é "base única e **integrada**" |
-| 4 | **D3** | depende do de-para da §3.1 |
-| 5 | **D5, D6** | maior valor, mas bloqueados em credencial (A7) |
-
-Os itens 1 a 3 **não dependem da Alup**. São o que dá para avançar hoje.
-
----
-
-## 5. O que este documento não decide
+## 6. O que este documento não decide
 
 **Não há KPI aqui, de propósito.** Os itens A5 e A6 informam que não existem
 indicadores formalizados e que **defini-los não é objetivo desta fase** — eles

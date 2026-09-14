@@ -1,0 +1,81 @@
+config {
+  type: "table",
+  schema: "gold",
+  tags: ["gold"]
+}
+
+-- Gold: preço e carga lado a lado, por mês e submercado.
+--
+-- Responde **"como o preço se comportou onde a carga estava"** — a leitura
+-- básica do domínio de mercado (`docs/arquitetura/dominios-analiticos.md`,
+-- domínios D1 e D2).
+--
+-- É a primeira Gold que **cruza fontes**. Todas as outras são de fonte única:
+-- `pld_mensal_submercado` sabe de preço e não sabe de carga;
+-- `carga_mensal_submercado` sabe o contrário. Quem quisesse as duas séries
+-- juntas escrevia o JOIN à mão, cada um do seu jeito — que é exatamente o que
+-- a camada Gold existe para evitar.
+--
+-- **Sem KPI**, conforme a ADR 012: as duas séries aparecem lado a lado e
+-- nenhuma razão entre elas é calculada. Preço alto com carga alta pode ser
+-- escassez, manutenção programada ou hidrologia, e escolher a fórmula que
+-- traduz isso é decisão de negócio — os itens A5 e A6 do Questionário dizem
+-- que ela não é objetivo desta fase.
+
+WITH preco AS (
+  SELECT
+    periodo_apuracao,
+    submercado,
+    COUNT(*)           AS horas_com_preco,
+    AVG(pld_reais_mwh) AS pld_medio_reais_mwh,
+    MAX(pld_reais_mwh) AS pld_maximo_reais_mwh,
+    MIN(pld_reais_mwh) AS pld_minimo_reais_mwh
+  FROM ${ref("silver", "ccee_pld")}
+  GROUP BY periodo_apuracao, submercado
+),
+
+carga AS (
+  SELECT
+    periodo_apuracao,
+    submercado,
+    COUNT(*)         AS dias_com_carga,
+    AVG(carga_mwmed) AS carga_media_mwmed,
+    MAX(carga_mwmed) AS carga_maxima_mwmed,
+    MIN(carga_mwmed) AS carga_minima_mwmed
+  FROM ${ref("silver", "ons_carga")}
+  GROUP BY periodo_apuracao, submercado
+)
+
+-- FULL OUTER, e não INNER, de propósito: a CCEE publica o PLD por fechamento,
+-- com um a dois meses de defasagem, enquanto o ONS publica carga no dia
+-- seguinte. Um INNER JOIN faria os meses mais recentes **desaparecerem** da
+-- tabela em vez de aparecerem sem preço — sumiço silencioso, que é pior que
+-- lacuna visível.
+SELECT
+  COALESCE(p.periodo_apuracao, c.periodo_apuracao) AS periodo_apuracao,
+  COALESCE(p.submercado, c.submercado)             AS submercado,
+
+  p.pld_medio_reais_mwh,
+  p.pld_maximo_reais_mwh,
+  p.pld_minimo_reais_mwh,
+
+  c.carga_media_mwmed,
+  c.carga_maxima_mwmed,
+  c.carga_minima_mwmed,
+
+  -- Cobertura do mês. Sem elas não se distingue "preço baixo" de "mês com
+  -- três dias publicados": 744 horas é um mês de 31 dias completo, e qualquer
+  -- número muito abaixo disso diz que a média ainda não é comparável.
+  p.horas_com_preco,
+  c.dias_com_carga,
+
+  CASE
+    WHEN p.pld_medio_reais_mwh IS NULL THEN 'sem preço publicado'
+    WHEN c.carga_media_mwmed  IS NULL THEN 'sem carga publicada'
+    ELSE 'completo'
+  END AS cobertura
+
+FROM preco AS p
+FULL OUTER JOIN carga AS c
+  ON  p.periodo_apuracao = c.periodo_apuracao
+  AND p.submercado       = c.submercado

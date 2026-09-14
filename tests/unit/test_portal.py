@@ -257,16 +257,16 @@ def test_orcamento_sem_dia_decorrido_nao_divide_por_zero() -> None:
 def test_dominio_de_negocio_usa_os_oito_documentados(cliente) -> None:
     """Era "provisório até o Questionário de Gaps" — que foi respondido em 11/09.
 
-    A visão de diretoria passou a falar o mesmo vocabulário de
-    `docs/arquitetura/dominios-analiticos.md`; "Macroeconomia", que era
-    agrupamento por afinidade, virou "Conjuntura e indicadores macro".
+    A visão de diretoria fala o vocabulário da resposta da Alup ao B1
+    (`docs/arquitetura/dominios-analiticos.md`); "Macroeconomia", que era
+    agrupamento por afinidade, virou "Econômico".
     """
     from src.portal.custo import DOMINIOS_VALIDOS
     from src.portal.dados import ProvedorSimulado
 
     dominios = dict(ProvedorSimulado().custo().por_dominio)
 
-    assert "Conjuntura e indicadores macro" in dominios  # BCB + IBGE + TempoOK
+    assert "Econômico" in dominios  # BCB + IBGE
     assert set(dominios) <= DOMINIOS_VALIDOS
     assert "Não classificado" not in dominios
     # A tela deixou de chamar o agrupamento de provisório.

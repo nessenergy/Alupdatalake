@@ -74,6 +74,7 @@ DOMINIO_ANALITICO = {
     "ons_carga": "Mercado de Energia",
     # Cadastro do mercado: dá nome ao que nas outras fontes é código.
     "ccee_perfil": "Mercado de Energia",
+    "ccee_agente": "Mercado de Energia",
     "aneel_siga": "Geração e Operacional",
     "tempook_boletins": "Meteorologia",
     "hubspot_negocios": "Comercial e Contratos",

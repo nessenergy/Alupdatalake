@@ -173,6 +173,36 @@ def test_recurso_gzip_e_descomprimido_em_fluxo(conector, monkeypatch):
     assert len(registros) == 3
 
 
+class _FechaAoEsgotar(io.BytesIO):
+    """Simula o socket HTTP que a CCEE fecha assim que o corpo termina de chegar.
+
+    Visto contra a API real em 14/09/2026 (`lista_agente_associado_2026`, que a
+    CDN entrega com `Content-Encoding: gzip`): a leitura que o `gzip` faz a mais
+    para conferir o rodapé do arquivo batia num arquivo já fechado.
+    """
+
+    def read(self, *args, **kwargs):
+        if self.tell() >= len(self.getvalue()):
+            raise ValueError("read of closed file")
+        return super().read(*args, **kwargs)
+
+    def readinto(self, b):
+        # io.BufferedReader lê o raw por `readinto`, não por `read` — é por
+        # aqui que o `peek()` da própria base bate no fluxo "fechado".
+        if self.tell() >= len(self.getvalue()):
+            raise ValueError("read of closed file")
+        return super().readinto(b)
+
+
+def test_conexao_fechada_pelo_servidor_apos_o_corpo_nao_derruba_a_leitura(conector, monkeypatch):
+    comprimido = gzip.compress(CSV.encode("iso-8859-1"))
+    monkeypatch.setattr(conector, "_abrir", lambda _s: _FechaAoEsgotar(comprimido))
+
+    registros = list(conector.extrair(Janela.de_texto("2026-01-01", "2026-03-31")))
+
+    assert len(registros) == 3
+
+
 # --------------------------------------------------------------- descoberta
 
 

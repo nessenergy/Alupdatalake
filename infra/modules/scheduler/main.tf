@@ -54,6 +54,12 @@ variable "conectores" {
       cron         = "0 7 * * 2" # terça, depois do semanal da ANEEL
       ultimos_dias = 1           # cadastro completo; a janela não se aplica
     }
+    ccee_agente = {
+      # Retrato mensal; a CCEE republica meses fechados (ADR 016). Dia 6, depois
+      # do PLD (dia 5), para não disputar a mesma janela.
+      cron         = "0 10 6 * *"
+      ultimos_dias = 120 # cobre a recontabilização e a defasagem de publicação
+    }
     bbce_curva_forward = {
       # A curva sai por pregão, em dia útil. Janela curta porque cada dia é uma
       # requisição própria; 7 dias cobrem feriado prolongado e execução perdida.

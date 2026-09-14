@@ -48,6 +48,46 @@ CKAN_PACOTE = "https://dadosabertos.ccee.org.br/api/3/action/package_show"
 _GZIP_MAGIC = b"\x1f\x8b"
 
 
+class _SemErroAoFechar:
+    """Envelope do fluxo bruto: leitura após o corpo terminar vira EOF, não erro.
+
+    urllib3 fecha a conexão assim que o corpo termina de chegar; o
+    `io.BufferedReader` (e, por cima dele, o `gzip.GzipFile`, que sempre faz
+    uma leitura a mais para conferir o rodapé do arquivo) ainda tenta uma
+    leitura extra para confirmar que não há mais dado, e essa leitura extra
+    batia num `ValueError: read of closed file` em vez de um EOF limpo — visto
+    contra a API real da CCEE em 14/09/2026 (`lista_agente_associado_2026`,
+    que a CDN entrega com `Content-Encoding: gzip`). Fica por baixo do
+    `BufferedReader` — não por cima — porque só assim o `readinto` devolve 0
+    (EOF) antes do `BufferedReader` propagar a exceção e descartar o que já
+    tinha em buffer.
+    """
+
+    def __init__(self, bruto: IO[bytes]) -> None:
+        self._bruto = bruto
+
+    def readable(self) -> bool:
+        return True
+
+    @property
+    def closed(self) -> bool:
+        return False
+
+    def close(self) -> None:
+        self._bruto.close()
+
+    def flush(self) -> None:
+        pass
+
+    def readinto(self, b: bytearray) -> int:
+        try:
+            dado = self._bruto.read(len(b))
+        except ValueError:
+            return 0
+        b[: len(dado)] = dado
+        return len(dado)
+
+
 def decodificar(linha: bytes) -> str:
     """UTF-8 quando a linha é UTF-8 válido; ISO-8859-1 no resto.
 
@@ -151,14 +191,21 @@ class CceeCsvCkan(Conector):
     # ---------------------------------------------------------------- leitura
 
     def _abrir(self, sufixo: str) -> IO[bytes]:
-        """Fluxo binário do recurso. É o seam dos testes: eles devolvem um BytesIO."""
+        """Fluxo binário do recurso. É o seam dos testes: eles devolvem um BytesIO.
+
+        O envelope `_SemErroAoFechar` fica por baixo do `BufferedReader` — veja
+        a docstring dele — porque a CDN da CCEE fecha a conexão assim que o
+        corpo termina de chegar (visto contra a API real em 14/09/2026, no
+        `lista_agente_associado_2026`, que ela serve com `Content-Encoding:
+        gzip`).
+        """
         resposta = self._sessao.get(self._recurso(sufixo)["url"], stream=True, timeout=get_settings().http_timeout)
         resposta.raise_for_status()
-        return io.BufferedReader(resposta.raw)  # type: ignore[arg-type]
+        return io.BufferedReader(_SemErroAoFechar(resposta.raw))  # type: ignore[arg-type]
 
     def _linhas(self, fluxo: IO[bytes]) -> Iterator[dict[str, str]]:
         if not hasattr(fluxo, "peek"):
-            fluxo = io.BufferedReader(fluxo)  # o BytesIO dos testes não tem peek
+            fluxo = io.BufferedReader(_SemErroAoFechar(fluxo))  # o BytesIO dos testes não tem peek
         if fluxo.peek(2)[:2] == _GZIP_MAGIC:
             fluxo = gzip.GzipFile(fileobj=fluxo)  # type: ignore[assignment]
         texto = (decodificar(linha).rstrip("\r\n") for linha in fluxo)

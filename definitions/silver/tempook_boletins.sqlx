@@ -4,7 +4,11 @@ config {
   tags: ["silver"],
   assertions: {
     uniqueKey: ["data_referencia"],
-    nonNull: ["data_referencia", "caminho_origem", "sha256"]
+    nonNull: ["data_referencia", "caminho_origem", "sha256"],
+    rowConditions: [
+      "tamanho_bytes > 0",
+      "REGEXP_CONTAINS(sha256, r'^[0-9a-f]{64}$')"
+    ]
   }
 }
 
@@ -12,6 +16,9 @@ config {
 -- Dedup por data_referencia: reingestão da mesma janela rebaixa o boletim
 -- anterior. `sha256` distinto entre ingestões do mesmo dia significa que a
 -- origem republicou o boletim corrigido — o histórico fica no Bronze.
+-- Faixas (issue #110): boletim de zero byte é falha de origem que passou pela
+-- guarda do conector. O `sha256` malformado inutilizaria a deteccão de
+-- republicação, que é a única razão de a coluna existir.
 SELECT
   data_referencia,
   FORMAT_DATE('%Y-%m', data_referencia) AS periodo_apuracao,

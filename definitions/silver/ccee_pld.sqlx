@@ -4,7 +4,12 @@ config {
   tags: ["silver"],
   assertions: {
     uniqueKey: ["data_referencia", "hora", "submercado"],
-    nonNull: ["data_referencia", "hora", "submercado", "pld_reais_mwh"]
+    nonNull: ["data_referencia", "hora", "submercado", "pld_reais_mwh"],
+    rowConditions: [
+      "submercado IN ('N','NE','S','SE')",
+      "hora BETWEEN 0 AND 23",
+      "pld_reais_mwh >= 0"
+    ]
   }
 }
 
@@ -12,6 +17,9 @@ config {
 -- Dedup por (data_referencia, hora, submercado): a CCEE recontabiliza período
 -- já publicado (ADR 016), então vence a ingestão mais recente. É o mesmo
 -- critério do ONS, pela mesma razão — origem que revisa o passado.
+-- Faixas (issue #110): o PLD tem piso regulatório positivo. `hora` é derivada
+-- do PERIODO_COMERCIALIZACAO, e um off-by-one no cálculo apareceria aqui como
+-- hora 24 — é a asserção que pega o erro mais caro desta fonte.
 SELECT
   data_referencia,
   hora,

@@ -4,12 +4,18 @@ config {
   tags: ["silver"],
   assertions: {
     uniqueKey: ["negocio_id"],
-    nonNull: ["negocio_id"]
+    nonNull: ["negocio_id"],
+    rowConditions: [
+      "valor IS NULL OR valor >= 0",
+      "data_fechamento IS NULL OR data_fechamento >= DATE(criado_em)"
+    ]
   }
 }
 
 -- Silver: negócios do CRM, uma linha por negócio na versão mais recente.
 -- Dedup por `negocio_id`: o mesmo negócio é reingerido a cada mudança de estágio.
+-- Faixas (issue #110): negócio sem valor é comum no início do funil, então
+-- nulo passa. Data de fechamento anterior à criação é erro de origem.
 SELECT
   DATE(modificado_em)  AS data_referencia,
   CAST(NULL AS STRING) AS submercado,    -- CRM não tem recorte de submercado

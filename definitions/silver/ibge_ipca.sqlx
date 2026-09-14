@@ -4,13 +4,19 @@ config {
   tags: ["silver"],
   assertions: {
     uniqueKey: ["data_referencia", "variavel_id"],
-    nonNull: ["data_referencia", "variavel_id"]
+    nonNull: ["data_referencia", "variavel_id"],
+    rowConditions: [
+      "valor IS NOT NULL"
+    ]
   }
 }
 
 -- Silver: IPCA higienizado e deduplicado, com as dimensões comuns.
 -- Dedup: para cada (data_referencia, variavel_id), vence a ingestão mais recente.
 -- O IBGE revisa série publicada, então a última ingestão é a versão correta.
+-- Faixas (issue #110): o IPCA **pode ser negativo** (deflação), então não há
+-- piso a impor — impor um transformaria deflação em erro. O que se exige é
+-- que o valor exista: série com buraco é o defeito real desta fonte.
 SELECT
   data_referencia,
   CAST(NULL AS STRING) AS submercado,     -- índice nacional, não é dado de submercado

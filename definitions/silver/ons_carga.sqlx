@@ -4,13 +4,20 @@ config {
   tags: ["silver"],
   assertions: {
     uniqueKey: ["data_referencia", "submercado"],
-    nonNull: ["data_referencia", "submercado"]
+    nonNull: ["data_referencia", "submercado"],
+    rowConditions: [
+      "submercado IN ('N','NE','S','SE')",
+      "carga_mwmed > 0"
+    ]
   }
 }
 
 -- Silver: carga diária higienizada e deduplicada.
 -- Dedup por (data_referencia, submercado): o ONS revisa dado publicado, então
 -- vence a ingestão mais recente.
+-- Faixas (issue #110): a sigla do submercado é a chave de cruzamento com a
+-- CCEE — sigla nova sem revisão do contrato entraria como dado silenciosamente
+-- errado. Carga nula ou negativa em MWmed não existe fisicamente.
 SELECT
   data_referencia,
   submercado,

@@ -4,7 +4,12 @@ config {
   tags: ["silver"],
   assertions: {
     uniqueKey: ["data_referencia", "curva", "vertice_em"],
-    nonNull: ["data_referencia", "curva", "vertice_em", "preco_reais_mwh"]
+    nonNull: ["data_referencia", "curva", "vertice_em", "preco_reais_mwh"],
+    rowConditions: [
+      "preco_reais_mwh >= 0",
+      "vertice_em >= data_referencia",
+      "horizonte_dias >= 0"
+    ]
   }
 }
 
@@ -12,6 +17,9 @@ config {
 -- Dedup por (data_referencia, curva, vertice_em): a BBCE revisa a curva
 -- publicada — daí a coluna `atualizado_em` existir —, então vence a ingestão
 -- mais recente. Mesmo critério do ONS e da CCEE, pela mesma razão.
+-- Faixas (issue #110): curva forward precifica o futuro — vértice no passado
+-- é erro de origem. O `horizonte_dias` é derivado nesta própria view, e a
+-- condição o protege de virar negativo se a derivação mudar.
 SELECT
   data_referencia,
   curva,

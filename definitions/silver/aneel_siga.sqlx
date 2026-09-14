@@ -4,13 +4,20 @@ config {
   tags: ["silver"],
   assertions: {
     uniqueKey: ["codigo_usina"],
-    nonNull: ["codigo_usina"]
+    nonNull: ["codigo_usina"],
+    rowConditions: [
+      "COALESCE(potencia_outorgada_kw, 0) >= 0 AND COALESCE(potencia_fiscalizada_kw, 0) >= 0",
+      "uf IS NULL OR LENGTH(uf) = 2"
+    ]
   }
 }
 
 -- Silver: cadastro vigente de usinas — uma linha por empreendimento.
 -- Dedup por codigo_usina: vence a ingestão mais recente. É esta view que
 -- fornece `codigo_usina` como dimensão comum para as demais fontes.
+-- Faixas (issue #110): o cadastro da ANEEL traz campo sujo, e o conector já
+-- converte número ilegível em nulo em vez de descartar a linha inteira. Por
+-- isso as condições toleram nulo e só recusam o que é impossível.
 SELECT
   data_referencia,
   CAST(NULL AS STRING) AS submercado,   -- a ANEEL publica UF, não submercado

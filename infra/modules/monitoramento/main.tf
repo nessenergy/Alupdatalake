@@ -238,6 +238,60 @@ resource "google_monitoring_alert_policy" "invalidos_em_alta" {
   }
 }
 
+# 4. O workflow do Dataform falhou — asserção reprovada, ou erro de execução.
+#
+# É o portão de qualidade da camada Silver (ADR 012, issue #110). Sem este
+# alerta, uma asserção violada não impede nada que alguém perceba: a view
+# continua servindo dado que já foi reprovado, e o erro só aparece quando
+# alguém questiona um número — meses depois, sem rastro de quando começou.
+#
+# O sinal vem do log do próprio serviço: a invocação do workflow registra
+# entrada com severidade ERROR quando termina em falha.
+resource "google_monitoring_alert_policy" "dataform_falhou" {
+  project      = var.project_id
+  display_name = "AlupData ${var.environment} — Dataform falhou (asserção ou execução)"
+  combiner     = "OR"
+
+  conditions {
+    display_name = "Invocação do workflow do Dataform com erro"
+
+    condition_matched_log {
+      filter = join(" AND ", [
+        "resource.type = \"dataform.googleapis.com/Repository\"",
+        "severity >= ERROR",
+      ])
+    }
+  }
+
+  # Log-based alert exige estratégia de notificação; sem ela o Terraform recusa.
+  alert_strategy {
+    notification_rate_limit {
+      # Uma asserção violada costuma violar em várias linhas e várias tabelas
+      # na mesma execução. Sem o limite, uma falha vira dezenas de e-mails e a
+      # equipe aprende a ignorar o alerta — que é o pior resultado possível.
+      period = "3600s"
+    }
+  }
+
+  notification_channels = [for canal in google_monitoring_notification_channel.email : canal.id]
+
+  documentation {
+    content   = <<-EOT
+      O workflow do Dataform terminou em falha.
+
+      1. A causa mais comum é **asserção reprovada**. As linhas que violaram
+         ficam no dataset `qualidade`, uma tabela por asserção — comece por lá,
+         não pelo log.
+      2. Asserção de **faixa** (`rowConditions`) reprovando quase sempre
+         significa que a origem mudou o conteúdo sem mudar o schema: sigla nova
+         de submercado, preço negativo, campo que passou a vir nulo.
+      3. Enquanto não for resolvido, a Silver segue servindo o dado anterior —
+         o Bronze é append-only e nada foi perdido.
+    EOT
+    mime_type = "text/markdown"
+  }
+}
+
 output "canais" {
   description = "IDs dos canais de notificação, para reuso em outros alertas"
   value       = [for canal in google_monitoring_notification_channel.email : canal.id]

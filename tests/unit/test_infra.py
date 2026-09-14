@@ -461,3 +461,44 @@ def test_alerta_de_frescor_distingue_entidades_da_mesma_fonte() -> None:
     scheduler = _ler("infra/modules/scheduler/main.tf")
     assert "ccee_pld" in scheduler
     assert "ccee_perfil" in scheduler
+
+
+def test_alerta_quando_o_workflow_do_dataform_falha() -> None:
+    """Asserção violada que ninguém vê não é portão de qualidade (issue #110).
+
+    O workflow diário roda às 11h e, se uma asserção reprovar, a invocação
+    termina em falha. Sem alerta, a Silver segue servindo dado que já foi
+    reprovado — e o erro só aparece quando alguém questiona um número.
+    """
+    monitoramento = _ler("infra/modules/monitoramento/main.tf")
+
+    assert 'resource "google_monitoring_alert_policy" "dataform_falhou"' in monitoramento
+    assert "dataform.googleapis.com" in monitoramento
+    # o alerta precisa chegar em alguém
+    assert "notification_channels" in monitoramento
+
+
+def test_toda_silver_tem_assercao_de_faixa() -> None:
+    """Unicidade e obrigatoriedade repetem o QUALIFY e os NOT NULL (ADR 012).
+
+    A faixa é a única das três que pega mudança silenciosa de conteúdo na
+    origem — sigla nova de submercado, preço negativo, hora fora do dia.
+    """
+    silver = sorted((RAIZ / "definitions" / "silver").glob("*.sqlx"))
+    assert silver, "nenhuma view Silver encontrada"
+
+    sem_faixa = [p.name for p in silver if "rowConditions" not in p.read_text(encoding="utf-8")]
+
+    assert not sem_faixa, f"Silver sem asserção de faixa: {', '.join(sem_faixa)}"
+
+
+def test_row_conditions_e_lista_e_nao_objeto_nomeado() -> None:
+    """O Dataform aceita `rowConditions` como string[]; a forma nomeada não compila.
+
+    Descoberto compilando: `rowConditions: {nome: "expr"}` é recusado com
+    ReferenceError, e o erro aparece como dependência faltando nas Gold — a
+    causa fica três camadas longe do sintoma.
+    """
+    for p in (RAIZ / "definitions" / "silver").glob("*.sqlx"):
+        texto = p.read_text(encoding="utf-8")
+        assert "rowConditions: {" not in texto, f"{p.name}: rowConditions como objeto não compila"

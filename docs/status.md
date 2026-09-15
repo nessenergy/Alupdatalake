@@ -109,7 +109,9 @@ rede e segurança são A/R da TI da Alup** — sustenta o registro de atraso de 
 e A3. Três divergências a conciliar: camada "Core" por Gold, "Fase" por Onda e
 um **Comitê** sem membros como accountable da passagem de fase e da sustentação
 — além do Google como accountable da arquitetura, que a ness. recomenda
-rebaixar a consultado.
+rebaixar a consultado. Os dois pontos que precisam de resposta da Alup estão na
+[issue #150](https://github.com/nessenergy/Alupdatalake/issues/150); o de-para
+Fase↔Onda e Core↔Gold está resolvido em [`raci.md`](raci.md) §5.
 
 Material de reunião: baralho de kickoff e **baralho de revisão arquitetural em
 GCP** (`apresentacoes/revisao-arquitetural-gcp.html`) — origem, tratamento e

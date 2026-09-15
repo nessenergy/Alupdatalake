@@ -107,3 +107,46 @@ corporativa"). Para uso operacional, é preciso ler junto com
 
 > Nenhuma destas questões bloqueia trabalho técnico. O que bloqueia continua
 > sendo **A3** (ambiente GCP), **A7** e **A9**.
+
+As perguntas 1 e 2 são cobradas na
+[issue #150](https://github.com/nessenergy/Alupdatalake/issues/150); a 3 está
+resolvida do nosso lado na seção 5.
+
+---
+
+## 5. De-para com o contrato
+
+Tradução da ness., não do documento recebido. Serve para ler a matriz sem
+ambiguidade na medição; não depende de resposta da Alup.
+
+### 5.1 Fase ↔ Onda
+
+| Fase no documento | Onda do contrato (cláusula 4ª) | Horas | Marco |
+|---|---|---|---|
+| Fase 0 — Arquitetura e governança | **Onda 0** — Fundação & Arquitetura | 90h | 15,52% · R$ 23.040,00 |
+| Fase 1 — Industrialização inicial | **Ondas 1, 2 e 3** — as 13 fontes, das públicas aos sistemas internos | 120h + 110h + 155h | 20,69% + 18,97% + 26,72% |
+| Fase 2 — Expansão | **Onda 4** — Planilhas, Governança & Handoff | 105h | 18,10% · R$ 26.880,00 |
+| Operação assistida | **Fora do preço**: garantia de 30 dias por onda (cláusula 9ª) e sustentação opcional de 20h/mês por R$ 5.120,00 (cláusula 10ª) | — | — |
+
+Duas ressalvas, e a primeira é a que mais confunde:
+
+1. **"Fase" já está ocupado.** O contrato chama o projeto inteiro de *AlupData
+   **Fase 1**: DataLake* e reserva a *Fase 3* para IA/ML (cláusula 5ª). A
+   "Fase 1" do documento — industrialização — **não é** a "Fase 1" do contrato,
+   que é tudo. Em medição, homologação e relatório, a ness. fala em **Onda**.
+2. **"Expansão" não é continuação, é escopo novo.** A Fase 2 do documento cita
+   "expande fontes" e "eventual uso de IA". Fonte além das 13 contratadas e
+   modelo de IA/ML são exclusão expressa da cláusula 5ª. A Onda 4 entrega
+   planilhas, Dataplex, KPIs e handoff — não expansão.
+
+### 5.2 Core ↔ Gold
+
+Onde o documento diz **Core**, leia-se **Gold**. A cláusula 2ª define os 7
+componentes por conector, e o de número 04 é **View Gold** — "regras de negócio
+complexas e KPIs consolidados". A arquitetura Medallion do projeto é
+Bronze/Silver/Gold (ADR 001 e seguintes), e é assim que estão nomeados os
+datasets, as views e o dicionário de dados.
+
+Consequência prática: *"homologar dados tratados e camada Core"*, na matriz, é
+**homologar as views Gold da onda**. Não há no projeto uma camada chamada Core,
+e criar uma para casar com o documento seria retrabalho sem ganho.

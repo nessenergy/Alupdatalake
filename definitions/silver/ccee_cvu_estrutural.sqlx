@@ -4,7 +4,7 @@ config {
   tags: ["silver"],
   assertions: {
     uniqueKey: ["periodo_apuracao_ccee", "ano_horizonte", "codigo_parcela_usina", "leilao", "produto", "codigo_modelo_preco"],
-    nonNull: ["data_referencia", "periodo_apuracao_ccee", "versao_publicacao", "ano_horizonte", "codigo_parcela_usina", "cvu_estrutural"],
+    nonNull: ["data_referencia", "periodo_apuracao_ccee", "versao_publicacao", "ano_horizonte", "codigo_parcela_usina", "leilao", "produto", "codigo_modelo_preco", "cvu_estrutural"],
     rowConditions: [
       "periodo_apuracao = periodo_apuracao_ccee",
       "cvu_estrutural >= 0",

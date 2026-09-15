@@ -91,10 +91,17 @@ publicação — opção B da ADR 016.
 
 ## Gold
 
-`gold.cvu_estrutural_vigente_usina` — o CVU de cada usina por ano de
-horizonte, como publicado no mês de referência mais recente (`QUALIFY` por
-`periodo_apuracao DESC`). Cruza com `geracao_mensal_usina` por
-`codigo_parcela_usina`. Sem KPI (ADR 012).
+`gold.cvu_estrutural_vigente_usina` — grão de uma linha por (`codigo_parcela_usina`,
+`leilao`, `produto`, `codigo_modelo_preco`, `ano_horizonte`): a chave da
+Silver perfilada no Step 1 menos o mês. `codigo_modelo_preco` entra na
+partição do `QUALIFY` pelo mesmo motivo da chave da Silver — sem ela, a chave
+de quatro colunas (usina, leilão, produto, horizonte) tinha 185 duplicatas no
+arquivo real, e um empate no mês faria o `ROW_NUMBER()` descartar uma das duas
+linhas de forma não determinística. Vigência: `QUALIFY` por
+`periodo_apuracao DESC, versao_publicacao DESC` — o mês mais recente publicado
+vence, e a versão mais recente desempata duas publicações do mesmo mês.
+Cruza com `geracao_mensal_usina` por `codigo_parcela_usina`. Sem KPI
+(ADR 012).
 
 ## Qualidade e observações
 

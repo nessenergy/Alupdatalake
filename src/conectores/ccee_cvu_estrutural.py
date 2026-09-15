@@ -52,8 +52,8 @@ class CvuEstrutural(BaseModel):
     def _parseia_data_br(cls, valor: Any) -> Any:
         """`dd/mm/aaaa` cru → `date`. Formato que não bate vira `ValidationError`
         (linha inválida, não crash) — o `ValueError` do `strptime` é capturado
-        pelo próprio pydantic, aqui dentro do validador (mesma regra da
-        geração horária, #141)."""
+        pelo próprio pydantic, aqui dentro do validador: mesma regra da
+        geração horária, falha de parse vira `ValidationError`, contada."""
         if isinstance(valor, str):
             texto = limpar(valor)
             return datetime.strptime(texto, "%d/%m/%Y").date() if texto else None
@@ -87,6 +87,6 @@ class CceeCvuEstrutural(CceeCsvCkan):
             "produto": limpar(bruto.get("PRODUTO")),
             "cvu_estrutural": numero_ou_nulo(bruto.get("CVU_ESTRUTURAL")),
             "codigo_modelo_preco": limpar(bruto.get("CODIGO_MODELO_PRECO")),
-            "inicio_suprimento": limpar(bruto.get("INICIO_SUPRIMENTO")) or None,
-            "termino_suprimento": limpar(bruto.get("TERMINO_SUPRIMENTO")) or None,
+            "inicio_suprimento": bruto.get("INICIO_SUPRIMENTO"),  # o validador do schema já limpa e converte
+            "termino_suprimento": bruto.get("TERMINO_SUPRIMENTO"),
         }

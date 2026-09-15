@@ -83,11 +83,11 @@ existe em Gold. Ordenados pelo B1.
 
 | | |
 |---|---|
-| **Fontes hoje** | `ccee_pld` (à vista, horário) · `ons_carga` · `bbce_curva_forward` (futuro negociado) · `ccee_perfil` (60 mil perfis) · `ccee_agente` · `ccee_encargo_ess` · `ccee_energia_reserva` · `ccee_cvu_estrutural` |
-| **Fontes a conectar** | EAR e ENA (ONS) |
+| **Fontes hoje** | `ccee_pld` (à vista, horário) · `ons_carga` · `ons_ear` · `ons_ena` · `bbce_curva_forward` (futuro negociado) · `ccee_perfil` (60 mil perfis) · `ccee_agente` · `ccee_encargo_ess` · `ccee_energia_reserva` · `ccee_cvu_estrutural` |
+| **Fontes a conectar** | — a hidrologia (EAR e ENA) entrou em 15/09 |
 | **Granularidade** | submercado e hora, para o PLD; submercado e dia, para a carga; vértice de entrega, para a curva |
 | **Cadência** | PLD mensal, por fechamento da CCEE; carga diária; curva por pregão |
-| **Gold hoje** | `pld_mensal_submercado`, `carga_mensal_submercado`, `curva_forward_vigente`, `agentes_ccee`, `agentes_por_classe_mensal`, `encargos_setoriais_mensal`, `cvu_estrutural_vigente_usina` |
+| **Gold hoje** | `pld_mensal_submercado`, `carga_mensal_submercado`, `mercado_mensal_submercado`, `armazenamento_e_afluencia_mensal`, `curva_forward_vigente`, `agentes_ccee`, `agentes_por_classe_mensal`, `encargos_setoriais_mensal`, `cvu_estrutural_vigente_usina` |
 | **Situação** | **pronto do lado da CCEE** — faltam EAR e ENA, que são do ONS |
 
 É o domínio mais maduro e o que sustenta os demais: quase toda pergunta
@@ -108,11 +108,11 @@ do Gabriel Barreto.
 
 | | |
 |---|---|
-| **Fontes hoje** | `aneel_siga` (cadastro público) · `ccee_geracao_usina` |
-| **Fontes a conectar** | geração e térmicas do ONS · DESSEM · **Oracle FMB** (Onda 3, medição do portfólio) |
+| **Fontes hoje** | `aneel_siga` (cadastro público) · `ccee_geracao_usina` · `ons_geracao_usina` · `ons_capacidade` |
+| **Fontes a conectar** | **térmicas do ONS** (`cvu-usitermica`, `geracao-termica-despacho`) · DESSEM · **Oracle FMB** (Onda 3, medição do portfólio) — a geração horária do ONS entrou em 15/09 |
 | **Granularidade** | **usina** — a granularidade que A7 fixa para dado de portfólio |
 | **Cadência** | semanal para o cadastro público; mensal para a geração da CCEE; diária para medição, na janela das 22h às 6h (C9) |
-| **Gold hoje** | `parque_gerador`, `geracao_mensal_usina` |
+| **Gold hoje** | `parque_gerador`, `geracao_mensal_usina`, `geracao_mensal_usina_ons`, `capacidade_instalada_vigente_usina`, `de_para_usina` |
 | **Situação** | **parcial** — geração na granularidade de usina entregue; `codigo_usina` cruza ANEEL↔ONS desde 15/09 (`gold.de_para_usina`); falta a sigla interna (#141) |
 
 **Tem um bloqueio nomeado**: o item D1 informa que a Alup identifica os ativos

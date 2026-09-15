@@ -62,16 +62,21 @@ contexto para agentes, em [`../AGENTS.md`](../AGENTS.md).
 | **CCEE/agente** | CSV anual, UTF-8 e ISO-8859-1 misturados por linha, via CKAN | **32.886 registros / 2 meses**, 0 inválidos, 4,2 s, contra a API real | mensal, dia 6 às 10h, janela 120 dias |
 | **CCEE/exposição financeira** | CSV anual, ASCII, série mensal sem agente, via CKAN | **7 registros / 7 meses**, 0 inválidos, 0,9 s, contra a API real | mensal, dia 6 às 10h, janela 120 dias |
 | **CCEE/contabilização por perfil** | CSV anual, UTF-8 e ISO-8859-1 misturados por linha, com recontabilização (ADR 016), via CKAN | **94.710 registros / 2 meses**, 0 inválidos, 11,8 s, contra a API real | mensal, dia 6 às 10h, janela 120 dias |
-| **CCEE/geração por usina** | CSV mensal, gzip, via CKAN | **2.964.096 registros / 1 mês**, 0 inválidos, 177,7 s **em dry-run** (raw e carga pulados; não é o tempo da execução real), contra a API real | mensal, dia 7 às 3h, janela **40 dias** (era 70 — o runner materializa o mês inteiro em memória; 70 dias abria 3-4 meses de uma vez, risco de OOM no Cloud Run Job de 512Mi padrão), 4Gi/2 vCPU declarados como premissa a confirmar no 1º apply |
+| **CCEE/geração por usina** | CSV mensal, gzip, via CKAN | **2.964.096 registros / 1 mês**, 0 inválidos, 177,7 s **em dry-run** (raw e carga pulados; não é o tempo da execução real), contra a API real | mensal, dia 7 às 3h, janela **40 dias** (cobre o mês fechado com folga sem abrir um quarto recurso mensal), **1Gi/2 vCPU medidos**, não mais premissa: com o runner em fatias o pico é de 225 MiB (#152) |
 | **CCEE/montantes contratados** | CSV anual, UTF-8 e ISO-8859-1 misturados por linha, via CKAN | **53.267 registros / 2 meses**, 0 inválidos, 4,8 s, contra a API real | mensal, dia 6 às 10h, janela 120 dias |
 | **CCEE/consumo varejista** | CSV anual, via CKAN | **6.664 registros / 2 meses**, 0 inválidos, 1,2 s, contra a API real | mensal, dia 6 às 10h, janela 120 dias |
 | **CCEE/ESS** | CSV anual, série mensal sem agente, via CKAN | **7 registros / 7 meses**, 0 inválidos, contra a API real | mensal, dia 6 às 10h, janela 120 dias |
 | **CCEE/energia de reserva (EER)** | CSV anual, série mensal sem agente, via CKAN | **7 registros / 7 meses**, 0 inválidos, contra a API real | mensal, dia 6 às 10h, janela 120 dias |
 | **CCEE/CVU estrutural** | CSV anual, delimitador vírgula, via CKAN | **805 registros / 2 meses**, 0 inválidos, contra a API real | mensal, dia 6 às 10h, janela 120 dias |
+| **ONS/EAR** | CSV por ano, reservatório por submercado, via CKAN | **0 inválidos**, contra a API real | diário, janela 30 dias |
+| **ONS/ENA** | CSV por ano, afluência por submercado, via CKAN | **0 inválidos**, contra a API real | diário, janela 30 dias |
+| **ONS/geração por usina** | CSV mensal, horário, por usina, via CKAN | **533.832 linhas / 1 mês**, 0 inválidos; `val_geracao` vem vazio em ~12% das linhas (usina sem medição na hora) e vira NULL em vez de zero | diário, janela 30 dias |
+| **ONS/capacidade instalada** | CSV de cadastro, por unidade geradora, via S3 | **5.688 registros**, 0 inválidos; aceitar `PY` (Itaipu/Paraguai, 10 unidades) fez o cadastro ganhar **7.000 MW**, de 200.233 para 207.233 MW | semanal |
 
-**Dezesseis das dezenove falaram com a API real** em dry-run: as seis que já
-falavam, somadas às nove entidades novas da CCEE (ADR 021) e ao `bcb_juros`,
-todas verificadas em 14/09. Hubspot e BBCE seguem as exceções: os 7 componentes
+**Vinte das vinte e três falaram com a API real** em dry-run: as dezesseis de
+14/09 — as seis originais, as nove entidades novas da CCEE (ADR 021) e o
+`bcb_juros` — somadas às **quatro fontes do ONS de 15/09** (EAR, ENA, geração
+horária e capacidade instalada). Hubspot e BBCE seguem as exceções: os 7 componentes
 existem, escritos contra a documentação, e o teste de integração está `skipif`
 até a credencial chegar (A9 e A7). No BBCE falta inclusive o **host**, que não
 consta da documentação pública e vem junto com o acesso.

@@ -226,8 +226,15 @@ class CceeCsvCkan(Conector):
         # novo fluxo a espiar, até os dois primeiros bytes deixarem de ser magic.
         # `GzipFile` tem `peek()` próprio (delega ao seu buffer interno), então
         # a segunda volta do laço não precisa reenvelopar em `_SemErroAoFechar`.
+        #
+        # `mode="rb"` é obrigatório, não cosmético: omitido, o `gzip` deduz o
+        # modo do `fileobj` com `getattr(fileobj, "mode", "rb")` — e o `mode` de
+        # um `GzipFile` é uma **string** no Python 3.13 e um **int** no 3.12.
+        # Aninhar um no outro sem fixar o modo quebra com `AttributeError` na
+        # versão que o CI e a imagem de produção usam, e não na estação de quem
+        # escreve. O teste de gzip duplo passava aqui e falhava lá.
         while fluxo.peek(2)[:2] == _GZIP_MAGIC:
-            fluxo = gzip.GzipFile(fileobj=fluxo)  # type: ignore[assignment]
+            fluxo = gzip.GzipFile(fileobj=fluxo, mode="rb")  # type: ignore[assignment]
         texto = (decodificar(linha).rstrip("\r\n") for linha in fluxo)
         yield from csv.DictReader(texto, delimiter=self.delimitador)
 

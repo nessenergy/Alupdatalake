@@ -1,10 +1,11 @@
 # Estado do projeto
 
-Atualizado em **2026-09-14** · **A3 completa hoje o 5º dia útil de atraso** —
+Atualizado em **2026-09-15** · **A3 chega hoje ao 6º dia útil de atraso** —
 vencido em 04/09, previsão da Alup para 18/09, contagem da cláusula 3ª em
-curso. Em 14/09 a Alup entregou a documentação das APIs: **A2 encerrada e A8
-atendida**, e as 32h da CCEE voltaram a andar sem depender da contratante
-(ADR 018)
+curso; **passou dos 5 dias úteis, o cronograma está postergado**. Em 14/09 a
+Alup entregou a documentação das APIs (**A2 encerrada e A8 atendida**) e em
+15/09 a **matriz RACI do projeto** ([`raci.md`](raci.md)), que não altera
+prazo nem desbloqueia frente de trabalho
 
 Este arquivo responde "onde estamos e o que trava o próximo passo". Detalhe de
 escopo e estimativa fica em [`plano-execucao.md`](plano-execucao.md); o que sai
@@ -98,6 +99,17 @@ ADRs 001–021 · 11 dicionários de dados com [índice e linhagem](dicionario-d
 de primeiro deploy e de acompanhamento semanal ·
 [`proximos-passos.md`](proximos-passos.md) como fila de execução ·
 `AGENTS.md` como contexto canônico · skills do projeto e shortlist do Google.
+
+**Matriz RACI do projeto recebida da Alup em 15/09** e transcrita em
+[`raci.md`](raci.md) — governança por atividade e por fase. Não reabre nem
+fecha pendência: A5 segue encerrada e a lacuna 2 de
+[`interlocutores.md`](interlocutores.md) (RACI **por domínio de dado**)
+continua aberta. O documento **corrobora por escrito que landing zone, IAM,
+rede e segurança são A/R da TI da Alup** — sustenta o registro de atraso de A1
+e A3. Três divergências a conciliar: camada "Core" por Gold, "Fase" por Onda e
+um **Comitê** sem membros como accountable da passagem de fase e da sustentação
+— além do Google como accountable da arquitetura, que a ness. recomenda
+rebaixar a consultado.
 
 Material de reunião: baralho de kickoff e **baralho de revisão arquitetural em
 GCP** (`apresentacoes/revisao-arquitetural-gcp.html`) — origem, tratamento e

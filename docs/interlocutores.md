@@ -3,11 +3,11 @@
 Quem é quem nas conversas do AlupData — Fase 1, contrato CPS-01025/2026.
 
 Este arquivo responde uma pergunta operacional: **para quem eu levo isto?**
-Ele não substitui a matriz RACI por domínio de dados (dependência **A5**), que é
-artefato de governança e cabe à Alup produzir. Aqui ficam as pessoas que já
-estão na mesa; lá ficará quem responde por cada domínio analítico. Os data
-owners por domínio de dado, respondidos no B1 em 11/09, estão na seção própria
-abaixo.
+Ele não substitui a matriz RACI. A **matriz por atividade e por fase** chegou da
+Alup em 15/09 e está em [`raci.md`](raci.md); a **matriz por domínio de dado**
+continua faltando (lacuna 2 abaixo). Aqui ficam as pessoas que já estão na
+mesa; lá ficam os papéis. Os data owners por domínio de dado, respondidos no B1
+em 11/09, estão na seção própria abaixo.
 
 ---
 
@@ -92,7 +92,7 @@ lado:
 | # | O que falta | Por que importa | Onde é cobrado |
 |---|---|---|---|
 | 1 | ~~**Substituto do ponto focal técnico** da Alup~~ | se toda liberação de acesso passa por uma única pessoa, uma ausência para o projeto | **Resolvida em 11/09**: Mauricio (B2) |
-| 2 | **Matriz RACI** por domínio — os data owners já vieram | a matriz completa diz também quem aprova, quem é consultado e quem é informado | **A5**; data owners respondidos no B1 em 11/09 |
+| 2 | **Matriz RACI por domínio** — os data owners já vieram | a matriz completa diz também quem aprova, quem é consultado e quem é informado *em cada domínio* | **A5** encerrada (B1, 11/09). A RACI **por atividade** chegou em 15/09 — [`raci.md`](raci.md) —, mas não desce ao domínio |
 | 3 | ~~**Quem administra o Workload Identity Federation**~~ | é o único item do provisionamento que exige familiaridade com OIDC | **Resolvida em 11/09**: a ness. (E6) |
 | 4 | ~~**Quem recebe os alertas** de falha de ingestão~~ | os alertas existem e não notificam ninguém | **Resolvida em 11/09**: `alup.alertas@alupar.com.br` (E3) |
 

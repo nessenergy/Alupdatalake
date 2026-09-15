@@ -1,0 +1,34 @@
+config {
+  type: "operations",
+  schema: "bronze",
+  hasOutput: true,
+  tags: ["bronze"]
+}
+
+-- Bronze: disponibilidade horária por usina (ONS, dados abertos, CSV mensal).
+-- ~117 mil linhas por mês (agosto/2026, 17 MB): 158 usinas × 24 h × 31 dias.
+-- Cobre só o parque despachado centralmente — UHE, UTE e UTN.
+CREATE TABLE IF NOT EXISTS ${self()} (
+  data_referencia              DATE      NOT NULL OPTIONS(description="Dia, derivado de din_instante"),
+  hora                         INT64     NOT NULL OPTIONS(description="0 a 23, derivada de din_instante"),
+  submercado                   STRING    NOT NULL OPTIONS(description="N, NE, S, SE"),
+  nome_subsistema              STRING    NOT NULL,
+  uf                           STRING    NOT NULL,
+  nome_uf                      STRING    NOT NULL,
+  tipo_usina                   STRING    NOT NULL OPTIONS(description="UHE, UTE, UTN"),
+  tipo_combustivel             STRING    NOT NULL,
+  nome_usina                   STRING    NOT NULL,
+  id_ons                       STRING    OPTIONS(description="Identificador ONS da usina"),
+  codigo_usina                 STRING    OPTIONS(description="CEG na forma canônica (src/core/ceg.py); preenchido em 100% das linhas de agosto/2026"),
+  potencia_instalada           NUMERIC   OPTIONS(description="MW instalados da usina"),
+  disponibilidade_operacional  NUMERIC   OPTIONS(description="MW aptos a gerar na hora; zero é usina indisponível, não ausência de dado"),
+  disponibilidade_sincronizada NUMERIC   OPTIONS(description="MW sincronizados na hora"),
+
+  _ingestao_id                 STRING    NOT NULL,
+  _ingestao_timestamp          TIMESTAMP NOT NULL,
+  _fonte                       STRING    NOT NULL,
+  _schema_versao               STRING    NOT NULL
+)
+PARTITION BY DATE(_ingestao_timestamp)
+CLUSTER BY data_referencia, submercado
+OPTIONS(description="Disponibilidade horária por usina (ONS) — camada Bronze, append-only");

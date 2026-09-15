@@ -1,0 +1,49 @@
+config {
+  type: "view",
+  schema: "silver",
+  tags: ["silver"],
+  assertions: {
+    uniqueKey: ["data_referencia", "hora", "nome_usina"],
+    nonNull: ["data_referencia", "hora", "nome_usina", "submercado"],
+    rowConditions: [
+      "submercado IN ('N','NE','S','SE')",
+      "potencia_instalada IS NULL OR potencia_instalada >= 0",
+      "disponibilidade_operacional IS NULL OR disponibilidade_operacional >= 0",
+      "disponibilidade_sincronizada IS NULL OR disponibilidade_sincronizada >= 0"
+    ]
+  }
+}
+
+-- Silver: disponibilidade horária por usina, higienizada e deduplicada.
+-- Dedup por (data_referencia, hora, nome_usina), como no `ons_geracao_usina`:
+-- vence a ingestão mais recente, porque o ONS revisa dado publicado.
+--
+-- As três medidas aceitam NULL de propósito — vazio na origem é ausência de
+-- medida. O que **não** pode virar NULL é o zero: usina indisponível na hora é
+-- exatamente o que esta fonte existe para mostrar, e confundir "parada" com
+-- "sem dado" inverteria a leitura.
+SELECT
+  data_referencia,
+  submercado,
+  codigo_usina,
+  CAST(NULL AS STRING) AS agente_ccee,  -- o ONS não usa perfil da CCEE
+  FORMAT_DATE('%Y-%m', data_referencia) AS periodo_apuracao,
+  CAST(NULL AS STRING) AS periodo_apuracao_ccee,  -- a origem não declara período próprio
+  hora,
+  nome_subsistema,
+  uf,
+  nome_uf,
+  tipo_usina,
+  tipo_combustivel,
+  nome_usina,
+  id_ons,
+  potencia_instalada,
+  disponibilidade_operacional,
+  disponibilidade_sincronizada,
+  _ingestao_id,
+  _ingestao_timestamp
+FROM ${ref("bronze", "ons_disponibilidade_usina")}
+QUALIFY ROW_NUMBER() OVER (
+  PARTITION BY data_referencia, hora, nome_usina
+  ORDER BY _ingestao_timestamp DESC
+) = 1

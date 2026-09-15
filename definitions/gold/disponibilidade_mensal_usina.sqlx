@@ -1,0 +1,39 @@
+config {
+  type: "table",
+  schema: "gold",
+  tags: ["gold"]
+}
+
+-- Gold: quanto cada usina esteve apta a gerar no mês, e quantas horas ficou
+-- com disponibilidade zero.
+--
+-- É a peça que faltava para ler `geracao_mensal_usina_ons` sem adivinhar: uma
+-- usina com geração baixa pode estar parada ou apenas não despachada, e a
+-- diferença muda a conclusão. Aqui as duas leituras ficam lado a lado, por
+-- mês e usina, sem razão calculada entre elas (ADR 012: Gold descritiva, sem
+-- KPI — decidir se 40 horas indisponíveis é muito é decisão de negócio).
+--
+-- `horas_indisponivel` conta a disponibilidade **igual a zero**, não a nula:
+-- zero é a usina parada, NULL é a hora sem medida publicada, e `horas_com_medida`
+-- diz quantas horas sustentam as médias.
+SELECT
+  periodo_apuracao,
+  nome_usina,
+  codigo_usina,
+  submercado,
+  uf,
+  tipo_usina,
+  tipo_combustivel,
+
+  COUNT(*)                                                      AS horas_no_mes,
+  COUNTIF(disponibilidade_operacional IS NOT NULL)              AS horas_com_medida,
+  COUNTIF(disponibilidade_operacional = 0)                      AS horas_indisponivel,
+
+  MAX(potencia_instalada)                                       AS potencia_instalada_mw,
+  AVG(disponibilidade_operacional)                              AS disponibilidade_media_mw,
+  MIN(disponibilidade_operacional)                              AS disponibilidade_minima_mw,
+  MAX(disponibilidade_operacional)                              AS disponibilidade_maxima_mw,
+  AVG(disponibilidade_sincronizada)                             AS sincronizada_media_mw
+
+FROM ${ref("silver", "ons_disponibilidade_usina")}
+GROUP BY periodo_apuracao, nome_usina, codigo_usina, submercado, uf, tipo_usina, tipo_combustivel

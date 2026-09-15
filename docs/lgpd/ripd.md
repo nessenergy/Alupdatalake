@@ -1,6 +1,6 @@
 # RIPD — Relatório de Impacto à Proteção de Dados Pessoais da plataforma AlupData
 
-**Versão** 0.6 · **Data** 2026-09-11 · **Situação**: minuta técnica, para
+**Versão** 0.7 · **Data** 2026-09-14 · **Situação**: minuta técnica, para
 revisão e aprovação da controladora
 
 Minuta elaborada pela ness. no âmbito do contrato CPS-01025/2026, conforme a
@@ -133,7 +133,7 @@ variáveis calculadas pela Comercialização, e o balanço energético da empres
 | Usuários da plataforma | E-mail de quem executa consultas, nos logs de *jobs* do BigQuery; lido pelo Knowledge Catalog (ADR 014). A view `gold.custo_consultas` não o seleciona | — | Sim | Característica do serviço |
 | Portal Alup (Onda 3) | **Desconhecido** — possivelmente dado de clientes | — | — | **[ALUP]** pergunta C6 |
 | FMB, MySQL Comercialização, RM/TOTVS, SQL Server do Balanço (Onda 3) | **Desconhecido**. A resposta à pergunta F1 não aponta dado pessoal; os dados da Comercialização e o balanço são confidenciais | Em parte | — | Schema pendente |
-| Fontes públicas (BCB, IBGE, ONS, ANEEL, CCEE pública) e de mercado licenciadas (BBCE, TempoOK) | Nenhum. A ANEEL SIGA lê só dados do empreendimento | Não | Não | Confirmado nos dicionários de dados |
+| Fontes públicas (BCB, IBGE, ONS, ANEEL, CCEE pública) e de mercado licenciadas (BBCE, TempoOK) | Nenhum. A ANEEL SIGA lê só dados do empreendimento. O `ccee_perfil` traz CNPJ e razão social de ~60,5 mil perfis — identificador de empresa, não de pessoa natural | Não | Não | **Verificado em 14/09 contra o retrato de 01/09**: nenhum documento de 11 dígitos entre os 60.509; as 129 ocorrências de EIRELI/ME são pessoas jurídicas. A asserção `LENGTH(cnpj) = 14` reprova a carga se um CPF entrar (issue #110) |
 
 **O conector do Hubspot lê só negócios.** Ele lê o objeto `deals`, com sete
 propriedades — sem contatos, sem empresas e, desde a decisão de 11/09, sem o
@@ -410,3 +410,4 @@ no código (regra 5).
 | 0.4 | 11/09/2026 | Medidas de R01, R04 e R07 passam a existentes, com a entrada dos PRs #116 e #118 na `main`; região e Portal descritos como estão no Terraform |
 | 0.5 | 11/09/2026 | Respostas da Alup de 11/09 às perguntas F1 a F5, G5 e E4: dados confidenciais do Hubspot, da CCEE e internos, separando o que o conector lê hoje do que depende da confirmação de escopo; distinção entre sensível no sentido legal e confidencial; finalidade F4 (consumo por cliente); controle de acesso por tipo de usuário e *policy tags* passam a requisito; classificação interna; três ambientes; retenção pela política 0.2; envio do relatório de SAST/SCA como pendência |
 | 0.6 | 11/09/2026 | Contatos e empresas do Hubspot ficam fora do escopo, por decisão da Alup: CPF e endereço não são tratados, e a pendência de escopo é encerrada |
+| 0.7 | 14/09/2026 | Fontes públicas reconferidas contra o cadastro real da CCEE (`ccee_perfil`, 60.509 perfis): nenhum CPF, nenhuma pessoa natural. O controle que detecta a mudança é a asserção `LENGTH(cnpj) = 14` da Silver |

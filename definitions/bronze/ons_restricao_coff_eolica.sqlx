@@ -1,0 +1,47 @@
+config {
+  type: "operations",
+  schema: "bronze",
+  hasOutput: true,
+  tags: ["bronze"]
+}
+
+-- Bronze: constrained-off de usinas eólicas (ONS, dados abertos, CSV mensal).
+-- Passo de **30 minutos**, não de hora: 227.664 linhas e 46 MB no mês de
+-- agosto/2026, 153 usinas e conjuntos.
+-- Metade das meias-horas não tem restrição — os campos de restrição vêm nulos
+-- nessas linhas, e isso é "não houve restrição", não dado faltando.
+CREATE TABLE IF NOT EXISTS ${self()} (
+  data_referencia             DATE      NOT NULL OPTIONS(description="Dia, derivado de din_instante"),
+  instante                    DATETIME  NOT NULL OPTIONS(description="Meia hora cheia: minuto 00 ou 30"),
+  submercado                  STRING    NOT NULL OPTIONS(description="N, NE, S, SE"),
+  nome_subsistema             STRING    NOT NULL,
+  uf                          STRING    NOT NULL,
+  nome_uf                     STRING    NOT NULL,
+  nome_usina                  STRING    NOT NULL OPTIONS(description="Usina ou conjunto (prefixo 'Conj.')"),
+  id_ons                      STRING    OPTIONS(description="Identificador ONS; é ele que identifica o conjunto, não o CEG"),
+  codigo_usina                STRING    OPTIONS(description="CEG na forma canônica; só ~7% das linhas o trazem — conjunto não tem CEG próprio"),
+  geracao_mw                  NUMERIC   OPTIONS(description="Pode ser negativa: usina parada consumindo da rede"),
+  geracao_limitada_mw         NUMERIC,
+  disponibilidade_mw          NUMERIC,
+  geracao_referencia_mw       NUMERIC,
+  geracao_referencia_final_mw NUMERIC,
+  razao_restricao             STRING    OPTIONS(description="REL (elétrica), CNF (confiabilidade), ENE (energia); nulo = sem restrição"),
+  origem_restricao            STRING    OPTIONS(description="SIS (sistêmica) ou LOC (local)"),
+  descricao_restricao         STRING,
+  id_ponto_conexao            STRING,
+  nome_ponto_conexao          STRING,
+  agente_operador             STRING,
+  geracao_nao_realizada_mw    NUMERIC   OPTIONS(description="O constrained-off apurado; nulo quando não houve restrição"),
+  minutos_rel                 INT64,
+  minutos_cnf                 INT64,
+  minutos_ene                 INT64,
+  minutos_restricao           INT64,
+
+  _ingestao_id                STRING    NOT NULL,
+  _ingestao_timestamp         TIMESTAMP NOT NULL,
+  _fonte                      STRING    NOT NULL,
+  _schema_versao              STRING    NOT NULL
+)
+PARTITION BY DATE(_ingestao_timestamp)
+CLUSTER BY data_referencia, submercado
+OPTIONS(description="Constrained-off eólico (ONS) — camada Bronze, append-only");

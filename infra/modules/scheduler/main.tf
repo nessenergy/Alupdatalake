@@ -141,6 +141,29 @@ variable "conectores" {
       memoria      = "1Gi"
       cpu          = "1"
     }
+    ons_restricao_coff_eolica = {
+      # Constrained-off eólico: CSV mensal de 46 MB, 227.664 linhas — passo de
+      # 30 minutos, não de hora. Dia 7, uma hora depois da disponibilidade,
+      # mantendo o espaçamento entre os conectores mensais pesados.
+      #
+      # Medido em 15/09 com o mês de agosto: **389 MiB** de pico em 60 s.
+      # 1 GiB dá folga de 2,5x sobre o medido, que é o que cobre o payload do
+      # `load_table_from_json` por fatia — o dry-run não o exercita.
+      cron         = "0 6 7 * *"
+      ultimos_dias = 40
+      memoria      = "1Gi"
+      cpu          = "1"
+    }
+    ons_restricao_coff_fotovoltaica = {
+      # Mesmo arquivo, metade do tamanho: 121.536 linhas, 83 usinas. Meia hora
+      # depois da eólica.
+      #
+      # Medido em 15/09 com o mês de agosto: **275 MiB** de pico em 33 s.
+      cron         = "30 6 7 * *"
+      ultimos_dias = 40
+      memoria      = "1Gi"
+      cpu          = "1"
+    }
     ons_disponibilidade_usina = {
       # Mesmo formato do ons_geracao_usina (CSV mensal do mesmo catálogo), em
       # escala menor: ~117 mil linhas e 17 MB por mês. Roda uma hora depois

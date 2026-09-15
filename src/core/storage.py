@@ -157,3 +157,64 @@ def gravar_raw(execucao: Execucao, registros: list[dict[str, Any]]) -> str | Non
     blob.upload_from_string(gzip.compress(corpo.encode("utf-8")), content_type="application/json")
     logger.info("raw gravado: %s (%d registros)", uri, len(registros))
     return uri
+
+
+class _RawEmFluxo:
+    """Escreve o raw registro a registro, sem montar o arquivo inteiro em memória.
+
+    O `gravar_raw` acima serve a quem já tem a lista na mão — o replay e as
+    fontes pequenas. Para a geração horária da CCEE, que são ~3 milhões de
+    registros por mês, montar a string inteira e só então comprimir custa
+    alguns gigabytes de pico: a versão em fluxo comprime conforme escreve.
+
+    O objeto final é idêntico ao do `gravar_raw`: um JSONL comprimido, no
+    mesmo caminho canônico, um por execução. O replay continua funcionando
+    sem saber qual dos dois o gravou.
+    """
+
+    def __init__(self, execucao: Execucao) -> None:
+        cfg = get_settings()
+        self._caminho = caminho_raw(execucao)
+        self.uri = f"gs://{cfg.bucket_raw}/{self._caminho}"
+        self._dry_run = cfg.dry_run
+        self._registros = 0
+        self._destino: Any = None
+        self._gzip: Any = None
+
+    def __enter__(self) -> _RawEmFluxo:
+        if self._dry_run:
+            return self
+        from google.cloud import storage  # import tardio: teste unitário não precisa do SDK
+
+        cfg = get_settings()
+        blob = storage.Client(project=cfg.gcp_project_id).bucket(cfg.bucket_raw).blob(self._caminho)
+        blob.content_encoding = "gzip"
+        self._destino = blob.open("wb", content_type="application/json")
+        self._gzip = gzip.GzipFile(fileobj=self._destino, mode="wb")
+        return self
+
+    def escrever(self, registro: dict[str, Any]) -> None:
+        self._registros += 1
+        if self._dry_run:
+            return
+        linha = json.dumps(registro, ensure_ascii=False, default=str) + "\n"
+        self._gzip.write(linha.encode("utf-8"))
+
+    def __exit__(self, exc_tipo: Any, exc: Any, tb: Any) -> bool:
+        if self._dry_run:
+            logger.info("dry-run: %d registros não gravados em %s", self._registros, self.uri)
+            return False
+        # Fecha nos dois caminhos: com erro, o objeto parcial fica no GCS e a
+        # execução vai para ERRO — é o que permite ver até onde a origem
+        # respondeu antes de falhar.
+        try:
+            self._gzip.close()
+        finally:
+            self._destino.close()
+        logger.info("raw gravado: %s (%d registros)", self.uri, self._registros)
+        return False
+
+
+def abrir_raw(execucao: Execucao) -> _RawEmFluxo:
+    """Gravador de raw em fluxo, para usar como gerenciador de contexto."""
+    return _RawEmFluxo(execucao)

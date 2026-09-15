@@ -131,8 +131,21 @@ class ConectorTeste(Conector):
         yield {"data_referencia": "2026-01-01", "valor": "1.5"}
 
 
+class _RawMudo:
+    """O raw em fluxo, sem GCS: o runner o usa como gerenciador de contexto."""
+
+    def escrever(self, _registro):
+        return None
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *_):
+        return False
+
+
 def _silenciar_gcp(monkeypatch):
-    monkeypatch.setattr("src.core.conector.gravar_raw", lambda *_a: None)
+    monkeypatch.setattr("src.core.conector.abrir_raw", lambda _e: _RawMudo())
     monkeypatch.setattr("src.core.conector.carregar_bronze", lambda _e, linhas: len(linhas))
     monkeypatch.setattr("src.core.conector.registrar_execucao", lambda _e: None)
 

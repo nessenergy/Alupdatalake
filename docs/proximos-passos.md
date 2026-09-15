@@ -1,7 +1,7 @@
 # Próximos passos — fila de execução
 
 Documento **vivo**: é para riscar linha, não para arquivar. Atualizado em
-**2026-09-14**.
+**2026-09-15**.
 
 Ele existe para responder uma pergunta que os outros três não respondem em uma
 tela: **qual é a próxima ação, de quem é, e qual comando a executa.**
@@ -55,7 +55,8 @@ A cadeia hoje é **em série**, e encurtou: com a revisão do Google feita em
 
 São as duas metades de A3, o único elo que resta antes do primeiro apply. A
 previsão é 18/09; a cláusula 3ª já conta atraso desde 08/09, e **passar de 5
-dias úteis posterga o cronograma** — marca atingida hoje, 14/09.
+dias úteis posterga o cronograma** — marca ultrapassada em 14/09; 15/09 é o 6º
+dia útil de atraso.
 
 ---
 
@@ -93,14 +94,15 @@ Ainda em 11/09, diante do teto de E2: **orquestração da Onda 3 em Cloud Workfl
 
 | O quê | Bloqueado por |
 |---|---|
-| EAR e ENA do ONS | plano próprio — não é escopo desta fila da CCEE |
+| ~~EAR e ENA do ONS~~ | **entregues em 15/09** ([#153](https://github.com/nessenergy/Alupdatalake/pull/153)) |
 | As 19 entidades secundárias da ADR 021 (§2.1/§3 da ADR) | fila priorizada, sem demanda de domínio ainda — mesmo caminho de subclasse de `CceeCsvCkan` quando entrarem |
-| Lote por fatia no runner — `extrair()` já lê em fluxo, mas `conector.py` materializa o mês inteiro em memória antes de gravar o raw e validar | mudança de framework (`_ingerir`), não desta fila; branch própria. Até lá, `ccee_geracao_usina` roda com janela reduzida (40 dias) e `memoria`/`cpu` de 4Gi/2 vCPU declarados como premissa no Terraform |
+| ~~Lote por fatia no runner~~ | **entregue em 15/09** ([#152](https://github.com/nessenergy/Alupdatalake/pull/152)). A memória deixou de ser premissa: medida contra a fonte real, caiu de **9.859 MiB** para **225 MiB** de pico, e o Terraform baixou de 4 GiB para 1 GiB. A janela de 40 dias do `ccee_geracao_usina` continua, por outro motivo — cobre o mês fechado sem abrir um quarto recurso mensal |
 
 | # | Ação | Depende de |
 |---|---|---|
 | ~~4.1~~ | ~~Conector do BBCE~~ — **entregue em 14/09**: `bbce_curva_forward`, 7 componentes, 17 testes. Falta só o acesso (A7, [#23](https://github.com/nessenergy/Alupdatalake/issues/23)) — inclusive o **host**, que não consta da documentação | — |
 | 4.2 | Endurecer o Portal MVP enquanto roda com provedor simulado | decisão 3.4 |
+| 4.8 | **Próxima fonte pública sem insumo da Alup** — candidatas: térmicas do ONS (`cvu-usitermica`, `geracao-termica-despacho-2`), `disponibilidade_usina`, ou as 19 entidades secundárias da ADR 021 | escolha de domínio, não de bloqueio: as três destravam Geração e Operacional pelo lado público |
 | 4.3 | Versão em inglês do baralho | decisão 3.2 |
 | 4.4 | Apagar `docs/fluxo-execucao` e o branch de trabalho, já mesclados; arquivar os dois `backup/*` como tag | permissão — daqui o `git push --delete` e a API respondem 403 |
 | 4.5 | Emitir o relatório de situação da semana | fechamento da S2 (11/09) |
@@ -121,12 +123,26 @@ passarem a existir, e cada um destravou o seguinte.
 | **Os dois calendários viram duas colunas**, com asserção que avisa | [#146](https://github.com/nessenergy/Alupdatalake/pull/146) | encerra a Lacuna 2, que a ADR 021 promoveu a bloqueio real |
 | **Camada gratuita** declarada no modelo de custo | [#147](https://github.com/nessenergy/Alupdatalake/pull/147) | achado do 4.6 |
 
-**Os cinco PRs estão abertos e verdes**, com 8 de 8 verificações. O merge
-depende de revisão — a `main` é protegida desde 11/09 (ADR 010).
+**Os cinco entraram na `main`** — a dependência de forma entre #143 e #146
+(a coluna `periodo_apuracao_ccee` na Silver do `bcb_juros`) foi respeitada na
+ordem de merge, como o teste exigia.
 
-**Ordem sugerida de merge**: #144, #145 e #147 são independentes. Entre #143 e
-#146 há uma dependência de forma: qual entrar depois precisa da coluna
-`periodo_apuracao_ccee` na Silver nova do `bcb_juros`. O teste acusa na hora.
+### O que entrou na fila em 15/09
+
+Nenhum destes depende de insumo da Alup — é a fila que dá para andar sem A3.
+
+| Entrega | PR | O que destravou |
+|---|---|---|
+| **Baralho do estado do desenvolvimento** em 15/09, no formato da casa | [#151](https://github.com/nessenergy/Alupdatalake/pull/151) | material de reunião sem montar nada à mão |
+| **Runner em fatias** — de 9,6 GiB para 225 MiB de pico | [#152](https://github.com/nessenergy/Alupdatalake/pull/152) | tira o item "lote por fatia" desta fila e derruba a memória do job de 4 GiB para 1 GiB |
+| **EAR e ENA diários do ONS** | [#153](https://github.com/nessenergy/Alupdatalake/pull/153) | fecha o domínio Mercado de Energia com a hidrologia que explica carga e preço |
+| **Geração horária e capacidade instalada do ONS** | [#155](https://github.com/nessenergy/Alupdatalake/pull/155) | as usinas do SIN; e o achado de que o ONS publica o CEG |
+| **CEG canônico e `gold.de_para_usina`** | [#156](https://github.com/nessenergy/Alupdatalake/pull/156) | encolhe a [#141](https://github.com/nessenergy/Alupdatalake/issues/141) de quatro colunas para uma |
+
+O #156 nasceu de um bug que só apareceu quando as duas pontas existiram: a
+ANEEL publica o último segmento do CEG com um dígito e o ONS com dois, e o JOIN
+por `codigo_usina` devolvia **zero** de 2.047 usinas. Normalizado na ingestão,
+casam 95,1% do cadastro de capacidade e 98,4% da geração horária.
 
 ### O que segue parado, e por quê
 
@@ -134,7 +150,7 @@ depende de revisão — a `main` é protegida desde 11/09 (ADR 010).
 |---|---|---|
 | 4.2 | Endurecer o Portal MVP | **despriorizado pela decisão 3.4**: com a CCEE destravada, a fila de trabalho útil sem GCP voltou a ser escopo facturável — e foi nela que o dia de 14/09 foi gasto |
 | 4.3 | Versão em inglês do baralho | decisão **3.2**, que é sua |
-| 4.4 | Apagar branches já mescladas e arquivar os `backup/*` como tag | permissão — `git push --delete` e a API respondem 403. **Não retestado após a virada para GitHub Enterprise em 11/09**: pode ter destravado sozinho |
+| ~~4.4~~ | ~~Apagar branches já mescladas e arquivar os `backup/*` como tag~~ | **Destravou sozinho com o GitHub Enterprise, confirmado em 15/09**: `git push --delete` removeu as cinco branches já mescladas (`feat/bcb-selic-cdi`, `feat/lote-por-fatia`, `feat/ons-ear-ena`, `feat/ons-geracao`, `feat/de-para-usina`) sem 403, e os dois `backup/*` já estão como tag `arquivo/*`. Sobra `docs/raci-15-09`, cujo conteúdo entrou pelo squash do #151 mas que nunca teve PR próprio — deixada de pé até alguém confirmar que não está em uso |
 
 ### Uma pendência técnica do próprio repositório — encerrada em 14/09
 

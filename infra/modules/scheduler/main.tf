@@ -46,6 +46,13 @@ variable "conectores" {
       cron         = "0 7 * * 1" # cadastro muda devagar: semanal, segunda
       ultimos_dias = 1           # cadastro completo; a janela não se aplica
     }
+    ons_capacidade = {
+      # Cadastro de unidades geradoras; muda devagar, como o aneel_siga.
+      # Segunda de manhã, uma hora depois do SIGA, para não disputar a mesma
+      # janela de execução.
+      cron         = "0 8 * * 1"
+      ultimos_dias = 1 # cadastro completo; a janela não se aplica
+    }
     ibge_ipca = {
       cron         = "0 10 12 * *" # IPCA sai por volta do dia 10
       ultimos_dias = 90            # janela larga: o IBGE revisa série publicada
@@ -97,6 +104,20 @@ variable "conectores" {
       ultimos_dias = 40
       memoria      = "4Gi"
       cpu          = "2"
+    }
+    ons_geracao_usina = {
+      # Um CSV de ~66 MB por mês, ~534 mil linhas — a mesma forma do
+      # ccee_geracao_usina (recurso mensal, runner que materializa a janela
+      # inteira em memória), numa escala bem menor (~1/6 das linhas). Roda uma
+      # hora depois dele, mesmo dia, para não disputar a mesma janela.
+      # `ultimos_dias` 40 pela mesma conta: cobre o mês fechado e o anterior
+      # (recontabilização) sem abrir um terceiro. `memoria`/`cpu` é premissa
+      # declarada, a confirmar no primeiro apply — o pico real ainda não foi
+      # medido.
+      cron         = "0 4 7 * *"
+      ultimos_dias = 40
+      memoria      = "2Gi"
+      cpu          = "1"
     }
     ccee_contrato_montante = {
       # Publicação mensal; dia 6, depois do PLD (dia 5). Janela de 120 dias

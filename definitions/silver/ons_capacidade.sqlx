@@ -1,0 +1,52 @@
+config {
+  type: "view",
+  schema: "silver",
+  tags: ["silver"],
+  assertions: {
+    uniqueKey: ["codigo_equipamento"],
+    nonNull: ["codigo_equipamento", "nome_usina"],
+    rowConditions: [
+      "submercado IN ('N','NE','S','SE')",
+      "potencia_efetiva >= 0"
+    ]
+  }
+}
+
+-- Silver: o retrato mais recente da capacidade instalada por unidade geradora.
+-- Dedup por codigo_equipamento — a chave da unidade geradora, não da usina
+-- (uma usina tem várias unidades) — e não por data, como no aneel_siga: é
+-- cadastro, não série; a janela não recorta (ADR 013).
+--
+-- Achado (issue #141): esta fonte traz `ceg`, o CEG da ANEEL, e preenche
+-- `codigo_usina` sem depender do de-para pendente na #141 (ver o dicionário
+-- de dados desta fonte).
+SELECT
+  data_referencia,
+  submercado,
+  codigo_usina,
+  CAST(NULL AS STRING) AS agente_ccee,  -- o ONS não usa perfil da CCEE
+  FORMAT_DATE('%Y-%m', data_referencia) AS periodo_apuracao,
+  CAST(NULL AS STRING) AS periodo_apuracao_ccee,  -- a origem não declara período próprio
+  nome_subsistema,
+  uf,
+  nome_uf,
+  modalidade_operacao,
+  agente_proprietario,
+  agente_operador,
+  tipo_usina,
+  nome_usina,
+  nome_unidade_geradora,
+  codigo_equipamento,
+  numero_unidade_geradora,
+  combustivel,
+  data_entrada_teste,
+  data_entrada_operacao,
+  data_desativacao,
+  potencia_efetiva,
+  _ingestao_id,
+  _ingestao_timestamp
+FROM ${ref("bronze", "ons_capacidade")}
+QUALIFY ROW_NUMBER() OVER (
+  PARTITION BY codigo_equipamento
+  ORDER BY _ingestao_timestamp DESC
+) = 1

@@ -23,6 +23,8 @@ variable "conectores_criticos" {
     bcb_juros                  = 26  # diário + folga para feriado
     ons_carga                  = 26  # diário
     aneel_siga                 = 180 # semanal + folga
+    ons_capacidade             = 180 # semanal + folga
+    ons_geracao_usina          = 780 # mensal + folga
     ibge_ipca                  = 780 # mensal + folga
     ccee_pld                   = 780 # mensal + folga; mede a execução, não a defasagem da CCEE
     ccee_perfil                = 180 # semanal + folga

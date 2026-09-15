@@ -21,6 +21,8 @@ Este índice diz o que já existe, o que falta e — importante — **por que fa
 | CCEE — energia de reserva (EER) | [`ccee_energia_reserva.md`](ccee_energia_reserva.md) | 1 | — | `encargos_setoriais_mensal` |
 | CCEE — CVU estrutural | [`ccee_cvu_estrutural.md`](ccee_cvu_estrutural.md) | 1 | — | `cvu_estrutural_vigente_usina` |
 | ANEEL — SIGA | [`aneel_siga.md`](aneel_siga.md) | 1 | **`codigo_usina`** | `parque_gerador` |
+| ONS — geração horária por usina | [`ons_geracao_usina.md`](ons_geracao_usina.md) | 1 | `submercado`, `codigo_usina` | `geracao_mensal_usina_ons` |
+| ONS — capacidade instalada | [`ons_capacidade.md`](ons_capacidade.md) | 1 | `submercado`, `codigo_usina` | `capacidade_instalada_vigente_usina` |
 | BCB — PTAX | [`bcb_cambio_ptax.md`](bcb_cambio_ptax.md) | 0 | — | `cambio_mensal` |
 | BCB — Selic e CDI | [`bcb_juros.md`](bcb_juros.md) | 1 | — | `juros_mensal` |
 | IBGE — IPCA | [`ibge_ipca.md`](ibge_ipca.md) | 1 | — | `inflacao_mensal` |

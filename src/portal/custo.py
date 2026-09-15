@@ -97,6 +97,8 @@ DOMINIO_ANALITICO = {
     "ccee_energia_reserva": "Mercado de Energia",
     "ccee_cvu_estrutural": "Mercado de Energia",
     "aneel_siga": "Geração e Operacional",
+    "ons_geracao_usina": "Geração e Operacional",
+    "ons_capacidade": "Geração e Operacional",
     "tempook_boletins": "Meteorologia",
     "hubspot_negocios": "Comercial e Contratos",
     "bcb_cambio_ptax": "Econômico",
@@ -114,6 +116,7 @@ BYTES_POR_LINHA = {
     "aneel_siga": 640,
     "hubspot_negocios": 512,
     "ccee_geracao_usina": 420,  # 36 colunas, 25 quase sempre nulas
+    "ons_geracao_usina": 220,  # 14 colunas + 4 técnicas; ver estimativa no relatório da entrega
 }
 BYTES_POR_LINHA_PADRAO = 256
 

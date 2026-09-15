@@ -1,0 +1,4 @@
+id_subsistema;nom_subsistema;id_estado;nom_estado;nom_modalidadeoperacao;nom_agenteproprietario;nom_agenteoperador;nom_tipousina;nom_usina;ceg;nom_unidadegeradora;cod_equipamento;num_unidadegeradora;nom_combustivel;dat_entradateste;dat_entradaoperacao;dat_desativacao;val_potenciaefetiva
+N;NORTE       ;AM;AMAZONAS;TIPO I;ELETROBRAS;ONS;HIDROELÉTRICA;BALBINA;UHE.PH.AM.000190-2.01;BALBINA UG01;EQ-BALB-01;1;Hidráulica;;1989-11-13;;50
+NE;NORDESTE       ;BA;BAHIA;Pequenas Usinas (MMGD);PARTICULAR;PARTICULAR;FOTOVOLTAICA;PQU BA MMGD;-;PQU BA MMGD UG01;EQ-MMGD-BA-01;1;Fotovoltaica;;2022-03-01;;0.075
+SE;SUDESTE       ;SP;SAO PAULO;TIPO I;CESP;ONS;HIDROELÉTRICA;PIRATININGA REV;UHE.PH.SP.000200-1.01;PIRATININGA REV UG01;EQ-PIRA-01;1;Hidráulica;1992-05-01;1992-07-15;2020-01-10;25.5

@@ -1,0 +1,27 @@
+config {
+  type: "table",
+  schema: "gold",
+  tags: ["gold"]
+}
+
+-- Gold: quanto cada usina gerou no mês, por submercado e tipo — segundo o
+-- ONS. O sufixo `_ons` evita colidir com `geracao_mensal_usina` (CCEE, por
+-- parcela de usina e centro de gravidade contábil): são duas perguntas
+-- parecidas, respondidas por origens diferentes, com granularidade diferente
+-- (usina inteira aqui, parcela lá).
+-- Sem KPI (ADR 012); a soma de MW por hora não vira "_mwh" sem confirmação
+-- do dono do domínio.
+SELECT
+  periodo_apuracao,
+  nome_usina,
+  codigo_usina,
+  submercado,
+  tipo_usina,
+  tipo_combustivel,
+  COUNT(*)        AS horas,
+  SUM(geracao_mw) AS geracao_mw_total,
+  AVG(geracao_mw) AS geracao_mw_media_horaria,
+  MAX(geracao_mw) AS geracao_mw_maxima_horaria,
+  MIN(geracao_mw) AS geracao_mw_minima_horaria
+FROM ${ref("silver", "ons_geracao_usina")}
+GROUP BY periodo_apuracao, nome_usina, codigo_usina, submercado, tipo_usina, tipo_combustivel

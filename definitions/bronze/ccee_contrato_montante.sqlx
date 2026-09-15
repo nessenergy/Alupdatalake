@@ -1,0 +1,28 @@
+config {
+  type: "operations",
+  schema: "bronze",
+  hasOutput: true,
+  tags: ["bronze"]
+}
+
+-- Bronze: montantes contratados de compra e venda por perfil (CCEE, dados abertos).
+CREATE TABLE IF NOT EXISTS ${self()} (
+  data_referencia        DATE      NOT NULL OPTIONS(description="Primeiro dia do mês de referência"),
+  periodo_apuracao_ccee  STRING    NOT NULL OPTIONS(description="AAAA-MM, como a CCEE declara"),
+  versao_publicacao      DATE      NOT NULL OPTIONS(description="last_modified do recurso no CKAN (ADR 016)"),
+  codigo_agente          STRING    NOT NULL,
+  codigo_perfil          STRING    NOT NULL,
+  sigla_perfil           STRING    NOT NULL,
+  nome_empresarial       STRING    NOT NULL,
+  cnpj                   STRING    NOT NULL,
+  contratacao_venda      NUMERIC            OPTIONS(description="Montante vendido; unidade não documentada pela CCEE — ver dicionário"),
+  contratacao_compra     NUMERIC            OPTIONS(description="Montante comprado; idem"),
+
+  _ingestao_id           STRING    NOT NULL,
+  _ingestao_timestamp    TIMESTAMP NOT NULL,
+  _fonte                 STRING    NOT NULL,
+  _schema_versao         STRING    NOT NULL
+)
+PARTITION BY DATE(_ingestao_timestamp)
+CLUSTER BY data_referencia, codigo_perfil
+OPTIONS(description="Montantes contratados por perfil — camada Bronze, append-only");

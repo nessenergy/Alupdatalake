@@ -15,6 +15,7 @@ Este índice diz o que já existe, o que falta e — importante — **por que fa
 | CCEE — exposição financeira mensal | [`ccee_exposicao_financeira.md`](ccee_exposicao_financeira.md) | 1 | — | `exposicao_mercado_mensal` |
 | CCEE — contabilização por perfil | [`ccee_contabilizacao_perfil.md`](ccee_contabilizacao_perfil.md) | 1 | — | `resultado_contabilizacao_mensal_perfil` |
 | CCEE — geração horária por usina | [`ccee_geracao_usina.md`](ccee_geracao_usina.md) | 1 | `submercado` | `geracao_mensal_usina` |
+| CCEE — montantes contratados por perfil | [`ccee_contrato_montante.md`](ccee_contrato_montante.md) | 1 | — | `posicao_contratual_mensal_perfil` |
 | ANEEL — SIGA | [`aneel_siga.md`](aneel_siga.md) | 1 | **`codigo_usina`** | `parque_gerador` |
 | BCB — PTAX | [`bcb_cambio_ptax.md`](bcb_cambio_ptax.md) | 0 | — | `cambio_mensal` |
 | IBGE — IPCA | [`ibge_ipca.md`](ibge_ipca.md) | 1 | — | `inflacao_mensal` |

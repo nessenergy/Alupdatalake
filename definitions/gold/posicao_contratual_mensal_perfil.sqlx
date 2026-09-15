@@ -1,0 +1,27 @@
+config {
+  type: "table",
+  schema: "gold",
+  tags: ["gold"]
+}
+
+-- Gold: o que cada perfil comprou e vendeu em contrato, mês a mês, e o saldo —
+-- a posição contratual como a CCEE a enxerga. É a via pública de Comercial e
+-- Contratos (ADR 021 §4): não substitui o book interno, e o dicionário diz
+-- onde os dois divergem por natureza.
+--
+-- `saldo` é compra menos venda, aritmética de leitura, sem unidade afirmada.
+-- LEFT JOIN com a dimensão de agente pela mesma razão da contabilização.
+SELECT
+  c.periodo_apuracao,
+  c.versao_publicacao,
+  c.codigo_perfil,
+  c.sigla_perfil,
+  a.agente_ccee,
+  a.submercado,
+  c.cnpj,
+  c.contratacao_compra,
+  c.contratacao_venda,
+  COALESCE(c.contratacao_compra, 0) - COALESCE(c.contratacao_venda, 0) AS saldo_compra_menos_venda
+FROM ${ref("silver", "ccee_contrato_montante")} AS c
+LEFT JOIN ${ref("gold", "agentes_ccee")} AS a
+  ON a.codigo_perfil = c.codigo_perfil

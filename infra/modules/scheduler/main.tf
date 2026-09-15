@@ -78,6 +78,12 @@ variable "conectores" {
       cron         = "0 3 7 * *"
       ultimos_dias = 70
     }
+    ccee_contrato_montante = {
+      # Publicação mensal; dia 6, depois do PLD (dia 5). Janela de 120 dias
+      # cobre a recontabilização (ADR 016), como as demais entidades mensais.
+      cron         = "0 10 6 * *"
+      ultimos_dias = 120
+    }
     bbce_curva_forward = {
       # A curva sai por pregão, em dia útil. Janela curta porque cada dia é uma
       # requisição própria; 7 dias cobrem feriado prolongado e execução perdida.

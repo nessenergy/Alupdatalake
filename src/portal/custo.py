@@ -78,6 +78,7 @@ DOMINIO_ANALITICO = {
     "ccee_exposicao_financeira": "Risco e Compliance",
     "ccee_contabilizacao_perfil": "Risco e Compliance",
     "ccee_geracao_usina": "Geração e Operacional",
+    "ccee_contrato_montante": "Comercial e Contratos",
     "aneel_siga": "Geração e Operacional",
     "tempook_boletins": "Meteorologia",
     "hubspot_negocios": "Comercial e Contratos",

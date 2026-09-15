@@ -70,13 +70,14 @@ contexto para agentes, em [`../AGENTS.md`](../AGENTS.md).
 | **CCEE/CVU estrutural** | CSV anual, delimitador vírgula, via CKAN | **805 registros / 2 meses**, 0 inválidos, contra a API real | mensal, dia 6 às 10h, janela 120 dias |
 | **ONS/EAR** | CSV por ano, reservatório por submercado, via CKAN | **0 inválidos**, contra a API real | diário, janela 30 dias |
 | **ONS/ENA** | CSV por ano, afluência por submercado, via CKAN | **0 inválidos**, contra a API real | diário, janela 30 dias |
-| **ONS/geração por usina** | CSV mensal, horário, por usina, via CKAN | **533.832 linhas / 1 mês**, 0 inválidos; `val_geracao` vem vazio em ~12% das linhas (usina sem medição na hora) e vira NULL em vez de zero | diário, janela 30 dias |
-| **ONS/capacidade instalada** | CSV de cadastro, por unidade geradora, via S3 | **5.688 registros**, 0 inválidos; aceitar `PY` (Itaipu/Paraguai, 10 unidades) fez o cadastro ganhar **7.000 MW**, de 200.233 para 207.233 MW | semanal |
+| **ONS/geração por usina** | CSV mensal, horário, por usina | **533.832 linhas / 1 mês**, 0 inválidos; `val_geracao` vem vazio em ~12% das linhas (usina sem medição na hora) e vira NULL em vez de zero; **pico de 440 MiB medido** | mensal, dia 7 às 4h, janela 40 dias, 1Gi |
+| **ONS/capacidade instalada** | CSV de cadastro, por unidade geradora, via S3 | **5.688 registros**, 0 inválidos; aceitar `PY` (Itaipu/Paraguai, 10 unidades) fez o cadastro ganhar **7.000 MW**, de 200.233 para 207.233 MW | semanal, segunda 8h |
+| **ONS/disponibilidade por usina** | CSV mensal, horário, por usina | **117.480 registros / 1 mês**, 0 inválidos, 29,8 s; **pico de 226 MiB medido**; CEG em 100% das linhas, 98,1% casando com a ANEEL | mensal, dia 7 às 5h, janela 40 dias, 1Gi |
 
-**Vinte das vinte e três falaram com a API real** em dry-run: as dezesseis de
-14/09 — as seis originais, as nove entidades novas da CCEE (ADR 021) e o
-`bcb_juros` — somadas às **quatro fontes do ONS de 15/09** (EAR, ENA, geração
-horária e capacidade instalada). Hubspot e BBCE seguem as exceções: os 7 componentes
+**Vinte e uma das vinte e quatro falaram com a API real** em dry-run: as
+dezesseis de 14/09 — as seis originais, as nove entidades novas da CCEE
+(ADR 021) e o `bcb_juros` — somadas às **cinco fontes do ONS de 15/09** (EAR,
+ENA, geração horária, capacidade instalada e disponibilidade por usina). Hubspot e BBCE seguem as exceções: os 7 componentes
 existem, escritos contra a documentação, e o teste de integração está `skipif`
 até a credencial chegar (A9 e A7). No BBCE falta inclusive o **host**, que não
 consta da documentação pública e vem junto com o acesso.

@@ -101,6 +101,7 @@ DOMINIO_ANALITICO = {
     "aneel_siga": "Geração e Operacional",
     "ons_geracao_usina": "Geração e Operacional",
     "ons_capacidade": "Geração e Operacional",
+    "ons_disponibilidade_usina": "Geração e Operacional",
     "tempook_boletins": "Meteorologia",
     "hubspot_negocios": "Comercial e Contratos",
     "bcb_cambio_ptax": "Econômico",
@@ -119,6 +120,7 @@ BYTES_POR_LINHA = {
     "hubspot_negocios": 512,
     "ccee_geracao_usina": 420,  # 36 colunas, 25 quase sempre nulas
     "ons_geracao_usina": 220,  # 14 colunas + 4 técnicas; ver estimativa no relatório da entrega
+    "ons_disponibilidade_usina": 200,  # 14 colunas + 4 técnicas, três NUMERIC sempre preenchidas
 }
 BYTES_POR_LINHA_PADRAO = 256
 

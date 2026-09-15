@@ -124,16 +124,34 @@ variable "conectores" {
     }
     ons_geracao_usina = {
       # Um CSV de ~66 MB por mês, ~534 mil linhas — a mesma forma do
-      # ccee_geracao_usina (recurso mensal, runner que materializa a janela
-      # inteira em memória), numa escala bem menor (~1/6 das linhas). Roda uma
-      # hora depois dele, mesmo dia, para não disputar a mesma janela.
-      # `ultimos_dias` 40 pela mesma conta: cobre o mês fechado e o anterior
-      # (recontabilização) sem abrir um terceiro. `memoria`/`cpu` é premissa
-      # declarada, a confirmar no primeiro apply — o pico real ainda não foi
-      # medido.
+      # ccee_geracao_usina (recurso mensal), numa escala bem menor (~1/6 das
+      # linhas). Roda uma hora depois dele, mesmo dia, para não disputar a
+      # mesma janela. `ultimos_dias` 40 pela mesma conta: cobre o mês fechado e
+      # o anterior (recontabilização) sem abrir um terceiro.
+      #
+      # `memoria` **deixou de ser premissa**. Medida em 15/09 com o mês de
+      # julho (533.832 linhas), somando processo e filhos: **440 MiB** de pico
+      # em 84 s. Os 2 GiB que estavam aqui eram chute do tempo em que o runner
+      # materializava a janela inteira; com o runner em fatias, 1 GiB dá folga
+      # de mais de 2x sobre o medido — e a medição do dry-run não inclui o
+      # payload que o `load_table_from_json` monta por fatia, que é o que a
+      # folga cobre.
       cron         = "0 4 7 * *"
       ultimos_dias = 40
-      memoria      = "2Gi"
+      memoria      = "1Gi"
+      cpu          = "1"
+    }
+    ons_disponibilidade_usina = {
+      # Mesmo formato do ons_geracao_usina (CSV mensal do mesmo catálogo), em
+      # escala menor: ~117 mil linhas e 17 MB por mês. Roda uma hora depois
+      # dele, mesmo dia, mantendo o espaçamento entre os conectores pesados.
+      #
+      # Medida em 15/09 com o mês de agosto (117.480 linhas): **226 MiB** de
+      # pico em 30 s. O default de 512Mi cobriria o medido, mas com menos de
+      # 2,3x de folga; 1 GiB mantém a mesma margem dos outros dois mensais.
+      cron         = "0 5 7 * *"
+      ultimos_dias = 40
+      memoria      = "1Gi"
       cpu          = "1"
     }
     ccee_contrato_montante = {

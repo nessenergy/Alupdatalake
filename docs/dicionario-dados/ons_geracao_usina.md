@@ -120,10 +120,12 @@ espera do insumo da Alup ([#141](https://github.com/nessenergy/Alupdatalake/issu
 - `din_instante` em formato diferente de `AAAA-MM-DD HH:MM:SS` conta como
   `linhas_invalidas` — nunca derruba o mês inteiro (a conversão vive no
   `model_validator` do schema, não em `transformar()`).
-- O runner (`src/core/conector.py`) materializa a janela inteira em memória
-  antes de gravar o raw e validar. Para 533 mil linhas/mês isso é bem menor que
-  o `ccee_geracao_usina` (~3 milhões/mês), mas o agendamento espelha a mesma
-  cautela: janela de 40 dias e memória acima do padrão (ver Terraform).
+- **Pico de memória medido** em 15/09, depois que o runner passou a ingerir em
+  fatias ([#152](https://github.com/nessenergy/Alupdatalake/pull/152)): **440
+  MiB** com o mês de julho, em 84 s. Os 2 GiB declarados antes eram do tempo em
+  que o runner materializava a janela inteira; o job passou a declarar 1 GiB.
+  A janela de 40 dias continua, por outro motivo: cobre o mês fechado e o
+  anterior sem abrir um terceiro recurso.
 
 ## Linhagem
 

@@ -51,3 +51,8 @@ bandit-report.json
 # Dataform
 node_modules/
 .df-credentials.json
+
+# Worktrees criados por ferramenta de edicao dentro do repositorio.
+# Sem esta linha, um `git add -A` distraido comita a arvore inteira de um
+# worktree — que e uma copia completa do repositorio.
+.claude/worktrees/

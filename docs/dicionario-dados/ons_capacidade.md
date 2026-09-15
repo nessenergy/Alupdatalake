@@ -27,6 +27,15 @@
 - `ceg` pode vir como `"-"` quando a unidade não tem CEG — vira `NULL`.
 - `dat_entradateste`, `dat_entradaoperacao` e `dat_desativacao` são ISO e
   **podem vir vazias** (`dat_desativacao` quase sempre) — vazio vira `NULL`.
+- **`id_subsistema` traz uma quinta sigla além de N/NE/S/SE: `PY`.** É a
+  interligação com o Paraguai — a metade paraguaia de Itaipu, 10 unidades
+  geradoras e 7.000 MW de potência efetiva, o maior ativo de geração do
+  cadastro. Diferente do `ons_carga` (onde submercado é a chave do fato, e
+  sigla fora da lista é dado que não deveria existir), aqui submercado é
+  atributo de localização de um ativo: um ativo fora dos quatro submercados
+  continua sendo um ativo. Por isso `PY` vira `submercado = NULL`, não linha
+  inválida — omiti-lo subestimaria a capacidade instalada do SIN em 7 GW.
+  Qualquer outra sigla que não seja N/NE/S/SE/PY continua rejeitada.
 
 ## O achado desta entrega: `codigo_usina` sem depender da Lacuna 1
 
@@ -47,7 +56,7 @@ na #141 se reduz a uma coisa só: sigla interna ↔ CEG.
 | Origem (CSV) | Bronze / Silver | Tipo | Transformação |
 |---|---|---|---|
 | `Last-Modified` (cabeçalho HTTP) | `data_referencia` | DATE | ver particularidades acima |
-| `id_subsistema` | `submercado` | STRING | trim, maiúsculas; validado contra `{N,NE,S,SE}` |
+| `id_subsistema` | `submercado` | STRING | trim, maiúsculas; `{N,NE,S,SE}` direto, `PY` (Itaipu/Paraguai) → NULL, qualquer outra sigla rejeitada |
 | `nom_subsistema` | `nome_subsistema` | STRING | trim (espaços à direita) |
 | `id_estado` | `uf` | STRING | trim |
 | `nom_estado` | `nome_uf` | STRING | trim |
@@ -73,7 +82,7 @@ Colunas técnicas do Bronze: `_ingestao_id`, `_ingestao_timestamp`, `_fonte`, `_
 | Dimensão | Preenchida? | Observação |
 |---|---|---|
 | `data_referencia` | sim | data do retrato (`Last-Modified` do S3) |
-| `submercado` | sim | N, NE, S, SE |
+| `submercado` | sim, exceto Itaipu/PY | N, NE, S, SE; NULL para a interligação com o Paraguai |
 | `codigo_usina` | **sim — o CEG** | nulo quando a origem publica traço ou vazio (ver achado acima) |
 | `agente_ccee` | não | o ONS não usa perfil da CCEE |
 | `periodo_apuracao` | sim | `YYYY-MM` do retrato |
@@ -93,13 +102,15 @@ usina, separando o que está ativo (sem `data_desativacao`) do total. Sem KPI
 
 ## Qualidade e observações
 
-- **Dry-run contra a API real (15/09/2026)**: 5.678 extraídos, **10
-  inválidos**, `SUCESSO` em 2,9s. Os 10 inválidos trazem `id_subsistema = "PY"`
-  — unidades do lado paraguaio de interligação (não uma das quatro siglas do
-  lake). Rejeitado por desenho, não por falha: o projeto trata sigla nova de
-  submercado como dado que precisa de revisão de contrato antes de entrar
-  silenciosamente (mesma regra do `ons_carga` e do `ccee_perfil`). Se a Alup
-  precisar desse recorte, é uma revisão de escopo, não um bug.
+- **Dry-run contra a API real (15/09/2026)**: 5.688 extraídos, **0
+  inválidos**, `SUCESSO`. Antes de tratar `PY` como o achado descrito acima, as
+  10 linhas de Itaipu/Paraguai contavam como inválidas (5.678 extraídos válidos
+  de fato, 10 descartadas) — a correção fez o cadastro ganhar 7.000 MW que
+  estavam sendo silenciosamente perdidos: potência efetiva total salta de
+  **200.233 MW (5.668 unidades) para 207.233 MW (5.678 unidades)**, +3,5%.
+  As 10 linhas de Itaipu (`cod_equipamento` únicos, 700 MW cada) já vêm com
+  `ceg` preenchido (`UHE.PH.PR.001161-4.01`) — diferente do que se poderia
+  supor, não é um caso de CEG ausente.
 - A data do retrato depende do cabeçalho `Last-Modified` do S3, não de um
   campo do próprio CSV — se o S3 não devolver o cabeçalho, a data assumida é a
   do dia da execução, e um aviso fica no log (mesma regra do `ccee_perfil`).

@@ -18,6 +18,14 @@ issue #141 pede um de-para de quatro colunas (sigla interna ↔ CEG ↔ nome CCE
 ↔ nome ONS) que hoje só o `aneel_siga` alimenta pelo lado CEG. Estas duas
 fontes entregam o lado CEG ↔ nome ONS sem depender de ninguém — ver o
 dicionário de dados.
+
+`id_subsistema` traz uma quinta sigla além de N/NE/S/SE: `PY`, a metade
+paraguaia de Itaipu (10 unidades geradoras, 7.000 MW). Diferente do
+`ons_carga`, onde submercado é a chave do fato (consumo *de* um submercado) e
+sigla fora da lista é dado que não deveria existir, aqui submercado é atributo
+de localização de um ativo — e um ativo fora dos quatro submercados continua
+sendo um ativo do cadastro. Por isso `PY` não vira `linhas_invalidas`: vira
+`submercado = NULL`, e o ativo entra no lake. Ver o dicionário de dados.
 """
 
 from __future__ import annotations
@@ -45,6 +53,12 @@ if TYPE_CHECKING:
 
 URL = "https://ons-aws-prod-opendata.s3.amazonaws.com/dataset/capacidade-geracao/CAPACIDADE_GERACAO.csv"
 
+# A interligação com o Paraguai (a metade paraguaia de Itaipu) não é submercado
+# do SIN; o ONS a identifica com esta sigla no mesmo campo. Não é sigla
+# desconhecida por erro — é o ativo binacional, e vira `submercado = NULL`,
+# não linha inválida.
+SIGLA_ITAIPU_PARAGUAI = "PY"
+
 logger = logging.getLogger(__name__)
 
 
@@ -64,7 +78,7 @@ class Capacidade(BaseModel):
     """Capacidade instalada de uma unidade geradora, no retrato corrente do ONS."""
 
     data_referencia: date
-    submercado: str
+    submercado: str | None  # NULL para PY — a metade paraguaia de Itaipu não é submercado do SIN
     nome_subsistema: str
     uf: str
     nome_uf: str
@@ -85,8 +99,13 @@ class Capacidade(BaseModel):
 
     @field_validator("submercado")
     @classmethod
-    def _submercado_conhecido(cls, valor: str) -> str:
+    def _submercado_conhecido_ou_itaipu_paraguai(cls, valor: str) -> str | None:
+        """N/NE/S/SE viram a sigla; `PY` (Itaipu, lado paraguaio) vira NULL —
+        é ativo do cadastro, não consumo de um submercado que não existe.
+        Qualquer outra sigla segue rejeitada: aí é a origem mudando o contrato."""
         sigla = valor.strip().upper()
+        if sigla == SIGLA_ITAIPU_PARAGUAI:
+            return None
         if sigla not in SUBMERCADOS:
             raise ValueError(f"submercado desconhecido: {valor}")
         return sigla

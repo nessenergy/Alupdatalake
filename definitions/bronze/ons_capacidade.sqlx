@@ -10,7 +10,7 @@ config {
 -- cadastro, como no aneel_siga e no ccee_perfil.
 CREATE TABLE IF NOT EXISTS ${self()} (
   data_referencia         DATE      NOT NULL OPTIONS(description="Last-Modified do recurso no S3 — o retrato não traz data própria"),
-  submercado              STRING    NOT NULL OPTIONS(description="N, NE, S, SE"),
+  submercado              STRING    OPTIONS(description="N, NE, S, SE; NULL para a interligação com o Paraguai (metade paraguaia de Itaipu, sigla PY na origem)"),
   nome_subsistema         STRING    NOT NULL,
   uf                      STRING    NOT NULL,
   nome_uf                 STRING    NOT NULL,

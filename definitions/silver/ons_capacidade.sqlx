@@ -6,7 +6,7 @@ config {
     uniqueKey: ["codigo_equipamento"],
     nonNull: ["codigo_equipamento", "nome_usina"],
     rowConditions: [
-      "submercado IN ('N','NE','S','SE')",
+      "submercado IS NULL OR submercado IN ('N','NE','S','SE')",
       "potencia_efetiva >= 0"
     ]
   }
@@ -20,6 +20,11 @@ config {
 -- Achado (issue #141): esta fonte traz `ceg`, o CEG da ANEEL, e preenche
 -- `codigo_usina` sem depender do de-para pendente na #141 (ver o dicionário
 -- de dados desta fonte).
+--
+-- `submercado` é NULL para a interligação com o Paraguai (metade paraguaia de
+-- Itaipu, 10 unidades, 7.000 MW): não é um dos quatro submercados do SIN, mas
+-- continua sendo um ativo do cadastro — omiti-la subestimaria a capacidade
+-- instalada. Por isso a condição aceita NULL de propósito.
 SELECT
   data_referencia,
   submercado,

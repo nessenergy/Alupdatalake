@@ -103,6 +103,13 @@ distribuidoras, com a contagem de distribuidoras distintas
 `gold.agentes_ccee` por `codigo_perfil`. Não desce abaixo de
 (mês, varejista, UF) — ver "Confidencialidade" acima.
 
+`COUNT(DISTINCT codigo_perfil_conectado)` não conta a linha em que essa coluna
+vem `NULL` (a carga sem distribuidora identificada, ver "A chave é de cinco
+colunas" acima) — `distribuidoras` fica uma unidade abaixo do número real de
+linhas somadas nesse caso, enquanto `consumo_total` e `parcelas_de_carga`
+somam a linha normalmente (`SUM` não descarta `NULL` do jeito que
+`COUNT(DISTINCT ...)` descarta).
+
 ## Qualidade e observações
 
 - A CCEE não considera, por ora, os consumidores migrados pela migração

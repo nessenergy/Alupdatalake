@@ -121,10 +121,21 @@ o nome da coluna descritivo, não `_mwh`.
 ## Qualidade e observações
 
 - **Dry-run contra a API real de julho/2026 (14/09/2026)**: 2.964.096
-  extraídos, 0 inválidos, `SUCESSO` em **177,7s** (~3 minutos). Muito abaixo
-  do limite de 1200s que forçaria subir o `timeout` do Cloud Run Job; o job
-  desta entidade segue no padrão de 1800s.
-- Se a CCEE republicar um mês, a janela de agendamento de 70 dias (cobrindo o
+  extraídos, 0 inválidos, `SUCESSO` em **177,7s** (~3 minutos) — **um mês, em
+  dry-run, com gravação do raw e carga no Bronze puladas**. Não é o tempo (nem
+  o pico de memória) de uma execução real: `extrair()` lê em fluxo, mas
+  `src/core/conector.py` (`_ingerir`) materializa a janela inteira numa lista
+  antes de gravar o raw e validar — com a janela de agendamento antiga (70
+  dias) isso abria 3-4 recursos mensais de uma vez (~9-12 milhões de linhas,
+  ~4 GB de dicts), acima do limite padrão de 512Mi do Cloud Run Job. Batching
+  por fatia no runner resolveria de vez, mas é mudança de framework, fora
+  desta fila (`docs/proximos-passos.md` §4).
+- Por isso a janela de agendamento passou de 70 para **40 dias** (um mês
+  fechado inteiro mais folga, sem abrir um quarto mês) e o job desta entidade
+  ganhou `memoria = "4Gi"`, `cpu = "2"` no Terraform — **premissa declarada**,
+  a confirmar no primeiro `apply` real, porque o pico de memória do lote
+  materializado ainda não foi medido contra a API real.
+- Se a CCEE republicar um mês, a janela de agendamento de 40 dias (cobrindo o
   mês fechado e o anterior) alcança a nova publicação sem intervenção manual.
 - `PERIODO_COMERCIALIZACAO` não numérico ou fora do mês, e `DATA` em formato
   diferente de `dd/mm/aaaa`, contam como `linhas_invalidas` — nunca derrubam a

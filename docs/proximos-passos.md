@@ -94,7 +94,7 @@ Ainda em 11/09, diante do teto de E2: **orquestração da Onda 3 em Cloud Workfl
 |---|---|
 | EAR e ENA do ONS | plano próprio — não é escopo desta fila da CCEE |
 | As 19 entidades secundárias da ADR 021 (§2.1/§3 da ADR) | fila priorizada, sem demanda de domínio ainda — mesmo caminho de subclasse de `CceeCsvCkan` quando entrarem |
-| — | o `timeout` do Cloud Run Job **não é pendência**: a Task 5 mediu 177,7 s reais para `ccee_geracao_usina`, dentro do limite configurado de 1800 s, sem qualquer ajuste |
+| Lote por fatia no runner — `extrair()` já lê em fluxo, mas `conector.py` materializa o mês inteiro em memória antes de gravar o raw e validar | mudança de framework (`_ingerir`), não desta fila; branch própria. Até lá, `ccee_geracao_usina` roda com janela reduzida (40 dias) e `memoria`/`cpu` de 4Gi/2 vCPU declarados como premissa no Terraform |
 
 | # | Ação | Depende de |
 |---|---|---|

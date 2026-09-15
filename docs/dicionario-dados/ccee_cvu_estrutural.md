@@ -30,6 +30,10 @@ o padrão do módulo (`csv.DictReader`, sem regra de negócio):
 | Duplicatas com `CODIGO_MODELO_PRECO` acrescentado à chave | **0** |
 | Anos de horizonte (`ANO_HORIZONTE`) | 2026, 2027, 2028, 2029, 2030 (5) |
 | Tipos de combustível (`TIPO_COMBUSTIVEL`) | 10: Bagaço de Cana de Açúcar, Biocombustíveis, Carvão, Carvão Mineral Importado, Carvão Mineral Nacional, Casca de Arroz, Cavaco de Madeira, Diesel, Gás Natural, Óleo Combustível B1 |
+| Vazios em `LEILAO` | **0 de 4.715 (0,0%)** |
+| Vazios em `PRODUTO` | **0 de 4.715 (0,0%)** |
+| Vazios em `CODIGO_MODELO_PRECO` | **0 de 4.715 (0,0%)** |
+| Vazios em `CODIGO_PARCELA_USINA` | **1.125 de 4.715 (23,9%)** |
 
 **A chave escolhida** é (`periodo_apuracao_ccee`, `ano_horizonte`,
 `codigo_parcela_usina`, `leilao`, `produto`, `codigo_modelo_preco`) — seis
@@ -41,10 +45,15 @@ zera as duplicatas. Não foi preciso registrar pendência técnica.
 
 `CODIGO_PARCELA_USINA` vem **vazio em 1.125 das 4.715 linhas** (~24%),
 concentrado nos meses mais recentes do ano corrente (jun–set/2026: 15, 360,
-360 e 390 linhas, respectivamente). Não é erro do conector: a coluna aceita
-string vazia (`limpar()` devolve `""`, que não é `NULL`), e a chave de seis
-colunas continua sem duplicata mesmo com o código vazio — outras colunas da
-chave distinguem essas linhas. Registrado aqui porque é o mesmo padrão que
+360 e 390 linhas, respectivamente). Vazio na origem vira **`NULL`** (o conector
+faz `limpar(...) or None`, não guarda `""`): a coluna não é `NOT NULL` no
+Bronze nem faz parte do `nonNull` da Silver, só do `uniqueKey` — `NULL`
+agrupa junto no `GROUP BY` da asserção de unicidade exatamente como `""`
+agrupava antes, e o perfilamento não achou nenhuma duplicata na chave de seis
+colunas mesmo com o código ausente — outras colunas da chave distinguem essas
+linhas. `LEILAO`, `PRODUTO` e `CODIGO_MODELO_PRECO` — as outras três colunas
+da chave — vieram **100% preenchidas** no arquivo real (ver tabela acima),
+por isso continuam em `nonNull`. Registrado aqui porque é o mesmo padrão que
 bloqueia o de-para de usina (#141): sem `CODIGO_PARCELA_USINA`, essas linhas
 também não têm como ganhar `codigo_usina` depois.
 
@@ -57,7 +66,7 @@ também não têm como ganhar `codigo_usina` depois.
 | — | `periodo_apuracao` | STRING | derivado de `data_referencia` na Silver |
 | `last_modified` do recurso (CKAN) | `versao_publicacao` | DATE | identificador de versão da [ADR 016](../arquitetura/decisoes/016-versionamento-de-recontabilizacao.md) |
 | `ANO_HORIZONTE` | `ano_horizonte` | INT64 | ano projetado ao qual este CVU se refere |
-| `CODIGO_PARCELA_USINA` | `codigo_parcela_usina` | STRING | código interno da CCEE — **não é o CEG** (#141) |
+| `CODIGO_PARCELA_USINA` | `codigo_parcela_usina` | STRING, nulo | código interno da CCEE — **não é o CEG** (#141); vazio na origem (~24% das linhas) vira `NULL`, não `""` |
 | `SIGLA_PARCELA` | `sigla_parcela` | STRING | — |
 | `TIPO_COMBUSTIVEL` | `tipo_combustivel` | STRING | — |
 | `LEILAO` | `leilao` | STRING | — |

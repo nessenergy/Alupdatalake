@@ -85,6 +85,8 @@ DOMINIO_ANALITICO = {
     "ccee_pld": "Mercado de Energia",
     "bbce_curva_forward": "Mercado de Energia",
     "ons_carga": "Mercado de Energia",
+    "ons_ear": "Mercado de Energia",
+    "ons_ena": "Mercado de Energia",
     # Cadastro do mercado: dá nome ao que nas outras fontes é código.
     "ccee_perfil": "Mercado de Energia",
     "ccee_agente": "Mercado de Energia",

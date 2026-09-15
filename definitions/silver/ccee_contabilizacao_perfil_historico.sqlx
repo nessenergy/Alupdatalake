@@ -1,0 +1,38 @@
+config {
+  type: "view",
+  schema: "silver",
+  tags: ["silver"],
+  assertions: {
+    uniqueKey: ["periodo_apuracao_ccee", "codigo_perfil", "versao_publicacao"],
+    nonNull: ["periodo_apuracao_ccee", "codigo_perfil", "versao_publicacao"],
+    rowConditions: [
+      "LENGTH(cnpj) = 14"
+    ]
+  }
+}
+
+-- Silver de histórico (ADR 016, opção B): uma linha por perfil, mês **e
+-- publicação**. Leituras repetidas da mesma publicação colapsam; publicações
+-- diferentes ficam lado a lado. É o que responde "qual era o resultado de
+-- março antes da recontabilização de junho" sem ler coluna técnica.
+SELECT
+  data_referencia,
+  CAST(NULL AS STRING) AS submercado,
+  CAST(NULL AS STRING) AS codigo_usina,
+  CAST(NULL AS STRING) AS agente_ccee,
+  FORMAT_DATE('%Y-%m', data_referencia) AS periodo_apuracao,
+  periodo_apuracao_ccee,
+  versao_publicacao,
+  codigo_agente,
+  codigo_perfil,
+  sigla_perfil,
+  cnpj,
+  ajuste_recontab,
+  resultado_final,
+  _ingestao_id,
+  _ingestao_timestamp
+FROM ${ref("bronze", "ccee_contabilizacao_perfil")}
+QUALIFY ROW_NUMBER() OVER (
+  PARTITION BY periodo_apuracao_ccee, codigo_perfil, versao_publicacao
+  ORDER BY _ingestao_timestamp DESC
+) = 1

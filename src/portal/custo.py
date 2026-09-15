@@ -74,6 +74,15 @@ DOMINIO_ANALITICO = {
     "ons_carga": "Mercado de Energia",
     # Cadastro do mercado: dá nome ao que nas outras fontes é código.
     "ccee_perfil": "Mercado de Energia",
+    "ccee_agente": "Mercado de Energia",
+    "ccee_exposicao_financeira": "Risco e Compliance",
+    "ccee_contabilizacao_perfil": "Risco e Compliance",
+    "ccee_geracao_usina": "Geração e Operacional",
+    "ccee_contrato_montante": "Comercial e Contratos",
+    "ccee_varejista_consumidor": "Comercial e Contratos",
+    "ccee_encargo_ess": "Mercado de Energia",
+    "ccee_energia_reserva": "Mercado de Energia",
+    "ccee_cvu_estrutural": "Mercado de Energia",
     "aneel_siga": "Geração e Operacional",
     "tempook_boletins": "Meteorologia",
     "hubspot_negocios": "Comercial e Contratos",
@@ -89,6 +98,7 @@ BYTES_POR_LINHA = {
     "ons_carga": 184,
     "aneel_siga": 640,
     "hubspot_negocios": 512,
+    "ccee_geracao_usina": 420,  # 36 colunas, 25 quase sempre nulas
 }
 BYTES_POR_LINHA_PADRAO = 256
 

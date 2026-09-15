@@ -1,0 +1,32 @@
+config {
+  type: "operations",
+  schema: "bronze",
+  hasOutput: true,
+  tags: ["bronze"]
+}
+
+-- Bronze: exposição financeira mensal do MCP (CCEE, dados abertos). Uma linha
+-- por mês e por publicação; a Silver fica com a publicação mais recente.
+CREATE TABLE IF NOT EXISTS ${self()} (
+  data_referencia                        DATE      NOT NULL OPTIONS(description="Primeiro dia do mês de referência"),
+  periodo_apuracao_ccee                  STRING    NOT NULL OPTIONS(description="AAAA-MM, como a CCEE declara"),
+  versao_publicacao                      DATE      NOT NULL OPTIONS(description="last_modified do recurso no CKAN (ADR 016)"),
+  excedente_financeiro                   NUMERIC            OPTIONS(description="R$"),
+  excedente_financeiro_positivo          NUMERIC            OPTIONS(description="R$"),
+  total_recurso_disponivel               NUMERIC            OPTIONS(description="R$"),
+  total_exposicao_negativa               NUMERIC            OPTIONS(description="R$"),
+  cobertura_exposicao_negativa           NUMERIC            OPTIONS(description="R$"),
+  total_exposicao_negativa_remanescente  NUMERIC            OPTIONS(description="R$"),
+  total_exposicao_negativa_liquidada     NUMERIC            OPTIONS(description="R$"),
+  total_recurso_disponivel_ef_anterior   NUMERIC            OPTIONS(description="R$"),
+  total_recurso_compensacao_ef           NUMERIC            OPTIONS(description="R$"),
+  reserva_alivio_ess                     NUMERIC            OPTIONS(description="R$"),
+
+  _ingestao_id                           STRING    NOT NULL,
+  _ingestao_timestamp                    TIMESTAMP NOT NULL,
+  _fonte                                 STRING    NOT NULL,
+  _schema_versao                         STRING    NOT NULL
+)
+PARTITION BY DATE(_ingestao_timestamp)
+CLUSTER BY data_referencia
+OPTIONS(description="Exposição financeira mensal do MCP — camada Bronze, append-only");

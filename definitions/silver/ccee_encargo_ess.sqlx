@@ -1,0 +1,48 @@
+config {
+  type: "view",
+  schema: "silver",
+  tags: ["silver"],
+  assertions: {
+    uniqueKey: ["periodo_apuracao_ccee"],
+    nonNull: ["data_referencia", "periodo_apuracao_ccee", "versao_publicacao"],
+    rowConditions: [
+      "periodo_apuracao = periodo_apuracao_ccee",
+      "encargo_constrained_on IS NULL OR encargo_constrained_on >= 0",
+      "encargo_constrained_off IS NULL OR encargo_constrained_off >= 0"
+    ]
+  }
+}
+
+-- Silver: uma linha por mês, pela publicação mais recente (ADR 016, opção B).
+-- Faixas (issue #110): constrained-on e constrained-off são encargos, não
+-- podem ser negativos.
+SELECT
+  data_referencia,
+  CAST(NULL AS STRING) AS submercado,    -- total do mercado
+  CAST(NULL AS STRING) AS codigo_usina,  -- idem
+  CAST(NULL AS STRING) AS agente_ccee,   -- idem
+  FORMAT_DATE('%Y-%m', data_referencia) AS periodo_apuracao,
+  periodo_apuracao_ccee,
+  versao_publicacao,
+  encargo_constrained_on,
+  encargo_constrained_off,
+  outros_servicos_ancilares,
+  encargo_cs,
+  encargo_seguranca_energetica,
+  recebimento_encargo_dh,
+  encargo_restricao_operativa_unit_commitment,
+  encargo_importacao,
+  recebimento_encargo_reserva_operativa,
+  ressarcimento_servicos_ancilares,
+  ressarcimento_custo_operacao_manutencao_equipamento,
+  ressarcimento_custo_operacao_manutencao_equipamento_cag,
+  ressarcimento_custo_implantacao_operacao_manutencao_sep,
+  ressarcimento_custo_emergencial,
+  ressarcimento_distribuidora_implantacao,
+  _ingestao_id,
+  _ingestao_timestamp
+FROM ${ref("bronze", "ccee_encargo_ess")}
+QUALIFY ROW_NUMBER() OVER (
+  PARTITION BY periodo_apuracao_ccee
+  ORDER BY versao_publicacao DESC, _ingestao_timestamp DESC
+) = 1

@@ -1,0 +1,35 @@
+config {
+  type: "table",
+  schema: "gold",
+  tags: ["gold"]
+}
+
+-- Gold: o CVU estrutural de cada usina térmica, por ano de horizonte, como
+-- publicado no mês de referência mais recente. A grão é a chave perfilada da
+-- Silver sem o mês: uma linha por (usina, leilão, produto, modelo de preço,
+-- horizonte). `codigo_modelo_preco` entra na partição porque é a coluna que o
+-- perfilamento do Step 1 (14/09/2026) exigiu — a chave de quatro colunas
+-- (usina, leilão, produto, horizonte) tinha 185 duplicatas no arquivo real
+-- sem ela; sem essa coluna, um empate no mês faria o `ROW_NUMBER()` descartar
+-- uma das duas linhas de forma não determinística, numa tabela que é "o custo
+-- que explica o despacho por ordem de mérito".
+-- Cruza com `geracao_mensal_usina` por `codigo_parcela_usina`.
+-- Sem KPI (ADR 012).
+SELECT
+  codigo_parcela_usina,
+  sigla_parcela,
+  tipo_combustivel,
+  leilao,
+  produto,
+  codigo_modelo_preco,
+  ano_horizonte,
+  cvu_estrutural                AS cvu_estrutural_reais_mwh,
+  inicio_suprimento,
+  termino_suprimento,
+  periodo_apuracao              AS publicado_no_mes,
+  versao_publicacao
+FROM ${ref("silver", "ccee_cvu_estrutural")}
+QUALIFY ROW_NUMBER() OVER (
+  PARTITION BY codigo_parcela_usina, leilao, produto, codigo_modelo_preco, ano_horizonte
+  ORDER BY periodo_apuracao DESC, versao_publicacao DESC
+) = 1

@@ -83,12 +83,12 @@ existe em Gold. Ordenados pelo B1.
 
 | | |
 |---|---|
-| **Fontes hoje** | `ccee_pld` (à vista, horário) · `ons_carga` · `bbce_curva_forward` (futuro negociado) · `ccee_perfil` (60 mil perfis) |
-| **Fontes a conectar** | EAR e ENA (ONS) · CVU, ESS e EER (conjuntos do InfoMercado, [ADR 018](decisoes/018-vias-de-acesso-a-ccee.md)) |
+| **Fontes hoje** | `ccee_pld` (à vista, horário) · `ons_carga` · `bbce_curva_forward` (futuro negociado) · `ccee_perfil` (60 mil perfis) · `ccee_agente` · `ccee_encargo_ess` · `ccee_energia_reserva` · `ccee_cvu_estrutural` |
+| **Fontes a conectar** | EAR e ENA (ONS) |
 | **Granularidade** | submercado e hora, para o PLD; submercado e dia, para a carga; vértice de entrega, para a curva |
 | **Cadência** | PLD mensal, por fechamento da CCEE; carga diária; curva por pregão |
-| **Gold hoje** | `pld_mensal_submercado`, `carga_mensal_submercado`, `curva_forward_vigente`, `agentes_ccee` |
-| **Situação** | **pronto no núcleo** — as fontes verificadas contra a API real; faltam EAR, ENA, CVU, ESS e EER |
+| **Gold hoje** | `pld_mensal_submercado`, `carga_mensal_submercado`, `curva_forward_vigente`, `agentes_ccee`, `agentes_por_classe_mensal`, `encargos_setoriais_mensal`, `cvu_estrutural_vigente_usina` |
+| **Situação** | **pronto do lado da CCEE** — faltam EAR e ENA, que são do ONS |
 
 É o domínio mais maduro e o que sustenta os demais: quase toda pergunta
 comercial termina comparada a um preço.
@@ -108,12 +108,12 @@ do Gabriel Barreto.
 
 | | |
 |---|---|
-| **Fontes hoje** | `aneel_siga` (cadastro público) |
+| **Fontes hoje** | `aneel_siga` (cadastro público) · `ccee_geracao_usina` |
 | **Fontes a conectar** | geração e térmicas do ONS · DESSEM · **Oracle FMB** (Onda 3, medição do portfólio) |
 | **Granularidade** | **usina** — a granularidade que A7 fixa para dado de portfólio |
-| **Cadência** | semanal para o cadastro público; diária para medição, na janela das 22h às 6h (C9) |
-| **Gold hoje** | `parque_gerador` |
-| **Situação** | **parcial** — o lado público está pronto; medição e DESSEM dependem de acesso (A7) |
+| **Cadência** | semanal para o cadastro público; mensal para a geração da CCEE; diária para medição, na janela das 22h às 6h (C9) |
+| **Gold hoje** | `parque_gerador`, `geracao_mensal_usina` |
+| **Situação** | **parcial** — geração na granularidade de usina entregue; `codigo_usina` depende do de-para (#141) |
 
 **Tem um bloqueio nomeado**: o item D1 informa que a Alup identifica os ativos
 por **sigla interna** (FGE, FOZ, IJU, QLZ, LVR, VD8, EAP I e II, PTB, EDV I a IV
@@ -141,12 +141,12 @@ chegou", não "choveu quanto". A diferença é grande e está registrada.
 
 | | |
 |---|---|
-| **Fontes hoje** | `hubspot_negocios` (funil, não contrato) |
+| **Fontes hoje** | `hubspot_negocios` (funil, não contrato) · `ccee_contrato_montante` · `ccee_varejista_consumidor` |
 | **Fontes a conectar** | **MySQL RDS de Comercialização** · **Portal Alup** — contratos de varejo (ambos Onda 3) |
 | **Granularidade** | contrato e perfil de agente |
-| **Cadência** | diária, na janela das 22h às 6h (C9) |
-| **Gold hoje** | `funil_comercial` |
-| **Situação** | **bloqueado** — depende de credencial (A7, C1) |
+| **Cadência** | diária, na janela das 22h às 6h (C9); mensal para os conjuntos públicos da CCEE |
+| **Gold hoje** | `funil_comercial`, `posicao_contratual_mensal_perfil`, `consumo_varejista_mensal_uf` |
+| **Situação** | **parcial pela via pública** — o book interno segue em A7 |
 
 É o domínio de maior valor e o menos pronto. É ele que a prioridade 1 de A2
 ("base única e integrada") mais cobra, porque hoje vive em planilha (A3).
@@ -179,11 +179,12 @@ O conector segue parado à espera do token (A9, chamado a partir de 14/09).
 
 | | |
 |---|---|
-| **Fontes a conectar** | conjuntos de contabilização da CCEE (públicos) · **Balanço Energético**, no MySQL RDS (Onda 3) |
+| **Fontes hoje** | `ccee_exposicao_financeira` · `ccee_contabilizacao_perfil` (com histórico de recontabilização) |
+| **Fontes a conectar** | **Balanço Energético**, no MySQL RDS (Onda 3) |
 | **Granularidade** | perfil de agente e mês de apuração |
 | **Cadência** | mensal, por fechamento |
-| **Gold hoje** | — |
-| **Situação** | **não iniciado** — a via pública existe e falta escolher os conjuntos |
+| **Gold hoje** | `exposicao_mercado_mensal`, `resultado_contabilizacao_mensal_perfil` |
+| **Situação** | **iniciado** — saiu de zero sem credencial |
 
 O item D5 já definiu a regra mais difícil deste domínio: **recontabilização se
 versiona, não se sobrescreve** — registrado na

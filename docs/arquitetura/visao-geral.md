@@ -123,12 +123,12 @@ pergunta, fontes, granularidade e Gold — em
 
 | # | Domínio | Data owner | Situação |
 |---|---|---|---|
-| 1 | Mercado de Energia | Taina Mota · Gabriel Barreto (BBCE e prêmio) | pronto no núcleo |
-| 2 | Geração e Operacional | Taina Mota · Letícia Ferreira | parcial — Lacuna 1 |
+| 1 | Mercado de Energia | Taina Mota · Gabriel Barreto (BBCE e prêmio) | pronto do lado da CCEE — faltam EAR e ENA (ONS) |
+| 2 | Geração e Operacional | Taina Mota · Letícia Ferreira | parcial — usina entregue, `codigo_usina` depende do de-para (#141) |
 | 3 | Meteorologia | Taina Mota | pronto como arquivo |
-| 4 | Comercial e Contratos | Letícia Ferreira · Tahigo Santos | bloqueado (A7) |
+| 4 | Comercial e Contratos | Letícia Ferreira · Tahigo Santos | parcial pela via pública — book interno em A7 |
 | 5 | CRM e Marketing | Tahigo Santos | parcial — token do Hubspot |
-| 6 | Risco e Compliance | Letícia Ferreira | não iniciado |
+| 6 | Risco e Compliance | Letícia Ferreira | iniciado — saiu de zero sem credencial |
 | 7 | Econômico | Letícia Ferreira | parcial — faltam Selic e CDI |
 | 8 | Planejamento | gestores da Comercialização | não iniciado |
 

@@ -1,0 +1,40 @@
+config {
+  type: "view",
+  schema: "silver",
+  tags: ["silver"],
+  assertions: {
+    uniqueKey: ["periodo_apuracao_ccee", "codigo_perfil"],
+    nonNull: ["data_referencia", "periodo_apuracao_ccee", "versao_publicacao", "codigo_agente", "codigo_perfil", "sigla_perfil", "nome_empresarial", "cnpj"],
+    rowConditions: [
+      "periodo_apuracao = periodo_apuracao_ccee",
+      "contratacao_venda IS NULL OR contratacao_venda >= 0",
+      "contratacao_compra IS NULL OR contratacao_compra >= 0"
+    ]
+  }
+}
+
+-- Silver: uma linha por perfil e mês, pela publicação mais recente (ADR 016).
+-- `agente_ccee` nulo pelo mesmo motivo da contabilização: a origem traz
+-- código, e a sigla entra na Gold por `gold.agentes_ccee`.
+SELECT
+  data_referencia,
+  CAST(NULL AS STRING) AS submercado,    -- o contrato é do perfil; o submercado está em ccee_perfil
+  CAST(NULL AS STRING) AS codigo_usina,  -- não é dado de ativo
+  CAST(NULL AS STRING) AS agente_ccee,   -- código na origem, sigla na Gold
+  FORMAT_DATE('%Y-%m', data_referencia) AS periodo_apuracao,
+  periodo_apuracao_ccee,
+  versao_publicacao,
+  codigo_agente,
+  codigo_perfil,
+  sigla_perfil,
+  nome_empresarial,
+  cnpj,
+  contratacao_venda,
+  contratacao_compra,
+  _ingestao_id,
+  _ingestao_timestamp
+FROM ${ref("bronze", "ccee_contrato_montante")}
+QUALIFY ROW_NUMBER() OVER (
+  PARTITION BY periodo_apuracao_ccee, codigo_perfil
+  ORDER BY versao_publicacao DESC, _ingestao_timestamp DESC
+) = 1

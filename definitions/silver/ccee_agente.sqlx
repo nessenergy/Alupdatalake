@@ -1,0 +1,45 @@
+config {
+  type: "view",
+  schema: "silver",
+  tags: ["silver"],
+  assertions: {
+    uniqueKey: ["periodo_apuracao_ccee", "cnpj"],
+    nonNull: ["data_referencia", "periodo_apuracao_ccee", "versao_publicacao", "cnpj", "agente_ccee", "classe_agente", "uf"],
+    rowConditions: [
+      "periodo_apuracao = periodo_apuracao_ccee",
+      "LENGTH(cnpj) = 14",
+      "LENGTH(uf) = 2",
+      "classe_agente IN ('Autoprodutor','Comercializador','Consumidor Especial','Consumidor Livre','Distribuidor','Gerador','Produtor Independente')"
+    ]
+  }
+}
+
+-- Silver: um agente por mês, deduplicado pela publicação mais recente da CCEE
+-- (ADR 016, opção B): vence `versao_publicacao`, e a hora da leitura só
+-- desempata leituras da mesma publicação. É o que impede o replay de um raw
+-- antigo de rebaixar o retrato vigente.
+-- Faixas (issue #110): classe fora das sete publicadas é mudança de contrato de
+-- dados na origem, não um agente novo.
+SELECT
+  data_referencia,
+  CAST(NULL AS STRING) AS submercado,    -- o agente não tem submercado; o perfil tem (ccee_perfil)
+  CAST(NULL AS STRING) AS codigo_usina,  -- cadastro de agente, não de ativo
+  agente_ccee,
+  FORMAT_DATE('%Y-%m', data_referencia) AS periodo_apuracao,
+  periodo_apuracao_ccee,
+  versao_publicacao,
+  cnpj,
+  razao_social,
+  classe_agente,
+  situacao_comercializador,
+  situacao_varejista,
+  uf,
+  categoria_agente,
+  varejista,
+  _ingestao_id,
+  _ingestao_timestamp
+FROM ${ref("bronze", "ccee_agente")}
+QUALIFY ROW_NUMBER() OVER (
+  PARTITION BY periodo_apuracao_ccee, cnpj
+  ORDER BY versao_publicacao DESC, _ingestao_timestamp DESC
+) = 1

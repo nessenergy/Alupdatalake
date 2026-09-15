@@ -1,0 +1,38 @@
+config {
+  type: "operations",
+  schema: "bronze",
+  hasOutput: true,
+  tags: ["bronze"]
+}
+
+-- Bronze: encargos de serviço do sistema (ESS) e serviços ancilares, mensal,
+-- mercado inteiro (CCEE, dados abertos). Uma linha por mês e por publicação;
+-- a Silver fica com a publicação mais recente.
+CREATE TABLE IF NOT EXISTS ${self()} (
+  data_referencia                                        DATE      NOT NULL OPTIONS(description="Primeiro dia do mês de referência"),
+  periodo_apuracao_ccee                                   STRING    NOT NULL OPTIONS(description="AAAA-MM, como a CCEE declara"),
+  versao_publicacao                                       DATE      NOT NULL OPTIONS(description="last_modified do recurso no CKAN (ADR 016)"),
+  encargo_constrained_on                                  NUMERIC            OPTIONS(description="R$"),
+  encargo_constrained_off                                 NUMERIC            OPTIONS(description="R$"),
+  outros_servicos_ancilares                               NUMERIC            OPTIONS(description="R$"),
+  encargo_cs                                              NUMERIC            OPTIONS(description="R$"),
+  encargo_seguranca_energetica                            NUMERIC            OPTIONS(description="R$"),
+  recebimento_encargo_dh                                  NUMERIC            OPTIONS(description="R$"),
+  encargo_restricao_operativa_unit_commitment             NUMERIC            OPTIONS(description="R$"),
+  encargo_importacao                                      NUMERIC            OPTIONS(description="R$"),
+  recebimento_encargo_reserva_operativa                   NUMERIC            OPTIONS(description="R$"),
+  ressarcimento_servicos_ancilares                        NUMERIC            OPTIONS(description="R$"),
+  ressarcimento_custo_operacao_manutencao_equipamento      NUMERIC            OPTIONS(description="R$"),
+  ressarcimento_custo_operacao_manutencao_equipamento_cag  NUMERIC            OPTIONS(description="R$"),
+  ressarcimento_custo_implantacao_operacao_manutencao_sep  NUMERIC            OPTIONS(description="R$"),
+  ressarcimento_custo_emergencial                         NUMERIC            OPTIONS(description="R$"),
+  ressarcimento_distribuidora_implantacao                 NUMERIC            OPTIONS(description="R$"),
+
+  _ingestao_id                                            STRING    NOT NULL,
+  _ingestao_timestamp                                     TIMESTAMP NOT NULL,
+  _fonte                                                  STRING    NOT NULL,
+  _schema_versao                                          STRING    NOT NULL
+)
+PARTITION BY DATE(_ingestao_timestamp)
+CLUSTER BY data_referencia
+OPTIONS(description="Encargos de serviço do sistema (ESS) mensal — camada Bronze, append-only");

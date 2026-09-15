@@ -1,0 +1,23 @@
+config {
+  type: "table",
+  schema: "gold",
+  tags: ["gold"]
+}
+
+-- Gold: quantos agentes existem em cada classe e categoria, mês a mês — e
+-- quantos deles atuam como varejista ou comercializador autorizado.
+--
+-- É a leitura de mercado que `agentes_ccee` (retrato de perfis) não dá: o
+-- movimento de entrada e saída de agentes ao longo do tempo. Sem KPI (ADR 012):
+-- contagem descritiva, sem meta nem fórmula de negócio.
+SELECT
+  periodo_apuracao,
+  classe_agente,
+  categoria_agente,
+  COUNT(*)                                                       AS agentes,
+  COUNTIF(varejista)                                             AS varejistas,
+  COUNTIF(situacao_comercializador = 'Autorizado')               AS comercializadores_autorizados,
+  COUNTIF(situacao_varejista = 'Aprovada')                       AS varejistas_aprovados,
+  COUNT(DISTINCT uf)                                             AS ufs
+FROM ${ref("silver", "ccee_agente")}
+GROUP BY periodo_apuracao, classe_agente, categoria_agente

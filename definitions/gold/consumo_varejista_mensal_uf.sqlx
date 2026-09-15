@@ -1,0 +1,26 @@
+config {
+  type: "table",
+  schema: "gold",
+  tags: ["gold"]
+}
+
+-- Gold: quanto cada varejista atendeu de carga em cada UF, mês a mês — parcelas
+-- e consumo somados sobre as distribuidoras. Não desce abaixo de
+-- (mês, varejista, UF): consumo vindo da CCEE é confidencial (F1), e a
+-- distribuidora é detalhe operacional, não pergunta de domínio.
+-- Unidade de `consumo_total` não documentada pela CCEE; a Gold não a afirma.
+SELECT
+  v.periodo_apuracao,
+  v.codigo_perfil,
+  v.sigla_perfil,
+  a.agente_ccee,
+  v.uf_carga,
+  v.submercado,
+  COUNT(DISTINCT v.codigo_perfil_conectado)  AS distribuidoras,
+  SUM(v.quantidade_parcelas_carga)           AS parcelas_de_carga,
+  SUM(v.consumo_total)                       AS consumo_total,
+  MAX(v.versao_publicacao)                   AS versao_publicacao
+FROM ${ref("silver", "ccee_varejista_consumidor")} AS v
+LEFT JOIN ${ref("gold", "agentes_ccee")} AS a
+  ON a.codigo_perfil = v.codigo_perfil
+GROUP BY v.periodo_apuracao, v.codigo_perfil, v.sigla_perfil, a.agente_ccee, v.uf_carga, v.submercado

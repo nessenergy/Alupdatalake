@@ -1,0 +1,22 @@
+config {
+  type: "table",
+  schema: "gold",
+  tags: ["gold"]
+}
+
+-- Gold: quanto o mercado de curto prazo ficou exposto, quanto foi coberto e
+-- quanto sobrou, mês a mês — em R$ e em fração coberta.
+--
+-- Primeira tabela do domínio Risco e Compliance. A fração é aritmética de
+-- leitura, não indicador de negócio (ADR 012): ninguém definiu meta para ela.
+SELECT
+  periodo_apuracao,
+  versao_publicacao,
+  total_exposicao_negativa                 AS exposicao_negativa_reais,
+  cobertura_exposicao_negativa             AS cobertura_reais,
+  total_exposicao_negativa_remanescente    AS exposicao_remanescente_reais,
+  total_exposicao_negativa_liquidada       AS exposicao_liquidada_reais,
+  SAFE_DIVIDE(cobertura_exposicao_negativa, total_exposicao_negativa) AS fracao_coberta,
+  excedente_financeiro                     AS excedente_financeiro_reais,
+  reserva_alivio_ess                       AS reserva_alivio_ess_reais
+FROM ${ref("silver", "ccee_exposicao_financeira")}

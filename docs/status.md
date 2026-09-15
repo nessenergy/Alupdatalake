@@ -39,6 +39,9 @@ contexto para agentes, em [`../AGENTS.md`](../AGENTS.md).
 | **FinOps F0** — rótulo de custo por fonte no job do BigQuery | `src/core/bigquery.py` (`rotulos()`) | 6 testes; precisa existir **antes** do 1º apply, custo gasto não se rateia depois |
 | **8 domínios analíticos** e dimensões comuns fechadas (plano 0.10 e 0.11) | `docs/arquitetura/dominios-analiticos.md`, `visao-geral.md` | Itens de Onda 0 que estavam desbloqueados desde 11/09. Duas lacunas nomeadas: de-para de usina (Alup) e mês CCEE (ness.) |
 | Domínios corrigidos para os do **B1**, e a abrangência do dado escrita | `docs/arquitetura/dominios-analiticos.md`, `src/portal/custo.py` | A primeira versão derivava os domínios de A1. São os do B1 — 8 domínios em 11 linhas, três com responsáveis distintos por subtema. As 6 coligadas respondem pelo faturamento e não delimitam o dado |
+| Base `CceeCsvCkan`: CKAN, fluxo, gzip, decodificação por linha, janela por mês | `src/conectores/ccee_ckan.py` | 20 testes; lida dos arquivos reais em 14/09 — encoding misto, gzip mensal, vírgula no CVU. Corrigida duas vezes durante a fila: gzip de transporte da CDN (`_SemErroAoFechar`) e estreitamento do `except ValueError` ao fluxo fechado |
+| ADR 016 **aceita**: `versao_publicacao` do CKAN (`last_modified`, opção B) em toda entidade mensal; Silver vigente + view `_historico` | `definitions/silver/ccee_contabilizacao_perfil*.sqlx` | replay de raw antigo deixa de rebaixar a vigente |
+| Parsing que pode falhar mora no schema, não no conector | Silver das entidades novas (Tasks 6–8) | linha malformada conta como inválida em vez de derrubar o mês inteiro; aprendido na Task 5, aplicado nas Tasks 6–8 |
 
 ### Conectores (7 componentes cada, exceto onde indicado)
 
@@ -53,12 +56,22 @@ contexto para agentes, em [`../AGENTS.md`](../AGENTS.md).
 | **Hubspot/negócios** | JSON paginado, CRM | **não executado** — sem token (A9) | a cada 6h, janela 2 dias |
 | **BBCE/curva forward** | JSON por pregão, sessão JWT | **não executado** — sem acesso (A7) | dia útil 20h, janela 7 dias |
 | **TempoOK/boletins** | PDF por download, catálogo no Bronze | **contrato verificado contra a API real**; 0 boletins ingeríveis — o acervo alcançável para em 26/10/2022 (ADR 019, adendo) | diário 11h, janela 5 dias |
+| **CCEE/agente** | CSV anual, UTF-8 e ISO-8859-1 misturados por linha, via CKAN | **32.886 registros / 2 meses**, 0 inválidos, 4,2 s, contra a API real | mensal, dia 6 às 10h, janela 120 dias |
+| **CCEE/exposição financeira** | CSV anual, ASCII, série mensal sem agente, via CKAN | **7 registros / 7 meses**, 0 inválidos, 0,9 s, contra a API real | mensal, dia 6 às 10h, janela 120 dias |
+| **CCEE/contabilização por perfil** | CSV anual, UTF-8 e ISO-8859-1 misturados por linha, com recontabilização (ADR 016), via CKAN | **94.710 registros / 2 meses**, 0 inválidos, 11,8 s, contra a API real | mensal, dia 6 às 10h, janela 120 dias |
+| **CCEE/geração por usina** | CSV mensal, gzip, via CKAN | **2.964.096 registros / 1 mês**, 0 inválidos, 177,7 s **em dry-run** (raw e carga pulados; não é o tempo da execução real), contra a API real | mensal, dia 7 às 3h, janela **40 dias** (era 70 — o runner materializa o mês inteiro em memória; 70 dias abria 3-4 meses de uma vez, risco de OOM no Cloud Run Job de 512Mi padrão), 4Gi/2 vCPU declarados como premissa a confirmar no 1º apply |
+| **CCEE/montantes contratados** | CSV anual, UTF-8 e ISO-8859-1 misturados por linha, via CKAN | **53.267 registros / 2 meses**, 0 inválidos, 4,8 s, contra a API real | mensal, dia 6 às 10h, janela 120 dias |
+| **CCEE/consumo varejista** | CSV anual, via CKAN | **6.664 registros / 2 meses**, 0 inválidos, 1,2 s, contra a API real | mensal, dia 6 às 10h, janela 120 dias |
+| **CCEE/ESS** | CSV anual, série mensal sem agente, via CKAN | **7 registros / 7 meses**, 0 inválidos, contra a API real | mensal, dia 6 às 10h, janela 120 dias |
+| **CCEE/energia de reserva (EER)** | CSV anual, série mensal sem agente, via CKAN | **7 registros / 7 meses**, 0 inválidos, contra a API real | mensal, dia 6 às 10h, janela 120 dias |
+| **CCEE/CVU estrutural** | CSV anual, delimitador vírgula, via CKAN | **805 registros / 2 meses**, 0 inválidos, contra a API real | mensal, dia 6 às 10h, janela 120 dias |
 
-**Seis das nove falaram com a API real** em dry-run. Hubspot e BBCE são as
-exceções: os 7 componentes existem, escritos contra a documentação, e o teste
-de integração está `skipif` até a credencial chegar (A9 e A7). No BBCE falta
-inclusive o **host**, que não consta da documentação pública e vem junto com o
-acesso.
+**Quinze das dezoito falaram com a API real** em dry-run: as seis que já
+falavam somadas às nove entidades novas da CCEE (ADR 021), todas verificadas
+em 14/09. Hubspot e BBCE seguem as exceções: os 7 componentes existem,
+escritos contra a documentação, e o teste de integração está `skipif` até a
+credencial chegar (A9 e A7). No BBCE falta inclusive o **host**, que não
+consta da documentação pública e vem junto com o acesso.
 
 O TempoOK é um caso à parte: **falou com a API e o contrato de dados está
 verificado** — caminho, ausência por 404, TLS, estabilidade do `sha256` —, mas
@@ -118,6 +131,7 @@ destino, com os oito invariantes e a pauta de perguntas. **Enviado ao Google em
 | ~~A8~~ | ~~**Documentação técnica de BBCE e TempoOK**~~ | **Atendida em 14/09** — BBCE documentado em Postman; TempoOK sem documentação publicada, mas com exemplo suficiente. Resta só a credencial do BBCE, que é A7 | [registro de 14/09](relatorios/2026-09-14-documentacao-de-apis-recebida.md) |
 | A9 | **Token do Hubspot** (private app) no secret `alupdata-hubspot-api-token` | o conector está pronto e parado; nenhuma linha de CRM entra no lake | plano 2.3 (2.3) |
 | A10 | **Verificar com o TempoOK o acesso ao acervo recente** — o token entregue em 14/09 alcança boletins só até 26/10/2022 | o conector está pronto e verificado, mas ingere zero boletins; a fonte não fecha na Onda 2. **Resolver isto antecipa a rotação do token** (gatilho 1 da [ADR 020](arquitetura/decisoes/020-token-tempook-rotacao-na-producao.md)): com acervo corrente, o alcance da credencial muda de patamar | [ADR 019](arquitetura/decisoes/019-boletim-do-tempook-como-arquivo.md), [registro de 14/09](relatorios/2026-09-14-documentacao-de-apis-recebida.md) §4.1 |
+| A11 | **De-para de usina** — sigla interna ↔ CEG ↔ nome CCEE ↔ nome ONS | **Agora bloqueia dado real**: `ccee_geracao_usina` e `ccee_cvu_estrutural` guardam `codigo_parcela_usina` com `codigo_usina` nulo à espera dele | Lacuna 1 (`dominios-analiticos.md` §5.1), [#141](https://github.com/nessenergy/Alupdatalake/issues/141) |
 
 > **Cláusula 3ª**: atraso > 5 dias úteis posterga o cronograma; > 5 dias úteis em
 > VPN/credencial gera taxa de ociosidade de 4h/dia (R$ 256/h); > 20 dias

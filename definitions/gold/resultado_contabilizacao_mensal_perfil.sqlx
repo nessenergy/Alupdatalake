@@ -1,0 +1,30 @@
+config {
+  type: "table",
+  schema: "gold",
+  tags: ["gold"]
+}
+
+-- Gold: o resultado financeiro de cada perfil de agente no MCP, mês a mês, com
+-- a sigla do agente que a origem não traz — junção com a dimensão
+-- `gold.agentes_ccee` por `codigo_perfil`, que é o uso para o qual ela existe.
+--
+-- LEFT JOIN, não INNER: perfil encerrado sai de `agentes_ccee` (só ATIVO) mas
+-- ainda tem resultado no mês; sumir com ele seria lacuna silenciosa.
+-- Lê só a Silver vigente (ADR 016). Sem KPI (ADR 012).
+SELECT
+  c.periodo_apuracao,
+  c.versao_publicacao,
+  c.codigo_perfil,
+  c.sigla_perfil,
+  a.agente_ccee,
+  c.codigo_agente,
+  c.cnpj,
+  c.resultado_final                        AS resultado_final_reais,
+  c.valor_tm_mcp                           AS mcp_reais,
+  c.valor_encargo                          AS encargos_reais,
+  c.ajuste_recontab                        AS recontabilizacao_reais,
+  c.efeito_repasse_risco_hidrologico       AS risco_hidrologico_reais,
+  c.resultado_financeiro_energia_reserva   AS energia_reserva_reais
+FROM ${ref("silver", "ccee_contabilizacao_perfil")} AS c
+LEFT JOIN ${ref("gold", "agentes_ccee")} AS a
+  ON a.codigo_perfil = c.codigo_perfil

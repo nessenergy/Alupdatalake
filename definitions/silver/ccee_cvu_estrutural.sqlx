@@ -1,0 +1,51 @@
+config {
+  type: "view",
+  schema: "silver",
+  tags: ["silver"],
+  assertions: {
+    uniqueKey: ["periodo_apuracao_ccee", "ano_horizonte", "codigo_parcela_usina", "leilao", "produto", "codigo_modelo_preco"],
+    nonNull: ["data_referencia", "periodo_apuracao_ccee", "versao_publicacao", "ano_horizonte", "leilao", "produto", "codigo_modelo_preco", "cvu_estrutural"],
+    rowConditions: [
+      "periodo_apuracao = periodo_apuracao_ccee",
+      "cvu_estrutural >= 0",
+      "ano_horizonte >= EXTRACT(YEAR FROM data_referencia)",
+      "termino_suprimento IS NULL OR inicio_suprimento IS NULL OR termino_suprimento >= inicio_suprimento"
+    ]
+  }
+}
+
+-- Silver: uma linha por (mês de referência, ano de horizonte, usina, leilão,
+-- produto, modelo de preço), pela publicação mais recente (ADR 016, opção B).
+-- Chave perfilada contra a API real em 14/09/2026: a candidata de cinco
+-- colunas do Questionário tinha 185 duplicatas em 4.715 linhas;
+-- `codigo_modelo_preco` (a próxima coluna discriminante) zera as duplicatas —
+-- ver `docs/dicionario-dados/ccee_cvu_estrutural.md`.
+-- `codigo_usina` é nulo: a origem usa código interno da CCEE, não o CEG —
+-- Lacuna 1, #141, mesma regra da geração horária.
+-- Faixas (issue #110): CVU não é negativo; o horizonte não é anterior ao mês
+-- de referência; suprimento não termina antes de começar.
+SELECT
+  data_referencia,
+  CAST(NULL AS STRING) AS submercado,    -- a origem não traz submercado por usina
+  CAST(NULL AS STRING) AS codigo_usina,  -- CODIGO_PARCELA_USINA não é CEG; de-para pendente (#141)
+  CAST(NULL AS STRING) AS agente_ccee,   -- a usina não é agente
+  FORMAT_DATE('%Y-%m', data_referencia) AS periodo_apuracao,
+  periodo_apuracao_ccee,
+  versao_publicacao,
+  ano_horizonte,
+  codigo_parcela_usina,
+  sigla_parcela,
+  tipo_combustivel,
+  leilao,
+  produto,
+  cvu_estrutural,
+  codigo_modelo_preco,
+  inicio_suprimento,
+  termino_suprimento,
+  _ingestao_id,
+  _ingestao_timestamp
+FROM ${ref("bronze", "ccee_cvu_estrutural")}
+QUALIFY ROW_NUMBER() OVER (
+  PARTITION BY periodo_apuracao_ccee, ano_horizonte, codigo_parcela_usina, leilao, produto, codigo_modelo_preco
+  ORDER BY versao_publicacao DESC, _ingestao_timestamp DESC
+) = 1

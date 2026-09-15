@@ -82,6 +82,20 @@ Ainda em 11/09, diante do teto de E2: **orquestração da Onda 3 em Cloud Workfl
 
 ## 4. Minha fila
 
+### O que entrou na fila em 14/09
+
+| O quê | Branch/PR | Situação |
+|---|---|---|
+| Fila da ADR 021, ordens 1–5: `ccee_agente`, `ccee_exposicao_financeira`, `ccee_contabilizacao_perfil`, `ccee_geracao_usina`, `ccee_contrato_montante`, `ccee_varejista_consumidor`, `ccee_encargo_ess`, `ccee_energia_reserva`, `ccee_cvu_estrutural` | `worktree-fila-ccee` (sem número de PR ainda) | **9 entidades entregues em 14/09** — 7 componentes cada, contra a API real (`status.md` §1) |
+
+### O que segue parado
+
+| O quê | Bloqueado por |
+|---|---|
+| EAR e ENA do ONS | plano próprio — não é escopo desta fila da CCEE |
+| As 19 entidades secundárias da ADR 021 (§2.1/§3 da ADR) | fila priorizada, sem demanda de domínio ainda — mesmo caminho de subclasse de `CceeCsvCkan` quando entrarem |
+| Lote por fatia no runner — `extrair()` já lê em fluxo, mas `conector.py` materializa o mês inteiro em memória antes de gravar o raw e validar | mudança de framework (`_ingerir`), não desta fila; branch própria. Até lá, `ccee_geracao_usina` roda com janela reduzida (40 dias) e `memoria`/`cpu` de 4Gi/2 vCPU declarados como premissa no Terraform |
+
 | # | Ação | Depende de |
 |---|---|---|
 | ~~4.1~~ | ~~Conector do BBCE~~ — **entregue em 14/09**: `bbce_curva_forward`, 7 componentes, 17 testes. Falta só o acesso (A7, [#23](https://github.com/nessenergy/Alupdatalake/issues/23)) — inclusive o **host**, que não consta da documentação | — |

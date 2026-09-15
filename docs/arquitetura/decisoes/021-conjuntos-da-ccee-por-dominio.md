@@ -32,12 +32,14 @@ adivinhação continua proibido*.
 |---|---|---|
 | `pld_horario_submercado` | preço à vista por submercado e hora | **entregue** (ADR 018) |
 | `lista_perfil_v1` | cadastro de perfis; alimenta `agente_ccee` | **entregue** |
-| `lista_agente_associado` | agente ↔ perfil: um agente tem vários perfis, e é o perfil que transaciona | a entrar |
+| `lista_agente_associado` | lista mensal de agentes — classe, situação de comercializador e de varejista, UF, categoria — com histórico por mês. **Não traz perfil**: o elo agente ↔ perfil já está em `lista_perfil_v1` | **entregue** |
 | `consumo_horario_submercado` | consumo reconciliado usado na contabilização do MCP | a entrar |
-| `custo_variavel_unitario_estrutural` | **CVU** por usina, combustível, leilão e produto | a entrar |
+| `custo_variavel_unitario_estrutural` | **CVU** por usina, combustível, leilão e produto | **entregue em 14/09** |
 | `custo_variavel_unitario_conjuntural` e `_conjuntural_revisado` | CVU conjuntural e a sua revisão — o par revisado é caso de versionamento ([ADR 016](016-versionamento-de-recontabilizacao.md)) | a entrar |
-| `encargo_ess_ancilar` · `encargo_horario_submercado` | **ESS** — encargos de serviço do sistema | a entrar |
-| `energia_reserva_liquidacao` · `energia_reserva_mensal_leilao` | **EER** — encargo de energia de reserva | a entrar |
+| `encargo_ess_ancilar` | **ESS** — encargos de serviço do sistema | **entregue em 14/09** |
+| `encargo_horario_submercado` | **ESS** — encargos de serviço do sistema, por submercado | a entrar |
+| `energia_reserva_liquidacao` | **EER** — encargo de energia de reserva | **entregue em 14/09** |
+| `energia_reserva_mensal_leilao` | **EER** — encargo de energia de reserva, mensal por leilão | a entrar |
 
 O B1 nomeia PLD, EAR, ENA, CCEE (CVU, ESS, EER) e ONS. **EAR e ENA não são da
 CCEE** — são do ONS, e entram por lá.
@@ -78,19 +80,56 @@ CCEE** — são do ONS, e entram por lá.
 InfoMercado. Registrar isso vale tanto quanto a lista: evita que alguém volte
 aos 204 procurando o que não está lá.
 
+## 2.1 O que a leitura dos arquivos corrigiu
+
+Esta ADR foi escrita a partir do catálogo do CKAN — títulos e descrições de
+`package_show`, sem abrir arquivo. A construção da fila leu os arquivos, e
+quatro coisas só o arquivo (e a execução real) mostraram:
+
+- **`lista_agente_associado` não tem coluna de perfil.** É a lista mensal de
+  agentes — classe, situação de comercializador e de varejista, UF, categoria
+  — com histórico por mês. O elo agente ↔ perfil está em `lista_perfil_v1`, já
+  entregue.
+- **`geracao_horaria_usina` é publicada em gzip mensal** — um recurso por mês
+  (`_202403` … `_202607`), não um recurso corrente único.
+- **`custo_variavel_unitario_estrutural` usa vírgula como delimitador** — o
+  único CSV desta fonte que não usa `;`.
+- **A leitura em fluxo termina no `extrair()`; o runner materializa o mês.**
+  `CceeCsvCkan.extrair()` lê o gzip mensal em fluxo, mas
+  `src/core/conector.py` (`_ingerir`) junta tudo numa lista antes de gravar o
+  raw e validar — com `ccee_geracao_usina` e a janela de agendamento antiga
+  (70 dias) isso abria 3-4 meses de uma vez (~9-12 milhões de linhas), acima
+  do padrão de memória do Cloud Run Job. A janela caiu para 40 dias e o job
+  ganhou `memoria`/`cpu` maiores como premissa a confirmar no 1º apply; lote
+  por fatia no runner é mudança de framework, fora desta fila.
+
+A ADR foi escrita do catálogo; o dicionário de cada entidade é a fonte a
+partir daqui.
+
 ## 3. Ordem de entrada
 
 Cada entidade custa os 7 componentes. Esta é uma **fila priorizada, não um
 compromisso de escopo** — o contrato é por regime de horas e a prioridade pode
 mudar; o padrão de entrega, não.
 
-| Ordem | Conjunto | Por quê primeiro |
-|---|---|---|
-| 1 | `lista_agente_associado` | é dimensão, é barato, e completa o cadastro que dá nome a todo código das entidades seguintes |
-| 2 | `exposicao_financeira_mensal` · `contabilizacao_montante_perfil_agente` | **Risco e Compliance não tem nenhuma fonte hoje.** Sair de zero vale mais do que adensar um domínio já pronto |
-| 3 | `geracao_horaria_usina` | põe Geração e Operacional na granularidade de usina que o A7 pede |
-| 4 | `contrato_montante_compra_venda_perfil_agente` · `varejista_consumidor` | ver §4 |
-| 5 | CVU, ESS e EER | completam o que o B1 nomeia em Mercado de Energia, que já é o domínio mais maduro |
+| Ordem | Conjunto | Por quê primeiro | Estado |
+|---|---|---|---|
+| 1 | `lista_agente_associado` | é dimensão, é barato, e completa o cadastro que dá nome a todo código das entidades seguintes | **entregue em 14/09** |
+| 2 | `exposicao_financeira_mensal` · `contabilizacao_montante_perfil_agente` | **Risco e Compliance não tem nenhuma fonte hoje.** Sair de zero vale mais do que adensar um domínio já pronto | **entregue em 14/09** |
+| 3 | `geracao_horaria_usina` | põe Geração e Operacional na granularidade de usina que o A7 pede | **entregue em 14/09** |
+| 4 | `contrato_montante_compra_venda_perfil_agente` · `varejista_consumidor` | ver §4 | **entregue em 14/09** |
+| 5 | CVU, ESS e EER | completam o que o B1 nomeia em Mercado de Energia, que já é o domínio mais maduro | **entregue em 14/09** |
+
+As demais entidades desta ADR não entraram nesta fila. Cada uma entra pelo
+mesmo caminho: subclasse de `CceeCsvCkan`, arquivo lido antes do schema:
+`geracao_horaria_submercado`, `geracao_fonte_primaria`,
+`garantia_fisica_*`, `mre_*`, `contrato_montante_mensal_tipo`,
+`contrato_montante_periodo`, `sazonalizacao_*`, `varejista_subclasse`,
+`montante_mensal_mcp_agente`, `sumario_mensal_liquidacao`, `fator_ajuste_gf`,
+`premio_risco_hidrologico`, `repasse_risco_hidrologico`, `proinfa_*`,
+`penalidade_preco_mensal`, `custo_variavel_unitario_conjuntural*`,
+`encargo_horario_submercado`, `energia_reserva_mensal_leilao`,
+`consumo_horario_submercado`.
 
 ## 4. O achado: parte de Comercial e Contratos tem via pública
 

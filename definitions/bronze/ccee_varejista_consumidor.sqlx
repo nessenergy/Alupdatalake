@@ -1,0 +1,31 @@
+config {
+  type: "operations",
+  schema: "bronze",
+  hasOutput: true,
+  tags: ["bronze"]
+}
+
+-- Bronze: consumo das cargas de varejo por varejista, UF e distribuidora (CCEE).
+-- Dado classificado como confidencial pela Alup (F1); dataset interno (F4).
+CREATE TABLE IF NOT EXISTS ${self()} (
+  data_referencia            DATE      NOT NULL OPTIONS(description="Primeiro dia do mês de referência"),
+  periodo_apuracao_ccee      STRING    NOT NULL,
+  versao_publicacao          DATE      NOT NULL OPTIONS(description="last_modified do recurso no CKAN (ADR 016)"),
+  codigo_perfil              STRING    NOT NULL OPTIONS(description="Perfil do varejista"),
+  sigla_perfil               STRING    NOT NULL,
+  nome_empresarial           STRING    NOT NULL,
+  uf_carga                   STRING    NOT NULL,
+  submercado                 STRING    NOT NULL OPTIONS(description="N, NE, S, SE — submercado da carga"),
+  codigo_perfil_conectado    STRING             OPTIONS(description="Perfil da distribuidora à qual a carga está conectada; nulo em raras linhas"),
+  sigla_perfil_conectado     STRING,
+  quantidade_parcelas_carga  INT64     NOT NULL,
+  consumo_total              NUMERIC   NOT NULL OPTIONS(description="Unidade não documentada pela CCEE — ver dicionário"),
+
+  _ingestao_id               STRING    NOT NULL,
+  _ingestao_timestamp        TIMESTAMP NOT NULL,
+  _fonte                     STRING    NOT NULL,
+  _schema_versao             STRING    NOT NULL
+)
+PARTITION BY DATE(_ingestao_timestamp)
+CLUSTER BY data_referencia, codigo_perfil
+OPTIONS(description="Consumo de varejo por varejista, UF e distribuidora — camada Bronze, append-only, confidencial (F1)");

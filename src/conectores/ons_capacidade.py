@@ -41,6 +41,7 @@ from typing import TYPE_CHECKING, Any
 from pydantic import BaseModel, field_validator
 
 from src.conectores.ons_carga import SUBMERCADOS
+from src.core.ceg import ceg_canonico
 from src.core.conector import Conector
 from src.core.config import get_settings
 from src.core.http import criar_sessao
@@ -113,7 +114,7 @@ class Capacidade(BaseModel):
     @field_validator("codigo_usina", mode="before")
     @classmethod
     def _ceg_ou_nulo(cls, valor: str | None) -> str | None:
-        return _texto_ou_nulo(valor)
+        return ceg_canonico(valor)
 
     @field_validator("data_entrada_teste", "data_entrada_operacao", "data_desativacao", mode="before")
     @classmethod

@@ -113,7 +113,7 @@ do Gabriel Barreto.
 | **Granularidade** | **usina** — a granularidade que A7 fixa para dado de portfólio |
 | **Cadência** | semanal para o cadastro público; mensal para a geração da CCEE; diária para medição, na janela das 22h às 6h (C9) |
 | **Gold hoje** | `parque_gerador`, `geracao_mensal_usina` |
-| **Situação** | **parcial** — geração na granularidade de usina entregue; `codigo_usina` depende do de-para (#141) |
+| **Situação** | **parcial** — geração na granularidade de usina entregue; `codigo_usina` cruza ANEEL↔ONS desde 15/09 (`gold.de_para_usina`); falta a sigla interna (#141) |
 
 **Tem um bloqueio nomeado**: o item D1 informa que a Alup identifica os ativos
 por **sigla interna** (FGE, FOZ, IJU, QLZ, LVR, VD8, EAP I e II, PTB, EDV I a IV
@@ -238,7 +238,7 @@ bloqueado:
 | Ordem | Domínio | Por quê |
 |---|---|---|
 | 1 | **Mercado de Energia**, **Econômico**, **Meteorologia** | já têm fonte no lake; é o que dá dashboard atualizado sem depender de ninguém |
-| 2 | **Geração e Operacional** (lado público) | cadastro pronto; o cruzamento depende do de-para da §5.1 |
+| 2 | **Geração e Operacional** (lado público) | cadastro pronto; o de-para público está em `gold.de_para_usina`, falta só a sigla interna (§5.1) |
 | 3 | **CRM e Marketing** | destrava com o token do Hubspot, insumo pequeno |
 | 4 | **Comercial e Contratos**, **Risco e Compliance** | maior valor, bloqueados em credencial (A7) |
 | 5 | **Planejamento** | depende do RM/TOTVS (25/09) e dos templates da Onda 4 |
@@ -255,7 +255,7 @@ aprendeu no caminho.
 Não são pendências novas — são consequências das respostas de 11/09 que ainda
 não tinham sido escritas em lugar nenhum.
 
-### 5.1 A dimensão de usina precisa de um de-para, e ele não existe
+### 5.1 A dimensão de usina precisa de um de-para — três quartos dele já existem
 
 O item **D1** informa que a Alup identifica ativos por sigla interna e que o CEG
 não é usado. A CCEE e o ONS usam nomes próprios. Hoje `codigo_usina` é
@@ -265,8 +265,18 @@ Sem uma tabela de correspondência entre **sigla interna ↔ CEG ↔ nome CCEE �
 ONS**, Geração e Operacional não cruza com Comercial e Contratos nem com Risco e
 Compliance — e é justamente esse cruzamento que a prioridade 1 de A2 pede.
 
-**O que destrava**: a Alup fornecer o de-para, ou a lista de siglas com o CEG
-correspondente. É insumo pequeno e de efeito grande.
+**O que mudou em 15/09**: o ONS publica o CEG junto do nome da usina, nas duas
+fontes conectadas naquele dia (`ons_geracao_usina` e `ons_capacidade`). Três das
+quatro colunas do de-para — **CEG ↔ nome ANEEL ↔ nome ONS** — passam a existir
+dentro do próprio lake, materializadas em `gold.de_para_usina`.
+
+Para que casassem foi preciso corrigir a chave: a ANEEL publica o último
+segmento do CEG com um dígito e o ONS com dois, e o JOIN devolvia **zero** linha
+em 2.047 usinas. Com o sufixo normalizado na ingestão (`src/core/ceg.py`),
+**1.946 (95,1%)** casam.
+
+**O que ainda destrava**: a Alup fornecer a lista de **siglas internas com o CEG
+correspondente** — uma coluna, não quatro. É insumo pequeno e de efeito grande.
 
 ### 5.2 Os dois calendários — encerrada em 14/09
 

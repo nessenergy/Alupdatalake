@@ -1,0 +1,131 @@
+config {
+  type: "table",
+  schema: "gold",
+  tags: ["gold"]
+}
+
+-- Gold: o de-para de usina que o lake consegue montar sozinho.
+--
+-- A issue #141 pede quatro colunas: sigla interna da Alup ↔ CEG ↔ nome CCEE ↔
+-- nome ONS. Três origens públicas já trazem o CEG — o cadastro da ANEEL, a
+-- capacidade instalada do ONS e a geração horária do ONS —, então o lado
+-- **CEG ↔ nome ANEEL ↔ nome ONS** é construído aqui, sem depender de insumo da
+-- Alup. O que resta pedir encolheu para `sigla_ccee`, que fica nula de
+-- propósito: é a única coluna que só a Alup tem.
+--
+-- O CEG das três origens só casa porque a ingestão o normaliza: a ANEEL publica
+-- o último segmento com um dígito (`...-6.1`) e o ONS com dois (`...-6.01`).
+-- Medido em 15/09/2026 contra as origens reais, o JOIN sem normalizar devolvia
+-- **zero** linha em 2.047 usinas; com `src/core/ceg.py`, 1.946 (95,1%) casam.
+--
+-- FULL OUTER entre as três: uma usina que existe no cadastro da ANEEL e não é
+-- despachada pelo ONS é informação, não erro, e vice-versa. `cobertura` diz
+-- quais origens conhecem cada usina — é a coluna que se lê para saber se um
+-- vazio é ausência de dado ou ausência da usina. Sem KPI (ADR 012).
+
+WITH aneel AS (
+  SELECT
+    codigo_usina,
+    nome        AS nome_aneel,
+    uf          AS uf_aneel,
+    tipo_geracao,
+    fase,
+    potencia_fiscalizada_kw / 1000 AS potencia_fiscalizada_mw
+  FROM ${ref("silver", "aneel_siga")}
+),
+
+-- Uma usina tem várias unidades geradoras; o cadastro do ONS é por unidade.
+-- `nomes_no_cadastro_ons` existe porque 11 CEGs do arquivo real trazem mais de
+-- um nome (Belo Monte/Pimental, Santana Bloco 1/2): quem for usar o nome como
+-- rótulo precisa saber que ali ele não é único.
+capacidade AS (
+  SELECT
+    codigo_usina,
+    MIN(nome_usina)             AS nome_ons_cadastro,
+    COUNT(DISTINCT nome_usina)  AS nomes_no_cadastro_ons,
+    MIN(submercado)             AS submercado_ons,
+    MIN(uf)                     AS uf_ons,
+    MIN(tipo_usina)             AS tipo_usina_ons,
+    COUNT(*)                    AS unidades_geradoras,
+    SUM(potencia_efetiva)       AS potencia_efetiva_total
+  FROM ${ref("silver", "ons_capacidade")}
+  WHERE codigo_usina IS NOT NULL
+  GROUP BY codigo_usina
+),
+
+geracao AS (
+  SELECT
+    codigo_usina,
+    MIN(nome_usina)             AS nome_ons_geracao,
+    COUNT(DISTINCT nome_usina)  AS nomes_na_geracao_ons,
+    MIN(data_referencia)        AS primeira_geracao,
+    MAX(data_referencia)        AS ultima_geracao
+  FROM ${ref("silver", "ons_geracao_usina")}
+  WHERE codigo_usina IS NOT NULL
+  GROUP BY codigo_usina
+),
+
+unido AS (
+  SELECT
+    COALESCE(a.codigo_usina, c.codigo_usina, g.codigo_usina) AS codigo_usina,
+    a.nome_aneel,
+    c.nome_ons_cadastro,
+    g.nome_ons_geracao,
+    a.uf_aneel,
+    c.uf_ons,
+    c.submercado_ons,
+    a.tipo_geracao,
+    c.tipo_usina_ons,
+    a.fase,
+    a.potencia_fiscalizada_mw,
+    c.unidades_geradoras,
+    c.potencia_efetiva_total,
+    g.primeira_geracao,
+    g.ultima_geracao,
+    c.nomes_no_cadastro_ons,
+    g.nomes_na_geracao_ons,
+    a.codigo_usina IS NOT NULL AS no_cadastro_aneel,
+    c.codigo_usina IS NOT NULL AS no_cadastro_ons,
+    g.codigo_usina IS NOT NULL AS na_geracao_ons
+  FROM aneel AS a
+  FULL OUTER JOIN capacidade AS c USING (codigo_usina)
+  FULL OUTER JOIN geracao    AS g USING (codigo_usina)
+)
+
+SELECT
+  codigo_usina,
+
+  -- A coluna que a Alup precisa preencher (#141): a sigla interna não existe em
+  -- nenhuma fonte pública, e inventar correspondência por semelhança de nome
+  -- seria criar dado. Fica nula até o insumo chegar.
+  CAST(NULL AS STRING) AS sigla_ccee,
+
+  nome_aneel,
+  nome_ons_cadastro,
+  nome_ons_geracao,
+
+  COALESCE(uf_aneel, uf_ons) AS uf,
+  submercado_ons             AS submercado,
+  tipo_geracao,
+  tipo_usina_ons,
+  fase,
+
+  potencia_fiscalizada_mw,
+  unidades_geradoras,
+  potencia_efetiva_total,
+  primeira_geracao,
+  ultima_geracao,
+
+  nomes_no_cadastro_ons,
+  nomes_na_geracao_ons,
+  no_cadastro_aneel,
+  no_cadastro_ons,
+  na_geracao_ons,
+
+  CASE
+    WHEN no_cadastro_aneel AND (no_cadastro_ons OR na_geracao_ons) THEN 'ANEEL e ONS'
+    WHEN no_cadastro_aneel                                          THEN 'só ANEEL'
+    ELSE 'só ONS'
+  END AS cobertura
+
+FROM unido

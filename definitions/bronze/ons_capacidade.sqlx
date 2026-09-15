@@ -1,0 +1,39 @@
+config {
+  type: "operations",
+  schema: "bronze",
+  hasOutput: true,
+  tags: ["bronze"]
+}
+
+-- Bronze: capacidade instalada por unidade geradora (ONS, cadastro).
+-- Snapshot completo a cada execução; append-only preserva o histórico do
+-- cadastro, como no aneel_siga e no ccee_perfil.
+CREATE TABLE IF NOT EXISTS ${self()} (
+  data_referencia         DATE      NOT NULL OPTIONS(description="Last-Modified do recurso no S3 — o retrato não traz data própria"),
+  submercado              STRING    OPTIONS(description="N, NE, S, SE; NULL para a interligação com o Paraguai (metade paraguaia de Itaipu, sigla PY na origem)"),
+  nome_subsistema         STRING    NOT NULL,
+  uf                      STRING    NOT NULL,
+  nome_uf                 STRING    NOT NULL,
+  modalidade_operacao     STRING    NOT NULL,
+  agente_proprietario     STRING    NOT NULL,
+  agente_operador         STRING    NOT NULL,
+  tipo_usina              STRING    NOT NULL,
+  nome_usina              STRING    NOT NULL,
+  codigo_usina            STRING    OPTIONS(description="CEG; nulo quando a origem publica traço ou vazio (achado #141)"),
+  nome_unidade_geradora   STRING    NOT NULL,
+  codigo_equipamento      STRING    NOT NULL OPTIONS(description="Chave da unidade geradora"),
+  numero_unidade_geradora STRING    NOT NULL,
+  combustivel             STRING    NOT NULL,
+  data_entrada_teste      DATE      OPTIONS(description="Quase sempre vazia"),
+  data_entrada_operacao   DATE,
+  data_desativacao        DATE      OPTIONS(description="Quase sempre vazia"),
+  potencia_efetiva        NUMERIC   NOT NULL OPTIONS(description="Unidade não confirmada pela fonte no catálogo público"),
+
+  _ingestao_id            STRING    NOT NULL,
+  _ingestao_timestamp     TIMESTAMP NOT NULL,
+  _fonte                  STRING    NOT NULL,
+  _schema_versao          STRING    NOT NULL
+)
+PARTITION BY DATE(_ingestao_timestamp)
+CLUSTER BY codigo_usina, codigo_equipamento
+OPTIONS(description="Capacidade instalada por unidade geradora (ONS) — camada Bronze, append-only");

@@ -1,0 +1,21 @@
+config {
+  type: "table",
+  schema: "gold",
+  tags: ["gold"]
+}
+
+-- Gold: capacidade efetiva instalada de cada usina hoje — soma das unidades
+-- geradoras vigentes (sem data de desativação) e o total incluindo as já
+-- desativadas, para comparação.
+-- "Vigente" no nome porque o Silver já é o retrato mais recente por unidade
+-- geradora (dedup por codigo_equipamento). Sem KPI (ADR 012).
+SELECT
+  nome_usina,
+  codigo_usina,
+  submercado,
+  tipo_usina,
+  COUNT(*)                                                AS unidades_geradoras,
+  SUM(IF(data_desativacao IS NULL, potencia_efetiva, 0))  AS potencia_efetiva_ativa,
+  SUM(potencia_efetiva)                                   AS potencia_efetiva_total
+FROM ${ref("silver", "ons_capacidade")}
+GROUP BY nome_usina, codigo_usina, submercado, tipo_usina

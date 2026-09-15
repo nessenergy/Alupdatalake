@@ -122,7 +122,7 @@ uv run alupdata ingerir ons_carga --de 2026-01-01 --ate 2026-01-31 --dry-run
 | Câmbio BCB (PTAX) | 1 | 16/10/2026 | API pública | **Concluído** |
 | IBGE (IPCA) | 1 | 16/10/2026 | API pública | **Concluído** |
 | ANEEL (SIGA) | 1 | 16/10/2026 | API pública | **Concluído** — fonte de `codigo_usina` |
-| ONS (carga diária) | 1 | 16/10/2026 | Arquivo público | **Concluído** — fonte de `submercado` |
+| ONS (carga, geração horária por usina, capacidade instalada) | 1 | 16/10/2026 | Arquivo público | **Concluído** — fonte de `submercado`; geração e capacidade também preenchem `codigo_usina` (CEG) |
 | CCEE (InfoMercado) | 1 | 16/10/2026 | API Pública | **Bloqueado** — portal responde 403 a acesso automatizado ([§3.1](docs/plano-execucao.md)) |
 | CCEE (Credenciado) | 2 | 13/11/2026 | API Credenciada | Backlog |
 | BBCE | 2 | 13/11/2026 | API Credenciada | Backlog |

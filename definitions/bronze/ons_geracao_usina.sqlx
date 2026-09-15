@@ -1,0 +1,33 @@
+config {
+  type: "operations",
+  schema: "bronze",
+  hasOutput: true,
+  tags: ["bronze"]
+}
+
+-- Bronze: geração horária por usina (ONS, dados abertos, CSV mensal).
+-- ~533 mil linhas por mês (julho/2026, 66 MB) — a segunda maior fonte
+-- pública direta do ONS, depois de carga_energia_di.
+CREATE TABLE IF NOT EXISTS ${self()} (
+  data_referencia     DATE      NOT NULL OPTIONS(description="Dia, derivado de din_instante"),
+  hora                INT64     NOT NULL OPTIONS(description="0 a 23, derivada de din_instante"),
+  submercado          STRING    NOT NULL OPTIONS(description="N, NE, S, SE"),
+  nome_subsistema     STRING    NOT NULL,
+  uf                  STRING    NOT NULL,
+  nome_uf             STRING    NOT NULL,
+  modalidade_operacao STRING    NOT NULL OPTIONS(description="Ex.: TIPO I, Pequenas Usinas (MMGD)"),
+  tipo_usina          STRING    NOT NULL,
+  tipo_combustivel    STRING    NOT NULL,
+  nome_usina          STRING    NOT NULL,
+  id_ons              STRING    OPTIONS(description="Identificador ONS da usina; vazio em MMGD agregada"),
+  codigo_usina        STRING    OPTIONS(description="CEG; nulo quando a origem publica traço ou vazio (achado #141)"),
+  geracao_mw          NUMERIC   OPTIONS(description="Pode ser zero e negativo; ~12% das linhas vêm sem medição (achado do dry-run de 15/09) e ficam NULL, não descartadas"),
+
+  _ingestao_id        STRING    NOT NULL,
+  _ingestao_timestamp TIMESTAMP NOT NULL,
+  _fonte              STRING    NOT NULL,
+  _schema_versao      STRING    NOT NULL
+)
+PARTITION BY DATE(_ingestao_timestamp)
+CLUSTER BY data_referencia, submercado
+OPTIONS(description="Geração horária por usina (ONS) — camada Bronze, append-only");

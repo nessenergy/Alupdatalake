@@ -1,0 +1,49 @@
+config {
+  type: "view",
+  schema: "silver",
+  tags: ["silver"],
+  assertions: {
+    uniqueKey: ["data_referencia", "hora", "nome_usina"],
+    nonNull: ["data_referencia", "hora", "nome_usina", "submercado"],
+    rowConditions: [
+      "submercado IN ('N','NE','S','SE')"
+    ]
+  }
+}
+
+-- Silver: geração horária por usina, higienizada e deduplicada.
+-- Dedup por (data_referencia, hora, nome_usina) — o nome da usina, não o CEG
+-- nem o id_ons, porque os dois podem vir vazios (MMGD agregada); vence a
+-- ingestão mais recente, como no ons_carga: o ONS revisa dado publicado.
+-- `geracao_mw` pode ser zero, negativo (usina reversível / ajuste de medição)
+-- ou NULL (~12% das linhas do arquivo real: usina sem medição na hora,
+-- achado do dry-run de 15/09/2026) — por isso não há condição de sinal nem
+-- de não-nulo aqui.
+--
+-- Achado (issue #141): esta fonte traz `ceg`, o CEG da ANEEL, e preenche
+-- `codigo_usina` sem depender do de-para pendente na #141 (ver o dicionário
+-- de dados desta fonte).
+SELECT
+  data_referencia,
+  submercado,
+  codigo_usina,
+  CAST(NULL AS STRING) AS agente_ccee,  -- o ONS não usa perfil da CCEE
+  FORMAT_DATE('%Y-%m', data_referencia) AS periodo_apuracao,
+  CAST(NULL AS STRING) AS periodo_apuracao_ccee,  -- a origem não declara período próprio
+  hora,
+  nome_subsistema,
+  uf,
+  nome_uf,
+  modalidade_operacao,
+  tipo_usina,
+  tipo_combustivel,
+  nome_usina,
+  id_ons,
+  geracao_mw,
+  _ingestao_id,
+  _ingestao_timestamp
+FROM ${ref("bronze", "ons_geracao_usina")}
+QUALIFY ROW_NUMBER() OVER (
+  PARTITION BY data_referencia, hora, nome_usina
+  ORDER BY _ingestao_timestamp DESC
+) = 1

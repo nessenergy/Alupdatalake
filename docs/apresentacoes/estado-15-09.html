@@ -1,0 +1,435 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AlupData — Estado do desenvolvimento em 15/09/2026</title>
+<meta name="theme-color" content="#00ade8">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Ccircle cx='256' cy='256' r='220' fill='%2300ade8'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --cyan:#00ADE8; --cyan-dark:#0090C4; --cyan-mist:#E5F6FD;
+  --ink:#0B1326; --ink-2:#162244;
+  --graphite:#0F172A; --gray:#475569; --gray-2:#94A3B8;
+  --line:#E2E8F0; --mist:#F8FAFC; --white:#fff;
+  --ok:#10B981; --warn:#F59E0B; --err:#EF4444;
+  --pad:clamp(32px,6vw,112px);
+  --space-2:8px; --space-3:12px; --space-4:16px; --space-6:24px;
+  --space-8:32px; --space-12:48px; --space-16:64px;
+  --ease-out:cubic-bezier(.16,1,.3,1);
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;height:100%}
+body{
+  font-family:Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;
+  color:var(--graphite); background:var(--white);
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3,.wordmark{font-family:Montserrat,Arial,sans-serif; margin:0; text-wrap:balance}
+
+/* ---------- estrutura ---------- */
+.deck{height:100vh;overflow-y:scroll;scroll-snap-type:y mandatory;scroll-behavior:smooth}
+.slide{
+  position:relative;min-height:100vh;scroll-snap-align:start;scroll-snap-stop:always;
+  display:flex;flex-direction:column;justify-content:center;
+  padding:calc(var(--pad)*.9) var(--pad);
+  box-shadow:inset 0 -1px 0 var(--line);
+}
+.slide.dark{background:var(--ink);color:#C7D2DE;box-shadow:none}
+.slide.mist{background:var(--mist);box-shadow:none}
+.inner{width:100%;max-width:1180px;margin:0 auto}
+
+/* ---------- marca ---------- */
+.wordmark{position:absolute;top:calc(var(--pad)*.55);left:var(--pad);
+  font-weight:500;font-size:24px;letter-spacing:-.01em;color:#000;z-index:2;text-transform:lowercase}
+.slide.cover .wordmark{font-size:clamp(30px,3.2vw,42px);top:calc(var(--pad)*.62)}
+.slide.dark .wordmark{color:#fff}
+.wordmark i{color:var(--cyan);font-style:normal}
+.tag{position:absolute;top:calc(var(--pad)*.55);right:var(--pad);
+  font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--gray-2);z-index:2}
+.pagenum{position:absolute;bottom:calc(var(--pad)*.5);right:var(--pad);
+  font-size:11px;letter-spacing:.14em;color:var(--gray-2);font-family:'JetBrains Mono',monospace}
+
+/* ---------- tipografia ---------- */
+.eyebrow{font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--cyan);
+  margin:0 0 var(--space-4);font-weight:500}
+h1{font-size:clamp(34px,5vw,60px);font-weight:600;letter-spacing:-.025em;line-height:1.05}
+h2{font-size:clamp(26px,3.4vw,40px);font-weight:600;letter-spacing:-.02em;line-height:1.12}
+h3{font-size:20px;font-weight:500;letter-spacing:-.01em}
+.lead{font-size:clamp(16px,1.5vw,20px);line-height:1.55;color:var(--gray);max-width:60ch;
+  margin:var(--space-6) 0 0}
+.slide.dark .lead{color:#AFBDCC}
+.lead b{color:var(--graphite);font-weight:600}
+.slide.dark .lead b{color:#fff}
+code,.mono{font-family:'JetBrains Mono',monospace;font-size:.86em}
+
+/* ---------- capa ---------- */
+.slide.cover{justify-content:flex-end;padding-bottom:calc(var(--pad)*1.1)}
+.cover-meta{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:var(--space-8);margin-top:clamp(40px,6vh,72px);
+  border-top:1px solid #242B33;padding-top:var(--space-6)}
+.cover-meta dt{font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;color:#6B7885;margin:0}
+.cover-meta dd{margin:var(--space-2) 0 0;font-weight:500;font-size:clamp(14px,1.2vw,18px);
+  color:#fff;letter-spacing:-.01em;font-family:'JetBrains Mono',monospace}
+
+/* ---------- números ---------- */
+.nums{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:var(--space-8);
+  margin-top:var(--space-12)}
+.nums div{display:flex;flex-direction:column;gap:var(--space-2)}
+.nums .v{font-family:Montserrat,sans-serif;font-size:clamp(38px,4.6vw,58px);font-weight:600;
+  letter-spacing:-.03em;line-height:1;font-variant-numeric:tabular-nums}
+.nums .k{font-size:13px;color:var(--gray);line-height:1.4}
+.slide.dark .nums .k{color:#8B9AAB}
+.nums .cy{color:var(--cyan)}
+
+/* ---------- confronto ---------- */
+.versus{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-16);margin-top:var(--space-12)}
+.versus > div{display:flex;flex-direction:column;gap:var(--space-3)}
+.versus .rot{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--gray-2)}
+.versus .big{font-family:Montserrat,sans-serif;font-size:clamp(40px,5.2vw,64px);font-weight:600;
+  letter-spacing:-.03em;line-height:1}
+.versus .a .big{color:var(--ok)}
+.versus .b .big{color:var(--err)}
+.versus p{margin:0;font-size:15px;line-height:1.55;color:#AFBDCC;max-width:34ch}
+
+/* ---------- camadas ---------- */
+.camadas{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:var(--space-6);
+  margin-top:var(--space-12)}
+.camada{border-top:3px solid var(--m);padding-top:var(--space-4);display:flex;flex-direction:column;gap:var(--space-2)}
+.camada .v{font-family:Montserrat,sans-serif;font-size:44px;font-weight:600;color:var(--m);
+  line-height:1;font-variant-numeric:tabular-nums}
+.camada .t{font-size:15px;font-weight:600;letter-spacing:.02em}
+.camada .d{font-size:13.5px;color:var(--gray);line-height:1.5}
+
+/* ---------- tabelas ---------- */
+.tw{margin-top:var(--space-8);overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:14px;min-width:560px}
+th{text-align:left;font-weight:600;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--gray-2);padding:var(--space-3) var(--space-4);border-bottom:1px solid var(--line);white-space:nowrap}
+td{padding:var(--space-3) var(--space-4);border-bottom:1px solid var(--line);vertical-align:top;line-height:1.45}
+tr:last-child td{border-bottom:none}
+td.r{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap;font-family:'JetBrains Mono',monospace;font-size:13px}
+.slide.dark th{color:#6B7885;border-color:#242B33}
+.slide.dark td{border-color:#1C2536}
+.idx{font-family:'JetBrains Mono',monospace;color:var(--gray-2);font-size:12.5px}
+.badge{display:inline-block;font-size:11px;font-weight:500;padding:3px var(--space-2);border-radius:3px;white-space:nowrap}
+.b-ok{background:#D9F5EA;color:#046B4E}
+.b-warn{background:#FDF0D8;color:#8A5A04}
+.b-err{background:#FBE0DE;color:#A31D14}
+.b-off{background:var(--mist);color:var(--gray)}
+
+/* ---------- bloqueios ---------- */
+.trava{margin-top:var(--space-8);display:flex;flex-direction:column}
+.trava .i{display:grid;grid-template-columns:96px 1fr 132px;gap:var(--space-6);
+  padding:var(--space-4) 0;border-bottom:1px solid #1C2536;align-items:start}
+.trava .i:last-child{border-bottom:none}
+.trava .c{font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:500;color:var(--cyan)}
+.trava .t{font-size:14.5px;line-height:1.5;color:#C7D2DE}
+.trava .t b{color:#fff;font-weight:600}
+.trava .t span{display:block;color:#8B9AAB;font-size:13px;margin-top:var(--space-1,4px)}
+.trava .q{font-family:'JetBrains Mono',monospace;font-size:12.5px;color:#8B9AAB;text-align:right;line-height:1.5}
+
+/* ---------- lista de entregas ---------- */
+.entregas{margin-top:var(--space-8);display:flex;flex-direction:column;gap:var(--space-4)}
+.entregas .e{display:grid;grid-template-columns:64px 1fr;gap:var(--space-4);align-items:baseline}
+.entregas .d{font-family:'JetBrains Mono',monospace;font-size:12.5px;color:var(--cyan)}
+.entregas .x{font-size:15px;line-height:1.5}
+.entregas .x b{font-weight:600}
+.entregas .x span{color:var(--gray)}
+
+/* ---------- próximo passo ---------- */
+.passo{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-16);margin-top:var(--space-12)}
+.passo h3{margin-bottom:var(--space-4)}
+.passo ul{margin:0;padding-left:1.1em;display:flex;flex-direction:column;gap:var(--space-3)}
+.passo li{font-size:14.5px;line-height:1.5;color:var(--gray)}
+.passo li b{color:var(--graphite);font-weight:600}
+.passo .cy{color:var(--cyan)}
+
+/* ---------- navegação ---------- */
+.progress{position:fixed;top:0;left:0;height:2px;background:var(--cyan);width:0;z-index:9;
+  transition:width var(--duration,200ms) var(--ease-out)}
+
+@media (max-width:820px){
+  .cover-meta{grid-template-columns:repeat(2,minmax(0,1fr));row-gap:var(--space-6)}
+  .versus,.passo{grid-template-columns:1fr;gap:var(--space-8)}
+  .trava .i{grid-template-columns:72px 1fr}
+  .trava .q{grid-column:2;text-align:left}
+}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
+
+/* ---------- impressão ---------- */
+@media print{
+  html,body{height:auto}
+  .deck{height:auto;overflow:visible}
+  .slide{min-height:auto;page-break-after:always;break-after:page;padding:28px 32px;box-shadow:none;
+    border-bottom:1px solid var(--line)}
+  .slide.dark{background:#fff;color:var(--graphite)}
+  .slide.dark .wordmark{color:#000}
+  .slide.dark .lead,.slide.dark .trava .t{color:var(--gray)}
+  .slide.dark .trava .t b,.slide.dark .lead b{color:var(--graphite)}
+  .slide.dark .versus p{color:var(--gray)}
+  .slide.dark th{color:var(--gray-2);border-color:var(--line)}
+  .slide.dark td{border-color:var(--line)}
+  .progress{display:none}
+  h1{font-size:34px} h2{font-size:26px}
+}
+</style>
+</head>
+<body>
+
+<div class="progress" id="progress"></div>
+
+<main class="deck" id="deck">
+
+  <!-- 01 · capa -->
+  <section class="slide cover dark">
+    <span class="wordmark">ness<i>.</i></span><span class="tag">AlupData · CPS-01025/2026</span>
+    <div class="inner">
+      <p class="eyebrow">Estado do desenvolvimento</p>
+      <h1>15 de setembro<br>de 2026</h1>
+      <p class="lead">Onde a Fase 1 está hoje, o que já roda, e o que está parado esperando insumo.</p>
+      <dl class="cover-meta">
+        <div><dt>Fase</dt><dd>1 de 1 · 580h</dd></div>
+        <div><dt>Ondas</dt><dd>5</dd></div>
+        <div><dt>Conectores</dt><dd>19</dd></div>
+        <div><dt>main</dt><dd>2418313</dd></div>
+      </dl>
+    </div>
+    <span class="pagenum">01</span>
+  </section>
+
+  <!-- 02 · a tensão -->
+  <section class="slide dark">
+    <span class="wordmark">ness<i>.</i></span><span class="tag">A leitura do dia</span>
+    <div class="inner">
+      <h2>O projeto está adiantado<br>e parado ao mesmo tempo.</h2>
+      <div class="versus">
+        <div class="a">
+          <span class="rot">Entrega técnica</span>
+          <span class="big">4 de 5</span>
+          <p>ondas com entrega, no quinto dia da primeira. A Onda 1 fechou com 5 de 5 fontes; a Onda 2 tem os 7 componentes escritos antes da credencial.</p>
+        </div>
+        <div class="b">
+          <span class="rot">Homologação</span>
+          <span class="big">0 de 5</span>
+          <p>ondas homologadas. Onda fecha por aceitação e carga real, não por volume de código — e nenhuma linha chegou a um BigQuery de verdade.</p>
+        </div>
+      </div>
+      <p class="lead">As duas colunas têm a mesma causa: <b>o projeto GCP <code>dev</code> ainda não existe</b>. Enquanto ele não existir, o que foi construído não pode ser aceito.</p>
+    </div>
+    <span class="pagenum">02</span>
+  </section>
+
+  <!-- 03 · o que existe -->
+  <section class="slide">
+    <span class="wordmark">ness<i>.</i></span><span class="tag">O que existe hoje</span>
+    <div class="inner">
+      <p class="eyebrow">Construído e verificado</p>
+      <h2>Dezenove fontes de dados,<br>com os 7 componentes cada.</h2>
+      <div class="nums">
+        <div><span class="v cy">19</span><span class="k">conectores registrados</span></div>
+        <div><span class="v">16</span><span class="k">verificados contra a API real</span></div>
+        <div><span class="v">62</span><span class="k">views Bronze, Silver e Gold</span></div>
+        <div><span class="v">773</span><span class="k">testes automatizados verdes</span></div>
+        <div><span class="v">21</span><span class="k">decisões de arquitetura</span></div>
+      </div>
+      <p class="lead">A cláusula 2ª exige sete componentes por fonte: conector, tabela Bronze, view Silver, view Gold, testes, agendamento e documentação com linhagem. <b>Fonte com cinco de sete não é entrega parcial — é retrabalho na medição.</b> As dezenove têm os sete.</p>
+    </div>
+    <span class="pagenum">03</span>
+  </section>
+
+  <!-- 04 · camadas -->
+  <section class="slide mist">
+    <span class="wordmark">ness<i>.</i></span><span class="tag">Arquitetura Medallion</span>
+    <div class="inner">
+      <p class="eyebrow">Três camadas</p>
+      <h2>O dado entra bruto, sai pronto<br>para consumo.</h2>
+      <div class="camadas">
+        <div class="camada" style="--m:#8C5A2B">
+          <span class="v">20</span><span class="t">Bronze</span>
+          <span class="d">Append-only, particionada por data de ingestão. Guarda toda publicação, inclusive as recontabilizações da CCEE — nenhuma versão se perde.</span>
+        </div>
+        <div class="camada" style="--m:#65727E">
+          <span class="v">20</span><span class="t">Silver</span>
+          <span class="d">Tipada, deduplicada e com seis dimensões comuns, que é o que permite cruzar fontes diferentes sem tradução.</span>
+        </div>
+        <div class="camada" style="--m:#8E7214">
+          <span class="v">22</span><span class="t">Gold</span>
+          <span class="d">Uma tabela por pergunta de negócio. Descritiva, sem KPI — a definição dos indicadores ficou para a Fase 2, conforme a resposta A5.</span>
+        </div>
+      </div>
+    </div>
+    <span class="pagenum">04</span>
+  </section>
+
+  <!-- 05 · domínios -->
+  <section class="slide">
+    <span class="wordmark">ness<i>.</i></span><span class="tag">Domínios analíticos</span>
+    <div class="inner">
+      <p class="eyebrow">Os oito domínios da resposta B1</p>
+      <h2>Seis dos oito já têm fonte no lake.</h2>
+      <div class="tw">
+        <table>
+          <thead><tr><th>#</th><th>Domínio</th><th>Data owner</th><th>Situação</th></tr></thead>
+          <tbody>
+            <tr><td class="idx">1</td><td>Mercado de Energia</td><td>Taina Mota · Gabriel Barreto</td><td><span class="badge b-ok">pronto do lado da CCEE</span></td></tr>
+            <tr><td class="idx">2</td><td>Geração e Operacional</td><td>Taina Mota · Letícia Ferreira</td><td><span class="badge b-warn">falta o de-para de usina</span></td></tr>
+            <tr><td class="idx">3</td><td>Meteorologia</td><td>Taina Mota</td><td><span class="badge b-warn">pronto como arquivo</span></td></tr>
+            <tr><td class="idx">4</td><td>Comercial e Contratos</td><td>Letícia Ferreira · Tahigo Santos</td><td><span class="badge b-warn">parcial, pela via pública</span></td></tr>
+            <tr><td class="idx">5</td><td>CRM e Marketing</td><td>Tahigo Santos</td><td><span class="badge b-warn">parado no token</span></td></tr>
+            <tr><td class="idx">6</td><td>Risco e Compliance</td><td>Letícia Ferreira</td><td><span class="badge b-ok">saiu do zero em 14/09</span></td></tr>
+            <tr><td class="idx">7</td><td>Econômico</td><td>Letícia Ferreira</td><td><span class="badge b-ok">pronto</span></td></tr>
+            <tr><td class="idx">8</td><td>Planejamento</td><td>gestores da Comercialização</td><td><span class="badge b-off">não iniciado</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="lead">Os domínios são os da resposta ao <b>B1</b>, com dono nomeado por domínio — e não uma proposta nossa. São oito em onze linhas do quadro, porque três deles têm responsáveis distintos por subtemas.</p>
+    </div>
+    <span class="pagenum">05</span>
+  </section>
+
+  <!-- 06 · ondas -->
+  <section class="slide mist">
+    <span class="wordmark">ness<i>.</i></span><span class="tag">Cronograma contratual</span>
+    <div class="inner">
+      <p class="eyebrow">As cinco ondas</p>
+      <h2>Quatro têm entrega.<br>Nenhuma homologou.</h2>
+      <div class="tw">
+        <table>
+          <thead><tr><th>Onda</th><th class="r">Horas</th><th class="r">Marco</th><th>Situação</th></tr></thead>
+          <tbody>
+            <tr><td><b>0</b> — Fundação &amp; Arquitetura</td><td class="r">90</td><td class="r">15,52%</td><td>Técnico concluído; falta o ambiente para homologar</td></tr>
+            <tr><td><b>1</b> — Inteligência de Mercado</td><td class="r">120</td><td class="r">20,69%</td><td>5 de 5 fontes, mais nove entidades da CCEE</td></tr>
+            <tr><td><b>2</b> — APIs com credenciais</td><td class="r">110</td><td class="r">18,97%</td><td>Três fontes escritas antes da credencial</td></tr>
+            <tr><td><b>3</b> — Sistemas internos</td><td class="r">155</td><td class="r">26,72%</td><td>Caminho de banco pronto; nenhuma fonte iniciada</td></tr>
+            <tr><td><b>4</b> — Planilhas e handoff</td><td class="r">105</td><td class="r">18,10%</td><td>Motor de planilha adiantado, por não depender de insumo</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="lead">Onde foi possível trabalhar sem insumo da contratante, trabalhou-se adiantado. <b>A Onda 1 é o colchão do cronograma</b> — é a única que roda inteira sem depender de ninguém, e foi por ela que começamos.</p>
+    </div>
+    <span class="pagenum">06</span>
+  </section>
+
+  <!-- 07 · o que trava -->
+  <section class="slide dark">
+    <span class="wordmark">ness<i>.</i></span><span class="tag">Insumos pendentes</span>
+    <div class="inner">
+      <p class="eyebrow">O que trava, em ordem do que custa</p>
+      <h2>Sete insumos. Todos da Alup.</h2>
+      <div class="trava">
+        <div class="i">
+          <span class="c">A3</span>
+          <span class="t"><b>Projeto GCP <code>dev</code></b> — criar, vincular ao faturamento e conceder os papéis de bootstrap.
+            <span>É o único elo antes do primeiro apply. Sem ele nada sobe, nada carrega, nada homologa.</span></span>
+          <span class="q">vencido 04/09<br>previsão 18/09</span>
+        </div>
+        <div class="i">
+          <span class="c">A7</span>
+          <span class="t"><b>Chamados de token e de VPN/credencial</b> abertos, com número.
+            <span>Destrava sete conectores já escritos: BBCE, TempoOK, Oracle FMB, Portal Alup, MySQL RDS e RM/TOTVS.</span></span>
+          <span class="q">prazo 25/09</span>
+        </div>
+        <div class="i">
+          <span class="c">A9</span>
+          <span class="t"><b>Token do Hubspot</b> no cofre de segredos.
+            <span>O conector está pronto e parado; nenhuma linha de CRM entra no lake.</span></span>
+          <span class="q">vencido 11/09</span>
+        </div>
+        <div class="i">
+          <span class="c">#141</span>
+          <span class="t"><b>De-para de usina</b> — sigla interna, CEG, nome CCEE e nome ONS.
+            <span>Passou a bloquear dado real: quase três milhões de linhas de geração por usina esperam por ele para cruzar com contrato e contabilização.</span></span>
+          <span class="q">sem data</span>
+        </div>
+        <div class="i">
+          <span class="c">#142</span>
+          <span class="t"><b>Exemplos reais das planilhas</b> que hoje alimentam decisão.
+            <span>É o que permite conferir o escopo de dado item a item contra os treze conectores contratados.</span></span>
+          <span class="q">prazo 18/09</span>
+        </div>
+        <div class="i">
+          <span class="c">#129</span>
+          <span class="t"><b>Acervo do TempoOK</b> — o token alcança boletins só até outubro de 2022.
+            <span>O conector está pronto e verificado, mas não há boletim recente para ingerir.</span></span>
+          <span class="q">sem data</span>
+        </div>
+        <div class="i">
+          <span class="c">#87</span>
+          <span class="t"><b>Conta de faturamento e destinatários de alerta.</b>
+            <span>Orçamento e alertas existem, mas não notificam ninguém.</span></span>
+          <span class="q">vencido 11/09</span>
+        </div>
+      </div>
+    </div>
+    <span class="pagenum">07</span>
+  </section>
+
+  <!-- 08 · últimas 48h -->
+  <section class="slide">
+    <span class="wordmark">ness<i>.</i></span><span class="tag">Últimas 48 horas</span>
+    <div class="inner">
+      <p class="eyebrow">O que entrou em 14 e 15 de setembro</p>
+      <h2>A CCEE destravada rendeu<br>nove fontes em dois dias.</h2>
+      <div class="entregas">
+        <div class="e"><span class="d">14/09</span><span class="x"><b>Os oito domínios passaram a vir da resposta B1</b> — a divisão que a Alup usa, com dono nomeado. <span>As seis coligadas respondem pelo faturamento e não delimitam o dado.</span></span></div>
+        <div class="e"><span class="d">14/09</span><span class="x"><b>Escolhidos 24 dos 204 conjuntos públicos da CCEE</b>, por demanda dos domínios — e não por completude.</span></div>
+        <div class="e"><span class="d">15/09</span><span class="x"><b>Nove entidades da CCEE entregues</b>, todas verificadas contra a API real. <span>Entre elas, 2.964.096 linhas de geração horária por usina, na granularidade que a resposta A7 pede para dado de portfólio.</span></span></div>
+        <div class="e"><span class="d">15/09</span><span class="x"><b>Risco e Compliance saiu do zero</b> sem depender de credencial — exposição financeira e contabilização por perfil, pela via pública.</span></div>
+        <div class="e"><span class="d">15/09</span><span class="x"><b>Definida a regra de recontabilização:</b> quando a CCEE republica um mês fechado, o lake versiona pela publicação da origem, não pela hora da leitura.</span></div>
+        <div class="e"><span class="d">15/09</span><span class="x"><b>Matriz RACI recebida</b> da Alup. Não bloqueia trabalho técnico; dois pontos a conciliar antes da primeira homologação.</span></div>
+      </div>
+    </div>
+    <span class="pagenum">08</span>
+  </section>
+
+  <!-- 09 · próximo passo -->
+  <section class="slide mist">
+    <span class="wordmark">ness<i>.</i></span><span class="tag">Próximo passo</span>
+    <div class="inner">
+      <p class="eyebrow">O que acontece a seguir</p>
+      <h2>Um insumo destrava<br>quatro ondas.</h2>
+      <div class="passo">
+        <div>
+          <h3 class="cy">Depende da Alup</h3>
+          <ul>
+            <li><b>Criar o projeto GCP <code>dev</code></b> e conceder os papéis. É o primeiro apply, o primeiro carregamento e a primeira homologação.</li>
+            <li><b>Abrir os chamados de acesso</b> com número, para as Ondas 2 e 3 saírem do papel.</li>
+            <li><b>Enviar o de-para de usina</b> e os exemplos das planilhas — dois insumos pequenos, de efeito grande.</li>
+          </ul>
+        </div>
+        <div>
+          <h3>Está na nossa fila</h3>
+          <ul>
+            <li><b>Primeiro deploy real</b> assim que o ambiente existir: imagem, job agendado e três dias consecutivos de execução com sucesso.</li>
+            <li><b>Ajuste de carga em lote</b> para a maior fonte, que hoje lê o mês inteiro de uma vez.</li>
+            <li><b>EAR e ENA do ONS</b>, que completam o domínio de Mercado de Energia.</li>
+          </ul>
+        </div>
+      </div>
+      <p class="lead">Nada acima depende de decisão técnica pendente. <b>O caminho está escrito, testado e documentado</b> — falta o ambiente onde ele roda.</p>
+    </div>
+    <span class="pagenum">09</span>
+  </section>
+
+</main>
+
+<script>
+  (function () {
+    var deck = document.getElementById('deck');
+    var bar = document.getElementById('progress');
+    function atualiza() {
+      var max = deck.scrollHeight - deck.clientHeight;
+      bar.style.width = (max > 0 ? (deck.scrollTop / max) * 100 : 0) + '%';
+    }
+    deck.addEventListener('scroll', atualiza, { passive: true });
+    atualiza();
+  })();
+</script>
+
+</body>
+</html>

@@ -25,7 +25,7 @@ A cadeia hoje é **em série**, e encurtou: com a revisão do Google feita em
 | # | Ação | Dono | Situação |
 |---|---|---|---|
 | ~~1.1~~ | ~~**Obter uma data para a resposta do Google**~~ — [issue #77](https://github.com/nessenergy/Alupdatalake/issues/77) | Alup / Google | **Encerrada: a revisão aconteceu em 10/09** e as recomendações viraram as ADRs 012, 013, 015 e 017. Esta linha sobreviveu por descuido à atualização de 11/09 — G1 deixou de ser gargalo, e o que precede o resto passou a ser A3 sozinho |
-| 1.2 | **Projeto GCP `dev`** (A3) | Alup | **vencido em 04/09**; hoje, 14/09, é o **5º dia útil de atraso**. Previsão da Alup: 18/09. Quem cria (E1) e de quem é a `billing_account` (E2) foi esclarecido em 09/09: ambos são da Alup. **Com G1 encerrada, é o único elo antes do primeiro apply** |
+| 1.2 | **Projeto GCP `dev`** (A3) | Alup | **vencido em 04/09**; hoje, 15/09, é o **6º dia útil de atraso — passou dos 5 dias úteis da cláusula 3ª**. Previsão da Alup: 18/09. Quem cria (E1) e de quem é a `billing_account` (E2) foi esclarecido em 09/09: ambos são da Alup. **Com G1 encerrada, é o único elo antes do primeiro apply** |
 | 1.3 | Variáveis `GCP_WIF_PROVIDER` e `GCP_DEPLOY_SA` (A1) | ness./Alup | dependem de A3. **Branch protection resolvida em 11/09**: a organização passou ao GitHub Enterprise e a `main` exige PR e seis verificações (ADR 010, encerrada) |
 
 > O atraso de A3 está registrado em
@@ -49,6 +49,7 @@ A cadeia hoje é **em série**, e encurtou: com a revisão do Google feita em
 | 2.7 | **Combinar o canal das credenciais seguintes** (BBCE, Hubspot, Onda 3) | o pedido está redigido no [registro de 14/09](relatorios/2026-09-14-documentacao-de-apis-recebida.md) §5. **A rotação do token do TempoOK saiu desta linha**: fica para a virada de produção ([ADR 020](arquitetura/decisoes/020-token-tempook-rotacao-na-producao.md)) — rotacionar antes de existir Secret Manager entregaria o valor novo pelo mesmo e-mail | a Alup grava cada credencial nova direto no Secret Manager, sem passar por e-mail |
 | 2.8 | **Enviar à Alup o registro de 14/09** | `.md` e `.html` prontos em [`relatorios/`](relatorios/) | Registro na mão da contratante |
 | 2.9 | **Perguntar ao TempoOK por que o acervo para em 26/10/2022** (A10) | o token funciona e o caminho está certo, mas nada posterior responde; três hipóteses no [registro de 14/09](relatorios/2026-09-14-documentacao-de-apis-recebida.md) §4.1 | acesso ao acervo recente, ou a informação de que o produto mudou. **Vale juntar com 2.7**: uma conversa só com o fornecedor resolve rotação e acervo |
+| 2.10 | **Levar dois pontos da matriz RACI à Alup** — recebida em 15/09, [`raci.md`](raci.md) | na reunião de sexta e no relatório de fechamento da S3, não em peça separada: o documento não muda prazo nem marco. Os dois pontos são (a) **quem compõe o Comitê** que a matriz põe como accountable da passagem de fase, já que B4 dá isso a Taina, e (b) **rebaixar o Google de accountable a consultado** na arquitetura. O de-para Fase↔Onda e Core↔Gold já está resolvido do nosso lado (§5 do `raci.md`) e não precisa de resposta | Comitê definido ou B4 confirmado como rito válido; papel do Google acordado — [issue #150](https://github.com/nessenergy/Alupdatalake/issues/150) |
 
 ### Por que 2.5 e 2.6 têm pressa
 

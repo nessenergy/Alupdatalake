@@ -6,6 +6,7 @@ from pathlib import Path
 
 import pytest
 from src.conectores.aneel_siga import AneelSiga, Empreendimento, _decimal_br
+from src.core.ceg import ceg_canonico
 from src.core.execucao import Janela
 
 FIXTURE = Path(__file__).parents[2] / "fixtures" / "aneel_siga.json"
@@ -41,10 +42,16 @@ def test_decimal_brasileiro(entrada, esperado):
 
 
 def test_transformar_mapeia_codceg_para_codigo_usina(conector, payload):
+    """O CodCEG vira `codigo_usina` na forma canônica, não como a ANEEL publica.
+
+    A ANEEL publica o último segmento com um dígito e o ONS com dois; sem
+    igualar, o JOIN entre as duas origens devolve zero linha (`src/core/ceg.py`).
+    """
     bruto = payload["result"]["records"][0]
     registro = Empreendimento.model_validate(conector.transformar(bruto))
 
-    assert registro.codigo_usina == bruto["CodCEG"]
+    assert registro.codigo_usina == ceg_canonico(bruto["CodCEG"])
+    assert registro.codigo_usina.endswith(".01")
     assert registro.data_referencia == bruto["DatGeracaoConjuntoDados"]
 
 

@@ -26,6 +26,7 @@ from typing import TYPE_CHECKING, Any
 from pydantic import BaseModel, Field, field_validator, model_validator
 
 from src.conectores.ons_carga import SUBMERCADOS
+from src.core.ceg import ceg_canonico
 from src.core.conector import Conector
 from src.core.http import criar_sessao
 from src.core.registry import registrar
@@ -93,10 +94,15 @@ class GeracaoUsina(BaseModel):
             raise ValueError(f"submercado desconhecido: {valor}")
         return sigla
 
-    @field_validator("id_ons", "codigo_usina", mode="before")
+    @field_validator("id_ons", mode="before")
     @classmethod
     def _vazio_ou_traco_e_nulo(cls, valor: str | None) -> str | None:
         return _texto_ou_nulo(valor)
+
+    @field_validator("codigo_usina", mode="before")
+    @classmethod
+    def _ceg_na_forma_canonica(cls, valor: str | None) -> str | None:
+        return ceg_canonico(valor)
 
     @field_validator("geracao_mw", mode="before")
     @classmethod

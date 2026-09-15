@@ -20,6 +20,7 @@ from typing import TYPE_CHECKING, Any
 
 from pydantic import BaseModel, field_validator
 
+from src.core.ceg import ceg_canonico
 from src.core.conector import Conector
 from src.core.http import criar_sessao, get_json
 from src.core.planilha import decimal_br
@@ -65,12 +66,21 @@ class Empreendimento(BaseModel):
     potencia_fiscalizada_kw: Decimal | None = None
     garantia_fisica_kw: Decimal | None = None
 
-    @field_validator("codigo_usina", "nome")
+    @field_validator("nome")
     @classmethod
     def _obrigatorio(cls, valor: str) -> str:
         if not valor.strip():
             raise ValueError("campo obrigatório vazio")
         return valor.strip()
+
+    @field_validator("codigo_usina")
+    @classmethod
+    def _ceg_na_forma_canonica(cls, valor: str) -> str:
+        """A ANEEL publica o sufixo com um dígito; o ONS, com dois (`src/core/ceg.py`)."""
+        canonico = ceg_canonico(valor)
+        if canonico is None:
+            raise ValueError("campo obrigatório vazio")
+        return canonico
 
 
 @registrar

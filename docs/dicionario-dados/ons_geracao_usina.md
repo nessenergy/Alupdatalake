@@ -47,6 +47,20 @@ com o CEG (nulo quando a origem publica traço ou vazio), e a junção ONS ↔
 ANEEL passa a ser possível por `codigo_usina` diretamente. O que ainda falta
 na #141 se reduz a uma coisa só: sigla interna ↔ CEG.
 
+### Correção de 15/09/2026: o de-para só fecha com o CEG normalizado
+
+A afirmação acima estava certa na origem e errada na prática. O último
+segmento do CEG vem com **um dígito na ANEEL** (`...-4.1`) e **dois no ONS**
+(`...-4.01`); como texto, são chaves distintas, e o JOIN por `codigo_usina`
+devolvia **zero** linha. Com o sufixo igualado na ingestão (`src/core/ceg.py`),
+**369 dos 375 CEG (98,4%)** que esta fonte publicou em 10–11/09/2026 casam com
+o cadastro da ANEEL — e no cadastro de capacidade do ONS, 1.946 de 2.047
+(95,1%). Os que sobram são usinas que o ONS opera e o cadastro da ANEEL não
+traz sob aquele código: diferença de conteúdo, não de formato.
+
+O de-para que sobra está materializado em `gold.de_para_usina`.
+
+
 ## Campos
 
 | Origem (CSV) | Bronze / Silver | Tipo | Transformação |
@@ -91,6 +105,9 @@ ingestão mais recente, como no `ons_carga`: o ONS revisa dado publicado.
 o sufixo `_ons` para não colidir com `gold.geracao_mensal_usina` (CCEE, por
 parcela de usina e centro de gravidade contábil) — são perguntas parecidas,
 respondidas por origens diferentes, com granularidade diferente.
+
+`gold.de_para_usina` — CEG ↔ nome ANEEL ↔ nome ONS, com `sigla_ccee` nula à
+espera do insumo da Alup ([#141](https://github.com/nessenergy/Alupdatalake/issues/141)).
 
 ## Qualidade e observações
 

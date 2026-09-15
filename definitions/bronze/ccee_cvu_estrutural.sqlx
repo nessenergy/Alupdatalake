@@ -13,7 +13,7 @@ CREATE TABLE IF NOT EXISTS ${self()} (
   periodo_apuracao_ccee  STRING    NOT NULL OPTIONS(description="AAAA-MM, como a CCEE declara"),
   versao_publicacao      DATE      NOT NULL OPTIONS(description="last_modified do recurso no CKAN (ADR 016)"),
   ano_horizonte          INT64     NOT NULL OPTIONS(description="Ano projetado ao qual este CVU se refere"),
-  codigo_parcela_usina   STRING    NOT NULL OPTIONS(description="Código interno da CCEE — NÃO é o CEG; de-para pendente (#141)"),
+  codigo_parcela_usina   STRING    OPTIONS(description="Código interno da CCEE — NÃO é o CEG; de-para pendente (#141). Vazio em ~24% das linhas; NULL"),
   sigla_parcela          STRING,
   tipo_combustivel       STRING,
   leilao                 STRING,

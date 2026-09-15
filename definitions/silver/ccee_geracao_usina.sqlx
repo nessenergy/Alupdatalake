@@ -4,7 +4,7 @@ config {
   tags: ["silver"],
   assertions: {
     uniqueKey: ["data_referencia", "hora", "codigo_parcela_usina"],
-    nonNull: ["data_referencia", "hora", "codigo_parcela_usina", "submercado", "geracao_centro_gravidade"],
+    nonNull: ["data_referencia", "hora", "codigo_parcela_usina", "submercado", "versao_publicacao", "geracao_centro_gravidade"],
     rowConditions: [
       "submercado IN ('N','NE','S','SE')",
       "hora BETWEEN 0 AND 23",

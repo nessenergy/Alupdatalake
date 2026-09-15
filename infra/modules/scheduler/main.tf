@@ -20,6 +20,12 @@ variable "conectores" {
   type = map(object({
     cron         = string
     ultimos_dias = number
+    # `_ingerir()` do runner (`src/core/conector.py`) materializa a janela
+    # inteira em memória antes de gravar o raw e validar — o default (512Mi)
+    # basta para toda fonte mensal leve. Só o conector que lê um volume
+    # grande por execução (hoje só `ccee_geracao_usina`) precisa de mais.
+    memoria = optional(string, "512Mi")
+    cpu     = optional(string, "1")
   }))
   default = {
     bcb_cambio_ptax = {
@@ -75,8 +81,16 @@ variable "conectores" {
       # Um recurso gzip de 61 MB por mês, ~3 milhões de linhas. Roda de
       # madrugada, um dia depois das entidades mensais leves, com janela que
       # alcança o mês fechado e o anterior (recontabilização, ADR 016).
+      # `ultimos_dias` 40, não 70: o runner materializa a janela inteira em
+      # memória (`src/core/conector.py`), e 70 dias abre 3-4 recursos mensais
+      # de uma vez (~9-12 M linhas, ~4 GB de dicts) — risco de OOM na primeira
+      # execução real. 40 dias cobre um mês fechado inteiro mais folga, sem
+      # abrir um quarto mês. `memoria`/`cpu` abaixo é a premissa a confirmar no
+      # primeiro apply — o pico real ainda não foi medido.
       cron         = "0 3 7 * *"
-      ultimos_dias = 70
+      ultimos_dias = 40
+      memoria      = "4Gi"
+      cpu          = "2"
     }
     ccee_contrato_montante = {
       # Publicação mensal; dia 6, depois do PLD (dia 5). Janela de 120 dias
@@ -146,6 +160,13 @@ resource "google_cloud_run_v2_job" "ingestao" {
       containers {
         image = var.imagem
         args  = ["ingerir", each.key, "--ultimos-dias", tostring(each.value.ultimos_dias)]
+
+        resources {
+          limits = {
+            memory = each.value.memoria
+            cpu    = each.value.cpu
+          }
+        }
 
         env {
           name  = "GCP_PROJECT_ID"

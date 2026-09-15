@@ -4,7 +4,7 @@ config {
   tags: ["silver"],
   assertions: {
     uniqueKey: ["periodo_apuracao_ccee", "codigo_perfil"],
-    nonNull: ["data_referencia", "periodo_apuracao_ccee", "versao_publicacao", "codigo_perfil", "cnpj"],
+    nonNull: ["data_referencia", "periodo_apuracao_ccee", "versao_publicacao", "codigo_agente", "codigo_perfil", "sigla_perfil", "nome_empresarial", "cnpj"],
     rowConditions: [
       "periodo_apuracao = periodo_apuracao_ccee",
       "contratacao_venda IS NULL OR contratacao_venda >= 0",

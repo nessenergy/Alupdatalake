@@ -4,7 +4,7 @@ config {
   tags: ["silver"],
   assertions: {
     uniqueKey: ["periodo_apuracao_ccee", "cnpj"],
-    nonNull: ["data_referencia", "periodo_apuracao_ccee", "cnpj", "agente_ccee", "classe_agente", "uf"],
+    nonNull: ["data_referencia", "periodo_apuracao_ccee", "versao_publicacao", "cnpj", "agente_ccee", "classe_agente", "uf"],
     rowConditions: [
       "periodo_apuracao = periodo_apuracao_ccee",
       "LENGTH(cnpj) = 14",

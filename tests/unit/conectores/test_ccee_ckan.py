@@ -94,6 +94,23 @@ def test_mes_de_referencia_invalido_e_recusado():
         primeiro_dia("2026-07")
 
 
+def test_dentro_recusa_mes_00_e_99_numa_janela_que_cruza_o_ano():
+    """Regressão: mês fora de 1..12 não pode passar `_dentro` e derrubar `primeiro_dia` em `transformar()`."""
+    janela = Janela.de_texto("2025-12-01", "2026-01-31")
+
+    assert CceeCsvCkan._dentro("202600", janela) is False
+    assert CceeCsvCkan._dentro("202599", janela) is False
+
+
+def test_linha_com_mes_referencia_00_e_ignorada_sem_derrubar_a_extracao(conector, monkeypatch):
+    csv_com_mes_invalido = "MES_REFERENCIA;SIGLA;VALOR\n202600;RUIM;9\n202601;ALFA;1.5\n"
+    monkeypatch.setattr(conector, "_abrir", lambda _s: io.BytesIO(csv_com_mes_invalido.encode("iso-8859-1")))
+
+    registros = list(conector.extrair(Janela.de_texto("2026-01-01", "2026-01-31")))
+
+    assert [r["SIGLA"] for r in registros] == ["ALFA"]
+
+
 def test_vazio_vira_nulo_e_zero_continua_zero():
     assert numero_ou_nulo("") is None
     assert numero_ou_nulo(None) is None
@@ -167,6 +184,16 @@ def test_recurso_ausente_vira_aviso_e_nao_derruba(conector, monkeypatch, caplog)
 def test_recurso_gzip_e_descomprimido_em_fluxo(conector, monkeypatch):
     comprimido = gzip.compress(CSV.encode("iso-8859-1"))
     monkeypatch.setattr(conector, "_abrir", lambda _s: io.BytesIO(comprimido))
+
+    registros = list(conector.extrair(Janela.de_texto("2026-01-01", "2026-03-31")))
+
+    assert len(registros) == 3
+
+
+def test_recurso_com_gzip_duplo_e_totalmente_descomprimido(conector, monkeypatch):
+    """A CDN pode entregar gzip de transporte por cima do gzip do próprio recurso mensal."""
+    comprimido_duas_vezes = gzip.compress(gzip.compress(CSV.encode("iso-8859-1")))
+    monkeypatch.setattr(conector, "_abrir", lambda _s: io.BytesIO(comprimido_duas_vezes))
 
     registros = list(conector.extrair(Janela.de_texto("2026-01-01", "2026-03-31")))
 

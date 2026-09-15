@@ -26,6 +26,7 @@ dia que nenhuma entidade mensal usa. Migrá-lo é tarefa à parte.
 
 from __future__ import annotations
 
+import contextlib
 import csv
 import gzip
 import io
@@ -65,15 +66,22 @@ class _SemErroAoFechar:
 
     def __init__(self, bruto: IO[bytes]) -> None:
         self._bruto = bruto
+        self._fechado = False
 
     def readable(self) -> bool:
         return True
 
     @property
     def closed(self) -> bool:
-        return False
+        # Reflete o fechamento do próprio envelope (via `close()`), não o do
+        # fluxo bruto: `io.BufferedReader` confere `raw.closed` antes de cada
+        # leitura e, se fosse `True` assim que o socket fecha sozinho no fim do
+        # corpo, passaria a levantar a exceção direto — sem chamar `readinto`
+        # — e a suprimir a leitura de confirmação de EOF deixaria de funcionar.
+        return self._fechado
 
     def close(self) -> None:
+        self._fechado = True
         self._bruto.close()
 
     def flush(self) -> None:
@@ -213,7 +221,12 @@ class CceeCsvCkan(Conector):
     def _linhas(self, fluxo: IO[bytes]) -> Iterator[dict[str, str]]:
         if not hasattr(fluxo, "peek"):
             fluxo = io.BufferedReader(_SemErroAoFechar(fluxo))  # o BytesIO dos testes não tem peek
-        if fluxo.peek(2)[:2] == _GZIP_MAGIC:
+        # `while`, não `if`: a CDN pode entregar gzip de transporte por cima do
+        # gzip do próprio recurso mensal — cada camada descomprimida vira um
+        # novo fluxo a espiar, até os dois primeiros bytes deixarem de ser magic.
+        # `GzipFile` tem `peek()` próprio (delega ao seu buffer interno), então
+        # a segunda volta do laço não precisa reenvelopar em `_SemErroAoFechar`.
+        while fluxo.peek(2)[:2] == _GZIP_MAGIC:
             fluxo = gzip.GzipFile(fileobj=fluxo)  # type: ignore[assignment]
         texto = (decodificar(linha).rstrip("\r\n") for linha in fluxo)
         yield from csv.DictReader(texto, delimiter=self.delimitador)
@@ -226,8 +239,8 @@ class CceeCsvCkan(Conector):
     @staticmethod
     def _dentro(mes_referencia: str, janela: Janela) -> bool:
         mes = limpar(mes_referencia)
-        if len(mes) != 6 or not mes.isdigit():
-            return False  # linha em branco ou rodapé; a validação conta o resto
+        if len(mes) != 6 or not mes.isdigit() or not 1 <= int(mes[4:6]) <= 12:
+            return False  # linha em branco, rodapé ou mês inválido; a validação conta o resto
         chave = (int(mes[:4]), int(mes[4:6]))
         return (janela.inicio.year, janela.inicio.month) <= chave <= (janela.fim.year, janela.fim.month)
 
@@ -248,10 +261,11 @@ class CceeCsvCkan(Conector):
             # da janela — um sufixo sem linha aproveitável (ex.: mês corrente
             # ainda vazio) não precisa de uma segunda consulta ao CKAN.
             versao: str | None = None
-            for linha in self._linhas(fluxo):
-                if self._dentro(linha.get("MES_REFERENCIA", ""), janela):
-                    if versao is None:
-                        versao = self.publicado_em(sufixo).isoformat()
-                    # As duas chaves técnicas viajam no bruto para chegar ao raw:
-                    # sem elas o arquivo no GCS não diria de qual publicação é.
-                    yield linha | {"_versao_publicacao": versao, "_sufixo": sufixo}
+            with contextlib.closing(fluxo):  # fecha o socket/arquivo ao sair do sufixo, sucesso ou não
+                for linha in self._linhas(fluxo):
+                    if self._dentro(linha.get("MES_REFERENCIA", ""), janela):
+                        if versao is None:
+                            versao = self.publicado_em(sufixo).isoformat()
+                        # As duas chaves técnicas viajam no bruto para chegar ao raw:
+                        # sem elas o arquivo no GCS não diria de qual publicação é.
+                        yield linha | {"_versao_publicacao": versao, "_sufixo": sufixo}

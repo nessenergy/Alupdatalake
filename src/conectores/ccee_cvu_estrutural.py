@@ -37,7 +37,7 @@ class CvuEstrutural(BaseModel):
     periodo_apuracao_ccee: str
     versao_publicacao: date
     ano_horizonte: int = Field(ge=2000, le=2100)
-    codigo_parcela_usina: str
+    codigo_parcela_usina: str | None = None
     sigla_parcela: str
     tipo_combustivel: str
     leilao: str
@@ -80,7 +80,7 @@ class CceeCvuEstrutural(CceeCsvCkan):
             "periodo_apuracao_ccee": periodo_ccee(mes),
             "versao_publicacao": bruto["_versao_publicacao"],
             "ano_horizonte": numero_ou_nulo(bruto.get("ANO_HORIZONTE")),
-            "codigo_parcela_usina": limpar(bruto.get("CODIGO_PARCELA_USINA")),
+            "codigo_parcela_usina": limpar(bruto.get("CODIGO_PARCELA_USINA")) or None,
             "sigla_parcela": limpar(bruto.get("SIGLA_PARCELA")),
             "tipo_combustivel": limpar(bruto.get("TIPO_COMBUSTIVEL")),
             "leilao": limpar(bruto.get("LEILAO")),

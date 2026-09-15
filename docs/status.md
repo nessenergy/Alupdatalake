@@ -80,7 +80,7 @@ Nenhuma linha chegou a um BigQuery de verdade — o projeto GCP ainda não exist
 
 ### Documentação
 
-ADRs 001–020 · 11 dicionários de dados com [índice e linhagem](dicionario-dados/README.md) · plano de execução · runbook de deploy,
+ADRs 001–021 · 11 dicionários de dados com [índice e linhagem](dicionario-dados/README.md) · plano de execução · runbook de deploy,
 de primeiro deploy e de acompanhamento semanal ·
 [`proximos-passos.md`](proximos-passos.md) como fila de execução ·
 `AGENTS.md` como contexto canônico · skills do projeto e shortlist do Google.

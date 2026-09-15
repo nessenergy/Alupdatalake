@@ -54,7 +54,7 @@ BBCE incluído, escrito no mesmo dia.
 | Fonte | Onda | O que falta para escrever |
 |---|---|---|
 | CCEE — agente credenciado | 2 | Credencial de agente, que não foi pedida em A7; é escopo candidato, não escopo em curso ([ADR 018](../arquitetura/decisoes/018-vias-de-acesso-a-ccee.md)) |
-| CCEE — demais conjuntos do InfoMercado | 1 | Nada técnico: são 204 conjuntos públicos. Falta **decidir quais**, e isso depende dos domínios analíticos (A4) |
+| CCEE — demais conjuntos do InfoMercado | 1 | **Decidido em 14/09**: dos 204 conjuntos públicos, 24 entram por demanda dos domínios do B1, com fila nomeada ([ADR 021](../arquitetura/decisoes/021-conjuntos-da-ccee-por-dominio.md)). O que falta agora é ler cada arquivo — o schema não se escreve por adivinhação |
 | Oracle FMB | 3 | VPN e schema documentado (A7 / [#12](https://github.com/nessenergy/Alupdatalake/issues/12)) |
 | Portal Alup | 3 | Credenciais read-only; quais bases exatamente (A7 / [#13](https://github.com/nessenergy/Alupdatalake/issues/13)) |
 | MySQL RDS — comercialização | 3 | Conectividade e usuário read-only (A7 / [#14](https://github.com/nessenergy/Alupdatalake/issues/14)) |

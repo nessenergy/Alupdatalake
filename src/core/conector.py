@@ -18,7 +18,7 @@ from src.core.execucao import Execucao, Janela
 from src.core.linhagem import emitir as emitir_linhagem
 from src.core.observabilidade import contexto_execucao
 from src.core.seguranca import sanitizar
-from src.core.storage import gravar_raw, identificar_raw, ler_raw
+from src.core.storage import abrir_raw, identificar_raw, ler_raw
 
 if TYPE_CHECKING:
     from collections.abc import Iterator
@@ -35,6 +35,7 @@ class Conector(ABC):
         schema: modelo Pydantic que valida um registro já transformado.
         schema_versao: muda quando o contrato da fonte muda.
         max_dias_por_requisicao: limite de janela da fonte, quando houver.
+        tamanho_do_lote: quantos registros o runner valida e carrega por vez.
     """
 
     fonte: str
@@ -42,6 +43,14 @@ class Conector(ABC):
     schema: type[BaseModel]
     schema_versao: str = "1"
     max_dias_por_requisicao: int | None = None
+
+    # Quantos registros ficam em memória por vez. O runner não acumula o mês
+    # inteiro: extrai, grava no raw e carrega de fatia em fatia. Fonte que
+    # devolve milhões de linhas por recurso — `ccee_geracao_usina` são ~3
+    # milhões por mês — pode baixar este número; fonte pequena nem chega perto
+    # dele. O Bronze é append-only, então uma falha no meio deixa as fatias já
+    # carregadas lá, e a Silver deduplica na reexecução (regra 4).
+    tamanho_do_lote: int = 50_000
 
     # Execução em curso, para o conector que precisa gravar um artefato da
     # origem além dos registros — o boletim em PDF do TempoOK (ADR 019) grava
@@ -82,13 +91,23 @@ class Conector(ABC):
         self._execucao = execucao
 
         try:
-            brutos: list[dict[str, Any]] = []
-            for pedaco in self._janelas(janela):
-                brutos.extend(self.extrair(pedaco))
-            execucao.linhas_extraidas = len(brutos)
-
-            gravar_raw(execucao, brutos)
-            self._validar_e_carregar(execucao, brutos)
+            # Passagem única: cada registro é gravado no raw e entra na fatia
+            # corrente; quando a fatia enche, ela é validada e carregada, e a
+            # memória volta ao tamanho de uma fatia. Materializar tudo antes,
+            # como a primeira versão fazia, custava alguns gigabytes na maior
+            # fonte e derrubava o job antes da primeira linha chegar ao Bronze.
+            lote: list[dict[str, Any]] = []
+            with abrir_raw(execucao) as raw:
+                for pedaco in self._janelas(janela):
+                    for bruto in self.extrair(pedaco):
+                        execucao.linhas_extraidas += 1
+                        raw.escrever(bruto)
+                        lote.append(bruto)
+                        if len(lote) >= self.tamanho_do_lote:
+                            self._validar_e_carregar(execucao, lote)
+                            lote.clear()
+                if lote:
+                    self._validar_e_carregar(execucao, lote)
             execucao.encerrar()
         except Exception as exc:  # noqa: BLE001 — a execução precisa ser registrada como ERRO
             execucao.encerrar(erro=sanitizar(f"{type(exc).__name__}: {exc}"))
@@ -129,7 +148,9 @@ class Conector(ABC):
                 )
                 continue
             linhas.append(validado.model_dump(mode="json") | tecnicas)
-        execucao.linhas_carregadas = carregar_bronze(execucao, linhas)
+        # Soma, não atribui: o método é chamado uma vez por fatia, e atribuir
+        # deixaria no contador só o que a última fatia carregou.
+        execucao.linhas_carregadas += carregar_bronze(execucao, linhas)
 
     def reprocessar_raw(self, uri: str, janela: Janela) -> Execucao:
         """Revalida e recarrega um raw existente sem acessar a fonte."""

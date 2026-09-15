@@ -87,15 +87,20 @@ variable "conectores" {
       # Um recurso gzip de 61 MB por mês, ~3 milhões de linhas. Roda de
       # madrugada, um dia depois das entidades mensais leves, com janela que
       # alcança o mês fechado e o anterior (recontabilização, ADR 016).
-      # `ultimos_dias` 40, não 70: o runner materializa a janela inteira em
-      # memória (`src/core/conector.py`), e 70 dias abre 3-4 recursos mensais
-      # de uma vez (~9-12 M linhas, ~4 GB de dicts) — risco de OOM na primeira
-      # execução real. 40 dias cobre um mês fechado inteiro mais folga, sem
-      # abrir um quarto mês. `memoria`/`cpu` abaixo é a premissa a confirmar no
-      # primeiro apply — o pico real ainda não foi medido.
+      # `ultimos_dias` 40, não 70: 40 cobre um mês fechado inteiro mais folga,
+      # sem abrir um quarto recurso mensal.
+      #
+      # `memoria` deixou de ser premissa. Medido em 15/09 com o mês de julho
+      # (2.964.096 registros), somando processo e filhos: o runner em fatias
+      # marcou **225 MiB** de pico, contra **9.859 MiB** da versão que
+      # materializava a janela inteira. Os 4 GiB que estavam aqui cobriam o
+      # código antigo pela metade — ele teria sido morto por OOM na primeira
+      # execução real. Com 1 GiB sobra folga de 4x sobre o pico medido, e a
+      # medição do dry-run não inclui o payload que o `load_table_from_json`
+      # monta por fatia, que é o que a folga cobre.
       cron         = "0 3 7 * *"
       ultimos_dias = 40
-      memoria      = "4Gi"
+      memoria      = "1Gi"
       cpu          = "2"
     }
     ccee_contrato_montante = {

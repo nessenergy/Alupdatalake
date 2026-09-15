@@ -30,6 +30,7 @@ variable "conectores_criticos" {
     ccee_contabilizacao_perfil = 780 # mensal + folga
     ccee_geracao_usina         = 780 # mensal + folga
     ccee_contrato_montante     = 780 # mensal + folga
+    ccee_varejista_consumidor  = 780 # mensal + folga
     # tempook_boletins fica fora enquanto não houver token (A7): alerta de
     # fonte que nunca rodou dispara todo dia e ensina a equipe a ignorá-lo.
   }

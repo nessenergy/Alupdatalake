@@ -84,6 +84,12 @@ variable "conectores" {
       cron         = "0 10 6 * *"
       ultimos_dias = 120
     }
+    ccee_varejista_consumidor = {
+      # Mesmo ritmo mensal das demais entidades desta fonte; janela de 120
+      # dias cobre a recontabilização (ADR 016).
+      cron         = "0 10 6 * *"
+      ultimos_dias = 120
+    }
     bbce_curva_forward = {
       # A curva sai por pregão, em dia útil. Janela curta porque cada dia é uma
       # requisição própria; 7 dias cobrem feriado prolongado e execução perdida.

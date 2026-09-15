@@ -1,0 +1,45 @@
+config {
+  type: "view",
+  schema: "silver",
+  tags: ["silver"],
+  assertions: {
+    uniqueKey: ["periodo_apuracao_ccee", "codigo_perfil", "uf_carga", "submercado", "codigo_perfil_conectado"],
+    nonNull: ["data_referencia", "periodo_apuracao_ccee", "codigo_perfil", "uf_carga", "submercado", "consumo_total"],
+    rowConditions: [
+      "periodo_apuracao = periodo_apuracao_ccee",
+      "submercado IN ('N','NE','S','SE')",
+      "consumo_total >= 0",
+      "quantidade_parcelas_carga >= 0"
+    ]
+  }
+}
+
+-- Silver: uma linha por varejista, mês, UF e distribuidora (chave de cinco
+-- colunas — (mês, varejista) sozinho duplica 2.465 vezes no arquivo real).
+-- `codigo_perfil_conectado` nulo entra na chave como um valor só: o BigQuery
+-- agrupa nulos juntos no GROUP BY da asserção, e há uma linha assim por mês.
+-- `agente_ccee` nulo: a origem traz o perfil do varejista, não a sigla do
+-- agente; a Gold junta com `gold.agentes_ccee`.
+SELECT
+  data_referencia,
+  submercado,
+  CAST(NULL AS STRING) AS codigo_usina,  -- carga, não ativo de geração
+  CAST(NULL AS STRING) AS agente_ccee,   -- perfil na origem, sigla na Gold
+  FORMAT_DATE('%Y-%m', data_referencia) AS periodo_apuracao,
+  periodo_apuracao_ccee,
+  versao_publicacao,
+  codigo_perfil,
+  sigla_perfil,
+  nome_empresarial,
+  uf_carga,
+  codigo_perfil_conectado,
+  sigla_perfil_conectado,
+  quantidade_parcelas_carga,
+  consumo_total,
+  _ingestao_id,
+  _ingestao_timestamp
+FROM ${ref("bronze", "ccee_varejista_consumidor")}
+QUALIFY ROW_NUMBER() OVER (
+  PARTITION BY periodo_apuracao_ccee, codigo_perfil, uf_carga, submercado, codigo_perfil_conectado
+  ORDER BY versao_publicacao DESC, _ingestao_timestamp DESC
+) = 1

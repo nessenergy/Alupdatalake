@@ -26,6 +26,8 @@ Este índice diz o que já existe, o que falta e — importante — **por que fa
 | ONS — geração horária por usina | [`ons_geracao_usina.md`](ons_geracao_usina.md) | 1 | `submercado`, `codigo_usina` | `geracao_mensal_usina_ons` |
 | ONS — capacidade instalada | [`ons_capacidade.md`](ons_capacidade.md) | 1 | `submercado`, `codigo_usina` | `capacidade_instalada_vigente_usina` |
 | ONS — disponibilidade horária por usina | [`ons_disponibilidade_usina.md`](ons_disponibilidade_usina.md) | 1 | `submercado`, `codigo_usina` | `disponibilidade_mensal_usina` |
+| ONS — constrained-off eólico | [`ons_restricao_coff.md`](ons_restricao_coff.md) | 1 | `submercado` | `restricao_coff_mensal_usina` |
+| ONS — constrained-off fotovoltaico | [`ons_restricao_coff.md`](ons_restricao_coff.md) | 1 | `submercado` | `restricao_coff_mensal_usina` |
 | BCB — PTAX | [`bcb_cambio_ptax.md`](bcb_cambio_ptax.md) | 0 | — | `cambio_mensal` |
 | BCB — Selic e CDI | [`bcb_juros.md`](bcb_juros.md) | 1 | — | `juros_mensal` |
 | IBGE — IPCA | [`ibge_ipca.md`](ibge_ipca.md) | 1 | — | `inflacao_mensal` |

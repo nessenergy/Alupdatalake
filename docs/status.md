@@ -73,11 +73,14 @@ contexto para agentes, em [`../AGENTS.md`](../AGENTS.md).
 | **ONS/geração por usina** | CSV mensal, horário, por usina | **533.832 linhas / 1 mês**, 0 inválidos; `val_geracao` vem vazio em ~12% das linhas (usina sem medição na hora) e vira NULL em vez de zero; **pico de 440 MiB medido** | mensal, dia 7 às 4h, janela 40 dias, 1Gi |
 | **ONS/capacidade instalada** | CSV de cadastro, por unidade geradora, via S3 | **5.688 registros**, 0 inválidos; aceitar `PY` (Itaipu/Paraguai, 10 unidades) fez o cadastro ganhar **7.000 MW**, de 200.233 para 207.233 MW | semanal, segunda 8h |
 | **ONS/disponibilidade por usina** | CSV mensal, horário, por usina | **117.480 registros / 1 mês**, 0 inválidos, 29,8 s; **pico de 226 MiB medido**; CEG em 100% das linhas, 98,1% casando com a ANEEL | mensal, dia 7 às 5h, janela 40 dias, 1Gi |
+| **ONS/constrained-off eólico** | CSV mensal, **passo de 30 min**, por usina ou conjunto | **227.664 registros / 1 mês**, 0 inválidos, 60,1 s; **pico de 389 MiB medido**; 47,5% das meias-horas sem restrição (usina gerando livre) | mensal, dia 7 às 6h, janela 40 dias, 1Gi |
+| **ONS/constrained-off fotovoltaico** | mesmo schema da eólica, 24 colunas | **121.536 registros / 1 mês**, 0 inválidos, 36,1 s; **pico de 275 MiB medido** | mensal, dia 7 às 6h30, janela 40 dias, 1Gi |
 
-**Vinte e uma das vinte e quatro falaram com a API real** em dry-run: as
+**Vinte e três das vinte e seis falaram com a API real** em dry-run: as
 dezesseis de 14/09 — as seis originais, as nove entidades novas da CCEE
-(ADR 021) e o `bcb_juros` — somadas às **cinco fontes do ONS de 15/09** (EAR,
-ENA, geração horária, capacidade instalada e disponibilidade por usina). Hubspot e BBCE seguem as exceções: os 7 componentes
+(ADR 021) e o `bcb_juros` — somadas às **sete fontes do ONS de 15/09** (EAR,
+ENA, geração horária, capacidade instalada, disponibilidade por usina e o
+constrained-off de eólica e de fotovoltaica). Hubspot e BBCE seguem as exceções: os 7 componentes
 existem, escritos contra a documentação, e o teste de integração está `skipif`
 até a credencial chegar (A9 e A7). No BBCE falta inclusive o **host**, que não
 consta da documentação pública e vem junto com o acesso.

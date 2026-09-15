@@ -1,0 +1,64 @@
+config {
+  type: "view",
+  schema: "silver",
+  tags: ["silver"],
+  assertions: {
+    uniqueKey: ["instante", "nome_usina"],
+    nonNull: ["data_referencia", "instante", "nome_usina", "submercado"],
+    rowConditions: [
+      "submercado IN ('N','NE','S','SE')",
+      "razao_restricao IS NULL OR razao_restricao IN ('REL','CNF','ENE')",
+      "origem_restricao IS NULL OR origem_restricao IN ('SIS','LOC')",
+      "minutos_restricao IS NULL OR minutos_restricao BETWEEN 0 AND 30"
+    ]
+  }
+}
+
+-- Silver: constrained-off fotovoltaico, higienizado e deduplicado.
+--
+-- Dedup por (instante, nome_usina) — e não por (data, hora, usina), como nas
+-- outras fontes do ONS: aqui o passo é de **30 minutos**, e a chave por hora
+-- colapsaria dois registros distintos em um. Conferido contra o arquivo real de
+-- agosto/2026: 121.536 pares (instante, usina) para 121.536 linhas, zero
+-- duplicata.
+--
+-- `razao_restricao` nula é a meia hora **sem restrição**, que é quase metade do
+-- arquivo (47,5% em agosto/2026). Quem contar linha em vez de restrição conta a
+-- usina gerando livre como se fosse evento.
+SELECT
+  data_referencia,
+  submercado,
+  codigo_usina,
+  CAST(NULL AS STRING) AS agente_ccee,  -- o ONS não usa perfil da CCEE
+  FORMAT_DATE('%Y-%m', data_referencia) AS periodo_apuracao,
+  CAST(NULL AS STRING) AS periodo_apuracao_ccee,  -- a origem não declara período próprio
+  instante,
+  EXTRACT(HOUR FROM instante) AS hora,
+  nome_subsistema,
+  uf,
+  nome_uf,
+  nome_usina,
+  id_ons,
+  geracao_mw,
+  geracao_limitada_mw,
+  disponibilidade_mw,
+  geracao_referencia_mw,
+  geracao_referencia_final_mw,
+  razao_restricao,
+  origem_restricao,
+  descricao_restricao,
+  id_ponto_conexao,
+  nome_ponto_conexao,
+  agente_operador,
+  geracao_nao_realizada_mw,
+  minutos_rel,
+  minutos_cnf,
+  minutos_ene,
+  minutos_restricao,
+  _ingestao_id,
+  _ingestao_timestamp
+FROM ${ref("bronze", "ons_restricao_coff_fotovoltaica")}
+QUALIFY ROW_NUMBER() OVER (
+  PARTITION BY instante, nome_usina
+  ORDER BY _ingestao_timestamp DESC
+) = 1

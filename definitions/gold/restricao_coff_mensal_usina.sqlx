@@ -1,0 +1,63 @@
+config {
+  type: "table",
+  schema: "gold",
+  tags: ["gold"]
+}
+
+-- Gold: quanto cada usina renovável deixou de gerar por restrição do sistema,
+-- por mês, e por qual motivo.
+--
+-- Uma tabela para as duas fontes, não duas: a pergunta "quanto deixei de gerar
+-- porque me limitaram" é a mesma para eólica e para solar, e separar obrigaria
+-- quem consulta a unir de novo. A coluna `tecnologia` diz de onde veio a linha.
+--
+-- É a resposta que nenhuma outra fonte pública do lake dá.
+-- `ons_disponibilidade_usina` cobre só o parque despachado centralmente (UHE,
+-- UTE, UTN) e `ons_geracao_usina` diz o que foi gerado — não o que deixou de
+-- ser. Para gerador renovável, constrained-off é receita que não entrou.
+--
+-- Sem KPI (ADR 012): não há razão calculada entre o não gerado e o gerado, nem
+-- conversão de MW em energia ou em dinheiro. A origem publica em passo de meia
+-- hora e a conversão para MWh depende de convenção do ONS que não está no
+-- arquivo; inventá-la aqui seria fabricar número. As somas abaixo são somas do
+-- que a origem publica, com o passo dito no nome.
+--
+-- `meias_horas_com_restricao` conta a meia hora em que a origem declarou razão.
+-- Nula é a usina gerando livre — 47,5% das linhas de agosto/2026 —, e contar
+-- linha em vez de restrição transformaria operação normal em evento.
+
+WITH unido AS (
+  SELECT 'Eólica' AS tecnologia, * FROM ${ref("silver", "ons_restricao_coff_eolica")}
+  UNION ALL
+  SELECT 'Fotovoltaica' AS tecnologia, * FROM ${ref("silver", "ons_restricao_coff_fotovoltaica")}
+)
+
+SELECT
+  periodo_apuracao,
+  tecnologia,
+  nome_usina,
+  id_ons,
+  codigo_usina,
+  submercado,
+  uf,
+  nome_ponto_conexao,
+  agente_operador,
+
+  COUNT(*)                                            AS meias_horas_no_mes,
+  COUNTIF(razao_restricao IS NOT NULL)                AS meias_horas_com_restricao,
+  COUNTIF(razao_restricao = 'ENE')                    AS meias_horas_por_energia,
+  COUNTIF(razao_restricao = 'REL')                    AS meias_horas_por_confiabilidade_eletrica,
+  COUNTIF(razao_restricao = 'CNF')                    AS meias_horas_por_confiabilidade,
+  COUNTIF(origem_restricao = 'SIS')                   AS meias_horas_de_origem_sistemica,
+  COUNTIF(origem_restricao = 'LOC')                   AS meias_horas_de_origem_local,
+
+  SUM(minutos_restricao)                              AS minutos_de_restricao,
+  SUM(geracao_nao_realizada_mw)                       AS soma_nao_gerado_mw_meia_hora,
+  SUM(geracao_mw)                                     AS soma_gerado_mw_meia_hora,
+  AVG(disponibilidade_mw)                             AS disponibilidade_media_mw,
+  MAX(disponibilidade_mw)                             AS disponibilidade_maxima_mw
+
+FROM unido
+GROUP BY
+  periodo_apuracao, tecnologia, nome_usina, id_ons, codigo_usina,
+  submercado, uf, nome_ponto_conexao, agente_operador

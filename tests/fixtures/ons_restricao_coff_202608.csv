@@ -1,0 +1,5 @@
+id_subsistema;nom_subsistema;id_estado;nom_estado;nom_usina;id_ons;ceg;din_instante;val_geracao;val_geracaolimitada;val_disponibilidade;val_geracaoreferencia;val_geracaoreferenciafinal;cod_razaorestricao;cod_origemrestricao;dsc_restricao;id_pontoconexao;nom_pontoconexao;nom_agenteoperador;val_geracaonaorealizadaapurada;num_minutos_rel;num_minutos_cnf;num_minutos_ene;num_minutos_restricao
+ NE ;Nordeste;RN;Rio Grande do Norte;Conj. Exemplo;CJU_RNEXE;-;2026-08-01 00:00:00;83.365;;411.0;106.324;;;;;RNXX--500-A;SUBESTACAO EXEMPLO;AGENTE X;;;;;
+NE;Nordeste;RN;Rio Grande do Norte;Conj. Exemplo;CJU_RNEXE;-;2026-08-01 00:30:00;50.000;70.000;411.0;120.000;118.000;ENE;SIS;Excedente de energia;RNXX--500-A;SUBESTACAO EXEMPLO;AGENTE X;68.000;0;0;30;30
+S;Sul;RS;Rio Grande do Sul;USINA COM CEG;RSEOLX;EOL.CV.RS.028443-2.1;2026-08-01 00:00:00;12.500;10.000;40.0;20.000;;REL;LOC;Restricao local;RSXX--230-B;SUBESTACAO SUL;AGENTE Y;7.500;30;0;0;30
+SE;Sudeste;SP;São Paulo;USINA NEGATIVA;SPEOLX;-;2026-08-02 00:00:00;-0.250;;15.0;0.000;;;;;SPXX--138-C;SUBESTACAO SE;AGENTE Z;;;;;

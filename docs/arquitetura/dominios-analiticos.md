@@ -104,15 +104,16 @@ do Gabriel Barreto.
 
 ### 2 · Geração e Operacional
 
-> **Quais ativos existem, quanto cada um gerou, e quanto foi medido?**
+> **Quais ativos existem, quanto cada um gerou, quanto foi medido — e quanto
+> deixaram de gerar porque o sistema os limitou?**
 
 | | |
 |---|---|
-| **Fontes hoje** | `aneel_siga` (cadastro público) · `ccee_geracao_usina` · `ons_geracao_usina` · `ons_capacidade` · `ons_disponibilidade_usina` |
-| **Fontes a conectar** | **constrained-off de eólica e solar** (`restricao_coff_eolica_usi`, `restricao_coff_fotovoltaica`) — o equivalente da disponibilidade para as renováveis, que o arquivo de disponibilidade não cobre · térmicas do ONS · DESSEM · **Oracle FMB** (Onda 3, medição do portfólio) |
+| **Fontes hoje** | `aneel_siga` (cadastro público) · `ccee_geracao_usina` · `ons_geracao_usina` · `ons_capacidade` · `ons_disponibilidade_usina` · `ons_restricao_coff_eolica` · `ons_restricao_coff_fotovoltaica` |
+| **Fontes a conectar** | térmicas do ONS (`cvu-usitermica`, `geracao-termica-despacho-2`) · `fator-capacidade-2` · DESSEM · **Oracle FMB** (Onda 3, medição do portfólio) — o constrained-off de eólica e solar entrou em 15/09 |
 | **Granularidade** | **usina** — a granularidade que A7 fixa para dado de portfólio |
 | **Cadência** | semanal para o cadastro público; mensal para a geração da CCEE; diária para medição, na janela das 22h às 6h (C9) |
-| **Gold hoje** | `parque_gerador`, `geracao_mensal_usina`, `geracao_mensal_usina_ons`, `capacidade_instalada_vigente_usina`, `disponibilidade_mensal_usina`, `de_para_usina` |
+| **Gold hoje** | `parque_gerador`, `geracao_mensal_usina`, `geracao_mensal_usina_ons`, `capacidade_instalada_vigente_usina`, `disponibilidade_mensal_usina`, `restricao_coff_mensal_usina`, `de_para_usina` |
 | **Situação** | **parcial** — geração na granularidade de usina entregue; `codigo_usina` cruza ANEEL↔ONS desde 15/09 (`gold.de_para_usina`); falta a sigla interna (#141) |
 
 **Tem um bloqueio nomeado**: o item D1 informa que a Alup identifica os ativos

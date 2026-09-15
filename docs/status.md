@@ -225,6 +225,42 @@ Acompanhamento consolidado destas linhas na [issue #57](https://github.com/nesse
 atraso começa, não quando vira problema. É o que sustenta postergação,
 ociosidade ou suspensão numa medição.
 
+### A7 em detalhe — o insumo que custa por dia parado
+
+Ele aparece no painel como uma linha, e a linha não diz o tamanho do que está
+pendurado nela.
+
+> **Atenção à sigla.** Este A7 é a **pendência nº 7 deste painel**. Existe um
+> **outro A7**, no bloco A do [Questionário de Gaps](questionario-gaps.md), que
+> pergunta a granularidade mínima de decisão e foi respondido em 11/09. Mesma
+> sigla, assuntos diferentes, e os dois convivem na documentação.
+
+| | |
+|---|---|
+| **O que se pede** | a Alup abrir os chamados internos de **token** (Onda 2) e de **VPN/credencial read-only** (Onda 3) |
+| **Prazo** | 25/09 |
+| **Estado** | em 11/09 (item C1) a Alup informou que os pedidos **ainda não tinham sido abertos**, e que seriam a partir de 14/09. Faltam os números de chamado |
+| **Exposição** | ociosidade de **4h/dia a R$ 256/h — R$ 1.024 por dia parado** acima de 5 dias úteis |
+
+**O que ele destrava**: sete conectores — quase toda a Onda 2 e a Onda 3
+inteira. BBCE ([#23](https://github.com/nessenergy/Alupdatalake/issues/23)),
+TempoOK ([#25](https://github.com/nessenergy/Alupdatalake/issues/25)), Oracle
+FMB ([#27](https://github.com/nessenergy/Alupdatalake/issues/27)), Portal Alup
+([#29](https://github.com/nessenergy/Alupdatalake/issues/29)), MySQL RDS
+([#31](https://github.com/nessenergy/Alupdatalake/issues/31)) e RM/TOTVS
+([#32](https://github.com/nessenergy/Alupdatalake/issues/32)). O Hubspot saiu
+desta linha e virou A9, porque é só um token.
+
+**Por que é o maior risco financeiro do contrato, e não o A3.** O A3 posterga
+prazo; o A7 gera cobrança por dia parado. É a única parte da cláusula 3ª com
+dinheiro corrente.
+
+Duas respostas de 11/09 o deixaram mais barato do que parecia: o banco de
+produção da Comercialização é liberado assim que solicitado (C2), e o MySQL RDS
+não precisa de VPN nem de peering (C8). O que sobrou é pedido administrativo —
+e é justamente por ser barato de atender que o atraso nele fica caro de
+justificar.
+
 **Registro de esclarecimento**: dúvida da contratante também tem data. A
 consulta sobre E1 e E2 chegou em 09/09 e foi respondida em 09/09; sem esse
 registro, a espera por A3 poderia ser lida depois como decisão pendente de

@@ -1,0 +1,25 @@
+config {
+  type: "operations",
+  schema: "bronze",
+  hasOutput: true,
+  tags: ["bronze"]
+}
+
+-- Bronze: energia natural afluente (ENA) diária por subsistema (ONS).
+CREATE TABLE IF NOT EXISTS ${self()} (
+  data_referencia                  DATE      NOT NULL OPTIONS(description="Dia de referência da ENA"),
+  submercado                       STRING    NOT NULL OPTIONS(description="N, NE, S, SE — já com trim do espaço à direita da origem"),
+  nome_subsistema                   STRING    NOT NULL,
+  ena_bruta_mwmed                   NUMERIC   NOT NULL OPTIONS(description="Afluência bruta da região, em MWmed"),
+  ena_bruta_percentual_mlt          NUMERIC   NOT NULL OPTIONS(description="ena_bruta_mwmed como percentual da MLT (média de longo termo)"),
+  ena_armazenavel_mwmed             NUMERIC   NOT NULL OPTIONS(description="Parcela armazenável da afluência (exclui fio d'água), em MWmed"),
+  ena_armazenavel_percentual_mlt    NUMERIC   NOT NULL OPTIONS(description="ena_armazenavel_mwmed como percentual da MLT"),
+
+  _ingestao_id        STRING    NOT NULL,
+  _ingestao_timestamp TIMESTAMP NOT NULL,
+  _fonte              STRING    NOT NULL,
+  _schema_versao      STRING    NOT NULL
+)
+PARTITION BY DATE(_ingestao_timestamp)
+CLUSTER BY data_referencia, submercado
+OPTIONS(description="ENA diária por subsistema — camada Bronze, append-only");

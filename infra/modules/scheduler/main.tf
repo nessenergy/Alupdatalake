@@ -42,6 +42,18 @@ variable "conectores" {
       cron         = "0 8 * * *" # o ONS publica o dia anterior de manhã
       ultimos_dias = 30          # janela larga: o ONS revisa dado publicado
     }
+    ons_ear = {
+      # Mesmo catálogo do ons_carga, mesmo horário de publicação; 15 min depois
+      # para não disputar a mesma janela de execução com ele.
+      cron         = "15 8 * * *"
+      ultimos_dias = 30 # janela larga: o ONS revisa dado publicado
+    }
+    ons_ena = {
+      # Mesmo catálogo do ons_ear; mais 15 min de espaçamento entre os três
+      # conectores do ONS.
+      cron         = "30 8 * * *"
+      ultimos_dias = 30 # janela larga: o ONS revisa dado publicado
+    }
     aneel_siga = {
       cron         = "0 7 * * 1" # cadastro muda devagar: semanal, segunda
       ultimos_dias = 1           # cadastro completo; a janela não se aplica

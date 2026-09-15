@@ -1,0 +1,47 @@
+config {
+  type: "view",
+  schema: "silver",
+  tags: ["silver"],
+  assertions: {
+    uniqueKey: ["data_referencia", "submercado"],
+    nonNull: ["data_referencia", "submercado"],
+    rowConditions: [
+      "submercado IN ('N','NE','S','SE')",
+      "ena_bruta_mwmed >= 0",
+      "ena_armazenavel_mwmed >= 0",
+      "ena_bruta_percentual_mlt >= 0",
+      "ena_armazenavel_percentual_mlt >= 0"
+    ]
+  }
+}
+
+-- Silver: ENA diária higienizada e deduplicada.
+-- Dedup por (data_referencia, submercado): mesma regra do ons_carga e do
+-- ons_ear — o ONS revisa dado publicado, vence a ingestão mais recente.
+--
+-- Faixa do percentual: aqui o teto de 100 do ons_ear NÃO se aplica. ENA
+-- percentual compara a afluência do dia com a MLT (média de longo termo) da
+-- própria região — uma referência histórica, não uma capacidade física — e
+-- passa de 100 em qualquer ano mais úmido que a média (documentado em
+-- docs/dicionario-dados/ons_ena.md). A faixa aqui fica só com o piso em zero;
+-- o teto de sanidade contra erro de captura (500%) já é responsabilidade do
+-- Pydantic em src/conectores/ons_ena.py, antes da linha chegar à Bronze.
+SELECT
+  data_referencia,
+  submercado,
+  CAST(NULL AS STRING) AS codigo_usina,  -- ENA é agregada por subsistema
+  CAST(NULL AS STRING) AS agente_ccee,   -- idem
+  FORMAT_DATE('%Y-%m', data_referencia) AS periodo_apuracao,
+  CAST(NULL AS STRING) AS periodo_apuracao_ccee,  -- a origem é o ONS, não a CCEE
+  nome_subsistema,
+  ena_bruta_mwmed,
+  ena_bruta_percentual_mlt,
+  ena_armazenavel_mwmed,
+  ena_armazenavel_percentual_mlt,
+  _ingestao_id,
+  _ingestao_timestamp
+FROM ${ref("bronze", "ons_ena")}
+QUALIFY ROW_NUMBER() OVER (
+  PARTITION BY data_referencia, submercado
+  ORDER BY _ingestao_timestamp DESC
+) = 1

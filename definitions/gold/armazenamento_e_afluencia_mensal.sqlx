@@ -1,0 +1,83 @@
+config {
+  type: "table",
+  schema: "gold",
+  tags: ["gold"]
+}
+
+-- Gold: armazenamento (EAR) e afluência (ENA) lado a lado, por mês e
+-- submercado.
+--
+-- Responde **"o reservatório está enchendo ou esvaziando, e por quê"** —
+-- fecha o domínio Mercado de Energia junto com `carga_mensal_submercado` e
+-- `mercado_mensal_submercado`: aquelas leem consumo e preço, esta lê a
+-- hidrologia que os explica (ADR 012: sem KPI, sem razão calculada entre as
+-- duas séries — decidir se uma ENA de 80% da MLT é motivo de alerta é decisão
+-- de negócio, fora desta fase).
+--
+-- Uma só Gold para as duas fontes, não duas: EAR e ENA são o mesmo domínio
+-- físico (o reservatório) visto de dois ângulos — quanto tem armazenado e
+-- quanto está chegando —, e é exatamente o par de perguntas que se olha
+-- junto na operação. Separar em duas tabelas obrigaria a comparação, que é o
+-- objetivo, a ser feita por quem consulta, em vez de estar pronta na tabela.
+--
+-- FULL OUTER, como em mercado_mensal_submercado: EAR e ENA podem fechar o mês
+-- em dias diferentes no catálogo do ONS, e um INNER JOIN faria o mês em que
+-- só uma das duas já publicou desaparecer da tabela em vez de aparecer
+-- parcial.
+
+WITH ear AS (
+  SELECT
+    periodo_apuracao,
+    submercado,
+    COUNT(*)                        AS dias_com_ear,
+    AVG(ear_verificada_percentual)  AS ear_media_percentual,
+    MAX(ear_verificada_percentual)  AS ear_maxima_percentual,
+    MIN(ear_verificada_percentual)  AS ear_minima_percentual,
+    AVG(ear_verificada_mwmes)       AS ear_media_mwmes
+  FROM ${ref("silver", "ons_ear")}
+  GROUP BY periodo_apuracao, submercado
+),
+
+ena AS (
+  SELECT
+    periodo_apuracao,
+    submercado,
+    COUNT(*)                             AS dias_com_ena,
+    AVG(ena_bruta_percentual_mlt)        AS ena_bruta_media_percentual_mlt,
+    AVG(ena_armazenavel_percentual_mlt)  AS ena_armazenavel_media_percentual_mlt,
+    AVG(ena_bruta_mwmed)                 AS ena_bruta_media_mwmed,
+    AVG(ena_armazenavel_mwmed)           AS ena_armazenavel_media_mwmed
+  FROM ${ref("silver", "ons_ena")}
+  GROUP BY periodo_apuracao, submercado
+)
+
+SELECT
+  COALESCE(e.periodo_apuracao, n.periodo_apuracao) AS periodo_apuracao,
+  COALESCE(e.submercado, n.submercado)             AS submercado,
+
+  e.ear_media_percentual,
+  e.ear_maxima_percentual,
+  e.ear_minima_percentual,
+  e.ear_media_mwmes,
+
+  n.ena_bruta_media_percentual_mlt,
+  n.ena_armazenavel_media_percentual_mlt,
+  n.ena_bruta_media_mwmed,
+  n.ena_armazenavel_media_mwmed,
+
+  -- Cobertura do mês: sem elas não se distingue "reservatório baixo" de "mês
+  -- com três dias publicados" — mesmo motivo do horas_com_preco / dias_com_carga
+  -- em mercado_mensal_submercado.
+  e.dias_com_ear,
+  n.dias_com_ena,
+
+  CASE
+    WHEN e.ear_media_percentual IS NULL THEN 'sem EAR publicada'
+    WHEN n.ena_bruta_media_percentual_mlt IS NULL THEN 'sem ENA publicada'
+    ELSE 'completo'
+  END AS cobertura
+
+FROM ear AS e
+FULL OUTER JOIN ena AS n
+  ON  e.periodo_apuracao = n.periodo_apuracao
+  AND e.submercado        = n.submercado

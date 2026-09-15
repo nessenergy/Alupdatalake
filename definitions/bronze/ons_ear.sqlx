@@ -1,0 +1,24 @@
+config {
+  type: "operations",
+  schema: "bronze",
+  hasOutput: true,
+  tags: ["bronze"]
+}
+
+-- Bronze: energia armazenada (EAR) diária por subsistema (ONS).
+CREATE TABLE IF NOT EXISTS ${self()} (
+  data_referencia            DATE      NOT NULL OPTIONS(description="Dia de referência da EAR"),
+  submercado                 STRING    NOT NULL OPTIONS(description="N, NE, S, SE — já com trim do espaço à direita da origem"),
+  nome_subsistema             STRING    NOT NULL,
+  ear_max_mwmes               NUMERIC   NOT NULL OPTIONS(description="Capacidade máxima de armazenamento do subsistema, em MWmês"),
+  ear_verificada_mwmes        NUMERIC   NOT NULL OPTIONS(description="Energia armazenada verificada no dia, em MWmês"),
+  ear_verificada_percentual   NUMERIC   NOT NULL OPTIONS(description="ear_verificada_mwmes como percentual de ear_max_mwmes"),
+
+  _ingestao_id        STRING    NOT NULL,
+  _ingestao_timestamp TIMESTAMP NOT NULL,
+  _fonte              STRING    NOT NULL,
+  _schema_versao      STRING    NOT NULL
+)
+PARTITION BY DATE(_ingestao_timestamp)
+CLUSTER BY data_referencia, submercado
+OPTIONS(description="EAR diária por subsistema — camada Bronze, append-only");

@@ -17,6 +17,9 @@ Este índice diz o que já existe, o que falta e — importante — **por que fa
 | CCEE — geração horária por usina | [`ccee_geracao_usina.md`](ccee_geracao_usina.md) | 1 | `submercado` | `geracao_mensal_usina` |
 | CCEE — montantes contratados por perfil | [`ccee_contrato_montante.md`](ccee_contrato_montante.md) | 1 | — | `posicao_contratual_mensal_perfil` |
 | CCEE — consumo de varejo | [`ccee_varejista_consumidor.md`](ccee_varejista_consumidor.md) | 1 | `submercado` | `consumo_varejista_mensal_uf` |
+| CCEE — ESS e serviços ancilares | [`ccee_encargo_ess.md`](ccee_encargo_ess.md) | 1 | — | `encargos_setoriais_mensal` |
+| CCEE — energia de reserva (EER) | [`ccee_energia_reserva.md`](ccee_energia_reserva.md) | 1 | — | `encargos_setoriais_mensal` |
+| CCEE — CVU estrutural | [`ccee_cvu_estrutural.md`](ccee_cvu_estrutural.md) | 1 | — | `cvu_estrutural_vigente_usina` |
 | ANEEL — SIGA | [`aneel_siga.md`](aneel_siga.md) | 1 | **`codigo_usina`** | `parque_gerador` |
 | BCB — PTAX | [`bcb_cambio_ptax.md`](bcb_cambio_ptax.md) | 0 | — | `cambio_mensal` |
 | IBGE — IPCA | [`ibge_ipca.md`](ibge_ipca.md) | 1 | — | `inflacao_mensal` |

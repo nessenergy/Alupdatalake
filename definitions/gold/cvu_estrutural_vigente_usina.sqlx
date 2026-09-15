@@ -1,0 +1,28 @@
+config {
+  type: "table",
+  schema: "gold",
+  tags: ["gold"]
+}
+
+-- Gold: o CVU estrutural de cada usina térmica, por ano de horizonte, como
+-- publicado no mês de referência mais recente. Uma linha por (usina, leilão,
+-- produto, horizonte). É o custo que explica o despacho por ordem de mérito
+-- e cruza com `geracao_mensal_usina` por `codigo_parcela_usina`.
+-- Sem KPI (ADR 012).
+SELECT
+  codigo_parcela_usina,
+  sigla_parcela,
+  tipo_combustivel,
+  leilao,
+  produto,
+  ano_horizonte,
+  cvu_estrutural                AS cvu_estrutural_reais_mwh,
+  inicio_suprimento,
+  termino_suprimento,
+  periodo_apuracao              AS publicado_no_mes,
+  versao_publicacao
+FROM ${ref("silver", "ccee_cvu_estrutural")}
+QUALIFY ROW_NUMBER() OVER (
+  PARTITION BY codigo_parcela_usina, leilao, produto, ano_horizonte
+  ORDER BY periodo_apuracao DESC
+) = 1

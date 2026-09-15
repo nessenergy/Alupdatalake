@@ -1,0 +1,27 @@
+config {
+  type: "operations",
+  schema: "bronze",
+  hasOutput: true,
+  tags: ["bronze"]
+}
+
+-- Bronze: liquidação da energia de reserva (EER), mensal, mercado inteiro
+-- (CCEE, dados abertos). Uma linha por mês e por publicação; a Silver fica
+-- com a publicação mais recente.
+CREATE TABLE IF NOT EXISTS ${self()} (
+  data_referencia                   DATE      NOT NULL OPTIONS(description="Primeiro dia do mês de referência"),
+  periodo_apuracao_ccee             STRING    NOT NULL OPTIONS(description="AAAA-MM, como a CCEE declara"),
+  versao_publicacao                 DATE      NOT NULL OPTIONS(description="last_modified do recurso no CKAN (ADR 016)"),
+  efeito_ccear_disponibilidade_cer  NUMERIC            OPTIONS(description="R$"),
+  repasse_usuarios_reserva          NUMERIC            OPTIONS(description="R$"),
+  ajuste                            NUMERIC            OPTIONS(description="R$ — pode ser negativo"),
+  valor_total_liquidado             NUMERIC            OPTIONS(description="R$"),
+
+  _ingestao_id                      STRING    NOT NULL,
+  _ingestao_timestamp               TIMESTAMP NOT NULL,
+  _fonte                            STRING    NOT NULL,
+  _schema_versao                    STRING    NOT NULL
+)
+PARTITION BY DATE(_ingestao_timestamp)
+CLUSTER BY data_referencia
+OPTIONS(description="Liquidação da energia de reserva (EER) mensal — camada Bronze, append-only");

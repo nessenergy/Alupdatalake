@@ -1,0 +1,30 @@
+config {
+  type: "table",
+  schema: "gold",
+  tags: ["gold"]
+}
+
+-- Gold: ESS e EER lado a lado, mês a mês — os dois encargos que o B1 nomeia
+-- em Mercado de Energia, em R$. FULL OUTER JOIN pelo mesmo motivo de
+-- `mercado_mensal_submercado`: as duas séries fecham em datas diferentes, e o
+-- mês em que só uma existe não pode sumir.
+-- Sem KPI (ADR 012): os totais são somas das colunas publicadas.
+SELECT
+  COALESCE(ess.periodo_apuracao, eer.periodo_apuracao) AS periodo_apuracao,
+  ess.encargo_constrained_on,
+  ess.encargo_constrained_off,
+  ess.encargo_cs,
+  ess.encargo_importacao,
+  COALESCE(ess.encargo_constrained_on, 0) + COALESCE(ess.encargo_constrained_off, 0)
+    + COALESCE(ess.outros_servicos_ancilares, 0) + COALESCE(ess.encargo_cs, 0)
+    + COALESCE(ess.encargo_seguranca_energetica, 0) + COALESCE(ess.encargo_restricao_operativa_unit_commitment, 0)
+    + COALESCE(ess.encargo_importacao, 0)                     AS ess_total_reais,
+  eer.efeito_ccear_disponibilidade_cer,
+  eer.repasse_usuarios_reserva,
+  eer.ajuste                                                  AS eer_ajuste_reais,
+  eer.valor_total_liquidado                                   AS eer_total_liquidado_reais,
+  ess.versao_publicacao                                       AS ess_versao_publicacao,
+  eer.versao_publicacao                                       AS eer_versao_publicacao
+FROM ${ref("silver", "ccee_encargo_ess")} AS ess
+FULL OUTER JOIN ${ref("silver", "ccee_energia_reserva")} AS eer
+  ON eer.periodo_apuracao = ess.periodo_apuracao

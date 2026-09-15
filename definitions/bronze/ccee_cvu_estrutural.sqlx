@@ -1,0 +1,33 @@
+config {
+  type: "operations",
+  schema: "bronze",
+  hasOutput: true,
+  tags: ["bronze"]
+}
+
+-- Bronze: custo variável unitário estrutural por usina, leilão, produto e ano
+-- de horizonte (CCEE, dados abertos, único CSV com vírgula). A mesma usina
+-- aparece uma vez por ano projetado no mesmo mês de referência.
+CREATE TABLE IF NOT EXISTS ${self()} (
+  data_referencia        DATE      NOT NULL OPTIONS(description="Primeiro dia do mês de referência"),
+  periodo_apuracao_ccee  STRING    NOT NULL OPTIONS(description="AAAA-MM, como a CCEE declara"),
+  versao_publicacao      DATE      NOT NULL OPTIONS(description="last_modified do recurso no CKAN (ADR 016)"),
+  ano_horizonte          INT64     NOT NULL OPTIONS(description="Ano projetado ao qual este CVU se refere"),
+  codigo_parcela_usina   STRING    NOT NULL OPTIONS(description="Código interno da CCEE — NÃO é o CEG; de-para pendente (#141)"),
+  sigla_parcela          STRING,
+  tipo_combustivel       STRING,
+  leilao                 STRING,
+  produto                STRING,
+  cvu_estrutural         NUMERIC   NOT NULL OPTIONS(description="R$/MWh"),
+  codigo_modelo_preco    STRING,
+  inicio_suprimento      DATE,
+  termino_suprimento     DATE,
+
+  _ingestao_id           STRING    NOT NULL,
+  _ingestao_timestamp    TIMESTAMP NOT NULL,
+  _fonte                 STRING    NOT NULL,
+  _schema_versao         STRING    NOT NULL
+)
+PARTITION BY DATE(_ingestao_timestamp)
+CLUSTER BY data_referencia, codigo_parcela_usina
+OPTIONS(description="CVU estrutural por usina e ano de horizonte — camada Bronze, append-only");

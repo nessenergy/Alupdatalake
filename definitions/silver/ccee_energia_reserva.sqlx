@@ -1,0 +1,37 @@
+config {
+  type: "view",
+  schema: "silver",
+  tags: ["silver"],
+  assertions: {
+    uniqueKey: ["periodo_apuracao_ccee"],
+    nonNull: ["data_referencia", "periodo_apuracao_ccee", "versao_publicacao"],
+    rowConditions: [
+      "periodo_apuracao = periodo_apuracao_ccee",
+      "valor_total_liquidado IS NULL OR valor_total_liquidado >= 0"
+    ]
+  }
+}
+
+-- Silver: uma linha por mês, pela publicação mais recente (ADR 016, opção B).
+-- Faixas (issue #110): o total liquidado não pode ser negativo, mas `ajuste`
+-- fica de fora da faixa de propósito — é ajuste, não montante, e pode vir
+-- negativo (visto contra a API real).
+SELECT
+  data_referencia,
+  CAST(NULL AS STRING) AS submercado,    -- total do mercado
+  CAST(NULL AS STRING) AS codigo_usina,  -- idem
+  CAST(NULL AS STRING) AS agente_ccee,   -- idem
+  FORMAT_DATE('%Y-%m', data_referencia) AS periodo_apuracao,
+  periodo_apuracao_ccee,
+  versao_publicacao,
+  efeito_ccear_disponibilidade_cer,
+  repasse_usuarios_reserva,
+  ajuste,
+  valor_total_liquidado,
+  _ingestao_id,
+  _ingestao_timestamp
+FROM ${ref("bronze", "ccee_energia_reserva")}
+QUALIFY ROW_NUMBER() OVER (
+  PARTITION BY periodo_apuracao_ccee
+  ORDER BY versao_publicacao DESC, _ingestao_timestamp DESC
+) = 1

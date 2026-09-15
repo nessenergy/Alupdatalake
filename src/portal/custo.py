@@ -36,6 +36,19 @@ GIB = 1024**3
 #    adotamos o preço-base, que é o dos EUA. Se us-east1 estiver numa faixa
 #    superior, a conta subestima na mesma proporção (5% ou 9%).
 #
+# 3. **A camada gratuita não está no modelo, e para este lake ela domina.** A
+#    documentação do BigQuery declara 1 TB de consulta grátis por mês, por
+#    projeto (`docs.cloud.google.com/bigquery/docs/best-practices-costs`,
+#    conferido em 14/09). O lake inteiro hoje tem ordem de dezenas de MB: todo
+#    o varrido de um mês cabe folgado nesse teto, e a linha de consulta da
+#    fatura real tende a ser **zero** enquanto o volume não mudar de patamar.
+#    O número desta tela, portanto, **superestima** — o erro é conservador, e
+#    é assim que fica de propósito: a comparação entre fontes, que é para o
+#    que a tela serve, continua válida, e um teto que não existe não vira
+#    desculpa para consulta desnecessária. Modelar o abatimento exigiria saber
+#    o que o resto do projeto da Alup consome do mesmo teto, que é justamente o
+#    que só o billing export responde.
+#
 # A conferência definitiva não é esta: é o billing export (camada F2), que vê
 # crédito e desconto por uso comprometido. Até lá, estes números servem para
 # ordem de grandeza e comparação entre fontes, não para fatura.

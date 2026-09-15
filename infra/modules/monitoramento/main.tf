@@ -20,6 +20,7 @@ variable "conectores_criticos" {
   type        = map(number)
   default = {
     bcb_cambio_ptax            = 26  # diário + folga para feriado
+    bcb_juros                  = 26  # diário + folga para feriado
     ons_carga                  = 26  # diário
     aneel_siga                 = 180 # semanal + folga
     ibge_ipca                  = 780 # mensal + folga

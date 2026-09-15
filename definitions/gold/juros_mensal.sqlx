@@ -1,0 +1,23 @@
+config {
+  type: "table",
+  schema: "gold",
+  tags: ["gold"]
+}
+
+-- Gold: Selic e CDI por mês — o indexador que corrige valor no tempo.
+-- Fecha o domínio Econômico do B1 junto de `cambio_mensal` e `inflacao_mensal`.
+--
+-- `taxa_acumulada_mes` é a capitalização composta dos dias úteis, que é como o
+-- mercado lê estas séries — a taxa publicada é ao dia e somá-la daria número
+-- errado com aparência de certo. Não é KPI da Alup: a Gold desta fase é
+-- descritiva (ADR 012), e nenhum indicador foi formalizado (A5).
+SELECT
+  periodo_apuracao,
+  serie,
+  MIN(data_referencia) AS primeiro_dia_util,
+  MAX(data_referencia) AS ultimo_dia_util,
+  COUNT(*)             AS dias_uteis,
+  AVG(taxa_percentual_dia) AS taxa_media_dia,
+  (EXP(SUM(LN(1 + taxa_percentual_dia / 100))) - 1) * 100 AS taxa_acumulada_mes
+FROM ${ref("silver", "bcb_juros")}
+GROUP BY periodo_apuracao, serie

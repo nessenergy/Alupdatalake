@@ -87,6 +87,7 @@ DOMINIO_ANALITICO = {
     "tempook_boletins": "Meteorologia",
     "hubspot_negocios": "Comercial e Contratos",
     "bcb_cambio_ptax": "Econômico",
+    "bcb_juros": "Econômico",
     "ibge_ipca": "Econômico",
 }
 
@@ -94,6 +95,7 @@ DOMINIO_ANALITICO = {
 # schema; no ambiente real sai de `INFORMATION_SCHEMA.PARTITIONS`.
 BYTES_POR_LINHA = {
     "bcb_cambio_ptax": 96,
+    "bcb_juros": 64,  # data, série curta e uma NUMERIC
     "ibge_ipca": 128,
     "ons_carga": 184,
     "aneel_siga": 640,

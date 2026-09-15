@@ -129,7 +129,7 @@ pergunta, fontes, granularidade e Gold — em
 | 4 | Comercial e Contratos | Letícia Ferreira · Tahigo Santos | parcial pela via pública — book interno em A7 |
 | 5 | CRM e Marketing | Tahigo Santos | parcial — token do Hubspot |
 | 6 | Risco e Compliance | Letícia Ferreira | iniciado — saiu de zero sem credencial |
-| 7 | Econômico | Letícia Ferreira | parcial — faltam Selic e CDI |
+| 7 | Econômico | Letícia Ferreira | pronto |
 | 8 | Planejamento | gestores da Comercialização | não iniciado |
 
 > **Por que o quadro do B1 tem 11 linhas**: três domínios — Mercado de Energia,

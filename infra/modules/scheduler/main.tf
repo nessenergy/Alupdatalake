@@ -32,6 +32,12 @@ variable "conectores" {
       cron         = "0 9 * * *" # após a publicação do boletim de fechamento
       ultimos_dias = 3           # cobre feriado e republicação
     }
+    bcb_juros = {
+      # Selic e CDI do dia útil anterior. Meia hora depois do PTAX para não
+      # disputar a mesma janela de execução com ele.
+      cron         = "30 9 * * *"
+      ultimos_dias = 5 # cobre feriado prolongado e execução perdida
+    }
     ons_carga = {
       cron         = "0 8 * * *" # o ONS publica o dia anterior de manhã
       ultimos_dias = 30          # janela larga: o ONS revisa dado publicado

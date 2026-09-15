@@ -110,7 +110,14 @@ def test_silver_deduplica_e_expoe_as_dimensoes_comuns(arquivo):
         pytest.skip("regra vale só para a Silver")
     sql = renderizar(arquivo)
     assert "QUALIFY" in sql.upper(), "Silver sem dedup: reprocessar duplicaria"
-    for dimensao in ("data_referencia", "submercado", "codigo_usina", "agente_ccee", "periodo_apuracao"):
+    for dimensao in (
+        "data_referencia",
+        "submercado",
+        "codigo_usina",
+        "agente_ccee",
+        "periodo_apuracao",
+        "periodo_apuracao_ccee",
+    ):
         assert dimensao in sql, f"Silver sem a dimensão comum {dimensao}"
 
 

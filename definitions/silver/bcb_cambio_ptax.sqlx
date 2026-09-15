@@ -23,6 +23,7 @@ SELECT
   CAST(NULL AS STRING)  AS codigo_usina,    -- idem
   CAST(NULL AS STRING)  AS agente_ccee,     -- idem
   FORMAT_DATE('%Y-%m', data_referencia) AS periodo_apuracao,
+  CAST(NULL AS STRING) AS periodo_apuracao_ccee,  -- a origem não declara período próprio
   tipo_boletim,
   data_hora_cotacao,
   cotacao_compra,

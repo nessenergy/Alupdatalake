@@ -36,7 +36,7 @@ origem                       o que muda por fonte
   ▼                          daqui em diante, idêntico para as 13
 bronze.<fonte>_<entidade>    tabela append-only, particionada e clusterizada
   ▼
-silver.<fonte>_<entidade>    view: tipagem, dedup por QUALIFY, 5 dimensões comuns
+silver.<fonte>_<entidade>    view: tipagem, dedup por QUALIFY, 6 dimensões comuns
   ▼
 gold.<pergunta_de_negocio>   tabela: uma pergunta nomeada por tabela, recarregada a cada execução
 ```

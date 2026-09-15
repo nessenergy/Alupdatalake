@@ -30,6 +30,7 @@ SELECT
   FORMAT_DATE('%Y-%m', vertice_em) AS vertice_periodo,
   preco_reais_mwh,
   FORMAT_DATE('%Y-%m', data_referencia) AS periodo_apuracao,
+  CAST(NULL AS STRING) AS periodo_apuracao_ccee,  -- a origem não declara período próprio
   CAST(NULL AS STRING) AS submercado,    -- a curva publicada é do produto, não do submercado
   CAST(NULL AS STRING) AS codigo_usina,
   CAST(NULL AS STRING) AS agente_ccee,   -- preço de mercado, não posição de agente

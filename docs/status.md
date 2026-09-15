@@ -76,6 +76,7 @@ Nenhuma linha chegou a um BigQuery de verdade — o projeto GCP ainda não exist
 | `codigo_usina` | ANEEL/SIGA (CodCEG) | ok |
 | `submercado` | ONS (N, NE, S, SE) | ok |
 | `agente_ccee` | CCEE (`lista_perfil_v1`) | **ok desde 14/09** — `ccee_perfil` entregue, 60.509 perfis verificados contra a API real. **As cinco dimensões comuns têm fonte** |
+| `periodo_apuracao_ccee` | a origem, onde ela declara | **nova em 14/09** — sexta dimensão. Hoje só o `ccee_pld` a preenche, pelo `MES_REFERENCIA`; nas demais é nula. A Silver do PLD exige que ela coincida com o calendário civil, e é essa asserção que avisa no dia em que os dois calendários divergirem |
 
 ### Documentação
 

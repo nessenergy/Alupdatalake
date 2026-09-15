@@ -37,6 +37,7 @@ SELECT
   tipo_energia,
   data_referencia,
   FORMAT_DATE('%Y-%m', data_referencia) AS periodo_apuracao,
+  CAST(NULL AS STRING) AS periodo_apuracao_ccee,  -- a origem não declara período próprio
   CAST(NULL AS STRING) AS codigo_usina,  -- perfil é da empresa, não da usina
   _ingestao_id,
   _ingestao_timestamp

@@ -24,6 +24,7 @@ SELECT
   codigo_usina,
   CAST(NULL AS STRING) AS agente_ccee,  -- o cadastro não traz o agente CCEE
   FORMAT_DATE('%Y-%m', data_referencia) AS periodo_apuracao,
+  CAST(NULL AS STRING) AS periodo_apuracao_ccee,  -- a origem não declara período próprio
   nome,
   uf,
   tipo_geracao,

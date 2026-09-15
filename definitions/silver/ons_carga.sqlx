@@ -24,6 +24,7 @@ SELECT
   CAST(NULL AS STRING) AS codigo_usina,  -- carga é agregada por subsistema
   CAST(NULL AS STRING) AS agente_ccee,   -- idem
   FORMAT_DATE('%Y-%m', data_referencia) AS periodo_apuracao,
+  CAST(NULL AS STRING) AS periodo_apuracao_ccee,  -- a origem não declara período próprio
   nome_subsistema,
   carga_mwmed,
   _ingestao_id,

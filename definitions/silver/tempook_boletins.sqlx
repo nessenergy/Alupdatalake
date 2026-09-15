@@ -22,6 +22,7 @@ config {
 SELECT
   data_referencia,
   FORMAT_DATE('%Y-%m', data_referencia) AS periodo_apuracao,
+  CAST(NULL AS STRING) AS periodo_apuracao_ccee,  -- a origem não declara período próprio
   CAST(NULL AS STRING) AS submercado,    -- o boletim é nacional
   CAST(NULL AS STRING) AS codigo_usina,  -- catálogo de documento, não de ativo
   CAST(NULL AS STRING) AS agente_ccee,   -- idem

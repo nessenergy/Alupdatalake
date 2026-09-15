@@ -188,7 +188,8 @@ O conector segue parado à espera do token (A9, chamado a partir de 14/09).
 O item D5 já definiu a regra mais difícil deste domínio: **recontabilização se
 versiona, não se sobrescreve** — registrado na
 [ADR 016](decisoes/016-versionamento-de-recontabilizacao.md). A lacuna do mês
-CCEE (§5.2) bloqueia este domínio quando houver dado.
+CCEE (§5.2) deixou de ser risco silencioso para este domínio: os dois
+calendários convivem em colunas separadas, com asserção que avisa se divergirem.
 
 ### 7 · Econômico
 
@@ -247,6 +248,9 @@ O item 1 **não depende da Alup**. É o que dá para avançar hoje.
 
 ## 5. Três lacunas que este documento nomeia
 
+Duas seguem abertas; a 5.2 foi encerrada em 14/09 e fica registrada com o que se
+aprendeu no caminho.
+
 Não são pendências novas — são consequências das respostas de 11/09 que ainda
 não tinham sido escritas em lugar nenhum.
 
@@ -263,18 +267,23 @@ Compliance — e é justamente esse cruzamento que a prioridade 1 de A2 pede.
 **O que destrava**: a Alup fornecer o de-para, ou a lista de siglas com o CEG
 correspondente. É insumo pequeno e de efeito grande.
 
-### 5.2 `periodo_apuracao` só existe em calendário civil
+### 5.2 Os dois calendários — encerrada em 14/09
 
-O item **D4** diz que valem **os dois calendários**: mês civil e mês CCEE. Hoje
-todas as views Silver derivam `periodo_apuracao` com
-`FORMAT_DATE('%Y-%m', data_referencia)` — que é só o civil.
+O item **D4** diz que valem **os dois calendários**: mês civil e mês CCEE.
 
-O mês CCEE não coincide com o civil no fechamento da contabilização. Enquanto a
-diferença não for modelada, qualquer agregação mensal que cruze dado da CCEE com
-dado interno **soma períodos diferentes sem avisar**.
+O registro original desta lacuna dizia que todas as Silver derivavam
+`periodo_apuracao` com `FORMAT_DATE`. **Não era verdade**: o `ccee_pld` trazia o
+`MES_REFERENCIA` declarado pela CCEE sob o mesmo nome de coluna que nas outras
+views guarda um valor derivado — duas proveniências, um nome, nenhum sinal.
 
-**O que destrava**: definir a regra do mês CCEE. É trabalho da ness., e entra
-como item de 0.11 — ver [`visao-geral.md`](visao-geral.md).
+Desde 14/09 são **duas colunas**: `periodo_apuracao`, derivado da data em todas
+as views, e `periodo_apuracao_ccee`, o período que a origem declara, nulo onde
+ela não declara nada. E uma asserção na Silver do PLD exige que os dois
+coincidam.
+
+Não definimos a regra do mês CCEE — seria inventar calendário do cliente. **No
+dia em que os dois divergirem, a asserção falha e a regra se aprende do dado
+real.** Detalhe em [`visao-geral.md`](visao-geral.md), Lacuna 2.
 
 ### 5.3 "Quase em tempo real" não é alcançável para fonte interna
 

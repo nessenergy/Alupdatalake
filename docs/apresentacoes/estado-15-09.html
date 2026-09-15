@@ -229,15 +229,15 @@ td.r{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap;font-
     <span class="wordmark">ness<i>.</i></span><span class="tag">O que existe hoje</span>
     <div class="inner">
       <p class="eyebrow">Construído e verificado</p>
-      <h2>Dezenove fontes de dados,<br>com os 7 componentes cada.</h2>
+      <h2>Vinte e seis fontes de dados,<br>com os 7 componentes cada.</h2>
       <div class="nums">
-        <div><span class="v cy">19</span><span class="k">conectores registrados</span></div>
-        <div><span class="v">16</span><span class="k">verificados contra a API real</span></div>
-        <div><span class="v">62</span><span class="k">views Bronze, Silver e Gold</span></div>
-        <div><span class="v">773</span><span class="k">testes automatizados verdes</span></div>
+        <div><span class="v cy">26</span><span class="k">conectores registrados</span></div>
+        <div><span class="v">23</span><span class="k">verificados contra a API real</span></div>
+        <div><span class="v">82</span><span class="k">views Bronze, Silver e Gold</span></div>
+        <div><span class="v">956</span><span class="k">testes automatizados verdes</span></div>
         <div><span class="v">21</span><span class="k">decisões de arquitetura</span></div>
       </div>
-      <p class="lead">A cláusula 2ª exige sete componentes por fonte: conector, tabela Bronze, view Silver, view Gold, testes, agendamento e documentação com linhagem. <b>Fonte com cinco de sete não é entrega parcial — é retrabalho na medição.</b> As dezenove têm os sete.</p>
+      <p class="lead">A cláusula 2ª exige sete componentes por fonte: conector, tabela Bronze, view Silver, view Gold, testes, agendamento e documentação com linhagem. <b>Fonte com cinco de sete não é entrega parcial — é retrabalho na medição.</b> As vinte e seis têm os sete. As três que ainda não falaram com a origem são as que dependem de credencial — Hubspot, BBCE — e o TempoOK, cujo acervo alcançável para em 2022.</p>
     </div>
     <span class="pagenum">03</span>
   </section>
@@ -277,7 +277,7 @@ td.r{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap;font-
           <thead><tr><th>#</th><th>Domínio</th><th>Data owner</th><th>Situação</th></tr></thead>
           <tbody>
             <tr><td class="idx">1</td><td>Mercado de Energia</td><td>Taina Mota · Gabriel Barreto</td><td><span class="badge b-ok">pronto do lado da CCEE</span></td></tr>
-            <tr><td class="idx">2</td><td>Geração e Operacional</td><td>Taina Mota · Letícia Ferreira</td><td><span class="badge b-warn">falta o de-para de usina</span></td></tr>
+            <tr><td class="idx">2</td><td>Geração e Operacional</td><td>Taina Mota · Letícia Ferreira</td><td><span class="badge b-warn">falta só a sigla interna</span></td></tr>
             <tr><td class="idx">3</td><td>Meteorologia</td><td>Taina Mota</td><td><span class="badge b-warn">pronto como arquivo</span></td></tr>
             <tr><td class="idx">4</td><td>Comercial e Contratos</td><td>Letícia Ferreira · Tahigo Santos</td><td><span class="badge b-warn">parcial, pela via pública</span></td></tr>
             <tr><td class="idx">5</td><td>CRM e Marketing</td><td>Tahigo Santos</td><td><span class="badge b-warn">parado no token</span></td></tr>
@@ -374,7 +374,7 @@ td.r{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap;font-
     <span class="wordmark">ness<i>.</i></span><span class="tag">Últimas 48 horas</span>
     <div class="inner">
       <p class="eyebrow">O que entrou em 14 e 15 de setembro</p>
-      <h2>A CCEE destravada rendeu<br>nove fontes em dois dias.</h2>
+      <h2>Sete fontes novas em um dia,<br>nenhuma dependendo da Alup.</h2>
       <div class="entregas">
         <div class="e"><span class="d">14/09</span><span class="x"><b>Os oito domínios passaram a vir da resposta B1</b> — a divisão que a Alup usa, com dono nomeado. <span>As seis coligadas respondem pelo faturamento e não delimitam o dado.</span></span></div>
         <div class="e"><span class="d">14/09</span><span class="x"><b>Escolhidos 24 dos 204 conjuntos públicos da CCEE</b>, por demanda dos domínios — e não por completude.</span></div>
@@ -382,6 +382,9 @@ td.r{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap;font-
         <div class="e"><span class="d">15/09</span><span class="x"><b>Risco e Compliance saiu do zero</b> sem depender de credencial — exposição financeira e contabilização por perfil, pela via pública.</span></div>
         <div class="e"><span class="d">15/09</span><span class="x"><b>Definida a regra de recontabilização:</b> quando a CCEE republica um mês fechado, o lake versiona pela publicação da origem, não pela hora da leitura.</span></div>
         <div class="e"><span class="d">15/09</span><span class="x"><b>Matriz RACI recebida</b> da Alup. Não bloqueia trabalho técnico; dois pontos a conciliar antes da primeira homologação.</span></div>
+        <div class="e"><span class="d">15/09</span><span class="x"><b>Sete fontes do ONS entregues</b> — EAR e ENA, geração horária, capacidade instalada, disponibilidade por usina e o constrained-off de eólica e de solar. <span>Nenhuma depende de insumo da Alup.</span></span></div>
+        <div class="e"><span class="d">15/09</span><span class="x"><b>O de-para de usina encolheu de quatro colunas para uma.</b> <span>O ONS publica o CEG junto do nome; faltava corrigir a chave — a ANEEL escreve o sufixo com um dígito e o ONS com dois, e o cruzamento devolvia zero de 2.047 usinas. Corrigido, 95% casam.</span></span></div>
+        <div class="e"><span class="d">15/09</span><span class="x"><b>O runner passou a ingerir em fatias:</b> a maior fonte pedia 9,6 GiB e passou a pedir 225 MiB. <span>O job declarava 4 GiB — a primeira execução real teria sido morta por falta de memória.</span></span></div>
       </div>
     </div>
     <span class="pagenum">08</span>
@@ -399,15 +402,15 @@ td.r{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap;font-
           <ul>
             <li><b>Criar o projeto GCP <code>dev</code></b> e conceder os papéis. É o primeiro apply, o primeiro carregamento e a primeira homologação.</li>
             <li><b>Abrir os chamados de acesso</b> com número, para as Ondas 2 e 3 saírem do papel.</li>
-            <li><b>Enviar o de-para de usina</b> e os exemplos das planilhas — dois insumos pequenos, de efeito grande.</li>
+            <li><b>Enviar a lista de siglas internas com o CEG</b> e os exemplos das planilhas — dois insumos pequenos, de efeito grande. O resto do de-para o lake já montou sozinho.</li>
           </ul>
         </div>
         <div>
           <h3>Está na nossa fila</h3>
           <ul>
             <li><b>Primeiro deploy real</b> assim que o ambiente existir: imagem, job agendado e três dias consecutivos de execução com sucesso.</li>
-            <li><b>Ajuste de carga em lote</b> para a maior fonte, que hoje lê o mês inteiro de uma vez.</li>
-            <li><b>EAR e ENA do ONS</b>, que completam o domínio de Mercado de Energia.</li>
+            <li><b>Térmicas do ONS e fator de capacidade</b>, as próximas fontes públicas que não dependem de ninguém.</li>
+            <li><b>As 19 entidades secundárias da CCEE</b>, quando um domínio pedir — a escolha é por demanda, não por completude.</li>
           </ul>
         </div>
       </div>

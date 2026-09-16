@@ -172,19 +172,26 @@ destino, com os oito invariantes e a pauta de perguntas. **Enviado ao Google em
 
 ## 4. Onde estamos no contrato
 
-| Onda | Escopo | Situação |
-|---|---|---|
-| 0 — Fundação | 90h · marco 15,52% | Técnico concluído; **falta o que depende da Alup** (A3–A6) para homologar |
-| 1 — Mercado base | 120h · marco 20,69% | **5 de 5 fontes com entrega**: as 4 públicas verificadas contra as APIs reais e a CCEE destravada em 14/09, com `ccee_pld` entregue pela via de dados abertos (ADR 018). As demais entidades da CCEE entram por demanda dos domínios analíticos (A4) |
-| 2 — APIs credenciadas | 110h · marco 18,97% | **Hubspot, TempoOK e BBCE com os 7 componentes**, os três escritos antes da credencial; falta rodar contra a API real (A9, A7). **A onda deixou de estar bloqueada por documentação** e depende só de credencial. Resta a CCEE credenciada, que é escopo candidato e não foi pedida em A7 ([ADR 018](arquitetura/decisoes/018-vias-de-acesso-a-ccee.md)) |
-| 3 — Sistemas internos | 155h · marco 26,72% | Caminho de banco pronto (ADR 008: Oracle, MySQL e SQL Server); **nenhuma fonte iniciada** — bloqueada por VPN e credencial (A7) |
-| 4 — Planilhas e handoff | 105h · marco 18,10% | **Motor S2 Data Intake pronto** (item 4.1), adiantado por não depender de insumo; templates concretos dependem de A4. Governança e handoff não iniciados |
+Faturamento é por **homologação da Onda** (cláusula 6ª) — carga real em BigQuery
+e aceitação da Alup, não volume de código. **Nenhuma onda homologou ainda.** A
+coluna "técnico" abaixo é a nossa leitura de prontidão de trabalho, calculada
+sobre as horas do plano de execução; não é métrica rastreada formalmente no
+quadro (o campo `Horas` do Project 2 está quase todo vazio) — mostrada com o
+método, para poder ser conferida.
 
-> **Leitura da tabela.** Quatro das cinco ondas já têm entrega, no quinto dia
-> da primeira. O que nenhuma linha acima mede é homologação: onda fecha por
-> aceitação e carga real, não por volume de código. O projeto está
+| Onda | Escopo | Técnico | Situação |
+|---|---|---|---|
+| 0 — Fundação | 90h · marco 15,52% | **~82%** | Framework, CI/CD, domínios, dimensões comuns e RACI entregues (~74h). Restam ~16h — provisionar o GCP, 1º deploy, ligar o portal — **100% bloqueadas por A3**, em liberação desde 16/09 |
+| 1 — Mercado base | 120h · marco 20,69% | **escopo original 100%** | As 4 fontes públicas + CCEE planejadas estão entregues. As sete fontes do ONS e as nove entidades da ADR 021, entregues em 15/09, são **escopo além das 120h originais** — por demanda dos domínios do B1, não porque a onda pedisse |
+| 2 — APIs credenciadas | 110h · marco 18,97% | **~50% escrito, 0% executável** | Hubspot, TempoOK e BBCE têm os 7 componentes escritos contra documentação, não contra API real credenciada. Só o TempoOK de fato conversou com a origem — e está travado por outro motivo, o acervo (#129). Para medição, o número que importa é 0% |
+| 3 — Sistemas internos | 155h · marco 26,72% | **0%** | Caminho de banco pronto (ADR 008: Oracle, MySQL e SQL Server, drivers puro-Python, testado sem rede); **nenhuma fonte iniciada** — bloqueada por VPN e credencial (A7, vence 25/09). VPN também depende de A3: mesmo com credencial em mãos, a rota de rede pode continuar bloqueada até o ambiente existir |
+| 4 — Planilhas e handoff | 105h · marco 18,10% | **~29%** | Motor S2 Data Intake pronto (~30h de 105h), adiantado por não depender de insumo. O resto é sequencial — Dataplex e KPIs dependem das outras ondas fecharem, templates dependem da G3 (#142, vence 18/09) |
+
+> **Leitura da tabela.** Quatro das cinco ondas já têm entrega técnica. O que
+> nenhuma linha acima mede é homologação: onda fecha por aceitação e carga
+> real, não por volume de código nem por percentual de horas. O projeto está
 > simultaneamente adiantado em entrega e parado em homologação — e o segundo
-> é o que define o marco.
+> é o que define o marco de faturamento (cláusula 6ª).
 
 ---
 

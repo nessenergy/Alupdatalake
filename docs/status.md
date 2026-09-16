@@ -5,7 +5,8 @@ vencido em 04/09, previsão da Alup para 18/09, contagem da cláusula 3ª em
 curso; **passou dos 5 dias úteis, o cronograma está postergado**. Em 16/09 a
 ness. enviou à Alup **as contas que devem receber os papéis no projeto GCP**
 (ver A3 abaixo): o lado da ness. de A3 está entregue, e o que falta é o
-provisionamento. Em 14/09 a Alup entregou a documentação das APIs (**A2
+provisionamento — que a Alup informou, no mesmo dia, estar **em processo de
+liberação**. Em 14/09 a Alup entregou a documentação das APIs (**A2
 encerrada e A8 atendida**) e em 15/09 a **matriz RACI do projeto**
 ([`raci.md`](raci.md)), que não altera prazo nem desbloqueia frente de
 trabalho
@@ -151,7 +152,7 @@ destino, com os oito invariantes e a pauta de perguntas. **Enviado ao Google em
 |---|---|---|---|
 | A1 | **Conceder à ness. os papéis de bootstrap** em cada projeto (ADR 015, revista em 11/09): com eles a ness. configura o WIF (`GCP_WIF_PROVIDER`, `GCP_DEPLOY_SA`), o bucket de state, o Artifact Registry e a SA de deploy | o bootstrap não roda e o workflow de deploy não autentica | ADR 015, `runbook/primeiro-deploy.md` §0 |
 | ~~A2~~ | ~~**Decidir sobre a CCEE InfoMercado**~~ | **Encerrada em 14/09** — era filtro de cliente não identificado, não bloqueio de IP nem credencial. Resolvido por cabeçalho no `src/core/http.py` | [ADR 018](arquitetura/decisoes/018-vias-de-acesso-a-ccee.md), [registro de 14/09](relatorios/2026-09-14-documentacao-de-apis-recebida.md) |
-| A3 | **Projeto GCP `dev`**: criar, habilitar APIs, IAM, Artifact Registry, bucket de state — criação e `billing_account` são da Alup, esclarecido em 09/09. **Em 16/09 a ness. enviou as quatro contas que devem receber os papéis** (`gptorres@`, `resper@`, `bertuzzi@`, `gpaz@`, todas `@ness.com.br`), fechando a única parte do pedido que dependia de nós | nada sobe; Onda 0 não homologa | plano 2.2 (0.13), [registro de 09/09](relatorios/2026-09-09-esclarecimento-e1-e2.md), [#55](https://github.com/nessenergy/Alupdatalake/issues/55) |
+| A3 | **Projeto GCP `dev`**: criar, habilitar APIs, IAM, Artifact Registry, bucket de state — criação e `billing_account` são da Alup, esclarecido em 09/09. **Em 16/09 a ness. enviou as quatro contas que devem receber os papéis** (`gptorres@`, `resper@`, `bertuzzi@`, `gpaz@`, todas `@ness.com.br`), pelo Google Chat, fechando a única parte do pedido que dependia de nós. **Liberação em processo do lado da Alup, informado em 16/09** — saiu de "não iniciado" para "em andamento", o que é o que sustenta a previsão de 18/09 | nada sobe; Onda 0 não homologa | plano 2.2 (0.13), [registro de 09/09](relatorios/2026-09-09-esclarecimento-e1-e2.md), [#55](https://github.com/nessenergy/Alupdatalake/issues/55) |
 | ~~A4~~ | ~~**Questionário de Gaps** (47 perguntas)~~ | **Respondido em 11/09.** Definir os 8 domínios a partir das respostas é tarefa da ness. (plano 0.10), não insumo pendente | [`questionario-gaps.md`](questionario-gaps.md) |
 | ~~A5~~ | ~~**RACI e data owners** por domínio~~ | **Respondido em 11/09** (item B1 do questionário) | [`interlocutores.md`](interlocutores.md) |
 | ~~A6~~ | ~~**Ferramenta de BI** definida~~ | **Respondido em 11/09**: Power BI hoje; Looker Studio ou fronts internos na Fase 2 (item G1) | [`questionario-gaps.md`](questionario-gaps.md) |

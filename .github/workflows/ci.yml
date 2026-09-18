@@ -30,6 +30,9 @@ jobs:
     needs: lint
     steps:
       - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_wrapper: false
       - uses: astral-sh/setup-uv@v4
         with:
           version: "0.5.11"
@@ -125,6 +128,14 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
+      - uses: astral-sh/setup-uv@v4
+        with:
+          version: "0.5.11"
+      - run: uv sync --frozen --extra dev
       # Compila sem credencial: pega ref quebrado, dependência circular e config
       # inválida antes do merge. Versão igual à de workflow_settings.yaml.
-      - run: npx --yes @dataform/cli@3.0.69 compile
+      - run: npx --yes @dataform/cli@3.0.69 compile --json > "$RUNNER_TEMP/dataform-graph.json"
+      - name: Verifica dependências de qualidade da Gold
+        env:
+          DATAFORM_GRAPH: ${{ runner.temp }}/dataform-graph.json
+        run: uv run pytest tests/unit/test_sql.py -q -k compiled_gold

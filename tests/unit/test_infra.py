@@ -34,7 +34,7 @@ def test_bucket_e_secrets_tem_iam_no_proprio_recurso() -> None:
 
 def test_deploy_all_publica_imagem_antes_do_terraform_e_executa_o_dataform_depois() -> None:
     workflow = _ler(".github/workflows/deploy.yml")
-    bloco_terraform = workflow[workflow.index("  terraform:") : workflow.index("  sync-dags:")]
+    bloco_terraform = workflow[workflow.index("  terraform:") :]
 
     assert "needs: imagem" in bloco_terraform
     assert 'TAG="${GITHUB_SHA}"' in bloco_terraform
@@ -85,8 +85,8 @@ def test_state_do_infra_fica_no_bucket_do_proprio_ambiente() -> None:
     assert _tem(r'prefix\s*=\s*"infra"', backend.group(1))
 
     workflow = _ler(".github/workflows/deploy.yml")
-    bloco_terraform = workflow[workflow.index("  terraform:") : workflow.index("  sync-dags:")]
-    assert 'terraform init -backend-config="bucket=${{ vars.TF_STATE_BUCKET }}"' in bloco_terraform
+    bloco_terraform = workflow[workflow.index("  terraform:") :]
+    assert 'terraform init -backend-config="bucket=$TF_STATE_BUCKET"' in bloco_terraform
     # O CI valida sem credencial.
     assert "terraform init -backend=false" in _ler(".github/workflows/ci.yml")
 

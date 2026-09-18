@@ -1,6 +1,6 @@
 ---
 name: gcp-alupdata
-description: Convenções de GCP do AlupData — BigQuery (datasets Bronze/Silver/Gold, nomenclatura, particionamento, clustering, custo), Cloud Storage, Secret Manager, Cloud Composer/Scheduler e os módulos Terraform em infra/. Use ao criar ou alterar dataset, tabela, view, bucket, DAG, job agendado, IAM, secret ou qualquer recurso GCP, e ao escrever ou revisar SQL/Terraform deste repositório.
+description: Convenções de GCP do AlupData — BigQuery (datasets Bronze/Silver/Gold, nomenclatura, particionamento, clustering, custo), Cloud Storage, Secret Manager, Cloud Run/Scheduler e Cloud Workflows e os módulos Terraform em infra/. Use ao criar ou alterar dataset, tabela, view, bucket, workflow, job agendado, IAM, secret ou qualquer recurso GCP, e ao escrever ou revisar SQL/Terraform deste repositório.
 ---
 
 # GCP no AlupData
@@ -87,7 +87,7 @@ mensagem de erro. O código nunca recebe o segredo por parâmetro default.
 
 ## Identidade e acesso
 
-- Service account por função (ingestão, transformação, Composer), com o mínimo
+- Service account por função (ingestão, transformação, orquestração), com o mínimo
   necessário: `roles/bigquery.dataEditor` na camada que grava,
   `roles/bigquery.dataViewer` no resto.
 - Nada de chave de service account em JSON no repositório. Local usa ADC
@@ -95,18 +95,18 @@ mensagem de erro. O código nunca recebe o segredo por parâmetro default.
 - Acesso a bancos internos da Alup (Onda 3) é **read-only** — se um conector
   precisa de escrita na origem, o desenho está errado.
 
-## Composer / Scheduler
+## Cloud Run / Scheduler / Workflows
 
-- DAGs em `dags/`, sincronizadas para `COMPOSER_BUCKET`.
-- Toda task com `retries` e timeout; DAG com `catchup` decidido conscientemente
-  (reprocessamento histórico é intencional, nunca acidente de deploy).
-- Job leve e periódico pode ser Cloud Scheduler + Cloud Run em vez de Composer —
-  Composer custa por hora ligado.
+- Ingestões periódicas usam Cloud Scheduler + Cloud Run Jobs.
+- Cloud Workflows é o destino da Onda 3 (ADR 017); não assumir implantação.
+- Não há sincronização de DAGs nem configuração de Composer no deploy.
+- Toda execução precisa de timeout, política de tentativas e janela explícita;
+  reprocessamento histórico é intencional, nunca acidente de deploy.
 
 ## Terraform
 
-Módulos em `infra/modules/`: `bigquery`, `storage`, `secrets`, `composer`,
-`scheduler`, `networking`. Fluxo:
+Módulos em `infra/modules/`: `bigquery`, `storage`, `secrets`, `scheduler`,
+`dataform`, `monitoramento` e `portal`. Fluxo:
 
 ```bash
 cd infra
@@ -121,10 +121,21 @@ cria esse bucket, é a única raiz com state local, fora do git e copiado para o
 bucket depois do apply); nenhum valor sensível em `.tfvars` versionado — use
 Secret Manager e referencie.
 
+No workflow de deploy, `all` publica e aplica a imagem de `GITHUB_SHA`;
+`connectors` apenas publica. Para `infra`, informar `image_sha` com SHA completo
+de uma imagem já publicada no ambiente selecionado. A validação antecede a
+autenticação, e a consulta ao Artifact Registry antecede `terraform init/plan`.
+Nunca usar `latest` como entrada do Terraform: `imagem_ingestao` aceita apenas
+vazio (bootstrap), tag de SHA completo ou digest `sha256`.
+
+Antes de existir o ambiente, validar localmente com `terraform init -backend=false`,
+`terraform validate` e os testes; registrar a ausência de plano real e manter a
+validação operacional pendente, sem provisionar só para testar o reparo.
+
 ## Antes de abrir PR que toca GCP
 
 - [ ] Recurso declarado em `infra/`, não criado a mão
 - [ ] Tabela Bronze particionada e clusterizada
 - [ ] Consulta nova estimada com dry-run
 - [ ] Credencial via Secret Manager, com IAM mínimo
-- [ ] `terraform plan` limpo e anexado ao PR
+- [ ] Validação local aprovada; quando o ambiente estiver disponível, `terraform plan` revisado e anexado ao PR

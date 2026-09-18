@@ -6,14 +6,17 @@ gravação do raw, validação, carga no Bronze e log de execução são do runn
 
 from __future__ import annotations
 
+import json
 import logging
 from abc import ABC, abstractmethod
+from contextlib import closing
 from datetime import UTC, datetime
 from typing import TYPE_CHECKING, Any
 
 from pydantic import BaseModel, ValidationError
 
 from src.core.bigquery import carregar_bronze, registrar_execucao
+from src.core.config import get_settings
 from src.core.execucao import Execucao, Janela
 from src.core.linhagem import emitir as emitir_linhagem
 from src.core.observabilidade import contexto_execucao
@@ -21,7 +24,7 @@ from src.core.seguranca import sanitizar
 from src.core.storage import abrir_raw, identificar_raw, ler_raw
 
 if TYPE_CHECKING:
-    from collections.abc import Iterator
+    from collections.abc import Iterable, Iterator
 
 logger = logging.getLogger(__name__)
 
@@ -44,12 +47,9 @@ class Conector(ABC):
     schema_versao: str = "1"
     max_dias_por_requisicao: int | None = None
 
-    # Quantos registros ficam em memória por vez. O runner não acumula o mês
-    # inteiro: extrai, grava no raw e carrega de fatia em fatia. Fonte que
-    # devolve milhões de linhas por recurso — `ccee_geracao_usina` são ~3
-    # milhões por mês — pode baixar este número; fonte pequena nem chega perto
-    # dele. O Bronze é append-only, então uma falha no meio deixa as fatias já
-    # carregadas lá, e a Silver deduplica na reexecução (regra 4).
+    # Raw e leitura para o Bronze são progressivos; cada lote respeita também
+    # o teto de 8 MiB de JSON bruto. Falhas tardias deixam os lotes anteriores
+    # no Bronze append-only; a Silver deduplica a reexecução (regra 4).
     tamanho_do_lote: int = 50_000
 
     # Execução em curso, para o conector que precisa gravar um artefato da
@@ -91,23 +91,21 @@ class Conector(ABC):
         self._execucao = execucao
 
         try:
-            # Passagem única: cada registro é gravado no raw e entra na fatia
-            # corrente; quando a fatia enche, ela é validada e carregada, e a
-            # memória volta ao tamanho de uma fatia. Materializar tudo antes,
-            # como a primeira versão fazia, custava alguns gigabytes na maior
-            # fonte e derrubava o job antes da primeira linha chegar ao Bronze.
-            lote: list[dict[str, Any]] = []
-            with abrir_raw(execucao) as raw:
-                for pedaco in self._janelas(janela):
-                    for bruto in self.extrair(pedaco):
+
+            def extracted_records() -> Iterator[dict[str, Any]]:
+                for part in self._janelas(janela):
+                    for record in self.extrair(part):
                         execucao.linhas_extraidas += 1
-                        raw.escrever(bruto)
-                        lote.append(bruto)
-                        if len(lote) >= self.tamanho_do_lote:
-                            self._validar_e_carregar(execucao, lote)
-                            lote.clear()
-                if lote:
-                    self._validar_e_carregar(execucao, lote)
+                        yield record
+
+            if get_settings().dry_run:
+                self._carregar_em_lotes(execucao, extracted_records())
+            else:
+                with abrir_raw(execucao) as raw:
+                    for record in extracted_records():
+                        raw.escrever(record)
+                with closing(ler_raw(raw.uri)) as records:
+                    self._carregar_em_lotes(execucao, records)
             execucao.encerrar()
         except Exception as exc:  # noqa: BLE001 — a execução precisa ser registrada como ERRO
             execucao.encerrar(erro=sanitizar(f"{type(exc).__name__}: {exc}"))
@@ -132,6 +130,24 @@ class Conector(ABC):
             execucao.duracao_segundos or 0.0,
         )
         return execucao
+
+    def _carregar_em_lotes(self, execucao: Execucao, registros: Iterable[dict[str, Any]]) -> None:
+        batch: list[dict[str, Any]] = []
+        batch_bytes = 0
+        for record in registros:
+            size = len(json.dumps(record, ensure_ascii=False, default=str).encode("utf-8"))
+            if batch and batch_bytes + size > 8 * 1024 * 1024:
+                self._validar_e_carregar(execucao, batch)
+                batch = []
+                batch_bytes = 0
+            batch.append(record)
+            batch_bytes += size
+            if len(batch) >= self.tamanho_do_lote:
+                self._validar_e_carregar(execucao, batch)
+                batch = []
+                batch_bytes = 0
+        if batch:
+            self._validar_e_carregar(execucao, batch)
 
     def _validar_e_carregar(self, execucao: Execucao, brutos: list[dict[str, Any]]) -> None:
         tecnicas = self._colunas_tecnicas(execucao)
@@ -168,9 +184,14 @@ class Conector(ABC):
         with contexto_execucao(execucao):
             logger.info("[%s] replay %s a partir de %s", self.rotulo, execucao.ingestao_id, uri)
             try:
-                brutos = ler_raw(uri)
-                execucao.linhas_extraidas = len(brutos)
-                self._validar_e_carregar(execucao, brutos)
+                with closing(ler_raw(uri)) as records:
+
+                    def counted_records() -> Iterator[dict[str, Any]]:
+                        for record in records:
+                            execucao.linhas_extraidas += 1
+                            yield record
+
+                    self._carregar_em_lotes(execucao, counted_records())
                 execucao.encerrar()
             except Exception as exc:  # noqa: BLE001 — registra toda falha do replay
                 execucao.encerrar(erro=sanitizar(f"{type(exc).__name__}: {exc}"))

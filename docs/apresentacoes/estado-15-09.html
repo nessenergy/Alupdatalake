@@ -11,172 +11,120 @@
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 :root{
-  --cyan:#00ADE8; --cyan-dark:#0090C4; --cyan-mist:#E5F6FD;
-  --ink:#0B1326; --ink-2:#162244;
-  --graphite:#0F172A; --gray:#475569; --gray-2:#94A3B8;
-  --line:#E2E8F0; --mist:#F8FAFC; --white:#fff;
-  --ok:#10B981; --warn:#F59E0B; --err:#EF4444;
-  --pad:clamp(32px,6vw,112px);
-  --space-2:8px; --space-3:12px; --space-4:16px; --space-6:24px;
-  --space-8:32px; --space-12:48px; --space-16:64px;
-  --ease-out:cubic-bezier(.16,1,.3,1);
+  --cyan:#00ade8;--cyan-dark:#006b91;--ink:#0b1326;--graphite:#172338;
+  --gray:#475569;--gray-2:#64748b;--line:#dce4ec;--mist:#f4f7fa;
+  --pad:clamp(24px,6vw,96px);--ease:cubic-bezier(.2,0,0,1);
 }
 *{box-sizing:border-box}
-html,body{margin:0;padding:0;height:100%}
-body{
-  font-family:Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;
-  color:var(--graphite); background:var(--white);
-  -webkit-font-smoothing:antialiased;
-}
-h1,h2,h3,.wordmark{font-family:Montserrat,Arial,sans-serif; margin:0; text-wrap:balance}
-
-/* ---------- estrutura ---------- */
-.deck{height:100vh;overflow-y:scroll;scroll-snap-type:y mandatory;scroll-behavior:smooth}
-.slide{
-  position:relative;min-height:100vh;scroll-snap-align:start;scroll-snap-stop:always;
-  display:flex;flex-direction:column;justify-content:center;
-  padding:max(96px,calc(var(--pad)*.9)) var(--pad);
-  box-shadow:inset 0 -1px 0 var(--line);
-}
-.slide.dark{background:var(--ink);color:#C7D2DE;box-shadow:none}
-.slide.mist{background:var(--mist);box-shadow:none}
-.inner{width:100%;max-width:1180px;margin:0 auto}
-
-/* ---------- marca ---------- */
-.wordmark{position:absolute;top:calc(var(--pad)*.55);left:var(--pad);
-  font-weight:500;font-size:24px;letter-spacing:-.01em;color:#000;z-index:2;text-transform:none;font-style:normal}
-.slide.cover .wordmark{font-size:clamp(30px,3.2vw,42px);top:calc(var(--pad)*.62)}
-.slide.dark .wordmark{color:#fff}
-.wordmark i{color:var(--cyan);font-style:normal}
-.tag{position:absolute;top:calc(var(--pad)*.55);right:var(--pad);
-  font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--gray-2);z-index:2}
-.pagenum{position:absolute;bottom:calc(var(--pad)*.5);right:var(--pad);
-  font-size:11px;letter-spacing:.14em;color:var(--gray-2);font-family:'JetBrains Mono',monospace}
-
-/* ---------- tipografia ---------- */
-.eyebrow{font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--cyan);
-  margin:0 0 var(--space-4);font-weight:500}
-h1{font-size:clamp(34px,5vw,60px);font-weight:600;letter-spacing:-.025em;line-height:1.05}
-h2{font-size:clamp(26px,3.4vw,40px);font-weight:600;letter-spacing:-.02em;line-height:1.12}
-h3{font-size:20px;font-weight:500;letter-spacing:-.01em}
-.lead{font-size:clamp(16px,1.5vw,20px);line-height:1.55;color:var(--gray);max-width:60ch;
-  margin:var(--space-6) 0 0}
-.slide.dark .lead{color:#AFBDCC}
+html,body{margin:0;height:100%}
+body{font-family:Inter,Arial,sans-serif;color:var(--graphite);background:#fff;-webkit-font-smoothing:antialiased}
+h1,h2,h3,.wordmark{font-family:Montserrat,Arial,sans-serif;margin:0;text-wrap:balance}
+a{color:var(--cyan-dark);text-underline-offset:4px;transition:background 180ms var(--ease),color 180ms var(--ease)}
+a:hover{color:var(--ink)}
+:focus-visible{outline:3px solid var(--cyan);outline-offset:5px}
+.deck{height:100dvh;overflow-y:auto;scroll-snap-type:y proximity;scroll-behavior:smooth}
+.slide{position:relative;min-height:100dvh;scroll-snap-align:start;display:flex;flex-direction:column;justify-content:center;padding:112px var(--pad) 80px;border-bottom:1px solid var(--line)}
+.inner{width:100%;max-width:1184px;margin:0 auto}
+.dark{background:var(--ink);color:#e6edf5;border-color:#26344b}
+.mist{background:var(--mist)}
+.wordmark{position:absolute;top:32px;left:var(--pad);font-weight:500;font-style:normal;font-size:28px;color:#000;text-transform:none;letter-spacing:-.01em}
+.wordmark i{font-style:normal;color:#00ade8}
+.dark .wordmark{color:#fff}
+.tag{position:absolute;top:40px;right:var(--pad);font-size:11px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--gray-2)}
+.dark .tag,.dark .pagenum{color:#a0b0c4}
+.pagenum{position:absolute;bottom:32px;right:var(--pad);font:12px 'JetBrains Mono',monospace;color:var(--gray-2);letter-spacing:.12em}
+.eyebrow{font-size:12px;line-height:1.5;letter-spacing:.16em;text-transform:uppercase;color:var(--cyan-dark);margin:0 0 16px;font-weight:600}
+.dark .eyebrow{color:#63d4ff}
+h1{font-size:clamp(40px,5.4vw,76px);font-weight:600;line-height:1.06;letter-spacing:-.04em}
+h2{font-size:clamp(28px,3.1vw,44px);font-weight:600;line-height:1.16;letter-spacing:-.03em;}
+h3{font-size:22px;font-weight:500;letter-spacing:-.02em}
+.lead{font-size:clamp(16px,1.4vw,20px);line-height:1.65;color:var(--gray);max-width:76ch;margin:32px 0 0;text-wrap:pretty}
 .lead b{color:var(--graphite);font-weight:600}
-.slide.dark .lead b{color:#fff}
+.dark .lead{color:#b7c5d6}.dark .lead b{color:#fff}
+.note{font-size:14px;line-height:1.6;color:var(--gray);margin:24px 0 0;max-width:100ch}
 code,.mono{font-family:'JetBrains Mono',monospace;font-size:.86em}
-
-/* ---------- capa ---------- */
-.slide.cover{justify-content:flex-end;padding-bottom:calc(var(--pad)*1.1)}
-.cover-meta{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));
-  gap:var(--space-8);margin-top:clamp(40px,6vh,72px);
-  border-top:1px solid #242B33;padding-top:var(--space-6)}
-.cover-meta dt{font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;color:#6B7885;margin:0}
-.cover-meta dd{margin:var(--space-2) 0 0;font-weight:500;font-size:clamp(14px,1.2vw,18px);
-  color:#fff;letter-spacing:-.01em;font-family:'JetBrains Mono',monospace}
-
-/* ---------- números ---------- */
-.nums{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:var(--space-8);
-  margin-top:var(--space-12)}
-.nums div{display:flex;flex-direction:column;gap:var(--space-2)}
-.nums .v{font-family:Montserrat,sans-serif;font-size:clamp(38px,4.6vw,58px);font-weight:600;
-  letter-spacing:-.03em;line-height:1;font-variant-numeric:tabular-nums}
-.nums .k{font-size:13px;color:var(--gray);line-height:1.4}
-.slide.dark .nums .k{color:#8B9AAB}
-.nums .cy{color:var(--cyan)}
-
-/* ---------- confronto ---------- */
-.versus{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-16);margin-top:var(--space-12)}
-.versus > div{display:flex;flex-direction:column;gap:var(--space-3)}
-.versus .rot{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--gray-2)}
-.versus .big{font-family:Montserrat,sans-serif;font-size:clamp(40px,5.2vw,64px);font-weight:600;
-  letter-spacing:-.03em;line-height:1}
-.versus .a .big{color:var(--ok)}
-.versus .b .big{color:var(--err)}
-.versus p{margin:0;font-size:15px;line-height:1.55;color:#AFBDCC;max-width:34ch}
-
-/* ---------- camadas ---------- */
-.camadas{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:var(--space-6);
-  margin-top:var(--space-12)}
-.camada{border-top:3px solid var(--m);padding-top:var(--space-4);display:flex;flex-direction:column;gap:var(--space-2)}
-.camada .v{font-family:Montserrat,sans-serif;font-size:44px;font-weight:600;color:var(--m);
-  line-height:1;font-variant-numeric:tabular-nums}
-.camada .t{font-size:15px;font-weight:600;letter-spacing:.02em}
-.camada .d{font-size:13.5px;color:var(--gray);line-height:1.5}
-
-/* ---------- tabelas ---------- */
-.tw{margin-top:var(--space-8);overflow-x:auto}
-table{border-collapse:collapse;width:100%;font-size:14px;min-width:560px}
-th{text-align:left;font-weight:600;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;
-  color:var(--gray-2);padding:var(--space-3) var(--space-4);border-bottom:1px solid var(--line);white-space:nowrap}
-td{padding:var(--space-3) var(--space-4);border-bottom:1px solid var(--line);vertical-align:top;line-height:1.45}
-tr:last-child td{border-bottom:none}
-td.r{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap;font-family:'JetBrains Mono',monospace;font-size:13px}
-.slide.dark th{color:#6B7885;border-color:#242B33}
-.slide.dark td{border-color:#1C2536}
-.idx{font-family:'JetBrains Mono',monospace;color:var(--gray-2);font-size:12.5px}
-.badge{display:inline-block;font-size:11px;font-weight:500;padding:3px var(--space-2);border-radius:3px;white-space:nowrap}
-.b-ok{background:#D9F5EA;color:#046B4E}
-.b-warn{background:#FDF0D8;color:#8A5A04}
-.b-err{background:#FBE0DE;color:#A31D14}
-.b-off{background:var(--mist);color:var(--gray)}
-
-/* ---------- bloqueios ---------- */
-.trava{margin-top:var(--space-8);display:flex;flex-direction:column}
-.trava .i{display:grid;grid-template-columns:96px 1fr 132px;gap:var(--space-6);
-  padding:var(--space-4) 0;border-bottom:1px solid #1C2536;align-items:start}
-.trava .i:last-child{border-bottom:none}
-.trava .c{font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:500;color:var(--cyan)}
-.trava .t{font-size:14.5px;line-height:1.5;color:#C7D2DE}
-.trava .t b{color:#fff;font-weight:600}
-.trava .t span{display:block;color:#8B9AAB;font-size:13px;margin-top:var(--space-1,4px)}
-.trava .q{font-family:'JetBrains Mono',monospace;font-size:12.5px;color:#8B9AAB;text-align:right;line-height:1.5}
-
-/* ---------- lista de entregas ---------- */
-.entregas{margin-top:var(--space-8);display:flex;flex-direction:column;gap:var(--space-4)}
-.entregas .e{display:grid;grid-template-columns:64px 1fr;gap:var(--space-4);align-items:baseline}
-.entregas .d{font-family:'JetBrains Mono',monospace;font-size:12.5px;color:var(--cyan)}
-.entregas .x{font-size:15px;line-height:1.5}
-.entregas .x b{font-weight:600}
-.entregas .x span{color:var(--gray)}
-
-/* ---------- próximo passo ---------- */
-.passo{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-16);margin-top:var(--space-12)}
-.passo h3{margin-bottom:var(--space-4)}
-.passo ul{margin:0;padding-left:1.1em;display:flex;flex-direction:column;gap:var(--space-3)}
-.passo li{font-size:14.5px;line-height:1.5;color:var(--gray)}
-.passo li b{color:var(--graphite);font-weight:600}
-.passo .cy{color:var(--cyan)}
-
-.note{font-size:13px;line-height:1.55;color:var(--gray);margin-top:24px} a{color:var(--cyan-dark);text-underline-offset:3px}.meeting-link{font-size:14px;margin-top:24px}.dark a{color:#63D4FF}
-/* ---------- navegação ---------- */
-.progress{position:fixed;top:0;left:0;height:2px;background:var(--cyan);width:0;z-index:9;
-  transition:width var(--duration,200ms) var(--ease-out)}
-
-@media (max-width:820px){
-  .cover-meta{grid-template-columns:repeat(2,minmax(0,1fr));row-gap:var(--space-6)}
-  .versus,.passo{grid-template-columns:1fr;gap:var(--space-8)}
-  .trava .i{grid-template-columns:72px 1fr}
-  .trava .q{grid-column:2;text-align:left}
+.cover{justify-content:center;border-top:4px solid var(--cyan)}
+.cover .inner{padding-top:32px}
+.cover .lead{max-width:58ch}
+.cover-meta{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:32px;margin:48px 0 0;border-top:1px solid #304056;padding-top:24px}
+.cover-meta dt{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#a0b0c4}
+.cover-meta dd{margin:8px 0 0;font:500 clamp(14px,1.2vw,18px) 'JetBrains Mono',monospace;color:#fff}
+.meeting-link{margin:24px 0 0}
+.meeting-link a{display:inline-flex;align-items:center;min-height:48px;padding:8px 24px;border:1px solid #4d728d;border-radius:8px;font-size:14px;text-decoration:none;color:#e1f6ff;background:#162d43}
+.meeting-link a:hover{background:#21445f;color:#fff}
+.section-links{display:flex;flex-wrap:wrap;gap:8px 24px;margin-top:24px}
+.section-links a{display:inline-flex;align-items:center;min-height:44px;color:#b7c5d6;font-size:13px;text-decoration:none;border-bottom:1px solid #3c526b}
+.section-links a:hover{color:#fff;border-color:var(--cyan)}
+.nums{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));margin-top:40px;border:1px solid var(--line);border-radius:16px;overflow:hidden;background:var(--mist)}
+.nums>div{display:flex;flex-direction:column;gap:16px;padding:24px;border-right:1px solid var(--line)}
+.nums>div:last-child{border-right:0}
+.nums .v{font:600 clamp(36px,4vw,56px)/1 Montserrat,sans-serif;letter-spacing:-.04em;font-variant-numeric:tabular-nums}
+.nums .cy{color:var(--cyan-dark)}
+.nums .k{font-size:14px;line-height:1.5;color:var(--gray)}
+.versus{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:40px}
+.versus>div{display:flex;flex-direction:column;gap:16px;padding:32px;border:1px solid #304056;border-radius:16px;background:#111f34}
+.versus .rot{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#b7c5d6}
+.versus .big{font:600 clamp(32px,4vw,56px)/1.1 Montserrat,sans-serif;letter-spacing:-.04em}
+.versus .a .big{color:#63d4ff}.versus .b .big{color:#ffd18a}
+.versus p{margin:0;font-size:16px;line-height:1.6;color:#b7c5d6;max-width:44ch}
+.camadas{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px;margin-top:40px}
+.camada{display:flex;flex-direction:column;gap:16px;padding:32px;background:#fff;border:1px solid var(--line);border-top:4px solid var(--m);border-radius:12px;box-shadow:0 8px 24px rgb(15 23 42 / 4%)}
+.camada .v{font:600 48px/1 Montserrat,sans-serif;letter-spacing:-.03em;color:var(--m)}
+.camada .t{font-size:18px;font-weight:600}.camada .d{font-size:15px;line-height:1.65;color:var(--gray)}
+.tw{margin-top:32px;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th{text-align:left;font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--gray);padding:16px;background:#eaf0f5}
+td{padding:16px;border-top:1px solid var(--line);vertical-align:top;line-height:1.5}
+td:first-child{font-weight:500}tbody tr:nth-child(even){background:#f8fafc}
+td.r{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap;font-family:'JetBrains Mono',monospace}
+.trava{margin-top:32px}
+.trava .i{display:grid;grid-template-columns:72px 1fr 144px;gap:24px;padding:16px 0;border-bottom:1px solid #304056;align-items:start}
+.trava .i:last-child{border-bottom:0}
+.trava .c{font:500 14px/1.5 'JetBrains Mono',monospace;color:#63d4ff}
+.trava .t{font-size:16px;line-height:1.5;color:#e6edf5}.trava .t b{font-weight:600}
+.trava .t span{display:block;color:#aabbd0;font-size:14px;margin-top:8px}
+.trava .q{font:12px/1.6 'JetBrains Mono',monospace;color:#d2dfed;text-align:right;border:1px solid #3b4a60;border-radius:8px;padding:8px}
+.entregas{margin-top:32px;display:flex;flex-direction:column}
+.entregas .e{display:grid;grid-template-columns:64px 1fr;gap:24px;padding:20px 0;border-bottom:1px solid var(--line);align-items:baseline}
+.entregas .e:last-child{border-bottom:0}
+.entregas .d{font:500 13px 'JetBrains Mono',monospace;color:var(--cyan-dark)}
+.entregas .x{font-size:16px;line-height:1.6}.entregas .x b{font-weight:600}.entregas .x span{color:var(--gray)}
+.passo{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:40px}
+.passo>div{padding:32px;border:1px solid var(--line);border-radius:12px;background:#fff}
+.passo h3{margin-bottom:24px}.passo .cy{color:var(--cyan-dark)}
+.passo ul{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:16px}
+.passo li{font-size:16px;line-height:1.6;color:var(--gray)}.passo li b{color:var(--graphite);font-weight:600}
+.progress{position:fixed;top:0;left:0;height:3px;background:var(--cyan);width:0;z-index:9}
+@media(max-width:1000px){.nums>div{padding:24px 16px}.camada{padding:24px}.cover-meta{gap:24px}}
+@media(max-width:700px){
+  .deck{scroll-snap-type:none}.slide{padding:104px 24px 64px;min-height:100svh}
+  .wordmark{top:24px}.tag{top:32px;left:auto;right:24px;max-width:60%;text-align:right;font-size:10px}.pagenum{bottom:24px}
+  .cover .inner{padding-top:24px}.cover-meta{grid-template-columns:repeat(2,minmax(0,1fr));gap:24px 16px;margin-top:32px}
+  h1{font-size:clamp(36px,9vw,56px)}h2{font-size:28px}.lead{font-size:16px;margin-top:24px}
+  .versus,.camadas,.passo{grid-template-columns:1fr;margin-top:32px}.versus>div,.passo>div{padding:24px}
+  .nums{grid-template-columns:repeat(2,minmax(0,1fr));margin-top:32px}.nums>div{padding:24px;border-bottom:1px solid var(--line)}
+  .nums>div:nth-child(even){border-right:0}.nums>div:last-child{grid-column:1/-1;border-bottom:0}
+  .trava .i{grid-template-columns:1fr auto;gap:8px 16px;padding:24px 0}.trava .t{grid-column:1/-1;grid-row:2}.trava .q{grid-column:2;grid-row:1;text-align:right;padding:0;border:0}
+  .entregas .e{grid-template-columns:1fr;gap:8px;padding:24px 0}
+  .tw{border:0;border-radius:0;background:transparent}.tw thead{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
+  table,tbody{display:block}tr{display:block;background:#fff!important;border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:16px}
+  td{display:block;border:0;padding:8px 0;font-size:16px}td:first-child{font-weight:600}td.r{text-align:left;white-space:normal}
+  td::before{content:attr(data-label);display:block;font:500 11px/1.5 Inter,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:var(--gray);margin-bottom:8px}
+  .note{font-size:14px}.note a{display:inline-block;padding:8px 0}.section-links{gap:8px 16px}
 }
-@media (prefers-reduced-motion:reduce){.deck{scroll-behavior:auto}*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
-:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
-
-/* ---------- impressão ---------- */
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation:none!important;transition:none!important}}
 @media print{
-  html,body{height:auto}
-  .deck{height:auto;overflow:visible}
-  .slide{min-height:auto;page-break-after:always;break-after:page;padding:28px 32px;box-shadow:none;
-    border-bottom:1px solid var(--line)}
-  .slide.dark{background:#fff;color:var(--graphite)}
-  .slide.dark .wordmark{color:#000}
-  .slide.dark .lead,.slide.dark .trava .t{color:var(--gray)}
-  .slide.dark .trava .t b,.slide.dark .lead b{color:var(--graphite)}
-  .slide.dark .versus p{color:var(--gray)}
-  .slide.dark th{color:var(--gray-2);border-color:var(--line)}
-  .slide.dark td{border-color:var(--line)}
-  .progress{display:none}
-  h1{font-size:34px} h2{font-size:26px}
+  @page{size:A4 landscape;margin:12mm}
+  html,body,.deck{height:auto;overflow:visible}.slide{min-height:0;display:block;break-after:page;padding:48px 0 32px;border:0}
+  .slide:last-child{break-after:auto}.slide,.dark,.mist{background:#fff;color:#172338}
+  .wordmark{top:0;left:0}.dark .wordmark{color:#000}.tag{top:8px;right:0}.pagenum{bottom:0;right:0}
+  .dark .tag,.dark .pagenum,.dark .lead,.dark .lead b,.dark .eyebrow,.versus .rot,.versus p,.trava .t,.trava .t span,.trava .q,.cover-meta dt,.cover-meta dd{color:#172338}
+  h1{font-size:40px}h2{font-size:28px}.lead{font-size:14px;margin-top:16px}.note{font-size:11px}
+  .cover .inner{padding-top:24px}.cover-meta{margin-top:24px}.cover-meta,.trava .i{border-color:#dce4ec}
+  .versus>div,.camada,.passo>div{background:#fff;box-shadow:none;padding:16px}.versus .big{font-size:36px}.versus .b .big{color:#825500}.versus .a .big{color:#006b91}
+  .nums,.versus,.camadas,.passo{margin-top:24px}.camada .d,.passo li,.entregas .x,.trava .t{font-size:12px}.trava .t span{font-size:11px}
+  .trava .i,.entregas .e{padding:8px 0}td,th{padding:8px;font-size:11px}.tw{margin-top:16px}
+  .progress,.section-links,.meeting-link{display:none}tr,.camada,.entregas .e,.trava .i{break-inside:avoid}
 }
 </style>
 </head>
@@ -184,9 +132,9 @@ td.r{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap;font-
 
 <div class="progress" id="progress"></div>
 
-<main class="deck" id="deck">
-  <section class="slide cover dark">
-    <span class="wordmark">ness<i>.</i></span><span class="tag">AlupData · CPS-01025/2026</span>
+<main class="deck" id="deck" aria-label="Relatório de acompanhamento AlupData" tabindex="0">
+  <section class="slide cover dark" id="abertura">
+    <span class="wordmark" role="img" aria-label="ness."><span aria-hidden="true">ness<i>.</i></span></span><span class="tag">AlupData · CPS-01025/2026</span>
     <div class="inner">
       <p class="eyebrow">Reunião semanal · 11h · Brasília</p>
       <h1>18 de setembro<br>de 2026</h1>
@@ -198,10 +146,11 @@ td.r{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap;font-
         <div><dt>Base do código</dt><dd>d1e1583</dd></div>
       </dl>
       <p class="meeting-link"><a href="https://meet.google.com/jgu-sdqf-wzq">Acessar a reunião · 11h–12h</a></p>
+      <nav class="section-links" aria-label="Seções do relatório"><a href="#resumo">Visão geral</a><a href="#evidencias">Evidências</a><a href="#pendencias">Pendências</a><a href="#decisoes">Decisões</a></nav>
     </div><span class="pagenum">01</span>
   </section>
-  <section class="slide dark">
-    <span class="wordmark">ness<i>.</i></span><span class="tag">A leitura do dia</span>
+  <section class="slide dark" id="resumo">
+    <span class="wordmark" role="img" aria-label="ness."><span aria-hidden="true">ness<i>.</i></span></span><span class="tag">A leitura do dia</span>
     <div class="inner">
       <h2>A base técnica avançou.<br>A validação em ambiente real aguarda liberação.</h2>
       <div class="versus">
@@ -211,8 +160,8 @@ td.r{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap;font-
       <p class="lead"><b>A liberação do GCP depende da Alup e segue sem confirmação.</b> A ness. já enviou as contas para concessão dos papéis. Durante a espera, corrigimos os achados técnicos e atualizamos o acompanhamento.</p>
     </div><span class="pagenum">02</span>
   </section>
-  <section class="slide">
-    <span class="wordmark">ness<i>.</i></span><span class="tag">Evidências disponíveis</span>
+  <section class="slide" id="evidencias">
+    <span class="wordmark" role="img" aria-label="ness."><span aria-hidden="true">ness<i>.</i></span></span><span class="tag">Evidências disponíveis</span>
     <div class="inner">
       <p class="eyebrow">Verificação até 18/09</p>
       <h2>13 fontes no contrato.<br>26 entidades implementadas.</h2>
@@ -227,8 +176,8 @@ td.r{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap;font-
       <p class="note">264 testes ignorados na suíte: 248 são regras SQL que não se aplicam à camada testada; os demais são de integração. Contagens de entidades não ampliam o escopo contratual.</p>
     </div><span class="pagenum">03</span>
   </section>
-  <section class="slide mist">
-    <span class="wordmark">ness<i>.</i></span><span class="tag">Arquitetura Medallion</span>
+  <section class="slide mist" id="arquitetura">
+    <span class="wordmark" role="img" aria-label="ness."><span aria-hidden="true">ness<i>.</i></span></span><span class="tag">Arquitetura Medallion</span>
     <div class="inner">
       <p class="eyebrow">82 definições SQL no repositório</p>
       <h2>Rastreabilidade na entrada.<br>Qualidade antes do consumo.</h2>
@@ -240,47 +189,47 @@ td.r{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap;font-
       <p class="lead">As <b>62 dependências de verificações de qualidade</b> foram comprovadas no grafo compilado. A criação dos objetos e a execução ponta a ponta ainda precisam ser validadas no GCP.</p>
     </div><span class="pagenum">04</span>
   </section>
-  <section class="slide">
-    <span class="wordmark">ness<i>.</i></span><span class="tag">Domínios analíticos</span>
+  <section class="slide" id="dominios">
+    <span class="wordmark" role="img" aria-label="ness."><span aria-hidden="true">ness<i>.</i></span></span><span class="tag">Domínios analíticos</span>
     <div class="inner">
       <p class="eyebrow">Os oito domínios da resposta B1</p>
       <h2>Cobertura técnica preparada.<br>Validação de negócio pendente.</h2>
       <div class="tw"><table>
         <thead><tr><th>Domínio</th><th>Data owner</th><th>Situação técnica</th></tr></thead>
         <tbody>
-          <tr><td>Mercado de Energia</td><td>Taina Mota · Gabriel Barreto</td><td>Dados públicos CCEE; acesso restrito pendente</td></tr>
-          <tr><td>Geração e Operacional</td><td>Taina Mota · Letícia Ferreira</td><td>ANEEL/ONS; de-para do portfólio pendente</td></tr>
-          <tr><td>Meteorologia</td><td>Taina Mota</td><td>TempoOK sem acervo recente acessível</td></tr>
-          <tr><td>Comercial e Contratos</td><td>Letícia Ferreira · Tahigo Santos</td><td>Cobertura pública parcial; fontes internas pendentes</td></tr>
-          <tr><td>CRM e Marketing</td><td>Tahigo Santos</td><td>Hubspot escrito; token pendente</td></tr>
-          <tr><td>Risco e Compliance</td><td>Letícia Ferreira</td><td>Exposição e contabilização públicas implementadas</td></tr>
-          <tr><td>Econômico</td><td>Letícia Ferreira</td><td>BCB e IBGE implementados</td></tr>
-          <tr><td>Planejamento</td><td>gestores da Comercialização</td><td>Fontes concretas ainda não implementadas</td></tr>
+          <tr><td data-label="Domínio">Mercado de Energia</td><td data-label="Data owner">Taina Mota · Gabriel Barreto</td><td data-label="Situação técnica">Dados públicos CCEE; acesso restrito pendente</td></tr>
+          <tr><td data-label="Domínio">Geração e Operacional</td><td data-label="Data owner">Taina Mota · Letícia Ferreira</td><td data-label="Situação técnica">ANEEL/ONS; de-para do portfólio pendente</td></tr>
+          <tr><td data-label="Domínio">Meteorologia</td><td data-label="Data owner">Taina Mota</td><td data-label="Situação técnica">TempoOK sem acervo recente acessível</td></tr>
+          <tr><td data-label="Domínio">Comercial e Contratos</td><td data-label="Data owner">Letícia Ferreira · Tahigo Santos</td><td data-label="Situação técnica">Cobertura pública parcial; fontes internas pendentes</td></tr>
+          <tr><td data-label="Domínio">CRM e Marketing</td><td data-label="Data owner">Tahigo Santos</td><td data-label="Situação técnica">Hubspot escrito; token pendente</td></tr>
+          <tr><td data-label="Domínio">Risco e Compliance</td><td data-label="Data owner">Letícia Ferreira</td><td data-label="Situação técnica">Exposição e contabilização públicas implementadas</td></tr>
+          <tr><td data-label="Domínio">Econômico</td><td data-label="Data owner">Letícia Ferreira</td><td data-label="Situação técnica">BCB e IBGE implementados</td></tr>
+          <tr><td data-label="Domínio">Planejamento</td><td data-label="Data owner">gestores da Comercialização</td><td data-label="Situação técnica">Fontes concretas ainda não implementadas</td></tr>
         </tbody>
       </table></div>
       <p class="note">As seis coligadas delimitam o faturamento, não o dado. Nenhum domínio está homologado; amostras, cruzamentos e critérios de aceite precisam de validação com os responsáveis.</p>
     </div><span class="pagenum">05</span>
   </section>
-  <section class="slide mist">
-    <span class="wordmark">ness<i>.</i></span><span class="tag">Cronograma contratual</span>
+  <section class="slide mist" id="ondas">
+    <span class="wordmark" role="img" aria-label="ness."><span aria-hidden="true">ness<i>.</i></span></span><span class="tag">Cronograma contratual</span>
     <div class="inner">
       <p class="eyebrow">Cinco ondas · 580h contratadas</p>
       <h2>Implementação adiantada<br>não antecipa o aceite da onda.</h2>
       <div class="tw"><table>
         <thead><tr><th>Onda</th><th>Horas previstas</th><th>Situação</th></tr></thead>
         <tbody>
-          <tr><td><b>0</b> — Fundação e Arquitetura</td><td class="r">90</td><td>Base preparada; ambiente, validações e aceite pendentes</td></tr>
-          <tr><td><b>1</b> — Inteligência de Mercado</td><td class="r">120</td><td>Fontes públicas implementadas; carga no GCP pendente</td></tr>
-          <tr><td><b>2</b> — APIs com credenciais</td><td class="r">110</td><td>Hubspot, BBCE e TempoOK escritos; operação pendente</td></tr>
-          <tr><td><b>3</b> — Sistemas internos</td><td class="r">155</td><td>Framework relacional preparado; conectores concretos pendentes</td></tr>
-          <tr><td><b>4</b> — Planilhas e handoff</td><td class="r">105</td><td>Motor genérico preparado; templates, catálogo e handoff pendentes</td></tr>
+          <tr><td data-label="Onda"><b>0</b> — Fundação e Arquitetura</td><td class="r" data-label="Horas previstas">90</td><td data-label="Situação">Base preparada; ambiente, validações e aceite pendentes</td></tr>
+          <tr><td data-label="Onda"><b>1</b> — Inteligência de Mercado</td><td class="r" data-label="Horas previstas">120</td><td data-label="Situação">Fontes públicas implementadas; carga no GCP pendente</td></tr>
+          <tr><td data-label="Onda"><b>2</b> — APIs com credenciais</td><td class="r" data-label="Horas previstas">110</td><td data-label="Situação">Hubspot, BBCE e TempoOK escritos; operação pendente</td></tr>
+          <tr><td data-label="Onda"><b>3</b> — Sistemas internos</td><td class="r" data-label="Horas previstas">155</td><td data-label="Situação">Framework relacional preparado; conectores concretos pendentes</td></tr>
+          <tr><td data-label="Onda"><b>4</b> — Planilhas e handoff</td><td class="r" data-label="Horas previstas">105</td><td data-label="Situação">Motor genérico preparado; templates, catálogo e handoff pendentes</td></tr>
         </tbody>
       </table></div>
       <p class="lead">As horas são a distribuição contratual, <b>não horas consumidas nem progresso medido</b>. A homologação exige os sete componentes por fonte, carga real, evidências e aceite.</p>
     </div><span class="pagenum">06</span>
   </section>
-  <section class="slide dark">
-    <span class="wordmark">ness<i>.</i></span><span class="tag">Insumos pendentes</span>
+  <section class="slide dark" id="pendencias">
+    <span class="wordmark" role="img" aria-label="ness."><span aria-hidden="true">ness<i>.</i></span></span><span class="tag">Insumos pendentes</span>
     <div class="inner">
       <p class="eyebrow">Posição para confirmação na reunião</p>
       <h2>Ambiente e acessos:<br>dependências sob responsabilidade da Alup.</h2>
@@ -295,8 +244,8 @@ td.r{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap;font-
       </div>
     </div><span class="pagenum">07</span>
   </section>
-  <section class="slide">
-    <span class="wordmark">ness<i>.</i></span><span class="tag">Avanços de 18/09</span>
+  <section class="slide" id="avancos">
+    <span class="wordmark" role="img" aria-label="ness."><span aria-hidden="true">ness<i>.</i></span></span><span class="tag">Avanços de 18/09</span>
     <div class="inner">
       <p class="eyebrow">Reparos concluídos durante a espera</p>
       <h2>Mais confiabilidade para<br>a primeira carga real.</h2>
@@ -310,8 +259,8 @@ td.r{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap;font-
       <p class="lead"><b>999 testes aprovados; 94% de cobertura.</b> O fluxo adiciona uma leitura do GCS por ingestão: tempo, memória e custo ainda serão medidos em dev. Raw antigo sem data exige evidência original para recuperação.</p>
     </div><span class="pagenum">08</span>
   </section>
-  <section class="slide mist">
-    <span class="wordmark">ness<i>.</i></span><span class="tag">Encaminhamentos · 11h</span>
+  <section class="slide mist" id="decisoes">
+    <span class="wordmark" role="img" aria-label="ness."><span aria-hidden="true">ness<i>.</i></span></span><span class="tag">Encaminhamentos · 11h</span>
     <div class="inner">
       <p class="eyebrow">Decisões a registrar nesta reunião</p>
       <h2>Confirmar responsáveis e datas.<br>Preparar a validação no ambiente.</h2>

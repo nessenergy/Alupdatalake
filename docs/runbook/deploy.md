@@ -165,13 +165,27 @@ repositório: o quadro (`quadro.yml`) roda sem ambiente do GitHub. Em `hml` e
 Workflow **Deploy GCP** (`workflow_dispatch`), escolhendo ambiente e módulo:
 
 - `connectors` → constrói e publica a imagem da CLI (`:<sha completo>` e `:latest`)
-- `infra` → `terraform plan` + `apply` usando a imagem já publicada em `:latest`
+- `infra` → exige `image_sha` com SHA completo (40 caracteres hexadecimais minúsculos)
+  de imagem já publicada no ambiente; executa `terraform plan` + `apply` com essa tag
 - `all` → publica a imagem imutável, aplica Terraform com essa mesma tag e
   depois aplica o SQL versionado
 
 No fluxo `all`, o job Terraform depende explicitamente do job de imagem. Isso
 impede o primeiro `apply` de disputar com o primeiro push. O estado guarda a tag
-imutável do commit; `latest` permanece apenas como conveniência operacional.
+imutável do commit (`GITHUB_SHA`); `latest` permanece apenas como conveniência
+operacional e nunca entra no Terraform. `connectors` apenas publica: para usar a
+imagem publicada, execute depois `infra` com seu `image_sha`. Em `all`, a entrada
+`image_sha` é ignorada.
+
+O workflow rejeita SHA ausente, abreviado ou inválido antes da autenticação de
+infraestrutura. Depois, confirma a existência da imagem no Artifact Registry do
+ambiente antes de `terraform init/plan/apply`; falta de imagem ou acesso interrompe
+o deploy. O Terraform aceita imagem vazia no bootstrap, tag de SHA completo ou
+digest `sha256`; rejeita `latest`.
+
+Não há sincronização de DAGs nem dependência de Composer. Cloud Workflows é o
+destino de orquestração da Onda 3 (ADR 017), ainda sem implantação comprovada.
+A validação local dessas guardas não comprova deploy nem homologação no GCP.
 
 ## SQL das camadas (Dataform)
 

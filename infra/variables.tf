@@ -28,6 +28,12 @@ variable "imagem_ingestao" {
   description = "Imagem do container com a CLI alupdata; vazio desliga o agendamento"
   type        = string
   default     = ""
+  validation {
+    condition = var.imagem_ingestao == "" || can(regex(
+      "(:[0-9a-f]{40}|@sha256:[0-9a-f]{64})$", var.imagem_ingestao
+    ))
+    error_message = "Use imagem vazia, tag de SHA completo ou digest sha256."
+  }
 }
 
 variable "emails_alerta" {

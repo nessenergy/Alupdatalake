@@ -19,7 +19,10 @@ on:
           - all
           - infra
           - connectors
-          - dags
+      image_sha:
+        description: 'SHA completo da imagem já publicada; obrigatório para infra'
+        required: false
+        type: string
 
 permissions:
   contents: read
@@ -57,6 +60,23 @@ jobs:
     environment: ${{ inputs.environment }}
     steps:
       - uses: actions/checkout@v4
+      - name: Validar referência da imagem
+        id: image
+        env:
+          DEPLOY_MODULE: ${{ inputs.module }}
+          IMAGE_SHA: ${{ inputs.image_sha }}
+          IMAGE_BASE: ${{ vars.IMAGEM_INGESTAO }}
+        run: |
+          if [ "$DEPLOY_MODULE" = "all" ]; then
+            TAG="${GITHUB_SHA}"
+          else
+            TAG="$IMAGE_SHA"
+          fi
+          if [[ ! "$TAG" =~ ^[0-9a-f]{40}$ ]]; then
+            echo "::error::Informe o SHA completo de uma imagem já publicada."
+            exit 1
+          fi
+          echo "reference=$IMAGE_BASE:$TAG" >> "$GITHUB_OUTPUT"
       - uses: hashicorp/setup-terraform@v3
       - uses: google-github-actions/auth@v2
         with:
@@ -64,16 +84,24 @@ jobs:
           # no repositório ou nos secrets do GitHub.
           workload_identity_provider: ${{ vars.GCP_WIF_PROVIDER }}
           service_account: ${{ vars.GCP_DEPLOY_SA }}
-      - run: |
-          TAG="latest"
-          if [ "${{ inputs.module }}" = "all" ]; then TAG="${GITHUB_SHA}"; fi
+      - uses: google-github-actions/setup-gcloud@v2
+      - name: Conferir imagem e aplicar infraestrutura
+        env:
+          INGESTION_IMAGE: ${{ steps.image.outputs.reference }}
+          DEPLOY_ENVIRONMENT: ${{ inputs.environment }}
+          TF_STATE_BUCKET: ${{ vars.TF_STATE_BUCKET }}
+          DEPLOY_SERVICE_ACCOUNT: ${{ vars.GCP_DEPLOY_SA }}
+          DATAFORM_GIT_TOKEN_VERSION: ${{ vars.DATAFORM_GIT_TOKEN_VERSAO }}
+        run: |
+          # Falha antes do init/plan se a imagem não existe no ambiente escolhido.
+          gcloud artifacts docker images describe "$INGESTION_IMAGE" --format='value(image_summary.digest)'
           cd infra
           # State no bucket do próprio projeto, criado pelo bootstrap.
-          terraform init -backend-config="bucket=${{ vars.TF_STATE_BUCKET }}"
-          terraform plan -var-file="environments/${{ inputs.environment }}.tfvars" \
-            -var="imagem_ingestao=${{ vars.IMAGEM_INGESTAO }}:${TAG}" \
-            -var="deploy_service_account=${{ vars.GCP_DEPLOY_SA }}" \
-            -var="dataform_git_token_versao=${{ vars.DATAFORM_GIT_TOKEN_VERSAO }}" \
+          terraform init -backend-config="bucket=$TF_STATE_BUCKET"
+          terraform plan -var-file="environments/$DEPLOY_ENVIRONMENT.tfvars" \
+            -var="imagem_ingestao=$INGESTION_IMAGE" \
+            -var="deploy_service_account=$DEPLOY_SERVICE_ACCOUNT" \
+            -var="dataform_git_token_versao=$DATAFORM_GIT_TOKEN_VERSION" \
             -out=tfplan
           terraform apply tfplan
       - uses: astral-sh/setup-uv@v4
@@ -95,19 +123,3 @@ jobs:
             exit 1
           fi
           uv run python -m scripts.executar_dataform --service-account "$SA" --repositorio "$REPO"
-
-  sync-dags:
-    name: "Sync DAGs (${{ inputs.environment }})"
-    if: inputs.module == 'all' || inputs.module == 'dags'
-    runs-on: ubuntu-latest
-    environment: ${{ inputs.environment }}
-    steps:
-      - uses: actions/checkout@v4
-      - uses: google-github-actions/auth@v2
-        with:
-          # Workload Identity Federation: nenhuma chave JSON de service account
-          # no repositório ou nos secrets do GitHub.
-          workload_identity_provider: ${{ vars.GCP_WIF_PROVIDER }}
-          service_account: ${{ vars.GCP_DEPLOY_SA }}
-      - uses: google-github-actions/setup-gcloud@v2
-      - run: gsutil -m rsync -r -d dags/ gs://${{ vars.COMPOSER_BUCKET }}/dags/

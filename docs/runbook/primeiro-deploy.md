@@ -6,6 +6,10 @@ Ela complementa [`deploy.md`](deploy.md) e produz as evidências para
 homologação da Onda 0. O primeiro ambiente é `dev`; `hml` e `prod` seguem a
 mesma lista, com o `.tfvars` e o ambiente do GitHub de cada um.
 
+A liberação do ambiente é responsabilidade da Alup. Os reparos de código e
+suas verificações locais/CI podem ser concluídos durante essa espera; os
+itens abaixo só produzem aceite operacional quando executados no ambiente.
+
 ## 0. Bootstrap do projeto (ness.)
 
 Uma vez por projeto, antes de qualquer deploy. O que ele cria existe porque
@@ -118,7 +122,8 @@ terraform output
   é falha do deploy.
 - [ ] `gcloud secrets versions add alupdata-dataform-git-token --data-file=-`
   com o token do GitHub do item 1, definir `DATAFORM_GIT_TOKEN_VERSAO` no
-  ambiente do GitHub e reexecutar o deploy (módulo `infra`): agora o passo do
+  ambiente do GitHub e reexecutar o deploy (módulo `infra`, com `image_sha`
+  igual ao SHA completo da imagem publicada no primeiro `all`): agora o passo do
   Dataform cria as tabelas Bronze, as views Silver e a Gold.
 - [ ] Ingestões agendadas que dispararem entre as duas execuções falham — a
   tabela Bronze ainda não existe — e são reprocessadas por janela depois que
@@ -136,9 +141,15 @@ terraform output
 
 - [ ] Executar BCB/PTAX para uma janela curta já conhecida.
 - [ ] Confirmar JSONL gzip no bucket raw.
+- [ ] Confirmar que o raw foi concluído antes da primeira carga Bronze. A
+  ingestão real grava o objeto completo e depois o lê em fluxo para carregar
+  em lotes; contabilizar essa leitura GCS adicional no tempo e no custo.
 - [ ] Confirmar linha na tabela Bronze.
 - [ ] Confirmar deduplicação e dimensões comuns na Silver.
 - [ ] Confirmar agregação na Gold.
+- [ ] Em dev, usar dados sintéticos para provocar uma assertion da Silver:
+  confirmar que a Gold dependente não é atualizada e conserva o último
+  resultado válido. Corrigir os dados de teste e confirmar nova execução.
 - [ ] Confirmar execução `FONTE` em `bronze._execucoes`.
 - [ ] Confirmar no Knowledge Catalog a linhagem da tabela
   `bronze.bcb_cambio_ptax`: a origem `custom:bcb.cambio_ptax` à esquerda
@@ -156,6 +167,12 @@ terraform output
 - [ ] Confirmar `modo=REPLAY` e `origem_ingestao_id` em `_execucoes`.
 - [ ] Confirmar nova linha Bronze e ausência de duplicação lógica na Silver.
 - [ ] Simular uma falha controlada e conferir o alerta.
+- [ ] Repetir carga e replay com uma fonte volumosa, incluindo raw acima de
+  100 MiB descomprimidos. Registrar pico de memória, duração e bytes lidos;
+  medições de dry-run não representam o caminho real GCS → Bronze.
+- [ ] Conferir que falha de fechamento do raw não inicia carga Bronze e que
+  falha de um lote registra `ERRO`. Lotes anteriores já carregados permanecem
+  no Bronze; na recuperação, a Silver deve eliminar duplicação lógica.
 
 ## 6. Fechamento
 

@@ -14,6 +14,25 @@ do GCP, billing ou planilhas. Referência do código: `main` em `2d0f7c6`, de
 16/09. O feriado de 07/09 não entra na contagem: primeiro dia útil de atraso
 em 08/09. G1 encerrou na reunião de 10/09 e não é bloqueio atual.
 
+## Reparos técnicos durante a espera pelo ambiente — 18/09
+
+A liberação do GCP permanece sob responsabilidade da Alup. O plano de
+[correção dos achados técnicos](planos/2026-09-18-correcao-achados-tecnicos.md)
+implementa o bloqueio da Gold por assertions, persistência completa do raw
+antes do Bronze, replay em fluxo e deploy sem Composer nem imagem `latest`.
+
+Validação local: **983 testes aprovados**, 264 ignorados, **94% de cobertura**;
+62 dependências de assertions comprovadas no Dataform; Ruff, Bandit, auditoria
+de dependências e Terraform validate aprovados. Desses testes ignorados, 248
+são regras SQL que não se aplicam à camada testada. Esses resultados não
+representam carga real nem homologação. O novo caminho faz uma leitura GCS
+adicional por ingestão; tempo, memória e custo precisam ser medidos em dev.
+
+Melhoria preexistente identificada na revisão: os cadastros `ccee_perfil` e
+`ons_capacidade` dependem de `_data_retrato` preenchido durante a extração;
+o replay em instância nova precisa recuperar a referência do retrato.
+Tratar com regressão específica, sem inferir a data a partir do dia atual.
+
 Este arquivo responde "onde estamos e o que trava o próximo passo". Detalhe de
 escopo e estimativa fica em [`plano-execucao.md`](plano-execucao.md); o que sai
 em cada semana, em [`plano-semanal.md`](plano-semanal.md); os relatórios emitidos

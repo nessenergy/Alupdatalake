@@ -4,6 +4,11 @@ O **componente 07** do contrato: cada fonte entrega, junto do conector e das
 views, a documentação de campos e a linhagem origem → Bronze → Silver → Gold.
 Este índice diz o que já existe, o que falta e — importante — **por que falta**.
 
+Em **18/09/2026**, o índice cobre **26 entidades em 25 dicionários de fonte**
+(eólico e fotovoltaico compartilham um documento), além de **2 dicionários
+técnicos**. Bases reutilizáveis não entram nessa contagem. O contrato mantém
+**13 fontes**; entidade implementada não cria uma fonte contratual nova.
+
 ## O que existe
 
 | Fonte | Documento | Onda | Dimensão comum que alimenta | Gold que sustenta |
@@ -50,7 +55,7 @@ origem                       o que muda por fonte
   ├─ transformar()           renomeia campo, normaliza número, achata aninhado
   ├─ schema Pydantic         registro inválido é descartado e contado
   │
-  ▼                          daqui em diante, idêntico para as 13
+  ▼                          daqui em diante, mesmo fluxo para cada entidade
 bronze.<fonte>_<entidade>    tabela append-only, particionada e clusterizada
   ▼
 silver.<fonte>_<entidade>    view: tipagem, dedup por QUALIFY, 6 dimensões comuns
@@ -87,7 +92,8 @@ conhecimento da origem, é acesso ao acervo ([#129](https://github.com/nessenerg
 O **motor de planilha** (S2 Data Intake) também não aparece na primeira tabela,
 e por outro motivo: ele é uma *base* de conector, não uma fonte. Ganha
 dicionário quando os templates concretos forem declarados, o que depende das
-respostas do Questionário de Gaps (A4).
+exemplos de planilha G3 ([#142](https://github.com/nessenergy/Alupdatalake/issues/142));
+A4 já foi respondido em 11/09.
 
 ## Convenção
 

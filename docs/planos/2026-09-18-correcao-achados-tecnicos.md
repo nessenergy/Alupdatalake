@@ -270,3 +270,16 @@ Quando o ambiente estiver disponível, executar o runbook existente em dev: uma 
 - Melhoria separada identificada na revisão: `ccee_perfil` e `ons_capacidade` usam `_data_retrato` inicializado na extração; replay em instância nova precisa recuperar essa referência. É comportamento anterior a este reparo, que preserva a instância na ingestão. Preparar regressão específica antes de corrigir, sem alterar datas por suposição.
 
 - [PR #165](https://github.com/nessenergy/Alupdatalake/pull/165): oito verificações do GitHub aprovadas no commit `110ec2c`; [execução do CI](https://github.com/nessenergy/Alupdatalake/actions/runs/35344381627). Confirmar novamente no commit final antes do merge.
+
+### Seguimento do replay dos cadastros — 18/09/2026
+
+A melhoria separada acima foi implementada: CCEE/perfil e ONS/capacidade
+persistem `_data_retrato` no raw, permitindo replay em instância nova, sem
+consultar a origem. Datas ausentes ou inválidas interrompem a execução;
+a extração não assume mais o dia atual. Bronze, Silver e Gold mantêm o schema.
+
+Os 16 testes novos reproduziram o defeito antes do reparo; depois, 43 testes
+focados e 999 testes da suíte completa passaram (264 ignorados, 94% de cobertura).
+Raw legado sem o metadado exige evidência da publicação original: nova
+extração representa o retrato corrente e não recupera automaticamente o antigo.
+Runbook e dicionários descrevem a recuperação. Nenhum acesso ao GCP foi realizado.

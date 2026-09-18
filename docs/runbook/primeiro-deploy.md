@@ -174,6 +174,13 @@ terraform output
   falha de um lote registra `ERRO`. Lotes anteriores já carregados permanecem
   no Bronze; na recuperação, a Silver deve eliminar duplicação lógica.
 
+Para `ccee_perfil` e `ons_capacidade`, o raw deve conter `_data_retrato`,
+obtido da publicação original. Sem esse metadado o replay falha explicitamente:
+não usar a janela, o `dt=` da URI ou o dia atual para preencher a data.
+Preservar o raw antigo e recuperar o metadado com evidência da publicação;
+se ela não existir, registrar que o retrato antigo não é recuperável por
+replay. Uma nova extração captura somente o cadastro corrente.
+
 ## 6. Fechamento
 
 - [ ] Exportar evidências sem dado real de cliente.

@@ -24,8 +24,8 @@
   `data_referencia` vem do `last_modified` que o CKAN declara para o recurso —
   a data que a origem atribui ao retrato, no mesmo espírito do
   `DatGeracaoConjuntoDados` usado no `aneel_siga`. Se a origem não declarar
-  data, o conector assume hoje **e registra aviso no log**, para ninguém ler a
-  coluna como se viesse da CCEE.
+  data válida, a extração falha explicitamente; não é utilizada a data atual
+  nem a janela como substituta.
 - **A janela não recorta** (ADR 013): cadastro é lido inteiro a cada execução.
   O Bronze acumula um retrato por semana e a Silver fica com o mais recente.
 - **Agente e perfil não são a mesma coisa.** Um agente pode ter vários perfis,
@@ -109,3 +109,15 @@ retrato de 01/09/2026. Não exercitado contra BigQuery real — o projeto GCP n�
 existe (A3). O que só a primeira carga revela: o custo de acumular ~60 mil
 linhas por semana no Bronze (≈ 3 milhões de linhas por ano, particionadas por
 `_ingestao_timestamp`).
+
+## Replay do retrato
+
+O raw JSONL inclui `_data_retrato` (data ISO do `last_modified` da origem)
+em cada registro, antes da validação. `transformar()` lê esse metadado, sem
+depender de extração anterior ou consulta à CCEE. A janela e o `dt=` da URI
+não substituem a data do cadastro. O schema Bronze permanece igual.
+
+Raw antigo sem esse metadado, ou com data inválida, interrompe o replay com
+`ERRO`, em vez de descartar todas as linhas e informar sucesso. Preservar o
+objeto original; recuperar a data apenas com evidência da publicação original.
+Uma nova extração captura o retrato corrente e não recupera o histórico perdido.

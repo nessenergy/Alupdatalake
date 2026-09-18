@@ -20,7 +20,7 @@
   de data, mas tem o `last_modified` que o CKAN declara para o recurso. O ONS
   publica direto no S3 — sem catálogo —, então `data_referencia` vem do
   cabeçalho HTTP `Last-Modified` que o próprio S3 devolve para o arquivo. Sem
-  o cabeçalho, assume a data corrente e registra aviso — mesmo comportamento
+  o cabeçalho válido, interrompe a extração — mesmo comportamento
   do `ccee_perfil` sem `last_modified`.
 - `nom_subsistema` **vem com espaços à direita** (`"NORDESTE       "`); o
   conector aplica `.strip()`.
@@ -127,8 +127,8 @@ espera do insumo da Alup ([#141](https://github.com/nessenergy/Alupdatalake/issu
   `ceg` preenchido (`UHE.PH.PR.001161-4.01`) — diferente do que se poderia
   supor, não é um caso de CEG ausente.
 - A data do retrato depende do cabeçalho `Last-Modified` do S3, não de um
-  campo do próprio CSV — se o S3 não devolver o cabeçalho, a data assumida é a
-  do dia da execução, e um aviso fica no log (mesma regra do `ccee_perfil`).
+  campo do próprio CSV. Sem cabeçalho válido, a extração falha; não utiliza
+  a data atual nem a janela como substituta (mesma regra do `ccee_perfil`).
 
 ## Linhagem
 
@@ -139,3 +139,14 @@ ons-aws-prod-opendata.s3.amazonaws.com → CAPACIDADE_GERACAO.csv
       → silver.ons_capacidade  (vigente; QUALIFY por codigo_equipamento, _ingestao_timestamp DESC)
         → gold.capacidade_instalada_vigente_usina
 ```
+
+## Replay do retrato
+
+O raw JSONL inclui `_data_retrato` (data ISO do `Last-Modified` da origem)
+em cada registro. O replay em uma instância nova preserva essa referência
+sem consultar o ONS, sem depender de estado em memória e sem alterar o schema Bronze.
+
+Raw antigo sem esse metadado, ou com data inválida, interrompe o replay com
+`ERRO`. O `dt=` da URI e a janela não comprovam a data da publicação. Preservar
+o raw original e recuperar o metadado somente com evidência da origem. Nova
+extração traz o cadastro corrente, não recompõe automaticamente retratos antigos.

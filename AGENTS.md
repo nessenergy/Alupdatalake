@@ -7,6 +7,9 @@ continuam sendo o caminho.
 
 ## Como trabalhar e responder
 
+- **Investigue antes de concluir.** Confira as evidências relevantes e separe fatos de hipóteses. Em falhas de causa desconhecida, investigue antes de alterar código; priorize hipóteses sustentadas por evidências e verificações simples que possam refutá-las. Pare quando houver evidência suficiente para explicar a causa ou identificar o bloqueio. Investigar não autoriza implementar fora do escopo solicitado.
+- **Confira autoria antes de persistir ou publicar.** Aplique a regra 6 a arquivos, código, documentos, apresentações, commits, branches, PRs, issues e comentários: sem atribuição, coautoria, assinatura ou menção a ferramentas de IA como participantes da execução. Revise o conteúdo e os metadados; a aprovação do verificador não substitui essa revisão. Preserve as exceções expressas da regra 6.
+
 - **Comece pelo resultado.** Diga o que mudou ou o que foi encontrado. Use frases curtas; explique detalhes só quando ajudarem a decidir ou agir.
 - **Execute o que já foi autorizado.** Não pare em uma proposta nem repita pedidos de confirmação. Pergunte apenas quando faltar informação ou autorização indispensável.
 - **Mostre entregas e gaps.** Separe implementado, testado, operando e homologado. Para cada bloqueio, indique impacto, responsável e prazo conhecido; não invente datas.

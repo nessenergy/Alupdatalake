@@ -32,7 +32,7 @@ from __future__ import annotations
 
 import csv
 import logging
-from datetime import date, datetime
+from datetime import date
 from decimal import Decimal
 from email.utils import parsedate_to_datetime
 from io import StringIO
@@ -134,20 +134,16 @@ class OnsCapacidade(Conector):
 
     def __init__(self) -> None:
         self._sessao = criar_sessao()
-        self._data_retrato: date | None = None
 
     @staticmethod
     def _data_do_cabecalho(valor: str | None) -> date:
-        """`Last-Modified` do S3 → data do retrato. Sem o cabeçalho, assume hoje
-        e avisa — o mesmo comportamento do `ccee_perfil` sem `last_modified`."""
-        if valor:
-            try:
-                return parsedate_to_datetime(valor).date()
-            except (TypeError, ValueError):
-                pass
-        hoje = datetime.now().date()
-        logger.warning("ONS capacidade: recurso sem Last-Modified; data_referencia assumida como %s", hoje)
-        return hoje
+        """Data declarada pelo S3; ausência ou valor inválido interrompe a extração."""
+        try:
+            return parsedate_to_datetime(valor).date()
+        except (TypeError, ValueError, IndexError):
+            raise ValueError(
+                "ONS capacidade: Last-Modified ausente ou inválido; data do retrato desconhecida"
+            ) from None
 
     def _baixar(self) -> tuple[str, date]:
         """Texto do CSV e a data do retrato. É o seam dos testes."""
@@ -158,13 +154,19 @@ class OnsCapacidade(Conector):
     def extrair(self, janela: Janela) -> Iterator[dict[str, Any]]:
         del janela  # cadastro: o retrato é completo, a janela não recorta
         texto, data_retrato = self._baixar()
-        self._data_retrato = data_retrato
         logger.info("ONS capacidade: retrato de %s", data_retrato.isoformat())
-        yield from csv.DictReader(StringIO(texto), delimiter=";")
+        for record in csv.DictReader(StringIO(texto), delimiter=";"):
+            yield record | {"_data_retrato": data_retrato.isoformat()}
 
     def transformar(self, bruto: dict[str, Any]) -> dict[str, Any]:
+        try:
+            snapshot_date = date.fromisoformat(bruto.get("_data_retrato"))
+        except (TypeError, ValueError):
+            raise ValueError(
+                "raw sem data do retrato válida; recuperar metadado original ou realizar nova extração"
+            ) from None
         return {
-            "data_referencia": self._data_retrato,
+            "data_referencia": snapshot_date,
             "submercado": bruto.get("id_subsistema", ""),
             "nome_subsistema": bruto.get("nom_subsistema", "").strip(),
             "uf": bruto.get("id_estado", "").strip(),

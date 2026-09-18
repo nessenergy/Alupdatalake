@@ -29,10 +29,19 @@ são regras SQL que não se aplicam à camada testada. Esses resultados não
 representam carga real nem homologação. O novo caminho faz uma leitura GCS
 adicional por ingestão; tempo, memória e custo precisam ser medidos em dev.
 
-Melhoria preexistente identificada na revisão: os cadastros `ccee_perfil` e
-`ons_capacidade` dependem de `_data_retrato` preenchido durante a extração;
-o replay em instância nova precisa recuperar a referência do retrato.
-Tratar com regressão específica, sem inferir a data a partir do dia atual.
+A melhoria de replay dos cadastros `ccee_perfil` e `ons_capacidade` foi
+implementada no seguimento: `_data_retrato` agora é persistido em cada registro
+raw, e o replay em instância nova preserva a data sem consultar a origem.
+Metadado ausente ou inválido gera erro explícito; a extração também não utiliza
+mais o dia atual quando a origem omite a data. Os 16 testes novos falharam
+antes do reparo, e os 43 testes focados passaram depois. A suíte completa do
+seguimento aprovou **999 testes**, com 264 ignorados e **94% de cobertura**.
+
+Raw antigo sem a referência não permite reconstruir a data por suposição.
+Preservar o objeto e recuperar metadados com evidência original; uma nova
+extração representa o cadastro corrente, não a recuperação do retrato antigo.
+Dicionários e runbook registram essa limitação. Homologação e validação real
+continuam pendentes de liberação do ambiente pela Alup.
 
 Este arquivo responde "onde estamos e o que trava o próximo passo". Detalhe de
 escopo e estimativa fica em [`plano-execucao.md`](plano-execucao.md); o que sai

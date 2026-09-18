@@ -28,7 +28,7 @@ from __future__ import annotations
 
 import csv
 import logging
-from datetime import date, datetime
+from datetime import date
 from io import StringIO
 from typing import TYPE_CHECKING, Any
 
@@ -134,7 +134,6 @@ class CceePerfil(Conector):
 
     def __init__(self) -> None:
         self._sessao = criar_sessao()
-        self._data_retrato: date | None = None
 
     # ------------------------------------------------------------- descoberta
 
@@ -153,10 +152,7 @@ class CceePerfil(Conector):
         try:
             retrato = date.fromisoformat(publicado)
         except ValueError:
-            # Sem data declarada, o retrato é de hoje — e o log diz que foi
-            # suposição, para ninguém ler a coluna como se viesse da origem.
-            retrato = datetime.now().date()
-            logger.warning("CCEE perfil: recurso sem last_modified; data_referencia assumida como %s", retrato)
+            raise ValueError("CCEE perfil: last_modified ausente ou inválido; data do retrato desconhecida") from None
         return str(recurso["url"]), retrato
 
     def _baixar(self, url: str) -> str:
@@ -169,18 +165,24 @@ class CceePerfil(Conector):
 
     def extrair(self, janela: Janela) -> Iterator[dict[str, Any]]:
         del janela  # cadastro: o retrato é completo, a janela não recorta
-        url, self._data_retrato = self._recurso_mais_recente()
-        logger.info("CCEE perfil: retrato de %s", self._data_retrato.isoformat())
+        url, snapshot_date = self._recurso_mais_recente()
+        logger.info("CCEE perfil: retrato de %s", snapshot_date.isoformat())
 
         for linha in csv.DictReader(StringIO(self._baixar(url)), delimiter=";"):
             if _limpar(linha.get("COD_PERF_AGENTE")):
-                yield linha
+                yield linha | {"_data_retrato": snapshot_date.isoformat()}
 
     def transformar(self, bruto: dict[str, Any]) -> dict[str, Any]:
+        try:
+            snapshot_date = date.fromisoformat(bruto.get("_data_retrato"))
+        except (TypeError, ValueError):
+            raise ValueError(
+                "raw sem data do retrato válida; recuperar metadado original ou realizar nova extração"
+            ) from None
         submercado = SIGLA_SUBMERCADO.get(_limpar(bruto.get("SUBMERCADO")).upper())
 
         return {
-            "data_referencia": self._data_retrato,
+            "data_referencia": snapshot_date,
             "codigo_agente": _limpar(bruto.get("COD_AGENTE")),
             "agente_ccee": _limpar(bruto.get("SIGLA_AGENTE")),
             "nome_empresarial": _limpar(bruto.get("NOME_EMPRESARIAL")),

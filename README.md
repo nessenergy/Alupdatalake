@@ -15,7 +15,7 @@
 | **Horas** | 580h em 5 ondas (19 semanas) |
 | **Kickoff** | 27/08/2026 |
 | **Término previsto** | 08/01/2027 |
-| **Stack** | Python · BigQuery · Cloud Storage · Terraform · Cloud Composer |
+| **Stack** | Python · BigQuery · Cloud Storage · Terraform · Dataform · Cloud Run · Cloud Workflows (Onda 3) |
 
 ## Cronograma
 
@@ -56,7 +56,7 @@ graph LR
     subgraph "Medallion (BigQuery)"
         E["Bronze<br/>Dados brutos"]
         F["Silver<br/>Higienizados"]
-        G["Gold<br/>KPIs & Regras"]
+        G["Gold<br/>Dados consolidados"]
     end
     A --> E
     B --> E
@@ -73,7 +73,7 @@ graph LR
 alupdatalake/
 ├── src/ # Código Python (conectores + core)
 ├── definitions/          # Dataform: DDL Bronze, view Silver, tabela Gold (ADR 012)
-├── dags/ # DAGs Cloud Composer/Airflow
+├── dags/ # vazio; orquestração da Onda 3 em Cloud Workflows (ADR 017)
 ├── infra/ # Terraform (IaC GCP)
 ├── tests/ # Testes pytest
 ├── docs/ # Documentação do projeto
@@ -100,7 +100,7 @@ make lint
 # Terraform
 cd infra && terraform init -backend=false
 
-# Ingestão (o mesmo comando roda local, no Cloud Run Job e na DAG)
+# Ingestão (o mesmo comando roda local e no Cloud Run Job, chamado pelo Workflows na Onda 3)
 uv run alupdata listar
 uv run alupdata ingerir ons_carga --de 2026-01-01 --ate 2026-01-31 --dry-run
 ```
@@ -119,15 +119,15 @@ uv run alupdata ingerir ons_carga --de 2026-01-01 --ate 2026-01-31 --dry-run
 
 | Fonte | Onda | Entrega até | Tipo | Status |
 |-------|------|-------------|------|--------|
-| Câmbio BCB (PTAX) | 1 | 16/10/2026 | API pública | **Concluído** |
-| IBGE (IPCA) | 1 | 16/10/2026 | API pública | **Concluído** |
-| ANEEL (SIGA) | 1 | 16/10/2026 | API pública | **Concluído** — fonte de `codigo_usina` |
-| ONS (carga, geração horária por usina, capacidade instalada) | 1 | 16/10/2026 | Arquivo público | **Concluído** — fonte de `submercado`; geração e capacidade também preenchem `codigo_usina` (CEG) |
-| CCEE (InfoMercado) | 1 | 16/10/2026 | API Pública | **Bloqueado** — portal responde 403 a acesso automatizado ([§3.1](docs/plano-execucao.md)) |
-| CCEE (Credenciado) | 2 | 13/11/2026 | API Credenciada | Backlog |
-| BBCE | 2 | 13/11/2026 | API Credenciada | Backlog |
+| Câmbio BCB (PTAX) | 1 | 16/10/2026 | API pública | **Implementado; validado em dry-run** |
+| IBGE (IPCA) | 1 | 16/10/2026 | API pública | **Implementado; validado em dry-run** |
+| ANEEL (SIGA) | 1 | 16/10/2026 | API pública | **Implementado; validado em dry-run** — fonte de `codigo_usina` |
+| ONS (carga, EAR, ENA, geração, capacidade, disponibilidade e constrained-off eólico/fotovoltaico) | 1 | 16/10/2026 | Arquivo público | **Implementado; validado em dry-run** — fonte de `submercado`; geração e capacidade também preenchem `codigo_usina` (CEG) |
+| CCEE (InfoMercado) | 1 | 16/10/2026 | API Pública | **Implementado via dados abertos** — 11 entidades; acesso destravado em 14/09 ([ADR 018](docs/arquitetura/decisoes/018-vias-de-acesso-a-ccee.md)) |
+| CCEE (Credenciado) | 2 | 13/11/2026 | API Credenciada | Escopo candidato; demanda e cobertura a definir na [#22](https://github.com/nessenergy/Alupdatalake/issues/22); distinto da via pública |
+| BBCE | 2 | 13/11/2026 | API Credenciada | **Implementado** — PR #131; aguarda acesso e host (A7) |
 | Hubspot | 2 | 13/11/2026 | API Credenciada | **Implementado, não validado na API** — aguarda token A9 |
-| TempoOK | 2 | 13/11/2026 | API Credenciada | Backlog |
+| TempoOK | 2 | 13/11/2026 | API Credenciada | **Implementado; contrato verificado na API** — acervo alcançável até 26/10/2022; aguarda acervo recente (#129) |
 | Oracle FMB | 3 | 18/12/2026 | Banco Interno | Backlog |
 | Portal Alup | 3 | 18/12/2026 | Banco Interno | Backlog |
 | MySQL RDS | 3 | 18/12/2026 | Banco Interno | Backlog |
@@ -135,7 +135,14 @@ uv run alupdata ingerir ons_carga --de 2026-01-01 --ate 2026-01-31 --dry-run
 
 ## Progresso por Onda
 
-Acompanhe no [GitHub Projects](https://github.com/nessenergy/alupdatalake/projects).
+Em **18/09/2026**, há **26 entidades implementadas** dentro do acompanhamento das
+**13 fontes contratuais**: 23 verificadas com dados reais em dry-run, TempoOK com
+contrato da API verificado e BBCE/Hubspot aguardando credencial. Não há carga
+real em GCP nem homologação registrada. A3 tem previsão de 18/09, ainda sem
+confirmação de entrega; o prazo original de 04/09 permanece registrado.
+
+Detalhes e evidências em [docs/status.md](docs/status.md) e no
+[Project 2](https://github.com/orgs/nessenergy/projects/2).
 
 ## Segurança
 

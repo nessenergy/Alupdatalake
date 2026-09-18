@@ -32,12 +32,13 @@ Configuração versionada em `scripts/campos_projeto.py`. Semântica, aqui.
 
 ## Como aplicar
 
-Projects V2 só tem API GraphQL; não existe endpoint REST equivalente. O script
-precisa de um **PAT clássico com escopo `project`** — o token do CI não serve,
-porque é limitado ao repositório.
+O script usa a API GraphQL do Projects V2. Na operação local, reutilize a
+sessão autenticada do `gh`, com acesso ao Project, sem criar segredo alternativo
+para contornar A3. Na automação, preserve o App com WIF e Secret Manager
+descrito abaixo; o token padrão do CI é limitado ao repositório.
 
 ```bash
-export GITHUB_TOKEN=<PAT clássico com escopo project>
+export GITHUB_TOKEN=$(gh auth token)
 
 # 1. descobrir o número do projeto
 uv run python -m scripts.campos_projeto --owner nessenergy --listar
@@ -81,7 +82,21 @@ make quadro-aplicar    # grava e posta os comentários de atraso novos
 
 Por padrão ele só simula, porque cada gravação e cada comentário ficam visíveis
 para a Alup. Issue nova no quadro entra no `quadro.toml`; sem isso, o comando a
-lista como sem onda.
+lista como sem onda. **Zero mudanças na simulação comprova apenas conformidade
+com o mapa e o estado de fechamento consultado.** Não confere implementação,
+descrições, critérios de aceite ou homologação. Issue aberta com código pronto
+pode exigir `In Progress` após revisão editorial; o script não decide isso.
+
+Para reproduzir a conferência datada, sem escrita externa:
+
+```powershell
+python -m scripts.quadro --hoje 2026-09-18
+uv run pytest tests/unit/test_quadro.py -q
+```
+
+`--aplicar` também publica comentários de atraso. Antes de usá-lo, revise
+conteúdo e destino e obtenha autorização explícita para essas mensagens;
+a autorização para editar campos ou descrições não a substitui.
 
 ### Sincronização automática
 
@@ -108,7 +123,12 @@ instalação com
 **Enquanto o projeto GCP (A3) e o App não existirem**, o job registra um aviso
 e termina com sucesso. Ele começa a sincronizar sozinho quando as três
 variáveis abaixo estiverem preenchidas e a chave estiver gravada. Não é preciso
-mudar nenhum arquivo.
+mudar nenhum arquivo. **Workflow verde não comprova sincronização:** confira
+se o passo que executa `scripts.quadro` rodou ou foi pulado. Na
+[execução de 17/09/2026, nº 35240311826](https://github.com/nessenergy/Alupdatalake/actions/runs/35240311826),
+a guarda encerrou sem configuração suficiente e os passos seguintes ficaram
+`skipped`. Em 18/09, a ativação permanece pendente de configuração e de uma
+execução efetiva observada; a conferência manual usa a sessão local existente.
 
 **Configuração, uma vez (fora do repositório):**
 
@@ -142,8 +162,9 @@ mudar nenhum arquivo.
      lugar do App ID, que está em desuso.
    - `GCP_WIF_PROVIDER` e `GCP_DEPLOY_SA` como variáveis **do repositório**,
      com os valores do projeto `dev` ([`deploy.md`](deploy.md)). A organização
-     está no plano Free e o repositório é privado: nesse caso o GitHub não
-     oferece ambientes, e uma variável de ambiente nunca chegaria ao job.
+     passou ao GitHub Enterprise em 11/09 (ADR 010). Este workflow continua
+     sem `environment:` e lê variáveis do repositório; a revisão documental
+     não muda essa configuração. O comentário sobre Free no YAML é histórico.
 
 `make quadro` e `make quadro-aplicar` continuam valendo para rodar à mão, com o
 token de quem roda.
@@ -154,7 +175,9 @@ token de quem roda.
 
 Na sexta-feira, com o quadro filtrado por `Semana = S<n>`:
 
-1. **Soma de Horas** por onda → quanto da onda foi consumido.
+1. **Soma de Horas comprovadas** por onda → consumo registrado. Enquanto os
+   sete lançamentos de 100h estiverem sem origem conciliada, não apresentá-los
+   como tempo realizado comprovado.
 2. **Itens em Done com `Validado = Não`** → a fila de homologação. É o que
    precisa de alguém da Alup, e o que trava o fechamento da onda.
 3. **Itens com `Correções = Sim`** → quanto da semana foi refação. Se cresce
@@ -182,31 +205,28 @@ recortes são o esqueleto dele nas semanas sem reunião.
 
 ## Base do lançamento de horas realizadas
 
-O contrato é por alocação de horas, e a medição se faz por item. A regra do
-lançamento é uma só:
+O campo `Horas` registra trabalho realizado com origem verificável: registro
+de trabalho, item, período e responsável. **Não copiar `Horas previstas` nem
+atribuir automaticamente o orçamento à conclusão de um item.** Conferir os
+artefatos prova implementação; não mede tempo gasto e não prova homologação.
 
-> **Hora contratada atribuída a entrega verificada.** Um item concluído recebe
-> as horas que o `plano-execucao.md` lhe orçou, e só depois de conferido que a
-> entrega existe de fato no repositório.
+### Registro histórico de 08/09/2026 — origem a conferir
 
-O que qualifica a hora, portanto, é a entrega — não a passagem do tempo. Item
-sem entrega conferida não recebe hora, ainda que esteja marcado como concluído
-no quadro.
+Foram lançadas **100h em sete itens**, usando a regra então documentada de
+atribuir o orçamento à entrega verificada. A consulta de 18/09 preserva os
+valores, mas **não os considera horas realizadas comprovadas** até conciliar
+sua origem com registros de trabalho. A regra acima substitui essa prática.
 
-A conferência não é a leitura do status no quadro — é a checagem dos artefatos.
-Para fonte de dados, os **7 componentes** da cláusula 2ª, um a um: conector,
-tabela Bronze, view Silver, view Gold, testes, agendamento e dicionário com
-linhagem. Para item de infraestrutura ou documentação, o artefato
-correspondente versionado.
-
-**Lançamento de 08/09/2026** — 100h, sobre sete itens conferidos:
-
-| Onda | Itens | Horas |
+| Onda no lançamento | Itens | Horas registradas, não comprovadas |
 |---|---|---:|
 | 0 — Fundação | Terraform (#2), CI/CD (#3), arquitetura Medallion (#7), conector BCB/PTAX (#21) | 40h |
 | 1 — Mercado base | conectores ONS (#18), ANEEL (#19) e IBGE (#20) | 60h |
 
-Os demais itens concluídos — região do ambiente (#67), revisão na `main` (#68)
-e campos do quadro (#78) — **não receberam horas**: são decisões e
-instrumentação, não constam do plano de execução e portanto não têm alocação
-contratual a consumir.
+BCB/PTAX consta na Onda 0 como conector de referência (plano, item 0.3);
+a fonte também é listada no escopo da Onda 1 sem horas adicionais. Não
+reclassificar o lançamento nem contar o esforço duas vezes por essa diferença.
+
+O registro de 08/09 informa que região (#67), revisão na `main` (#68) e
+campos do quadro (#78) não receberam horas. A ausência de orçamento próprio
+não permite inferir ausência de trabalho realizado. A conciliação deve manter
+histórico de qualquer correção, sem sobrescrever valores por estimativa.

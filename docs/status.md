@@ -1,6 +1,6 @@
 # Estado do projeto
 
-Atualizado em **2026-09-16** · **A3 chega hoje ao 7º dia útil de atraso** —
+Atualizado em **2026-09-18** · **A3 chega ao 9º dia útil de atraso sem confirmação de entrega** —
 vencido em 04/09, previsão da Alup para 18/09, contagem da cláusula 3ª em
 curso; **passou dos 5 dias úteis, o cronograma está postergado**. Em 16/09 a
 ness. enviou à Alup **as contas que devem receber os papéis no projeto GCP**
@@ -9,7 +9,10 @@ provisionamento — que a Alup informou, no mesmo dia, estar **em processo de
 liberação**. Em 14/09 a Alup entregou a documentação das APIs (**A2
 encerrada e A8 atendida**) e em 15/09 a **matriz RACI do projeto**
 ([`raci.md`](raci.md)), que não altera prazo nem desbloqueia frente de
-trabalho
+trabalho. A conferência de 18/09 não encontrou confirmação posterior de entrega
+do GCP, billing ou planilhas. Referência do código: `main` em `2d0f7c6`, de
+16/09. O feriado de 07/09 não entra na contagem: primeiro dia útil de atraso
+em 08/09. G1 encerrou na reunião de 10/09 e não é bloqueio atual.
 
 Este arquivo responde "onde estamos e o que trava o próximo passo". Detalhe de
 escopo e estimativa fica em [`plano-execucao.md`](plano-execucao.md); o que sai
@@ -25,20 +28,20 @@ contexto para agentes, em [`../AGENTS.md`](../AGENTS.md).
 
 | Item | Onde | Verificação |
 |---|---|---|
-| Runner de ingestão (janela, raw no GCS, validação, colunas técnicas, carga, log) | `src/core/` | 257 testes aprovados, 92% de cobertura (suíte inteira) |
+| Runner de ingestão (janela, raw no GCS, validação, colunas técnicas, carga, log) | `src/core/` | Suíte local de 18/09: 956 aprovados, 264 pulados, 93% de cobertura; [registro da verificação](relatorios/2026-09-18-reconciliacao-acompanhamento.md). Integrações puladas não comprovam operação real |
 | Caminho de banco relacional (Oracle/MySQL/**SQL Server**) para a Onda 3 | `src/core/banco.py` | ADR 008 e adendo de 04/09; 20 testes sem rede; **nenhuma conexão real** — depende de VPN (A7). Compose e testes de integração prontos em `tests/integration/` |
 | Replay do raw sem nova chamada à fonte | `alupdata reprocessar-raw`, `src/core/storage.py` | testes locais com JSONL gzip; falta validar contra GCS real |
-| CLI única (`alupdata listar` / `ingerir`) | `src/cli.py` | executada contra as 4 fontes |
+| CLI única (`alupdata listar` / `ingerir`) | `src/cli.py` | 23 entidades verificadas com dados reais em dry-run; TempoOK com contrato da API verificado |
 | Scaffolding dos 7 componentes | `make novo-conector` | usado nas fontes novas |
-| Deploy de views idempotente | `make deploy-views` | `--dry-run` conferido |
-| Motor S2 Data Intake (planilha CSV/XLSX sob template) | `src/core/planilha.py`, `src/conectores/planilha.py` | 19 testes; templates concretos dependem de A4 |
-| Painel de saúde do lake (frescor, confiabilidade, volumetria) | `sql/gold/saude_ingestao.sql`, rota `/lake` | ADR 006; ferramenta de sustentação, não escopo faturado |
+| Transformações Dataform | `definitions/`, `make dataform-compile` | DDL Bronze, views Silver e tabelas Gold; execução no GCP ainda pendente |
+| Motor S2 Data Intake (planilha CSV/XLSX sob template) | `src/core/planilha.py`, `src/conectores/planilha.py` | 19 testes; templates concretos dependem de G3/#142 |
+| Painel de saúde do lake (frescor, confiabilidade, volumetria) | `definitions/gold/saude_ingestao.sqlx`, rota `/lake` | ADR 006; ferramenta de sustentação, não escopo faturado |
 | Portal falha fechado sem identidade do IAP | `src/portal/app.py` | 7 testes; deploy sem autenticação ou IAP mal configurado devolve 403 em vez de servir dado |
 | Log estruturado com correlação por execução | `src/core/observabilidade.py` | 8 testes; verificado contra a API do BCB |
-| Alertas (falha, silêncio, inválidos em alta) | `infra/modules/monitoramento` | `terraform validate` limpo; **sem destinatário** — ver runbook |
+| Alertas (falha, silêncio, inválidos em alta) | `infra/modules/monitoramento` | `terraform validate` limpo; destinatários recebidos em 11/09; ativação depende de A3/#87 |
 | Painel no Cloud Monitoring e orçamento com alerta de custo | `infra/modules/monitoramento` | orçamento precisa do `billing_account` da Alup (A3) |
 | Terraform: datasets, bucket raw, secrets, Cloud Run Job + Scheduler, IAM | `infra/` | IAM restringido por recurso; Terraform 1.15.8 `fmt` e `validate` limpos |
-| CI/CD: lint, testes, Bandit, pip-audit, Gitleaks, Terraform | `.github/workflows/` | workflow de deploy ordenado; 7 jobs verdes no Actions |
+| CI/CD: lint, testes, Bandit, pip-audit, Gitleaks, Terraform | `.github/workflows/` | workflow de deploy ordenado; consultar execução datada de CI; workflow de acompanhamento verde não comprova sincronização (§7) |
 | Imagem da CLI | `Dockerfile` | build local não executado: Docker Desktop sem daemon ativo |
 | Campos de acompanhamento semanal do GitHub Projects | `scripts/campos_projeto.py`, `runbook/acompanhamento-semanal.md` | 12 testes; script idempotente. **Os cinco campos criados no quadro em 04/09** — Horas, Semana, Validado, Correções e Atraso |
 | **FinOps F0** — rótulo de custo por fonte no job do BigQuery | `src/core/bigquery.py` (`rotulos()`) | 6 testes; precisa existir **antes** do 1º apply, custo gasto não se rateia depois |
@@ -94,7 +97,7 @@ verificado** — caminho, ausência por 404, TLS, estabilidade do `sha256` —, 
 o acervo alcançável termina em 26/10/2022, então não há boletim para ingerir
 (A10).
 
-Nenhuma linha chegou a um BigQuery de verdade — o projeto GCP ainda não existe.
+Não há carga em BigQuery real registrada nem confirmação de entrega do ambiente GCP até esta conferência.
 
 ### Dimensões comuns
 
@@ -109,7 +112,7 @@ Nenhuma linha chegou a um BigQuery de verdade — o projeto GCP ainda não exist
 
 ### Documentação
 
-ADRs 001–021 · 11 dicionários de dados com [índice e linhagem](dicionario-dados/README.md) · plano de execução · runbook de deploy,
+ADRs 001–021 · 25 dicionários de fonte para 26 entidades e 2 dicionários técnicos com [índice e linhagem](dicionario-dados/README.md) · plano de execução · runbook de deploy,
 de primeiro deploy e de acompanhamento semanal ·
 [`proximos-passos.md`](proximos-passos.md) como fila de execução ·
 `AGENTS.md` como contexto canônico · skills do projeto e shortlist do Google.
@@ -130,7 +133,7 @@ Fase↔Onda e Core↔Gold está resolvido em [`raci.md`](raci.md) §5.
 Material de reunião: baralho de kickoff e **baralho de revisão arquitetural em
 GCP** (`apresentacoes/revisao-arquitetural-gcp.html`) — origem, tratamento e
 destino, com os oito invariantes e a pauta de perguntas. **Enviado ao Google em
-04/09**; a resposta é a pendência G1 do painel §6.
+04/09**; G1 foi encerrada pela revisão de 10/09, cujas decisões estão nas ADRs vigentes.
 
 ---
 
@@ -138,7 +141,7 @@ destino, com os oito invariantes e a pauta de perguntas. **Enviado ao Google em
 
 | # | Item | Bloqueado por |
 |---|---|---|
-| N1 | Preparar contrato de dados das fontes das Ondas 2 e 3 | **destravado em 14/09** — com a documentação recebida, o TempoOK foi entregue e o **BBCE é o próximo a escrever**, antes do token. Restam as fontes da Onda 3, que dependem de A7 |
+| N1 | Preparar contrato de dados das fontes das Ondas 2 e 3 | TempoOK e **BBCE já implementados** (BBCE: [PR #131](https://github.com/nessenergy/Alupdatalake/pull/131)); faltam acervo recente (#129), acesso/host BBCE (#23) e documentação/acessos das fontes internas (A7) |
 | N2 | Portal MVP: ligar contra o BigQuery e publicar no Cloud Run | escopo cravado na ADR 005; a tela existe e roda com provedor simulado — falta o ambiente GCP (A3) |
 | N3 | Primeiro `terraform apply` real e primeiro deploy da imagem | ambiente GCP (A3) |
 | N4 | Validar replay contra objeto real no GCS e conferir linhagem no BigQuery | ambiente GCP (A3) |
@@ -152,7 +155,7 @@ destino, com os oito invariantes e a pauta de perguntas. **Enviado ao Google em
 |---|---|---|---|
 | A1 | **Conceder à ness. os papéis de bootstrap** em cada projeto (ADR 015, revista em 11/09): com eles a ness. configura o WIF (`GCP_WIF_PROVIDER`, `GCP_DEPLOY_SA`), o bucket de state, o Artifact Registry e a SA de deploy | o bootstrap não roda e o workflow de deploy não autentica | ADR 015, `runbook/primeiro-deploy.md` §0 |
 | ~~A2~~ | ~~**Decidir sobre a CCEE InfoMercado**~~ | **Encerrada em 14/09** — era filtro de cliente não identificado, não bloqueio de IP nem credencial. Resolvido por cabeçalho no `src/core/http.py` | [ADR 018](arquitetura/decisoes/018-vias-de-acesso-a-ccee.md), [registro de 14/09](relatorios/2026-09-14-documentacao-de-apis-recebida.md) |
-| A3 | **Projeto GCP `dev`**: criar, habilitar APIs, IAM, Artifact Registry, bucket de state — criação e `billing_account` são da Alup, esclarecido em 09/09. **Em 16/09 a ness. enviou as quatro contas que devem receber os papéis** (`gptorres@`, `resper@`, `bertuzzi@`, `gpaz@`, todas `@ness.com.br`), pelo Google Chat, fechando a única parte do pedido que dependia de nós. **Liberação em processo do lado da Alup, informado em 16/09** — saiu de "não iniciado" para "em andamento", o que é o que sustenta a previsão de 18/09 | nada sobe; Onda 0 não homologa | plano 2.2 (0.13), [registro de 09/09](relatorios/2026-09-09-esclarecimento-e1-e2.md), [#55](https://github.com/nessenergy/Alupdatalake/issues/55) |
+| A3 | **Projetos GCP `dev`, `hml` e `prod`**: a Alup cria, vincula faturamento e concede papéis; a ness. executa APIs, WIF, Artifact Registry, state e demais recursos do bootstrap (ADR 015). **Em 16/09 a ness. enviou as quatro contas que devem receber os papéis** (`gptorres@`, `resper@`, `bertuzzi@`, `gpaz@`, todas `@ness.com.br`), pelo Google Chat, fechando a única parte do pedido que dependia de nós. **Liberação em processo do lado da Alup, informado em 16/09** — saiu de "não iniciado" para "em andamento", o que é o que sustenta a previsão de 18/09 | nada sobe; Onda 0 não homologa | plano 2.2 (0.13), [registro de 09/09](relatorios/2026-09-09-esclarecimento-e1-e2.md), [#55](https://github.com/nessenergy/Alupdatalake/issues/55) |
 | ~~A4~~ | ~~**Questionário de Gaps** (47 perguntas)~~ | **Respondido em 11/09.** Definir os 8 domínios a partir das respostas é tarefa da ness. (plano 0.10), não insumo pendente | [`questionario-gaps.md`](questionario-gaps.md) |
 | ~~A5~~ | ~~**RACI e data owners** por domínio~~ | **Respondido em 11/09** (item B1 do questionário) | [`interlocutores.md`](interlocutores.md) |
 | ~~A6~~ | ~~**Ferramenta de BI** definida~~ | **Respondido em 11/09**: Power BI hoje; Looker Studio ou fronts internos na Fase 2 (item G1) | [`questionario-gaps.md`](questionario-gaps.md) |
@@ -176,16 +179,18 @@ Faturamento é por **homologação da Onda** (cláusula 6ª) — carga real em B
 e aceitação da Alup, não volume de código. **Nenhuma onda homologou ainda.** A
 coluna "técnico" abaixo é a nossa leitura de prontidão de trabalho, calculada
 sobre as horas do plano de execução; não é métrica rastreada formalmente no
-quadro (o campo `Horas` do Project 2 está quase todo vazio) — mostrada com o
-método, para poder ser conferida.
+quadro. Na consulta de 18/09, os sete lançamentos de `Horas` somam 100h,
+com **origem a conferir**; não são horas realizadas comprovadas. As estimativas
+abaixo usam os pesos orçados dos itens tecnicamente prontos, não apontamento
+de tempo, quantidade de cartões ou PRs.
 
 | Onda | Escopo | Técnico | Situação |
 |---|---|---|---|
-| 0 — Fundação | 90h · marco 15,52% | **~82%** | Framework, CI/CD, domínios, dimensões comuns e RACI entregues (~74h). Restam ~16h — provisionar o GCP, 1º deploy, ligar o portal — **100% bloqueadas por A3**, em liberação desde 16/09 |
-| 1 — Mercado base | 120h · marco 20,69% | **escopo original 100%** | As 4 fontes públicas + CCEE planejadas estão entregues. As sete fontes do ONS e as nove entidades da ADR 021, entregues em 15/09, são **escopo além das 120h originais** — por demanda dos domínios do B1, não porque a onda pedisse |
-| 2 — APIs credenciadas | 110h · marco 18,97% | **~50% escrito, 0% executável** | Hubspot, TempoOK e BBCE têm os 7 componentes escritos contra documentação, não contra API real credenciada. Só o TempoOK de fato conversou com a origem — e está travado por outro motivo, o acervo (#129). Para medição, o número que importa é 0% |
+| 0 — Fundação | 90h · marco 15,52% | **~82%** | Framework, CI/CD, domínios, dimensões comuns e RACI entregues (peso estimado de ~74h do plano, não horas realizadas). Restam itens com peso estimado de ~16h — provisionar o GCP, 1º deploy, ligar o portal — **100% bloqueados por A3**, em liberação desde 16/09 |
+| 1 — Mercado base | 120h · marco 20,69% | **escopo original 100%** | As 4 fontes públicas + CCEE planejadas estão entregues. As sete novas entidades do ONS (15/09) e as nove entidades da ADR 021 (14/09) ampliam a cobertura técnica considerada na estimativa original; a conciliação com as **120h orçadas** e as 13 fontes continua pendente — por demanda dos domínios do B1, não porque a onda pedisse |
+| 2 — APIs credenciadas | 110h · marco 18,97% | **~50% escrito, 0% executável** | Hubspot, TempoOK e BBCE têm os 7 componentes escritos contra documentação, não contra API real credenciada. Só o TempoOK de fato conversou com a origem — e está travado por outro motivo, o acervo (#129). Esse indicador não representa horas realizadas nem percentual de homologação |
 | 3 — Sistemas internos | 155h · marco 26,72% | **0%** | Caminho de banco pronto (ADR 008: Oracle, MySQL e SQL Server, drivers puro-Python, testado sem rede); **nenhuma fonte iniciada** — bloqueada por VPN e credencial (A7, vence 25/09). VPN também depende de A3: mesmo com credencial em mãos, a rota de rede pode continuar bloqueada até o ambiente existir |
-| 4 — Planilhas e handoff | 105h · marco 18,10% | **~29%** | Motor S2 Data Intake pronto (~30h de 105h), adiantado por não depender de insumo. O resto é sequencial — Dataplex e KPIs dependem das outras ondas fecharem, templates dependem da G3 (#142, vence 18/09) |
+| 4 — Planilhas e handoff | 105h · marco 18,10% | **~29%** | Motor S2 Data Intake pronto (peso estimado de ~30h de 105h, não horas realizadas), adiantado por não depender de insumo. O resto é sequencial — Knowledge Catalog e handoff dependem das outras ondas; Gold sem KPI nesta fase (ADR 012), templates dependem da G3 (#142, vence 18/09) |
 
 > **Leitura da tabela.** Quatro das cinco ondas já têm entrega técnica. O que
 > nenhuma linha acima mede é homologação: onda fecha por aceitação e carga
@@ -204,7 +209,7 @@ sondagem de 2026-08-25 mostra que isso **só se sustenta para uma delas**:
 | Fonte | Documentação/API alcançável? | Dá para escrever o contrato hoje? |
 |---|---|---|
 | CCEE InfoMercado | **sim, desde 14/09** — o 403 era filtro de cliente não identificado; o CKAN de dados abertos expõe 204 conjuntos, sem credencial | **sim, e sem depender de token** — ADR 018 |
-| BBCE | **sim, desde 14/09** — coleção Postman completa | sim; falta só a credencial (A7) |
+| BBCE | **sim, desde 14/09** — coleção Postman completa | implementado no PR #131; faltam acesso e host (A7) |
 | TempoOK | **sem documentação publicada**, mas com exemplo de consulta e token entregues em 14/09 | **feito** em 14/09 — ADR 019 |
 | Hubspot | sim — API e docs públicas | **feito** em 2026-08-26 — ver abaixo |
 
@@ -242,15 +247,15 @@ Ordenado por data em que o atraso passa a custar. Prazos derivados do
 
 | # | Insumo | Responsável | Prazo útil | Efeito de passar do prazo |
 |---|---|---|---|---|
-| A3 | Projetos GCP (`dev` primeiro, depois `hml` e `prod`) criados, vinculados ao faturamento e com os papéis de bootstrap concedidos à ness. — APIs, IAM, WIF, Artifact Registry e state passaram à ness. em 11/09 (ADR 015) | Alup | **04/09 — vencido** | **Não entregue. Atraso registrado em 04/09**; 1º dia útil de atraso em 08/09, 5º em 14/09. A Alup condicionou A3 à resposta do Google (G1). Em 09/09 a Alup levantou dúvida sobre quem cria o projeto (E1) e de quem é a `billing_account` (E2); **ambas são da Alup, esclarecido no mesmo dia** — ver [registro de 09/09](relatorios/2026-09-09-esclarecimento-e1-e2.md). S2 e S3 escorregam inteiras; Onda 0 não homologa; > 5 dias úteis posterga o cronograma |
+| A3 | Projetos GCP (`dev` primeiro, depois `hml` e `prod`) criados, vinculados ao faturamento e com os papéis de bootstrap concedidos à ness. — APIs, IAM, WIF, Artifact Registry e state passaram à ness. em 11/09 (ADR 015) | Alup | **04/09 — vencido** | **Entrega não confirmada nesta conferência. Atraso registrado em 04/09**; 1º dia útil de atraso em 08/09, 5º em 14/09. Historicamente a Alup condicionou A3 a G1, encerrada em 10/09; esse elo não é mais bloqueio. Previsão de A3: 18/09, sem confirmação até a conferência. Em 09/09 a Alup levantou dúvida sobre quem cria o projeto (E1) e de quem é a `billing_account` (E2); **ambas são da Alup, esclarecido no mesmo dia** — ver [registro de 09/09](relatorios/2026-09-09-esclarecimento-e1-e2.md). S2 e S3 escorregam inteiras; Onda 0 não homologa; > 5 dias úteis posterga o cronograma |
 | A9 | Token Hubspot no secret `alupdata-hubspot-api-token` | Alup | 11/09 | conector pronto segue parado; item 2.3 não fecha |
 | ~~A4~~ | ~~Questionário de Gaps respondido~~ | Alup | 11/09 | **Respondido no prazo** |
 | ~~A5~~ | ~~Matriz RACI e data owners~~ | Alup | 11/09 | **Respondido no prazo** |
 | ~~A6~~ | ~~Ferramenta de BI definida~~ | Alup | 11/09 | **Respondido no prazo**: Power BI |
-| [#87](https://github.com/nessenergy/Alupdatalake/issues/87) | Destinatários de alerta e `billing_account` | Alup | 11/09 | alertas e orçamento existem mas não notificam ninguém |
+| [#87](https://github.com/nessenergy/Alupdatalake/issues/87) | Destinatários de alerta e `billing_account` | Alup | destinatários: 11/09, atendido; billing: 18/09 | destinatários recebidos em 11/09; billing previsto para 18/09, sem confirmação de entrega; ativação depende de A3 |
 | — | Variáveis do GitHub (`GCP_WIF_PROVIDER`, `GCP_DEPLOY_SA`) | ness. | depende de A3 | deploy não autentica. **Branch protection resolvida em 11/09**: a organização passou ao GitHub Enterprise e a `main` exige PR e seis verificações, com force push e exclusão bloqueados (ADR 010, encerrada) |
 | ~~A2~~ | ~~Decisão sobre a CCEE~~ | Alup | ~~18/09~~ | **Encerrada em 14/09, antes do prazo.** As 32h voltaram a andar; nenhuma das quatro alternativas foi necessária ([ADR 018](arquitetura/decisoes/018-vias-de-acesso-a-ccee.md)) |
-| G1 | **Resposta do Google à revisão arquitetural** (enviada em 04/09) | Google | **a definir** | **Precede A3 por decisão da Alup**, e portanto precede todo o cronograma técnico. Sem data pactuada, a postergação passa a depender de terceiro sem prazo acordado — ver `plano-semanal.md`, S1 |
+| ~~G1~~ | ~~Resposta do Google à revisão arquitetural~~ | Google | **10/09 — encerrada** | Reunião realizada e recomendações incorporadas às ADRs; preservado o registro histórico do atraso na S1 |
 | A7 | Pedidos de token (Onda 2) e VPN/credencial (Onda 3) **abertos** | Alup | 25/09 | maior risco financeiro: ociosidade de 4h/dia (R$ 256/h) |
 | ~~A8~~ | ~~Documentação técnica de BBCE e TempoOK~~ | Alup | ~~25/09~~ | **Atendida em 14/09, onze dias antes do prazo.** A Onda 2 pode ser escrita antes do token, como o plano previa |
 
@@ -277,8 +282,9 @@ pendurado nela.
 | **Estado** | em 11/09 (item C1) a Alup informou que os pedidos **ainda não tinham sido abertos**, e que seriam a partir de 14/09. Faltam os números de chamado |
 | **Exposição** | ociosidade de **4h/dia a R$ 256/h — R$ 1.024 por dia parado** acima de 5 dias úteis |
 
-**O que ele destrava**: sete conectores — quase toda a Onda 2 e a Onda 3
-inteira. BBCE ([#23](https://github.com/nessenergy/Alupdatalake/issues/23)),
+**O que ele destrava**: acesso ao BBCE e às quatro fontes internas. O TempoOK
+já recebeu token; a pendência atual é acervo recente (A10/#129), e o Hubspot
+está separado em A9. Referências: BBCE ([#23](https://github.com/nessenergy/Alupdatalake/issues/23)),
 TempoOK ([#25](https://github.com/nessenergy/Alupdatalake/issues/25)), Oracle
 FMB ([#27](https://github.com/nessenergy/Alupdatalake/issues/27)), Portal Alup
 ([#29](https://github.com/nessenergy/Alupdatalake/issues/29)), MySQL RDS
@@ -312,3 +318,12 @@ mantendo sempre o número mais baixo de cada par. As issues das quatro fontes
 públicas concluídas e das tarefas de fundação já entregues também foram
 fechadas, com a ressalva de que **entrega técnica não é homologação** — esta
 depende do primeiro `apply` real (§5.1).
+
+
+Na conferência de **18/09**, antes da reconciliação, o Project 2 tinha 69 itens:
+30 `Done`, 1 `In Progress` e 38 `Todo`. Essa contagem não mede homologação nem
+horas. Os sete lançamentos de horas (100h) têm origem a conferir. O workflow de
+[17/09, nº 35240311826](https://github.com/nessenergy/Alupdatalake/actions/runs/35240311826)
+terminou verde com passos pulados pela guarda de configuração; a sincronização
+automática ainda não tem execução efetiva comprovada. O resultado da
+reconciliação está no [relatório de 18/09](relatorios/2026-09-18-reconciliacao-acompanhamento.md).

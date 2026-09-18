@@ -1,7 +1,7 @@
 # Plano de Execução — AlupData Fase 1: DataLake
 
 Contrato CPS-01025/2026 · 580h · 19 semanas · 5 ondas
-Última revisão: 2026-08-25
+Linha de base: 2026-08-25 · referências e situação revisadas em 2026-09-18
 
 Situação de execução, atualizada a cada entrega: [`status.md`](status.md).
 
@@ -9,9 +9,10 @@ Este plano detalha **como** as 580h contratadas serão gastas. Ele não substitu
 o contrato (`docs/contrato/resumo-contrato.md`); traduz o escopo em tarefas com
 estimativa, dependência e critério de aceite.
 
-> **Data de início**: a definir. As semanas abaixo são relativas (S1 = primeira
-> semana após o kickoff e a liberação do ambiente GCP). Toda data absoluta
-> depende desse marco zero.
+> **Linha de base:** S1 começou em 31/08/2026, após o kickoff de 27/08.
+> As 580h, as cinco ondas e as datas contratuais permanecem como referência.
+> Atrasos de insumo e previsões revisadas são registrados em `status.md`;
+> não alteram silenciosamente a linha de base nem comprovam homologação.
 
 ---
 
@@ -34,7 +35,7 @@ Papéis usados abaixo: **ness.** (contratada), **Alup** (contratante),
 
 Marco 1 — 15,52% · R$ 23.040,00
 
-### 2.1 Já concluído (~40h)
+### 2.1 Implementação inicial (peso orçado de ~40h; não horas realizadas)
 
 | # | Entrega | Onde |
 |---|---|---|
@@ -44,10 +45,10 @@ Marco 1 — 15,52% · R$ 23.040,00
 | 0.4 | Terraform: datasets, bucket raw, secrets, Cloud Run Job + Scheduler, IAM | `infra/` |
 | 0.5 | CI/CD: lint, testes, Bandit, pip-audit, Gitleaks, Terraform validate | `.github/workflows/` |
 | 0.6 | Scaffolding dos 7 componentes (`make novo-conector`) | `scripts/` |
-| 0.7 | Decisões registradas: framework, SQL puro sem dbt, Cloud Run antes de Composer | ADR 003, 004 |
+| 0.7 | Decisões registradas: framework, Dataform nas três camadas e Workflows na Onda 3 | ADR 003, 012, 017 |
 | 0.8 | Runbook de deploy | `docs/runbook/deploy.md` |
 
-### 2.2 Pendente na Onda 0 (~50h)
+### 2.2 Complemento da Onda 0 (peso orçado de ~50h; situação por item)
 
 | # | Tarefa | Est. | Depende de | Critério de aceite |
 |---|---|---|---|---|
@@ -55,14 +56,14 @@ Marco 1 — 15,52% · R$ 23.040,00
 | 0.10 | Definir os **8 domínios analíticos** a partir das respostas | 8h | 0.9 | **Concluído em 14/09** — [`arquitetura/dominios-analiticos.md`](arquitetura/dominios-analiticos.md). Os domínios são os da resposta ao B1: 8 domínios em 11 linhas, porque três têm responsáveis distintos por subtemas. A1 respondeu outra pergunta — o que o lake responde como um todo — e é dele, via A2, que sai a ordem de entrega |
 | 0.11 | Fechar as **dimensões comuns Silver** contra fontes reais | 6h | 0.9, 0.10 | **Concluído em 14/09** — regra por dimensão em [`arquitetura/visao-geral.md`](arquitetura/visao-geral.md), com as regras D3 a D7 do questionário e **duas lacunas nomeadas**: o de-para de usina (Alup) e o mês CCEE (ness.) |
 | 0.12 | Matriz RACI e data owners por domínio | 4h | **Alup** nomear | RACI publicada; cada fonte com dono nomeado |
-| 0.13 | Provisionar o ambiente GCP `dev`: projeto, APIs, WIF, Artifact Registry, backend do state | 8h | **Alup** criar projeto e conceder IAM | `terraform apply` limpo; `make deploy-views` aplicado |
+| 0.13 | Provisionar o ambiente GCP `dev`: projeto, APIs, WIF, Artifact Registry, backend do state | 8h | **Alup** criar `dev` primeiro, vincular billing e conceder papéis; **ness.** executar bootstrap (ADR 015). `hml` e `prod` seguem sem bloquear o primeiro apply em `dev` | `terraform apply` limpo; Dataform executado pelo deploy (`make dataform-compile` confere compilação local) |
 | 0.14 | Primeiro deploy real: imagem publicada, job agendado, BCB rodando diariamente | 6h | 0.13 | 3 dias consecutivos com `status = SUCESSO` em `bronze._execucoes` |
-| 0.15 | Portal MVP com autenticação (escopo mínimo da cláusula 4ª) | 8h → **tela pronta**, falta ligar no BigQuery e publicar | 0.13 | Login funcionando; uma view Gold visível. Escopo cravado na ADR 005; roda hoje com provedor simulado |
+| 0.15 | Portal MVP com autenticação (escopo mínimo da cláusula 4ª) | 8h → **tela pronta**, falta ligar no BigQuery e publicar | 0.13 | Login funcionando; uma tabela Gold visível. Escopo cravado na ADR 005; roda hoje com provedor simulado |
 | — | **Homologação da Onda 0** | — | tudo acima | Evidências reunidas (ver `homologacao-onda`) |
 
 **Riscos da onda**
-- 0.9 e 0.12 são da Alup. Sem elas, 0.10 e 0.11 param — e a Onda 1 começa sem
-  saber quais KPIs a Gold precisa responder.
+- 0.9 e 0.12 dependiam da Alup: questionário respondido em 11/09 e matriz RACI
+  recebida em 15/09. Domínios definidos; restam duas questões de governança (#150).
 - 0.13 depende de o projeto GCP existir. Atraso > 5 dias úteis posterga tudo.
 - 0.15 é o único item de front-end do contrato; escopo precisa ficar cravado
   por escrito antes de começar, ou vira poço sem fundo.
@@ -83,7 +84,7 @@ ela é o colchão do cronograma.
 | 1.3 | **ANEEL SIGA** | 20h | média | **Concluído.** Cadastro de ~25 mil empreendimentos; alimenta `codigo_usina` |
 | 1.4 | **IBGE IPCA** | 12h | baixa | **Concluído.** Período mensal, payload aninhado |
 | 1.5 | **BCB câmbio** | — | — | **Concluído na Onda 0** como conector de referência |
-| 1.6 | Views Gold do domínio de mercado | 16h | — | Depende dos 8 domínios (0.10) |
+| 1.6 | Tabelas Gold do domínio de mercado (ADR 012) | 16h | — | Depende dos 8 domínios (0.10) |
 | 1.7 | Agendamento e monitoramento das 4 fontes | 8h | — | Job + Scheduler por fonte; alerta em falha |
 | 1.8 | Ajustes no framework revelados pelas fontes reais | 4h | — | Reserva deliberada: a 2ª fonte é quem testa o framework de verdade |
 
@@ -108,9 +109,10 @@ foi encerrada e as 32h voltaram a andar **sem insumo da Alup**.
 O que sobrou não é técnico nem contratual: é escolha. São 204 conjuntos
 públicos, e ingerir todos seria pagar 7 componentes por arquivo que ninguém
 pediu. A [ADR 021](arquitetura/decisoes/021-conjuntos-da-ccee-por-dominio.md)
-escolhe **24**, por demanda dos domínios do B1, com fila nomeada — duas
-entidades já entregues (`pld_horario_submercado` e `lista_perfil_v1`) e
-`lista_agente_associado` na frente das demais.
+escolhe **24**, por demanda dos domínios do B1, com fila nomeada. Em 18/09,
+há 11 entidades CCEE implementadas e verificadas em dry-run; a cobertura
+atual está no índice de dicionários e em `status.md`. Conjuntos selecionados,
+entidades implementadas e as 13 fontes contratuais são contagens distintas.
 
 O cabeçalho é a única dependência frágil: o filtro é da CCEE e pode mudar. Se o
 403 voltar, a investigação começa pelo que a origem passou a exigir, não pelo
@@ -133,10 +135,10 @@ Marco 3 — 18,97% · R$ 28.160,00 · **Bloqueada por credencial da Alup**
 | # | Fonte | Est. | Credencial necessária |
 |---|---|---|---|
 | 2.1 | **CCEE agente credenciado** | 32h ⚠ | Certificado/credencial de agente |
-| 2.2 | **BBCE** | 28h ⚠ | Token de API e contrato ativo |
-| 2.3 | **Hubspot** | 20h → **~4h restantes** | Token de API (private app). Os 7 componentes foram escritos às cegas em 2026-08-26; falta rodar contra a API real e ajustar |
-| 2.4 | **TempoOK** | 18h | Token de API e contrato ativo |
-| 2.5 | Views Gold de preço e posição comercial | 12h | — |
+| 2.2 | **BBCE** | 28h ⚠ | Implementado no PR #131; faltam acesso e host (#23) |
+| 2.3 | **Hubspot** | 20h → **~4h restantes** | Token de API (private app). Os 7 componentes foram escritos contra documentação pública em 2026-08-26, sem acesso real; falta rodar contra a API real e ajustar |
+| 2.4 | **TempoOK** | 18h | Implementado; contrato da API verificado, mas acervo alcançável até 26/10/2022; falta acervo recente (#129) |
+| 2.5 | Tabelas Gold de preço e posição comercial | 12h | — |
 
 **Estratégia contra o bloqueio** (decidida no brainstorm): para cada fonte
 travada, escrever **antes** o schema Pydantic e os fixtures a partir da
@@ -161,10 +163,10 @@ Marco 4 — 26,72% · R$ 39.680,00 · **A maior onda; bloqueada por VPN e creden
 |---|---|---|---|
 | 3.1 | **Oracle FMB** | 45h ⚠ | VPN + usuário read-only + schema documentado |
 | 3.2 | **Portal Alup** (MySQL/NoSQL/Storage) | 40h ⚠ | VPN + credenciais read-only |
-| 3.3 | **MySQL RDS Comercialização** | 30h ⚠ | VPN + usuário read-only |
+| 3.3 | **MySQL RDS Comercialização** | 30h ⚠ | Usuário read-only e conectividade; C8 dispensa VPN e peering |
 | 3.4 | **RM/TOTVS** | 25h ⚠ | Endpoints e credencial |
 | 3.5 | Orquestração em Cloud Workflows | 10h | — |
-| 3.6 | Views Gold que cruzam interno × mercado | 5h | — |
+| 3.6 | Tabelas Gold que cruzam interno × mercado | 5h | — |
 
 **Marcos técnicos desta onda**
 - É aqui que o framework encontra fontes **não-HTTP**: `extrair()` passa a falar
@@ -189,10 +191,10 @@ Marco 5 — 18,10% · R$ 26.880,00
 
 | # | Tarefa | Est. | Depende de |
 |---|---|---|---|
-| 4.1 | Motor **S2 Data Intake** (CSV/XLSX): ingestão de planilha sob template | 30h → **motor pronto**; resta declarar os templates | Templates dependem do Questionário de Gaps (A4). O motor não dependia de nada e foi adiantado em 2026-08-26 — `docs/arquitetura/s2-data-intake.md` |
+| 4.1 | Motor **S2 Data Intake** (CSV/XLSX): ingestão de planilha sob template | 30h → **motor pronto**; resta declarar os templates | Templates dependem dos exemplos de planilha G3/#142; A4 foi respondido em 11/09. O motor não dependia de nada e foi adiantado em 2026-08-26 — `docs/arquitetura/s2-data-intake.md` |
 | 4.2 | Fontes pendentes que ficaram de ondas anteriores | 20h | — |
-| 4.3 | **Dataplex**: catálogo e linhagem | 20h | Todas as fontes carregadas |
-| 4.4 | Views Gold de KPIs consolidados | 15h | 0.10 (8 domínios) |
+| 4.3 | **Knowledge Catalog**: catálogo e linhagem (ADR 014) | 20h | Todas as fontes carregadas |
+| 4.4 | Tabelas Gold consolidadas, sem KPI nesta fase (ADR 012) | 15h | 0.10 (8 domínios) |
 | 4.5 | Documentação final e dicionário completo | 10h | Todas as fontes |
 | 4.6 | **Handoff técnico**: repasse ao time que vai operar | 10h | 4.5 |
 
@@ -210,7 +212,7 @@ final). O material é o repositório: runbook, dicionário, ADRs e as skills em
 
 | Quando | O que | Bloqueia | Efeito do atraso |
 |---|---|---|---|
-| Onda 0 | Questionário de Gaps, RACI, data owners, ferramenta de BI | 0.10, 0.11, 0.12 | Onda 1 começa sem saber os KPIs alvo |
+| Onda 0 | Questionário de Gaps, RACI, data owners, ferramenta de BI | 0.10, 0.11, 0.12 | Respostas recebidas; questões residuais de RACI na #150 |
 | Onda 0 | Projeto GCP, IAM, WIF | 0.13, 0.14, 0.15 | Nada sobe; > 5 dias úteis posterga o cronograma |
 | Até Onda 2 | Tokens: CCEE credenciado, BBCE, Hubspot, TempoOK | 2.1–2.4 | > 5 dias úteis posterga; > 20 dias suspende |
 | Até Onda 3 | VPN + credenciais read-only: Oracle FMB, Portal Alup, MySQL RDS, RM/TOTVS | 3.1–3.4 | Ociosidade de 4h/dia (R$ 256/h) |
@@ -223,7 +225,7 @@ cláusula financeira.
 
 ---
 
-## 8. Como uma fonte é desenvolvida (o ciclo que se repete 13 vezes)
+## 8. Como cada entidade de uma fonte é desenvolvida
 
 1. `make novo-conector fonte=X entidade=Y` — gera os 7 componentes esqueletados
 2. Ler a documentação da fonte; escrever o **schema Pydantic** e o fixture

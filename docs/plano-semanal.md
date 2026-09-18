@@ -8,11 +8,18 @@ Situação atual: [`status.md`](status.md)
 
 ## O quadro em uma frase
 
-Todo o trabalho técnico que **não** depende da Alup já está entregue: framework,
-5 conectores, motor de planilha, Portal MVP, observabilidade e Terraform — 170
-testes, 92% de cobertura, CI verde. O que resta na Onda 0 e na Onda 1 está
-parado em insumo da contratante (A3, A4, A9, A2). **Nada foi validado contra um
-GCP real**, porque ele ainda não existe.
+Em **18/09/2026**, há 26 entidades implementadas: 23 com dados reais em
+dry-run, TempoOK com contrato de API verificado e acervo recente pendente,
+BBCE e Hubspot sem credencial. **Não há carga em GCP nem homologação
+registrada**. G1 encerrou em 10/09; GCP, billing e planilhas têm previsão de
+18/09, sem confirmação de entrega na conferência desta data.
+
+S1 e S2 abaixo preservam o **registro histórico e o plano então vigente**,
+inclusive decisões posteriormente substituídas. A região atual é `us-east1`
+(ADR 011), Dataform substitui o deploy SQL (ADR 012), o bootstrap é da ness.
+em três projetos da Alup (ADR 015) e Workflows orquestra a Onda 3 (ADR 017).
+A organização passou ao GitHub Enterprise em 11/09. As tabelas históricas
+não comprovam execução, horas realizadas ou aceite.
 
 Por isso este plano tem duas trilhas por semana:
 
@@ -24,7 +31,7 @@ Semanas contadas de segunda a sexta. S1 começa em **2026-08-31**.
 
 ---
 
-## S1 · 31/08 – 04/09 · Ambiente e contrato de dados
+## S1 · registro histórico · 31/08 – 04/09 · Ambiente e contrato de dados
 
 > Revisado em **31/08**, primeiro dia da semana, e de novo em **04/09**, no
 > último. Dois itens previstos aqui já tinham sido entregues antes de a semana
@@ -125,7 +132,7 @@ build da imagem deixa de depender de ambiente e vira tarefa desta semana.
 
 ---
 
-## S2 · 07/09 – 11/09 · Primeiro deploy real
+## S2 · plano histórico · 07/09 – 11/09 · Primeiro deploy real
 
 Esta semana **só existe se A3 chegou**. Sem projeto GCP, o conteúdo abaixo
 escorrega inteiro e a semana vira ociosidade.
@@ -145,6 +152,8 @@ escorrega inteiro e a semana vira ociosidade.
 
 ## S3 · 14/09 – 18/09 · Fechar a Onda 0
 
+### Plano original da S3 (não realizado integralmente; fechamento abaixo)
+
 | Trilha | Item | Entregável verificável |
 |---|---|---|
 | Entregamos | Os **8 domínios analíticos** definidos a partir das respostas de A4 (item 0.10) | documento com pergunta de negócio e fontes por domínio |
@@ -156,42 +165,61 @@ escorrega inteiro e a semana vira ociosidade.
 
 **Marco**: Onda 0 homologada → 15,52% · R$ 23.040,00.
 
+### Fechamento da S3 — 18/09/2026
+
+- **Realizado:** domínios e dimensões documentados; RACI recebida em 15/09;
+  CCEE via dados abertos, BBCE (PR #131), TempoOK e novas entidades ONS
+  implementados; runner em fatias e de-para público de usinas entregues.
+- **Verificado:** 23 das 26 entidades em dry-run com dados reais; TempoOK
+  com contrato da API verificado e acervo alcançável até 26/10/2022. Não há
+  evidência de carga em BigQuery, três dias de execução ou aceite da Alup.
+- **Bloqueios:** A3/#55, billing/#87 e planilhas/#142 sem confirmação de
+  entrega em 18/09. A3 conserva o prazo original de 04/09 e chega ao 9º dia
+  útil de atraso (primeiro em 08/09, excluído o feriado de 07/09).
+- **Próximas ações:** Alup confirma projetos, billing, papéis e exemplos;
+  ness. executa bootstrap/deploy após A3 e reúne carga, replay e evidências
+  em `hml`. Acessos BBCE/Hubspot e acervo TempoOK seguem #23/#24/#129.
+
+**O marco acima não foi atingido.** A previsão de 18/09 não substitui prazo
+original nem comprova entrega. Horas realizadas exigem apontamento: os sete
+lançamentos existentes no Project têm origem a conferir.
+
+
 ---
 
-## S4 · 21/09 – 25/09 · Fechar a Onda 1 e abrir a 2
+## S4 · 21/09 – 25/09 · Próximas ações, condicionadas ao ambiente
 
 | Trilha | Item | Entregável verificável |
 |---|---|---|
-| Entregamos | Views Gold do domínio de mercado (item 1.6), agora com os 8 domínios como alvo | uma view por pergunta de negócio nomeada |
+| Entregamos | Tabelas Gold do domínio de mercado em Dataform (item 1.6), com os 8 domínios como alvo | tabelas executadas no GCP, sem KPI nesta fase (ADR 012) |
 | Entregamos | Agendamento e monitoramento das 4 fontes públicas em produção (item 1.7) | 4 jobs no Scheduler; alerta disparando em falha simulada |
 | Entregamos | Ajustes de framework revelados pela carga real (item 1.8 — reserva já prevista) | o que aparecer no primeiro contato com BigQuery de verdade |
-| Entregamos | Dossiê de homologação da Onda 1, com a CCEE tratada conforme a decisão de A2 | |
-| Destrava | **A7** — pedidos de token (BBCE, TempoOK, CCEE credenciado) e de VPN/credencial read-only (Oracle FMB, Portal Alup, MySQL RDS, RM/TOTVS) **abertos agora**, não na véspera da onda | é o maior risco financeiro do contrato |
-| Destrava | **A8** — documentação técnica de BBCE e TempoOK | permite escrever o conector antes do token, como foi feito no Hubspot |
+| Entregamos | Dossiê de homologação da Onda 1, com CCEE via dados abertos (ADR 018; A2 encerrada em 14/09) | evidências de carga, replay e aceite; nenhuma homologação presumida |
+| Destrava | **A7** — confirmar pedidos de acesso e host BBCE e de credencial read-only/conectividade dos sistemas internos (Oracle FMB, Portal Alup, MySQL RDS, RM/TOTVS); MySQL RDS dispensa VPN conforme C8 | chamados e responsáveis registrados; Hubspot segue A9, TempoOK segue acervo A10/#129; CCEE pública independe de credencial |
+| Destrava | **A8 atendida em 14/09** — BBCE e TempoOK implementados | documentação deixou de ser bloqueio; restam acesso BBCE e acervo TempoOK |
 
 **Marco**: Onda 1 homologada → 20,69% · R$ 30.720,00.
 
 ---
 
-## O que trava o quê — resumo de uma linha cada
+## Dependências — linha de base e situação em 18/09
 
 | Insumo | Prazo útil | Se não vier |
 |---|---|---|
 | A3 · projeto GCP | 04/09 | S2 e S3 inteiras escorregam; Onda 0 não homologa |
 | A9 · token Hubspot | 11/09 | conector pronto fica parado; item 2.3 não fecha |
-| A4 · Questionário de Gaps | 11/09 | sem os 8 domínios, a Gold da Onda 1 fica sem alvo |
-| A5/A6 · RACI e BI | 11/09 | dúvida de regra de negócio sem dono; Portal sem consumidor definido |
-| G1 · resposta do Google | a definir | sem data pactuada, a crítica chega depois do `apply` e vira migração em vez de reprojeto |
-| A2 · decisão CCEE | 18/09 | 32h da Onda 1 seguem paradas |
+| A4 · Questionário de Gaps | 11/09 | respondido; domínios documentados |
+| A5/A6 · RACI e BI | 11/09 | respostas recebidas; matriz RACI em 15/09, duas questões residuais na #150 |
+| G1 · resposta do Google | encerrada em 10/09 | não é bloqueio atual |
+| A2 · decisão CCEE | 18/09 | encerrada em 14/09; acesso público destravado |
 | A7 · tokens e VPN | 25/09 | Onda 3 dispara ociosidade de 4h/dia (R$ 256/h) |
-| A8 · docs BBCE/TempoOK | 25/09 | Onda 2 só começa depois do token, em vez de antes |
+| A8 · docs BBCE/TempoOK | 25/09 | atendida em 14/09; conectores implementados |
 
 ---
 
-## Ressalva
+## Ressalva atual
 
-S2 em diante é **condicional a A3**. Se o ambiente GCP não existir, o que
-sobra de trabalho não-bloqueado são horas de documentação e preparo — que já
-foram, em boa parte, adiantadas. A partir daí o projeto não avança por esforço
-da ness.; avança por decisão da Alup. Isso precisa estar dito na reunião
-semanal, não descoberto na medição.
+A operação e a homologação de S2 em diante seguem **condicionadas a A3**.
+O trabalho sem ambiente avançou na S3, como registrado acima, mas não substitui
+carga real e aceite. Datas-alvo contratuais, execução e previsão revisada
+permanecem separadas; o estado corrente está em [`status.md`](status.md).

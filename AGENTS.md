@@ -95,7 +95,7 @@ alupdata ingerir bcb_cambio_ptax --de 2026-01-01 --ate 2026-01-31 --dry-run
 |---|---|
 | `src/core/` | framework de ingestão — runner, janela, registry, GCS, BigQuery, secrets, HTTP, banco |
 | `src/conectores/` | um módulo por fonte |
-| `src/cli.py` | CLI única: laptop, Cloud Run Job e DAG usam o mesmo comando |
+| `src/cli.py` | CLI única: laptop e Cloud Run Job usam o mesmo comando; Workflows o orquestra na Onda 3 |
 | `definitions/{bronze,silver,gold}/` e `workflow_settings.yaml` | projeto Dataform: DDL Bronze, view Silver, tabela Gold (ADR 012) |
 | `infra/` | Terraform: datasets, bucket raw, secrets, Cloud Run Job + Scheduler, IAM — um `.tfvars` por ambiente (`dev`, `hml`, `prod`) |
 | `infra/bootstrap/` | Terraform do bootstrap de cada projeto — APIs, bucket de state, Artifact Registry, WIF e SA de deploy —, aplicado pela ness. com state local (ADR 015) |
@@ -159,38 +159,36 @@ dizem como *este contrato* usa o produto.
 | 013 | Ingestão em lote pelos conectores Python, sem CDC nem Dataflow; linhagem OpenLineage no executor |
 | 014 | Knowledge Catalog na Onda 4, linhagem desde o 1º apply; recursos de IA do produto sob aviso |
 | 015 | Três ambientes (`dev`, `hml`, `prod`), um projeto cada; bootstrap de cada projeto pela ness. em `infra/bootstrap/`, com os papéis que a Alup concede; chave gerenciada pelo Google |
+| 016 | Recontabilização CCEE: versão da publicação no CKAN, Silver vigente e histórico |
+| 017 | Cloud Workflows na Onda 3, sem Composer |
+| 018 | CCEE via dados abertos; acesso credenciado é escopo candidato |
+| 019 | TempoOK como arquivo PDF e catálogo; acervo recente ainda pendente |
+| 020 | Rotação do token TempoOK na entrada em produção ou mudança do alcance |
+| 021 | Seleção dos conjuntos CCEE por demanda dos domínios analíticos |
 
 Se você for propor algo que contraria um ADR, escreva um ADR novo — não um
 remendo. Em particular: o framework em `src/core/` é mais estrutura do que 13
 scripts soltos **de propósito** (ADR 003, 13 fontes / 19 semanas / handoff).
 
-## Estado atual (2026-09-04)
+## Estado atual (2026-09-18)
 
-> Quadro completo, com pendências e dono de cada uma, em
-> [`docs/status.md`](docs/status.md).
+Referência conferida: `main` em `2d0f7c6` (16/09). O estado detalhado,
+evidências, responsáveis e prazos vivem em [`docs/status.md`](docs/status.md).
 
-Concluído: framework, CLI, replay do raw, sanitização de credencial em log,
-IAM por recurso e **cinco conectores com os 7 componentes** — BCB/PTAX
-(diário), IBGE/IPCA (mensal, aninhado), ANEEL/SIGA (cadastro paginado, ~25 mil
-registros), ONS/carga (CSV anual por subsistema) e Hubspot/negócios (escrito
-antes do token, nunca executado) —, Terraform, CI/CD, scaffolding, ADRs
-003–009, runbooks de deploy e de primeiro deploy, e plano de execução.
+Há **26 entidades implementadas**, sem alterar as **13 fontes contratuais**:
+23 verificadas com dados reais em dry-run; TempoOK com contrato da API
+verificado, mas acervo alcançável somente até 26/10/2022; BBCE (PR #131) e
+Hubspot aguardam credenciais, incluindo o host do BBCE. Framework, Dataform,
+Terraform, motor de planilha e caminho de banco estão implementados; isso não
+comprova execução no GCP nem homologação.
 
-**Há entrega adiantada de quatro ondas**, no quinto dia da primeira: o caminho
-de banco relacional é escopo da Onda 3 (ADR 008 — Oracle, MySQL e SQL Server),
-e o motor de planilha S2 Data Intake é da Onda 4. Ambos foram feitos por não
-dependerem de insumo da Alup. Isso não antecipa marco: onda fecha por
-homologação e carga real, não por volume de código.
+G1 encerrou com a revisão de 10/09. A Alup cria os três projetos (`dev`, `hml`,
+`prod`), vincula faturamento e concede os papéis da ADR 015; a ness. executa o
+bootstrap em `infra/bootstrap/`. A região vigente é `us-east1`. Em 18/09,
+não há confirmação de entrega do GCP, billing ou exemplos de planilha. O prazo
+original de A3 é 04/09; a previsão de 18/09 não substitui esse prazo.
 
-As dimensões comuns já têm dono: `codigo_usina` vem do ANEEL/SIGA e
-`submercado` vem do ONS.
-
-Bloqueado por insumo da Alup: 8 domínios analíticos, RACI, ambiente GCP real,
-todas as fontes das Ondas 2 e 3 (token, VPN, credencial read-only) e a **CCEE
-InfoMercado**, cujo portal responde 403 a acesso automatizado — ver
-`docs/plano-execucao.md` §3.1.
-
-Próximo passo técnico: validar no primeiro ambiente GCP o IAM por recurso, o
-deploy com imagem imutável, a carga ponta a ponta e o replay do raw. Em paralelo,
-preparar contrato de dados das Ondas 2 e 3 apenas quando houver documentação
-real; schema por adivinhação continua proibido.
+Próximo passo técnico: após A3, bootstrap e primeiro deploy, carga ponta a
+ponta, replay do raw e evidências de homologação. Templates dependem de G3/#142;
+fontes internas dependem dos acessos e contratos reais. Nenhuma onda tem
+homologação registrada; código pronto e cartões concluídos não são aceite.

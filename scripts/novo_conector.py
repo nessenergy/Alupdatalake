@@ -111,7 +111,8 @@ QUALIFY ROW_NUMBER() OVER (
 GOLD = """config {{
   type: "table",
   schema: "gold",
-  tags: ["gold"]
+  tags: ["gold"],
+  dependOnDependencyAssertions: true
 }}
 
 -- Gold: TODO — nomeie pela pergunta de negócio que a tabela responde.

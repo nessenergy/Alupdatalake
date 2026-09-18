@@ -17,4 +17,5 @@ def test_esqueleto_gera_sqlx_das_tres_camadas(tmp_path, monkeypatch):
     assert 'type: "view"' in silver and '${ref("bronze", "ons_carga")}' in silver
     assert "uniqueKey:" in silver
     assert 'type: "table"' in gold and '${ref("silver", "ons_carga")}' in gold
+    assert "dependOnDependencyAssertions: true" in gold
     assert not (tmp_path / "sql").exists()

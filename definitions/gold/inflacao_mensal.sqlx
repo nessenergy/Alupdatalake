@@ -1,7 +1,8 @@
 config {
   type: "table",
   schema: "gold",
-  tags: ["gold"]
+  tags: ["gold"],
+  dependOnDependencyAssertions: true
 }
 
 -- Gold: IPCA por mês em uma linha — insumo de reajuste de contrato e de

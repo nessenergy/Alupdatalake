@@ -1,7 +1,8 @@
 config {
   type: "table",
   schema: "gold",
-  tags: ["gold"]
+  tags: ["gold"],
+  dependOnDependencyAssertions: true
 }
 
 -- Gold: o que cada perfil comprou e vendeu em contrato, mês a mês, e o saldo —

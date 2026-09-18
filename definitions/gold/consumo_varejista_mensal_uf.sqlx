@@ -1,7 +1,8 @@
 config {
   type: "table",
   schema: "gold",
-  tags: ["gold"]
+  tags: ["gold"],
+  dependOnDependencyAssertions: true
 }
 
 -- Gold: quanto cada varejista atendeu de carga em cada UF, mês a mês — parcelas

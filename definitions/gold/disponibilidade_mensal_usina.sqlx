@@ -1,7 +1,8 @@
 config {
   type: "table",
   schema: "gold",
-  tags: ["gold"]
+  tags: ["gold"],
+  dependOnDependencyAssertions: true
 }
 
 -- Gold: quanto cada usina esteve apta a gerar no mês, e quantas horas ficou

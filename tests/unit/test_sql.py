@@ -8,6 +8,8 @@ que ele gera, o bastante para o sqlglot ler.
 
 from __future__ import annotations
 
+import json
+import os
 import re
 from pathlib import Path
 
@@ -126,6 +128,44 @@ def test_silver_tem_assertion_na_chave_de_deduplicacao(arquivo):
         pytest.skip("regra vale só para a Silver")
     bloco = config(arquivo)
     assert "uniqueKey:" in bloco and "nonNull:" in bloco, "Silver sem portão de qualidade (ADR 012)"
+
+
+def test_business_gold_requires_dependency_assertions():
+    tables = [path for path in ARQUIVOS if path.parent.name == "gold" and path.stem not in GOLD_OPERACIONAL]
+    assert tables
+    for path in tables:
+        assert "dependOnDependencyAssertions: true" in config(path), path.name
+
+
+def test_compiled_gold_depends_on_silver_assertions():
+    """DATAFORM_GRAPH aponta para o JSON produzido pelo job de compilação, sem GCP."""
+    graph_path = os.environ.get("DATAFORM_GRAPH")
+    if not graph_path:
+        pytest.skip("grafo disponível no job de compilação Dataform")
+    graph = json.loads(Path(graph_path).read_text(encoding="utf-8-sig"))
+
+    def key(target):
+        return tuple(target.get(field, "") for field in ("database", "schema", "name"))
+
+    tables = [table for table in graph["tables"] if table["target"]["schema"] == "gold"]
+    assert {table["target"]["name"] for table in tables} == {
+        path.stem for path in ARQUIVOS if path.parent.name == "gold"
+    }
+    for table in tables:
+        dependencies = {key(target) for target in table.get("dependencyTargets", [])}
+        if table["target"]["name"] in GOLD_OPERACIONAL:
+            assert not any(target[1] == "qualidade" for target in dependencies), table["target"]
+            continue
+        silver = {target for target in dependencies if target[1] == "silver"}
+        assert silver, table["target"]
+        for source in silver:
+            required = {
+                key(assertion["target"])
+                for assertion in graph["assertions"]
+                if assertion.get("parentAction") and key(assertion["parentAction"]) == source
+            }
+            assert required, (table["target"], source)
+            assert required <= dependencies, (table["target"], required - dependencies)
 
 
 def test_view_referencia_a_camada_anterior(arquivo):

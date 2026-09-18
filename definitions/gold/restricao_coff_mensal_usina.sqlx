@@ -1,7 +1,8 @@
 config {
   type: "table",
   schema: "gold",
-  tags: ["gold"]
+  tags: ["gold"],
+  dependOnDependencyAssertions: true
 }
 
 -- Gold: quanto cada usina renovável deixou de gerar por restrição do sistema,

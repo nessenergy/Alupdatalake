@@ -132,154 +132,44 @@ td.r{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap;font-
 
 <div class="progress" id="progress"></div>
 
-<main class="deck" id="deck" aria-label="Relatório de acompanhamento AlupData" tabindex="0">
-  <section class="slide cover dark" id="abertura">
-    <span class="wordmark" role="img" aria-label="ness."><span aria-hidden="true">ness<i>.</i></span></span><span class="tag">AlupData · CPS-01025/2026</span>
-    <div class="inner">
-      <p class="eyebrow">Reunião semanal · 11h · Brasília</p>
-      <h1>18 de setembro<br>de 2026</h1>
-      <p class="lead">Estado da Fase 1, avanços durante a espera pelo ambiente e decisões para o próximo passo.</p>
-      <dl class="cover-meta">
-        <div><dt>Contrato · Fase 1</dt><dd>580h · 19 semanas</dd></div>
-        <div><dt>Ondas</dt><dd>5</dd></div>
-        <div><dt>Fontes contratuais</dt><dd>13</dd></div>
-        <div><dt>Base do código</dt><dd>d1e1583</dd></div>
-      </dl>
-      <p class="meeting-link"><a href="https://meet.google.com/jgu-sdqf-wzq">Acessar a reunião · 11h–12h</a></p>
-      <nav class="section-links" aria-label="Seções do relatório"><a href="#resumo">Visão geral</a><a href="#evidencias">Evidências</a><a href="#pendencias">Pendências</a><a href="#decisoes">Decisões</a></nav>
-    </div><span class="pagenum">01</span>
-  </section>
-  <section class="slide dark" id="resumo">
-    <span class="wordmark" role="img" aria-label="ness."><span aria-hidden="true">ness<i>.</i></span></span><span class="tag">A leitura do dia</span>
-    <div class="inner">
-      <h2>A base técnica avançou.<br>A validação em ambiente real aguarda liberação.</h2>
-      <div class="versus">
-        <div class="a"><span class="rot">Implementação</span><span class="big">26 entidades</span><p>Conectores registrados e componentes preparados. Há extrações reais em dry-run para 23 entidades públicas.</p></div>
-        <div class="b"><span class="rot">Homologação</span><span class="big">0 de 5</span><p>Ondas homologadas. Ainda não há carga real no BigQuery nem aceite de onda comprovado.</p></div>
-      </div>
-      <p class="lead"><b>A liberação do GCP depende da Alup e segue sem confirmação.</b> A ness. já enviou as contas para concessão dos papéis. Durante a espera, corrigimos os achados técnicos e atualizamos o acompanhamento.</p>
-    </div><span class="pagenum">02</span>
-  </section>
-  <section class="slide" id="evidencias">
-    <span class="wordmark" role="img" aria-label="ness."><span aria-hidden="true">ness<i>.</i></span></span><span class="tag">Evidências disponíveis</span>
-    <div class="inner">
-      <p class="eyebrow">Verificação até 18/09</p>
-      <h2>13 fontes no contrato.<br>26 entidades implementadas.</h2>
-      <div class="nums">
-        <div><span class="v cy">26</span><span class="k">entidades registradas</span></div>
-        <div><span class="v">23</span><span class="k">com extração real em dry-run</span></div>
-        <div><span class="v">999</span><span class="k">testes aprovados na suíte local</span></div>
-        <div><span class="v">94%</span><span class="k">cobertura de testes</span></div>
-        <div><span class="v">8</span><span class="k">verificações de CI aprovadas no PR #166</span></div>
-      </div>
-      <p class="lead">Hubspot e BBCE aguardam acesso. O contrato da API TempoOK foi verificado, mas o acervo acessível termina em 26/10/2022, sem boletim recente para ingestão. <b>Dry-run não grava no GCP e não comprova operação.</b></p>
-      <p class="note">264 testes ignorados na suíte: 248 são regras SQL que não se aplicam à camada testada; os demais são de integração. Contagens de entidades não ampliam o escopo contratual.</p>
-    </div><span class="pagenum">03</span>
-  </section>
-  <section class="slide mist" id="arquitetura">
-    <span class="wordmark" role="img" aria-label="ness."><span aria-hidden="true">ness<i>.</i></span></span><span class="tag">Arquitetura Medallion</span>
-    <div class="inner">
-      <p class="eyebrow">82 definições SQL no repositório</p>
-      <h2>Rastreabilidade na entrada.<br>Qualidade antes do consumo.</h2>
-      <div class="camadas">
-        <div class="camada" style="--m:#8C5A2B"><span class="v">27</span><span class="t">Bronze</span><span class="d">Definições de tabelas append-only. O raw completo é persistido no GCS antes de qualquer lote ser carregado no Bronze.</span></div>
-        <div class="camada" style="--m:#65727E"><span class="v">27</span><span class="t">Silver</span><span class="d">Definições de views para tipagem, deduplicação e histórico. O cruzamento com o portfólio ainda depende do de-para da Alup.</span></div>
-        <div class="camada" style="--m:#8E7214"><span class="v">28</span><span class="t">Gold</span><span class="d">25 tabelas de negócio e 3 views operacionais. As tabelas de negócio dependem das verificações de qualidade das suas entradas.</span></div>
-      </div>
-      <p class="lead">As <b>62 dependências de verificações de qualidade</b> foram comprovadas no grafo compilado. A criação dos objetos e a execução ponta a ponta ainda precisam ser validadas no GCP.</p>
-    </div><span class="pagenum">04</span>
-  </section>
-  <section class="slide" id="dominios">
-    <span class="wordmark" role="img" aria-label="ness."><span aria-hidden="true">ness<i>.</i></span></span><span class="tag">Domínios analíticos</span>
-    <div class="inner">
-      <p class="eyebrow">Os oito domínios da resposta B1</p>
-      <h2>Cobertura técnica preparada.<br>Validação de negócio pendente.</h2>
-      <div class="tw"><table>
-        <thead><tr><th>Domínio</th><th>Data owner</th><th>Situação técnica</th></tr></thead>
-        <tbody>
-          <tr><td data-label="Domínio">Mercado de Energia</td><td data-label="Data owner">Taina Mota · Gabriel Barreto</td><td data-label="Situação técnica">Dados públicos CCEE; acesso restrito pendente</td></tr>
-          <tr><td data-label="Domínio">Geração e Operacional</td><td data-label="Data owner">Taina Mota · Letícia Ferreira</td><td data-label="Situação técnica">ANEEL/ONS; de-para do portfólio pendente</td></tr>
-          <tr><td data-label="Domínio">Meteorologia</td><td data-label="Data owner">Taina Mota</td><td data-label="Situação técnica">TempoOK sem acervo recente acessível</td></tr>
-          <tr><td data-label="Domínio">Comercial e Contratos</td><td data-label="Data owner">Letícia Ferreira · Tahigo Santos</td><td data-label="Situação técnica">Cobertura pública parcial; fontes internas pendentes</td></tr>
-          <tr><td data-label="Domínio">CRM e Marketing</td><td data-label="Data owner">Tahigo Santos</td><td data-label="Situação técnica">Hubspot escrito; token pendente</td></tr>
-          <tr><td data-label="Domínio">Risco e Compliance</td><td data-label="Data owner">Letícia Ferreira</td><td data-label="Situação técnica">Exposição e contabilização públicas implementadas</td></tr>
-          <tr><td data-label="Domínio">Econômico</td><td data-label="Data owner">Letícia Ferreira</td><td data-label="Situação técnica">BCB e IBGE implementados</td></tr>
-          <tr><td data-label="Domínio">Planejamento</td><td data-label="Data owner">gestores da Comercialização</td><td data-label="Situação técnica">Fontes concretas ainda não implementadas</td></tr>
-        </tbody>
-      </table></div>
-      <p class="note">As seis coligadas delimitam o faturamento, não o dado. Nenhum domínio está homologado; amostras, cruzamentos e critérios de aceite precisam de validação com os responsáveis.</p>
-    </div><span class="pagenum">05</span>
-  </section>
-  <section class="slide mist" id="ondas">
-    <span class="wordmark" role="img" aria-label="ness."><span aria-hidden="true">ness<i>.</i></span></span><span class="tag">Cronograma contratual</span>
-    <div class="inner">
-      <p class="eyebrow">Cinco ondas · 580h contratadas</p>
-      <h2>Implementação adiantada<br>não antecipa o aceite da onda.</h2>
-      <div class="tw"><table>
-        <thead><tr><th>Onda</th><th>Horas previstas</th><th>Situação</th></tr></thead>
-        <tbody>
-          <tr><td data-label="Onda"><b>0</b> — Fundação e Arquitetura</td><td class="r" data-label="Horas previstas">90</td><td data-label="Situação">Base preparada; ambiente, validações e aceite pendentes</td></tr>
-          <tr><td data-label="Onda"><b>1</b> — Inteligência de Mercado</td><td class="r" data-label="Horas previstas">120</td><td data-label="Situação">Fontes públicas implementadas; carga no GCP pendente</td></tr>
-          <tr><td data-label="Onda"><b>2</b> — APIs com credenciais</td><td class="r" data-label="Horas previstas">110</td><td data-label="Situação">Hubspot, BBCE e TempoOK escritos; operação pendente</td></tr>
-          <tr><td data-label="Onda"><b>3</b> — Sistemas internos</td><td class="r" data-label="Horas previstas">155</td><td data-label="Situação">Framework relacional preparado; conectores concretos pendentes</td></tr>
-          <tr><td data-label="Onda"><b>4</b> — Planilhas e handoff</td><td class="r" data-label="Horas previstas">105</td><td data-label="Situação">Motor genérico preparado; templates, catálogo e handoff pendentes</td></tr>
-        </tbody>
-      </table></div>
-      <p class="lead">As horas são a distribuição contratual, <b>não horas consumidas nem progresso medido</b>. A homologação exige os sete componentes por fonte, carga real, evidências e aceite.</p>
-    </div><span class="pagenum">06</span>
-  </section>
-  <section class="slide dark" id="pendencias">
-    <span class="wordmark" role="img" aria-label="ness."><span aria-hidden="true">ness<i>.</i></span></span><span class="tag">Insumos pendentes</span>
-    <div class="inner">
-      <p class="eyebrow">Posição para confirmação na reunião</p>
-      <h2>Ambiente e acessos:<br>dependências sob responsabilidade da Alup.</h2>
-      <div class="trava">
-        <div class="i"><span class="c">A3</span><span class="t"><b>Projetos GCP e papéis de bootstrap.</b><span>Confirmar liberação de dev e cronograma de hml/prod; contas da ness. já enviadas.</span></span><span class="q">original 04/09<br>previsão 18/09</span></div>
-        <div class="i"><span class="c">#87</span><span class="t"><b>Billing e exportação de custos.</b><span>Destinatários dos alertas recebidos em 11/09; ativação depende do ambiente.</span></span><span class="q">prazo 18/09</span></div>
-        <div class="i"><span class="c">A9</span><span class="t"><b>Token do Hubspot no Secret Manager.</b><span>Conector escrito, ainda sem execução autenticada.</span></span><span class="q">vencido 11/09</span></div>
-        <div class="i"><span class="c">A7</span><span class="t"><b>Acessos BBCE e sistemas internos.</b><span>Confirmar chamados, VPN, documentação e credenciais para as Ondas 2 e 3.</span></span><span class="q">prazo 25/09</span></div>
-        <div class="i"><span class="c">#141</span><span class="t"><b>De-para do portfólio.</b><span>Código interno ↔ CEG e vínculo com parcelas CCEE ainda precisam de confirmação.</span></span><span class="q">definir data</span></div>
-        <div class="i"><span class="c">#142</span><span class="t"><b>Amostras das planilhas usadas na decisão.</b><span>Necessárias para definir templates e conferir a cobertura do escopo.</span></span><span class="q">prazo 18/09</span></div>
-        <div class="i"><span class="c">#129</span><span class="t"><b>Acervo recente do TempoOK.</b><span>O acesso disponível alcança boletins somente até 26/10/2022.</span></span><span class="q">prazo 25/09</span></div>
-      </div>
-    </div><span class="pagenum">07</span>
-  </section>
-  <section class="slide" id="avancos">
-    <span class="wordmark" role="img" aria-label="ness."><span aria-hidden="true">ness<i>.</i></span></span><span class="tag">Avanços de 18/09</span>
-    <div class="inner">
-      <p class="eyebrow">Reparos concluídos durante a espera</p>
-      <h2>Mais confiabilidade para<br>a primeira carga real.</h2>
-      <div class="entregas">
-        <div class="e"><span class="d">#164</span><span class="x"><b>Acompanhamento reconciliado.</b> <span>Documentação, issues e quadro atualizados, sem converter implementação em aceite.</span></span></div>
-        <div class="e"><span class="d">#165</span><span class="x"><b>Qualidade bloqueia a Gold.</b> <span>25 tabelas de negócio vinculadas às verificações de suas entradas; 62 dependências comprovadas.</span></span></div>
-        <div class="e"><span class="d">#165</span><span class="x"><b>Raw completo antes do Bronze e replay em fluxo.</b> <span>Limites de memória e validação de integridade protegem o reprocessamento de arquivos grandes.</span></span></div>
-        <div class="e"><span class="d">#165</span><span class="x"><b>Deploy alinhado à arquitetura.</b> <span>Removida a etapa obsoleta de Composer; imagem identificada por SHA completo, sem latest.</span></span></div>
-        <div class="e"><span class="d">#166</span><span class="x"><b>Replay preserva a data dos cadastros.</b> <span>CCEE/perfil e ONS/capacidade mantêm a referência no raw; ausência gera erro, sem inventar uma data.</span></span></div>
-      </div>
-      <p class="lead"><b>999 testes aprovados; 94% de cobertura.</b> O fluxo adiciona uma leitura do GCS por ingestão: tempo, memória e custo ainda serão medidos em dev. Raw antigo sem data exige evidência original para recuperação.</p>
-    </div><span class="pagenum">08</span>
-  </section>
-  <section class="slide mist" id="decisoes">
-    <span class="wordmark" role="img" aria-label="ness."><span aria-hidden="true">ness<i>.</i></span></span><span class="tag">Encaminhamentos · 11h</span>
-    <div class="inner">
-      <p class="eyebrow">Decisões a registrar nesta reunião</p>
-      <h2>Confirmar responsáveis e datas.<br>Preparar a validação no ambiente.</h2>
-      <div class="passo">
-        <div><h3 class="cy">Alinhar com a Alup</h3><ul>
-          <li><b>Ambiente e billing:</b> confirmar entrega de dev, papéis e responsável pela liberação.</li>
-          <li><b>Acessos e dados:</b> registrar número dos chamados e datas para token, VPN, de-para e planilhas.</li>
-          <li><b>Governança:</b> conciliar os dois pontos da RACI (#150) e confirmar aprovação das minutas de privacidade (#111).</li>
-        </ul></div>
-        <div><h3>Próximos passos da ness.</h3><ul>
-          <li><b>Executar o primeiro deploy</b> após a liberação, seguindo o runbook e validando permissões e imagem.</li>
-          <li><b>Validar uma fonte pequena e uma volumosa:</b> carga, replay, qualidade, agendamento e alertas; medir memória, tempo e custo.</li>
-          <li><b>Consolidar as evidências</b> e submeter os critérios de aceite aos responsáveis antes de encerrar qualquer onda.</li>
-        </ul></div>
-      </div>
-      <p class="lead">Sugestão: sair da reunião com <b>um responsável e uma data por pendência</b>, mantendo as evidências de implementação separadas das de operação e homologação.</p>
-      <p class="note">Base: <a href="../status.md">estado do projeto</a> · <a href="https://github.com/nessenergy/Alupdatalake/pull/165">PR #165</a> · <a href="https://github.com/nessenergy/Alupdatalake/pull/166">PR #166</a>. Posição anterior à reunião; decisões tomadas às 11h ainda não registradas.</p>
-    </div><span class="pagenum">09</span>
-  </section>
+<main class="deck" id="deck" aria-label="Entregas e pendências do AlupData" tabindex="0">
+<section class="slide dark" id="resumo"><span class="wordmark" role="img" aria-label="ness."><span aria-hidden="true">ness<i>.</i></span></span><span class="tag">AlupData · 18/09/2026 · 11h</span><div class="inner">
+<p class="eyebrow">Fase 1 · 13 fontes contratuais · 580h</p>
+<h1>Entregas e pendências</h1>
+<p class="lead"><b>A implementação avançou. A operação aguarda o ambiente da Alup.</b></p>
+<div class="versus">
+<div class="a"><span class="rot">Implementado</span><span class="big">26 entidades</span><p>23 com extração de dados reais, ainda sem gravação no ambiente GCP.</p></div>
+<div class="b"><span class="rot">Homologado</span><span class="big">0 de 5 ondas</span><p>Primeira carga no BigQuery e aceite de negócio ainda pendentes.</p></div>
+</div>
+<p class="note" style="color:#b7c5d6">Entidade é um conjunto de dados de uma fonte. As 26 entidades não representam 26 fontes contratuais.</p>
+<nav class="section-links" aria-label="Seções do relatório"><a href="#entregas">Entregas e gaps</a><a href="#pendencias">Dependências da Alup</a><a href="#decisoes">Próximos passos</a><a href="https://meet.google.com/jgu-sdqf-wzq">Entrar na reunião</a></nav>
+</div><span class="pagenum">01 / 04</span></section>
+<section class="slide " id="entregas"><span class="wordmark" role="img" aria-label="ness."><span aria-hidden="true">ness<i>.</i></span></span><span class="tag">Entregas e gaps</span><div class="inner">
+<p class="eyebrow">O que existe e o que ainda falta</p><h2>O que foi implementado e o que falta</h2>
+<div class="tw"><table><thead><tr><th>Frente</th><th>Implementado</th><th>Gap para concluir</th></tr></thead><tbody><tr><td data-label="Frente">Plataforma</td><td data-label="Implementado">Código de ingestão, armazenamento, transformação e agendamento.</td><td data-label="Gap para concluir">Implantar no GCP e validar carga, permissões e alertas.</td></tr><tr><td data-label="Frente">Fontes públicas</td><td data-label="Implementado">BCB, IBGE, ANEEL, ONS e CCEE: 23 entidades com extração real.</td><td data-label="Gap para concluir">Gravar no ambiente, conferir os dados e obter aceite.</td></tr><tr><td data-label="Frente">APIs com acesso</td><td data-label="Implementado">Conectores Hubspot, BBCE e TempoOK implementados.</td><td data-label="Gap para concluir">Receber acessos Hubspot/BBCE e acervo recente TempoOK.</td></tr><tr><td data-label="Frente">Sistemas e planilhas</td><td data-label="Implementado">Motores genéricos para bancos e planilhas.</td><td data-label="Gap para concluir">Construir integrações específicas com documentação, acessos e amostras.</td></tr><tr><td data-label="Frente">Confiabilidade</td><td data-label="Implementado">Correções de qualidade, preservação do dado original e reprocessamento concluídas.</td><td data-label="Gap para concluir">Validar o fluxo completo e medir tempo, memória e custo no GCP.</td></tr></tbody></table></div>
+<p class="note"><b>Evidência técnica:</b> 999 testes locais aprovados e 94% de cobertura. <b>Para aceite:</b> os sete componentes por fonte, carga real e validação do responsável de negócio.</p>
+</div><span class="pagenum">02 / 04</span></section>
+<section class="slide dark" id="pendencias"><span class="wordmark" role="img" aria-label="ness."><span aria-hidden="true">ness<i>.</i></span></span><span class="tag">Dependências externas</span><div class="inner">
+<p class="eyebrow">Responsabilidade da Alup</p><h2>O que bloqueia o avanço</h2>
+<div class="trava"><div class="i"><span class="c">A3 / #87</span><span class="t"><b>Ambiente GCP, permissões e faturamento.</b><span>Bloqueiam implantação e primeira carga. Contas da ness. já enviadas.</span></span><span class="q">previsão 18/09</span></div><div class="i"><span class="c">A9</span><span class="t"><b>Token Hubspot.</b><span>Bloqueia a carga de CRM.</span></span><span class="q">vencido 11/09</span></div><div class="i"><span class="c">A7</span><span class="t"><b>Acessos BBCE e sistemas internos.</b><span>Necessários para integrar e testar as fontes restritas.</span></span><span class="q">prazo 25/09</span></div><div class="i"><span class="c">#129</span><span class="t"><b>Acervo recente TempoOK.</b><span>O acesso atual só alcança boletins até outubro de 2022.</span></span><span class="q">prazo 25/09</span></div><div class="i"><span class="c">#141</span><span class="t"><b>Correspondência das usinas.</b><span>Relacionar códigos internos, CEG e parcelas CCEE para cruzar o portfólio.</span></span><span class="q">definir data</span></div><div class="i"><span class="c">#142</span><span class="t"><b>Amostras de planilhas.</b><span>Necessárias para construir os modelos de importação.</span></span><span class="q">prazo 18/09</span></div></div>
+<p class="note" style="color:#b7c5d6">Liberação do GCP sem confirmação; prazo original de A3: 04/09. Datas acima devem ser confirmadas na reunião.</p>
+</div><span class="pagenum">03 / 04</span></section>
+<section class="slide mist" id="decisoes"><span class="wordmark" role="img" aria-label="ness."><span aria-hidden="true">ness<i>.</i></span></span><span class="tag">Encaminhamentos</span><div class="inner">
+<p class="eyebrow">Resultado esperado da reunião</p><h2>Definir responsável e data para cada pendência.</h2>
+<div class="passo">
+<div><h3 class="cy">Alup · confirmar</h3><ul>
+<li><b>Ambiente:</b> data de liberação, permissões e faturamento.</li>
+<li><b>Insumos:</b> chamados de acesso, dados das usinas e amostras de planilhas.</li>
+<li><b>Aceite:</b> ajustes na matriz de responsabilidades e aprovação das minutas de privacidade.</li>
+</ul></div>
+<div><h3>ness. · após a liberação</h3><ul>
+<li><b>Implantar</b> a plataforma no ambiente de desenvolvimento.</li>
+<li><b>Validar</b> uma fonte pequena e uma volumosa: carga, reprocessamento, qualidade e alertas.</li>
+<li><b>Apresentar evidências</b> aos responsáveis de negócio para homologação.</li>
+</ul></div>
+</div>
+<p class="note">Detalhamento: <a href="../status.md">estado do projeto</a> · <a href="https://github.com/nessenergy/Alupdatalake/pull/165">correções de confiabilidade</a> · <a href="https://github.com/nessenergy/Alupdatalake/pull/166">correção do reprocessamento</a>. Posição anterior à reunião de 18/09.</p>
+</div><span class="pagenum">04 / 04</span></section>
 </main>
 
 <script>

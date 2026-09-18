@@ -246,7 +246,7 @@ validation {
 ## Fechamento e evidências
 
 - [x] Executar `make all` e `make dataform-compile`. Em Windows sem Make, usar os comandos equivalentes do `Makefile`; definir `PYTHONUTF8=1` no processo de auditoria se necessário pelo caminho acentuado. Não alterar arquivos de dependências por conveniência.
-- [ ] Conferir os oito checks existentes do CI nos PRs; revisar diff para excluir arquivos temporários, fixtures com dados reais e mudanças alheias.
+- [x] Conferir os oito checks existentes do CI nos PRs; revisar diff para excluir arquivos temporários, fixtures com dados reais e mudanças alheias.
 - [x] Atualizar `docs/status.md` com testes executados e links dos PRs, registrando separadamente “corrigido e validado localmente/CI” e “validação operacional aguardando ambiente da Alup”. Não promover cartões a homologados ou preencher horas a partir de estimativas.
 - [x] Conferir que os quatro achados têm evidência: grafo Gold, falha no fechamento raw sem carga, replay grande em lotes, deploy sem Composer e sem imagem mutável.
 
@@ -268,3 +268,5 @@ Quando o ambiente estiver disponível, executar o runbook existente em dev: uma 
 - Dos testes ignorados, 248 são regras SQL não aplicáveis à camada; não representam 248 integrações pendentes.
 - Testes reais no ambiente continuam pendentes de liberação pela Alup; nenhum provisionamento ou deploy foi executado.
 - Melhoria separada identificada na revisão: `ccee_perfil` e `ons_capacidade` usam `_data_retrato` inicializado na extração; replay em instância nova precisa recuperar essa referência. É comportamento anterior a este reparo, que preserva a instância na ingestão. Preparar regressão específica antes de corrigir, sem alterar datas por suposição.
+
+- [PR #165](https://github.com/nessenergy/Alupdatalake/pull/165): oito verificações do GitHub aprovadas no commit `110ec2c`; [execução do CI](https://github.com/nessenergy/Alupdatalake/actions/runs/35344381627). Confirmar novamente no commit final antes do merge.

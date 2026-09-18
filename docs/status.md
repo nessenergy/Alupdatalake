@@ -18,6 +18,7 @@ em 08/09. G1 encerrou na reunião de 10/09 e não é bloqueio atual.
 
 A liberação do GCP permanece sob responsabilidade da Alup. O plano de
 [correção dos achados técnicos](planos/2026-09-18-correcao-achados-tecnicos.md)
+([PR #165](https://github.com/nessenergy/Alupdatalake/pull/165))
 implementa o bloqueio da Gold por assertions, persistência completa do raw
 antes do Bronze, replay em fluxo e deploy sem Composer nem imagem `latest`.
 

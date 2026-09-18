@@ -7,10 +7,10 @@ algumas APIs do projeto têm rate limit ou retenção curta.
 from __future__ import annotations
 
 import gzip
-import io
 import json
 import logging
 import re
+import zlib
 from dataclasses import dataclass
 from datetime import date
 from typing import TYPE_CHECKING, Any
@@ -19,6 +19,8 @@ from urllib.parse import urlparse
 from src.core.config import get_settings
 
 if TYPE_CHECKING:
+    from collections.abc import Iterator
+
     from src.core.execucao import Execucao
 
 logger = logging.getLogger(__name__)
@@ -27,7 +29,7 @@ _CAMINHO_RAW = re.compile(
     r"^(?P<fonte>[a-z0-9_-]+)/(?P<entidade>[a-z0-9_-]+)/dt=(?P<data>\d{4}-\d{2}-\d{2})/"
     r"(?P<ingestao_id>[A-Za-z0-9_-]+)\.json\.gz$"
 )
-MAX_RAW_BYTES = 100 * 1024 * 1024
+MAX_RAW_LINE_BYTES = 1024 * 1024
 
 
 @dataclass(frozen=True)
@@ -62,42 +64,49 @@ def identificar_raw(uri: str) -> RawInfo:
     )
 
 
-def ler_raw(uri: str) -> list[dict[str, Any]]:
-    """Lê JSONL gzip do GCS para replay, sem consultar novamente a fonte."""
+def ler_raw(uri: str) -> Iterator[dict[str, Any]]:
+    """Lê JSONL gzip em fluxo; consumir até EOF confere o trailer gzip."""
     info = identificar_raw(uri)
     from google.cloud import storage
 
-    cliente = storage.Client(project=get_settings().gcp_project_id)
-    blob = cliente.bucket(info.bucket).blob(info.caminho)
-
-    # O tamanho é conferido pelos metadados, antes de baixar: medir depois do
-    # download não protege de nada — o estouro de memória já teria acontecido.
+    client = storage.Client(project=get_settings().gcp_project_id)
+    blob = client.bucket(info.bucket).blob(info.caminho)
     blob.reload()
-    if blob.size is None:
-        raise ValueError("raw sem tamanho declarado no GCS")
-    if blob.size > MAX_RAW_BYTES:
-        raise ValueError(f"raw excede o limite comprimido de {MAX_RAW_BYTES} bytes")
+    if blob.generation is None:
+        raise ValueError("raw sem geração identificada")
+    with (
+        blob.open("rb", chunk_size=1024 * 1024, raw_download=True, if_generation_match=int(blob.generation)) as source,
+        gzip.GzipFile(fileobj=source) as stream,
+    ):
+        number = 0
+        while True:
+            try:
+                line = stream.readline(MAX_RAW_LINE_BYTES + 1)
+            except (gzip.BadGzipFile, EOFError, zlib.error) as exc:
+                raise ValueError("raw gzip inválido") from exc
+            if not line:
+                break
+            number += 1
+            if len(line) > MAX_RAW_LINE_BYTES:
+                raise ValueError(f"linha {number} do raw excede o limite de {MAX_RAW_LINE_BYTES} bytes")
+            if not line.strip():
+                continue
+            try:
+                record = json.loads(line.decode("utf-8"))
+            except UnicodeDecodeError:
+                raise ValueError(f"linha {number} do raw contém UTF-8 inválido") from None
+            except json.JSONDecodeError:
+                raise ValueError(f"linha {number} do raw contém JSON inválido") from None
+            if not isinstance(record, dict):
+                raise ValueError(f"linha {number} do raw não é um objeto JSON")
+            yield record
 
-    corpo_comprimido = blob.download_as_bytes()
-    # Leitura com teto em vez de `gzip.decompress`: gzip descompacta na razão de
-    # ~1000:1, então 100 MB comprimidos cabem na memória mas viram dezenas de GB.
-    try:
-        with gzip.GzipFile(fileobj=io.BytesIO(corpo_comprimido)) as fluxo:
-            corpo = fluxo.read(MAX_RAW_BYTES + 1)
-    except (OSError, EOFError) as exc:
-        raise ValueError("raw gzip inválido") from exc
-    if len(corpo) > MAX_RAW_BYTES:
-        raise ValueError(f"raw excede o limite descomprimido de {MAX_RAW_BYTES} bytes")
 
-    registros: list[dict[str, Any]] = []
-    for numero, linha in enumerate(corpo.decode("utf-8").splitlines(), start=1):
-        if not linha.strip():
-            continue
-        registro = json.loads(linha)
-        if not isinstance(registro, dict):
-            raise ValueError(f"linha {numero} do raw não é um objeto JSON")
-        registros.append(registro)
-    return registros
+def _raw_line(record: dict[str, Any]) -> bytes:
+    line = (json.dumps(record, ensure_ascii=False, default=str) + "\n").encode("utf-8")
+    if len(line) > MAX_RAW_LINE_BYTES:
+        raise ValueError(f"registro raw excede o limite de {MAX_RAW_LINE_BYTES} bytes")
+    return line
 
 
 def caminho_raw(execucao: Execucao) -> str:
@@ -151,10 +160,10 @@ def gravar_raw(execucao: Execucao, registros: list[dict[str, Any]]) -> str | Non
 
     from google.cloud import storage  # import tardio: teste unitário não precisa do SDK
 
-    corpo = "\n".join(json.dumps(r, ensure_ascii=False, default=str) for r in registros)
+    corpo = b"".join(_raw_line(record) for record in registros)
     blob = storage.Client(project=cfg.gcp_project_id).bucket(cfg.bucket_raw).blob(caminho)
     blob.content_encoding = "gzip"
-    blob.upload_from_string(gzip.compress(corpo.encode("utf-8")), content_type="application/json")
+    blob.upload_from_string(gzip.compress(corpo), content_type="application/json")
     logger.info("raw gravado: %s (%d registros)", uri, len(registros))
     return uri
 
@@ -197,8 +206,7 @@ class _RawEmFluxo:
         self._registros += 1
         if self._dry_run:
             return
-        linha = json.dumps(registro, ensure_ascii=False, default=str) + "\n"
-        self._gzip.write(linha.encode("utf-8"))
+        self._gzip.write(_raw_line(registro))
 
     def __exit__(self, exc_tipo: Any, exc: Any, tb: Any) -> bool:
         if self._dry_run:

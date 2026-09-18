@@ -1,105 +1,115 @@
-"""Leitura do raw arquivado, sem acesso real ao Cloud Storage."""
-
-from __future__ import annotations
+"""Leitura progressiva e integridade do raw sem rede."""
 
 import gzip
+import io
 import json
+from contextlib import closing
 
 import pytest
 from google.cloud import storage
-from src.core.storage import MAX_RAW_BYTES, ler_raw
+from src.core.storage import ler_raw
 
 URI = "gs://lake-raw/teste/medicao/dt=2026-01-01/origem.json.gz"
+LIMIT = 1024 * 1024
 
 
-def _simular_download(
-    monkeypatch: pytest.MonkeyPatch,
-    corpo: bytes,
-    *,
-    tamanho: int | None = -1,
-) -> dict[str, int]:
-    """Instala um GCS falso. Devolve um contador de downloads efetivamente feitos.
+def _simular_download(monkeypatch, source, generation=42):
+    opened = {}
+    if isinstance(source, bytes):
+        source = io.BytesIO(source)
 
-    `tamanho` é o que os metadados declaram; `-1` significa "o tamanho real do
-    corpo". Passar um valor maior simula um objeto grande sem alocá-lo.
-    """
-    chamadas = {"download": 0}
-    declarado = len(corpo) if tamanho == -1 else tamanho
+    class Blob:
+        def reload(self):
+            self.generation = generation
 
-    class BlobFalso:
-        size: int | None = declarado
+        def download_as_bytes(self):
+            raise AssertionError("download integral proibido")
 
-        def reload(self) -> None: ...
+        def open(self, mode, **kwargs):
+            assert mode == "rb"
+            opened.update(kwargs)
+            return source
 
-        def download_as_bytes(self) -> bytes:
-            chamadas["download"] += 1
-            return corpo
+    class Client:
+        def __init__(self, **kwargs):
+            pass
 
-    class BucketFalso:
-        def blob(self, _caminho: str) -> BlobFalso:
-            return BlobFalso()
+        def bucket(self, name):
+            return self
 
-    class ClienteFalso:
-        def __init__(self, **_kwargs) -> None: ...
+        def blob(self, name):
+            return Blob()
 
-        def bucket(self, _nome: str) -> BucketFalso:
-            return BucketFalso()
-
-    monkeypatch.setattr(storage, "Client", ClienteFalso)
-    return chamadas
+    monkeypatch.setattr(storage, "Client", Client)
+    return source, opened
 
 
-def test_ler_raw_descompacta_jsonl(monkeypatch: pytest.MonkeyPatch) -> None:
-    registros = [{"id": "1", "valor": 10}, {"id": "2", "valor": 20}]
-    jsonl = "\n".join(json.dumps(registro) for registro in registros).encode()
-    _simular_download(monkeypatch, gzip.compress(jsonl))
-
-    assert ler_raw(URI) == registros
-
-
-def test_ler_raw_recusa_gzip_corrompido(monkeypatch: pytest.MonkeyPatch) -> None:
-    _simular_download(monkeypatch, b"nao-e-gzip")
-
-    with pytest.raises(ValueError, match="gzip inválido"):
-        ler_raw(URI)
+def test_le_jsonl_e_fixa_geracao(monkeypatch):
+    records = [{"id": "1"}, {"id": "2"}]
+    source, opened = _simular_download(
+        monkeypatch, gzip.compress(b"\n" + b"\n".join(json.dumps(r).encode() for r in records))
+    )
+    assert list(ler_raw(URI)) == records
+    assert source.closed
+    assert opened == {"chunk_size": LIMIT, "raw_download": True, "if_generation_match": 42}
 
 
-def test_ler_raw_recusa_linha_que_nao_e_objeto(monkeypatch: pytest.MonkeyPatch) -> None:
-    _simular_download(monkeypatch, gzip.compress(b"[1, 2, 3]"))
-
-    with pytest.raises(ValueError, match="não é um objeto"):
-        ler_raw(URI)
-
-
-def test_ler_raw_recusa_objeto_grande_sem_baixar(monkeypatch: pytest.MonkeyPatch) -> None:
-    """A guarda de tamanho só serve se disparar antes do download.
-
-    Conferir `len()` depois de `download_as_bytes()` não protege de nada: o
-    estouro de memória que a guarda existe para evitar já teria acontecido.
-    """
-    chamadas = _simular_download(monkeypatch, gzip.compress(b"{}"), tamanho=MAX_RAW_BYTES + 1)
-
-    with pytest.raises(ValueError, match="limite comprimido"):
-        ler_raw(URI)
-
-    assert chamadas["download"] == 0, "o objeto não pode ser baixado para só então ser recusado"
+@pytest.mark.parametrize(
+    "body, message",
+    [
+        (b"nao-e-gzip", "gzip inválido"),
+        (gzip.compress(b"{}")[:-3], "gzip inválido"),
+        (gzip.compress(b"{}")[:-8] + b"\x00" * 8, "gzip inválido"),
+        (gzip.compress(b"[1,2]"), "não é um objeto"),
+        (gzip.compress(b"{invalido}"), "JSON inválido"),
+        (gzip.compress(b'{"x":"\xff"}'), "UTF-8 inválido"),
+        (gzip.compress(b" " * (LIMIT + 1)), "limite"),
+    ],
+)
+def test_rejeita_formato_invalido_e_fecha(monkeypatch, body, message):
+    source, _ = _simular_download(monkeypatch, body)
+    with pytest.raises(ValueError, match=message):
+        list(ler_raw(URI))
+    assert source.closed
 
 
-def test_ler_raw_recusa_bomba_de_descompressao(monkeypatch: pytest.MonkeyPatch) -> None:
-    # Poucos KB comprimidos que viram mais que o teto ao descompactar.
-    bomba = gzip.compress(b"\0" * (MAX_RAW_BYTES + 1))
-    assert len(bomba) < MAX_RAW_BYTES, "a bomba precisa passar pela guarda do comprimido"
-    _simular_download(monkeypatch, bomba)
-
-    with pytest.raises(ValueError, match="limite descomprimido"):
-        ler_raw(URI)
+def test_sem_geracao_nao_abre(monkeypatch):
+    _, opened = _simular_download(monkeypatch, gzip.compress(b"{}"), generation=None)
+    with pytest.raises(ValueError, match="geração"):
+        list(ler_raw(URI))
+    assert not opened
 
 
-def test_ler_raw_recusa_objeto_sem_tamanho_declarado(monkeypatch: pytest.MonkeyPatch) -> None:
-    _simular_download(monkeypatch, gzip.compress(b"{}"), tamanho=None)
+def test_incremental_e_fecha_em_erro_do_consumidor(monkeypatch):
+    source, _ = _simular_download(monkeypatch, gzip.compress(b"{}\ninvalido\n"))
+    with pytest.raises(RuntimeError), closing(ler_raw(URI)) as records:
+        assert next(records) == {}
+        assert not source.closed
+        raise RuntimeError("falha na carga")
+    assert source.closed
 
-    with pytest.raises(ValueError, match="sem tamanho declarado"):
-        ler_raw(URI)
+
+def test_arquivo_maior_que_100_mib_em_linhas_pequenas(monkeypatch, tmp_path):
+    path = tmp_path / "raw.gz"
+    line = json.dumps({"valor": "x" * 1024}).encode() + b"\n"
+    count = 101 * 1024
+    with gzip.open(path, "wb") as stream:
+        for _ in range(count):
+            stream.write(line)
+    source, _ = _simular_download(monkeypatch, path.open("rb"))
+    assert sum(1 for _ in ler_raw(URI)) == count
+    assert source.closed
+
+
+def test_falha_de_rede_nao_vira_erro_de_formato(monkeypatch):
+    class Broken(io.BytesIO):
+        def read(self, *args):
+            raise OSError("rede indisponível")
+
+    source, _ = _simular_download(monkeypatch, Broken())
+    with pytest.raises(OSError, match="rede indisponível"):
+        list(ler_raw(URI))
+    assert source.closed
 
 
 # ------------------------------------------------------- raw binário (ADR 019)
@@ -144,3 +154,54 @@ def test_dry_run_nao_grava_arquivo_e_devolve_none(monkeypatch):
     assert gravar_arquivo(execucao, "b.pdf", b"%PDF-1.4", "application/pdf") is None
 
     get_settings.cache_clear()
+
+
+@pytest.mark.parametrize("streaming", [False, True])
+def test_escritores_respeitam_o_mesmo_limite_do_leitor(monkeypatch, streaming):
+    from src.core.execucao import Execucao, Janela
+    from src.core.storage import abrir_raw, gravar_raw
+
+    monkeypatch.setenv("DRY_RUN", "false")
+    captured = []
+
+    class Destination(io.BytesIO):
+        def close(self):
+            captured.append(self.getvalue())
+            super().close()
+
+    class Blob:
+        def open(self, mode, **kwargs):
+            return Destination()
+
+        def upload_from_string(self, body, **kwargs):
+            captured.append(body)
+
+    class Client:
+        def __init__(self, **kwargs):
+            pass
+
+        def bucket(self, name):
+            return self
+
+        def blob(self, name):
+            return Blob()
+
+    monkeypatch.setattr(storage, "Client", Client)
+    execution = Execucao(fonte="teste", entidade="medicao", janela=Janela.de_texto("2026-01-01", "2026-01-01"))
+    # O limite inclui o delimitador de linha e conta bytes UTF-8, não caracteres.
+    base = len((json.dumps({"value": ""}) + "\n").encode())
+    row = {"value": "é" * ((LIMIT - base) // 2)}
+
+    def write(record):
+        if streaming:
+            with abrir_raw(execution) as raw:
+                raw.escrever(record)
+        else:
+            gravar_raw(execution, [record])
+
+    write(row)
+    _simular_download(monkeypatch, captured[-1])
+    assert list(ler_raw(URI)) == [row]
+    monkeypatch.setattr(storage, "Client", Client)
+    with pytest.raises(ValueError, match="limite"):
+        write({"value": row["value"] + "é"})

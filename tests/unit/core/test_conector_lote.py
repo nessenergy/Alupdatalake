@@ -1,15 +1,4 @@
-"""O runner ingere em fatias: memória limitada, e a carga começa antes do fim da extração.
-
-O que estes testes protegem, e que a primeira versão do runner não fazia:
-
-- `extrair()` é consumido **preguiçosamente**. Antes, o runner fazia
-  `brutos.extend(...)` de tudo antes de gravar qualquer coisa — com a geração
-  horária da CCEE isso são ~3 milhões de dicionários por mês, e o Cloud Run Job
-  morria de memória antes da primeira linha chegar ao Bronze;
-- a carga acontece **por fatia**, e os contadores somam entre as fatias em vez
-  de serem sobrescritos pela última;
-- o raw recebe todos os registros, na ordem da origem, mesmo fatiado.
-"""
+"""O runner conclui o raw antes de validar e carregar em lotes."""
 
 from __future__ import annotations
 
@@ -54,12 +43,15 @@ class ConectorFatiado(Conector):
 @pytest.fixture
 def espiao(monkeypatch):
     """Registra cada chamada de carga e cada registro gravado no raw."""
+    monkeypatch.setenv("DRY_RUN", "false")
+    state = {"closed": False}
     cargas: list[int] = []
     emitidos_na_carga: list[int] = []
     raw: list[dict[str, Any]] = []
     conector: dict[str, ConectorFatiado] = {}
 
     def carregar(_execucao, linhas):
+        assert state["closed"], "Bronze antes do fechamento raw"
         cargas.append(len(linhas))
         emitidos_na_carga.append(conector["c"].emitidos)
         return len(linhas)
@@ -74,13 +66,19 @@ def espiao(monkeypatch):
             return self
 
         def __exit__(self, *_):
+            if state.get("fail_close"):
+                raise OSError("falha ao concluir raw")
+            state["closed"] = True
             return False
 
+    import json
+
+    monkeypatch.setattr("src.core.conector.ler_raw", lambda _uri: (json.loads(json.dumps(r, default=str)) for r in raw))
     monkeypatch.setattr("src.core.conector.carregar_bronze", carregar)
     monkeypatch.setattr("src.core.conector.abrir_raw", lambda _e: RawFalso())
     monkeypatch.setattr("src.core.conector.registrar_execucao", lambda _e: None)
     monkeypatch.setattr("src.core.conector.emitir_linhagem", lambda *_a, **_k: None)
-    return {"cargas": cargas, "emitidos": emitidos_na_carga, "raw": raw, "conector": conector}
+    return {"state": state, "cargas": cargas, "emitidos": emitidos_na_carga, "raw": raw, "conector": conector}
 
 
 def test_carrega_em_fatias_em_vez_de_um_lote_unico(espiao):
@@ -94,14 +92,13 @@ def test_carrega_em_fatias_em_vez_de_um_lote_unico(espiao):
     assert execucao.linhas_extraidas == 5
 
 
-def test_a_primeira_carga_acontece_antes_do_fim_da_extracao(espiao):
-    """É esta a propriedade que limita a memória — sem ela, fatiar não adianta."""
+def test_a_primeira_carga_acontece_depois_do_fim_da_extracao(espiao):
     c = ConectorFatiado(total=5)
     espiao["conector"]["c"] = c
 
     c.ingerir(Janela.de_texto("2026-01-01", "2026-01-01"))
 
-    assert espiao["emitidos"][0] == 2, "a primeira carga viu só os 2 primeiros registros emitidos"
+    assert espiao["emitidos"] == [5, 5, 5]
     assert espiao["emitidos"][-1] == 5
 
 
@@ -153,3 +150,47 @@ def test_o_tamanho_do_lote_e_configuravel_por_conector():
     """A geração horária da CCEE precisa de fatia menor que a de uma série diária."""
     assert Conector.tamanho_do_lote > 0
     assert ConectorFatiado.tamanho_do_lote == 2
+
+
+@pytest.mark.parametrize("failure", ["close", "extract"])
+def test_falha_antes_do_raw_completo_nao_carrega(espiao, monkeypatch, failure):
+    c = ConectorFatiado()
+    espiao["conector"]["c"] = c
+    registered = []
+    monkeypatch.setattr("src.core.conector.registrar_execucao", registered.append)
+    if failure == "close":
+        espiao["state"]["fail_close"] = True
+    else:
+
+        def broken(window):
+            yield {"dia": "2026-01-01", "valor": "1"}
+            yield {"dia": "2026-01-01", "valor": "2"}
+            raise OSError("falha na extração")
+
+        monkeypatch.setattr(c, "extrair", broken)
+    with pytest.raises(OSError):
+        c.ingerir(Janela.de_texto("2026-01-01", "2026-01-01"))
+    assert espiao["cargas"] == []
+    assert registered[0].status == "ERRO"
+
+
+def test_dry_run_nao_abre_nem_le_raw(espiao, monkeypatch):
+    monkeypatch.setenv("DRY_RUN", "true")
+
+    def forbidden(*args):
+        raise AssertionError("dry-run não acessa GCS")
+
+    monkeypatch.setattr("src.core.conector.abrir_raw", forbidden)
+    monkeypatch.setattr("src.core.conector.ler_raw", forbidden)
+    monkeypatch.setattr("src.core.conector.carregar_bronze", lambda e, rows: len(rows))
+    result = ConectorFatiado().ingerir(Janela.de_texto("2026-01-01", "2026-01-01"))
+    assert result.linhas_carregadas == result.linhas_extraidas == 5
+
+
+def test_ingestao_real_conserva_datas_e_decimais_apos_raw(espiao, monkeypatch):
+    c = ConectorFatiado()
+    espiao["conector"]["c"] = c
+    monkeypatch.setattr(c, "extrair", lambda window: iter([{"dia": date(2026, 1, 1), "valor": Decimal("12.30")}]))
+    result = c.ingerir(Janela.de_texto("2026-01-01", "2026-01-01"))
+    assert result.linhas_carregadas == result.linhas_extraidas == 1
+    assert result.linhas_invalidas == 0

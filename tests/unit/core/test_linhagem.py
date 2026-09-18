@@ -163,7 +163,9 @@ def test_ingestao_bem_sucedida_emite_uma_vez(monkeypatch):
 def test_replay_nao_emite(monkeypatch):
     emitidos = []
     _silenciar_gcp(monkeypatch)
-    monkeypatch.setattr("src.core.conector.ler_raw", lambda _uri: [{"data_referencia": "2026-01-01", "valor": "1"}])
+    monkeypatch.setattr(
+        "src.core.conector.ler_raw", lambda _uri: (r for r in [{"data_referencia": "2026-01-01", "valor": "1"}])
+    )
     monkeypatch.setattr("src.core.conector.emitir_linhagem", lambda *a: emitidos.append(a))
 
     ConectorTeste().reprocessar_raw(

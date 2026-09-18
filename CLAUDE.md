@@ -1,5 +1,6 @@
-# CLAUDE.md
+# Orientação rápida
 
-O contexto deste repositório é agnóstico de agente e vive em [`AGENTS.md`](AGENTS.md).
-Leia aquele arquivo — este existe apenas como ponteiro, porque algumas
-ferramentas de edição procuram por um arquivo com este nome na raiz.
+Leia [`AGENTS.md`](AGENTS.md): regras do projeto e [forma de trabalhar](AGENTS.md#como-trabalhar-e-responder).
+Consulte [`docs/status.md`](docs/status.md) para o estágio atual e as pendências.
+
+Responda com o resultado, a evidência necessária e o próximo passo recomendado.

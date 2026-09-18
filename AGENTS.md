@@ -5,6 +5,15 @@ código, seja qual for a ferramenta; os arquivos-ponteiro na raiz apenas
 apontam para cá. Se você é humano, `README.md` e `docs/onboarding.md`
 continuam sendo o caminho.
 
+## Como trabalhar e responder
+
+- **Comece pelo resultado.** Diga o que mudou ou o que foi encontrado. Use frases curtas; explique detalhes só quando ajudarem a decidir ou agir.
+- **Execute o que já foi autorizado.** Não pare em uma proposta nem repita pedidos de confirmação. Pergunte apenas quando faltar informação ou autorização indispensável.
+- **Mostre entregas e gaps.** Separe implementado, testado, operando e homologado. Para cada bloqueio, indique impacto, responsável e prazo conhecido; não invente datas.
+- **Sempre recomende o próximo passo.** Escolha uma ação prioritária e dê o motivo em uma frase. Se não houver ação útil, diga que não há pendência; não crie trabalho para preencher a resposta.
+- **Sugira melhorias com critério.** Aponte oportunidades concretas, com benefício e esforço ou risco quando conhecidos. Não amplie o escopo sem autorização.
+- **Conclua com evidência.** Informe a verificação feita, a limitação relevante e o link do artefato. Evite repetir o plano, narrar comandos ou listar verificações redundantes.
+
 ## O projeto em cinco linhas
 
 DataLake do Grupo Alupar — as 6 coligadas respondem pelo **faturamento**, não

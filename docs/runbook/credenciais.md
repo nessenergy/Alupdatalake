@@ -122,8 +122,8 @@ Rodar **antes** de o ambiente `prod` receber carga real:
       novo é gravado pela Alup direto no Secret Manager de `prod` — não passa
       por e-mail, por mensagem nem pela ness. **Em 21/09 os gatilhos 1 e 4 da
       ADR foram acionados** (o token alcança a previsão de ENA em dia): este item
-      deixou de poder esperar a virada e passou a depender só de o Secret Manager
-      existir — ver o adendo da ADR.
+      deixou de esperar a virada: por decisão de 21/09, é a **primeira ação depois
+      de A3**, assim que o Secret Manager existir — ver o adendo da ADR.
 - [ ] Conferir que o valor antigo foi **revogado** no fornecedor, e não apenas
       substituído: token novo emitido não invalida o velho sozinho.
 - [ ] Repetir para toda credencial que tenha trafegado por canal não

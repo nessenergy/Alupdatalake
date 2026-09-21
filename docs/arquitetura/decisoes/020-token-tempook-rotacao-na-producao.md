@@ -137,8 +137,16 @@ contrata do TempoOK.
 
 A seção 5 diz que, acionado um gatilho, **a rotação passa a ser imediata**. A
 seção 3 diz que rotacionar antes de existir Secret Manager renova a exposição em
-vez de encerrá-la. As duas não cabem juntas hoje, e **a ADR não diz qual vence** —
-é decisão do responsável nomeado na seção 2, e não foi tomada aqui.
+vez de encerrá-la. As duas não cabiam juntas, e a ADR não dizia qual vence.
+
+**Decisão de 21/09/2026 — Ricardo Esper, responsável nomeado na seção 2:** a ADR
+foi aceita com este adendo. A tensão se resolve pela **seção 3**: o argumento
+decisivo — rotacionar sem Secret Manager reproduz a exposição — continua de pé, e
+o token de 14/09 é mantido até o Secret Manager existir. O que muda é a data: a
+rotação deixa de estar amarrada à virada de produção e passa a ser a **primeira
+ação depois de A3**, com o valor novo gravado pela Alup direto no Secret Manager.
+Os gatilhos 1 e 4 seguem registrados como acionados; não há prazo próprio além
+de A3.
 
 **Duas coisas que não dependem de decisão e foram feitas:**
 

@@ -152,7 +152,7 @@ Não há carga em BigQuery real registrada nem confirmação de entrega do ambie
 
 ### Documentação
 
-ADRs 001–021 · 25 dicionários de fonte para 26 entidades e 2 dicionários técnicos com [índice e linhagem](dicionario-dados/README.md) · plano de execução · runbook de deploy,
+ADRs 001–022 · 25 dicionários de fonte para 26 entidades e 2 dicionários técnicos com [índice e linhagem](dicionario-dados/README.md) · plano de execução · runbook de deploy,
 de primeiro deploy e de acompanhamento semanal ·
 [`proximos-passos.md`](proximos-passos.md) como fila de execução ·
 `AGENTS.md` como contexto canônico · skills do projeto e shortlist do Google.

@@ -129,6 +129,12 @@ define todos em uma página.
 - Nomes de objeto e coluna em `snake_case`, sem acento. Colunas técnicas com
   prefixo `_`.
 - Nada de dado real de cliente no repositório — nem em fixture, nem em exemplo.
+- **Identidade visual segue quem fala** ([ADR 022](docs/arquitetura/decisoes/022-identidade-visual-por-audiencia.md)):
+  o que a ness. emite (relatório, proposta, apresentação) leva a marca da ness.;
+  **o produto é da Alup** — Portal, painéis de BI, alertas — e leva a identidade
+  da Alup, sem cor, fonte, nome ou crédito da ness. O tema do Portal vive só nos
+  tokens `:root` de `ESTILO` em `src/portal/app.py`. Documentação técnica do
+  repositório fica neutra. A regra de marca da ness. **não** se aplica ao produto.
 
 ## Skills (funcionam em qualquer agente)
 
@@ -174,6 +180,7 @@ dizem como *este contrato* usa o produto.
 | 019 | TempoOK como arquivo PDF e catálogo; acervo recente ainda pendente |
 | 020 | Rotação do token TempoOK na entrada em produção ou mudança do alcance |
 | 021 | Seleção dos conjuntos CCEE por demanda dos domínios analíticos |
+| 022 | Identidade visual por audiência: ness. no que a ness. emite, Alup no produto, neutra na documentação técnica |
 
 Se você for propor algo que contraria um ADR, escreva um ADR novo — não um
 remendo. Em particular: o framework em `src/core/` é mais estrutura do que 13

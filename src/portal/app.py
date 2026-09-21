@@ -189,7 +189,10 @@ def _celula(valor: Any) -> str:
 # entre duas telas do mesmo Portal é como o desalinho visual começa.
 ESTILO = """<style>
  /* Tokens no formato do shadcn/ui, com a paleta do alup.io.
-    Sem React e sem build: a ADR 005 mantém o Portal renderizado no servidor. */
+    Sem React e sem build: a ADR 005 mantém o Portal renderizado no servidor.
+    O Portal é produto da Alup (ADR 022): é aqui, e só aqui, que o design
+    system da Alup entra — trocar o tema é trocar estes valores. A paleta atual
+    é provisória, derivada do site da Alup, até o design system ser validado. */
  :root{
    --background:#fcfcfb; --foreground:#212121;
    --card:#ffffff; --card-foreground:#212121;
@@ -284,6 +287,7 @@ ESTILO = """<style>
    text-transform:uppercase;padding:2px 6px;border-radius:3px;
    background:#fdecef;color:var(--critical)}
  .nota{font-size:12.5px;color:var(--muted-foreground);margin:12px 0 0;max-width:70ch}
+ .rolagem-tabela{overflow-x:auto;margin-top:12px}
  .premissa{background:var(--muted);border-radius:var(--radius);padding:14px 16px;
    font-size:12.5px;color:var(--muted-foreground);margin-top:26px;max-width:80ch}
 """
@@ -413,23 +417,18 @@ def _pagina(dados: Painel, usuario: str, *, simulado: bool) -> str:
 <html lang="pt-BR"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>AlupData — {html.escape(dados.view)}</title>
-<style>
- body{{font-family:system-ui,-apple-system,Segoe UI,Arial,sans-serif;
-       color:#2B333B;margin:0;padding:40px;background:#fff}}
- header{{display:flex;justify-content:space-between;align-items:baseline;
-         border-bottom:2px solid #00ADE8;padding-bottom:12px}}
- h1{{font-size:22px;margin:0;letter-spacing:-.02em}}
- .quem{{font-size:13px;color:#5A6473}}
- .aviso{{background:#FFF4E5;border-left:3px solid #C9A227;padding:12px 16px;font-size:14px}}
- table{{width:100%;border-collapse:collapse;margin-top:24px;font-size:14px}}
- th{{background:#0E1116;color:#fff;text-align:left;padding:10px 12px;font-weight:500}}
- td{{padding:10px 12px;border-bottom:1px solid #E4E8EC}}
- footer{{margin-top:24px;font-size:13px;color:#5A6473}}
-</style></head>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600
+&family=Zilla+Slab:wght@500;600&display=swap">
+{ESTILO}</style></head>
 <body>
 <header><h1>AlupData · {html.escape(dados.view)}</h1><span class="quem">{html.escape(usuario)}</span></header>
+{_naves("/")}
 {aviso}
-<table><thead><tr>{cabecalhos}</tr></thead><tbody>{linhas}</tbody></table>
+<div class="rolagem-tabela"><table class="lista">
+<thead><tr>{cabecalhos}</tr></thead><tbody>{linhas}</tbody>
+</table></div>
 <footer>{rodape}</footer>
 </body></html>"""
 
@@ -569,8 +568,8 @@ def _visao_diretoria(dados: PainelCusto) -> str:
   </table>
   <p class="nota">O agrupamento segue os <strong>8 domínios analíticos</strong> definidos
     em 14/09 a partir do Questionário de Gaps — <code>docs/arquitetura/dominios-analiticos.md</code>.
-    Os domínios são proposta da ness. para confirmação da Alup: o questionário
-    respondeu com objetivos do programa, e a tradução para domínios é nossa.</p>
+    Os domínios são os da resposta B1 do questionário, com um responsável da Alup
+    nomeado para cada um.</p>
 </section>"""
 
 

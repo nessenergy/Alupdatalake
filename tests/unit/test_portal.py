@@ -449,3 +449,25 @@ def test_os_dominios_usados_sao_os_oito_documentados():
 
     assert len(DOMINIOS_VALIDOS) == 8
     assert set(DOMINIO_ANALITICO.values()) <= DOMINIOS_VALIDOS
+
+
+# ------------------------------------------------ identidade do produto (ADR 022)
+
+
+@pytest.mark.parametrize("rota", ["/", "/lake", "/custo"])
+def test_o_produto_nao_carrega_a_marca_da_ness(cliente, rota) -> None:
+    """O Portal é da Alup (cláusula 7ª): a identidade da ness. vale para o que a
+    ness. emite, não para o que ela entrega. Nem a cor, nem o nome."""
+    corpo = cliente.get(rota).get_data(as_text=True).lower()
+
+    assert "#00ade8" not in corpo
+    assert "ness." not in corpo
+
+
+@pytest.mark.parametrize("rota", ["/", "/lake", "/custo"])
+def test_todas_as_telas_usam_o_mesmo_tema(cliente, rota) -> None:
+    """O design system da Alup entra trocando os tokens de um lugar só. Tela com
+    estilo próprio escapa da troca — foi assim que a `/` divergiu."""
+    corpo = cliente.get(rota).get_data(as_text=True)
+
+    assert "--primary:" in corpo

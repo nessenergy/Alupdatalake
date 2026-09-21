@@ -189,3 +189,39 @@ exatamente o que a regra 3 existe para permitir. O PDF de 31/03/2022 tem
 **9 MB**; a série de um ano de dias úteis fica na ordem de **2 GB no bucket
 raw**, o que é barato e cabe no teto de custo, mas merece ser dito antes de
 alguém pedir "todo o histórico".
+
+---
+
+## Adendo de 21/09/2026 — um segundo produto, e a hipótese 2 com evidência
+
+Em 18/09 a Alup entregou a função que ela mesma usa para baixar do TempoOK e um
+caminho de exemplo de **outro produto**: a previsão de ENA
+(`Comercializadora/Arquivos/ENA-PREVS/…`, um `tar.gz` por dia). Conferido em 21/09
+contra a origem real, com o token que já tínhamos:
+
+- **está em dia** (arquivo de 20/09), diário inclusive fim de semana, ~94 KB;
+- o acervo começa em ~17/11/2024;
+- o TLS passa sem `verify=False` — que a função da Alup também traz;
+- a resposta é `application/octet-stream`, como a do boletim.
+
+**A mecânica é a mesma da decisão acima**, então ela foi generalizada em vez de
+copiada: `tempook_arquivos` (base) carrega o POST, a guarda de assinatura e o
+catálogo; `tempook_boletins` e `tempook_ena_prevs` declaram só o caminho e a
+assinatura (PDF e gzip). Os quatro itens da decisão valem para os dois. O item 4
+ganha uma consequência prática: **a assinatura é por produto**, e um PDF no
+caminho do ENA-PREVS é rejeitado.
+
+### O que muda na questão do acervo
+
+A hipótese 2 — *os boletins passaram a ser publicados em outra área do storage* —
+**ganhou evidência**: existe outra área (`Arquivos/`) e ela tem dado atual. Não foi
+testada, porque sem listagem achar o caminho depende de a Alup indicá-lo. A
+pergunta a fazer deixa de ser "por que o acervo para em 2022" e passa a ser **"onde
+estão os boletins recentes"**.
+
+### O que muda na segurança
+
+O alcance do token, medido no item 3.1 desta ADR e tomado como premissa da
+[ADR 020](020-token-tempook-rotacao-na-producao.md), **deixou de descrever a
+realidade**. Ver o adendo daquela ADR.
+

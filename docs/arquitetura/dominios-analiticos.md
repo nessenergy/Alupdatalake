@@ -127,14 +127,18 @@ nomes para os mesmos conjuntos. Ver §5.1.
 
 | | |
 |---|---|
-| **Fontes hoje** | `tempook_boletins` — boletim guardado como arquivo ([ADR 019](decisoes/019-boletim-do-tempook-como-arquivo.md)) |
-| **Granularidade** | boletim |
-| **Cadência** | por publicação |
-| **Gold hoje** | `cobertura_boletins_tempook` |
-| **Situação** | **pronto como arquivo** — a extração do conteúdo do boletim é escopo futuro ([#129](https://github.com/nessenergy/Alupdatalake/issues/129)) |
+| **Fontes hoje** | `tempook_boletins` — boletim guardado como arquivo, **acervo até 26/10/2022** ([ADR 019](decisoes/019-boletim-do-tempook-como-arquivo.md)) · **`tempook_ena_prevs`** — previsão de ENA, um `tar.gz` por dia, **em dia** |
+| **Fontes a conectar** | os demais caminhos do TempoOK que a Alup vai indicar; o boletim recente, se estiver em outra área do storage |
+| **Granularidade** | arquivo diário (por modelo, no ENA-PREVS) |
+| **Cadência** | diária, inclusive fim de semana |
+| **Gold hoje** | `cobertura_boletins_tempook`, `cobertura_ena_prevs_tempook` |
+| **Situação** | **arquivado e em dia — sem conteúdo extraído.** O domínio passou a ter dado da data de hoje em 21/09; a extração dos números é escopo futuro e depende de a Alup dizer quais importam |
 
-Enquanto o conteúdo não for extraído, o domínio responde "o boletim de tal dia
-chegou", não "choveu quanto". A diferença é grande e está registrada.
+O domínio responde "o arquivo de tal dia chegou", não "choveu quanto" nem "a ENA
+esperada é tal". A diferença é grande e está registrada. Os `tar.gz` do ENA-PREVS
+trazem 7 arquivos de texto, um por revisão do PMO, com tabela de ENA por
+subsistema e semana — o que os torna a contraparte prospectiva do `ons_ena`, mas
+**só depois** de alguém abrir e decidir o que ler.
 
 ### 4 · Comercial e Contratos
 

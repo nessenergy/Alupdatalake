@@ -38,6 +38,7 @@ técnicos**. Bases reutilizáveis não entram nessa contagem. O contrato mantém
 | IBGE — IPCA | [`ibge_ipca.md`](ibge_ipca.md) | 1 | — | `inflacao_mensal` |
 | Hubspot — negócios | [`hubspot_negocios.md`](hubspot_negocios.md) | 2 | — | `funil_comercial` |
 | TempoOK — boletins | [`tempook_boletins.md`](tempook_boletins.md) | 2 | — | `cobertura_boletins_tempook` |
+| TempoOK — previsão de ENA (ENA-PREVS) | [`tempook_ena_prevs.md`](tempook_ena_prevs.md) | 2 | — | `cobertura_ena_prevs_tempook` |
 | BBCE — curva forward | [`bbce_curva_forward.md`](bbce_curva_forward.md) | 2 | — | `curva_forward_vigente` |
 | Log de execução | [`_execucoes.md`](_execucoes.md) | 0 | — | `saude_ingestao`, `volumetria_lake` |
 | Custo de nuvem | [`_custo_consultas.md`](_custo_consultas.md) | 0 | — | `custo_consultas` |

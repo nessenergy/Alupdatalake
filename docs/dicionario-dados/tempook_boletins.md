@@ -114,6 +114,12 @@ absorve o transitório; persistindo, a execução falha — que é o certo. Trat
 
 ## O que segue em aberto — e é da Alup
 
+> **Atualização de 21/09/2026.** O mesmo token alcança **outro produto em dia**: a
+> previsão de ENA, documentada em [`tempook_ena_prevs.md`](tempook_ena_prevs.md). Isso
+> não resolve o acervo de boletins, mas dá à hipótese 2 abaixo — os boletins mudaram
+> de área do storage — uma evidência que ela não tinha: existe outra área, e ela tem
+> dado atual.
+
 **A série alcançável por este token termina em 2022-10-26.** Nenhum boletim de
 novembro ou dezembro de 2022 responde, nem nada de 2023, 2024, 2025 ou 2026.
 Sete variações plausíveis do caminho para uma data recente também devolveram

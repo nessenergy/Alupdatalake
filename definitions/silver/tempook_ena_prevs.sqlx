@@ -1,0 +1,43 @@
+config {
+  type: "view",
+  schema: "silver",
+  tags: ["silver"],
+  assertions: {
+    uniqueKey: ["data_referencia", "modelo"],
+    nonNull: ["data_referencia", "modelo", "caminho_origem", "sha256"],
+    rowConditions: [
+      "tamanho_bytes > 0",
+      "REGEXP_CONTAINS(sha256, r'^[0-9a-f]{64}$')"
+    ]
+  }
+}
+
+-- Silver: um arquivo por dia e por modelo, o mais recentemente arquivado.
+-- Dedup por (data_referencia, modelo): reingestão da mesma janela rebaixa o
+-- arquivo anterior. `sha256` distinto entre ingestões do mesmo dia significa que
+-- a origem republicou o arquivo corrigido — o histórico fica no Bronze.
+--
+-- `submercado` é NULL porque o arquivo é nacional: a tabela de ENA que ele
+-- carrega é por subsistema, mas isso só se vê abrindo o conteúdo, que este
+-- catálogo não abre.
+SELECT
+  data_referencia,
+  modelo,
+  FORMAT_DATE('%Y-%m', data_referencia) AS periodo_apuracao,
+  CAST(NULL AS STRING) AS periodo_apuracao_ccee,  -- a origem não declara período próprio
+  CAST(NULL AS STRING) AS submercado,    -- o catálogo não abre o conteúdo
+  CAST(NULL AS STRING) AS codigo_usina,  -- catálogo de documento, não de ativo
+  CAST(NULL AS STRING) AS agente_ccee,   -- idem
+  caminho_origem,
+  nome_arquivo,
+  uri_arquivo,
+  tamanho_bytes,
+  sha256,
+  content_type,
+  _ingestao_id,
+  _ingestao_timestamp
+FROM ${ref("bronze", "tempook_ena_prevs")}
+QUALIFY ROW_NUMBER() OVER (
+  PARTITION BY data_referencia, modelo
+  ORDER BY _ingestao_timestamp DESC
+) = 1

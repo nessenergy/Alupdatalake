@@ -1,0 +1,44 @@
+config {
+  type: "table",
+  schema: "gold",
+  tags: ["gold"],
+  dependOnDependencyAssertions: true
+}
+
+-- Gold: cobertura mensal dos arquivos de previsão de ENA do TempoOK, por modelo
+-- — quantos dias do mês têm arquivo arquivado, e onde há buraco.
+--
+-- É o que se pode afirmar **sem conhecer o conteúdo do tar.gz** (ADR 019): se a
+-- série está completa e se parou de chegar. Não é indicador de negócio, e não
+-- pretende ser — Gold sem KPI nesta fase, conforme ADR 012.
+--
+-- Diferente da cobertura dos boletins, aqui **buraco é sinal**: o produto é
+-- diário, inclusive sábado e domingo, então `dias_sem_arquivo` maior que zero
+-- não é fim de semana nem feriado. Na sondagem de 21/09 apareceram três (15/08,
+-- 05/09 e 19/09, todos sábado) em ~50 dias.
+--
+-- O mês corrente só conta até o último dia que o modelo tem arquivo, para o
+-- futuro não aparecer como falta. E a série começa quando a ingestão começou:
+-- dias anteriores à primeira carga do mês aparecem como buraco.
+WITH base AS (
+  SELECT
+    *,
+    MAX(data_referencia) OVER (PARTITION BY modelo) AS ultimo_dia_do_modelo
+  FROM ${ref("silver", "tempook_ena_prevs")}
+)
+
+SELECT
+  periodo_apuracao,
+  modelo,
+  COUNT(*)                                          AS dias_com_arquivo,
+  MIN(data_referencia)                              AS primeiro_dia,
+  MAX(data_referencia)                              AS ultimo_dia,
+  SUM(tamanho_bytes)                                AS bytes_arquivados,
+  COUNT(DISTINCT sha256)                            AS arquivos_distintos,
+  DATE_DIFF(
+    LEAST(LAST_DAY(MIN(data_referencia)), ANY_VALUE(ultimo_dia_do_modelo)),
+    DATE_TRUNC(MIN(data_referencia), MONTH),
+    DAY
+  ) + 1 - COUNT(*)                                  AS dias_sem_arquivo
+FROM base
+GROUP BY periodo_apuracao, modelo

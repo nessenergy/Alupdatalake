@@ -137,7 +137,7 @@ Marco 3 — 18,97% · R$ 28.160,00 · **Bloqueada por credencial da Alup**
 | 2.1 | **CCEE agente credenciado** | 32h ⚠ | Certificado/credencial de agente |
 | 2.2 | **BBCE** | 28h ⚠ | Implementado no PR #131; faltam acesso e host (#23) |
 | 2.3 | **Hubspot** | 20h → **~4h restantes** | Token de API (private app). Os 7 componentes foram escritos contra documentação pública em 2026-08-26, sem acesso real; falta rodar contra a API real e ajustar |
-| 2.4 | **TempoOK** | 18h | Implementado; contrato da API verificado, mas acervo alcançável até 26/10/2022; falta acervo recente (#129) |
+| 2.4 | **TempoOK** | 18h | Implementado, **dois produtos**: o boletim tem contrato verificado mas acervo só até 26/10/2022 (#129); a **previsão de ENA** (`tempook_ena_prevs`) responde para a data de hoje, verificada em 21/09 — só o caminho de exemplo é conhecido, a Alup vai indicar os demais |
 | 2.5 | Tabelas Gold de preço e posição comercial | 12h | — |
 
 **Estratégia contra o bloqueio** (decidida no brainstorm): para cada fonte

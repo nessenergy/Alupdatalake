@@ -112,3 +112,52 @@ amarrado em três lugares, de propósito:
 - [`runbook/credenciais.md`](../../runbook/credenciais.md) — cofre local e travessia
 - [Registro de 14/09](../../relatorios/2026-09-14-documentacao-de-apis-recebida.md) — §4.1 e §5
 - Contrato CPS-01025/2026, cláusula 8ª
+
+---
+
+## Adendo de 21/09/2026 — os gatilhos 1 e 4 foram acionados
+
+**Fato.** O token de 14/09 baixa a **previsão de ENA do TempoOK com a data de
+hoje** (`Comercializadora/Arquivos/ENA-PREVS/…`, arquivo de 20/09 presente, série
+diária desde ~17/11/2024). O caminho veio da Alup em 18/09 e foi conferido em
+21/09 ([ADR 019](019-boletim-do-tempook-como-arquivo.md), adendo).
+
+**O que isso faz com esta ADR:**
+
+| Item da ADR | Situação em 21/09 |
+|---|---|
+| Fato 1 da seção 3 — *"o alcance é pequeno: só boletins, só até 26/10/2022"* | **Deixou de ser verdade.** O token dá acesso a produto do fornecedor com dado corrente |
+| Gatilho 1 — *"o acervo recente passa a ser alcançável"* | **Acionado** no espírito: o token alcança dado corrente do fornecedor, embora não o boletim |
+| Gatilho 4 — *"o token passar a valer para outro produto que não o boletim"* | **Acionado** na letra: o alcance medido no item 3.1 não descreve mais a realidade |
+| Argumento decisivo da seção 3 — *rotacionar hoje reproduziria a exposição, porque o Secret Manager não existe* | **Continua de pé** enquanto A3 não chegar |
+
+**O que continua verdadeiro:** o acesso é somente leitura, não há dado pessoal e
+não há sistema transacional atrás — é dado comercial de previsão que a Alup
+contrata do TempoOK.
+
+A seção 5 diz que, acionado um gatilho, **a rotação passa a ser imediata**. A
+seção 3 diz que rotacionar antes de existir Secret Manager renova a exposição em
+vez de encerrá-la. As duas não cabiam juntas, e a ADR não dizia qual vence.
+
+**Decisão de 21/09/2026 — Ricardo Esper, responsável nomeado na seção 2:** a ADR
+foi aceita com este adendo. A tensão se resolve pela **seção 3**: o argumento
+decisivo — rotacionar sem Secret Manager reproduz a exposição — continua de pé, e
+o token de 14/09 é mantido até o Secret Manager existir. O que muda é a data: a
+rotação deixa de estar amarrada à virada de produção e passa a ser a **primeira
+ação depois de A3**, com o valor novo gravado pela Alup direto no Secret Manager.
+Os gatilhos 1 e 4 seguem registrados como acionados; não há prazo próprio além
+de A3.
+
+**Duas coisas que não dependem de decisão e foram feitas:**
+
+- o dicionário e o `status.md` deixam de repetir o alcance de 2022 como o alcance
+  do token;
+- a dúvida sobre **a natureza do token** entra como pergunta em aberto: a função
+  da Alup obtém o token por `get_tok_token()`, o que sugere credencial renovável,
+  enquanto o nosso é o valor estático de 14/09 — que **continua válido sete dias
+  depois**.
+
+**Consequência para o pedido à Alup.** A rotação, quando acontecer, deve ser
+pedida já com destino: o valor novo gravado direto no Secret Manager, sem e-mail
+(seção 3). O momento natural é o dia em que A3 chegar.
+

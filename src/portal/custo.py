@@ -105,6 +105,7 @@ DOMINIO_ANALITICO = {
     "ons_restricao_coff_eolica": "Geração e Operacional",
     "ons_restricao_coff_fotovoltaica": "Geração e Operacional",
     "tempook_boletins": "Meteorologia",
+    "tempook_ena_prevs": "Meteorologia",
     "hubspot_negocios": "Comercial e Contratos",
     "bcb_cambio_ptax": "Econômico",
     "bcb_juros": "Econômico",

@@ -1,6 +1,6 @@
 # Estado do projeto
 
-Atualizado em **2026-09-18** · **A3 chega ao 9º dia útil de atraso sem confirmação de entrega** —
+Atualizado em **2026-09-21** · **A3 chega hoje ao 10º dia útil de atraso sem confirmação de entrega** —
 vencido em 04/09, previsão da Alup para 18/09, contagem da cláusula 3ª em
 curso; **passou dos 5 dias úteis, o cronograma está postergado**. Em 16/09 a
 ness. enviou à Alup **as contas que devem receber os papéis no projeto GCP**
@@ -10,8 +10,13 @@ liberação**. Em 14/09 a Alup entregou a documentação das APIs (**A2
 encerrada e A8 atendida**) e em 15/09 a **matriz RACI do projeto**
 ([`raci.md`](raci.md)), que não altera prazo nem desbloqueia frente de
 trabalho. A conferência de 18/09 não encontrou confirmação posterior de entrega
-do GCP, billing ou planilhas. Referência do código: `main` em `2d0f7c6`, de
-16/09. O feriado de 07/09 não entra na contagem: primeiro dia útil de atraso
+do GCP, billing ou planilhas, **e a de 21/09 também não**: nenhuma atividade da
+Alup nas issues desde 18/09; a previsão de 18/09 passou sem confirmação. O
+`gcloud` local pede reautenticação, então o ambiente não foi consultado
+diretamente. **Em 21/09** o token do TempoOK provou alcançar um produto **em dia**
+(previsão de ENA) — nova fonte entregue e um gatilho de segurança acionado, ver
+A10 e a [ADR 020](arquitetura/decisoes/020-token-tempook-rotacao-na-producao.md).
+Referência do código: `main` em `e2b21ca`, de 21/09. O feriado de 07/09 não entra na contagem: primeiro dia útil de atraso
 em 08/09. G1 encerrou na reunião de 10/09 e não é bloqueio atual.
 
 ## Reparos técnicos durante a espera pelo ambiente — 18/09
@@ -60,7 +65,7 @@ contexto para agentes, em [`../AGENTS.md`](../AGENTS.md).
 | Runner de ingestão (janela, raw no GCS, validação, colunas técnicas, carga, log) | `src/core/` | Suíte local de 18/09: 956 aprovados, 264 pulados, 93% de cobertura; [registro da verificação](relatorios/2026-09-18-reconciliacao-acompanhamento.md). Integrações puladas não comprovam operação real |
 | Caminho de banco relacional (Oracle/MySQL/**SQL Server**) para a Onda 3 | `src/core/banco.py` | ADR 008 e adendo de 04/09; 20 testes sem rede; **nenhuma conexão real** — depende de VPN (A7). Compose e testes de integração prontos em `tests/integration/` |
 | Replay do raw sem nova chamada à fonte | `alupdata reprocessar-raw`, `src/core/storage.py` | testes locais com JSONL gzip; falta validar contra GCS real |
-| CLI única (`alupdata listar` / `ingerir`) | `src/cli.py` | 23 entidades verificadas com dados reais em dry-run; TempoOK com contrato da API verificado |
+| CLI única (`alupdata listar` / `ingerir`) | `src/cli.py` | 24 entidades verificadas com dados reais em dry-run; TempoOK/boletins com contrato da API verificado |
 | Scaffolding dos 7 componentes | `make novo-conector` | usado nas fontes novas |
 | Transformações Dataform | `definitions/`, `make dataform-compile` | DDL Bronze, views Silver e tabelas Gold; execução no GCP ainda pendente |
 | Motor S2 Data Intake (planilha CSV/XLSX sob template) | `src/core/planilha.py`, `src/conectores/planilha.py` | 19 testes; templates concretos dependem de G3/#142 |
@@ -95,6 +100,7 @@ contexto para agentes, em [`../AGENTS.md`](../AGENTS.md).
 | **Hubspot/negócios** | JSON paginado, CRM | **não executado** — sem token (A9) | a cada 6h, janela 2 dias |
 | **BBCE/curva forward** | JSON por pregão, sessão JWT | **não executado** — sem acesso (A7) | dia útil 20h, janela 7 dias |
 | **TempoOK/boletins** | PDF por download, catálogo no Bronze | **contrato verificado contra a API real**; 0 boletins ingeríveis — o acervo alcançável para em 26/10/2022 (ADR 019, adendo) | diário 11h, janela 5 dias |
+| **TempoOK/ENA-PREVS** | `tar.gz` por download, catálogo no Bronze; **um arquivo por dia, inclusive fim de semana** | **em dia**: dry-run de 01 a 15/09 = 14 arquivos, 0 inválidos, 69 s, contra a origem real; 43 de 45 dias cobertos, buracos só em sábado; acervo desde ~17/11/2024, ~60 MB | diário 11h30, janela 5 dias |
 | **CCEE/agente** | CSV anual, UTF-8 e ISO-8859-1 misturados por linha, via CKAN | **32.886 registros / 2 meses**, 0 inválidos, 4,2 s, contra a API real | mensal, dia 6 às 10h, janela 120 dias |
 | **CCEE/exposição financeira** | CSV anual, ASCII, série mensal sem agente, via CKAN | **7 registros / 7 meses**, 0 inválidos, 0,9 s, contra a API real | mensal, dia 6 às 10h, janela 120 dias |
 | **CCEE/contabilização por perfil** | CSV anual, UTF-8 e ISO-8859-1 misturados por linha, com recontabilização (ADR 016), via CKAN | **94.710 registros / 2 meses**, 0 inválidos, 11,8 s, contra a API real | mensal, dia 6 às 10h, janela 120 dias |
@@ -112,19 +118,24 @@ contexto para agentes, em [`../AGENTS.md`](../AGENTS.md).
 | **ONS/constrained-off eólico** | CSV mensal, **passo de 30 min**, por usina ou conjunto | **227.664 registros / 1 mês**, 0 inválidos, 60,1 s; **pico de 389 MiB medido**; 47,5% das meias-horas sem restrição (usina gerando livre) | mensal, dia 7 às 6h, janela 40 dias, 1Gi |
 | **ONS/constrained-off fotovoltaico** | mesmo schema da eólica, 24 colunas | **121.536 registros / 1 mês**, 0 inválidos, 36,1 s; **pico de 275 MiB medido** | mensal, dia 7 às 6h30, janela 40 dias, 1Gi |
 
-**Vinte e três das vinte e seis falaram com a API real** em dry-run: as
+**Vinte e quatro das vinte e sete falaram com a API real** em dry-run: as
 dezesseis de 14/09 — as seis originais, as nove entidades novas da CCEE
 (ADR 021) e o `bcb_juros` — somadas às **sete fontes do ONS de 15/09** (EAR,
 ENA, geração horária, capacidade instalada, disponibilidade por usina e o
-constrained-off de eólica e de fotovoltaica). Hubspot e BBCE seguem as exceções: os 7 componentes
+constrained-off de eólica e de fotovoltaica) e a **previsão de ENA do TempoOK**, de 21/09.
+Hubspot e BBCE seguem as exceções: os 7 componentes
 existem, escritos contra a documentação, e o teste de integração está `skipif`
 até a credencial chegar (A9 e A7). No BBCE falta inclusive o **host**, que não
 consta da documentação pública e vem junto com o acesso.
 
-O TempoOK é um caso à parte: **falou com a API e o contrato de dados está
-verificado** — caminho, ausência por 404, TLS, estabilidade do `sha256` —, mas
-o acervo alcançável termina em 26/10/2022, então não há boletim para ingerir
-(A10).
+O TempoOK é um caso à parte, e tem **dois produtos com destinos diferentes**. O
+**boletim** falou com a API e o contrato está verificado — caminho, ausência por
+404, TLS, estabilidade do `sha256` —, mas o acervo alcançável termina em
+26/10/2022, então não há boletim para ingerir (A10). A **previsão de ENA** foi
+recebida em 18/09 e verificada em 21/09: **responde para a data de hoje**, diária,
+com acervo desde ~17/11/2024. É o primeiro dado do domínio Meteorologia que não é
+de 2022. Só o caminho de exemplo é conhecido — **a Alup vai indicar os que
+importam** — e o conector não abre o `tar.gz` (extrair os números é escopo futuro).
 
 Não há carga em BigQuery real registrada nem confirmação de entrega do ambiente GCP até esta conferência.
 
@@ -191,7 +202,7 @@ destino, com os oito invariantes e a pauta de perguntas. **Enviado ao Google em
 | A7 | Abrir **já** os pedidos de token (Onda 2) e VPN/credencial (Onda 3) | é o maior risco do contrato: atraso dispara ociosidade de 4h/dia | plano §7 |
 | ~~A8~~ | ~~**Documentação técnica de BBCE e TempoOK**~~ | **Atendida em 14/09** — BBCE documentado em Postman; TempoOK sem documentação publicada, mas com exemplo suficiente. Resta só a credencial do BBCE, que é A7 | [registro de 14/09](relatorios/2026-09-14-documentacao-de-apis-recebida.md) |
 | A9 | **Token do Hubspot** (private app) no secret `alupdata-hubspot-api-token` | o conector está pronto e parado; nenhuma linha de CRM entra no lake | plano 2.3 (2.3) |
-| A10 | **Verificar com o TempoOK o acesso ao acervo recente** — o token entregue em 14/09 alcança boletins só até 26/10/2022 | o conector está pronto e verificado, mas ingere zero boletins; a fonte não fecha na Onda 2. **Resolver isto antecipa a rotação do token** (gatilho 1 da [ADR 020](arquitetura/decisoes/020-token-tempook-rotacao-na-producao.md)): com acervo corrente, o alcance da credencial muda de patamar | [ADR 019](arquitetura/decisoes/019-boletim-do-tempook-como-arquivo.md), [registro de 14/09](relatorios/2026-09-14-documentacao-de-apis-recebida.md) §4.1 |
+| A10 | **Verificar com o TempoOK o acesso ao acervo recente** — o token entregue em 14/09 alcança boletins só até 26/10/2022 | o conector do boletim está pronto e verificado, mas ingere zero boletins. **Atualização de 21/09**: o mesmo token alcança a previsão de ENA em dia (`tempook_ena_prevs`, dicionário [`tempook_ena_prevs.md`](dicionario-dados/tempook_ena_prevs.md)), então a pergunta passa a ser **onde estão os boletins recentes** e **quais caminhos importam**. **Isto aciona os gatilhos 1 e 4 da [ADR 020](arquitetura/decisoes/020-token-tempook-rotacao-na-producao.md)** — o alcance medido em 14/09 deixou de descrever o token; a rotação, que a ADR diz ser imediata, colide com o fato de o Secret Manager ainda não existir. **Decidido em 21/09 pelo responsável da ADR (ness.):** aceita com o adendo — o token é mantido até o Secret Manager existir e a rotação passa a ser a **primeira ação depois de A3**, não mais da virada de produção | [ADR 019](arquitetura/decisoes/019-boletim-do-tempook-como-arquivo.md), [registro de 14/09](relatorios/2026-09-14-documentacao-de-apis-recebida.md) §4.1 |
 | A11 | **De-para de usina** — falta só **sigla interna ↔ CEG** | Encolheu em 15/09: o lado CEG ↔ nome ANEEL ↔ nome ONS está em `gold.de_para_usina`, montado do dado público (95,1% do cadastro de capacidade do ONS casa com a ANEEL; 98,4% da geração horária). Segue bloqueando `ccee_geracao_usina` e `ccee_cvu_estrutural`, que guardam `codigo_parcela_usina` com `codigo_usina` nulo | Lacuna 1 (`dominios-analiticos.md` §5.1), [#141](https://github.com/nessenergy/Alupdatalake/issues/141) |
 | A12 | **Exemplos reais das planilhas** (G3, prometidos até 18/09) | além do item 4.1 da Onda 4, é o que permite conferir o escopo de dado item a item contra os 13 conectores. O escopo declarado é "o mapeado na planilha da proposta"; se a planilha nomear algo fora dos 13, é aditivo, e a distinção precisa ser feita antes da medição | [#142](https://github.com/nessenergy/Alupdatalake/issues/142), [`questionario-gaps.md`](questionario-gaps.md) G3, [`arquitetura/dominios-analiticos.md`](arquitetura/dominios-analiticos.md) §2 |
 
@@ -217,7 +228,7 @@ de tempo, quantidade de cartões ou PRs.
 |---|---|---|---|
 | 0 — Fundação | 90h · marco 15,52% | **~82%** | Framework, CI/CD, domínios, dimensões comuns e RACI entregues (peso estimado de ~74h do plano, não horas realizadas). Restam itens com peso estimado de ~16h — provisionar o GCP, 1º deploy, ligar o portal — **100% bloqueados por A3**, em liberação desde 16/09 |
 | 1 — Mercado base | 120h · marco 20,69% | **escopo original 100%** | As 4 fontes públicas + CCEE planejadas estão entregues. As sete novas entidades do ONS (15/09) e as nove entidades da ADR 021 (14/09) ampliam a cobertura técnica considerada na estimativa original; a conciliação com as **120h orçadas** e as 13 fontes continua pendente — por demanda dos domínios do B1, não porque a onda pedisse |
-| 2 — APIs credenciadas | 110h · marco 18,97% | **~50% escrito, 0% executável** | Hubspot, TempoOK e BBCE têm os 7 componentes escritos contra documentação, não contra API real credenciada. Só o TempoOK de fato conversou com a origem — e está travado por outro motivo, o acervo (#129). Esse indicador não representa horas realizadas nem percentual de homologação |
+| 2 — APIs credenciadas | 110h · marco 18,97% | **~50% escrito, 0% executável** | Hubspot, TempoOK e BBCE têm os 7 componentes escritos contra documentação, não contra API real credenciada. O TempoOK conversou com a origem e, desde 21/09, **tem um produto em dia** (previsão de ENA, `tempook_ena_prevs`); o boletim segue travado pelo acervo (#129). Esse indicador não representa horas realizadas nem percentual de homologação |
 | 3 — Sistemas internos | 155h · marco 26,72% | **0%** | Caminho de banco pronto (ADR 008: Oracle, MySQL e SQL Server, drivers puro-Python, testado sem rede); **nenhuma fonte iniciada** — bloqueada por VPN e credencial (A7, vence 25/09). VPN também depende de A3: mesmo com credencial em mãos, a rota de rede pode continuar bloqueada até o ambiente existir |
 | 4 — Planilhas e handoff | 105h · marco 18,10% | **~29%** | Motor S2 Data Intake pronto (peso estimado de ~30h de 105h, não horas realizadas), adiantado por não depender de insumo. O resto é sequencial — Knowledge Catalog e handoff dependem das outras ondas; Gold sem KPI nesta fase (ADR 012), templates dependem da G3 (#142, vence 18/09) |
 

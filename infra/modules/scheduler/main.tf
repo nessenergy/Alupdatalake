@@ -220,6 +220,17 @@ variable "conectores" {
       cron         = "0 11 * * *" # depois da publicação do boletim do dia
       ultimos_dias = 5            # cobre execução perdida e publicação atrasada
     }
+    tempook_ena_prevs = {
+      # Previsão de ENA, um tar.gz de ~94 KB por dia — **diário, inclusive fim de
+      # semana** (sondagem de 21/09: buracos pontuais, todos em sábado).
+      # Mesmo endpoint e mesma cautela do boletim (ADR 019): cada dia é um POST
+      # próprio, ~4,6 s cada medido em 21/09, então janela de 5 dias fica em ~25 s
+      # e cobre execução perdida e publicação atrasada. Meia hora depois do
+      # boletim para não disputar a mesma janela. Arquivo minúsculo: a memória
+      # padrão sobra.
+      cron         = "30 11 * * *"
+      ultimos_dias = 5
+    }
   }
 }
 

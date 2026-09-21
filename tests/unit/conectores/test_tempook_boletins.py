@@ -20,8 +20,8 @@ PDF = b"%PDF-1.4\n%fake boletim para teste\n%%EOF\n"
 
 @pytest.fixture
 def conector(monkeypatch):
-    monkeypatch.setattr("src.conectores.tempook_boletins.criar_sessao", lambda **_: None)
-    monkeypatch.setattr("src.conectores.tempook_boletins.ler_secret", lambda *_a, **_k: "token-de-teste")
+    monkeypatch.setattr("src.conectores.tempook_arquivos.criar_sessao", lambda **_: None)
+    monkeypatch.setattr("src.conectores.tempook_arquivos.ler_secret", lambda *_a, **_k: "token-de-teste")
     return TempookBoletins()
 
 

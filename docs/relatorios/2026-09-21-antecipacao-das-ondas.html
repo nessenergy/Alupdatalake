@@ -1,4 +1,4 @@
-<!doctype html><html lang='pt-BR'><head><meta charset='utf-8'><title>Proposta 21/09/2026 — o que podemos antecipar e o que precisamos da Alup</title><link rel='preconnect' href='https://fonts.googleapis.com'><link rel='preconnect' href='https://fonts.gstatic.com' crossorigin><link href='https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap' rel='stylesheet'><style>
+<!doctype html><html lang='pt-BR'><head><meta charset='utf-8'><meta name='viewport' content='width=device-width, initial-scale=1'><title>Proposta 21/09/2026 — o que podemos antecipar e o que precisamos da Alup</title><link rel='preconnect' href='https://fonts.googleapis.com'><link rel='preconnect' href='https://fonts.gstatic.com' crossorigin><link href='https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap' rel='stylesheet'><style>
 @page { size: A4; margin: 16mm 14mm 16mm 14mm; }
 
 /* O documento existe para virar A4. Declarar o esquema claro impede o
@@ -15,22 +15,6 @@ html {
   print-color-adjust: exact;
 }
 
-/* Só a versão de tela: no PDF a margem é da @page. Em tela o documento se
-   apresenta como folha sobre fundo, que é como ele será lido e impresso. */
-@media screen {
-  html { background: var(--zebra); }
-  body {
-    max-width: 940px;
-    margin: 0 auto;
-    padding: 56px 56px 72px;
-    font-size: 15px;
-    background: #fff;
-    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04),
-                0 10px 15px -3px rgba(15, 23, 42, 0.06);
-  }
-  table { font-size: 14px; }
-}
-
 :root {
   --tinta: #0f172a;
   --suave: #475569;
@@ -39,6 +23,7 @@ html {
   --linha-fina: #eef2f6;
   --zebra: #f8fafc;
   --ness: #00ade8;
+  --link: #007aa3;
   --alerta: #b3261e;
   --fundo-alerta: #fdf3f2;
   /* Corpo em Inter, títulos e marca em Montserrat, dado técnico em mono. */
@@ -292,6 +277,56 @@ td, th, .id-valor { overflow-wrap: break-word; }
    na última — vale para o título do documento e para os de seção. */
 h1, h2, h3 { text-wrap: balance; }
 
+/* ------------------------------------------------------------------ links */
+
+/* Link com a cor da casa, não o azul padrão do navegador. O BlueDot puro
+   (#00ade8) não passa 4,5:1 sobre branco em texto corrido; o tom escuro dele
+   passa, e o sublinhado fica claro o bastante para não pesar na linha. */
+a {
+  color: var(--link);
+  text-decoration: underline;
+  text-decoration-color: rgba(0, 122, 163, 0.35);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.18em;
+}
+a:hover { text-decoration-color: currentColor; }
+a:focus-visible { outline: 2px solid var(--ness); outline-offset: 2px; border-radius: 2px; }
+
+::selection { background: rgba(0, 173, 232, 0.18); color: var(--tinta); }
+
+/* Lista com uma pendência por linha: o espaço entre itens é o que deixa o
+   olho contar quantas são. */
+li + li { margin-top: 1.2mm; }
+
+/* ----------------------------------------------------------------- em tela */
+
+/* Só a versão de tela: no PDF a margem é da @page. Em tela o documento se
+   apresenta como folha sobre fundo, que é como ele será lido e impresso.
+   Fica DEPOIS das regras-base de propósito: antes delas, o `body { margin: 0;
+   font-size: 9.4pt }` vencia pela ordem, a folha encostava à esquerda e o corpo
+   saía menor do que o previsto. */
+@media screen {
+  html { background: var(--zebra); }
+  body {
+    max-width: 940px;
+    margin: 0 auto;
+    padding: 56px 56px 72px;
+    font-size: 15px;
+    background: #fff;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04),
+                0 10px 15px -3px rgba(15, 23, 42, 0.06);
+  }
+  table { font-size: 14px; }
+  code { font-size: 13px; }
+}
+
+/* Folha estreita (celular): a margem da folha encolhe junto, e a tabela rola
+   dentro dela em vez de empurrar a página para o lado. */
+@media screen and (max-width: 640px) {
+  body { padding: 28px 18px 40px; font-size: 15px; }
+  table { display: block; overflow-x: auto; }
+}
+
 @media print {
   /* Uma linha solta no pé ou no topo da página é o defeito mais visível de um
      documento impresso. Três linhas é o mínimo que se lê como parágrafo. */
@@ -304,204 +339,93 @@ h1, h2, h3 { text-wrap: balance; }
   a { text-decoration: none; color: var(--tinta); }
 }
 </style></head><body class='relatorio'><p class="marca">ness<span>.</span></p><h1>O que podemos antecipar, e o que precisamos da Alup para isso</h1><section class='identificacao'><div class='id-rotulo'>Documento</div><div class='id-valor'>Proposta de antecipação de entregas</div><div class='id-rotulo'>Referência</div><div class='id-valor'>REL-2026-09-21 · AlupData Fase 1</div><div class='id-rotulo'>Data de emissão</div><div class='id-valor'>21 de setembro de 2026</div><div class='id-rotulo'>Emitente</div><div class='id-valor'>ness. Processos e Tecnologia Ltda.</div><div class='id-rotulo'>Destinatário</div><div class='id-valor'>Alup</div><div class='id-rotulo'>Contrato</div><div class='id-valor'>CPS-01025/2026 — AlupData Fase 1: DataLake</div><div class='id-rotulo'>Marco em jogo</div><div class='id-valor'>Ondas 0 a 4 — antecipação de entregas</div><div class='id-rotulo'>Responsável técnico</div><div class='id-valor'>Ricardo Esper</div><div class='id-rotulo'>Classificação</div><div class='id-valor'>Confidencial — uso restrito das partes</div></section>
-<h2>1. Por que escrevemos</h2>
-<p>Boa parte do trabalho técnico das Ondas 1, 2, 3 e 4 ficou pronta antes do
-calendário, porque adiantamos tudo que não dependia de insumo. Hoje o lake tem
-<strong>27 conectores</strong>, dos quais <strong>24 já foram verificados contra a origem real</strong>,
-com os sete componentes da cláusula 2ª cada.</p>
-<p>Queremos aproveitar isso. A cláusula 1ª prevê que atividades, prioridades e
-sequência podem ser redefinidas durante a execução, e o regime é de horas, não
-de empreitada. Este documento propõe <strong>fechar ondas antes das datas do
-cronograma</strong> e lista, em um só lugar, o que precisaríamos da Alup para isso.
-Nada aqui muda escopo nem valor.</p>
-<h2>2. Onde estamos</h2>
+<h2>Resumo</h2>
+<p>Adiantamos tudo que não dependia de insumo: o lake tem <strong>27 conectores</strong>, 24 já
+verificados contra a origem real. Propomos <strong>fechar ondas antes das datas do
+cronograma</strong> — a cláusula 1ª permite redefinir a sequência, e nada aqui muda
+escopo nem valor.</p>
+<p>Para isso, o que mais destrava é o <strong>ambiente GCP</strong>: com ele, homologamos as
+Ondas 0 e 1 juntas.</p>
+<h2>Onde estamos</h2>
 <table>
 <thead>
 <tr>
 <th>Onda</th>
-<th>Calendário do contrato</th>
+<th>Calendário</th>
 <th>Pronto do nosso lado</th>
-<th>O que falta para fechar</th>
+<th>Falta</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td><strong>0 — Fundação</strong></td>
 <td>até 11/09</td>
-<td>Framework, CI/CD, domínios, dimensões comuns, portal com autenticação (roda hoje com dados simulados)</td>
-<td>Ambiente GCP para o primeiro <code>apply</code> e três dias de execução real</td>
+<td>Tudo</td>
+<td>Ambiente GCP</td>
 </tr>
 <tr>
 <td><strong>1 — Mercado base</strong></td>
-<td>14/09 a 16/10</td>
-<td><strong>Escopo original entregue</strong>, e além dele: CCEE, ONS e ANEEL com 20 conjuntos de dados, todos verificados contra a origem</td>
-<td>O mesmo ambiente GCP — é só carga real e homologação</td>
+<td>até 16/10</td>
+<td>Tudo, e mais: 20 conjuntos de CCEE, ONS e ANEEL</td>
+<td>Ambiente GCP</td>
 </tr>
 <tr>
 <td><strong>2 — APIs com credencial</strong></td>
 <td>19/10 a 13/11</td>
-<td>Hubspot, BBCE e TempoOK com os sete componentes. O TempoOK já baixa um produto em dia (previsão de ENA)</td>
+<td>Hubspot, BBCE e TempoOK escritos; TempoOK já em uso</td>
 <td>Token do Hubspot e acesso do BBCE</td>
 </tr>
 <tr>
 <td><strong>3 — Sistemas internos</strong></td>
 <td>16/11 a 18/12</td>
-<td>Caminho de banco pronto para Oracle, MySQL e SQL Server, testado sem rede</td>
-<td>Credenciais e caminho de rede de cada sistema</td>
+<td>Conexão com Oracle, MySQL e SQL Server</td>
+<td>Credenciais e rede</td>
 </tr>
 <tr>
 <td><strong>4 — Planilhas e handoff</strong></td>
 <td>21/12 a 08/01</td>
-<td>Motor de ingestão de planilhas pronto</td>
-<td>As planilhas de exemplo, para declarar os templates</td>
+<td>Motor de planilhas</td>
+<td>Planilhas de exemplo</td>
 </tr>
 </tbody>
 </table>
-<p><strong>Nenhuma onda está homologada.</strong> Homologar exige carga real em BigQuery e
-aceitação da Alup, e as duas dependem do ambiente GCP. É por isso que ele
-aparece no topo da seção 4.</p>
-<h2>3. O que podemos antecipar</h2>
-<h3>3.1 Ondas 0 e 1, juntas, assim que o GCP existir</h3>
-<p>Não há trabalho de desenvolvimento pendente em nenhuma das duas. Do dia em que o
-projeto <code>dev</code> estiver liberado, o caminho é: primeiro <code>apply</code>, publicação da
-imagem, três dias consecutivos de execução com sucesso e a sessão de
-homologação. <strong>A Onda 1, cuja data é 16/10, pode ser homologada junto com a
-Onda 0</strong> — as duas passam pelo mesmo ambiente e pelas mesmas evidências.</p>
-<h3>3.2 A Onda 2 antes de ela começar</h3>
-<p>O calendário abre a Onda 2 em 19/10. Os três conectores já estão escritos contra
-a documentação que a Alup enviou em 14/09, e o que falta é ligá-los à origem:</p>
+<p>Nenhuma onda está homologada: homologar exige carga real no ambiente GCP.</p>
+<h2>O que podemos antecipar</h2>
 <ul>
-<li><strong>Hubspot</strong> — só o token;</li>
-<li><strong>BBCE</strong> — o acesso somente leitura, que a Alup informou em 14/09 estar sendo
-  providenciado, e o endereço do serviço, que não consta da documentação;</li>
-<li><strong>TempoOK</strong> — <strong>já funciona.</strong> A previsão de ENA, cujo caminho a Alup enviou
-  em 18/09, responde para a data de hoje e está verificada. Falta só a Alup dizer
-  quais outros arquivos interessam.</li>
+<li><strong>Ondas 0 e 1, juntas</strong>, assim que o GCP existir. Não há desenvolvimento
+  pendente em nenhuma das duas.</li>
+<li><strong>Onda 2 em outubro</strong>, antes de começar formalmente — com o token do Hubspot
+  e o acesso do BBCE.</li>
+<li><strong>Onda 3 pelo MySQL RDS</strong>, que não precisa de VPN. Basta a credencial para
+  começar já em outubro.</li>
+<li><strong>Templates da Onda 4</strong>, assim que chegarem as planilhas de exemplo.</li>
 </ul>
-<p>Com o token e o acesso em mãos, a Onda 2 pode ser entregue <strong>em outubro, antes
-de começar formalmente</strong>.</p>
-<h3>3.3 Começar a Onda 3 pelo MySQL RDS</h3>
-<p>A Onda 3 é a maior do contrato (155h) e termina às vésperas do recesso. Começá-la
-antes alivia o fim do ano, e há uma porta de entrada pronta: a Alup informou em
-11/09 que o <strong>MySQL RDS da Comercialização não precisa de VPN</strong>. Com a
-credencial somente leitura, podemos começar por ele <strong>já em outubro</strong>, sem
-esperar o restante da Onda 3.</p>
-<p>Do <strong>Oracle FMB</strong> já recebemos host, porta e schema em 11/09. Falta confirmar
-se ele é alcançável sem VPN — se for, também pode começar cedo.</p>
-<h3>3.4 Os templates da Onda 4</h3>
-<p>O motor que ingere planilhas está pronto desde agosto. Com as planilhas de
-exemplo da proposta, declaramos os templates e deixamos a Onda 4 com uma parte
-já feita quando ela começar.</p>
-<h2>4. O que precisamos da Alup</h2>
-<p>Em ordem do que destrava mais. Cada item tem uma issue no repositório, onde o
-andamento fica registrado.</p>
-<table>
-<thead>
-<tr>
-<th>#</th>
-<th>O que</th>
-<th>Para quê</th>
-<th>Onde acompanhar</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>1</td>
-<td><strong>Projeto GCP <code>dev</code> liberado</strong>, com os papéis concedidos às quatro contas enviadas em 16/09</td>
-<td>Homologar as Ondas 0 e 1. É o único item que destrava duas ondas de uma vez</td>
-<td><a href="https://github.com/nessenergy/Alupdatalake/issues/55">#55</a></td>
-</tr>
-<tr>
-<td>2</td>
-<td><strong>Conta de faturamento</strong> vinculada ao projeto</td>
-<td>O <code>apply</code> não completa sem ela</td>
-<td><a href="https://github.com/nessenergy/Alupdatalake/issues/87">#87</a></td>
-</tr>
-<tr>
-<td>3</td>
-<td><strong>Token do Hubspot</strong></td>
-<td>Fechar o Hubspot na Onda 2</td>
-<td><a href="https://github.com/nessenergy/Alupdatalake/issues/24">#24</a></td>
-</tr>
-<tr>
-<td>4</td>
-<td><strong>Acesso do BBCE</strong> e o endereço do serviço</td>
-<td>Fechar o BBCE na Onda 2</td>
-<td><a href="https://github.com/nessenergy/Alupdatalake/issues/23">#23</a></td>
-</tr>
-<tr>
-<td>5</td>
-<td><strong>Credencial somente leitura do MySQL RDS</strong> — e, se a liberação for por lista de IPs, nos avisar, para reservarmos um IP fixo de saída</td>
-<td>Começar a Onda 3 sem VPN</td>
-<td><a href="https://github.com/nessenergy/Alupdatalake/issues/14">#14</a></td>
-</tr>
-<tr>
-<td>6</td>
-<td><strong>Oracle FMB</strong>: confirmar se é alcançável sem VPN, e a credencial somente leitura</td>
-<td>Antecipar a segunda fonte da Onda 3</td>
-<td><a href="https://github.com/nessenergy/Alupdatalake/issues/12">#12</a></td>
-</tr>
-<tr>
-<td>7</td>
-<td><strong>Portal Alup</strong>: credenciais do Aurora, DynamoDB e S3, e o caminho de rede</td>
-<td>Onda 3</td>
-<td><a href="https://github.com/nessenergy/Alupdatalake/issues/13">#13</a></td>
-</tr>
-<tr>
-<td>8</td>
-<td><strong>RM/TOTVS</strong>: endpoints e credencial</td>
-<td>Onda 3</td>
-<td><a href="https://github.com/nessenergy/Alupdatalake/issues/15">#15</a></td>
-</tr>
-<tr>
-<td>9</td>
-<td><strong>Fuso da janela de leitura</strong> dos sistemas internos (22h às 6h) — é horário de Brasília?</td>
-<td>Agendar a Onda 3 dentro da janela certa</td>
-<td><a href="https://github.com/nessenergy/Alupdatalake/issues/12">#12</a></td>
-</tr>
-<tr>
-<td>10</td>
-<td><strong>Planilhas de exemplo da proposta</strong></td>
-<td>Declarar os templates da Onda 4</td>
-<td><a href="https://github.com/nessenergy/Alupdatalake/issues/142">#142</a></td>
-</tr>
-<tr>
-<td>11</td>
-<td><strong>Lista das siglas internas com o CEG ao lado</strong> — pouco mais de vinte linhas</td>
-<td>Ligar a geração por usina da CCEE aos ativos da Alup. O resto do de-para o lake já montou sozinho</td>
-<td><a href="https://github.com/nessenergy/Alupdatalake/issues/141">#141</a></td>
-</tr>
-<tr>
-<td>12</td>
-<td><strong>TempoOK</strong>: quais arquivos interessam, onde estão os boletins recentes e se o token é fixo ou renovável</td>
-<td>Ingerir o que importa, e nada além</td>
-<td><a href="https://github.com/nessenergy/Alupdatalake/issues/174">#174</a></td>
-</tr>
-<tr>
-<td>13</td>
-<td><strong>Matriz RACI</strong>: quem compõe o Comitê e o papel do Google</td>
-<td>Saber quem aceita cada homologação</td>
-<td><a href="https://github.com/nessenergy/Alupdatalake/issues/150">#150</a></td>
-</tr>
-</tbody>
-</table>
-<p>Os itens 1 e 2 são a mesma conversa. Os itens 4 a 8 são o pedido de acessos
-com prazo em <strong>25/09</strong>, e o item 3 é o mais simples de todos: um token. Se
-ajudar, podemos tratar os itens 3 a 9 numa reunião curta com o Leonardo, ponto
-focal técnico da Alup: a maior parte é confirmação, não trabalho.</p>
-<h2>5. Como entregar as credenciais</h2>
-<p>Quando o projeto GCP existir, a forma mais segura para as duas partes é a Alup
-gravar cada credencial <strong>direto no Secret Manager</strong>, sem passar por e-mail. Os
-nomes já estão definidos e o acesso fica restrito à conta que executa a
-ingestão — ninguém da ness. precisa ver o valor:</p>
-<p><code>printf '%s' 'O-VALOR' | gcloud secrets versions add alupdata-hubspot-api-token --data-file=-</code></p>
-<p>No mesmo dia, pedimos também a <strong>rotação do token do TempoOK</strong>, que chegou por
-e-mail em 14/09 e desde 21/09 dá acesso a dado atual. O token novo segue o mesmo
-caminho.</p>
-<p>Se alguma credencial ficar pronta antes do GCP, combinamos um canal que não seja
-e-mail.</p>
-<h2>6. Agradecimento</h2>
-<p>Chegamos até aqui porque cada insumo que a Alup enviou foi aproveitado no mesmo
-dia: a orientação sobre a CCEE, a documentação de 14/09, a matriz RACI e o
-caminho do TempoOK de 18/09. A proposta é seguir nesse ritmo — e, com o ambiente
-liberado, transformar o que já está pronto em ondas homologadas.</p><section class='assinatura'><p class=local-data>21 de setembro de 2026</p><div class='linha-assinatura'></div><p class='assina-nome'>Ricardo Esper</p><p class='assina-org'>ness. Processos e Tecnologia Ltda.</p></section><p class="rodape">ness. Processos e Tecnologia Ltda. · CNPJ 72.027.097/0001-37 · Contrato CPS-01025/2026 — AlupData Fase 1: DataLake</p></body></html>
+<h2>O que precisamos da Alup</h2>
+<h3>Ambiente — destrava as Ondas 0 e 1</h3>
+<ul>
+<li>Projeto GCP <code>dev</code> com os papéis das quatro contas enviadas em 16/09 — <a href="https://github.com/nessenergy/Alupdatalake/issues/55">#55</a></li>
+<li>Conta de faturamento vinculada ao projeto — <a href="https://github.com/nessenergy/Alupdatalake/issues/87">#87</a></li>
+</ul>
+<h3>Acessos — Ondas 2 e 3, prazo 25/09</h3>
+<ul>
+<li>Token do Hubspot — <a href="https://github.com/nessenergy/Alupdatalake/issues/24">#24</a></li>
+<li>Acesso do BBCE e o endereço do serviço — <a href="https://github.com/nessenergy/Alupdatalake/issues/23">#23</a></li>
+<li>Credencial do MySQL RDS, e se a liberação é por lista de IPs — <a href="https://github.com/nessenergy/Alupdatalake/issues/14">#14</a></li>
+<li>Oracle FMB: credencial, e se é alcançável sem VPN — <a href="https://github.com/nessenergy/Alupdatalake/issues/12">#12</a></li>
+<li>Portal Alup: credenciais e caminho de rede — <a href="https://github.com/nessenergy/Alupdatalake/issues/13">#13</a></li>
+<li>RM/TOTVS: endpoints e credencial — <a href="https://github.com/nessenergy/Alupdatalake/issues/15">#15</a></li>
+</ul>
+<h3>Confirmações e listas</h3>
+<ul>
+<li>Fuso da janela de leitura dos sistemas internos (22h às 6h) — <a href="https://github.com/nessenergy/Alupdatalake/issues/12">#12</a></li>
+<li>Planilhas de exemplo da proposta — <a href="https://github.com/nessenergy/Alupdatalake/issues/142">#142</a></li>
+<li>Siglas internas das usinas com o CEG ao lado, cerca de vinte linhas — <a href="https://github.com/nessenergy/Alupdatalake/issues/141">#141</a></li>
+<li>TempoOK: quais arquivos interessam — <a href="https://github.com/nessenergy/Alupdatalake/issues/174">#174</a></li>
+<li>RACI: quem compõe o Comitê e o papel do Google — <a href="https://github.com/nessenergy/Alupdatalake/issues/150">#150</a></li>
+</ul>
+<p>Os acessos e as confirmações cabem numa reunião curta com o Leonardo.</p>
+<h2>Credenciais</h2>
+<p>Com o GCP liberado, a Alup grava cada credencial <strong>direto no Secret Manager</strong>,
+sem e-mail — os nomes já estão definidos e ninguém da ness. vê o valor. No mesmo
+dia pedimos a rotação do token do TempoOK, que chegou por e-mail em 14/09.</p>
+<p>Obrigado pela parceria até aqui: cada insumo enviado foi usado no mesmo dia.</p><section class='assinatura'><p class=local-data>21 de setembro de 2026</p><div class='linha-assinatura'></div><p class='assina-nome'>Ricardo Esper</p><p class='assina-org'>ness. Processos e Tecnologia Ltda.</p></section><p class="rodape">ness. Processos e Tecnologia Ltda. · CNPJ 72.027.097/0001-37 · Contrato CPS-01025/2026 — AlupData Fase 1: DataLake</p></body></html>

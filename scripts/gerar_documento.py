@@ -50,22 +50,6 @@ html {
   print-color-adjust: exact;
 }
 
-/* Só a versão de tela: no PDF a margem é da @page. Em tela o documento se
-   apresenta como folha sobre fundo, que é como ele será lido e impresso. */
-@media screen {
-  html { background: var(--zebra); }
-  body {
-    max-width: 940px;
-    margin: 0 auto;
-    padding: 56px 56px 72px;
-    font-size: 15px;
-    background: #fff;
-    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04),
-                0 10px 15px -3px rgba(15, 23, 42, 0.06);
-  }
-  table { font-size: 14px; }
-}
-
 :root {
   --tinta: #0f172a;
   --suave: #475569;
@@ -74,6 +58,7 @@ html {
   --linha-fina: #eef2f6;
   --zebra: #f8fafc;
   --ness: #00ade8;
+  --link: #007aa3;
   --alerta: #b3261e;
   --fundo-alerta: #fdf3f2;
   /* Corpo em Inter, títulos e marca em Montserrat, dado técnico em mono. */
@@ -327,6 +312,56 @@ td, th, .id-valor { overflow-wrap: break-word; }
    na última — vale para o título do documento e para os de seção. */
 h1, h2, h3 { text-wrap: balance; }
 
+/* ------------------------------------------------------------------ links */
+
+/* Link com a cor da casa, não o azul padrão do navegador. O BlueDot puro
+   (#00ade8) não passa 4,5:1 sobre branco em texto corrido; o tom escuro dele
+   passa, e o sublinhado fica claro o bastante para não pesar na linha. */
+a {
+  color: var(--link);
+  text-decoration: underline;
+  text-decoration-color: rgba(0, 122, 163, 0.35);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.18em;
+}
+a:hover { text-decoration-color: currentColor; }
+a:focus-visible { outline: 2px solid var(--ness); outline-offset: 2px; border-radius: 2px; }
+
+::selection { background: rgba(0, 173, 232, 0.18); color: var(--tinta); }
+
+/* Lista com uma pendência por linha: o espaço entre itens é o que deixa o
+   olho contar quantas são. */
+li + li { margin-top: 1.2mm; }
+
+/* ----------------------------------------------------------------- em tela */
+
+/* Só a versão de tela: no PDF a margem é da @page. Em tela o documento se
+   apresenta como folha sobre fundo, que é como ele será lido e impresso.
+   Fica DEPOIS das regras-base de propósito: antes delas, o `body { margin: 0;
+   font-size: 9.4pt }` vencia pela ordem, a folha encostava à esquerda e o corpo
+   saía menor do que o previsto. */
+@media screen {
+  html { background: var(--zebra); }
+  body {
+    max-width: 940px;
+    margin: 0 auto;
+    padding: 56px 56px 72px;
+    font-size: 15px;
+    background: #fff;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04),
+                0 10px 15px -3px rgba(15, 23, 42, 0.06);
+  }
+  table { font-size: 14px; }
+  code { font-size: 13px; }
+}
+
+/* Folha estreita (celular): a margem da folha encolhe junto, e a tabela rola
+   dentro dela em vez de empurrar a página para o lado. */
+@media screen and (max-width: 640px) {
+  body { padding: 28px 18px 40px; font-size: 15px; }
+  table { display: block; overflow-x: auto; }
+}
+
 @media print {
   /* Uma linha solta no pé ou no topo da página é o defeito mais visível de um
      documento impresso. Três linhas é o mínimo que se lê como parágrafo. */
@@ -449,6 +484,7 @@ def montar_html(texto_md: str, *, classe: str = "relatorio") -> str:
     )
     return (
         "<!doctype html><html lang='pt-BR'><head><meta charset='utf-8'>"
+        "<meta name='viewport' content='width=device-width, initial-scale=1'>"
         f"<title>{titulo}</title>"
         "<link rel='preconnect' href='https://fonts.googleapis.com'>"
         "<link rel='preconnect' href='https://fonts.gstatic.com' crossorigin>"

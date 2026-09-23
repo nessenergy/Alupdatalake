@@ -30,7 +30,7 @@ Da Alup, antes:
 Da ness.:
 
 ```bash
-gcloud auth application-default login
+gcloud auth application-default login --account=<voce>@ness.com.br
 cd infra/bootstrap
 terraform init
 terraform workspace select -or-create <ambiente>
@@ -38,6 +38,24 @@ terraform plan -var-file=environments/<ambiente>.tfvars -out=tfplan
 terraform apply tfplan
 terraform output
 ```
+
+> **Confira de quem é a ADC antes do apply.** A credencial de aplicação é
+> independente da conta do `gcloud`: em 23/09 o `gcloud` estava na conta da
+> ness. e a ADC, numa conta pessoal de um login antigo. O sintoma não diz
+> "conta errada" — chega como 403 de permissão, e custa uma investigação
+> inteira. Para conferir sem imprimir credencial:
+>
+> ```bash
+> uv run python -c "
+> import json, urllib.request, google.auth, google.auth.transport.requests as t
+> c, _ = google.auth.default(); c.refresh(t.Request())
+> r = urllib.request.Request('https://www.googleapis.com/oauth2/v3/userinfo')
+> r.add_header('Authorization', 'Bearer ' + c.token)
+> print(json.load(urllib.request.urlopen(r))['email'])"
+> ```
+>
+> O campo `account` do arquivo de ADC vem vazio em login antigo e não serve
+> de prova. Na dúvida, refaça o login com `--account=`.
 
 - [ ] Conferir no `plan`: as APIs, o bucket `<projeto>-tfstate` em
   `us-central1`, o repositório `alupdata`, o pool `github` e o provedor

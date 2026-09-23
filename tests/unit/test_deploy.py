@@ -45,12 +45,17 @@ def test_deploy_image_guard(module, image_sha, exists, success, tmp_path):
     assert guard["env"]["IMAGE_SHA"] == "${{ inputs.image_sha }}"
     assert guard["env"]["DEPLOY_MODULE"] == "${{ inputs.module }}"
     assert "${{" not in guard["run"]
-    cloud = next(step for step in steps if "gcloud artifacts docker images describe" in step.get("run", ""))
+    cloud = next(step for step in steps if "gcloud artifacts docker images list" in step.get("run", ""))
     assert cloud["env"]["INGESTION_IMAGE"] == "${{ steps.image.outputs.reference }}"
     assert steps.index(guard) < next(i for i, step in enumerate(steps) if "auth@" in step.get("uses", ""))
     assert cloud["run"].index("gcloud artifacts") < cloud["run"].index("terraform init")
     # Funções substituem os executáveis; nenhuma chamada chega ao GCP ou Terraform.
-    stub = """gcloud() { echo "gcloud $*" >> calls; return "$IMAGE_EXISTS"; }
+    # A guarda decide pela saída, não pelo código de retorno: `images list` de
+    # uma tag inexistente responde vazio e com sucesso.
+    stub = """gcloud() {
+  echo "gcloud $*" >> calls
+  if [ "$IMAGE_EXISTS" = 0 ]; then echo "sha256:0123456789abcdef"; fi
+}
 terraform() { echo "terraform $*" >> calls; }
 """
     (tmp_path / "infra").mkdir()
@@ -78,7 +83,8 @@ terraform() { echo "terraform $*" >> calls; }
     calls = (tmp_path / "calls").read_text() if (tmp_path / "calls").exists() else ""
     if success:
         expected_sha = "c" * 40 if module == "all" else image_sha
-        assert f"gcloud artifacts docker images describe {BASE}:{expected_sha}" in calls
+        assert f"gcloud artifacts docker images list {BASE} --include-tags" in calls
+        assert f"--filter=tags:{expected_sha}" in calls
         assert f"-var=imagem_ingestao={BASE}:{expected_sha}" in (tmp_path / "infra/calls").read_text()
         assert f"reference={BASE}:{expected_sha}" in (tmp_path / "image-output").read_text()
     elif exists:

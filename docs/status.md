@@ -3,8 +3,9 @@
 Atualizado em **2026-09-23** · **A Alup liberou o GCP nos três ambientes** —
 `dev`, homologação e produção, informado à ness. em 23/09. Os projetos
 existem com os IDs `alupar-dev-alupdata`, `alupar-hm-alupdata` e
-`prod-alupdata` (ver A3). **A3 sai de bloqueio e vira trabalho da ness.**: o
-bootstrap da ADR 015 é o próximo passo. **A conferência do ambiente foi feita
+`prod-alupdata` (ver A3). **O bootstrap do `dev` foi aplicado no mesmo dia**
+— 38 recursos, a primeira infraestrutura do contrato a existir de verdade
+(ver N3). **A conferência do ambiente foi feita
 no mesmo dia** (A13): faturamento vinculado, os seis papéis concedidos e as
 políticas de IAM abertas. Achou também um bloqueio: a política
 `gcp.resourceLocations` herdada nos três projetos **não admite `us-east1`**,
@@ -196,7 +197,7 @@ destino, com os oito invariantes e a pauta de perguntas. **Enviado ao Google em
 |---|---|---|
 | N1 | Preparar contrato de dados das fontes das Ondas 2 e 3 | TempoOK e **BBCE já implementados** (BBCE: [PR #131](https://github.com/nessenergy/Alupdatalake/pull/131)); faltam acervo recente (#129), acesso/host BBCE (#23) e documentação/acessos das fontes internas (A7) |
 | N2 | Portal MVP: ligar contra o BigQuery e publicar no Cloud Run | escopo cravado na ADR 005; a tela existe e roda com provedor simulado — depende do N3 |
-| N3 | **Bootstrap do `dev`, primeiro `terraform apply` real e primeiro deploy da imagem** — desbloqueado em 23/09. Antes de rodar: gravar os IDs reais nos `.tfvars` (hoje ainda trazem os previstos) e conferir A13 | nada: é a frente ativa. `runbook/primeiro-deploy.md` §0 |
+| N3 | **Bootstrap do `dev` aplicado em 23/09** — 38 recursos, 0 alterados, 0 destruídos: 16 APIs, o bucket de state `alupar-dev-alupdata-tfstate` em `us-central1`, o repositório `alupdata` do Artifact Registry, o pool e o provedor de WIF (condição por nome **e** ID do repositório) e a SA `alupdata-deploy`, sem chave, com 13 papéis. A cópia do state está em `gs://alupar-dev-alupdata-tfstate/bootstrap/` e as cinco variáveis estão gravadas no ambiente `dev` do GitHub, com `GCP_WIF_PROVIDER` e `GCP_DEPLOY_SA` também nas do repositório (o quadro roda sem ambiente). **Duas voltas antes de passar**, ambas registradas no runbook §0: o provider do bootstrap usava o projeto como projeto de cota, o que exige um papel que a ADR 015 não pede ([#183](https://github.com/nessenergy/Alupdatalake/pull/183)); e a ADC estava numa conta pessoal, não na da ness. | o **primeiro `apply` do `infra/`** é o próximo passo, pelo workflow `Deploy GCP`. `runbook/primeiro-deploy.md` §1 em diante |
 | N4 | Validar replay contra objeto real no GCS e conferir linhagem no BigQuery | N3 |
 | N5 | Construir e executar a imagem no ambiente de desenvolvimento | Docker Desktop não disponibilizou o daemon nesta estação |
 

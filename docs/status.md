@@ -12,7 +12,10 @@ que era a região de todo o `infra/` desde a ADR 011. **Resolvido no mesmo dia
 por decisão da ness.** — a [ADR 023](arquitetura/decisoes/023-regiao-us-central1.md)
 substitui a 011 e adota `us-central1`, que é o que a política permite.
 Pedir exceção custaria outra espera; trocar a região, enquanto nada existe
-em região alguma, é editar variável. A3 venceu em 04/09 e foi atendida
+em região alguma, é editar variável. **Tudo isso foi comunicado à Alup por
+e-mail em 23/09** — os IDs readequados, a adoção de `us-central1` com a
+janela até o primeiro apply para ela pedir outra região, e a conta
+`gptorres@ness.com.br` sem papel nos três projetos. A3 venceu em 04/09 e foi atendida
 em 23/09, **12 dias úteis depois**; a contagem da cláusula 3ª para nesta
 data, e o cronograma seguia postergado por ter passado de 5 dias úteis. Em
 16/09 a ness. enviou à Alup **as contas que devem receber os papéis**
@@ -203,7 +206,7 @@ destino, com os oito invariantes e a pauta de perguntas. **Enviado ao Google em
 
 | # | Item | Efeito enquanto não vier | Referência |
 |---|---|---|---|
-| ~~A1~~ | ~~**Conceder à ness. os papéis de bootstrap** em cada projeto~~ | **Atendida em 23/09**: os seis papéis da ADR 015 estão concedidos nos três projetos. Duas ressalvas apuradas na conferência — `gptorres@ness.com.br` **não recebeu papel em nenhum dos três**, e em `dev` há um `roles/owner` para `bertuzzi@` com convites pendentes para `resper@` e `gpaz@`, mais amplo do que a ADR pediu | ADR 015, `runbook/primeiro-deploy.md` §0 |
+| ~~A1~~ | ~~**Conceder à ness. os papéis de bootstrap** em cada projeto~~ | **Atendida em 23/09**: os seis papéis da ADR 015 estão concedidos nos três projetos. Duas ressalvas apuradas na conferência — `gptorres@ness.com.br` **não recebeu papel em nenhum dos três**, e em `dev` há um `roles/owner` para `bertuzzi@` com convites pendentes para `resper@` e `gpaz@`, mais amplo do que a ADR pediu. **As duas foram registradas com a Alup no e-mail de 23/09**; nenhuma bloqueia o bootstrap, que roda com as três contas que têm os papéis | ADR 015, `runbook/primeiro-deploy.md` §0 |
 | ~~A14~~ | ~~**Liberar `us-east1` na política `gcp.resourceLocations`**~~ | **Encerrada em 23/09 sem pedido à Alup.** A política efetiva nos três projetos admite só `us-central1` (região e zonas), a multirregião `us` e `global`; é herdada da pasta `511203368267` e só a Alup alteraria. Em vez de esperar, a região do ambiente passou a ser `us-central1` — nada existia em região alguma, então foi troca de variável. Se a Alup preferir `us-east1`, a conversa vale **até o primeiro apply** | [ADR 023](arquitetura/decisoes/023-regiao-us-central1.md), que substitui a [011](arquitetura/decisoes/011-regiao-us-east1.md) |
 | ~~A2~~ | ~~**Decidir sobre a CCEE InfoMercado**~~ | **Encerrada em 14/09** — era filtro de cliente não identificado, não bloqueio de IP nem credencial. Resolvido por cabeçalho no `src/core/http.py` | [ADR 018](arquitetura/decisoes/018-vias-de-acesso-a-ccee.md), [registro de 14/09](relatorios/2026-09-14-documentacao-de-apis-recebida.md) |
 | ~~A3~~ | ~~**Projetos GCP `dev`, `hml` e `prod`**~~ | **Atendida em 23/09**: os três projetos existem e o acesso da ness. foi liberado. Os IDs reais são `alupar-dev-alupdata`, `alupar-hm-alupdata` e `prod-alupdata` — **diferentes dos previstos** (`alupdata-dev`/`-hml`/`-prod`), e o de homologação diverge do próprio nome do projeto (`alupar-hml-alupdata`). **Ficam como estão** — ID de projeto é imutável e recriar significaria refazer o processo interno da Alup ([adendo da ADR 015](arquitetura/decisoes/015-fundacao-do-ambiente.md)). O que resta é da ness. (N3) e o que ainda precisa ser conferido está em A13 | plano 2.2 (0.13), [ADR 015](arquitetura/decisoes/015-fundacao-do-ambiente.md), [#55](https://github.com/nessenergy/Alupdatalake/issues/55) |

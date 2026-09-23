@@ -94,7 +94,17 @@ jobs:
           DATAFORM_GIT_TOKEN_VERSION: ${{ vars.DATAFORM_GIT_TOKEN_VERSAO }}
         run: |
           # Falha antes do init/plan se a imagem não existe no ambiente escolhido.
-          gcloud artifacts docker images describe "$INGESTION_IMAGE" --format='value(image_summary.digest)'
+          # `images describe` traz o resumo de vulnerabilidades e exige
+          # containeranalysis.occurrences.list, que a SA de deploy não tem — e
+          # não deve ter, porque o bootstrap dá a ela só escrita no repositório
+          # de imagens. `images list` responde a mesma pergunta com o que ela já
+          # pode ler.
+          encontrada="$(gcloud artifacts docker images list "${INGESTION_IMAGE%:*}" \
+            --include-tags --filter="tags:${INGESTION_IMAGE##*:}" --format='value(version)')"
+          if [ -z "$encontrada" ]; then
+            echo "::error::Imagem $INGESTION_IMAGE não existe em $DEPLOY_ENVIRONMENT."
+            exit 1
+          fi
           cd infra
           # State no bucket do próprio projeto, criado pelo bootstrap.
           terraform init -backend-config="bucket=$TF_STATE_BUCKET"

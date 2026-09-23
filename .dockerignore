@@ -8,3 +8,6 @@ sql
 tests
 scripts
 *.md
+# O pyproject declara `readme = "README.md"`, e o segundo `uv sync` instala o
+# projeto: sem este arquivo o build para em "/README.md: not found".
+!README.md

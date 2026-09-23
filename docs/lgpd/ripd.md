@@ -4,7 +4,7 @@
 revisão e aprovação da controladora
 
 Minuta elaborada pela ness. no âmbito do contrato CPS-01025/2026, conforme a
-[ADR 011](../arquitetura/decisoes/011-regiao-us-east1.md). O RIPD é documento
+[ADR 023](../arquitetura/decisoes/023-regiao-us-central1.md). O RIPD é documento
 da controladora: a ness. descreve a plataforma e propõe a análise; a Alup
 revisa, completa e assina.
 
@@ -35,7 +35,7 @@ Documentos relacionados, em `docs/lgpd/`:
 |---|---|---|
 | Controladora | ACE Comercializadora Ltda., nome fantasia Alup — CNPJ 14.402.579/0001-23; Rua Gomes de Carvalho, 1996, 16º andar, conj. 162, sala B, Vila Olímpia, São Paulo/SP, CEP 04547-905 | Definida em 11/09; dados cadastrais conferidos na Receita Federal em 11/09. As contratantes do CPS-01025/2026 são seis coligadas do Grupo Alupar; a controladora da plataforma é a ACE |
 | Operadora (desenvolvimento) | ness. Processos e Tecnologia Ltda., CNPJ 72.027.097/0001-37 | Desenvolve a plataforma. O acesso a dado pessoal real fica restrito ao período de desenvolvimento e homologação (ADR 011) |
-| Suboperador (infraestrutura) | Google Cloud | Processa o dado em `us-east1`, sob o DPA do contrato de nuvem da Alupar ([dpa.md](dpa.md)). A entidade contratante é a indicada nesse contrato |
+| Suboperador (infraestrutura) | Google Cloud | Processa o dado em `us-central1`, sob o DPA do contrato de nuvem da Alupar ([dpa.md](dpa.md)). A entidade contratante é a indicada nesse contrato |
 | Encarregada | Rosimeire Miler dos Santos | Canal público: privacidade@alupar.com.br (art. 41, § 1º) |
 
 As fontes de onde o dado é lido — Hubspot, CCEE, o Portal Alup hospedado na AWS
@@ -58,7 +58,7 @@ consumo por cliente da CCEE. Mesmo assim o RIPD se justifica:
 
 1. **Legítimo interesse.** É a hipótese proposta para boa parte das operações
    (item g), e o art. 10, § 3º, prevê o relatório nesse caso.
-2. **Transferência internacional.** Todo o ambiente fica em `us-east1`, nos
+2. **Transferência internacional.** Todo o ambiente fica em `us-central1`, nos
    Estados Unidos (ADR 011, art. 33).
 3. **Tecnologia com IA generativa.** O Knowledge Catalog tem recursos com o
    modelo Gemini ativados (ADR 014), e o assistente do Dataform pode rascunhar
@@ -88,7 +88,8 @@ CPS-01025/2026, de 27/08/2026 a 08/01/2027.
 | Cloud Logging | Logs de execução, 30 dias; log de auditoria de acesso a dados, 1 ano pela política de retenção | padrão do serviço; bucket de log dedicado a declarar |
 | Portal (Cloud Run + IAP) | Consulta das tabelas Gold, saúde e custo | `infra/modules/portal`, com conta de serviço própria (ADR 005) |
 
-A região é `us-east1` (ADR 011), já declarada em `infra/`.
+A região é `us-central1` (ADR 023, que substituiu a 011 em 23/09), já
+declarada em `infra/`.
 
 **Classificação da informação (pergunta F4).** Os datasets e o bucket raw são
 classificados como **internos**. O conteúdo confidencial listado no item f.ii
@@ -233,7 +234,7 @@ repositório; os de 5 e 10 anos são ativados na primeira data de vencimento,
 01/01/2032 e 01/01/2037.
 
 **Transferência internacional (art. 33).** Todo o dado, nos três projetos, fica
-em `us-east1`. A transferência se apoia no DPA do contrato de nuvem da Alupar;
+em `us-central1`. A transferência se apoia no DPA do contrato de nuvem da Alupar;
 o [registro do DPA](dpa.md) detalha o mecanismo.
 
 ## g) Hipótese legal

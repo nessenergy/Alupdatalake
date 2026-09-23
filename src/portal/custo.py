@@ -32,8 +32,8 @@ GIB = 1024**3
 #    outra coisa. Subestimava o armazenamento em ~15%.
 # 2. A tabela tem três preços de consulta por TiB (6,25 / 6,5625 / 6,8125),
 #    selecionados por região num seletor que roda no navegador. **Não foi
-#    possível confirmar pela página pública qual deles vale para `us-east1`**;
-#    adotamos o preço-base, que é o dos EUA. Se us-east1 estiver numa faixa
+#    possível confirmar pela página pública qual deles vale para `us-central1`**;
+#    adotamos o preço-base, que é o dos EUA. Se us-central1 estiver numa faixa
 #    superior, a conta subestima na mesma proporção (5% ou 9%).
 #
 # 3. **A camada gratuita não está no modelo, e para este lake ela domina.** A

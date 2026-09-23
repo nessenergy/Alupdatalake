@@ -18,8 +18,8 @@ Tudo em GCP, arquitetura Medallion, infraestrutura por Terraform. Recurso criado
 ## Ambientes
 
 Três, um projeto GCP cada: `dev`, `hml` (homologação das ondas) e `prod`
-(`infra/variables.tf` valida; ADR 015). Região padrão `us-east1` (Carolina do
-Sul) — ver ADR 011, que substitui a 009. Variáveis por ambiente em
+(`infra/variables.tf` valida; ADR 015). Região padrão `us-central1` (Iowa) — ver
+ADR 023, que substitui a 011. Variáveis por ambiente em
 `infra/environments/{dev,hml,prod}.tfvars`; `hml` nasce com
 `agendamentos_ativos = false` (custo). Nunca aponte código para `prod` por
 default — `src/core/config.py` cai em `alupar-dev-alupdata`.

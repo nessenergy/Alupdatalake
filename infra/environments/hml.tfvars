@@ -2,7 +2,7 @@
 # `alupar-hml-alupdata`. Divergência de origem, e ID de projeto não se
 # renomeia: vale o ID.
 project_id  = "alupar-hm-alupdata"
-region      = "us-east1"
+region      = "us-central1"
 environment = "hml"
 
 # Custo mínimo (E2, 11/09): hml não agenda nada fora da homologação. O Cloud

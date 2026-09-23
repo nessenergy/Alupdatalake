@@ -172,7 +172,7 @@ dizem como *este contrato* usa o produto.
 | 008 | Acesso a bancos relacionais: drivers puro-Python, DSN única no Secret Manager |
 | 009 | Região `southamerica-east1` — **substituída pela 011** |
 | 010 | Aceite do risco de `main` sem proteção — **encerrado em 11/09**: com o GitHub Enterprise, a `main` exige PR e seis verificações |
-| 011 | Região do ambiente: `us-east1`, irreversível depois do primeiro apply; transferência internacional documentada (DPA, RoPA, RIPD) |
+| 011 | Região `us-east1` — **substituída pela 023** |
 | 012 | Dataform para o SQL das três camadas, projeto na raiz; substitui o SQL solto e o script de deploy antigo |
 | 013 | Ingestão em lote pelos conectores Python, sem CDC nem Dataflow; linhagem OpenLineage no executor |
 | 014 | Knowledge Catalog na Onda 4, linhagem desde o 1º apply; recursos de IA do produto sob aviso |
@@ -184,6 +184,7 @@ dizem como *este contrato* usa o produto.
 | 020 | Rotação do token TempoOK na entrada em produção ou mudança do alcance |
 | 021 | Seleção dos conjuntos CCEE por demanda dos domínios analíticos |
 | 022 | Identidade visual por audiência: ness. no que a ness. emite, Alup no produto, neutra na documentação técnica |
+| 023 | Região do ambiente: `us-central1`, a única que a política da Alupar admite; irreversível depois do primeiro apply; transferência internacional documentada (DPA, RoPA, RIPD) |
 
 Se você for propor algo que contraria um ADR, escreva um ADR novo — não um
 remendo. Em particular: o framework em `src/core/` é mais estrutura do que 13
@@ -201,11 +202,13 @@ Hubspot aguardam credenciais, incluindo o host do BBCE. Framework, Dataform,
 Terraform, motor de planilha e caminho de banco estão implementados; isso não
 comprova execução no GCP nem homologação.
 
-G1 encerrou com a revisão de 10/09. A Alup cria os três projetos (`dev`, `hml`,
-`prod`), vincula faturamento e concede os papéis da ADR 015; a ness. executa o
-bootstrap em `infra/bootstrap/`. A região vigente é `us-east1`. Em 18/09,
-não há confirmação de entrega do GCP, billing ou exemplos de planilha. O prazo
-original de A3 é 04/09; a previsão de 18/09 não substitui esse prazo.
+G1 encerrou com a revisão de 10/09. **Em 23/09 a Alup entregou os três
+projetos** (`alupar-dev-alupdata`, `alupar-hm-alupdata`, `prod-alupdata`),
+com faturamento vinculado e os papéis da ADR 015 concedidos; a ness. executa
+o bootstrap em `infra/bootstrap/`. A região vigente é `us-central1`
+(**ADR 023**, que substituiu a 011 porque a política da Alupar não admite
+`us-east1`). O prazo original de A3 era 04/09: 12 dias úteis de atraso.
+Seguem sem confirmação os exemplos de planilha (#142).
 
 Próximo passo técnico: após A3, bootstrap e primeiro deploy, carga ponta a
 ponta, replay do raw e evidências de homologação. Templates dependem de G3/#142;

@@ -79,7 +79,7 @@ Descrição de ativo passa a carregar o *aspect* `origem`, com valor `curada` ou
 >
 > **Tratamento de dados.** Para gerar sugestões, o serviço processa metadados:
 > esquemas, logs de consulta e modelos semânticos. O processamento acontece
-> dentro do Google Cloud, na região do ambiente (ADR 011), sob os termos de
+> dentro do Google Cloud, na região do ambiente (ADR 023), sob os termos de
 > serviço do Google Cloud contratados pela Alupar. A ness. não controla esse
 > processamento nem responde por ele.
 >
@@ -107,7 +107,7 @@ Descrição de ativo passa a carregar o *aspect* `origem`, com valor `curada` ou
 - O item 4.3 do plano de execução (Dataplex: catálogo e linhagem, 20h) passa a
   se chamar Knowledge Catalog, sem mudança de escopo ou de esforço.
 - **Antes de ativar os recursos de IA**, confirmar que estão disponíveis em
-  `us-east1`: a página de localizações do produto não informa (ADR 011).
+  `us-central1`: a página de localizações do produto não informa (ADR 023).
 - Operação do catálogo e decisão de manter ou desligar os recursos de IA depois
   do handoff são da Alup.
 

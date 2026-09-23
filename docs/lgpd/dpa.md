@@ -6,7 +6,7 @@ conferência da controladora
 Este arquivo **não é o DPA**. O DPA é o *Aditivo sobre Tratamento de Dados do
 Cloud* do Google, incorporado ao contrato de nuvem da Alupar. Aqui ficam
 registrados o que ele prevê e o que isso significa para a plataforma, como
-pede a [ADR 011](../arquitetura/decisoes/011-regiao-us-east1.md). O resultado
+pede a [ADR 023](../arquitetura/decisoes/023-regiao-us-central1.md). O resultado
 alimenta o [RIPD](ripd.md) (R03) e o [RoPA](ropa.md).
 
 | Item | Registro |
@@ -21,7 +21,7 @@ alimenta o [RIPD](ripd.md) (R03) e o [RoPA](ropa.md).
 O Aditivo tem termos específicos para o Brasil (Apêndice 3, seção "Brasil").
 
 - **Transferência Restrita BR** é a transferência de dado sujeito à LGPD para
-  país que a ANPD não reconhece como adequado. O ambiente fica em `us-east1`,
+  país que a ANPD não reconhece como adequado. O ambiente fica em `us-central1`,
   nos Estados Unidos. Salvo decisão de adequação posterior, a transferência da
   plataforma se enquadra aqui.
 - **Mecanismo**, pela seção 3.1 dos termos brasileiros:

@@ -40,7 +40,7 @@ terraform output
 ```
 
 - [ ] Conferir no `plan`: as APIs, o bucket `<projeto>-tfstate` em
-  `us-east1`, o repositório `alupdata`, o pool `github` e o provedor
+  `us-central1`, o repositório `alupdata`, o pool `github` e o provedor
   `alupdata` com a condição do repositório, e a SA `alupdata-deploy` sem
   chave.
 - [ ] Se o projeto veio sem as APIs padrão e o `apply` falhar ao habilitar
@@ -67,9 +67,11 @@ terraform output
 - [ ] Bootstrap do projeto aplicado (§0).
 - [ ] Grupos Google de consumidores e de operação, e quem acessa o Portal,
   informados pela Alup — ou deliberadamente vazios (R01 do RIPD).
-- [ ] Política `gcp.resourceLocations` efetiva da organização Alupar permite
-  `us-east1` (ADR 011) — por exemplo `in:us-locations` ou
-  `in:us-east1-locations`: `gcloud resource-manager org-policies describe
+- [x] Política `gcp.resourceLocations` efetiva da organização Alupar permite
+  `us-central1` (ADR 023) — **conferida em 23/09 nos três projetos**: admite
+  `us-central1`, suas zonas, a multirregião `us` e `global`, e nada além.
+  Foi essa restrição que derrubou a ADR 011. Reconferir se a região mudar:
+  `gcloud resource-manager org-policies describe
   constraints/gcp.resourceLocations --project=<projeto> --effective`.
 - [ ] Quem liga o billing export combinado: pessoa da Alup com papel *Billing
   Account Costs Manager* ou *Billing Account Administrator* na conta de

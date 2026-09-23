@@ -1,5 +1,5 @@
 project_id  = "alupar-dev-alupdata"
-region      = "us-east1"
+region      = "us-central1"
 environment = "dev"
 
 # Acesso de pessoas (R01 do RIPD): grupos Google da Alup, preenchidos por ela.

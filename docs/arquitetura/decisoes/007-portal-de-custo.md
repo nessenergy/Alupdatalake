@@ -93,8 +93,8 @@ crescer o bastante para pagar a complexidade. Não é hoje.
 ## Adendo de 2026-09-10 — billing export ligado no primeiro `apply`
 
 A camada F2 previa ligar o billing export depois. Com a região definida pela
-[ADR 011](011-regiao-us-east1.md), **esperar passa a custar histórico**: a
-exportação do faturamento para dataset **regional** (`us-east1`) só recebe dado
+[ADR 023](023-regiao-us-central1.md), **esperar passa a custar histórico**: a
+exportação do faturamento para dataset **regional** (`us-central1`) só recebe dado
 a partir do dia em que é ligada — não há carga retroativa, que existe apenas
 para dataset multirregião. Export desligado no início é histórico perdido de
 forma permanente.
@@ -104,7 +104,7 @@ forma permanente.
 - **O export é ligado no mesmo dia do primeiro `apply`.** O que a F2 constrói
   sobre ele — a view de custo lendo a fatura em vez do log do BigQuery — segue
   no seu tempo; o que se antecipa é só o interruptor.
-- **O dataset de destino e o IAM ficam em `infra/`**, em `us-east1`. O
+- **O dataset de destino e o IAM ficam em `infra/`**, em `us-central1`. O
   interruptor, não: a exportação só se configura pelo console, sem recurso
   Terraform, comando `gcloud` ou API (verificado em 10/09). É a **primeira
   exceção documentada à regra 5**, prevista no

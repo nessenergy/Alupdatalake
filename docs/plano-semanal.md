@@ -15,8 +15,9 @@ registrada**. G1 encerrou em 10/09; GCP, billing e planilhas têm previsão de
 18/09, sem confirmação de entrega na conferência desta data.
 
 S1 e S2 abaixo preservam o **registro histórico e o plano então vigente**,
-inclusive decisões posteriormente substituídas. A região atual é `us-east1`
-(ADR 011), Dataform substitui o deploy SQL (ADR 012), o bootstrap é da ness.
+inclusive decisões posteriormente substituídas. A região atual é `us-central1`
+(ADR 023, que substituiu a 011 em 23/09), Dataform substitui o deploy SQL
+(ADR 012), o bootstrap é da ness.
 em três projetos da Alup (ADR 015) e Workflows orquestra a Onda 3 (ADR 017).
 A organização passou ao GitHub Enterprise em 11/09. As tabelas históricas
 não comprovam execução, horas realizadas ou aceite.

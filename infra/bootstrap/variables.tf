@@ -15,7 +15,7 @@ variable "environment" {
 variable "region" {
   description = "Região do bucket de state e do Artifact Registry (ADR 011)"
   type        = string
-  default     = "us-east1"
+  default     = "us-central1"
 }
 
 variable "github_repositorio" {

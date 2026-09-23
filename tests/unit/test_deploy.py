@@ -10,7 +10,7 @@ import yaml
 
 ROOT = Path(__file__).parents[2]
 SHA = "a" * 40
-BASE = "us-east1-docker.pkg.dev/example-dev/images/cli"
+BASE = "us-central1-docker.pkg.dev/example-dev/images/cli"
 
 
 def workflow():

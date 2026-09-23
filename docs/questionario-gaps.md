@@ -195,7 +195,7 @@ Onda 0 não homologa. Todo o cronograma pendura nesta linha.
 | E4 | A Alup provisiona também o projeto de **produção** agora, ou só `dev` nesta fase? | TI | **11/09**: três ambientes — desenvolvimento, homologação e produção. Decisão da ness. de 11/09: adotar os três. Muda a [ADR 015](arquitetura/decisoes/015-fundacao-do-ambiente.md), que previa só `dev` e `prod`. |
 | E5 | Existe organização/pasta GCP e política de nomenclatura corporativa que devemos seguir? | TI | **11/09**: não há organização nem política de nomenclatura. |
 | E6 | Quem administra o Workload Identity Federation para o deploy via GitHub Actions? | TI | **11/09**: a ness. Decisão da ness. de 11/09: o bootstrap do ambiente fica com a ness. Muda a [ADR 015](arquitetura/decisoes/015-fundacao-do-ambiente.md), que o atribuía à Alup. |
-| E7 | Há restrição de região? Assumimos `southamerica-east1` (São Paulo) — confirma? | TI | **11/09**: região nos EUA, com bom custo-benefício. Coerente com a decisão de 10/09 por `us-east1` ([ADR 011](arquitetura/decisoes/011-regiao-us-east1.md)). |
+| E7 | Há restrição de região? Assumimos `southamerica-east1` (São Paulo) — confirma? | TI | **11/09**: região nos EUA, com bom custo-benefício. Coerente com a decisão de 10/09 por `us-east1` ([ADR 011](arquitetura/decisoes/011-regiao-us-east1.md)). **Revisto em 23/09**: a política de organização da Alupar só admite `us-central1`, e a região passou a ser essa ([ADR 023](arquitetura/decisoes/023-regiao-us-central1.md)). |
 
 ---
 

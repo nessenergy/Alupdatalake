@@ -57,10 +57,10 @@ AMBIENTES = ("dev", "hml", "prod")
 
 def test_regiao_padrao_e_us_east1_em_todo_o_ambiente() -> None:
     """ADR 011: dataset do BigQuery não muda de região depois do primeiro apply."""
-    assert _tem(r'variable "region" \{[^}]*default\s*=\s*"us-east1"', _ler("infra/variables.tf"))
+    assert _tem(r'variable "region" \{[^}]*default\s*=\s*"us-central1"', _ler("infra/variables.tf"))
     for ambiente in AMBIENTES:
         tfvars = _ler(f"infra/environments/{ambiente}.tfvars")
-        assert _tem(r'region\s*=\s*"us-east1"', tfvars), ambiente
+        assert _tem(r'region\s*=\s*"us-central1"', tfvars), ambiente
         assert _tem(rf'environment\s*=\s*"{ambiente}"', tfvars), ambiente
 
 
@@ -140,7 +140,7 @@ def test_config_aponta_para_a_regiao_do_ambiente() -> None:
     """O INFORMATION_SCHEMA é por região: padrão errado devolve zero linhas em silêncio."""
     from src.core.config import Settings
 
-    assert Settings.model_fields["gcp_region"].default == "us-east1"
+    assert Settings.model_fields["gcp_region"].default == "us-central1"
 
 
 def test_dataset_do_billing_export_existe_sem_acesso_da_ingestao() -> None:
@@ -169,8 +169,8 @@ def test_projeto_dataform_na_raiz_com_versao_e_regiao_fixas() -> None:
     """ADR 012: o Dataform lê o projeto só a partir da raiz do repositório Git."""
     settings = _ler("workflow_settings.yaml")
     assert _tem(r"dataformCoreVersion:\s*3\.0\.69", settings)
-    assert _tem(r"defaultLocation:\s*us-east1", settings)
-    assert _tem(r"regiao:\s*us-east1", settings)
+    assert _tem(r"defaultLocation:\s*us-central1", settings)
+    assert _tem(r"regiao:\s*us-central1", settings)
     assert _tem(r"defaultAssertionDataset:\s*qualidade", settings)
 
 

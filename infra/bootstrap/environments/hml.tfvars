@@ -2,5 +2,5 @@
 # infra/environments/hml.tfvars: `alupar-hm-alupdata`, sem o "l" do nome do
 # projeto (`alupar-hml-alupdata`).
 project_id  = "alupar-hm-alupdata"
-region      = "us-east1"
+region      = "us-central1"
 environment = "hml"

@@ -15,7 +15,7 @@ config {
 -- enxerga. Ver `docs/arquitetura/portal-finops.md`.
 --
 -- As tarifas são premissa declarada aqui, num lugar só: preço de lista dos EUA
--- adotado para us-east1 em 2026-09-10, conferência na tabela oficial pendente.
+-- adotado para us-central1 em 2026-09-10, conferência na tabela oficial pendente.
 WITH tarifas AS (
   SELECT
     6.25  AS usd_por_tib_varrido,

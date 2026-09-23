@@ -150,10 +150,10 @@ e `prod` (ADR 015).
 | Variável | Saída do bootstrap | Exemplo |
 |---|---|---|
 | `GCP_WIF_PROVIDER` | `workload_identity_provider` | `projects/123/locations/global/workloadIdentityPools/github/providers/alupdata` |
-| `GCP_DEPLOY_SA` | `service_account_deploy` | `alupdata-deploy@alupdata-dev.iam.gserviceaccount.com` |
-| `TF_STATE_BUCKET` | `bucket_state` | `alupdata-dev-tfstate` |
+| `GCP_DEPLOY_SA` | `service_account_deploy` | `alupdata-deploy@alupar-dev-alupdata.iam.gserviceaccount.com` |
+| `TF_STATE_BUCKET` | `bucket_state` | `alupar-dev-alupdata-tfstate` |
 | `GCP_REGION` | `region` | `us-east1` |
-| `IMAGEM_INGESTAO` | `imagem_ingestao` | `us-east1-docker.pkg.dev/alupdata-dev/alupdata/cli` (sem tag) |
+| `IMAGEM_INGESTAO` | `imagem_ingestao` | `us-east1-docker.pkg.dev/alupar-dev-alupdata/alupdata/cli` (sem tag) |
 | `DATAFORM_GIT_TOKEN_VERSAO` | — | `1` (versão do secret `alupdata-dataform-git-token`) |
 
 Em `dev`, `GCP_WIF_PROVIDER` e `GCP_DEPLOY_SA` ficam também como variáveis do

@@ -36,7 +36,7 @@ campos-projeto: ## Cria os campos de acompanhamento semanal no GitHub Projects
 	uv run python -m scripts.campos_projeto --owner $(owner) --numero $(numero)
 
 migrar-segredos: ## Sobe o cofre local para o Secret Manager (ver runbook/credenciais.md)
-	@test -n "$(projeto)" || (echo "uso: make migrar-segredos projeto=alupdata-dev [aplicar=1]"; exit 1)
+	@test -n "$(projeto)" || (echo "uso: make migrar-segredos projeto=alupar-dev-alupdata [aplicar=1]"; exit 1)
 	uv run python -m scripts.migrar_segredos --projeto $(projeto) $(if $(aplicar),--aplicar,)
 
 quadro: ## Simula a sincronização do quadro de acompanhamento (Project 2)

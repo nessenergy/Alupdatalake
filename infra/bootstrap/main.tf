@@ -25,13 +25,22 @@ terraform {
   }
 }
 
-# A credencial é de pessoa (ADC): cota e faturamento das chamadas vão para o
-# próprio projeto, e não para um projeto padrão do gcloud.
+# A credencial é de pessoa (ADC).
+#
+# Sem `billing_project`/`user_project_override`, de propósito. Apontar o
+# projeto como projeto de cota faz cada chamada levar o cabeçalho
+# `X-Goog-User-Project`, e usar um projeto assim exige
+# `serviceusage.services.use` nele — permissão que está em
+# `roles/serviceusage.serviceUsageConsumer`, e **não** em
+# `serviceUsageAdmin`, que é o que a ADR 015 pede para o bootstrap. Com o
+# cabeçalho, o apply de 23/09 em `dev` parou em `USER_PROJECT_DENIED` nas 16
+# APIs, antes de criar qualquer coisa. Sem ele, os seis papéis da ADR bastam.
+#
+# No `infra/` a história é outra: lá quem aplica é a SA de deploy, que tem
+# `serviceUsageConsumer` entre os papéis do bootstrap.
 provider "google" {
-  project               = var.project_id
-  region                = var.region
-  billing_project       = var.project_id
-  user_project_override = true
+  project = var.project_id
+  region  = var.region
 }
 
 locals {

@@ -47,6 +47,13 @@ terraform output
   serviços, habilitar antes as duas de que o Terraform depende e reaplicar:
   `gcloud services enable serviceusage.googleapis.com cloudresourcemanager.googleapis.com --project=<projeto>`.
   As duas estão na lista do bootstrap.
+- [ ] Se o erro for `USER_PROJECT_DENIED` ("Caller does not have required
+  permission to use project"), alguém devolveu `billing_project` e
+  `user_project_override` ao provider do bootstrap. Usar o projeto como
+  projeto de cota exige `serviceusage.services.use`, que vem no
+  `serviceUsageConsumer` e não no `serviceUsageAdmin` da ADR 015 — foi o que
+  parou o apply de 23/09 em `dev`, nas 16 APIs, antes de criar qualquer
+  recurso. O provider do bootstrap não define nenhum dos dois.
 - [ ] Guardar a cópia do state no bucket que ele criou:
   `gcloud storage cp terraform.tfstate.d/<ambiente>/terraform.tfstate gs://<projeto>-tfstate/bootstrap/terraform.tfstate`.
   O state não contém segredo — a SA de deploy não tem chave.

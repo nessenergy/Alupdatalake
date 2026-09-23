@@ -1,7 +1,19 @@
 # ADR 015 — Fundação do ambiente: três ambientes, bootstrap pela ness., chave gerenciada pelo Google
 
 **Status**: aceito · **Data**: 2026-09-11 · **Revisada**: 2026-09-11 ·
-**Complementa** a [ADR 011](011-regiao-us-east1.md)
+**Adendo**: 2026-09-23 · **Complementa** a
+[ADR 011](011-regiao-us-east1.md)
+
+> **Adendo de 23/09 — os três projetos existem, e os IDs são estes.** A Alup
+> criou e liberou os três ambientes de uma vez. Os IDs ficaram
+> `alupar-dev-alupdata`, `alupar-hm-alupdata` e `prod-alupdata` — sem padrão
+> comum entre si, e o de homologação diverge do nome do próprio projeto
+> (`alupar-hml-alupdata`). **Não serão renomeados**: ID de projeto no GCP é
+> imutável depois da criação, recriar exigiria refazer o processo interno da
+> Alup, que é longo, e nada foi provisionado ainda que justifique o custo.
+> Consequência prática: **o ID nunca é deduzido do ambiente**. Ele vem do
+> `.tfvars`, que é a única fonte, e código ou documento que monte o nome a
+> partir de `alupdata-<ambiente>` está errado.
 
 > **Revisão de 11/09.** A primeira versão desta ADR, no PR #106, fixava dois
 > ambientes, `dev` e `prod`, e deixava o bootstrap dos projetos com a TI da

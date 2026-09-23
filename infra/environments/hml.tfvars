@@ -1,4 +1,7 @@
-project_id  = "alupdata-hml"
+# O ID é `alupar-hm-alupdata`, sem o "l" — o nome do projeto é
+# `alupar-hml-alupdata`. Divergência de origem, e ID de projeto não se
+# renomeia: vale o ID.
+project_id  = "alupar-hm-alupdata"
 region      = "us-east1"
 environment = "hml"
 

@@ -1,4 +1,4 @@
-project_id  = "alupdata-dev"
+project_id  = "alupar-dev-alupdata"
 region      = "us-east1"
 environment = "dev"
 

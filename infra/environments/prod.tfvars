@@ -1,4 +1,6 @@
-project_id  = "alupdata-prod"
+# O ID é `prod-alupdata`, sem o prefixo `alupar-` dos outros dois; o nome do
+# projeto é `alupar-prd-alupdata`. Vale o ID.
+project_id  = "prod-alupdata"
 region      = "us-east1"
 environment = "prod"
 

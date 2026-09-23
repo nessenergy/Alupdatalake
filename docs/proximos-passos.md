@@ -26,7 +26,7 @@ três ambientes e a cadeia passou a ser trabalho da ness.:
 
 | # | Ação | Dono | Situação |
 |---|---|---|---|
-| 1.1 | **Gravar os IDs reais nos `.tfvars`** — `alupar-dev-alupdata`, `alupar-hm-alupdata` e `prod-alupdata`, nos seis arquivos de `infra/environments/` e `infra/bootstrap/environments/` | ness. | os arquivos ainda trazem os IDs previstos (`alupdata-dev`/`-hml`/`-prod`). O de homologação tem ID `alupar-hm-alupdata` e nome `alupar-hml-alupdata`; ID de projeto não se renomeia depois de criado |
+| ~~1.1~~ | ~~Gravar os IDs reais nos `.tfvars`~~ | ness. | **feito em 23/09**, nos seis arquivos de `infra/environments/` e `infra/bootstrap/environments/`. Os IDs ficam como a Alup criou — renomear é processo longo do lado dela e ID de projeto é imutável ([adendo da ADR 015](arquitetura/decisoes/015-fundacao-do-ambiente.md)) |
 | 1.2 | **Conferir o que veio junto com a liberação** (A13 do status): billing vinculado, os seis papéis da ADR 015, `gcp.resourceLocations` com `us-east1`, `iam.allowedPolicyMemberDomains` com o domínio da ness. e o emissor do GitHub em `iam.workloadIdentityPoolProviders` | ness. | `gcloud auth login` local está pedindo reautenticação; sem isso o ambiente não é consultado daqui |
 | 1.3 | **Bootstrap do `dev`** e gravação das variáveis `GCP_WIF_PROVIDER` e `GCP_DEPLOY_SA` no ambiente do GitHub | ness. | `runbook/primeiro-deploy.md` §0. **Branch protection resolvida em 11/09** (ADR 010, encerrada) |
 | 1.4 | **Rotação do token do TempoOK** — a [ADR 020](arquitetura/decisoes/020-token-tempook-rotacao-na-producao.md) a define como a primeira ação depois de A3 | ness./TempoOK | entra assim que o Secret Manager do `dev` existir (item 1.3) |

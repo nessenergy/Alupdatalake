@@ -21,7 +21,7 @@ RAIZ = Path(__file__).parents[2]
 DEFINICOES = RAIZ / "definitions"
 CAMADAS = ("bronze", "silver", "gold")
 PROJETO = "alupdata-test"
-REGIAO = "us-east1"
+REGIAO = "us-central1"
 ARQUIVOS = [c for camada in CAMADAS for c in sorted((DEFINICOES / camada).glob("*.sqlx"))]
 
 # ADR 012 (revisada em 11/09): a Gold de negócio é tabela, recarregada inteira a
@@ -222,7 +222,7 @@ def test_information_schema_usa_a_regiao_configurada():
         assert "region-${dataform.projectConfig.vars.regiao}" in bruto, (
             f"{arquivo.name} consulta INFORMATION_SCHEMA com região fora da configuração"
         )
-        assert "region-us-east1" in renderizar(arquivo)
+        assert "region-us-central1" in renderizar(arquivo)
 
 
 def _sem_comentarios(sql: str) -> str:

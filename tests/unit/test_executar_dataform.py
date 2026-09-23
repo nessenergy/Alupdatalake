@@ -7,7 +7,7 @@ import logging
 import pytest
 from scripts.executar_dataform import erros_de_compilacao, executar, repositorio
 
-REPO = repositorio("alupdata-test", "us-east1")
+REPO = repositorio("alupdata-test", "us-central1")
 
 
 class Resposta:
@@ -39,7 +39,7 @@ class SessaoFalsa:
 
 
 def test_repositorio_monta_o_nome_completo() -> None:
-    assert REPO == "projects/alupdata-test/locations/us-east1/repositories/alupdata"
+    assert REPO == "projects/alupdata-test/locations/us-central1/repositories/alupdata"
 
 
 def test_compila_a_release_main_e_executa_com_a_service_account() -> None:
@@ -82,8 +82,8 @@ def test_erros_de_compilacao_vazio_quando_nao_ha_erro() -> None:
 
 def test_repositorio_aceita_nome_customizado() -> None:
     assert (
-        repositorio("alupdata-test", "us-east1", "outro")
-        == "projects/alupdata-test/locations/us-east1/repositories/outro"
+        repositorio("alupdata-test", "us-central1", "outro")
+        == "projects/alupdata-test/locations/us-central1/repositories/outro"
     )
 
 

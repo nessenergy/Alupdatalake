@@ -18,11 +18,16 @@ Tudo em GCP, arquitetura Medallion, infraestrutura por Terraform. Recurso criado
 ## Ambientes
 
 Três, um projeto GCP cada: `dev`, `hml` (homologação das ondas) e `prod`
-(`infra/variables.tf` valida; ADR 015). Região padrão `us-east1` (Carolina do
-Sul) — ver ADR 011, que substitui a 009. Variáveis por ambiente em
+(`infra/variables.tf` valida; ADR 015). Região padrão `us-central1` (Iowa) — ver
+ADR 023, que substitui a 011. Variáveis por ambiente em
 `infra/environments/{dev,hml,prod}.tfvars`; `hml` nasce com
 `agendamentos_ativos = false` (custo). Nunca aponte código para `prod` por
-default — `src/core/config.py` cai em `alupdata-dev`.
+default — `src/core/config.py` cai em `alupar-dev-alupdata`.
+
+Os IDs foram criados pela Alup em 23/09 e **não seguem um padrão**:
+`alupar-dev-alupdata`, `alupar-hm-alupdata` (nome do projeto:
+`alupar-hml-alupdata`) e `prod-alupdata`. Use o ID, nunca o nome, e nunca o
+padrão deduzido do ambiente.
 
 APIs, bucket de state, Artifact Registry, WIF e SA de deploy vêm do bootstrap
 (`infra/bootstrap/`), aplicado pela ness. uma vez por projeto. Papel novo para

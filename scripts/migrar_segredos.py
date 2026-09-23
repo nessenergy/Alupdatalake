@@ -15,8 +15,8 @@ Por que um script em vez de `gcloud secrets versions add` na mão:
 
 Uso:
 
-    ALUPDATA_SECRETS_LOCAIS=1 uv run python -m scripts.migrar_segredos --projeto alupdata-dev
-    ALUPDATA_SECRETS_LOCAIS=1 uv run python -m scripts.migrar_segredos --projeto alupdata-dev --aplicar
+    ALUPDATA_SECRETS_LOCAIS=1 uv run python -m scripts.migrar_segredos --projeto alupar-dev-alupdata
+    ALUPDATA_SECRETS_LOCAIS=1 uv run python -m scripts.migrar_segredos --projeto alupar-dev-alupdata --aplicar
 
 Sem `--aplicar` é simulação: lista o que faria, sem gravar nada e sem imprimir
 valor nenhum.

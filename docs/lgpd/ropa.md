@@ -4,7 +4,7 @@
 revisão e aprovação da controladora
 
 Registro exigido pelo art. 37 da LGPD. Minuta elaborada pela ness. no contrato
-CPS-01025/2026 ([ADR 011](../arquitetura/decisoes/011-regiao-us-east1.md)). A
+CPS-01025/2026 ([ADR 023](../arquitetura/decisoes/023-regiao-us-central1.md)). A
 análise de risco está no [RIPD](ripd.md), os prazos na
 [política de retenção](politica-de-retencao.md) e a transferência internacional
 no [registro do DPA](dpa.md). As perguntas citadas (F1, E4 e outras) são as do
@@ -22,7 +22,7 @@ no [registro do DPA](dpa.md). As perguntas citadas (F1, E4 e outras) são as do
 ## Comum a todas as operações
 
 - **Onde:** projetos GCP `dev`, `hml` e `prod` da organização da Alupar, região
-  `us-east1` (ADR 011; pergunta E4). O dado oficial fica em `prod`; `dev` e
+  `us-central1` (ADR 023; pergunta E4). O dado oficial fica em `prod`; `dev` e
   `hml` guardam cópia por 30 e 90 dias. O `infra/` declara hoje `dev` e `prod`,
   e a ADR 015, que previa dois ambientes, será revista.
 - **Transferência internacional:** sim, para os Estados Unidos, sob o DPA do

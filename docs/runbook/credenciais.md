@@ -55,16 +55,16 @@ na leitura.
 | Recusa dentro do Cloud Run (`K_SERVICE`, `CLOUD_RUN_JOB`) | a ponte virar porta em produção |
 | Recusa de arquivo dentro do repositório | commit acidental |
 
-## 2. Quando A3 chegar — a travessia
+## 2. A travessia — A3 entregue em 23/09
 
 Depois do primeiro `terraform apply`, que cria os secrets vazios:
 
 ```bash
 # 1. simule primeiro: lista o que faria, sem gravar e sem imprimir valor
-ALUPDATA_SECRETS_LOCAIS=1 make migrar-segredos projeto=alupdata-dev
+ALUPDATA_SECRETS_LOCAIS=1 make migrar-segredos projeto=alupar-dev-alupdata
 
 # 2. grave
-ALUPDATA_SECRETS_LOCAIS=1 make migrar-segredos projeto=alupdata-dev aplicar=1
+ALUPDATA_SECRETS_LOCAIS=1 make migrar-segredos projeto=alupar-dev-alupdata aplicar=1
 
 # 3. apague o cofre
 rm ~/.alupdata/segredos.env

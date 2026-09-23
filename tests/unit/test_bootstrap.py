@@ -71,7 +71,7 @@ def test_bootstrap_tem_tfvars_dos_tres_ambientes_sem_valor_real() -> None:
     for ambiente in AMBIENTES:
         tfvars = _ler(BOOTSTRAP / "environments" / f"{ambiente}.tfvars")
         assert _tem(rf'environment\s*=\s*"{ambiente}"', tfvars), ambiente
-        assert _tem(r'region\s*=\s*"us-east1"', tfvars), ambiente
+        assert _tem(r'region\s*=\s*"us-central1"', tfvars), ambiente
         # Nenhum e-mail, host ou identificador de infraestrutura da Alup.
         assert "@" not in tfvars, ambiente
         assert not re.search(r"\b\d{1,3}(?:\.\d{1,3}){3}\b", tfvars), ambiente
@@ -125,9 +125,9 @@ def test_toda_api_que_o_infra_referencia_e_habilitada_no_bootstrap() -> None:
 
 
 def test_bucket_de_state_em_us_east1_versionado_e_fechado() -> None:
-    """ADR 011: tudo em `us-east1`; o state guarda o histórico do ambiente."""
+    """ADR 011: tudo em `us-central1`; o state guarda o histórico do ambiente."""
     assert _tem(
-        r'variable "region" \{[^}]*default\s*=\s*"us-east1"',
+        r'variable "region" \{[^}]*default\s*=\s*"us-central1"',
         _ler(BOOTSTRAP / "variables.tf"),
     )
 

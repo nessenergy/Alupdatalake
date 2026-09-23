@@ -15,10 +15,10 @@ class Settings(BaseSettings):
 
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
-    gcp_project_id: str = "alupdata-dev"
+    gcp_project_id: str = "alupar-dev-alupdata"
     gcp_region: str = Field(
-        default="us-east1",
-        description="Região dos recursos (ADR 011). O INFORMATION_SCHEMA do BigQuery é por região: "
+        default="us-central1",
+        description="Região dos recursos (ADR 023). O INFORMATION_SCHEMA do BigQuery é por região: "
         "apontar para a região errada devolve zero linhas em silêncio",
     )
 

@@ -1,7 +1,19 @@
 # ADR 015 — Fundação do ambiente: três ambientes, bootstrap pela ness., chave gerenciada pelo Google
 
 **Status**: aceito · **Data**: 2026-09-11 · **Revisada**: 2026-09-11 ·
-**Complementa** a [ADR 011](011-regiao-us-east1.md)
+**Adendo**: 2026-09-23 · **Complementa** a
+[ADR 023](023-regiao-us-central1.md)
+
+> **Adendo de 23/09 — os três projetos existem, e os IDs são estes.** A Alup
+> criou e liberou os três ambientes de uma vez. Os IDs ficaram
+> `alupar-dev-alupdata`, `alupar-hm-alupdata` e `prod-alupdata` — sem padrão
+> comum entre si, e o de homologação diverge do nome do próprio projeto
+> (`alupar-hml-alupdata`). **Não serão renomeados**: ID de projeto no GCP é
+> imutável depois da criação, recriar exigiria refazer o processo interno da
+> Alup, que é longo, e nada foi provisionado ainda que justifique o custo.
+> Consequência prática: **o ID nunca é deduzido do ambiente**. Ele vem do
+> `.tfvars`, que é a única fonte, e código ou documento que monte o nome a
+> partir de `alupdata-<ambiente>` está errado.
 
 > **Revisão de 11/09.** A primeira versão desta ADR, no PR #106, fixava dois
 > ambientes, `dev` e `prod`, e deixava o bootstrap dos projetos com a TI da
@@ -77,7 +89,7 @@ A divisão fica assim:
 - **A ness.** aplica `infra/bootstrap/` uma vez por projeto. É uma raiz
   Terraform separada, com state local, que:
   - habilita as APIs que o `infra/` usa;
-  - cria o bucket de state em `us-east1` e o repositório do Artifact Registry;
+  - cria o bucket de state em `us-central1` e o repositório do Artifact Registry;
   - cria o pool e o provedor de WIF, que só aceitam token do repositório
     `nessenergy/Alupdatalake`. Em `hml` e `prod`, só aceitam token de job que
     roda no ambiente do GitHub de mesmo nome;
@@ -195,7 +207,9 @@ pesou mais do que a restrição adicional de acesso que a chave própria daria.
     admitir as contas da ness., senão a concessão dos papéis falha;
   - `iam.workloadIdentityPoolProviders`: se restringe emissores, precisa
     admitir `https://token.actions.githubusercontent.com`;
-  - `gcp.resourceLocations`, como já previsto na ADR 011.
+  - `gcp.resourceLocations`, como já previsto na ADR 011. **Conferida em
+    23/09**: a política herdada admite só `us-central1`, e é por isso que a
+    [ADR 023](023-regiao-us-central1.md) substituiu a 011.
 - **A conferir no primeiro `apply`.** A conta de deploy recebe
   `serviceusage.serviceUsageConsumer` para gerar os agentes de serviço do
   Dataform e do IAP. A documentação do Google não nomeia a permissão exigida.

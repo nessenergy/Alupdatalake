@@ -1,6 +1,16 @@
 # ADR 011 — Região do ambiente: `us-east1`
 
-**Status**: aceito · **Data**: 2026-09-10 · **Substitui** a [ADR 009](009-regiao-do-ambiente.md)
+**Status**: **substituída pela [ADR 023](023-regiao-us-central1.md)** em
+2026-09-23 · **Data**: 2026-09-10 · **Substitui** a
+[ADR 009](009-regiao-do-ambiente.md)
+
+> **Por que caiu.** A política de organização `gcp.resourceLocations`,
+> herdada nos três projetos criados pela Alup, não admite `us-east1` — só
+> `us-central1`, a multirregião `us` e `global`. Conferido em 23/09, no dia
+> em que o acesso ao ambiente saiu. O raciocínio desta ADR continua válido e
+> é a base da [ADR 023](023-regiao-us-central1.md); o que mudou foi a
+> restrição, que não havia como conhecer enquanto não existia projeto para
+> consultar.
 
 ## Contexto
 

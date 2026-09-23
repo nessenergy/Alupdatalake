@@ -1,7 +1,7 @@
 # Próximos passos — fila de execução
 
 Documento **vivo**: é para riscar linha, não para arquivar. Atualizado em
-**2026-09-21**.
+**2026-09-23**.
 
 Ele existe para responder uma pergunta que os outros três não respondem em uma
 tela: **qual é a próxima ação, de quem é, e qual comando a executa.**
@@ -19,15 +19,18 @@ em acompanhamento com a Alup; sua execução não é presumida por esta revisão
 
 ## 1. O que está travando tudo
 
-A cadeia hoje é **em série**, e encurtou: com a revisão do Google feita em
-10/09, sobrou um elo antes do primeiro apply.
+**Nada externo trava o primeiro apply desde 23/09.** A Alup liberou o GCP nos
+três ambientes e a cadeia passou a ser trabalho da ness.:
 
-    A3 (ambiente GCP) → 1º apply → Onda 0 homologada
+    bootstrap do dev → 1º apply → Onda 0 homologada
 
 | # | Ação | Dono | Situação |
 |---|---|---|---|
-| 1.2 | **Projetos GCP `dev`, `hml` e `prod`** (A3, [#55](https://github.com/nessenergy/Alupdatalake/issues/55)) | Alup | **vencido em 04/09**; em 18/09, sem confirmação de entrega, é o **9º dia útil de atraso — passou dos 5 dias úteis da cláusula 3ª**. Previsão da Alup: 18/09. Quem cria (E1) e de quem é a `billing_account` (E2) foi esclarecido em 09/09: ambos são da Alup. **Com G1 encerrada, é o único elo antes do primeiro apply** |
-| 1.3 | Variáveis `GCP_WIF_PROVIDER` e `GCP_DEPLOY_SA` (A1) | ness./Alup | dependem de A3. **Branch protection resolvida em 11/09**: a organização passou ao GitHub Enterprise e a `main` exige PR e seis verificações (ADR 010, encerrada) |
+| ~~1.1~~ | ~~Gravar os IDs reais nos `.tfvars`~~ | ness. | **feito em 23/09**, nos seis arquivos de `infra/environments/` e `infra/bootstrap/environments/`. Os IDs ficam como a Alup criou — renomear é processo longo do lado dela e ID de projeto é imutável ([adendo da ADR 015](arquitetura/decisoes/015-fundacao-do-ambiente.md)) |
+| ~~1.2~~ | ~~Conferir o que veio junto com a liberação~~ | ness. | **feito em 23/09** (A13 do status). Passou: faturamento, os seis papéis, `iam.allowedPolicyMemberDomains` e `iam.workloadIdentityPoolProviders` |
+| ~~1.2a~~ | ~~Pedir à Alup a liberação de `us-east1`~~ | ness. | **resolvido por decisão em 23/09**, sem pedido: a política herdada admite só `us-central1`, e a [ADR 023](arquitetura/decisoes/023-regiao-us-central1.md) substituiu a 011. Pedir exceção custaria outra espera de prazo desconhecido; trocar a região, enquanto nada existe, é editar variável |
+| 1.3 | **Bootstrap do `dev`** e gravação das variáveis `GCP_WIF_PROVIDER` e `GCP_DEPLOY_SA` no ambiente do GitHub | ness. | `runbook/primeiro-deploy.md` §0. **Branch protection resolvida em 11/09** (ADR 010, encerrada) |
+| 1.4 | **Rotação do token do TempoOK** — a [ADR 020](arquitetura/decisoes/020-token-tempook-rotacao-na-producao.md) a define como a primeira ação depois de A3 | ness./TempoOK | entra assim que o Secret Manager do `dev` existir (item 1.3) |
 
 > O atraso de A3 está registrado em
 > [`relatorios/2026-09-04-a3-nao-entregue.md`](relatorios/2026-09-04-a3-nao-entregue.md),
@@ -44,7 +47,7 @@ A cadeia hoje é **em série**, e encurtou: com a revisão do Google feita em
 | 2.2 | **Enviar o relatório de 04/09 à Alup** | `.md` e `.html` prontos em [`relatorios/`](relatorios/) | Registro na mão da contratante |
 | 2.4 | **Enviar à Alup o registro de 09/09 sobre E1 e E2** | `.md` e `.html` prontos em [`relatorios/`](relatorios/) | Registro na mão da contratante |
 | 2.5 | **Confirmar a entrega prevista de A3 e o responsável** | em 11/09 a Alup deu previsão de 18/09, com o faturamento em acerto com a QI Network; o nome não veio — [issue #55](https://github.com/nessenergy/Alupdatalake/issues/55) | E1 respondido com data e nome |
-| 2.6 | **Obter a `billing_account`** | teto e destinatário respondidos em 11/09: US$ 20/mês até novembro e até US$ 400/mês a partir de meados de novembro (E2); alertas para `alup.alertas@alupar.com.br` (E3). Falta a conta — [issue #87](https://github.com/nessenergy/Alupdatalake/issues/87) | conta vinculada; previsão de 18/09 ainda sem confirmação |
+| ~~2.6~~ | ~~**Obter a `billing_account`**~~ | teto e destinatário respondidos em 11/09: US$ 20/mês até novembro e até US$ 400/mês a partir de meados de novembro (E2); alertas para `alup.alertas@alupar.com.br` (E3) | **a conta apareceu na conferência de 23/09**, vinculada aos três projetos. Resta acertar o valor do orçamento por ambiente — [#87](https://github.com/nessenergy/Alupdatalake/issues/87) |
 | 2.7 | **Combinar o canal das credenciais seguintes** (BBCE, Hubspot, Onda 3) | o pedido está redigido no [registro de 14/09](relatorios/2026-09-14-documentacao-de-apis-recebida.md) §5. **A rotação do token do TempoOK saiu desta linha** e ficou para a virada de produção ([ADR 020](arquitetura/decisoes/020-token-tempook-rotacao-na-producao.md)) — rotacionar antes de existir Secret Manager entregaria o valor novo pelo mesmo e-mail. **Em 21/09 dois gatilhos dessa ADR foram acionados** (o token alcança a previsão de ENA em dia): a ADR mandava rotacionar de imediato e, ao mesmo tempo, dizia que rotacionar sem Secret Manager renova a exposição. **Decidido em 21/09** (responsável da ADR): vale a seção 3, e a rotação passa a ser a **primeira ação depois de A3** — ver o adendo | a Alup grava cada credencial nova direto no Secret Manager, sem passar por e-mail |
 | 2.8 | **Enviar à Alup o registro de 14/09** | `.md` e `.html` prontos em [`relatorios/`](relatorios/) | Registro na mão da contratante |
 | 2.9 | **Perguntar à Alup onde estão os boletins recentes do TempoOK, e quais caminhos importam** (A10) — a pergunta mudou em 21/09: o mesmo token alcança a previsão de ENA em dia, então o acervo de 2022 deixou de ser o único fato | [#129](https://github.com/nessenergy/Alupdatalake/issues/129): o token funciona e o caminho está certo, mas nada posterior responde; três hipóteses no [registro de 14/09](relatorios/2026-09-14-documentacao-de-apis-recebida.md) §4.1 | acesso ao acervo recente, ou a informação de que o produto mudou. **Vale juntar com 2.7**: uma conversa só com o fornecedor resolve rotação e acervo |
@@ -71,7 +74,7 @@ dias úteis posterga o cronograma** — 14/09 foi o 5º dia, 15/09 o 6º e
 | 3.3 | **Redação da exclusão de escopo no baralho de kickoff** | manter ou trocar por "modelos preditivos avançados" | Exclusão legítima da Fase 3; é preferência, não correção |
 | 3.4 | **Paralelos restantes** | ~~dicionário de dados · endurecer o Portal MVP~~ — **mudou em 14/09**: com a CCEE destravada, a fila de trabalho útil sem GCP voltou a ser escopo faturável | Ver 3.7 |
 
-Decisões já tomadas: **região** `us-east1` ([ADR 011](arquitetura/decisoes/011-regiao-us-east1.md), que
+Decisões já tomadas: **região** `us-central1` ([ADR 023](arquitetura/decisoes/023-regiao-us-central1.md), que
 substituiu a 009) e **tom cordial** nos relatórios (convenção no [README](relatorios/README.md) do
 diretório). Em 11/09, com as respostas da Alup: **três ambientes** e **bootstrap pela ness.**
 ([ADR 015](arquitetura/decisoes/015-fundacao-do-ambiente.md)), **Gold sem KPI nesta fase**
@@ -162,11 +165,12 @@ a proteção da `main` (ADR 010, encerrada).
 
 ---
 
-## 5. Depois que A3 for entregue
+## 5. A fila aberta em 23/09 pela entrega de A3
 
 Sequência, não lista — cada item depende do anterior. Detalhe em
 [`runbook/primeiro-deploy.md`](runbook/primeiro-deploy.md).
 
+0. **Gravar os IDs reais dos três projetos nos `.tfvars`** (item 1.1).
 1. **Conferir os projetos e executar o bootstrap** em `infra/bootstrap/`: a
    Alup cria, vincula billing e concede os papéis da ADR 015; a ness. configura
    APIs, WIF, state e Artifact Registry. G1 já encerrou em 10/09.
@@ -193,7 +197,7 @@ Fonte: [`status.md` §6](status.md). Repetido aqui como calendário; a tabela l�
 | Prazo | Insumo | Situação |
 |---|---|---|
 | ~~sem data~~ | ~~G1 · resposta do Google~~ | **encerrada em 10/09**; as recomendações viraram ADRs |
-| **04/09 — vencido** | A3 · projeto GCP | atraso registrado; S2 e S3 escorregam |
+| ~~04/09 — vencido~~ | A3 · projeto GCP | **atendida em 23/09**, com 12 dias úteis de atraso e os três ambientes de uma vez; S2 e S3 escorregaram |
 | 11/09 — respondido | A4 Questionário, com A5 (data owners, B1), A6 (Power BI hoje; Looker Studio ou fronts internos na Fase 2, G1) e destinatário de alerta (E3). Segue aberto: A9 token Hubspot, com chamado a partir de 14/09 (C1) | Gold da Fase 1 sem KPI ([ADR 012](arquitetura/decisoes/012-dataform.md#gold-na-fase-1)); a execução real do Hubspot aguarda token |
 | 18/09 | `billing_account` (E1, E2, em acerto com a QI Network) · exemplos de planilha (G3). **A2 encerrada em 14/09**: a orientação chegou, era filtro de `User-Agent`, e as 32h da Onda 1 destravaram no mesmo dia | sem confirmação de billing (#87) e planilhas (#142) em 18/09; sem conta, sem `apply` |
 | 25/09 | A7 chamados de token e acesso, abertos a partir de 14/09 (C1); o MySQL RDS dispensa VPN (C8) · C7 RM/TOTVS. **A8 saiu daqui**: documentação recebida em 14/09 | **ociosidade de 4h/dia** — maior risco financeiro do contrato |

@@ -95,7 +95,7 @@ cobra por job existente, pausado ou não, nem o workflow `diario` do Dataform.
 Os Cloud Run Jobs existem e rodam sob demanda:
 
 ```bash
-gcloud run jobs execute ingestao-bcb-cambio-ptax --region us-east1 --project <projeto-hml>
+gcloud run jobs execute ingestao-bcb-cambio-ptax --region us-central1 --project <projeto-hml>
 ```
 
 Na janela de homologação de uma onda, `agendamentos_ativos = true` em PR e
@@ -141,7 +141,7 @@ e `prod` (ADR 015).
    lista está na ADR 015.
 2. **Da ness.**: o bootstrap aplicado (`infra/bootstrap/`, passo a passo em
    [`primeiro-deploy.md`](primeiro-deploy.md) §0). Ele habilita as APIs, cria o
-   bucket de state e o repositório do Artifact Registry em `us-east1` (ADR
+   bucket de state e o repositório do Artifact Registry em `us-central1` (ADR
    011), o **Workload Identity Federation** e a SA de deploy — o deploy **não**
    usa chave JSON de service account (cláusula 8.5).
 3. Um ambiente do GitHub com o nome do ambiente e as variáveis abaixo. Os
@@ -150,10 +150,10 @@ e `prod` (ADR 015).
 | Variável | Saída do bootstrap | Exemplo |
 |---|---|---|
 | `GCP_WIF_PROVIDER` | `workload_identity_provider` | `projects/123/locations/global/workloadIdentityPools/github/providers/alupdata` |
-| `GCP_DEPLOY_SA` | `service_account_deploy` | `alupdata-deploy@alupdata-dev.iam.gserviceaccount.com` |
-| `TF_STATE_BUCKET` | `bucket_state` | `alupdata-dev-tfstate` |
-| `GCP_REGION` | `region` | `us-east1` |
-| `IMAGEM_INGESTAO` | `imagem_ingestao` | `us-east1-docker.pkg.dev/alupdata-dev/alupdata/cli` (sem tag) |
+| `GCP_DEPLOY_SA` | `service_account_deploy` | `alupdata-deploy@alupar-dev-alupdata.iam.gserviceaccount.com` |
+| `TF_STATE_BUCKET` | `bucket_state` | `alupar-dev-alupdata-tfstate` |
+| `GCP_REGION` | `region` | `us-central1` |
+| `IMAGEM_INGESTAO` | `imagem_ingestao` | `us-central1-docker.pkg.dev/alupar-dev-alupdata/alupdata/cli` (sem tag) |
 | `DATAFORM_GIT_TOKEN_VERSAO` | — | `1` (versão do secret `alupdata-dataform-git-token`) |
 
 Em `dev`, `GCP_WIF_PROVIDER` e `GCP_DEPLOY_SA` ficam também como variáveis do

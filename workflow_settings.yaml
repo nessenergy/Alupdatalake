@@ -2,9 +2,9 @@
 # partir da raiz do repositório Git. Projeto e região valem para a compilação
 # local; no GCP, a release configuration do Terraform sobrescreve os dois.
 dataformCoreVersion: 3.0.69
-defaultProject: alupdata-dev
-defaultLocation: us-east1
+defaultProject: alupar-dev-alupdata
+defaultLocation: us-central1
 defaultDataset: silver
 defaultAssertionDataset: qualidade
 vars:
-  regiao: us-east1
+  regiao: us-central1

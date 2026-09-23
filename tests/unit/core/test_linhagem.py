@@ -64,13 +64,13 @@ def test_envia_para_o_endpoint_da_regiao(monkeypatch: pytest.MonkeyPatch):
             return Resposta()
 
     monkeypatch.setenv("DRY_RUN", "false")
-    monkeypatch.setenv("GCP_REGION", "us-east1")
+    monkeypatch.setenv("GCP_REGION", "us-central1")
     get_settings.cache_clear()
 
     linhagem.emitir(_execucao(), "bcb.cambio_ptax", sessao=Sessao())
 
     assert enviado["url"] == (
-        "https://datalineage.googleapis.com/v1/projects/alupdata-test/locations/us-east1:processOpenLineageRunEvent"
+        "https://datalineage.googleapis.com/v1/projects/alupdata-test/locations/us-central1:processOpenLineageRunEvent"
     )
     assert enviado["corpo"]["outputs"][0]["name"] == "alupdata-test.bronze.bcb_cambio_ptax"
     assert enviado["timeout"] == get_settings().http_timeout

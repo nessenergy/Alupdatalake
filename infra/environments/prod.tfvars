@@ -1,5 +1,7 @@
-project_id  = "alupdata-prod"
-region      = "us-east1"
+# O ID é `prod-alupdata`, sem o prefixo `alupar-` dos outros dois; o nome do
+# projeto é `alupar-prd-alupdata`. Vale o ID.
+project_id  = "prod-alupdata"
+region      = "us-central1"
 environment = "prod"
 
 # Acesso de pessoas (R01 do RIPD): grupos Google da Alup, preenchidos por ela.

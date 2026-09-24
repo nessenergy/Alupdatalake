@@ -6,13 +6,13 @@
 
 **Tecnologias:** Terraform 1.15, provider `hashicorp/google` (já em uso no módulo), pytest. Nenhuma dependência nova.
 
-**Base de requisitos:** `docs/glossario.md`, ADR 014, `infra/modules/catalogo/main.tf` e `aspectos.tf`, `infra/main.tf` (bloco do módulo `catalogo` e `required_providers`), `tests/unit/test_catalogo.py`, tarefa 5.1 de `.superpowers/sdd/2026-09-24-fechamento-das-ondas/task-5.1-brief.md`. HEAD no início: `d6f8533`, branch `docs/plano-ondas`.
+**Base de requisitos:** `docs/glossario.md`, ADR 014, `infra/modules/catalogo/main.tf` e `aspectos.tf`, `infra/main.tf` (bloco do módulo `catalogo` e `required_providers`), `tests/unit/test_catalogo.py`, tarefa 5.1 do plano de fechamento das ondas. HEAD no início: `d6f8533`, branch `docs/plano-ondas`.
 
 **Execução:** uma entrega, um PR. Este documento não autoriza `terraform apply` nem representa homologação.
 
 ## Confirmação do provider (passo obrigatório, antes de escrever o resto)
 
-`infra/main.tf` fixa `hashicorp/google` em `~> 6.0`; `infra/.terraform.lock.hcl` trava a versão resolvida em `6.50.0`. Consultado o Context7 (`/hashicorp/terraform-provider-google`) e o CHANGELOG do provider (`raw.githubusercontent.com/hashicorp/terraform-provider-google/v6.37.0/CHANGELOG.md`, que acumula o histórico até essa tag) e o Terraform Registry (`registry.terraform.io/providers/hashicorp/google/latest/docs/resources/dataplex_glossary`):
+`infra/main.tf` fixa `hashicorp/google` em `~> 6.0`; `infra/.terraform.lock.hcl` trava a versão resolvida em `6.50.0`. Consultado o CHANGELOG do provider (`raw.githubusercontent.com/hashicorp/terraform-provider-google/v6.37.0/CHANGELOG.md`, que acumula o histórico até essa tag) e o Terraform Registry (`registry.terraform.io/providers/hashicorp/google/latest/docs/resources/dataplex_glossary`):
 
 | Recurso | Provider | Adicionado em | PR |
 |---|---|---|---|
@@ -22,7 +22,7 @@
 
 Os três existem no provider `google` padrão — não exigem `google-beta` — e a versão travada (`6.50.0`) é posterior a 6.37.0. **O recurso existe na faixa `~> 6.0` já em uso; o plano segue.**
 
-Argumentos confirmados no Registry/Context7:
+Argumentos confirmados no Registry:
 
 - `google_dataplex_glossary`: `glossary_id` (obrigatório na criação), `location` (obrigatório), `project`, `display_name`, `description`, `labels` (opcionais).
 - `google_dataplex_glossary_term`: `parent` (obrigatório — `projects/{project}/locations/{location}/glossaries/{glossary_id}`), `location` (obrigatório), `glossary_id`, `term_id`, `display_name`, `description`, `labels`, `project` (opcionais).
@@ -66,11 +66,9 @@ Nenhum arquivo em `infra/main.tf` muda: o módulo `catalogo` já recebe `project
 
 **Interfaces:** módulo `catalogo` ganha um output `glossario`; nenhuma variável nova, nenhuma mudança em `main.tf` ou `aspectos.tf`.
 
-- [ ] Acrescentar em `tests/unit/test_catalogo.py`, abaixo dos testes existentes de `aspectos.tf`, a leitura do novo arquivo e do glossário:
+- [ ] Mover `import unicodedata` para o topo de `tests/unit/test_catalogo.py`, junto dos outros imports (`ruff` recusa import fora do topo, E402). Acrescentar, abaixo dos testes existentes de `aspectos.tf`, a leitura do novo arquivo e do glossário:
 
 ```python
-import unicodedata
-
 GLOSSARIO_MD = (RAIZ / "docs" / "glossario.md").read_text(encoding="utf-8")
 GLOSSARIO_TF = (RAIZ / "infra" / "modules" / "catalogo" / "glossario.tf").read_text(encoding="utf-8")
 
@@ -308,12 +306,12 @@ output "glossario" {
 - [ ] Rodar `uv run pytest tests/unit/test_catalogo.py -q` e confirmar que os cinco testes novos, mais os já existentes do arquivo, passam.
 - [ ] Rodar `terraform -chdir=infra fmt -recursive` para alinhar o `=` dos blocos (o teste de sincronização não depende de alinhamento, mas `fmt -check` sim) e então `terraform -chdir=infra fmt -check -recursive` para confirmar.
 - [ ] Rodar `terraform -chdir=infra init -backend=false` (baixa o provider `6.50.0` já travado no lock, sem backend GCS) e, se o `init` concluir, `terraform -chdir=infra validate`. Se o ambiente não tiver acesso de rede para baixar o provider, registrar isso no lugar do resultado — não é bloqueio deste plano, é limitação do ambiente de execução local.
-- [ ] Acrescentar o adendo em `docs/arquitetura/decisoes/014-knowledge-catalog.md`, logo após o "Adendo de 2026-09-23", registrando que o glossário de negócio passou a ser declarado em `infra/modules/catalogo/glossario.tf`, com as 19 entradas das quatro seções de vocabulário do setor elétrico, a decisão de não usar `google_dataplex_glossary_category`, e a lacuna do vínculo termo↔coluna (sem campo correspondente no provider). Referenciar a issue #36 como fechada por este item.
-- [ ] Atualizar `docs/status.md`: mover o item do glossário de "pendente" para "declarado em código, validado localmente; `apply` pendente do ambiente da Alup" — mesma distinção usada no plano de 18/09 para os outros reparos.
+- [ ] Acrescentar o adendo em `docs/arquitetura/decisoes/014-knowledge-catalog.md`, logo após o "Adendo de 2026-09-23", registrando que o glossário de negócio passou a ser declarado em `infra/modules/catalogo/glossario.tf`, com as 19 entradas das quatro seções de vocabulário do setor elétrico, a decisão de não usar `google_dataplex_glossary_category`, e a lacuna do vínculo termo↔coluna (sem campo correspondente no provider). Registrar essa lacuna como comentário na issue #36; fechar a issue é decisão da coordenação.
+- [ ] Atualizar `docs/status.md`: mover o item do glossário de "pendente" para "declarado em código, validado localmente; `apply` pendente de PR e deploy em `dev`" — mesma distinção usada no plano de 18/09 para os outros reparos.
 - [ ] Validar a mensagem de commit antes de commitar: `python scripts/verifica_atribuicao.py <arquivo-da-mensagem>`.
 - [ ] Commit: `feat(catalogo): glossario de negocio como termos do knowledge catalog`.
 
-**Aceite local:** os cinco testes novos de `test_catalogo.py` passam; `terraform fmt -check` e, se possível no ambiente, `terraform validate` aprovam; ADR 014 e `docs/status.md` refletem o estado. **Aceite posterior em GCP:** `apply` cria o glossário e os 19 termos no Knowledge Catalog do projeto; a Alup consegue buscar um termo (ex. "PLD") e ver a descrição e a categoria. Pendente da liberação do ambiente pela Alup — este plano não autoriza `apply`.
+**Aceite local:** os cinco testes novos de `test_catalogo.py` passam; `terraform fmt -check` e, se possível no ambiente, `terraform validate` aprovam; ADR 014 e `docs/status.md` refletem o estado. **Aceite posterior em GCP:** `apply` cria o glossário e os 19 termos no Knowledge Catalog do projeto; a Alup consegue buscar um termo (ex. "PLD") e ver a descrição e a categoria. Pendente de PR e deploy em `dev` — este plano não autoriza `apply`.
 
 ## Referências técnicas consultadas
 
@@ -322,4 +320,3 @@ output "glossario" {
 - [google_dataplex_glossary_category — Terraform Registry](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/dataplex_glossary_category)
 - CHANGELOG do provider (`terraform-provider-google`, tag `v6.37.0`): `google_dataplex_glossary` adicionado em 6.36.0 ([PR #22794](https://github.com/hashicorp/terraform-provider-google/pull/22794), mesclado em 20/05/2025); `google_dataplex_glossary_term` e `google_dataplex_glossary_category` adicionados em 6.37.0 ([PR #22835](https://github.com/hashicorp/terraform-provider-google/pull/22835)).
 - `infra/.terraform.lock.hcl`: versão resolvida do provider `google` no repositório é `6.50.0`, acima da versão mínima que introduz os três recursos.
-- Consulta via Context7 (`/hashicorp/terraform-provider-google`) confirmou os argumentos de `parent`, `location`, `glossary_id`/`term_id`/`category_id`, `display_name`, `description`, `labels`, `project` e `deletion_policy` para `google_dataplex_glossary_term` e `google_dataplex_glossary_category`.

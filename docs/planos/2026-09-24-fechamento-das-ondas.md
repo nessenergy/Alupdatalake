@@ -50,7 +50,7 @@ os critérios de aceite são os da skill `homologacao-onda`.
 
 | Onda | Prazo contratual | Situação técnica | O que falta para o dossiê |
 |---|---|---|---|
-| **0 — Fundação** | **11/09 — vencida** | tudo entregue; `dev` provisionado (159 recursos), Dataform de pé, Portal publicado atrás do IAP | 3 dias seguidos de `SUCESSO`, replay contra o GCS real, Portal mostrando uma Gold real, aplicação em `hml` |
+| **0 — Fundação** | **11/09 — vencida** | tudo entregue; `dev` provisionado (159 recursos), Dataform de pé, Portal publicado atrás do IAP | 3 dias seguidos de `SUCESSO`, replay contra o GCS real, Portal mostrando uma Gold real |
 | **1 — Mercado base** | 16/10 | as 23 fontes públicas escritas e testadas contra as APIs reais em dry-run; Gold do domínio de mercado escrita | carga real de cada uma, Gold com linha, aplicação em `hml` |
 | **2 — APIs credenciadas** | 13/11 | os 4 conectores escritos; TempoOK ENA com token no Secret Manager | credencial do Hubspot e do BBCE, acervo do TempoOK e a decisão sobre o item 2.1 |
 | **3 — Sistemas internos** | 18/12 | caminho de banco (ADR 008) e orquestração (Workflows) prontos | VPN e credenciais read-only das quatro fontes (A7) |
@@ -66,14 +66,15 @@ se registra quando a ness. consegue entregar.
 | Onda | Dossiê entregue à Alup | Prazo contratual | Diferença | Condição |
 |---|---|---|---|---|
 | 0 | **30/09** | 11/09 (postergado por A3) | — | nenhuma além da carga |
-| 1 | **07/10** | 16/10 | **7 dias úteis antes** | a janela de `hml` aberta em 30/09 |
-| 2 | **23/10** | 13/11 | **15 dias úteis antes** | Hubspot e BBCE no Secret Manager até **12/10** |
-| 3 | chegada da última credencial **+ 5 semanas** | 18/12 | até 4 semanas antes | com tudo em 19/10, dossiê em **23/11** |
+| 1 | **07/10** | 16/10 | **6 dias úteis antes** | a janela de `hml` aberta em 30/09 |
+| 2 | **23/10** | 13/11 | **14 dias úteis antes** | Hubspot e BBCE no Secret Manager até **12/10** |
+| 3 | chegada da última credencial **+ 5 semanas** | 18/12 | até cerca de 3 semanas e meia antes | com tudo em 19/10, dossiê em **23/11** |
 | 4 | dossiê da Onda 3 **+ 1 semana** | 08/01/2027 | até 6 semanas antes | planilhas no bucket até **01/10**; o resto adiantado nas fases 4 e 5 |
 
 As datas das Ondas 2 a 4 **são condicionais**, e a condição é o insumo da
-coluna da direita. Se ele atrasa, a data anda junto e o registro do atraso
-começa no dia seguinte ao combinado.
+coluna da direita. Se o insumo atrasa, a data do dossiê anda junto; atraso da
+Alup só se registra depois do prazo contratual (19/10 Onda 2, 16/11 Onda 3,
+21/12 Onda 4).
 
 ## 3. Mapa de arquivos
 
@@ -84,7 +85,7 @@ começa no dia seguinte ao combinado.
 | `docs/relatorios/2026-09-30-dossie-onda-0.md` (+ `.html`) | Fase 1 | dossiê da Onda 0 |
 | `docs/relatorios/2026-10-07-dossie-onda-1.md` (+ `.html`) | Fase 3 | dossiê da Onda 1 |
 | `docs/status.md`, `docs/proximos-passos.md`, `docs/plano-semanal.md` | ao fim de cada fase | registrar o que fechou |
-| `docs/planos/<data>-glossario-como-codigo.md` | Fase 5 | plano próprio do glossário |
+| `docs/planos/2026-09-24-glossario-como-codigo.md` | Fase 5 | plano próprio do glossário |
 | `docs/planos/<data>-templates-de-planilha.md` | Fase 5 | plano próprio dos templates |
 | `docs/planos/<data>-fonte-<nome>.md` | Fase 6 | um plano por fonte interna |
 
@@ -195,9 +196,10 @@ SELECT ingestao_id, modo, origem_ingestao_id, status, linhas_carregadas
 FROM bronze._execucoes WHERE modo = "REPLAY" ORDER BY iniciada_em DESC LIMIT 1'
 ```
 
-Esperado: `modo = REPLAY`, `origem_ingestao_id` igual ao ID do objeto e
-`status = SUCESSO`. Na Silver, o total de linhas da janela não muda, porque a
-deduplicação absorve a recarga.
+Esperado: `modo = REPLAY`, `origem_ingestao_id` igual ao `ingestao_id` da
+execução que gerou o objeto raw (é o nome do arquivo) e `status = SUCESSO`.
+Na Silver, o total de linhas da janela não muda, porque a deduplicação
+absorve a recarga.
 
 ### Tarefa 1.3: Portal mostrando uma Gold real *(paralela)*
 
@@ -256,6 +258,8 @@ gh workflow run "Deploy GCP" -f environment=dev -f module=all
 | Portal com login e Gold | captura da Tarefa 1.3 |
 | 8 domínios e dimensões comuns | `docs/arquitetura/dominios-analiticos.md`, `visao-geral.md` |
 | RACI e data owners | `docs/raci.md`, `docs/interlocutores.md` |
+| `make all` verde | saída de `make all` na `main` do dia |
+| Agendamento executando | captura do Cloud Scheduler do `dev` com a última execução dos jobs do BCB |
 
 - [ ] **Passo 2: Escrever `docs/relatorios/2026-09-30-dossie-onda-0.md`** no
   formato dos outros relatórios e gerar o HTML:
@@ -326,7 +330,7 @@ de repetir.
 
 ### Tarefa 3.1: Carga real das 23 fontes públicas em `dev` *(começa em 25/09)*
 
-As fontes mensais só rodariam sozinhas entre 05 e 07/10, e as semanais em
+As fontes mensais só rodariam sozinhas entre 05 e 12/10, e as semanais em
 28 e 29/09. Executar cada job uma vez, com os argumentos do agendamento,
 antecipa a carga sem mudar a janela. A regra 3 continua valendo: a janela
 vem de `--ultimos-dias`.
@@ -353,6 +357,7 @@ SELECT fonte, entidade, status, linhas_extraidas, linhas_invalidas,
        linhas_carregadas, ROUND(duracao_segundos) AS s, erro
 FROM bronze._execucoes
 WHERE DATE(iniciada_em, "America/Sao_Paulo") = CURRENT_DATE("America/Sao_Paulo")
+  AND fonte NOT IN ("hubspot", "bbce", "tempook")
 QUALIFY ROW_NUMBER() OVER (PARTITION BY fonte, entidade ORDER BY iniciada_em DESC) = 1
 ORDER BY status, fonte, entidade'
 ```
@@ -402,10 +407,17 @@ porque a Silver também está vazia volta para a Tarefa 3.1.
 **Depende de:** Fase 2.
 
 - [ ] **Passo 1:** o laço da Tarefa 3.1 com `--project alupar-hm-alupdata`.
-- [ ] **Passo 2:** as consultas das Tarefas 3.1 e 3.2 em `hml`.
-- [ ] **Passo 3: Replay de uma fonte da onda em `hml`** (`ons_carga`), com o
+- [ ] **Passo 2: Rodar o Dataform em `hml`** para a Silver e a Gold
+  refletirem a carga.
+
+```bash
+gh workflow run "Deploy GCP" -f environment=hml -f module=all
+```
+
+- [ ] **Passo 3:** as consultas das Tarefas 3.1 e 3.2 em `hml`.
+- [ ] **Passo 4: Replay de uma fonte da onda em `hml`** (`ons_carga`), com o
   mesmo procedimento da Tarefa 1.2.
-- [ ] **Passo 4: Captura do Cloud Scheduler de `hml`** com os 27 jobs e a
+- [ ] **Passo 5: Captura do Cloud Scheduler de `hml`** com os 27 jobs e a
   próxima execução de cada um.
 
 ### Tarefa 3.4: Dossiê da Onda 1
@@ -439,7 +451,8 @@ quando a última fecha, ou quando uma decisão tira alguma dela do escopo.
   token novo, gravar como versão nova de `alupdata-tempook-api-token` e
   confirmar que o antigo deixou de autenticar.
 - [ ] **Passo 2:** executar `ingestao-tempook-ena-prevs` em `dev` e ler o
-  `_execucoes`. Esperado: `SUCESSO` com 5 arquivos, um por dia da janela.
+  `_execucoes`. Esperado: `SUCESSO` com até 5 arquivos (o acervo tem buracos
+  aos sábados).
 - [ ] **Passo 3: Boletins.** Sem acervo recente (A10,
   [#129](https://github.com/nessenergy/Alupdatalake/issues/129)), o conector
   roda e carrega zero. O dossiê declara isso como pendência da origem, com
@@ -454,7 +467,7 @@ pelo grupo da Alup no canal combinado.
 - [ ] **Passo 2: Rodar o teste de integração que hoje é `skipif`**
 
 ```bash
-uv run pytest tests/integration -k hubspot -v
+ALUPDATA_INTEGRACAO_HUBSPOT=1 uv run pytest tests/integration -k hubspot -v
 ```
 
 - [ ] **Passo 3:** conferir cada item da lista "Não verificado" de
@@ -467,8 +480,17 @@ uv run pytest tests/integration -k hubspot -v
 [#23](https://github.com/nessenergy/Alupdatalake/issues/23)). O host não
 consta da documentação pública.
 
-- [ ] Os mesmos três passos da Tarefa 4.2, com `ingestao-bbce-curva-forward`
-  e `-k bbce`.
+- [ ] **Passo 1:** executar `ingestao-bbce-curva-forward` em `dev`.
+- [ ] **Passo 2: Rodar o teste de integração que hoje é `skipif`**
+
+```bash
+ALUPDATA_INTEGRACAO_BBCE=1 uv run pytest tests/integration -k bbce -v
+```
+
+- [ ] **Passo 3:** conferir cada item da seção "O que não foi possível
+  verificar sem credencial" de `docs/dicionario-dados/bbce_curva_forward.md`
+  contra a API real. Divergência entra com teste; item confirmado sai da
+  lista.
 
 ### Tarefa 4.4: Decidir o item 2.1 (CCEE agente credenciado, 32h)
 
@@ -496,12 +518,10 @@ fechar a Onda 4 uma semana depois da 3, em vez de três.
 
 ### Tarefa 5.1: Glossário como código *(plano próprio)*
 
-- [ ] Escrever `docs/planos/<data>-glossario-como-codigo.md`: os termos de
-  `docs/glossario.md` declarados em `infra/modules/catalogo` como glossário
-  do Knowledge Catalog, com teste em `tests/unit/test_catalogo.py`. Antes de
-  escrever, confirmar na documentação do provider `google` que o recurso de
-  glossário existe na versão fixada no `required_providers` de `infra/main.tf`. Se não existir,
-  o plano registra isso e para ali.
+- [x] Escrever [`docs/planos/2026-09-24-glossario-como-codigo.md`](2026-09-24-glossario-como-codigo.md):
+  os termos de `docs/glossario.md` declarados em `infra/modules/catalogo`
+  como glossário do Knowledge Catalog, com teste em
+  `tests/unit/test_catalogo.py`.
 
 ### Tarefa 5.2: Anotações do catálogo *(depois da Fase 3)*
 
@@ -530,7 +550,7 @@ fechar a Onda 4 uma semana depois da 3, em vez de três.
 **Depende de:** A7. Os pedidos vencem em 25/09, e a mensagem de 24/09 pede
 as credenciais até 09/11.
 
-### Tarefa 6.1: Registrar A7 em 25/09
+### Tarefa 6.1: Registrar A7 em 26/09
 
 - [ ] Em 26/09, registrar em `status.md` se a Alup confirmou os pedidos
   abertos, com número de chamado e responsável. Sem confirmação, a

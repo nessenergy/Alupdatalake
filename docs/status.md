@@ -74,9 +74,27 @@ continuam pendentes de liberação do ambiente pela Alup.
 > **uma única ação reprovada**: `gold.custo_consultas`, que espera o
 > `INFORMATION_SCHEMA.TABLE_STORAGE` ligado no projeto — passo único de quem é
 > *Owner* ([`acoes-humanas.md`](acoes-humanas.md) §1b). As tabelas de Bronze
-> existem, e **a primeira carga real acontece nos agendamentos de 25/09**.
+> existem, e **a primeira carga real já aconteceu no mesmo dia**: `bcb_juros`
+> às 09h34 e as duas do TempoOK às 11h e 11h37.
 > O primeiro Dataform revelou três DDLs de Bronze com `NULL` solto, que o
 > BigQuery recusa ([#208](https://github.com/nessenergy/Alupdatalake/pull/208)).
+
+> **24/09, à tarde — o `TABLE_STORAGE` foi ligado e um efeito colateral do
+> bootstrap apareceu.** Entre 09h45 e 11h alguém com papel de *Owner* rodou o
+> passo do §1b; a *workflow config* `diario` das 11h passou inteira, 141
+> ações, zero falhas — `gold.custo_consultas` incluída. **Quatro jobs
+> públicos falharam nas primeiras horas da manhã**: `bcb_cambio_ptax` (09h),
+> `ons_carga` (08h), `ons_ear` (08h15) e `ons_ena` (08h30) rodaram antes de o
+> Dataform criar a tabela `bronze._execucoes` pela primeira vez (09h29), e a
+> gravação do log de execução falhou com `404 Not found: Table
+> bronze._execucoes` — o raw foi gravado normalmente nos quatro casos, só o
+> registro da execução que faltou. A tabela usa `CREATE TABLE IF NOT EXISTS`,
+> não é recriada a cada rodada, então não se repete: os mesmos quatro jobs
+> voltam a rodar em 25/09 e a partir daí a tabela já existe. Sem ação humana
+> — é bootstrapping de primeiro dia, não um defeito recorrente. Nenhum dos
+> quatro pôde ser reexecutado manualmente hoje: a conta pessoal não tem
+> `run.jobs.run` nos Cloud Run Jobs, e isso é o esperado — quem executa job
+> é a SA de deploy, não uma pessoa.
 
 Este arquivo responde "onde estamos e o que trava o próximo passo". Detalhe de
 escopo e estimativa fica em [`plano-execucao.md`](plano-execucao.md); o que sai
@@ -226,7 +244,7 @@ destino, com os oito invariantes e a pauta de perguntas. **Enviado ao Google em
 
 | # | Item | Efeito enquanto não vier | Referência |
 |---|---|---|---|
-| ~~A1~~ | ~~**Conceder à ness. os papéis de bootstrap** em cada projeto~~ | **Atendida em 23/09**: os seis papéis da ADR 015 estão concedidos nos três projetos. Duas ressalvas apuradas na conferência — `gptorres@ness.com.br` **não recebeu papel em nenhum dos três**, e em `dev` há um `roles/owner` para `bertuzzi@` com convites pendentes para `resper@` e `gpaz@`, mais amplo do que a ADR pediu. **As duas foram registradas com a Alup no e-mail de 23/09**; nenhuma bloqueia o bootstrap, que roda com as três contas que têm os papéis | ADR 015, `runbook/primeiro-deploy.md` §0 |
+| ~~A1~~ | ~~**Conceder à ness. os papéis de bootstrap** em cada projeto~~ | **Atendida em 23/09**: os seis papéis da ADR 015 estão concedidos nos três projetos. Duas ressalvas apuradas na conferência — `gptorres@ness.com.br` **não recebeu papel em nenhum dos três**, e em `dev` há um `roles/owner` para `bertuzzi@` com convites pendentes para `resper@` e `gpaz@`, mais amplo do que a ADR pediu. **As duas foram registradas com a Alup no e-mail de 23/09**; nenhuma bloqueia o bootstrap, que roda com as três contas que têm os papéis. **Reconferido em `dev` em 24/09, direto no IAM**: os seis papéis de `resper` e de `gpaz` são só os condicionais (vencem 28/02/2027), sem duplicata sem prazo — **nada a remover**. Os convites de *Owner* para `resper@` e `gpaz@` não se efetivaram; `roles/owner` em `dev` continua só com `bertuzzi@` e `gabriel.alves@qinetwork.com.br`. `gptorres@` segue sem nenhum papel | ADR 015, `runbook/primeiro-deploy.md` §0 |
 | ~~A14~~ | ~~**Liberar `us-east1` na política `gcp.resourceLocations`**~~ | **Encerrada em 23/09 sem pedido à Alup.** A política efetiva nos três projetos admite só `us-central1` (região e zonas), a multirregião `us` e `global`; é herdada da pasta `511203368267` e só a Alup alteraria. Em vez de esperar, a região do ambiente passou a ser `us-central1` — nada existia em região alguma, então foi troca de variável. Se a Alup preferir `us-east1`, a conversa vale **até o primeiro apply** | [ADR 023](arquitetura/decisoes/023-regiao-us-central1.md), que substitui a [011](arquitetura/decisoes/011-regiao-us-east1.md) |
 | ~~A2~~ | ~~**Decidir sobre a CCEE InfoMercado**~~ | **Encerrada em 14/09** — era filtro de cliente não identificado, não bloqueio de IP nem credencial. Resolvido por cabeçalho no `src/core/http.py` | [ADR 018](arquitetura/decisoes/018-vias-de-acesso-a-ccee.md), [registro de 14/09](relatorios/2026-09-14-documentacao-de-apis-recebida.md) |
 | ~~A3~~ | ~~**Projetos GCP `dev`, `hml` e `prod`**~~ | **Atendida em 23/09**: os três projetos existem e o acesso da ness. foi liberado. Os IDs reais são `alupar-dev-alupdata`, `alupar-hm-alupdata` e `prod-alupdata` — **diferentes dos previstos** (`alupdata-dev`/`-hml`/`-prod`), e o de homologação diverge do próprio nome do projeto (`alupar-hml-alupdata`). **Ficam como estão** — ID de projeto é imutável e recriar significaria refazer o processo interno da Alup ([adendo da ADR 015](arquitetura/decisoes/015-fundacao-do-ambiente.md)). O que resta é da ness. (N3) e o que ainda precisa ser conferido está em A13 | plano 2.2 (0.13), [ADR 015](arquitetura/decisoes/015-fundacao-do-ambiente.md), [#55](https://github.com/nessenergy/Alupdatalake/issues/55) |

@@ -142,6 +142,22 @@ resource "google_secret_manager_secret" "git_token" {
   }
 }
 
+# Quem grava o token (ADR 015): acrescenta versão, não lê. Por grupo (R01).
+variable "gravacao_segredos" {
+  description = "Membros group:/domain: que gravam versão nova do token, sem leitura"
+  type        = list(string)
+  default     = []
+}
+
+resource "google_secret_manager_secret_iam_member" "grava_token" {
+  for_each = toset(var.gravacao_segredos)
+
+  project   = var.project_id
+  secret_id = google_secret_manager_secret.git_token.secret_id
+  role      = "roles/secretmanager.secretVersionAdder"
+  member    = each.value
+}
+
 resource "google_secret_manager_secret_iam_member" "agente_le_token" {
   project   = var.project_id
   secret_id = google_secret_manager_secret.git_token.secret_id

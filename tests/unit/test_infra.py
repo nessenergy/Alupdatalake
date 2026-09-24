@@ -531,3 +531,29 @@ def test_row_conditions_e_lista_e_nao_objeto_nomeado() -> None:
     for p in (RAIZ / "definitions" / "silver").glob("*.sqlx"):
         texto = p.read_text(encoding="utf-8")
         assert "rowConditions: {" not in texto, f"{p.name}: rowConditions como objeto não compila"
+
+
+def test_gravacao_de_segredo_e_por_grupo_e_sem_leitura() -> None:
+    """ADR 015: gravar o token do Dataform é acesso de operação, por variável.
+
+    Faltava a variável que a ADR prometia, e a falta apareceu em 24/09: nenhuma
+    conta da ness. conseguia gravar o token (`secretmanager.versions.add`
+    negado), e o `migrar_segredos` esbarraria no mesmo. O papel tem de ser o
+    que acrescenta versão **sem ler** — quem entrega credencial não precisa
+    vê-la — e o membro tem de ser grupo, nunca pessoa (R01).
+    """
+    variavel = _bloco(_ler("infra/variables.tf"), 'variable "gravacao_segredos"')
+    assert "validation" in variavel
+    assert "group:" in variavel and "domain:" in variavel
+    assert "user:" in variavel  # citado só na mensagem que o recusa
+
+    for caminho in ("infra/modules/secrets/main.tf", "infra/modules/dataform/main.tf"):
+        modulo = _ler(caminho)
+        assert "var.gravacao_segredos" in modulo, caminho
+        concessoes = re.findall(r'role\s*=\s*"(roles/secretmanager\.\w+)"', modulo)
+        # Quem grava não lê: o único papel de leitura continua sendo o das
+        # identidades que consomem a credencial (ingestão e agente do Dataform).
+        assert "roles/secretmanager.secretVersionAdder" in concessoes, caminho
+
+    principal = _ler("infra/main.tf")
+    assert principal.count("gravacao_segredos      = var.gravacao_segredos") == 2

@@ -153,6 +153,7 @@ module "secrets" {
   service_account_email = google_service_account.ingestao.email
   # A SA do deploy é a que o GitHub assume via WIF; o quadro a reutiliza.
   github_service_account = var.deploy_service_account
+  gravacao_segredos      = var.gravacao_segredos
 }
 
 # Alertas. `emails_alerta` vazio cria as políticas sem destinatário — ver o
@@ -202,6 +203,7 @@ module "dataform" {
   git_token_versao       = var.dataform_git_token_versao
   deploy_service_account = var.deploy_service_account
   agendar                = var.agendamentos_ativos
+  gravacao_segredos      = var.gravacao_segredos
 }
 
 # Knowledge Catalog (ADR 014): lake, zonas e ativos sobre o que já existe.

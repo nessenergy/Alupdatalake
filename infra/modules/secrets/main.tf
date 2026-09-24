@@ -100,3 +100,25 @@ output "secret_ids" {
   description = "Ids dos secrets criados"
   value       = [for s in google_secret_manager_secret.fonte : s.secret_id]
 }
+
+# Gravar sem ler (ADR 015, acesso de operação depois do bootstrap): quem está
+# aqui acrescenta versão a um secret de fonte — o `migrar_segredos` faz isso —
+# mas não consegue ler valor nenhum. É o papel certo para quem só entrega a
+# credencial, e é por grupo, nunca por pessoa (R01).
+variable "gravacao_segredos" {
+  description = "Membros group:/domain: que gravam versão nova, sem leitura"
+  type        = list(string)
+  default     = []
+}
+
+resource "google_secret_manager_secret_iam_member" "grava" {
+  for_each = {
+    for par in setproduct(keys(google_secret_manager_secret.fonte), var.gravacao_segredos) :
+    "${par[0]}|${par[1]}" => { segredo = par[0], membro = par[1] }
+  }
+
+  project   = var.project_id
+  secret_id = google_secret_manager_secret.fonte[each.value.segredo].secret_id
+  role      = "roles/secretmanager.secretVersionAdder"
+  member    = each.value.membro
+}

@@ -112,8 +112,10 @@ variable "conectores" {
       # de 24/09 extraiu zero linhas com status SUCESSO. `ultimos_dias` 100
       # alcança o mês publicado mais recente e o anterior (recontabilização,
       # ADR 016) — em geral três recursos mensais — e cabe no `timeout` de
-      # 1800s do job: cada mês leva cerca de 3 minutos só na extração,
-      # medido em dry-run.
+      # 1800s do job: cada mês leva cerca de 3 minutos só na extração, medido
+      # em dry-run (raw e carga na Bronze pulados) — um piso, não o tempo da
+      # execução real. Mesmo com três meses ainda sobra folga grande no
+      # timeout.
       #
       # `memoria` deixou de ser premissa. Medido em 15/09 com o mês de julho
       # (2.964.096 registros), somando processo e filhos: o runner em fatias

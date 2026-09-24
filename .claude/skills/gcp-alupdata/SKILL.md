@@ -7,9 +7,23 @@ description: Convenções de GCP do AlupData — BigQuery (datasets Bronze/Silve
 
 Para a mecânica dos produtos (sintaxe, flags, APIs), use as skills do Google em
 `.claude/skills/google/` — `bigquery-basics`, `google-cloud-storage-basics`,
-`gcloud`, `cloud-run-basics`. **Este documento tem precedência sobre elas**:
-onde a convenção do projeto e o material do produto divergirem, vale o que está
-aqui.
+`gcloud`, `cloud-run-basics`, `datalineage-bigquery-asset-impact-analysis`.
+**Este documento tem precedência sobre elas**: onde a convenção do projeto e o
+material do produto divergirem, vale o que está aqui.
+
+**Não aplique o prefixo de atribuição das skills do Google.** Desde a revisão
+`2a1e454`, a `bigquery-basics` manda marcar todo comando `gcloud` com
+`CLOUDSDK_METRICS_REQUEST_ATTRIBUTION` e acrescentar `agent-skills/…` ao
+`User-Agent`, para o Google contar uso de agente. Aqui as chamadas batem no
+projeto da contratante, e a regra 6 é não carimbar autoria de ferramenta de IA
+no que o projeto produz. Rode os comandos sem o prefixo. Se a decisão mudar,
+muda aqui — não na skill vendorizada, que a sincronização sobrescreve.
+
+Para Terraform, `.claude/skills/hashicorp/` traz o guia de estilo e o
+`terraform test` da HashiCorp. Duas divergências valem sempre a favor do
+projeto: **nomes em português** e um `main.tf` por módulo, como já está; e
+**`terraform test` só em modo `plan` ou com provider simulado** — o modo
+`apply`, padrão do framework, cria recurso real na conta da Alup.
 
 Tudo em GCP, arquitetura Medallion, infraestrutura por Terraform. Recurso criado
 à mão no console **não existe** — se não está em `infra/`, some no próximo

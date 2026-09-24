@@ -16,6 +16,7 @@ Para a primeira implantação, use também a checklist
 | Repositório Dataform, release config `main`, workflow config `diario` e SA `alupdata-dataform` | `infra/modules/dataform` |
 | Dataset `qualidade` (assertions do Dataform) | `infra/modules/bigquery` |
 | Serviço `alupdata-portal` no Cloud Run, IAP e SA `alupdata-portal` | `infra/modules/portal` |
+| Lake `alupdata`, zonas Bronze/Silver/Gold e ativos do Knowledge Catalog, com descoberta desligada | `infra/modules/catalogo` |
 | Fluxo `alupdata-onda3` no Cloud Workflows, seu Scheduler e a SA `alupdata-orquestracao` — **só quando `cadeia_onda3` tiver conector** | `infra/modules/orquestracao` |
 | Leitura de pessoas por grupo (R01 do RIPD) | `infra/main.tf` |
 | Log de auditoria de acesso a dado do BigQuery e do Cloud Storage (R07 do RIPD) | `infra/main.tf` |

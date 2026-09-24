@@ -2,6 +2,23 @@
 
 **Status**: aceito · **Data**: 2026-09-10
 
+## Adendo de 2026-09-23 — lake, zonas e ativos declarados
+
+`infra/modules/catalogo` declara o lake `alupdata`, as três zonas — Bronze
+crua, Silver e Gold curadas — e um ativo por dataset, mais o bucket raw na
+zona Bronze. O agente de serviço do Dataplex recebe `dataplex.serviceAgent`
+no projeto, sem o que o ativo nasce em estado de erro.
+
+**A descoberta nasce desligada.** Ela é cobrada por unidade de processamento,
+e o esquema das tabelas vem do Dataform (ADR 012), que é fonte melhor do que
+inferência: ligá-la pagaria para adivinhar o que já está declarado. É uma
+variável, `descoberta_ativa`, para o dia em que houver motivo.
+
+Continuam fora, na [issue #36](https://github.com/nessenergy/Alupdatalake/issues/36):
+os *aspect types* — os "Tag Templates" do contrato — e o glossário de negócio
+a partir de `docs/glossario.md`. Os dois descrevem **conteúdo** do catálogo, e
+conteúdo antes da primeira carga seria descrição de tabela vazia.
+
 ## Contexto
 
 A Onda 4 do contrato prevê a "configuração do Google Cloud Dataplex (Knowledge

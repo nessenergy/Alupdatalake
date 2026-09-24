@@ -204,6 +204,18 @@ module "dataform" {
   agendar                = var.agendamentos_ativos
 }
 
+# Knowledge Catalog (ADR 014): lake, zonas e ativos sobre o que já existe.
+# Descoberta desligada — o esquema vem do Dataform, não de varredura paga.
+module "catalogo" {
+  source              = "./modules/catalogo"
+  project_id          = var.project_id
+  region              = var.region
+  environment         = var.environment
+  datasets_por_camada = module.bigquery.dataset_ids
+  dataset_qualidade   = module.bigquery.dataset_qualidade
+  bucket_raw          = module.storage.bucket_raw
+}
+
 # Onda 3 (ADR 017): a cadeia só existe quando houver fonte interna ingerida.
 # Com `cadeia_onda3` vazia — o padrão — nenhum recurso é criado.
 module "orquestracao" {

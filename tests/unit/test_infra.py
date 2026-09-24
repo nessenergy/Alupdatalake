@@ -679,4 +679,4 @@ def test_timeout_do_job_e_configuravel_por_conector() -> None:
     assert not _tem(r'timeout\s*=\s*"1800s"', job), "o job não pode mais fixar o timeout default"
 
     bloco_ccee = _bloco(scheduler, "ccee_geracao_usina = {")
-    assert _tem(r'timeout\s*=\s*"3600s"', bloco_ccee)
+    assert _tem(r'timeout\s*=\s*"7200s"', bloco_ccee)

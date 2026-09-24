@@ -119,8 +119,9 @@ variable "conectores" {
       # linhas) levava ~42 min só de carga — estourando o `timeout` de 1800s
       # sozinho, antes mesmo de somar os outros dois meses da janela.
       # `bytes_por_lote` do conector (`src/conectores/ccee_geracao_usina.py`)
-      # subiu para 32 MiB, 4x menos load jobs; com isso, três meses cabem com
-      # folga numa hora — daí o `timeout` de 3600s abaixo. O tempo por load
+      # subiu para 32 MiB, 4x menos load jobs; medido em 24/09, um mês (~3M
+      # linhas) levou 1650 s com lote de 32 MiB. A janela de 100 dias alcança
+      # dois a três meses publicados, daí `timeout` de 7200 s. O tempo por load
       # job também foi medido com 8 MiB; com lote maior tende a ficar mais
       # raro, mas mais longo cada um — não remedido ainda.
       #
@@ -137,7 +138,7 @@ variable "conectores" {
       ultimos_dias = 100
       memoria      = "1Gi"
       cpu          = "2"
-      timeout      = "3600s"
+      timeout      = "7200s"
     }
     ons_geracao_usina = {
       # Um CSV de ~66 MB por mês, ~534 mil linhas — a mesma forma do

@@ -139,7 +139,9 @@ Em **24/09/2026**, há **27 entidades implementadas** dentro do acompanhamento d
 **13 fontes contratuais**. A Alup liberou o GCP em 23/09, e o ambiente `dev` está
 provisionado, com Dataform e Portal no ar. **A carga real começou em 24/09**
 (BCB, ONS e a previsão de ENA do TempoOK); BBCE e Hubspot aguardam credencial.
-Nenhuma onda homologou ainda: o dossiê da Onda 0 está previsto para 30/09.
+No mesmo dia, as **23 fontes públicas da Onda 1 carregaram em `dev` com
+`SUCESSO`**, zero inválidas. Nenhuma onda homologou ainda: o novo alvo é o
+dossiê conjunto das Ondas 0 e 1 em 29–30/09, com aceite em ~01/10.
 
 Detalhes e evidências em [docs/status.md](docs/status.md) e no
 [Project 2](https://github.com/orgs/nessenergy/projects/2).

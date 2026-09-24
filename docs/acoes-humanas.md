@@ -183,7 +183,7 @@ registra o que pedir e por quê.
 | # | O que pedir | Quem, na Alup | Por que trava |
 |---|---|---|---|
 | [#87](https://github.com/nessenergy/Alupdatalake/issues/87) | **Valor do orçamento por ambiente** | Saulo (TI) | O padrão do módulo é R$ 500/mês e estoura o teto da E2 (US$ 20/mês até novembro, US$ 400 depois). Sem o valor, o alerta de custo não sobe |
-| — | **Papéis para `gptorres@ness.com.br`** nos três projetos | Saulo (TI) | As outras três contas da ness. receberam; essa não. Já registrado no e-mail de 23/09 |
+| — | ~~**Papéis para `gptorres@ness.com.br`** nos três projetos~~ — **congelado em 24/09 por decisão do Ricardo**: segue registrado no pedido de 24/09 (item 14 do relatório), mas sem cobrança ativa | Saulo (TI) | As outras três contas da ness. receberam; essa não. Não bloqueia trabalho técnico hoje |
 | — | **Grupos que passam pelo IAP do Portal** (R01 do RIPD) | Leonardo (PO) | O Portal está publicado e **ninguém** tem acesso: `portal_acesso` vazio não concede nada, de propósito |
 | — | **Ligar o billing export no console**, apontando para o dataset `faturamento` do `dev` | Alup, com papel na conta de faturamento | Dataset regional só recebe dado **a partir do dia em que o export é ligado**: cada dia de espera é histórico que não volta ([ADR 007](arquitetura/decisoes/007-portal-de-custo.md)) |
 | [#24](https://github.com/nessenergy/Alupdatalake/issues/24) · [#23](https://github.com/nessenergy/Alupdatalake/issues/23) | **Token do Hubspot** e **acesso/host do BBCE** | Leonardo (ponto focal) | Conectores escritos e parados; Onda 2 não executa |

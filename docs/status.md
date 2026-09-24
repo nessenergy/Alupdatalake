@@ -303,8 +303,10 @@ Faturamento é por **homologação da Onda** (cláusula 6ª) — carga real em B
 e aceitação da Alup, não volume de código. **Nenhuma onda homologou ainda.** A
 coluna "técnico" abaixo é a nossa leitura de prontidão de trabalho, calculada
 sobre as horas do plano de execução; não é métrica rastreada formalmente no
-quadro. Na consulta de 24/09, os sete lançamentos de `Horas` somam 100h,
-com **origem a conferir**; não são horas realizadas comprovadas. As estimativas
+quadro. **Apontamento em 24/09**: pelo critério definido pela coordenação
+(horas previstas na proposta + 3%, só para item concluído), os 14 itens `Done`
+com peso somam **166,86h** no campo `Horas` ([runbook](runbook/acompanhamento-semanal.md#critério-de-apontamento)).
+Apontamento não é homologação. As estimativas
 abaixo usam os pesos orçados dos itens tecnicamente prontos, não apontamento
 de tempo, quantidade de cartões ou PRs.
 

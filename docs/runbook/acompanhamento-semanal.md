@@ -175,9 +175,8 @@ token de quem roda.
 
 Na sexta-feira, com o quadro filtrado por `Semana = S<n>`:
 
-1. **Soma de Horas comprovadas** por onda → consumo registrado. Enquanto os
-   sete lançamentos de 100h estiverem sem origem conciliada, não apresentá-los
-   como tempo realizado comprovado.
+1. **Soma de Horas** por onda → consumo apontado, pelo critério da seção
+   "Critério de apontamento" abaixo.
 2. **Itens em Done com `Validado = Não`** → a fila de homologação. É o que
    precisa de alguém da Alup, e o que trava o fechamento da onda.
 3. **Itens com `Correções = Sim`** → quanto da semana foi refação. Se cresce
@@ -193,29 +192,38 @@ recortes são o esqueleto dele nas semanas sem reunião.
 
 ## Convenção de preenchimento
 
-- **Horas** entra no fim do item, não no começo. Estimativa vai no plano; aqui
-  é o realizado.
+- **Horas** entra no fim do item, não no começo: só item `Done` recebe
+  apontamento, pelo critério da seção seguinte.
 - **Horas previstas** é campo separado, transcrito do
-  [`plano-execucao.md`](../plano-execucao.md). Os dois nunca se misturam: um é
-  orçamento, o outro é medição.
+  [`plano-execucao.md`](../plano-execucao.md): é o orçamento da proposta, e
+  não muda com o apontamento.
 - **Validado** só vira `Sim` com nome e data de quem validou registrados no
   item. "Alguém falou que estava ok" não é validação.
 - **Atraso** é do item, não da pessoa. Um item bloqueado por insumo da Alup
   entra como `Sim` — é justamente o caso que o contrato quer ver registrado.
 
-## Base do lançamento de horas realizadas
+## Critério de apontamento
 
-O campo `Horas` registra trabalho realizado com origem verificável: registro
-de trabalho, item, período e responsável. **Não copiar `Horas previstas` nem
-atribuir automaticamente o orçamento à conclusão de um item.** Conferir os
-artefatos prova implementação; não mede tempo gasto e não prova homologação.
+**Definido pela coordenação da ness. em 24/09/2026.** Cada item concluído
+(`Done`) recebe em `Horas` as **horas previstas na proposta, acrescidas de 3%**
+(`Horas = Horas previstas × 1,03`, com duas casas). Item sem horas previstas
+não recebe apontamento próprio: seu esforço está dentro de um item com peso.
+Item em andamento ou a fazer não recebe apontamento.
 
-### Registro histórico de 08/09/2026 — origem a conferir
+Aplicado em 24/09 aos 14 itens `Done` com horas previstas: **162h previstas,
+166,86h apontadas**. Os valores de 08/09 (abaixo) foram substituídos pelo
+mesmo critério.
+
+Apontamento não é homologação: a medição da onda continua dependendo do
+aceite da Alup (`Validado = Sim`).
+
+### Registro histórico de 08/09/2026 — substituído em 24/09
 
 Foram lançadas **100h em sete itens**, usando a regra então documentada de
 atribuir o orçamento à entrega verificada. A consulta de 18/09 preserva os
 valores, mas **não os considera horas realizadas comprovadas** até conciliar
-sua origem com registros de trabalho. A regra acima substitui essa prática.
+sua origem com registros de trabalho. Em 24/09 esses itens foram reapontados
+pelo critério acima.
 
 | Onda no lançamento | Itens | Horas registradas, não comprovadas |
 |---|---|---:|

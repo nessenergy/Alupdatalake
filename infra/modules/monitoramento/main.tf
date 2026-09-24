@@ -172,17 +172,38 @@ resource "google_monitoring_alert_policy" "job_falhou" {
 
 # 2. A fonte parou de dar certo — sem erro, só silêncio.
 #
-# Em PromQL, e não em `condition_absent`, porque a ausência de métrica do
-# Cloud Monitoring tem teto de **23h30m** de janela e o primeiro apply de
-# 23/09 reprovou com "Durations longer than 23h30m are not supported". Fonte
-# semanal e mensal precisam de 180h e 780h. PromQL alcança até dois anos de
-# dado, e é o caminho que a própria documentação indica para esse caso.
+# **O Cloud Monitoring só enxerga um dia para trás nesta métrica.** Duas
+# paredes, as duas medidas no primeiro apply de 23/09:
+#
+# - `condition_absent` recusa janela acima de **23h30m**;
+# - PromQL alcança dois anos em métrica comum, mas **métrica de log** — que é
+#   o caso desta — recusa janela acima de **1d1h**.
+#
+# Então só a cadência diária cabe aqui, com a janela no teto de 25h. Fonte
+# semanal (180h) e mensal (780h) ficam fora deste alerta: `sem_alerta`, abaixo,
+# nomeia quais são para que a lacuna tenha lista, e não silêncio. Elas
+# continuam medidas — `gold.saude_ingestao` marca `ATRASADA` contra a cadência
+# observada de cada fonte, sem limite de janela, e o painel `/lake` mostra.
+# O que falta é o aviso automático: mecanismo a decidir, issue #188.
 #
 # `absent_over_time` devolve 1 quando a série não teve amostra nenhuma na
 # janela. Em ambiente novo, antes da primeira ingestão, isso é verdade e o
 # alerta dispara — o que é a informação correta: a fonte nunca subiu.
+locals {
+  # Teto do PromQL para métrica de log: 1d1h. A janela declarada da fonte
+  # diária é 26h (um dia mais folga de feriado); 25h é o que o produto aceita.
+  janela_maxima_horas = 25
+
+  com_alerta = {
+    for conector, horas in var.conectores_criticos : conector => min(horas, local.janela_maxima_horas)
+    if horas <= 26
+  }
+
+  sem_alerta = sort([for conector, horas in var.conectores_criticos : conector if horas > 26])
+}
+
 resource "google_monitoring_alert_policy" "fonte_sem_sucesso" {
-  for_each = var.conectores_criticos
+  for_each = local.com_alerta
 
   project      = var.project_id
   display_name = "AlupData ${var.environment} — ${each.key} sem sucesso há ${each.value}h"
@@ -207,10 +228,9 @@ resource "google_monitoring_alert_policy" "fonte_sem_sucesso" {
         "[${each.value}h])",
       ])
 
-      # Intervalo mínimo por tamanho da janela (documentação do Cloud
-      # Monitoring): 30s até 25h, 5min de 25h a 8 dias, mais espaçado adiante.
-      # Uma hora para as mensais não atrasa o que já se mede em semanas.
-      evaluation_interval = each.value <= 25 ? "60s" : (each.value <= 192 ? "300s" : "3600s")
+      # Janela de até 25h aceita avaliação a cada 30s; 60s é folga suficiente
+      # para uma medida que só muda de hora em hora.
+      evaluation_interval = "60s"
       duration            = "0s"
     }
   }
@@ -323,4 +343,14 @@ resource "google_monitoring_alert_policy" "dataform_falhou" {
 output "canais" {
   description = "IDs dos canais de notificação, para reuso em outros alertas"
   value       = [for canal in google_monitoring_notification_channel.email : canal.id]
+}
+
+output "fontes_sem_alerta_de_silencio" {
+  description = <<-EOT
+    Fontes cuja cadência passa do que o Cloud Monitoring enxerga (1d1h em
+    métrica de log). Não têm alerta automático de silêncio; seguem medidas em
+    `gold.saude_ingestao` e no painel `/lake`. Sai no `apply` para que a
+    lacuna apareça a cada deploy, em vez de virar esquecimento.
+  EOT
+  value       = local.sem_alerta
 }

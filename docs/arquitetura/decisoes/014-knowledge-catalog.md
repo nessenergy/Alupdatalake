@@ -14,10 +14,16 @@ e o esquema das tabelas vem do Dataform (ADR 012), que é fonte melhor do que
 inferência: ligá-la pagaria para adivinhar o que já está declarado. É uma
 variável, `descoberta_ativa`, para o dia em que houver motivo.
 
-Continuam fora, na [issue #36](https://github.com/nessenergy/Alupdatalake/issues/36):
-os *aspect types* — os "Tag Templates" do contrato — e o glossário de negócio
-a partir de `docs/glossario.md`. Os dois descrevem **conteúdo** do catálogo, e
-conteúdo antes da primeira carga seria descrição de tabela vazia.
+Os ***aspect types*** entraram em seguida, no mesmo dia: `origem` — com
+`curada`, `automatica` e a data da última revisão humana, que é a condição
+desta ADR para ativar a IA generativa — e `dominio-analitico`, com os oito
+domínios do B1 e o responsável. Eles são **estrutura**, não conteúdo: dizem
+que campos uma anotação pode ter, e por isso não dependem de carga.
+
+Continua fora, na [issue #36](https://github.com/nessenergy/Alupdatalake/issues/36),
+o **glossário de negócio** a partir de `docs/glossario.md`, e o preenchimento
+das anotações — os dois são conteúdo, e conteúdo antes da primeira carga seria
+descrição de tabela vazia.
 
 ## Contexto
 

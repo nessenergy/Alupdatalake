@@ -193,7 +193,7 @@ Marco 5 — 18,10% · R$ 26.880,00
 |---|---|---|---|
 | 4.1 | Motor **S2 Data Intake** (CSV/XLSX): ingestão de planilha sob template | 30h → **motor pronto**; resta declarar os templates | Templates dependem dos exemplos de planilha G3/#142; A4 foi respondido em 11/09. O motor não dependia de nada e foi adiantado em 2026-08-26 — `docs/arquitetura/s2-data-intake.md` |
 | 4.2 | Fontes pendentes que ficaram de ondas anteriores | 20h | — |
-| 4.3 | **Knowledge Catalog**: catálogo e linhagem (ADR 014) | 20h → **lake, zonas e ativos declarados em 23/09** (`infra/modules/catalogo`), com descoberta desligada por custo. Faltam os *aspect types* e o glossário, que descrevem conteúdo | conteúdo do catálogo depende das fontes carregadas |
+| 4.3 | **Knowledge Catalog**: catálogo e linhagem (ADR 014) | 20h → **lake, zonas e ativos declarados em 23/09** (`infra/modules/catalogo`), com descoberta desligada por custo. Os *aspect types* entraram em 23/09; falta o glossário e o preenchimento das anotações, que dependem de carga | conteúdo do catálogo depende das fontes carregadas |
 | 4.4 | Tabelas Gold consolidadas, sem KPI nesta fase (ADR 012) | 15h | 0.10 (8 domínios) |
 | 4.5 | Documentação final e dicionário completo | 10h | Todas as fontes |
 | 4.6 | **Handoff técnico**: repasse ao time que vai operar | 10h | 4.5 |

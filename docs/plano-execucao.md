@@ -165,8 +165,8 @@ Marco 4 — 26,72% · R$ 39.680,00 · **A maior onda; bloqueada por VPN e creden
 | 3.2 | **Portal Alup** (MySQL/NoSQL/Storage) | 40h ⚠ | VPN + credenciais read-only |
 | 3.3 | **MySQL RDS Comercialização** | 30h ⚠ | Usuário read-only e conectividade; C8 dispensa VPN e peering |
 | 3.4 | **RM/TOTVS** | 25h ⚠ | Endpoints e credencial |
-| 3.5 | Orquestração em Cloud Workflows | 10h | — |
-| 3.6 | Tabelas Gold que cruzam interno × mercado | 5h | — |
+| 3.5 | Orquestração em Cloud Workflows | 10h → **mecanismo entregue em 23/09** (`infra/modules/orquestracao`): fluxo que executa as ingestões da cadeia em paralelo, compila a release do Dataform e espera o estado terminal. Com `cadeia_onda3` vazia não cria recurso — a cadeia nasce com a primeira fonte interna | — |
+| 3.6 | Tabelas Gold que cruzam interno × mercado | 5h | dado interno carregado |
 
 **Marcos técnicos desta onda**
 - É aqui que o framework encontra fontes **não-HTTP**: `extrair()` passa a falar

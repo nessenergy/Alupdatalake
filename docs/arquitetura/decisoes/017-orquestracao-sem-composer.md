@@ -1,7 +1,22 @@
 # ADR 017 — Orquestração da Onda 3 em Cloud Workflows, não em Composer
 
-**Status**: aceita · **Data**: 2026-09-11 · **Revê** a decisão de orquestração
-da [ADR 004](004-sql-puro-e-orquestracao.md), que segue valendo nas Ondas 1 e 2.
+**Status**: aceita · **Data**: 2026-09-11 · **Implementada**: 2026-09-23 ·
+**Revê** a decisão de orquestração da
+[ADR 004](004-sql-puro-e-orquestracao.md), que segue valendo nas Ondas 1 e 2.
+
+> **Adendo de 23/09 — o mecanismo existe.** `infra/modules/orquestracao`
+> declara o fluxo `alupdata-onda3`: executa em paralelo as ingestões da cadeia,
+> espera todas, compila a release `main` do Dataform e acompanha a invocação
+> até o estado terminal. Falha em qualquer etapa para o fluxo. A cadeia vem da
+> variável `cadeia_onda3`, hoje vazia — **com ela vazia, nenhum recurso é
+> criado**, porque as fontes internas dependem de VPN e credencial (A7). O que
+> a primeira fonte interna vai exigir é acrescentar o rótulo dela à variável;
+> o fluxo não muda.
+>
+> A validação possível hoje é de estrutura: o YAML renderizado é lido e os
+> `next` são conferidos contra os passos que existem
+> (`tests/unit/test_orquestracao.py`). Semântica de conector e de `parallel` só
+> o primeiro deploy com cadeia real responde.
 
 ## Contexto
 

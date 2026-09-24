@@ -64,7 +64,9 @@ locals {
     "secretmanager.googleapis.com",
     "serviceusage.googleapis.com",
     "storage.googleapis.com",
-    "sts.googleapis.com", # WIF: troca do token do GitHub
+    "sts.googleapis.com",                # WIF: troca do token do GitHub
+    "workflowexecutions.googleapis.com", # o Scheduler dispara o fluxo por aqui
+    "workflows.googleapis.com",          # orquestração da Onda 3, ADR 017
   ]
 
   # Papéis da SA de deploy no projeto: o que o `infra/` declara, tipo de
@@ -84,6 +86,7 @@ locals {
     "roles/secretmanager.admin",               # secrets vazios e o IAM de cada um
     "roles/serviceusage.serviceUsageConsumer", # agentes de serviço do Dataform e do IAP
     "roles/storage.admin",                     # bucket raw, o IAM dele e o state
+    "roles/workflows.admin",                   # fluxo da Onda 3, ADR 017
   ]
 
   # Token do GitHub só vale se vier do repositório do projeto; em hml e prod,

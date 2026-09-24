@@ -24,6 +24,21 @@ variable "agendamentos_ativos" {
   default     = true
 }
 
+variable "cadeia_onda3" {
+  description = <<-EOT
+    Conectores cuja carga precisa terminar antes de o Dataform rodar — as
+    fontes internas da Onda 3 (ADR 017). Vazia, nenhum recurso de orquestração
+    é criado: o fluxo nasce com a primeira fonte interna, não antes.
+  EOT
+  type        = list(string)
+  default     = []
+
+  validation {
+    condition     = alltrue([for conector in var.cadeia_onda3 : can(regex("^[a-z0-9_]+$", conector))])
+    error_message = "Use o rótulo do conector em snake_case, como `fmb_contrato`."
+  }
+}
+
 variable "imagem_ingestao" {
   description = "Imagem do container com a CLI alupdata; vazio desliga o agendamento"
   type        = string

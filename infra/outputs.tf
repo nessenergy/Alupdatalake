@@ -52,3 +52,8 @@ output "repositorio_dataform" {
   description = "Repositório Dataform (vazio enquanto não houver token do GitHub)"
   value       = module.dataform.repositorio
 }
+
+output "fluxo_onda3" {
+  description = "Fluxo de orquestração da Onda 3; nulo enquanto `cadeia_onda3` estiver vazia"
+  value       = module.orquestracao.fluxo
+}

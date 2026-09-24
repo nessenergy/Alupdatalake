@@ -109,6 +109,24 @@ continuam pendentes de liberação do ambiente pela Alup.
 > `gptorres@` fica congelado, sem cobrança ativa, por decisão do Ricardo
 > (#217). `main` em `978075d`.
 
+> **24/09, à noite — avaliação global, decisões aceitas e o ONS carregado.**
+> A [avaliação global](planos/2026-09-24-avaliacao-global.md) (#219) teve as
+> seis recomendações aceitas pelo Ricardo, e as três primeiras já estão em
+> `dev`, aplicadas pelo deploy de `a2dd53d`: os alertas vão para
+> `operacao-datalake@ness.com.br` (9 políticas, todas com canal, #220);
+> Hubspot, BBCE e o boletim do TempoOK saíram do Scheduler, com os 27 jobs
+> mantidos (#220); e o workflow `Executar ingestão` dispara um job à mão com
+> a SA de deploy (#221). A falha ao registrar a execução passou a logar as
+> contagens, e extrair sem carregar nada tem alerta próprio (#222). O PR #216
+> (grupo no IAP do Portal) foi aplicado no mesmo deploy. Pelo workflow, os
+> quatro jobs que falharam de manhã rodaram de novo: `bcb_cambio_ptax` já com
+> a correção do #215 (3 linhas), e `ons_ear` (120). **`ons_carga` e `ons_ena`
+> revelaram mais um defeito da primeira carga**: o `NUMERIC` do BigQuery
+> guarda 9 casas e o ONS publica float com resíduo (`9750.321541666666`).
+> Corrigido no ponto por onde toda carga passa (#223), e as duas carregaram
+> (116 e 120 linhas, zero inválidas). As fontes diárias da Onda 0 e do ONS
+> estão com `SUCESSO` em 24/09. `main` em `a2dd53d`.
+
 Este arquivo responde "onde estamos e o que trava o próximo passo". Detalhe de
 escopo e estimativa fica em [`plano-execucao.md`](plano-execucao.md); o que sai
 em cada semana, em [`plano-semanal.md`](plano-semanal.md); os relatórios emitidos

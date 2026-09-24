@@ -452,15 +452,36 @@ def test_alerta_de_frescor_distingue_entidades_da_mesma_fonte() -> None:
 
     # a métrica precisa extrair a entidade, não só a fonte
     assert '"entidade" = "EXTRACT(jsonPayload.entidade)"' in monitoramento
-    # e o alerta precisa filtrar pelas duas, não por uma delas
-    assert "metric.labels.fonte" in monitoramento
-    assert "metric.labels.entidade" in monitoramento
+    # e o alerta precisa filtrar pelas duas, não por uma delas — desde 23/09
+    # em PromQL, onde o rótulo entra como seletor da série
+    assert 'fonte=\\"' in monitoramento
+    assert 'entidade=\\"' in monitoramento
 
     # As duas entidades da CCEE têm frequências diferentes; é o caso que o
     # rótulo por fonte sozinho não distinguia.
     scheduler = _ler("infra/modules/scheduler/main.tf")
     assert "ccee_pld" in scheduler
     assert "ccee_perfil" in scheduler
+
+
+def test_silencio_de_fonte_lenta_nao_cabe_em_ausencia_de_metrica() -> None:
+    """Ausência de métrica tem teto de 23h30m de janela; semanal e mensal não cabem.
+
+    O primeiro apply de 23/09 reprovou com "Durations longer than 23h30m are
+    not supported" para as fontes de 180h e 780h. PromQL alcança dois anos.
+    Se alguém devolver `condition_absent` a este alerta, o apply quebra de
+    novo — e só no fim, depois de criar o resto do ambiente.
+    """
+    monitoramento = _ler("infra/modules/monitoramento/main.tf")
+    bloco = _bloco(monitoramento, 'resource "google_monitoring_alert_policy" "fonte_sem_sucesso"')
+
+    assert "condition_prometheus_query_language" in bloco
+    assert "condition_absent" not in bloco
+    assert "absent_over_time(" in bloco
+
+    # Nenhuma janela de `condition_absent` no módulo pode passar de 23h30m.
+    for duracao in re.findall(r'duration\s*=\s*"(\d+)s"', monitoramento):
+        assert int(duracao) <= 84600, f"{duracao}s passa do teto de 23h30m"
 
 
 def test_alerta_quando_o_workflow_do_dataform_falha() -> None:

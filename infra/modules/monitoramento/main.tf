@@ -171,6 +171,16 @@ resource "google_monitoring_alert_policy" "job_falhou" {
 }
 
 # 2. A fonte parou de dar certo — sem erro, só silêncio.
+#
+# Em PromQL, e não em `condition_absent`, porque a ausência de métrica do
+# Cloud Monitoring tem teto de **23h30m** de janela e o primeiro apply de
+# 23/09 reprovou com "Durations longer than 23h30m are not supported". Fonte
+# semanal e mensal precisam de 180h e 780h. PromQL alcança até dois anos de
+# dado, e é o caminho que a própria documentação indica para esse caso.
+#
+# `absent_over_time` devolve 1 quando a série não teve amostra nenhuma na
+# janela. Em ambiente novo, antes da primeira ingestão, isso é verdade e o
+# alerta dispara — o que é a informação correta: a fonte nunca subiu.
 resource "google_monitoring_alert_policy" "fonte_sem_sucesso" {
   for_each = var.conectores_criticos
 
@@ -181,23 +191,27 @@ resource "google_monitoring_alert_policy" "fonte_sem_sucesso" {
   conditions {
     display_name = "Nenhuma ingestão bem-sucedida de ${each.key}"
 
-    condition_absent {
-      filter = join(" AND ", [
-        "resource.type = \"cloud_run_job\"",
-        "metric.type = \"logging.googleapis.com/user/${google_logging_metric.ingestao_sucesso.name}\"",
-        # A chave do mapa é o rótulo do conector (`ccee_pld`): a `fonte` é a
-        # primeira parte e a `entidade`, o resto. As duas são necessárias —
-        # `ccee_pld` e `ccee_perfil` dividem a fonte e têm frequências
-        # diferentes.
-        "metric.labels.fonte = \"${split("_", each.key)[0]}\"",
-        "metric.labels.entidade = \"${join("_", slice(split("_", each.key), 1, length(split("_", each.key))))}\"",
+    condition_prometheus_query_language {
+      # Nome do PromQL: primeira barra vira `:`, o resto vira `_`. Métrica de
+      # log serve a vários recursos, então o tipo do recurso é obrigatório.
+      # A chave do mapa é o rótulo do conector (`ccee_pld`): a `fonte` é a
+      # primeira parte e a `entidade`, o resto. As duas são necessárias —
+      # `ccee_pld` e `ccee_perfil` dividem a fonte e têm frequências
+      # diferentes.
+      query = join("", [
+        "absent_over_time(",
+        "logging_googleapis_com:user_${google_logging_metric.ingestao_sucesso.name}",
+        "{monitored_resource=\"cloud_run_job\"",
+        ",fonte=\"${split("_", each.key)[0]}\"",
+        ",entidade=\"${join("_", slice(split("_", each.key), 1, length(split("_", each.key))))}\"}",
+        "[${each.value}h])",
       ])
-      duration = "${each.value * 3600}s"
 
-      aggregations {
-        alignment_period   = "3600s"
-        per_series_aligner = "ALIGN_SUM"
-      }
+      # Intervalo mínimo por tamanho da janela (documentação do Cloud
+      # Monitoring): 30s até 25h, 5min de 25h a 8 dias, mais espaçado adiante.
+      # Uma hora para as mensais não atrasa o que já se mede em semanas.
+      evaluation_interval = each.value <= 25 ? "60s" : (each.value <= 192 ? "300s" : "3600s")
+      duration            = "0s"
     }
   }
 

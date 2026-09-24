@@ -14,6 +14,11 @@ dependencies = [
     "pydantic-settings>=2.6",
     "openpyxl>=3.1.5",
     "flask>=3.1.3",
+    # O Portal roda no Cloud Run sob gunicorn (infra/modules/portal). Sem ele
+    # na imagem, o contêiner não sobe e a sonda de inicialização reprova —
+    # foi o que derrubou o primeiro apply de dev em 23/09. O servidor de
+    # desenvolvimento do Flask não serve produção.
+    "gunicorn>=23.0",
 ]
 
 [project.optional-dependencies]

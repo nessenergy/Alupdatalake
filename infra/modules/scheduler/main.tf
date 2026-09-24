@@ -240,6 +240,19 @@ variable "agendar" {
   default     = true
 }
 
+variable "sem_agendamento" {
+  description = "Conectores sem disparo agendado: o Cloud Run Job existe e roda à mão"
+  type        = list(string)
+  default     = []
+}
+
+locals {
+  # Fonte sem credencial falha a cada disparo, e o erro repetido enterra o
+  # alerta que importa. Sai do Scheduler; o job fica para quando a credencial
+  # chegar.
+  agendados = { for k, v in var.conectores : k => v if !contains(var.sem_agendamento, k) }
+}
+
 resource "google_cloud_run_v2_job" "ingestao" {
   for_each = var.conectores
 
@@ -288,7 +301,7 @@ resource "google_cloud_run_v2_job" "ingestao" {
 # Sem `agendar`, nenhum disparo existe: o Scheduler cobra por job existente,
 # pausado ou não. O Cloud Run Job acima continua disponível para execução manual.
 resource "google_cloud_scheduler_job" "ingestao" {
-  for_each = var.agendar ? var.conectores : {}
+  for_each = var.agendar ? local.agendados : {}
 
   name     = "ingestao-${replace(each.key, "_", "-")}"
   project  = var.project_id

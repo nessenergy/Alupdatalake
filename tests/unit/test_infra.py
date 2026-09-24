@@ -108,7 +108,7 @@ def test_hml_nasce_sem_agendamento() -> None:
     # Sem agendamento, o Cloud Run Job continua existindo para execução manual.
     scheduler = _ler("infra/modules/scheduler/main.tf")
     disparo = _bloco(scheduler, 'resource "google_cloud_scheduler_job" "ingestao"')
-    assert _tem(r"for_each\s*=\s*var\.agendar \? var\.conectores : \{\}", disparo)
+    assert _tem(r"for_each\s*=\s*var\.agendar \? local\.agendados : \{\}", disparo)
     job = _bloco(scheduler, 'resource "google_cloud_run_v2_job" "ingestao"')
     assert _tem(r"for_each\s*=\s*var\.conectores", job)
 
@@ -597,3 +597,27 @@ def test_bucket_de_entrada_e_fechado_e_nao_concede_acesso_novo() -> None:
     assert "uniform_bucket_level_access = true" in bloco
     assert not re.search(r"google_storage_bucket\.entrada\.name[^\n]*\n[^\n]*role", storage)
     assert 'google_storage_bucket_iam_member" "entrada' not in storage
+
+
+def test_fonte_sem_credencial_fica_fora_do_agendamento_mas_o_job_existe() -> None:
+    """Fonte sem credencial falha a cada disparo e enterra o alerta real no ruído."""
+    variavel = _bloco(_ler("infra/variables.tf"), 'variable "conectores_sem_agendamento"')
+    assert _tem(r"default\s*=\s*\[\]", variavel)
+    assert "validation" in variavel
+    modulo = _bloco(_ler("infra/main.tf"), 'module "scheduler" {')
+    assert _tem(r"sem_agendamento\s*=\s*var\.conectores_sem_agendamento", modulo)
+
+    scheduler = _ler("infra/modules/scheduler/main.tf")
+    assert _tem(r"agendados\s*=\s*\{[^}]*if !contains\(var\.sem_agendamento, k\)", scheduler)
+    job = _bloco(scheduler, 'resource "google_cloud_run_v2_job" "ingestao"')
+    assert _tem(r"for_each\s*=\s*var\.conectores\b", job)
+
+    dev = _ler("infra/environments/dev.tfvars")
+    for conector in ("hubspot_negocios", "bbce_curva_forward", "tempook_boletins"):
+        assert f'"{conector}"' in dev, conector
+        assert re.search(rf"^\s+{conector} = \{{", scheduler, re.MULTILINE), conector
+
+
+def test_alertas_de_dev_vao_para_o_grupo_de_operacao() -> None:
+    dev = _ler("infra/environments/dev.tfvars")
+    assert _tem(r'emails_alerta\s*=\s*\["operacao-datalake@ness\.com\.br"\]', dev)

@@ -150,6 +150,17 @@ o nome da coluna descritivo, não `_mwh`.
   execução inteira (a conversão e a checagem vivem no schema, não em
   `transformar()`, exatamente para isso).
 - `(data_referencia, hora, codigo_parcela_usina)` é único na origem.
+- **`geracao_centro_gravidade` pode ser levemente negativa.** A CCEE publica a
+  geração líquida no centro de gravidade: quando a usina consome mais do que
+  gera (consumo auxiliar), o valor fica levemente negativo. Medido no GCP em
+  24/09/2026: a primeira carga real de julho/2026 (1.735.627 linhas) reprovou
+  a condição original da Silver (`>= 0`, issue #110, "geração negativa não
+  existe") em 7 linhas, todas levemente negativas — a menor é -0,002261 MWh
+  (parcela 967489, NE, 12/07/2026, hora 14). A `rowConditions` da Silver
+  passou a exigir `>= -10`: aceita o consumo auxiliar e ainda pega inversão
+  de sinal ou erro de unidade em qualquer usina que gere mais de 10 MWh na
+  hora. A Gold `geracao_mensal_usina` soma, tira média e máximo sem filtrar
+  por sinal — não pressupõe geração não negativa.
 - A unidade de `GERACAO_CENTRO_GRAVIDADE` não está documentada pela CCEE no
   catálogo; a dúvida vai ao dono do domínio (B3: 3 dias úteis).
 

@@ -265,6 +265,24 @@ def test_gold_de_dominio_nao_calcula_razao_entre_series():
     assert "/ carga_media_mwmed" not in corpo
 
 
+def test_silver_geracao_usina_aceita_geracao_liquida_levemente_negativa() -> None:
+    """Medido no GCP em 24/09/2026: a primeira carga real de julho/2026 de
+    `ccee_geracao_usina` (1.735.627 linhas) reprovou a condição antiga
+    (`geracao_centro_gravidade >= 0`) em 7 linhas, todas levemente negativas
+    — a menor é -0,002261 MWh (parcela 967489, NE, 12/07/2026, hora 14). A
+    CCEE publica a geração **líquida** no centro de gravidade: quando a
+    usina consome mais do que gera (consumo auxiliar), o valor fica
+    levemente negativo — o dado é real, a premissa de "geração negativa não
+    existe" (issue #110) estava errada. A condição passa a exigir
+    `geracao_centro_gravidade >= -10`: aceita o consumo auxiliar e ainda
+    pega inversão de sinal ou erro de unidade em qualquer usina que gere
+    mais de 10 MWh na hora.
+    """
+    bloco = config(DEFINICOES / "silver" / "ccee_geracao_usina.sqlx")
+    assert "geracao_centro_gravidade >= -10" in bloco
+    assert "geracao_centro_gravidade >= 0" not in bloco
+
+
 def test_coluna_anulavel_nao_declara_null_sozinho() -> None:
     """O DDL do BigQuery aceita `NOT NULL`, e não aceita `NULL` sozinho.
 

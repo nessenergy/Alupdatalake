@@ -228,6 +228,29 @@ O replay cria uma nova execução com `modo=REPLAY` e preenche
 `origem_ingestao_id`. A janela é obrigatória porque os objetos raw gravados até
 esta versão não carregam a data final no próprio arquivo.
 
+### No GCP: workflow `Executar ingestão`
+
+Os comandos acima rodam a CLI local. No ambiente, pessoa não executa Cloud Run
+Job — só a SA de deploy tem `run.jobs.run`. O disparo à mão é pelo workflow
+`Executar ingestão`, que roda o job com a SA de deploy e deixa no GitHub quem
+disparou, qual conector e com que janela:
+
+```bash
+# janela do agendamento
+gh workflow run "Executar ingestão" -f environment=dev -f conector=ons_carga
+# janela explícita
+gh workflow run "Executar ingestão" -f environment=dev -f conector=ons_carga \
+  -f de=2026-01-01 -f ate=2026-01-31
+# replay de um raw, com a janela original
+gh workflow run "Executar ingestão" -f environment=dev -f conector=bcb_cambio_ptax \
+  -f uri=gs://<bucket>/bcb/cambio_ptax/dt=2026-01-01/<ingestao_id>.json.gz \
+  -f de=2026-01-01 -f ate=2026-01-31
+```
+
+O workflow valida o conector (snake_case), as datas (`AAAA-MM-DD`, as duas ou
+nenhuma) e a URI antes de chamar o GCP, e espera a execução terminar. O
+resultado fica em `bronze._execucoes`.
+
 ## Segredos
 
 O Terraform cria o secret vazio; o valor entra fora do versionamento:

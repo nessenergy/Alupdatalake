@@ -1,0 +1,110 @@
+name: Executar ingestão
+
+# Dispara um Cloud Run Job de ingestão à mão: carga fora do agendamento,
+# janela antiga ou replay de um raw já arquivado. Só a SA de deploy executa
+# job (ADR 015); pessoa dispara por aqui, e o GitHub guarda quem, qual
+# conector e com que janela.
+#
+# Entrada do usuário nunca entra no script por `${{ }}`: vai por variável de
+# ambiente e é validada antes de chegar ao gcloud.
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Ambiente'
+        required: true
+        type: choice
+        options:
+          - dev
+          - hml
+          - prod
+      conector:
+        description: 'Rótulo do conector, como ons_carga (ver `alupdata listar`)'
+        required: true
+        type: string
+      de:
+        description: 'Início da janela (AAAA-MM-DD). Vazio usa a janela do agendamento'
+        required: false
+        type: string
+      ate:
+        description: 'Fim da janela (AAAA-MM-DD). Vazio usa a janela do agendamento'
+        required: false
+        type: string
+      uri:
+        description: 'Replay: objeto gs:// do raw. Exige a janela original em de/ate'
+        required: false
+        type: string
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: executar-ingestao-${{ inputs.environment }}-${{ inputs.conector }}
+  cancel-in-progress: false
+
+jobs:
+  executar:
+    name: "Ingestão ${{ inputs.conector }} (${{ inputs.environment }})"
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    steps:
+      - name: Validar entradas
+        env:
+          CONECTOR: ${{ inputs.conector }}
+          DE: ${{ inputs.de }}
+          ATE: ${{ inputs.ate }}
+          URI: ${{ inputs.uri }}
+        run: |
+          set -euo pipefail
+          [[ "$CONECTOR" =~ ^[a-z0-9_]+$ ]] || { echo "::error::conector inválido: use o rótulo em snake_case"; exit 1; }
+          for data in "$DE" "$ATE"; do
+            [[ -z "$data" || "$data" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}$ ]] || { echo "::error::data inválida: use AAAA-MM-DD"; exit 1; }
+          done
+          if [[ -n "$DE" && -z "$ATE" || -z "$DE" && -n "$ATE" ]]; then
+            echo "::error::informe de e ate juntos, ou nenhum dos dois"; exit 1
+          fi
+          if [[ -n "$URI" ]]; then
+            [[ "$URI" =~ ^gs://[a-z0-9._-]+/[a-z0-9_=./-]+$ ]] || { echo "::error::uri inválida: use gs://bucket/fonte/entidade/dt=AAAA-MM-DD/id.json.gz"; exit 1; }
+            [[ -n "$DE" ]] || { echo "::error::replay exige a janela original em de/ate"; exit 1; }
+          fi
+
+      - uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3.0.0
+        id: auth
+        with:
+          workload_identity_provider: ${{ vars.GCP_WIF_PROVIDER }}
+          service_account: ${{ vars.GCP_DEPLOY_SA }}
+      - uses: google-github-actions/setup-gcloud@aa5489c8933f4cc7a4f7d45035b3b1440c9c10db # v3.0.1
+
+      - name: Executar o job
+        env:
+          CONECTOR: ${{ inputs.conector }}
+          DE: ${{ inputs.de }}
+          ATE: ${{ inputs.ate }}
+          URI: ${{ inputs.uri }}
+          AMBIENTE: ${{ inputs.environment }}
+          PROJETO: ${{ steps.auth.outputs.project_id }}
+          REGIAO: ${{ vars.GCP_REGION }}
+        run: |
+          set -euo pipefail
+          [[ "$CONECTOR" =~ ^[a-z0-9_]+$ ]] || exit 1
+          JOB="ingestao-${CONECTOR//_/-}"
+          ARGS=()
+          if [[ -n "$URI" ]]; then
+            ARGS=(--args="reprocessar-raw,$CONECTOR,--uri,$URI,--de,$DE,--ate,$ATE")
+            JANELA="replay de $URI ($DE a $ATE)"
+          elif [[ -n "$DE" ]]; then
+            ARGS=(--args="ingerir,$CONECTOR,--de,$DE,--ate,$ATE")
+            JANELA="$DE a $ATE"
+          else
+            JANELA="a do agendamento"
+          fi
+          {
+            echo "### Ingestão \`$CONECTOR\` em \`$AMBIENTE\`"
+            echo ""
+            echo "- Job: \`$JOB\`"
+            echo "- Janela: $JANELA"
+          } >> "$GITHUB_STEP_SUMMARY"
+          gcloud run jobs execute "$JOB" --project "$PROJETO" --region "$REGIAO" --wait "${ARGS[@]}"
+          echo "- Resultado: execução concluída; confira \`bronze._execucoes\`" >> "$GITHUB_STEP_SUMMARY"

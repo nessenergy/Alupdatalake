@@ -10,7 +10,7 @@ config {
       "hora BETWEEN 0 AND 23",
       "periodo_apuracao = periodo_apuracao_ccee",
       "data_publicada = data_referencia",
-      "geracao_centro_gravidade >= 0"
+      "geracao_centro_gravidade >= -10"
     ]
   }
 }
@@ -19,8 +19,16 @@ config {
 -- recente (ADR 016). `codigo_usina` é nulo: a origem usa código interno da
 -- CCEE, não o CEG — Lacuna 1, #141. `codigo_parcela_usina` e `sigla_usina`
 -- ficam prontos para o de-para.
--- Faixas (issue #110): geração negativa não existe; DATA e período têm de
--- concordar (a mesma regra do PLD: off-by-one apareceria aqui).
+-- Faixas: a CCEE publica a geração líquida no centro de gravidade — quando a
+-- usina consome mais do que gera (consumo auxiliar), o valor fica levemente
+-- negativo. Medido no GCP em 24/09/2026: a primeira carga real de julho/2026
+-- (1.735.627 linhas) reprovou a condição original do issue #110
+-- (`>= 0`, "geração negativa não existe") em 7 linhas, todas levemente
+-- negativas — a menor é -0,002261 MWh. O dado é real; a premissa estava
+-- errada. A condição passa a ser `>= -10`: aceita o consumo auxiliar e ainda
+-- pega inversão de sinal ou erro de unidade em qualquer usina que gere mais
+-- de 10 MWh na hora. DATA e período têm de concordar (a mesma regra do PLD:
+-- off-by-one apareceria aqui).
 SELECT
   data_referencia,
   submercado,

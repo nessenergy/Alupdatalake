@@ -1,39 +1,4 @@
-"""Renderiza um documento Markdown com a identidade ness., em HTML e/ou PDF.
-
-O Markdown é sempre a fonte única; este script só apresenta. Usado pelos
-documentos que saem para a contratante: o Questionário de Gaps e os relatórios
-de situação, que por convenção existem em `.md` e `.html`
-(ver `docs/relatorios/README.md`).
-
-O HTML é autocontido — abre direto no navegador, sem servidor e sem dependência
-externa além das fontes da identidade: Montserrat nos títulos e na marca, Inter
-no corpo e JetBrains Mono no dado técnico. Sem elas o documento continua legível
-nos fallbacks declarados. O PDF sai do Chrome/Edge headless, a mesma
-engine em que o documento é revisado, o que evita divergência entre o que se vê
-em tela e o que o cliente recebe.
-
-    uv run --with markdown python scripts/gerar_documento.py FONTE.md --html --pdf
-"""
-
-from __future__ import annotations
-
-import argparse
-import shutil
-import subprocess
-import sys
-import tempfile
-from pathlib import Path
-
-import markdown
-
-RAIZ = Path(__file__).resolve().parent.parent
-
-NAVEGADORES = (
-    Path(r"C:\Program Files\Google\Chrome\Application\chrome.exe"),
-    Path(r"C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe"),
-)
-
-ESTILO = """
+<!doctype html><html lang='pt-BR'><head><meta charset='utf-8'><meta name='viewport' content='width=device-width, initial-scale=1'><title>Pendências da Alup, item a item — 24/09/2026</title><link rel='preconnect' href='https://fonts.googleapis.com'><link rel='preconnect' href='https://fonts.gstatic.com' crossorigin><link href='https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap' rel='stylesheet'><style>
 @page { size: A4; margin: 16mm 14mm 16mm 14mm; }
 
 /* O documento existe para virar A4. Declarar o esquema claro impede o
@@ -394,203 +359,142 @@ li + li { margin-top: 1.2mm; }
   /* Link impresso vira texto: sublinhado só polui o papel. */
   a { text-decoration: none; color: var(--tinta); }
 }
-"""
-
-
-def encontrar_navegador() -> Path:
-    for caminho in NAVEGADORES:
-        if caminho.exists():
-            return caminho
-    achado = shutil.which("chrome") or shutil.which("msedge") or shutil.which("chromium")
-    if achado:
-        return Path(achado)
-    raise SystemExit("Chrome ou Edge não encontrado; nenhum deles está instalado num caminho conhecido.")
-
-
-# Ordem em que os campos de identificação aparecem no documento. Chave do
-# front-matter à esquerda, rótulo impresso à direita. Campo ausente na fonte
-# simplesmente não é impresso — nenhum documento é obrigado a ter todos.
-CAMPOS_IDENTIFICACAO = (
-    ("documento", "Documento"),
-    ("referencia", "Referência"),
-    ("emitido_em", "Data de emissão"),
-    ("emitente", "Emitente"),
-    ("destinatario", "Destinatário"),
-    ("contrato", "Contrato"),
-    ("marco", "Marco em jogo"),
-    ("responsavel", "Responsável técnico"),
-    ("classificacao", "Classificação"),
-)
-
-
-def separar_frontmatter(texto: str) -> tuple[dict[str, str], str]:
-    """Extrai o bloco `---` de metadados do topo, se houver.
-
-    Sem front-matter o documento segue como antes: nada de identificação é
-    inventado a partir do corpo, porque metadado adivinhado num documento
-    contratual é pior que metadado ausente.
-    """
-    if not texto.startswith("---\n"):
-        return {}, texto
-    fim = texto.find("\n---\n", 4)
-    if fim == -1:
-        return {}, texto
-    meta = {}
-    for linha in texto[4:fim].splitlines():
-        if ":" in linha:
-            chave, _, valor = linha.partition(":")
-            meta[chave.strip()] = valor.strip()
-    return meta, texto[fim + 5 :].lstrip("\n")
-
-
-def titulo_do_corpo(texto_md: str) -> str:
-    """Título da aba e do PDF quando o front-matter não declara um.
-
-    Vem do próprio `# ` do documento — antes esta função não existia e todo
-    arquivo gerado saía com o título do questionário na aba do navegador e nos
-    metadados do PDF, inclusive os relatórios.
-    """
-    for linha in texto_md.splitlines():
-        if linha.startswith("# "):
-            titulo = linha[2:].strip()
-            # Título que já se nomeia não recebe o sufixo de novo.
-            return titulo if "AlupData" in titulo else f"{titulo} — AlupData"
-    return "Documento — AlupData"
-
-
-def bloco_identificacao(meta: dict[str, str]) -> str:
-    """Tabela de identificação do documento, logo abaixo do título."""
-    linhas = [
-        f"<div class='id-rotulo'>{rotulo}</div><div class='id-valor'>{meta[chave]}</div>"
-        for chave, rotulo in CAMPOS_IDENTIFICACAO
-        if meta.get(chave)
-    ]
-    return f"<section class='identificacao'>{''.join(linhas)}</section>" if linhas else ""
-
-
-def bloco_assinatura(meta: dict[str, str]) -> str:
-    """Fecho com responsável e local/data — um relatório emitido tem emissor."""
-    if not meta.get("responsavel"):
-        return ""
-    local_data = meta.get("local_data", "")
-    return (
-        "<section class='assinatura'>"
-        f"{f'<p class=local-data>{local_data}</p>' if local_data else ''}"
-        "<div class='linha-assinatura'></div>"
-        f"<p class='assina-nome'>{meta['responsavel']}</p>"
-        f"<p class='assina-org'>{meta.get('emitente', '')}</p>"
-        "</section>"
-    )
-
-
-def montar_html(texto_md: str, *, classe: str = "relatorio") -> str:
-    meta, texto_md = separar_frontmatter(texto_md)
-    # `fenced_code`: sem ela, um bloco entre crases vira código no meio da
-    # linha, e o comando que a contratante precisa copiar sai emendado ao texto.
-    corpo = markdown.markdown(texto_md, extensions=["tables", "attr_list", "fenced_code"])
-    # O marcador textual vira etiqueta visual — quem lê precisa achar as
-    # perguntas que travam trabalho sem ler as 47.
-    corpo = corpo.replace("[BLOQUEIA]", '<span class="bloqueia">BLOQUEIA</span>')
-    # A identificação entra depois do <h1>, não antes: o leitor vê primeiro do
-    # que se trata, depois a ficha do documento.
-    identificacao = bloco_identificacao(meta)
-    if identificacao and "</h1>" in corpo:
-        corpo = corpo.replace("</h1>", "</h1>" + identificacao, 1)
-    else:
-        corpo = identificacao + corpo
-    corpo += bloco_assinatura(meta)
-    marca = '<p class="marca">ness<span>.</span></p>'
-    titulo = meta.get("titulo") or meta.get("documento") or titulo_do_corpo(texto_md)
-    rodape = (
-        '<p class="rodape">ness. Processos e Tecnologia Ltda. · CNPJ 72.027.097/0001-37 · '
-        "Contrato CPS-01025/2026 — AlupData Fase 1: DataLake</p>"
-    )
-    return (
-        "<!doctype html><html lang='pt-BR'><head><meta charset='utf-8'>"
-        "<meta name='viewport' content='width=device-width, initial-scale=1'>"
-        f"<title>{titulo}</title>"
-        "<link rel='preconnect' href='https://fonts.googleapis.com'>"
-        "<link rel='preconnect' href='https://fonts.gstatic.com' crossorigin>"
-        "<link href='https://fonts.googleapis.com/css2?"
-        "family=Montserrat:wght@500;600&"
-        "family=Inter:wght@400;500;600&"
-        "family=JetBrains+Mono:wght@400;500&display=swap' "
-        "rel='stylesheet'>"
-        f"<style>{ESTILO}</style></head>"
-        f"<body class='{classe}'>{marca}{corpo}{rodape}</body></html>"
-    )
-
-
-def gerar_html(fonte: Path, saida: Path, classe: str) -> Path:
-    saida.parent.mkdir(parents=True, exist_ok=True)
-    saida.write_text(montar_html(fonte.read_text(encoding="utf-8"), classe=classe), encoding="utf-8")
-    return saida
-
-
-def gerar_pdf(fonte: Path, saida: Path, classe: str) -> Path:
-    saida.parent.mkdir(parents=True, exist_ok=True)
-    with tempfile.TemporaryDirectory() as tmp:
-        origem = Path(tmp) / "documento.html"
-        origem.write_text(montar_html(fonte.read_text(encoding="utf-8"), classe=classe), encoding="utf-8")
-        # Escreve num temporário e só então substitui. Imprimir direto sobre o
-        # destino falha em silêncio quando ele está aberto num visualizador: o
-        # navegador não grava, o arquivo antigo continua lá, e um documento
-        # desatualizado seguiria para a contratante.
-        provisorio = Path(tmp) / "documento.pdf"
-        subprocess.run(  # noqa: S603 — argumentos fixos, sem entrada do usuário
-            [
-                str(encontrar_navegador()),
-                "--headless=new",
-                "--disable-gpu",
-                "--no-pdf-header-footer",
-                "--virtual-time-budget=10000",  # espera a fonte remota carregar
-                f"--print-to-pdf={provisorio}",
-                origem.as_uri(),
-            ],
-            check=True,
-            capture_output=True,
-            timeout=180,
-        )
-        if not provisorio.exists():
-            raise SystemExit("o navegador terminou sem escrever o PDF")
-        try:
-            shutil.move(str(provisorio), str(saida))
-        except OSError as exc:
-            raise SystemExit(
-                f"não foi possível escrever em {saida}: {exc}.\n"
-                "O arquivo provavelmente está aberto num visualizador de PDF — feche-o e repita."
-            ) from exc
-    return saida
-
-
-def main() -> int:
-    parser = argparse.ArgumentParser(description="Renderiza Markdown com a identidade ness.")
-    parser.add_argument("fonte", type=Path, help="arquivo .md a renderizar")
-    parser.add_argument("--html", action="store_true", help="gera .html ao lado da fonte")
-    parser.add_argument("--pdf", action="store_true", help="gera .pdf")
-    parser.add_argument("--saida-pdf", type=Path, help="caminho do PDF (padrão: ao lado da fonte)")
-    parser.add_argument(
-        "--classe",
-        default="relatorio",
-        choices=("relatorio", "questionario"),
-        help="questionario aplica as larguras de coluna do formulário",
-    )
-    args = parser.parse_args()
-
-    if not args.fonte.exists():
-        raise SystemExit(f"fonte não encontrada: {args.fonte}")
-    if not (args.html or args.pdf):
-        raise SystemExit("escolha ao menos um formato: --html, --pdf")
-
-    if args.html:
-        caminho = gerar_html(args.fonte, args.fonte.with_suffix(".html"), args.classe)
-        print(f"{caminho} ({caminho.stat().st_size / 1024:.0f} KB)")
-    if args.pdf:
-        destino = args.saida_pdf or args.fonte.with_suffix(".pdf")
-        caminho = gerar_pdf(args.fonte, destino, args.classe)
-        print(f"{caminho} ({caminho.stat().st_size / 1024:.0f} KB)")
-    return 0
-
-
-if __name__ == "__main__":
-    sys.exit(main())
+</style></head><body class='relatorio'><p class="marca">ness<span>.</span></p><h1>Primeira carga concluída, e o que precisamos da Alup</h1><section class='identificacao'><div class='id-rotulo'>Documento</div><div class='id-valor'>Pendências da contratante</div><div class='id-rotulo'>Referência</div><div class='id-valor'>REL-2026-09-24 · AlupData Fase 1</div><div class='id-rotulo'>Data de emissão</div><div class='id-valor'>24 de setembro de 2026</div><div class='id-rotulo'>Emitente</div><div class='id-valor'>ness. Processos e Tecnologia Ltda.</div><div class='id-rotulo'>Destinatário</div><div class='id-valor'>Alup — Leonardo Guiel Marques, com cópia para Saulo Rodrigues, Taina Ulhoa Mota e Mauricio Cardoso</div><div class='id-rotulo'>Contrato</div><div class='id-valor'>CPS-01025/2026 — AlupData Fase 1: DataLake</div><div class='id-rotulo'>Marco em jogo</div><div class='id-valor'>Ondas 0 a 4 — insumos da contratante</div><div class='id-rotulo'>Responsável técnico</div><div class='id-valor'>Ricardo Esper</div><div class='id-rotulo'>Classificação</div><div class='id-valor'>Confidencial — uso restrito das partes</div></section>
+<p>Leonardo, boa tarde.</p>
+<p><strong>A primeira carga real do AlupData aconteceu hoje às 9h34</strong>: taxas de juros do
+Banco Central, 6 registros carregados sem nenhuma rejeição. O ambiente de
+desenvolvimento está completo, e a Onda 0 fica pronta para homologação após três
+dias seguidos de carga com sucesso.</p>
+<p>Abaixo está tudo o que depende da Alup. Cada item traz o que precisamos, o
+formato, onde entregar e o prazo.</p>
+<h2>Até amanhã, 25/09 — confirmação dos pedidos de acesso</h2>
+<p>Por favor, confirmem que <strong>os pedidos internos de VPN e de credenciais das Ondas
+2 e 3 já foram abertos</strong> na Alup, com a previsão de entrega de cada um. As
+entregas em si têm os prazos abaixo, amarrados ao início de cada onda.</p>
+<h2>Credenciais — um único canal</h2>
+<p>Credenciais <strong>não devem ser enviadas por e-mail, chat, GitHub ou qualquer outro
+meio</strong>. Elas são gravadas diretamente no cofre de segredos do projeto (Google
+Secret Manager), por um grupo de vocês com permissão de <strong>gravar, sem poder
+ler</strong>.</p>
+<h3>1. E-mail do grupo Google da Alup que vai gravar as credenciais — até 26/09</h3>
+<p>Respondam a este e-mail com o endereço do grupo. Em até 1 dia útil o grupo
+recebe a permissão, e avisaremos.</p>
+<p>Com o grupo ativo, cada credencial é gravada com o comando abaixo, trocando
+apenas o nome do segredo e o arquivo. O arquivo deve ser apagado depois do
+envio.</p>
+<pre><code>gcloud secrets versions add &lt;nome-do-segredo&gt; --data-file=&lt;arquivo&gt; --project=alupar-dev-alupdata
+</code></pre>
+<p><strong>Apoio:</strong> Gabriel Paz (<code>gpaz@ness.com.br</code>) acompanha a gravação com vocês, tira
+dúvidas e confirma a chegada de cada credencial.</p>
+<h3>Onda 2 — APIs. Prazo: 12/10 (a onda começa em 19/10)</h3>
+<p><strong>2. BBCE</strong> (<a href="https://github.com/nessenergy/Alupdatalake/issues/23">#23</a>)</p>
+<ul>
+<li>Segredo: <code>alupdata-bbce-credenciais</code></li>
+<li>Formato: um arquivo JSON com exatamente estas cinco chaves:</li>
+</ul>
+<pre><code class="language-json">{&quot;base_url&quot;: &quot;…&quot;, &quot;company_external_code&quot;: &quot;…&quot;, &quot;email&quot;: &quot;…&quot;, &quot;password&quot;: &quot;…&quot;, &quot;api_key&quot;: &quot;…&quot;}
+</code></pre>
+<p><strong>3. Hubspot</strong> (<a href="https://github.com/nessenergy/Alupdatalake/issues/24">#24</a>)</p>
+<ul>
+<li>Segredo: <code>alupdata-hubspot-api-token</code></li>
+<li>O que é: o token de um <em>private app</em> criado no Hubspot da Alup, <strong>somente</strong>
+  com o escopo <code>crm.objects.deals.read</code>.</li>
+</ul>
+<h3>Onda 3 — sistemas internos, somente leitura. Prazo: 09/11 (a onda começa em 16/11)</h3>
+<p><strong>4. Oracle FMB</strong> (<a href="https://github.com/nessenergy/Alupdatalake/issues/12">#12</a>)</p>
+<ul>
+<li>Segredo: <code>alupdata-fmb-dsn</code></li>
+<li>Formato, uma linha: <code>oracle://usuario:senha@host:1521/SERVICO</code></li>
+<li>Além disso: a configuração da VPN e o contato técnico da TI responsável por ela.</li>
+</ul>
+<p><strong>5. MySQL RDS da Comercialização</strong> (<a href="https://github.com/nessenergy/Alupdatalake/issues/14">#14</a>)</p>
+<ul>
+<li>Segredo: <code>alupdata-comercializacao-dsn</code></li>
+<li>Formato, uma linha: <code>mysql://usuario:senha@host:3306/base</code></li>
+<li>Rede: vocês indicaram que não precisa de VPN. Se o banco restringir acesso por
+  IP de origem, avisem, e informamos o endereço de saída do nosso ambiente.</li>
+</ul>
+<p><strong>6. Portal Alup</strong> (<a href="https://github.com/nessenergy/Alupdatalake/issues/13">#13</a>)</p>
+<ul>
+<li>MySQL: segredo <code>alupdata-portal-alup-dsn</code>, no formato
+  <code>mysql://usuario:senha@host:3306/base</code></li>
+<li>NoSQL e Storage: informem, respondendo na issue #13, <strong>qual é o produto</strong> de
+  cada um (por exemplo, MongoDB, Amazon S3). A partir disso indicamos o formato
+  da credencial.</li>
+</ul>
+<p><strong>7. RM/TOTVS</strong> (<a href="https://github.com/nessenergy/Alupdatalake/issues/15">#15</a>)</p>
+<ul>
+<li>Segredo: <code>alupdata-rm-dsn</code></li>
+<li>Acesso ao banco: <code>sqlserver://usuario:senha@host:1433/base</code> ou <code>oracle://…</code>,
+  conforme o banco.</li>
+<li>Acesso por API: respondam na issue #15 com a URL base e o método de
+  autenticação, e indicamos o formato.</li>
+</ul>
+<h2>Arquivos com dado da Alup — prazo: 01/10</h2>
+<p>Contêm dado da Alup, então <strong>não vão por e-mail nem ao GitHub</strong>. Devem ser
+enviados ao bucket <strong><code>alupar-dev-alupdata-entrada</code></strong>, dentro do próprio projeto
+Google Cloud da Alup:
+<a href="https://console.cloud.google.com/storage/browser/alupar-dev-alupdata-entrada?project=alupar-dev-alupdata">https://console.cloud.google.com/storage/browser/alupar-dev-alupdata-entrada?project=alupar-dev-alupdata</a></p>
+<p>Leonardo, Taina, Mauricio, Eduardo e Fernando já têm permissão para enviar. É só
+abrir o link, entrar na pasta indicada e usar <em>Fazer upload</em>. Cada pasta tem um
+arquivo <code>LEIA-ME.txt</code> com o que colocar nela.</p>
+<p><strong>8. Exemplos reais das planilhas da proposta (G3)</strong> (<a href="https://github.com/nessenergy/Alupdatalake/issues/142">#142</a>)</p>
+<ul>
+<li>Um exemplo preenchido de cada planilha, no formato em que ela é usada hoje
+  (XLSX ou CSV), na pasta <code>planilhas/</code>.</li>
+</ul>
+<p><strong>9. Sigla interna das usinas</strong> (<a href="https://github.com/nessenergy/Alupdatalake/issues/141">#141</a>)</p>
+<ul>
+<li>Uma tabela com duas colunas, <strong>sigla interna da Alup</strong> e <strong>CEG</strong> (código da
+  usina na ANEEL), na pasta <code>usinas/</code>.</li>
+</ul>
+<h2>Respostas diretas — neste e-mail ou na issue indicada. Prazo: 01/10</h2>
+<p><strong>10. TempoOK</strong> (<a href="https://github.com/nessenergy/Alupdatalake/issues/174">#174</a>, <a href="https://github.com/nessenergy/Alupdatalake/issues/129">#129</a>)</p>
+<ul>
+<li>A lista dos caminhos de arquivo do TempoOK que interessam a vocês. Hoje só
+  conhecemos o da previsão de ENA.</li>
+<li>Com o fornecedor, a informação de onde estão os boletins posteriores a outubro
+  de 2022.</li>
+<li>Na mesma conversa, peçam ao TempoOK <strong>um token novo</strong>, a ser gravado no
+  segredo <code>alupdata-tempook-api-token</code> pelo canal acima. Depois disso o token
+  atual será invalidado.</li>
+</ul>
+<p><strong>11. Quem acessa o Portal</strong></p>
+<ul>
+<li>O e-mail de um grupo Google da Alup, ou o domínio (<code>alupar.com.br</code>), que deve
+  entrar no Portal. Hoje ele está no ar e protegido, sem ninguém autorizado.</li>
+</ul>
+<p><strong>12. Orçamento mensal de nuvem</strong> (<a href="https://github.com/nessenergy/Alupdatalake/issues/87">#87</a>)</p>
+<ul>
+<li>O valor em US$ do alerta de orçamento de cada ambiente: desenvolvimento,
+  homologação e produção. A referência de vocês foi de até US$ 20/mês até
+  novembro e até US$ 400/mês depois.</li>
+</ul>
+<h2>Ações no console do Google Cloud</h2>
+<p><strong>13. Exportação de faturamento para o BigQuery — o quanto antes</strong>, por quem
+administra a conta de faturamento</p>
+<ul>
+<li>No console: <em>Faturamento → Exportação de faturamento → BigQuery</em>.</li>
+<li>Ligar <strong>custo padrão</strong> e <strong>custo detalhado</strong>, os dois apontando para o dataset
+  <code>faturamento</code> do projeto <code>alupar-dev-alupdata</code>.</li>
+<li>O histórico só é gravado a partir do dia em que a exportação é ligada.</li>
+</ul>
+<p><strong>14. Papéis para <code>gptorres@ness.com.br</code> — até 01/10</strong>, por quem administra o IAM</p>
+<ul>
+<li>Nos três projetos, os mesmos seis papéis das demais contas da ness., com a
+  mesma condição de expiração: 28/02/2027 em <code>alupar-dev-alupdata</code>, e 01/03/2027
+  em <code>alupar-hm-alupdata</code> e <code>prod-alupdata</code>.</li>
+</ul>
+<h2>Governança — quando puderem</h2>
+<p><strong>15. Matriz RACI</strong> (<a href="https://github.com/nessenergy/Alupdatalake/issues/150">#150</a>)</p>
+<ul>
+<li>Quem compõe o Comitê que aprova a passagem de fase, e se o Google fica como
+  <strong>consultado</strong>, e não como <strong>responsável</strong>, na matriz RACI.</li>
+</ul>
+<hr />
+<p>Confirmaremos o recebimento de cada item na issue correspondente, no dia em que
+chegar. Se preferirem, podemos percorrer a lista na reunião de sexta.</p>
+<p>Obrigado, e seguimos à disposição.</p>
+<p>Atenciosamente,<br>
+Ricardo Esper<br>
+ness.</p><section class='assinatura'><p class=local-data>24 de setembro de 2026</p><div class='linha-assinatura'></div><p class='assina-nome'>Ricardo Esper</p><p class='assina-org'>ness. Processos e Tecnologia Ltda.</p></section><p class="rodape">ness. Processos e Tecnologia Ltda. · CNPJ 72.027.097/0001-37 · Contrato CPS-01025/2026 — AlupData Fase 1: DataLake</p></body></html>

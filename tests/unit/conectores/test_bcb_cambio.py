@@ -57,6 +57,20 @@ def test_cotacao_negativa_e_rejeitada():
         )
 
 
+def test_transformar_usa_fechamento_quando_a_api_nao_envia_tipo_boletim(conector):
+    """Em 2026-09 o BCB passou a devolver uma cotação por dia, sem `tipoBoletim`."""
+    bruto = {
+        "cotacaoCompra": 5.1111,
+        "cotacaoVenda": 5.1117,
+        "dataHoraCotacao": "2026-09-21 13:06:51.445645",
+    }
+
+    registro = conector.transformar(bruto)
+
+    assert registro["tipo_boletim"] == "Fechamento"
+    CotacaoDolar.model_validate(registro)  # não levanta
+
+
 def test_extrair_devolve_os_registros_do_payload(conector):
     registros = list(conector.extrair(Janela.de_texto("2026-01-01", "2026-01-31")))
     assert len(registros) == 3

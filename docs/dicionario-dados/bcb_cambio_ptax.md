@@ -15,7 +15,7 @@
 |---|---|---|---|---|
 | `dataHoraCotacao` | `data_hora_cotacao` | `data_hora_cotacao` | TIMESTAMP | direto |
 | `dataHoraCotacao[:10]` | `data_referencia` | `data_referencia` | DATE | data do boletim |
-| `tipoBoletim` | `tipo_boletim` | `tipo_boletim` | STRING | trim; vazio é rejeitado |
+| `tipoBoletim` | `tipo_boletim` | `tipo_boletim` | STRING | trim; ausente ou vazio vira `Fechamento` (o BCB parou de enviar o campo em 2026-09, com uma cotação por dia) |
 | `cotacaoCompra` | `cotacao_compra` | `cotacao_compra` | NUMERIC | ≥ 0 |
 | `cotacaoVenda` | `cotacao_venda` | `cotacao_venda` | NUMERIC | ≥ 0 |
 | — | — | `cotacao_media` | NUMERIC | `(compra + venda) / 2` |

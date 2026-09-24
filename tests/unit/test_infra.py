@@ -582,3 +582,18 @@ def test_leitura_do_projeto_e_por_grupo_e_nao_le_segredo() -> None:
     assert "var.leitura_projeto" in bloco
     # Nada de papel que leia segredo por esse caminho.
     assert "secretmanager" not in bloco and "roles/owner" not in bloco and "roles/editor" not in bloco
+
+
+def test_bucket_de_entrada_e_fechado_e_nao_concede_acesso_novo() -> None:
+    """Dado de negócio da Alup chega aqui em vez de e-mail ou GitHub (24/09).
+
+    As duas promessas feitas à Alup: nada público, e ninguém ganha acesso novo
+    por causa dele — envia quem ela já autorizou no projeto, lê quem tem
+    `roles/viewer`. Uma concessão silenciosa aqui quebraria a segunda.
+    """
+    storage = _ler("infra/modules/storage/main.tf")
+    bloco = _bloco(storage, 'resource "google_storage_bucket" "entrada"')
+    assert 'public_access_prevention    = "enforced"' in bloco
+    assert "uniform_bucket_level_access = true" in bloco
+    assert not re.search(r"google_storage_bucket\.entrada\.name[^\n]*\n[^\n]*role", storage)
+    assert 'google_storage_bucket_iam_member" "entrada' not in storage

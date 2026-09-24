@@ -1,0 +1,22 @@
+# Mantém as ações dos workflows atualizadas sem voltar a tag mutável.
+#
+# As ações são fixadas por SHA de commit (supply chain: tag pode ser reescrita,
+# e o deploy assume a SA do GCP da contratante por WIF). SHA fixo sem
+# atualização vira ação velha com falha conhecida; o Dependabot abre o PR com o
+# SHA novo e a versão no comentário, e o CI decide se passa.
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: "08:00"
+      timezone: America/Sao_Paulo
+    # Um PR por semana com todas as ações, em vez de um por ação: cada PR
+    # consome minutos de CI, e o Actions desta organização tem cota.
+    groups:
+      acoes:
+        patterns: ["*"]
+    commit-message:
+      prefix: "chore(ci)"

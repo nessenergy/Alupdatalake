@@ -276,13 +276,13 @@ def test_quadro_tem_permissoes_minimas_e_nunca_roda_em_paralelo() -> None:
 
 def test_quadro_le_a_chave_do_secret_manager_e_mascara_sem_gravar_no_ambiente() -> None:
     workflow = _quadro()
-    assert "google-github-actions/auth@v2" in workflow
+    assert "google-github-actions/auth@" in workflow  # fixada por SHA desde 24/09
     # A org está no plano Free e o repositório é privado: ambiente do GitHub
     # não existe nesse caso, e variável de ambiente nunca chegaria ao job.
     assert not _tem(r"(?m)^\s*environment:", workflow), "as variáveis do quadro ficam no repositório, não em ambiente"
     assert "gcloud secrets versions access latest --secret=alupdata-github-quadro-app-key" in workflow
     assert "::add-mask::" in workflow
-    assert "actions/create-github-app-token@v3" in workflow
+    assert "actions/create-github-app-token@" in workflow  # fixada por SHA desde 24/09
     assert "GITHUB_ENV" not in workflow
     assert "upload-artifact" not in workflow
     assert "secrets." not in workflow  # nada de chave nos secrets do GitHub (regra 2)

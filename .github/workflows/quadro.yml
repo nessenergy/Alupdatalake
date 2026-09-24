@@ -60,16 +60,16 @@ jobs:
             echo "pronto=true" >> "$GITHUB_OUTPUT"
           fi
       - if: steps.guarda.outputs.pronto == 'true'
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
       - if: steps.guarda.outputs.pronto == 'true'
-        uses: google-github-actions/auth@v2
+        uses: google-github-actions/auth@c200f3691d83b41bf9bbd8638997a462592937ed # v2.1.13
         with:
           # Workload Identity Federation: nenhuma chave JSON de service account
           # no repositório ou nos secrets do GitHub.
           workload_identity_provider: ${{ vars.GCP_WIF_PROVIDER }}
           service_account: ${{ vars.GCP_DEPLOY_SA }}
       - if: steps.guarda.outputs.pronto == 'true'
-        uses: google-github-actions/setup-gcloud@v2
+        uses: google-github-actions/setup-gcloud@e427ad8a34f8676edf47cf7d7925499adf3eb74f # v2.2.1
       # A chave vai do Secret Manager direto para a saída deste passo, que só
       # existe dentro do job: nunca para o log, o ambiente do job ou artefato.
       # `::add-mask::` cobre uma linha por vez, então cada linha do PEM é
@@ -88,7 +88,7 @@ jobs:
       # subconjunto que o script usa.
       - id: token
         if: steps.guarda.outputs.pronto == 'true'
-        uses: actions/create-github-app-token@v3
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
         with:
           client-id: ${{ vars.QUADRO_APP_CLIENT_ID }}
           private-key: ${{ steps.chave.outputs.valor }}
@@ -97,7 +97,7 @@ jobs:
           permission-issues: write
           permission-pull-requests: read
       - if: steps.guarda.outputs.pronto == 'true'
-        uses: astral-sh/setup-uv@v4
+        uses: astral-sh/setup-uv@38f3f104447c67c051c4a08e39b64a148898af3a # v4.2.0
         with:
           version: "0.5.11"
       - if: steps.guarda.outputs.pronto == 'true'

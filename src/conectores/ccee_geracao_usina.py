@@ -176,6 +176,12 @@ class CceeGeracaoUsina(CceeCsvCkan):
     schema = GeracaoHorariaUsina
     recurso_por = "mes"
 
+    # Medido em 24/09: o teto default de 8 MiB fechava lote a cada ~5.900
+    # linhas, e o mês (~3M linhas) não cabia no timeout do job. 32 MiB dá 4x
+    # menos load jobs; o pico de memória medido com 8 MiB foi 225 MiB, dentro
+    # do 1 GiB do job (folga de 4x ainda sobra com o lote maior).
+    bytes_por_lote = 32 * 1024 * 1024
+
     def transformar(self, bruto: dict[str, Any]) -> dict[str, Any]:
         # `transformar()` só repassa texto: MES_REFERENCIA já chegou validado
         # (a base descarta linha com mês malformado antes de render aqui — ver

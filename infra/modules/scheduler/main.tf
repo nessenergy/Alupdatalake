@@ -26,6 +26,7 @@ variable "conectores" {
     # grande por execução (hoje só `ccee_geracao_usina`) precisa de mais.
     memoria = optional(string, "512Mi")
     cpu     = optional(string, "1")
+    timeout = optional(string, "1800s")
   }))
   default = {
     bcb_cambio_ptax = {
@@ -111,11 +112,15 @@ variable "conectores" {
       # 202607. `ultimos_dias` 40 não alcançava essa defasagem — a execução
       # de 24/09 extraiu zero linhas com status SUCESSO. `ultimos_dias` 100
       # alcança o mês publicado mais recente e o anterior (recontabilização,
-      # ADR 016) — em geral três recursos mensais — e cabe no `timeout` de
-      # 1800s do job: cada mês leva cerca de 3 minutos só na extração, medido
-      # em dry-run (raw e carga na Bronze pulados) — um piso, não o tempo da
-      # execução real. Mesmo com três meses ainda sobra folga grande no
-      # timeout.
+      # ADR 016) — em geral três recursos mensais.
+      #
+      # Medido em 24/09: com o teto default de 8 MiB por lote, cada load job
+      # carregava ~5.900 linhas, e o mês inteiro (~3 milhões de linhas) levava
+      # ~42 min só de carga — estourando o `timeout` de 1800s sozinho, antes
+      # mesmo de somar os outros dois meses da janela. `bytes_por_lote` do
+      # conector (`src/conectores/ccee_geracao_usina.py`) subiu para 32 MiB,
+      # 4x menos load jobs; com isso, três meses cabem com folga numa hora —
+      # daí o `timeout` de 3600s abaixo.
       #
       # `memoria` deixou de ser premissa. Medido em 15/09 com o mês de julho
       # (2.964.096 registros), somando processo e filhos: o runner em fatias
@@ -129,6 +134,7 @@ variable "conectores" {
       ultimos_dias = 100
       memoria      = "1Gi"
       cpu          = "2"
+      timeout      = "3600s"
     }
     ons_geracao_usina = {
       # Um CSV de ~66 MB por mês, ~534 mil linhas — a mesma forma do
@@ -272,7 +278,7 @@ resource "google_cloud_run_v2_job" "ingestao" {
     template {
       service_account = var.service_account_email
       max_retries     = 2
-      timeout         = "1800s"
+      timeout         = each.value.timeout
 
       containers {
         image = var.imagem

@@ -135,8 +135,14 @@ o nome da coluna descritivo, não `_mwh`.
   execução de 24/09 extraiu zero linhas com status `SUCESSO` — a janela nunca
   alcançava um mês publicado. Por isso a janela de agendamento passou para
   **100 dias** (o mês publicado mais recente e o anterior, recontabilização
-  ADR 016 — em geral três recursos mensais), dentro do `timeout` de 1800s do
-  job (cada mês leva cerca de 3 minutos só na extração, medido em dry-run).
+  ADR 016 — em geral três recursos mensais).
+- Também medido em 24/09: com o teto default de 8 MiB por lote
+  (`Conector.bytes_por_lote`), cada lote fechava em ~5.900 linhas e virava um
+  load job de ~5s no BigQuery — um mês de ~3 milhões de linhas levava ~42 min
+  só de carga, estourando o `timeout` de 1800s do job sozinho. `bytes_por_lote`
+  do conector subiu para **32 MiB** (4x menos load jobs), e o `timeout` do job
+  subiu para **3600s**, com folga para os três meses que a janela de 100 dias
+  costuma alcançar.
 - Se a CCEE republicar um mês, a janela de agendamento de 100 dias (cobrindo o
   mês fechado e o anterior) alcança a nova publicação sem intervenção manual.
 - `PERIODO_COMERCIALIZACAO` não numérico ou fora do mês, e `DATA` em formato

@@ -33,6 +33,13 @@ htmlcov/
 *.tfstate
 *.tfstate.*
 *.tfplan
+# `terraform plan -out=tfplan` sem extensão, como o runbook usa
+tfplan
+tfplan-*
+
+# Material da Alup que não é versionado (brand book e afins)
+*.pdf
+!docs/**/*.pdf
 
 # GCP
 service-account-*.json

@@ -205,7 +205,7 @@ acompanhamento vive.
 | # | Decisão | Opções | Minha recomendação |
 |---|---|---|---|
 | [#188](https://github.com/nessenergy/Alupdatalake/issues/188) | Como avisar que uma **fonte semanal ou mensal parou** | (a) vigia diário lendo `gold.saude_ingestao`; (b) asserção no Dataform; (c) métrica customizada no lugar da métrica de log | **(a)** — mantém o aviso no mesmo lugar dos outros e não confunde frescor com qualidade de dado |
-| [#177](https://github.com/nessenergy/Alupdatalake/issues/177) | Quando aplicar o **design system da Alup** no Portal | depende de você fechar o sistema no Claude Design e de a Alup validar | pedir à Alup o logo em SVG e a licença da Basic Sans junto, para não travar duas vezes |
+| [#177](https://github.com/nessenergy/Alupdatalake/issues/177) | Quando aplicar o **design system da Alup** no Portal | depende de a ness. fechar o sistema de design e de a Alup validar | pedir à Alup o logo em SVG e a licença da Basic Sans junto, para não travar duas vezes |
 | — | **Região `us-central1`** | a Alup pode preferir `us-east1` e alterar a política | vale **até o primeiro apply de `prod`**; depois, mudar região é migração de dado |
 
 ---

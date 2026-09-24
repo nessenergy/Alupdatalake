@@ -1,0 +1,95 @@
+# Fluxo da Onda 3 — gerado pelo Terraform (infra/modules/orquestracao).
+#
+# Não edite no console: o que está aqui é a fonte, e o apply seguinte desfaz
+# qualquer mudança feita por fora (regra 5 do AGENTS.md).
+#
+# Passos planos de propósito: em Cloud Workflows, `next` só alcança passo do
+# mesmo bloco, e o laço de espera do item 4 depende disso.
+main:
+  steps:
+    # 1. As ingestões internas, em paralelo. O conector do Cloud Run espera a
+    #    execução terminar; erro em qualquer uma para o fluxo inteiro, que é o
+    #    ponto: Dataform rodando sobre carga incompleta produz Gold errada em
+    #    silêncio, e silêncio é pior que falha.
+    - ingestoes:
+        parallel:
+          for:
+            value: job
+            in: ${jsonencode(jobs)}
+            steps:
+              - executar:
+                  call: googleapis.run.v2.projects.locations.jobs.run
+                  args:
+                    name: $${"projects/${projeto}/locations/${regiao}/jobs/" + job}
+                    connector_params:
+                      timeout: ${timeout_ingestao}
+
+    # 2. Compilar a release `main`. É a mesma chamada de
+    #    `scripts/executar_dataform.py`, que o deploy usa — duas portas para o
+    #    mesmo caminho, e nenhuma lógica de transformação vive aqui.
+    - compilar:
+        call: http.post
+        args:
+          url: "https://dataform.googleapis.com/v1/${repositorio}/compilationResults"
+          auth:
+            type: OAuth2
+          body:
+            releaseConfig: "${repositorio}/releaseConfigs/main"
+        result: compilacao
+
+    - conferir_compilacao:
+        switch:
+          - condition: $${"compilationErrors" in compilacao.body}
+            next: compilacao_reprovada
+        next: invocar
+
+    - compilacao_reprovada:
+        raise:
+          mensagem: "compilação do Dataform falhou"
+          erros: $${compilacao.body.compilationErrors}
+
+    # 3. Executar, com a identidade do Dataform — não com a do fluxo.
+    - invocar:
+        call: http.post
+        args:
+          url: "https://dataform.googleapis.com/v1/${repositorio}/workflowInvocations"
+          auth:
+            type: OAuth2
+          body:
+            compilationResult: $${compilacao.body.name}
+            invocationConfig:
+              serviceAccount: "${service_account_dataform}"
+        result: invocacao
+
+    # 4. Esperar o fim. Sem isto o fluxo termina "com sucesso" no instante em
+    #    que pede a execução, e uma asserção reprovada não apareceria aqui.
+    - pausa:
+        call: sys.sleep
+        args:
+          seconds: 30
+
+    - consultar:
+        call: http.get
+        args:
+          url: $${"https://dataform.googleapis.com/v1/" + invocacao.body.name}
+          auth:
+            type: OAuth2
+        result: situacao
+
+    - decidir:
+        switch:
+          - condition: $${situacao.body.state == "SUCCEEDED"}
+            next: concluir
+          - condition: $${situacao.body.state in ["FAILED", "CANCELLED"]}
+            next: execucao_reprovada
+        next: pausa
+
+    - execucao_reprovada:
+        raise:
+          mensagem: "execução do Dataform terminou sem sucesso"
+          estado: $${situacao.body.state}
+          invocacao: $${invocacao.body.name}
+
+    - concluir:
+        return:
+          invocacao: $${invocacao.body.name}

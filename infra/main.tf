@@ -203,3 +203,16 @@ module "dataform" {
   deploy_service_account = var.deploy_service_account
   agendar                = var.agendamentos_ativos
 }
+
+# Onda 3 (ADR 017): a cadeia só existe quando houver fonte interna ingerida.
+# Com `cadeia_onda3` vazia — o padrão — nenhum recurso é criado.
+module "orquestracao" {
+  source                   = "./modules/orquestracao"
+  project_id               = var.project_id
+  region                   = var.region
+  environment              = var.environment
+  cadeia                   = var.cadeia_onda3
+  agendar                  = var.agendamentos_ativos
+  repositorio_dataform     = module.dataform.repositorio
+  service_account_dataform = module.dataform.service_account
+}

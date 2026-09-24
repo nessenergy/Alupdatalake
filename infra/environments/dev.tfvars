@@ -20,3 +20,13 @@ leitura_projeto = ["group:operacao-datalake@ness.com.br"]
 
 # Validação do Portal com dado real (Onda 0). O grupo da Alup entra em hml.
 portal_acesso = ["group:operacao-datalake@ness.com.br"]
+
+# Alertas (24/09): em dev vão para a operação da ness. O endereço da Alup
+# (alup.alertas@alupar.com.br, E3) entra em hml e prod, depois que o ruído das
+# fontes sem credencial sair do agendamento.
+emails_alerta = ["operacao-datalake@ness.com.br"]
+
+# Sem credencial ainda, o disparo só gera erro: Hubspot (A9), BBCE (A7) e o
+# boletim do TempoOK, cujo acervo parou em 2022 (A10). Os jobs continuam
+# existindo; tire da lista quando a credencial ou o acervo chegar.
+conectores_sem_agendamento = ["hubspot_negocios", "bbce_curva_forward", "tempook_boletins"]

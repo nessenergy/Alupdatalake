@@ -191,6 +191,7 @@ module "scheduler" {
   imagem                = var.imagem_ingestao
   service_account_email = google_service_account.ingestao.email
   agendar               = var.agendamentos_ativos
+  sem_agendamento       = var.conectores_sem_agendamento
 }
 
 # Portal atrás do IAP (R01). Sobe com a imagem publicada, que é a mesma da CLI;

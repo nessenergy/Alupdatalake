@@ -39,6 +39,21 @@ variable "cadeia_onda3" {
   }
 }
 
+variable "conectores_sem_agendamento" {
+  description = <<-EOT
+    Conectores que não recebem disparo do Cloud Scheduler, em geral porque a
+    credencial ainda não chegou. O Cloud Run Job continua existindo e roda à
+    mão. Quando a credencial chegar, tire o conector da lista.
+  EOT
+  type        = list(string)
+  default     = []
+
+  validation {
+    condition     = alltrue([for conector in var.conectores_sem_agendamento : can(regex("^[a-z0-9_]+$", conector))])
+    error_message = "Use o rótulo do conector em snake_case, como `hubspot_negocios`."
+  }
+}
+
 variable "imagem_ingestao" {
   description = "Imagem do container com a CLI alupdata; vazio desliga o agendamento"
   type        = string

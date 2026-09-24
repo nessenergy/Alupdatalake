@@ -67,6 +67,13 @@ extração representa o cadastro corrente, não a recuperação do retrato antig
 Dicionários e runbook registram essa limitação. Homologação e validação real
 continuam pendentes de liberação do ambiente pela Alup.
 
+> **Em 24/09, às 03h, o GitHub Actions parou por cota**: o job de testes não
+> inicia, com a anotação de pagamento recusado ou limite de gasto atingido.
+> Como a `main` exige as seis verificações, **nenhum PR mergeia até isso ser
+> regularizado** — e o deploy depende do mesmo runner. Não é falha de código:
+> os jobs não chegam a rodar. Passo a passo em
+> [`acoes-humanas.md`](acoes-humanas.md) §0.
+
 Este arquivo responde "onde estamos e o que trava o próximo passo". Detalhe de
 escopo e estimativa fica em [`plano-execucao.md`](plano-execucao.md); o que sai
 em cada semana, em [`plano-semanal.md`](plano-semanal.md); os relatórios emitidos

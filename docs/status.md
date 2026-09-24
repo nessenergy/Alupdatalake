@@ -67,12 +67,16 @@ extração representa o cadastro corrente, não a recuperação do retrato antig
 Dicionários e runbook registram essa limitação. Homologação e validação real
 continuam pendentes de liberação do ambiente pela Alup.
 
-> **Em 24/09, às 03h, o GitHub Actions parou por cota**: o job de testes não
-> inicia, com a anotação de pagamento recusado ou limite de gasto atingido.
-> Como a `main` exige as seis verificações, **nenhum PR mergeia até isso ser
-> regularizado** — e o deploy depende do mesmo runner. Não é falha de código:
-> os jobs não chegam a rodar. Passo a passo em
-> [`acoes-humanas.md`](acoes-humanas.md) §0.
+> **24/09 — o Dataform está de pé em `dev`.** O GitHub Actions, parado por
+> cota às 03h, voltou no fim da manhã; o token do Dataform foi gravado pelo
+> grupo `operacao-datalake@ness.com.br` (vence em 25/09/2027) e o repositório
+> foi criado. O grafo de Bronze, Silver, Gold e asserções passou inteiro, com
+> **uma única ação reprovada**: `gold.custo_consultas`, que espera o
+> `INFORMATION_SCHEMA.TABLE_STORAGE` ligado no projeto — passo único de quem é
+> *Owner* ([`acoes-humanas.md`](acoes-humanas.md) §1b). As tabelas de Bronze
+> existem, e **a primeira carga real acontece nos agendamentos de 25/09**.
+> O primeiro Dataform revelou três DDLs de Bronze com `NULL` solto, que o
+> BigQuery recusa ([#208](https://github.com/nessenergy/Alupdatalake/pull/208)).
 
 Este arquivo responde "onde estamos e o que trava o próximo passo". Detalhe de
 escopo e estimativa fica em [`plano-execucao.md`](plano-execucao.md); o que sai

@@ -129,9 +129,16 @@ def test_secrets_ficam_na_regiao_do_ambiente() -> None:
     assert _tem(r"region\s*=\s*var\.region", bloco)
 
 
+# Só configuração. `*.tf*` sozinho casa também com o state e o plano do
+# bootstrap, que o runbook manda manter na máquina de quem aplica
+# (`terraform.tfstate.d/`, `tfplan`): diretório e binário que não são código, e
+# que quebravam estes testes em qualquer máquina que já rodou o bootstrap.
+CONFIGURACAO = {".tf", ".tfvars"}
+
+
 def test_nenhuma_regiao_antiga_sobrou_na_infra() -> None:
     for caminho in (RAIZ / "infra").rglob("*.tf*"):
-        if ".terraform" in caminho.parts:
+        if ".terraform" in caminho.parts or caminho.suffix not in CONFIGURACAO:
             continue
         assert "southamerica" not in caminho.read_text(encoding="utf-8"), caminho
 
@@ -158,7 +165,7 @@ def test_dataset_do_billing_export_existe_sem_acesso_da_ingestao() -> None:
 
     # A ingestão não recebe IAM sobre a fatura, que traz todos os projetos da conta.
     for caminho in (RAIZ / "infra").rglob("*.tf*"):
-        if ".terraform" in caminho.parts:
+        if ".terraform" in caminho.parts or caminho.suffix not in CONFIGURACAO:
             continue
         texto = caminho.read_text(encoding="utf-8")
         for iam in re.finditer(r'resource "google_bigquery_dataset_iam_\w+" "\w+" \{.*?\n\}', texto, re.DOTALL):

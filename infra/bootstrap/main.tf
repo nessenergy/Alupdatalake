@@ -87,6 +87,7 @@ locals {
     "roles/serviceusage.serviceUsageConsumer", # agentes de serviço do Dataform e do IAP
     "roles/storage.admin",                     # bucket raw, o IAM dele e o state
     "roles/dataplex.admin",                    # lake, zonas e ativos do catálogo, ADR 014
+    "roles/dataplex.catalogEditor",            # aspect types: `dataplex.admin` não os cobre
     "roles/workflows.admin",                   # fluxo da Onda 3, ADR 017
   ]
 

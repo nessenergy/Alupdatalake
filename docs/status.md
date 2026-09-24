@@ -1,6 +1,6 @@
 # Estado do projeto
 
-Atualizado em **2026-09-23** · **A Alup liberou o GCP nos três ambientes** —
+Atualizado em **2026-09-24** · **A Alup liberou o GCP nos três ambientes** —
 `dev`, homologação e produção, informado à ness. em 23/09. Os projetos
 existem com os IDs `alupar-dev-alupdata`, `alupar-hm-alupdata` e
 `prod-alupdata` (ver A3). **O `dev` foi provisionado no mesmo dia**: bootstrap
@@ -95,6 +95,19 @@ continuam pendentes de liberação do ambiente pela Alup.
 > quatro pôde ser reexecutado manualmente hoje: a conta pessoal não tem
 > `run.jobs.run` nos Cloud Run Jobs, e isso é o esperado — quem executa job
 > é a SA de deploy, não uma pessoa.
+
+> **24/09, fim do dia — plano de fechamento das ondas e seis PRs mesclados.**
+> [`docs/planos/2026-09-24-fechamento-das-ondas.md`](planos/2026-09-24-fechamento-das-ondas.md)
+> organiza as cinco ondas em fases, com dossiê da Onda 0 previsto para 30/09 —
+> antes do prazo contratual, que já estava postergado por A3. Junto entraram:
+> o Dependabot (#205, sete ações do CI atualizadas), os achados de hoje e a
+> reconferência de IAM (#214 — `resper` e `gpaz` só têm os seis papéis
+> condicionais, sem duplicata; `gptorres@` segue sem papel), a correção do
+> conector `bcb_cambio_ptax` (#215 — o BCB parou de enviar `tipoBoletim` e
+> zerava a carga), o grupo de operação no IAP do Portal em `dev` (#216 — em
+> `infra/`, ainda não aplicado no GCP) e o registro de que o papel do
+> `gptorres@` fica congelado, sem cobrança ativa, por decisão do Ricardo
+> (#217). `main` em `978075d`.
 
 Este arquivo responde "onde estamos e o que trava o próximo passo". Detalhe de
 escopo e estimativa fica em [`plano-execucao.md`](plano-execucao.md); o que sai

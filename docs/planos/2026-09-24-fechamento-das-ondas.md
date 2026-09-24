@@ -63,6 +63,10 @@ se registra quando a ness. consegue entregar.
 
 ## 2. Cronograma proposto
 
+> **Atualização de 24/09 (aceite conjunto).** As datas das Ondas 0 e 1 abaixo
+> foram substituídas pelo [plano de aceleração do faturamento](2026-09-24-aceleracao-do-faturamento.md):
+> dossiês das duas ondas juntos em 29–30/09, com aceite conjunto em ~01/10.
+
 | Onda | Dossiê entregue à Alup | Prazo contratual | Diferença | Condição |
 |---|---|---|---|---|
 | 0 | **30/09** | 11/09 (postergado por A3) | — | nenhuma além da carga |
@@ -141,6 +145,10 @@ antes da Fase 1, com o mesmo padrão do
 ---
 
 ## Fase 1 — Fechar a Onda 0 (25/09 → 30/09)
+
+> **Atualização de 24/09:** a data de dossiê da Onda 0 abaixo foi
+> substituída pelo [plano de aceleração](2026-09-24-aceleracao-do-faturamento.md)
+> — dossiê junto com o da Onda 1 em 29–30/09, aceite conjunto em ~01/10.
 
 ### Tarefa 1.1: Três dias seguidos de `SUCESSO` *(corre sozinha)*
 
@@ -276,6 +284,9 @@ uv run --with markdown python scripts/gerar_documento.py docs/relatorios/2026-09
 
 ## Fase 2 — Abrir a janela de homologação em `hml` (30/09)
 
+> **Atualização de 24/09:** a janela de `hml` foi preparada em código
+> (#228) antes desta data, dentro do [plano de aceleração](2026-09-24-aceleracao-do-faturamento.md).
+
 Uma janela só para as Ondas 0 e 1 custa menos que duas. Os jobs agendados em
 `hml` custam cerca de US$ 3/mês, dentro do teto da E2.
 
@@ -327,6 +338,11 @@ de repetir.
 ---
 
 ## Fase 3 — Fechar a Onda 1 (25/09 → 07/10)
+
+> **Atualização de 24/09:** a data de dossiê da Onda 1 abaixo foi
+> substituída pelo [plano de aceleração](2026-09-24-aceleracao-do-faturamento.md)
+> — dossiê junto com o da Onda 0 em 29–30/09, aceite conjunto em ~01/10; as
+> 23 fontes públicas já carregaram com `SUCESSO` em 24/09.
 
 ### Tarefa 3.1: Carga real das 23 fontes públicas em `dev` *(começa em 25/09)*
 

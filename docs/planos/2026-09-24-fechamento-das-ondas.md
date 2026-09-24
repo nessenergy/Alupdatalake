@@ -178,14 +178,14 @@ origem (N4).
 gcloud storage ls "gs://alupar-dev-alupdata-raw/bcb/cambio_ptax/" --recursive | head
 ```
 
-- [ ] **Passo 2: Executar o replay pelo próprio job, sobrescrevendo os
-  argumentos.** Troque `<objeto>` pelo URI do passo 1, e `<de>`/`<ate>` pela
-  janela original dessa execução, que está em `_execucoes`.
+- [ ] **Passo 2: Executar o replay pelo workflow `Executar ingestão`.** Pessoa
+  não executa Cloud Run Job; o workflow roda com a SA de deploy. Troque
+  `<objeto>` pelo URI do passo 1, e `<de>`/`<ate>` pela janela original dessa
+  execução, que está em `_execucoes`.
 
 ```bash
-gcloud run jobs execute ingestao-bcb-cambio-ptax \
-  --project alupar-dev-alupdata --region us-central1 --wait \
-  --args=reprocessar-raw,bcb_cambio_ptax,--uri,<objeto>,--de,<de>,--ate,<ate>
+gh workflow run "Executar ingestão" -f environment=dev -f conector=bcb_cambio_ptax \
+  -f uri=<objeto> -f de=<de> -f ate=<ate>
 ```
 
 - [ ] **Passo 3: Conferir a linha de replay**
@@ -344,8 +344,7 @@ for c in bcb_cambio_ptax bcb_juros ibge_ipca aneel_siga \
          ccee_pld ccee_perfil ccee_agente ccee_exposicao_financeira ccee_contabilizacao_perfil \
          ccee_geracao_usina ccee_contrato_montante ccee_varejista_consumidor \
          ccee_encargo_ess ccee_energia_reserva ccee_cvu_estrutural; do
-  gcloud run jobs execute "ingestao-${c//_/-}" \
-    --project alupar-dev-alupdata --region us-central1 --async
+  gh workflow run "Executar ingestão" -f environment=dev -f conector="$c"
 done
 ```
 
@@ -406,7 +405,7 @@ porque a Silver também está vazia volta para a Tarefa 3.1.
 
 **Depende de:** Fase 2.
 
-- [ ] **Passo 1:** o laço da Tarefa 3.1 com `--project alupar-hm-alupdata`.
+- [ ] **Passo 1:** o laço da Tarefa 3.1 com `-f environment=hml`.
 - [ ] **Passo 2: Rodar o Dataform em `hml`** para a Silver e a Gold
   refletirem a carga.
 
@@ -607,8 +606,8 @@ histórico começar a acumular onde vai ser consumido.
 | # | Decisão | Recomendação | Trava |
 |---|---|---|---|
 | D1 | **Profundidade do histórico** (risco R4, o custo é da Alup) | homologar com a janela do agendamento e fazer carga retroativa só por pedido de domínio, com janela explícita | nada; a carga retroativa é opcional |
-| D2 | **Destino das 32h do item 2.1** | pedir a posição da Alup na entrega do dossiê da Onda 1 | dossiê da Onda 2 |
-| D3 | **Aviso de fonte semanal ou mensal parada** ([#188](https://github.com/nessenergy/Alupdatalake/issues/188)) | opção (a), vigia diário sobre `gold.saude_ingestao` | nada até a Fase 7 |
+| D2 | **Destino das 32h do item 2.1** | **antecipada em 24/09**: pedir a posição da Alup em 30/09, junto do dossiê da Onda 0 | dossiê da Onda 2 |
+| D3 | **Aviso de fonte semanal ou mensal parada** ([#188](https://github.com/nessenergy/Alupdatalake/issues/188)) | **decidida em 24/09: opção (a)**, vigia diário sobre `gold.saude_ingestao`; implementação até o dossiê da Onda 2 | nada até a Fase 7 |
 | D4 | **Valor do orçamento** ([#87](https://github.com/nessenergy/Alupdatalake/issues/87)) | acertar com o Saulo junto do pedido de grupos | Fase 7 |
 | D5 | **Data formal da Onda 0 postergada** | coordenação da ness., com o registro de A3 | nada técnico |
 

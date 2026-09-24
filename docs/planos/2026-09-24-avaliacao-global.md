@@ -195,7 +195,7 @@ opção (a) do #188 (item 15).
 | 2 | Como disparar um job à mão | o workflow `Executar ingestão`, com a SA de deploy, sem ampliar o IAM de pessoas | [#221](https://github.com/nessenergy/Alupdatalake/pull/221); o plano de fechamento já usa o workflow |
 | 3 | Pausar o agendamento das fontes sem credencial | sim, até a credencial chegar: Hubspot, BBCE e o boletim do TempoOK em `dev` | [#220](https://github.com/nessenergy/Alupdatalake/pull/220) |
 | 4 | Antecipar a decisão das 32h do item 2.1 | pedir a posição da Alup em 30/09, junto do dossiê da Onda 0 | D2 do plano de fechamento; coordenação com a Alup |
-| 5 | Fonte e regra das horas | definir quem aponta, onde e com que periodicidade, e conferir as 100h, antes do dossiê da Onda 0 (30/09) | coordenação |
+| 5 | Fonte e regra das horas | **definida em 24/09**: horas previstas na proposta + 3%, para item concluído; 166,86h apontadas em 14 itens | [runbook de acompanhamento](../runbook/acompanhamento-semanal.md#critério-de-apontamento) |
 | 6 | Extrair o conteúdo da previsão de ENA do TempoOK (domínio Meteorologia) | conferir primeiro se está no escopo da proposta; fora dele, é aditivo | coordenação, antes de qualquer código |
 
 Os itens 4 e 5 do Horizonte 1 (falha de registro visível e alerta de carga

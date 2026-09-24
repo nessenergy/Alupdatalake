@@ -97,6 +97,21 @@ variable "grupo_operacao" {
   }
 }
 
+variable "gravacao_segredos" {
+  description = <<-EOT
+    Quem grava versão nova de secret — o token do Dataform e as credenciais das
+    fontes — **sem poder ler** (`roles/secretmanager.secretVersionAdder`). É o
+    "acesso de operação depois do bootstrap" que a ADR 015 manda entrar por
+    variável. Só group:<e-mail> ou domain:<domínio> (R01); vazio não concede.
+  EOT
+  type        = list(string)
+  default     = []
+  validation {
+    condition     = alltrue([for m in var.gravacao_segredos : can(regex("^(group|domain):[^\\s]+$", m))])
+    error_message = "Use só group:<e-mail> ou domain:<domínio>; acesso individual (user:) não entra."
+  }
+}
+
 variable "portal_acesso" {
   description = "Quem passa pelo IAP do Portal: group:<e-mail> ou domain:<domínio> da Alup; vazio não libera ninguém"
   type        = list(string)

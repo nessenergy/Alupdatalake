@@ -80,10 +80,30 @@ O `WriteAllText` existe para não gravar a quebra de linha que o `echo` do
 PowerShell acrescentaria — token com `\n` no fim é recusado pelo GitHub e o
 erro aparece longe daqui.
 
-**Se responder `PERMISSION_DENIED`**: sua conta não tem papel de Secret
-Manager. Três saídas, em ordem de rapidez: aceitar o convite de *Owner* que
-está pendente no projeto `dev`; pedir a quem já é *Owner* que rode; ou pedir à
-Alup o papel `roles/secretmanager.secretVersionAdder`.
+**Vai responder `PERMISSION_DENIED`**, e respondeu em 24/09: nenhuma conta da
+ness. tem papel no Secret Manager. Não é falta de concessão da Alup — é uma
+lacuna nossa. A ADR 015 diz que gravar este token "entra no `infra/` por
+variável, como o acesso de pessoas", e a variável nunca tinha sido escrita.
+Agora existe: `gravacao_segredos`, que dá `roles/secretmanager.secretVersionAdder`
+— **grava versão sem poder ler** — só a grupo, nunca a pessoa (R01).
+
+1. Criar no Google Workspace da ness. um grupo para quem opera o AlupData — por
+   exemplo `alupdata-operacao@ness.com.br` — com as pessoas que gravam
+   credencial.
+2. Preencher no `infra/environments/dev.tfvars`:
+   `gravacao_segredos = ["group:alupdata-operacao@ness.com.br"]`, por PR.
+3. Depois do deploy, gravar o token com os comandos acima.
+
+O mesmo papel destrava o `migrar_segredos`, que grava as credenciais das
+fontes e esbarraria no mesmo erro.
+
+Evite as saídas rápidas: o convite de *Owner* pendente no `dev` dá acesso
+muito além do necessário, e pedir a outra pessoa que rode o comando faz o token
+trocar de mãos.
+
+**O token de `dev` vence em 25/09/2027.** Na véspera, criar outro pelo mesmo
+caminho e gravar como versão nova; o Dataform passa a usá-la quando
+`DATAFORM_GIT_TOKEN_VERSAO` apontar para ela.
 
 ### 1.3 Apontar a versão e reexecutar o deploy
 

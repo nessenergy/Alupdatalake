@@ -97,7 +97,7 @@ def test_todo_termo_de_negocio_do_glossario_vira_termo_do_catalogo():
     termos_no_md = {
         _slug(termo)
         for secao in SECOES_DE_NEGOCIO
-        for termo in re.findall(r"\*\*(.+?)\*\*", _fatia_secao(secao))
+        for termo in re.findall(r"^\| \*\*(.+?)\*\* \|", _fatia_secao(secao), re.MULTILINE)
     }
     chaves_no_tf = set(re.findall(r"^\s{4}([a-z][a-z0-9_]*) = \{", GLOSSARIO_TF, re.MULTILINE))
 
@@ -107,7 +107,10 @@ def test_todo_termo_de_negocio_do_glossario_vira_termo_do_catalogo():
 
 def test_nenhum_termo_do_projeto_vaza_para_o_catalogo():
     """'Do projeto' é jargão de repositório e contrato, não vocabulário do dado."""
-    termos_do_projeto = {_slug(termo) for termo in re.findall(r"\*\*(.+?)\*\*", _fatia_secao("Do projeto"))}
+    termos_do_projeto = {
+        _slug(termo)
+        for termo in re.findall(r"^\| \*\*(.+?)\*\* \|", _fatia_secao("Do projeto"), re.MULTILINE)
+    }
     chaves_no_tf = set(re.findall(r"^\s{4}([a-z][a-z0-9_]*) = \{", GLOSSARIO_TF, re.MULTILINE))
 
     assert not (termos_do_projeto & chaves_no_tf)

@@ -71,7 +71,13 @@ class BcbCambioPtax(Conector):
         return {
             "data_referencia": data_hora[:10],
             "data_hora_cotacao": data_hora,
-            "tipo_boletim": bruto.get("tipoBoletim", ""),
+            # Em 2026-09 o BCB parou de enviar `tipoBoletim` e passou a
+            # devolver uma cotação por dia (verificado em 24/09 contra a API
+            # real). Sem a classificação Abertura/Intermediário/Fechamento,
+            # a única cotação do dia é tratada como o fechamento — é a
+            # leitura que a Gold (`cambio_mensal`) já fazia e continua
+            # fazendo. Boletim vazio explícito segue caindo aqui também.
+            "tipo_boletim": bruto.get("tipoBoletim") or "Fechamento",
             "cotacao_compra": bruto["cotacaoCompra"],
             "cotacao_venda": bruto["cotacaoVenda"],
         }

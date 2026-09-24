@@ -67,7 +67,11 @@ resource "google_dataplex_lake" "alupdata" {
 resource "google_dataplex_zone" "camada" {
   for_each = local.zonas
 
-  name         = each.key
+  # `camada-` no nome porque a zona cria, no projeto, um dataset do BigQuery
+  # com o próprio ID — e `bronze`, `silver` e `gold` já são nossos. O apply de
+  # 23/09 reprovou com "Zone ID 'bronze' ... is already taken". Quem consulta
+  # o catálogo lê o `display_name`, e esse continua "Bronze".
+  name         = "camada-${each.key}"
   project      = var.project_id
   location     = var.region
   lake         = google_dataplex_lake.alupdata.name

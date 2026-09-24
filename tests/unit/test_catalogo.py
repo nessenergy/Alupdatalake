@@ -31,6 +31,15 @@ def test_uma_zona_por_camada_medallion():
     assert zonas == {"bronze": "RAW", "silver": "CURATED", "gold": "CURATED"}
 
 
+def test_o_nome_da_zona_nao_colide_com_dataset_nosso():
+    """A zona cria um dataset com o próprio ID, e `bronze` e `gold` já são nossos.
+
+    Sem o prefixo, o apply reprova com "Zone ID 'bronze' ... is already taken"
+    — e só no fim, depois de já ter criado o lake.
+    """
+    assert 'name         = "camada-${each.key}"' in MODULO
+
+
 def test_ativos_apontam_para_o_que_o_infra_ja_declara():
     """Ativo é ponteiro. Nome inventado aqui vira ativo em erro no console."""
     assert 'type = "BIGQUERY_DATASET"' in MODULO

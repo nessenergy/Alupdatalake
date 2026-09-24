@@ -192,7 +192,7 @@ Se você for propor algo que contraria um ADR, escreva um ADR novo — não um
 remendo. Em particular: o framework em `src/core/` é mais estrutura do que 13
 scripts soltos **de propósito** (ADR 003, 13 fontes / 19 semanas / handoff).
 
-## Estado atual (2026-09-18)
+## Estado atual (2026-09-23)
 
 Referência conferida: `main` em `2d0f7c6` (16/09). O estado detalhado,
 evidências, responsáveis e prazos vivem em [`docs/status.md`](docs/status.md).

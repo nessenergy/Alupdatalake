@@ -1,6 +1,6 @@
 # Plano semanal — próximas 4 semanas
 
-Emitido em **2026-08-27** · S1 revisada em **2026-08-31** e em **2026-09-04** ·
+Emitido em **2026-08-27** · S1 revisada em **2026-08-31** e em **2026-09-04** · S4 registrada em **2026-09-24** ·
 Escopo e estimativa por onda: [`plano-execucao.md`](plano-execucao.md) ·
 Situação atual: [`status.md`](status.md)
 
@@ -200,6 +200,27 @@ lançamentos existentes no Project têm origem a conferir.
 | Destrava | **A8 atendida em 14/09** — BBCE e TempoOK implementados | documentação deixou de ser bloqueio; restam acesso BBCE e acervo TempoOK |
 
 **Marco**: Onda 1 homologada → 20,69% · R$ 30.720,00.
+
+### Registro de 24/09 — o ambiente chegou no meio da S4
+
+A S4 foi escrita condicionada ao ambiente, e o ambiente chegou nela: a Alup
+liberou o GCP em 23/09. O que a semana produziu, até 24/09:
+
+| Trilha | Item | Situação em 24/09 |
+|---|---|---|
+| Entregamos | Bootstrap e primeiro `apply` em `dev` | **feito em 23/09**: 159 recursos; `hml` com bootstrap |
+| Entregamos | Dataform executado no GCP (Bronze, Silver, Gold e asserções) | **feito em 24/09**: 141 ações, zero falhas |
+| Entregamos | Agendamento e monitoramento (item 1.7) | **aplicado em 24/09**: 24 disparos, 9 alertas com destinatário |
+| Entregamos | Primeira carga real | **24/09**: BCB (câmbio e juros), ONS (carga, EAR e ENA) e a previsão de ENA do TempoOK |
+| Entregamos | Ajustes revelados pela carga real (item 1.8) | três defeitos corrigidos no mesmo dia (#215, #222, #223) |
+| Entregamos | Dossiê de homologação da Onda 1 | **não nesta semana**: previsto para 07/10, antes do prazo de 16/10 |
+| Destrava | A7 — pedidos de acesso da Onda 3 e tokens da Onda 2 | vence em 25/09; registro do que a Alup confirmar em 26/09 |
+
+**Da S5 em diante, a sequência está no
+[plano de fechamento das ondas](planos/2026-09-24-fechamento-das-ondas.md)**:
+dossiê da Onda 0 em 30/09, carga das fontes públicas e janela em `hml` para o
+dossiê da Onda 1 em 07/10, e Onda 2 em 23/10 se as credenciais chegarem até
+12/10. Este arquivo não repete aquele plano semana a semana.
 
 ---
 

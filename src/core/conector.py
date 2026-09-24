@@ -11,6 +11,7 @@ import logging
 from abc import ABC, abstractmethod
 from contextlib import closing
 from datetime import UTC, datetime
+from decimal import Decimal
 from typing import TYPE_CHECKING, Any
 
 from pydantic import BaseModel, ValidationError
@@ -27,6 +28,19 @@ if TYPE_CHECKING:
     from collections.abc import Iterable, Iterator
 
 logger = logging.getLogger(__name__)
+
+
+# NUMERIC do BigQuery guarda 9 casas decimais e recusa a linha inteira com
+# mais que isso. Origem que publica float (o ONS: 1554.3750000000002) traz
+# resíduo de representação além da 9ª casa; o raw guarda o valor original.
+_CASAS_NUMERIC = Decimal("1e-9")
+
+
+def _cabe_no_numeric(linha: dict[str, Any], validado: BaseModel) -> dict[str, Any]:
+    for campo, valor in validado:
+        if isinstance(valor, Decimal) and valor.as_tuple().exponent < -9:
+            linha[campo] = str(valor.quantize(_CASAS_NUMERIC))
+    return linha
 
 
 class Conector(ABC):
@@ -184,7 +198,7 @@ class Conector(ABC):
                     exc.errors(include_input=False)[:1],
                 )
                 continue
-            linhas.append(validado.model_dump(mode="json") | tecnicas)
+            linhas.append(_cabe_no_numeric(validado.model_dump(mode="json"), validado) | tecnicas)
         # Soma, não atribui: o método é chamado uma vez por fatia, e atribuir
         # deixaria no contador só o que a última fatia carregou.
         execucao.linhas_carregadas += carregar_bronze(execucao, linhas)

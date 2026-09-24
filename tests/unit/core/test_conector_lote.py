@@ -243,3 +243,34 @@ def test_dry_run_nao_avisa_carga_vazia(espiao, monkeypatch, caplog):
         conector.ingerir(Janela.de_texto("2026-01-01", "2026-01-01"))
 
     assert not any("nenhuma linha carregada" in r.getMessage() for r in caplog.records)
+
+
+class ConectorValorLongo(ConectorFatiado):
+    """Devolve o valor como o ONS publica: float com resíduo de representação."""
+
+    def __init__(self, valor: str) -> None:
+        super().__init__(total=1)
+        self.valor = valor
+
+    def transformar(self, bruto: dict[str, Any]) -> dict[str, Any]:
+        return {"data_referencia": bruto["dia"], "valor": self.valor}
+
+
+@pytest.mark.parametrize(
+    ("origem", "carregado"),
+    [
+        ("9750.321541666666", "9750.321541667"),  # ons_carga, 24/09
+        ("1554.3750000000002", "1554.375000000"),  # ons_ena, 24/09
+        ("1554.375", "1554.375"),  # cabe no NUMERIC: não muda
+        ("7", "7"),
+    ],
+)
+def test_decimal_alem_de_nove_casas_e_arredondado_para_o_numeric(espiao, monkeypatch, origem, carregado):
+    """O NUMERIC do BigQuery aceita 9 casas; mais que isso recusa a linha inteira."""
+    linhas: list[dict[str, Any]] = []
+    monkeypatch.setattr("src.core.conector.carregar_bronze", lambda _e, lote: linhas.extend(lote) or len(lote))
+    conector = espiao["conector"]["c"] = ConectorValorLongo(origem)
+
+    conector.ingerir(Janela.de_texto("2026-01-01", "2026-01-01"))
+
+    assert linhas[0]["valor"] == carregado

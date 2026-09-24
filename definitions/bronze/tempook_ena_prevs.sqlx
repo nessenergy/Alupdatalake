@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS ${self()} (
   modelo              STRING    NOT NULL OPTIONS(description="Combinação de modelos, como aparece no nome do arquivo"),
   caminho_origem      STRING    NOT NULL OPTIONS(description="Caminho pedido ao TempoOK, como consta na origem"),
   nome_arquivo        STRING    NOT NULL,
-  uri_arquivo         STRING        NULL OPTIONS(description="gs:// do tar.gz arquivado; nulo em dry-run"),
+  uri_arquivo         STRING             OPTIONS(description="gs:// do tar.gz arquivado; nulo em dry-run"),
   tamanho_bytes       INT64     NOT NULL,
   sha256              STRING    NOT NULL OPTIONS(description="Identifica republicação corrigida sem reabrir o arquivo"),
   content_type        STRING    NOT NULL OPTIONS(description="application/gzip; o servidor diz octet-stream"),

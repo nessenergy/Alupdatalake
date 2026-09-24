@@ -263,3 +263,20 @@ def test_gold_de_dominio_nao_calcula_razao_entre_series():
 
     assert "pld_medio_reais_mwh /" not in corpo
     assert "/ carga_media_mwmed" not in corpo
+
+
+def test_coluna_anulavel_nao_declara_null_sozinho() -> None:
+    """O DDL do BigQuery aceita `NOT NULL`, e não aceita `NULL` sozinho.
+
+    Coluna sem restrição já é anulável. Escrever `STRING NULL` compila no
+    Dataform — a compilação só resolve `ref()` — e só reprova no BigQuery, com
+    "Expected ")" or "," but got keyword NULL". Foi o que derrubou três DDLs
+    de Bronze no primeiro Dataform real, em 24/09.
+    """
+    soltos = []
+    for arquivo in sorted(Path(__file__).resolve().parents[2].glob("definitions/**/*.sqlx")):
+        for numero, linha in enumerate(arquivo.read_text(encoding="utf-8").splitlines(), start=1):
+            if re.match(r"^\s+\w+\s+[A-Z0-9<>,]+\s+NULL\b", linha) and "NOT NULL" not in linha:
+                soltos.append(f"{arquivo.name}:{numero}: {linha.strip()}")
+
+    assert not soltos, "coluna com NULL solto — tire a palavra, anulável é o padrão:\n" + "\n".join(soltos)

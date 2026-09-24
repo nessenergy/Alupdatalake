@@ -24,6 +24,31 @@ destrava. Os comandos foram executados ou conferidos em 23/09, no ambiente
 
 ---
 
+## 0. Reativar o GitHub Actions — parou por cota, não por código
+
+**Quem**: ness., quem administra a organização no GitHub · **Bloqueia**: todo
+merge e todo deploy · **Desde**: 24/09, 03h
+
+O job `Testes pytest` deixou de iniciar, com esta anotação do próprio GitHub:
+
+> The job was not started because recent account payments have failed or your
+> spending limit needs to be increased.
+
+Não é falha de teste: o job não chega a rodar. Conferido repetindo a execução,
+que reprovou de novo sem iniciar. Como a `main` exige as seis verificações
+(ADR 010), **nenhum PR mergeia enquanto isso durar** — e o workflow de deploy
+também depende de runner.
+
+1. Abrir *Settings → Billing & plans* da organização `nessenergy`.
+2. Conferir pagamento recusado e o limite de gasto do Actions.
+3. Regularizar ou elevar o limite.
+4. Reexecutar os jobs reprovados: `gh run rerun <id> --failed`.
+
+**Deu certo quando**: `gh pr checks <numero>` volta a mostrar as oito
+verificações verdes, e o PR mergeia.
+
+---
+
 ## 1. Destravar o Dataform — sem isto não há dado nenhum
 
 **Quem**: ness. (líder técnico ou quem tiver acesso ao Secret Manager do `dev`)

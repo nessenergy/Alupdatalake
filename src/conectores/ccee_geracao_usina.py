@@ -176,10 +176,12 @@ class CceeGeracaoUsina(CceeCsvCkan):
     schema = GeracaoHorariaUsina
     recurso_por = "mes"
 
-    # Medido em 24/09: o teto default de 8 MiB fechava lote a cada ~5.900
-    # linhas, e o mês (~3M linhas) não cabia no timeout do job. 32 MiB dá 4x
-    # menos load jobs; o pico de memória medido com 8 MiB foi 225 MiB, dentro
-    # do 1 GiB do job (folga de 4x ainda sobra com o lote maior).
+    # Medido em 24/09 com o teto default de 8 MiB: lote fechava a cada ~5.900
+    # linhas (~5s por load job), e o mês (~3M linhas) não cabia no timeout do
+    # job. 32 MiB dá 4x menos load jobs. O pico de memória medido com 8 MiB foi
+    # 225 MiB; com 32 MiB o pico estimado segue dentro do 1 GiB do job, mas o
+    # payload que o `load_table_from_json` monta cresce com o lote — não
+    # remedido ainda, a confirmar na primeira carga real com 32 MiB.
     bytes_por_lote = 32 * 1024 * 1024
 
     def transformar(self, bruto: dict[str, Any]) -> dict[str, Any]:

@@ -114,22 +114,25 @@ variable "conectores" {
       # alcança o mês publicado mais recente e o anterior (recontabilização,
       # ADR 016) — em geral três recursos mensais.
       #
-      # Medido em 24/09: com o teto default de 8 MiB por lote, cada load job
-      # carregava ~5.900 linhas, e o mês inteiro (~3 milhões de linhas) levava
-      # ~42 min só de carga — estourando o `timeout` de 1800s sozinho, antes
-      # mesmo de somar os outros dois meses da janela. `bytes_por_lote` do
-      # conector (`src/conectores/ccee_geracao_usina.py`) subiu para 32 MiB,
-      # 4x menos load jobs; com isso, três meses cabem com folga numa hora —
-      # daí o `timeout` de 3600s abaixo.
+      # Medido em 24/09 com o teto default de 8 MiB por lote: cada load job
+      # levava ~5s e carregava ~5.900 linhas, e o mês inteiro (~3 milhões de
+      # linhas) levava ~42 min só de carga — estourando o `timeout` de 1800s
+      # sozinho, antes mesmo de somar os outros dois meses da janela.
+      # `bytes_por_lote` do conector (`src/conectores/ccee_geracao_usina.py`)
+      # subiu para 32 MiB, 4x menos load jobs; com isso, três meses cabem com
+      # folga numa hora — daí o `timeout` de 3600s abaixo. O tempo por load
+      # job também foi medido com 8 MiB; com lote maior tende a ficar mais
+      # raro, mas mais longo cada um — não remedido ainda.
       #
       # `memoria` deixou de ser premissa. Medido em 15/09 com o mês de julho
-      # (2.964.096 registros), somando processo e filhos: o runner em fatias
-      # marcou **225 MiB** de pico, contra **9.859 MiB** da versão que
-      # materializava a janela inteira. Os 4 GiB que estavam aqui cobriam o
-      # código antigo pela metade — ele teria sido morto por OOM na primeira
-      # execução real. Com 1 GiB sobra folga de 4x sobre o pico medido, e a
-      # medição do dry-run não inclui o payload que o `load_table_from_json`
-      # monta por fatia, que é o que a folga cobre.
+      # (2.964.096 registros), somando processo e filhos, com o teto de 8 MiB
+      # por lote: o runner em fatias marcou **225 MiB** de pico, contra
+      # **9.859 MiB** da versão que materializava a janela inteira. Os 4 GiB
+      # que estavam aqui cobriam o código antigo pela metade — ele teria sido
+      # morto por OOM na primeira execução real. Com 32 MiB de lote o payload
+      # que o `load_table_from_json` monta por fatia cresce junto — o pico
+      # estimado segue dentro do 1 GiB do job, mas isso é estimativa, não
+      # medição: a confirmar na primeira carga real com o lote de 32 MiB.
       cron         = "0 3 7 * *"
       ultimos_dias = 100
       memoria      = "1Gi"

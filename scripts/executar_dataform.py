@@ -45,6 +45,32 @@ def _verificar(resposta: Any) -> None:
         raise
 
 
+def acoes_reprovadas(sessao: Any, invocacao: str) -> list[str]:
+    """`schema.nome: motivo` de cada ação que reprovou numa execução.
+
+    O estado da execução sozinho não diz qual das dezenas de ações falhou, e o
+    console não está ao alcance de quem opera. A própria execução guarda o
+    motivo por ação; basta pedir.
+    """
+    linhas: list[str] = []
+    pagina = ""
+    while True:
+        url = f"{API}/{invocacao}:query" + (f"?pageToken={pagina}" if pagina else "")
+        resposta = sessao.get(url)
+        _verificar(resposta)
+        corpo = resposta.json()
+        for acao in corpo.get("workflowInvocationActions", []):
+            if acao.get("state") != "FAILED":
+                continue
+            alvo = acao.get("target", {})
+            linhas.append(
+                f"{alvo.get('schema', '?')}.{alvo.get('name', '?')}: {acao.get('failureReason', 'sem motivo')}"
+            )
+        pagina = corpo.get("nextPageToken", "")
+        if not pagina:
+            return linhas
+
+
 def executar(sessao: Any, repo: str, service_account: str, intervalo: float = 10.0, limite: float = 1800.0) -> str:
     """Compila a release `main`, executa tudo e devolve o estado terminal."""
     compilacao = sessao.post(f"{API}/{repo}/compilationResults", json={"releaseConfig": f"{repo}/releaseConfigs/main"})
@@ -67,6 +93,9 @@ def executar(sessao: Any, repo: str, service_account: str, intervalo: float = 10
         _verificar(resposta)
         estado = resposta.json().get("state", "STATE_UNSPECIFIED")
         if estado in TERMINAIS:
+            if estado != "SUCCEEDED":
+                for linha in acoes_reprovadas(sessao, nome):
+                    logger.error("ação reprovada — %s", sanitizar(linha))
             return estado
         if time.monotonic() - inicio >= limite:
             raise TimeoutError(f"execução do Dataform sem fim após {limite:.0f}s: {nome}")

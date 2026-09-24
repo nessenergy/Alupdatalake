@@ -58,3 +58,32 @@ def test_o_agente_do_dataplex_recebe_acesso():
     """Sem o agente, o ativo nasce em erro e ninguém repara até abrir o console."""
     assert "google_project_service_identity" in MODULO
     assert "roles/dataplex.serviceAgent" in MODULO
+
+
+ASPECTOS = (RAIZ / "infra" / "modules" / "catalogo" / "aspectos.tf").read_text(encoding="utf-8")
+
+
+def test_o_aspecto_que_separa_texto_curado_de_gerado():
+    """A ADR 014 ativou a IA do catálogo com uma condição: marcar o que ela escreve.
+
+    Sem a marca, sugestão do serviço vira documentação com a mesma autoridade
+    do que uma pessoa revisou.
+    """
+    assert '"curada"' in ASPECTOS or '"curada"' in ASPECTOS.replace("'", '"')
+    assert "automatica" in ASPECTOS
+    assert "revisada_em" in ASPECTOS
+
+
+def test_os_oito_dominios_do_b1_estao_no_aspecto():
+    """Domínio que falta aqui é dado que o catálogo não sabe de quem é."""
+    for dominio in (
+        "mercado_de_energia",
+        "geracao_e_operacional",
+        "meteorologia",
+        "comercial_e_contratos",
+        "crm_e_marketing",
+        "risco_e_compliance",
+        "economico",
+        "planejamento",
+    ):
+        assert dominio in ASPECTOS, f"domínio {dominio} fora do aspect type"

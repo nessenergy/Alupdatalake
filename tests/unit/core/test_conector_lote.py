@@ -152,6 +152,36 @@ def test_o_tamanho_do_lote_e_configuravel_por_conector():
     assert ConectorFatiado.tamanho_do_lote == 2
 
 
+class ConectorBytesPequenos(ConectorFatiado):
+    """Teto de bytes bem menor que o default, para fechar lote por bytes, não por contagem."""
+
+    tamanho_do_lote = 1_000_000  # nunca é o teto que fecha o lote neste teste
+    bytes_por_lote = 100  # cada registro bruto serializa a 35 bytes; dois cabem, três não
+
+
+def test_o_teto_de_bytes_por_lote_e_configuravel_por_conector(espiao):
+    """`_carregar_em_lotes` tem de fechar pelo teto do próprio conector, não pelo default de 8 MiB."""
+    c = ConectorBytesPequenos(total=5)
+    espiao["conector"]["c"] = c
+
+    execucao = c.ingerir(Janela.de_texto("2026-01-01", "2026-01-01"))
+
+    # `_carregar_em_lotes` mede o registro bruto (antes de `transformar`), e cada
+    # um (`{"dia": "2026-01-01", "valor": "N"}`) serializa a 35 bytes; com teto
+    # de 100, só dois cabem por lote — então mais de uma carga acontece. Com o
+    # teto de 8 MiB do default, os 5 caberiam numa só.
+    assert len(espiao["cargas"]) > 1, espiao["cargas"]
+    assert sum(espiao["cargas"]) == 5
+    assert execucao.linhas_carregadas == 5
+
+
+def test_ccee_geracao_usina_tem_teto_de_bytes_maior_que_o_default():
+    from src.conectores.ccee_geracao_usina import CceeGeracaoUsina
+
+    assert Conector.bytes_por_lote == 8 * 1024 * 1024
+    assert CceeGeracaoUsina.bytes_por_lote == 32 * 1024 * 1024
+
+
 @pytest.mark.parametrize("failure", ["close", "extract"])
 def test_falha_antes_do_raw_completo_nao_carrega(espiao, monkeypatch, failure):
     c = ConectorFatiado()

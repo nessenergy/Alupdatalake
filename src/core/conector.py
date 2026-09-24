@@ -53,6 +53,7 @@ class Conector(ABC):
         schema_versao: muda quando o contrato da fonte muda.
         max_dias_por_requisicao: limite de janela da fonte, quando houver.
         tamanho_do_lote: quantos registros o runner valida e carrega por vez.
+        bytes_por_lote: teto de JSON bruto por lote, para limitar memória.
     """
 
     fonte: str
@@ -62,9 +63,10 @@ class Conector(ABC):
     max_dias_por_requisicao: int | None = None
 
     # Raw e leitura para o Bronze são progressivos; cada lote respeita também
-    # o teto de 8 MiB de JSON bruto. Falhas tardias deixam os lotes anteriores
-    # no Bronze append-only; a Silver deduplica a reexecução (regra 4).
+    # o teto de `bytes_por_lote` de JSON bruto. Falhas tardias deixam os lotes
+    # anteriores no Bronze append-only; a Silver deduplica a reexecução (regra 4).
     tamanho_do_lote: int = 50_000
+    bytes_por_lote: int = 8 * 1024 * 1024
 
     # Execução em curso, para o conector que precisa gravar um artefato da
     # origem além dos registros — o boletim em PDF do TempoOK (ADR 019) grava
@@ -171,7 +173,7 @@ class Conector(ABC):
         batch_bytes = 0
         for record in registros:
             size = len(json.dumps(record, ensure_ascii=False, default=str).encode("utf-8"))
-            if batch and batch_bytes + size > 8 * 1024 * 1024:
+            if batch and batch_bytes + size > self.bytes_por_lote:
                 self._validar_e_carregar(execucao, batch)
                 batch = []
                 batch_bytes = 0

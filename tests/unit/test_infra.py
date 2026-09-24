@@ -661,3 +661,22 @@ def test_janela_da_geracao_por_usina_alcanca_a_defasagem_da_ccee() -> None:
     match = re.search(r"ultimos_dias\s*=\s*(\d+)", bloco)
     assert match, "ultimos_dias precisa estar declarado no bloco ccee_geracao_usina"
     assert int(match.group(1)) >= 90
+
+
+def test_timeout_do_job_e_configuravel_por_conector() -> None:
+    """24/09: 3M linhas em lotes de 8 MiB (~5.900 linhas cada) estouram o timeout de 1800s.
+
+    Lote maior (32 MiB) reduz os load jobs, mas três meses de defasagem ainda
+    pedem folga: o timeout também precisa ser configurável por conector.
+    """
+    scheduler = _ler("infra/modules/scheduler/main.tf")
+
+    variavel = _bloco(scheduler, 'variable "conectores"')
+    assert _tem(r'timeout\s*=\s*optional\(string,\s*"1800s"\)', variavel)
+
+    job = _bloco(scheduler, 'resource "google_cloud_run_v2_job" "ingestao"')
+    assert _tem(r"timeout\s*=\s*each\.value\.timeout", job)
+    assert not _tem(r'timeout\s*=\s*"1800s"', job), "o job não pode mais fixar o timeout default"
+
+    bloco_ccee = _bloco(scheduler, "ccee_geracao_usina = {")
+    assert _tem(r'timeout\s*=\s*"3600s"', bloco_ccee)

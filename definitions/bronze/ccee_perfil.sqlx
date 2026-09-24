@@ -21,9 +21,9 @@ CREATE TABLE IF NOT EXISTS ${self()} (
   classe_perfil       STRING    NOT NULL OPTIONS(description="Gerador, Comercializador, Consumidor Livre, Transmissor…"),
   status_perfil       STRING    NOT NULL OPTIONS(description="ATIVO, ENCERRADO ou PERFIL ESPECIFICO"),
   categoria_agente    STRING    NOT NULL,
-  submercado          STRING        NULL OPTIONS(description="N, NE, S, SE; nulo para perfil sem submercado"),
+  submercado          STRING             OPTIONS(description="N, NE, S, SE; nulo para perfil sem submercado"),
   varejista           BOOL      NOT NULL,
-  tipo_energia        STRING        NULL,
+  tipo_energia        STRING,
 
   _ingestao_id        STRING    NOT NULL,
   _ingestao_timestamp TIMESTAMP NOT NULL,

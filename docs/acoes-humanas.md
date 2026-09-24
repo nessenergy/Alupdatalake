@@ -129,6 +129,12 @@ tabelas Bronze existem e as ingestões agendadas param de falhar.
 
 ## 1b. Ligar o `TABLE_STORAGE` no projeto — uma vez por ambiente
 
+**Feito em `dev` em 24/09, entre 09h45 e 11h.** A invocação do Dataform das
+09h45 ainda reprovou `gold.custo_consultas` com a mensagem de
+`TABLE_STORAGE` desligado; a das 11h (a *workflow config* `diario`) passou
+inteira, 141 ações, zero falhas. Falta o mesmo passo em `hml` e `prod`,
+quando os ambientes subirem.
+
 **Quem**: quem já é *Owner* do projeto (hoje, no `dev`: Thiago) ·
 **Bloqueia**: `gold.custo_consultas`, e com ela o Dataform diário, que
 termina em `FAILED` e dispara o alerta de workflow reprovado.

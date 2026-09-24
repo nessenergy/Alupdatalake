@@ -74,9 +74,27 @@ continuam pendentes de liberação do ambiente pela Alup.
 > **uma única ação reprovada**: `gold.custo_consultas`, que espera o
 > `INFORMATION_SCHEMA.TABLE_STORAGE` ligado no projeto — passo único de quem é
 > *Owner* ([`acoes-humanas.md`](acoes-humanas.md) §1b). As tabelas de Bronze
-> existem, e **a primeira carga real acontece nos agendamentos de 25/09**.
+> existem, e **a primeira carga real já aconteceu no mesmo dia**: `bcb_juros`
+> às 09h34 e as duas do TempoOK às 11h e 11h37.
 > O primeiro Dataform revelou três DDLs de Bronze com `NULL` solto, que o
 > BigQuery recusa ([#208](https://github.com/nessenergy/Alupdatalake/pull/208)).
+
+> **24/09, à tarde — o `TABLE_STORAGE` foi ligado e um efeito colateral do
+> bootstrap apareceu.** Entre 09h45 e 11h alguém com papel de *Owner* rodou o
+> passo do §1b; a *workflow config* `diario` das 11h passou inteira, 141
+> ações, zero falhas — `gold.custo_consultas` incluída. **Quatro jobs
+> públicos falharam nas primeiras horas da manhã**: `bcb_cambio_ptax` (09h),
+> `ons_carga` (08h), `ons_ear` (08h15) e `ons_ena` (08h30) rodaram antes de o
+> Dataform criar a tabela `bronze._execucoes` pela primeira vez (09h29), e a
+> gravação do log de execução falhou com `404 Not found: Table
+> bronze._execucoes` — o raw foi gravado normalmente nos quatro casos, só o
+> registro da execução que faltou. A tabela usa `CREATE TABLE IF NOT EXISTS`,
+> não é recriada a cada rodada, então não se repete: os mesmos quatro jobs
+> voltam a rodar em 25/09 e a partir daí a tabela já existe. Sem ação humana
+> — é bootstrapping de primeiro dia, não um defeito recorrente. Nenhum dos
+> quatro pôde ser reexecutado manualmente hoje: a conta pessoal não tem
+> `run.jobs.run` nos Cloud Run Jobs, e isso é o esperado — quem executa job
+> é a SA de deploy, não uma pessoa.
 
 Este arquivo responde "onde estamos e o que trava o próximo passo". Detalhe de
 escopo e estimativa fica em [`plano-execucao.md`](plano-execucao.md); o que sai

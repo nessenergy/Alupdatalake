@@ -35,7 +35,11 @@ class SessaoFalsa:
 
     def get(self, url: str) -> Resposta:
         self.chamadas.append(("GET", url, None))
+        if url.endswith(":query"):
+            return Resposta({"workflowInvocationActions": self.acoes})
         return Resposta({"state": self.estados.pop(0)})
+
+    acoes: list[dict] = []
 
 
 def test_repositorio_monta_o_nome_completo() -> None:
@@ -109,3 +113,31 @@ def test_erro_http_registra_o_corpo_da_resposta_no_log(caplog: pytest.LogCapture
         executar(SessaoComErro(), REPO, "sa", intervalo=0)
 
     assert "mensagem de erro da API do Dataform" in caplog.text
+
+
+def test_falha_nomeia_cada_acao_reprovada_e_o_motivo(caplog: pytest.LogCaptureFixture) -> None:
+    """Em 24/09 o primeiro Dataform real terminou em FAILED, e o log só dizia isso.
+
+    Sem o nome da ação e o motivo, a causa exige acesso ao console — que a
+    conta de quem opera não tem. A execução já sabe o motivo; o deploy tem de
+    dizê-lo.
+    """
+    sessao = SessaoFalsa({"name": "c1"}, ["FAILED"])
+    sessao.acoes = [
+        {"target": {"schema": "bronze", "name": "bcb_cambio_ptax"}, "state": "SUCCEEDED"},
+        {"target": {"schema": "silver", "name": "ons_carga"}, "state": "FAILED", "failureReason": "Not found: Table x"},
+        {"target": {"schema": "gold", "name": "carga_mensal"}, "state": "SKIPPED"},
+    ]
+
+    with caplog.at_level(logging.ERROR, logger="executar-dataform"):
+        assert executar(sessao, REPO, "sa", intervalo=0) == "FAILED"
+
+    assert "silver.ons_carga: Not found: Table x" in caplog.text
+    assert "bronze.bcb_cambio_ptax" not in caplog.text  # só o que reprovou
+    assert any(url.endswith("/workflowInvocations/inv1:query") for _, url, _ in sessao.chamadas)
+
+
+def test_sucesso_nao_consulta_as_acoes() -> None:
+    sessao = SessaoFalsa({"name": "c1"}, ["SUCCEEDED"])
+    assert executar(sessao, REPO, "sa", intervalo=0) == "SUCCEEDED"
+    assert not any(url.endswith(":query") for _, url, _ in sessao.chamadas)

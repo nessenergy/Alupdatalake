@@ -11,4 +11,4 @@ environment = "dev"
 # Quem grava versão de secret sem poder ler — o token do Dataform e as
 # credenciais das fontes (ADR 015, acesso de operação). Grupo da ness., nunca
 # pessoa (R01). Vazio não concede nada.
-# gravacao_segredos = ["group:<grupo>@ness.com.br"]
+gravacao_segredos = ["group:operacao-datalake@ness.com.br"]

@@ -89,9 +89,9 @@ Agora existe: `gravacao_segredos`, que dá `roles/secretmanager.secretVersionAdd
 
 1. Criar no Google Workspace da ness. um grupo para quem opera o AlupData — por
    exemplo `alupdata-operacao@ness.com.br` — com as pessoas que gravam
-   credencial.
+   credencial. **Criado em 24/09: `operacao-datalake@ness.com.br`.**
 2. Preencher no `infra/environments/dev.tfvars`:
-   `gravacao_segredos = ["group:alupdata-operacao@ness.com.br"]`, por PR.
+   `gravacao_segredos = ["group:operacao-datalake@ness.com.br"]`, por PR — **feito no #204**.
 3. Depois do deploy, gravar o token com os comandos acima.
 
 O mesmo papel destrava o `migrar_segredos`, que grava as credenciais das

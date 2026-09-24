@@ -1,0 +1,969 @@
+<!doctype html><html lang='pt-BR'><head><meta charset='utf-8'><meta name='viewport' content='width=device-width, initial-scale=1'><title>Avaliação global do projeto e próximos passos — AlupData</title><link rel='preconnect' href='https://fonts.googleapis.com'><link rel='preconnect' href='https://fonts.gstatic.com' crossorigin><link href='https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap' rel='stylesheet'><style>
+@page { size: A4; margin: 16mm 14mm 16mm 14mm; }
+
+/* O documento existe para virar A4. Declarar o esquema claro impede o
+   navegador de escurecer por conta própria e descolar tela de papel. */
+:root { color-scheme: light; }
+
+/* Imprimir do navegador (Ctrl+P → Salvar como PDF) vem com "gráficos de plano
+   de fundo" DESLIGADO por padrão. Sem isto, a faixa alternada das tabelas, o
+   fundo do `code` e o bloco de alerta somem no papel — e a etiqueta vermelha
+   do questionário vira texto branco sobre branco, isto é, invisível.
+   Forçar aqui garante que tela, --print-to-pdf e impressão manual coincidam. */
+html {
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+:root {
+  --tinta: #0f172a;
+  --suave: #475569;
+  --tenue: #94a3b8;
+  --linha: #e2e8f0;
+  --linha-fina: #eef2f6;
+  --zebra: #f8fafc;
+  --ness: #00ade8;
+  --link: #007aa3;
+  --alerta: #b3261e;
+  --fundo-alerta: #fdf3f2;
+  /* Corpo em Inter, títulos e marca em Montserrat, dado técnico em mono. */
+  --texto: Inter, "Segoe UI", system-ui, sans-serif;
+  --titulo: Montserrat, "Segoe UI", system-ui, sans-serif;
+  --mono: "JetBrains Mono", "Cascadia Mono", Consolas, monospace;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: var(--texto);
+  font-size: 9.4pt;
+  line-height: 1.55;
+  color: var(--tinta);
+  margin: 0;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ---------------------------------------------------------------- cabeçalho */
+
+.marca {
+  font-family: var(--titulo);
+  font-weight: 500;
+  font-size: 15pt;
+  letter-spacing: -0.01em;
+  margin: 0 0 2mm;
+}
+/* O ponto da marca é sempre BlueDot, em qualquer fundo. */
+.marca span { color: var(--ness); }
+
+h1 {
+  font-family: var(--titulo);
+  font-size: 17pt;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+  margin: 0 0 1mm;
+  padding-bottom: 3mm;
+  border-bottom: 2px solid var(--ness);
+}
+
+/* A primeira linha depois do h1 é a tarja de identificação do documento —
+   emissão, contrato, marco. Ela se lê como etiqueta, não como parágrafo. */
+h1 + p {
+  font-size: 8.4pt;
+  color: var(--suave);
+  margin-bottom: 5mm;
+}
+
+/* ------------------------------------------------- identificação do documento */
+
+/* Ficha do documento: quem emite, para quem, sob qual contrato, em que data.
+   Fica logo abaixo do título e não se parte entre páginas — um documento
+   contratual precisa ser identificável pela primeira folha, isolada. */
+.identificacao {
+  display: grid;
+  /* Largura suficiente para "RESPONSÁVEL TÉCNICO" caber em uma linha. */
+  grid-template-columns: 37mm 1fr;
+  gap: 1.2mm 4mm;
+  margin: 4mm 0 6mm;
+  padding: 3.5mm 4mm;
+  background: var(--zebra);
+  border-left: 2px solid var(--ness);
+  font-size: 8.4pt;
+  break-inside: avoid;
+}
+.id-rotulo {
+  font-family: var(--titulo);
+  font-size: 7.2pt;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--suave);
+  padding-top: 0.4mm;
+}
+.id-valor { color: var(--tinta); }
+
+/* ------------------------------------------------------------- fecho assinado */
+
+.assinatura {
+  margin-top: 12mm;
+  break-inside: avoid;
+}
+.assinatura .local-data {
+  font-size: 8.6pt;
+  color: var(--suave);
+  margin-bottom: 12mm;
+}
+.linha-assinatura {
+  width: 68mm;
+  border-top: 1px solid var(--tinta);
+  margin-bottom: 1.6mm;
+}
+.assina-nome {
+  font-family: var(--titulo);
+  font-weight: 500;
+  font-size: 9.4pt;
+  margin: 0;
+}
+.assina-org {
+  font-size: 8pt;
+  color: var(--suave);
+  margin: 0.4mm 0 0;
+}
+
+h2 {
+  font-family: var(--titulo);
+  font-size: 11.5pt;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  margin: 8mm 0 2.5mm;
+  padding-top: 3mm;
+  border-top: 1px solid var(--linha);
+  /* Um bloco não deve abrir no rodapé e continuar na página seguinte. */
+  break-after: avoid;
+}
+
+/* Marcador BlueDot antes do título de seção: assinatura discreta, custo zero
+   de espaço, e dá ao olho um ponto de entrada por seção. */
+h2::before {
+  content: "";
+  display: inline-block;
+  width: 1.4mm;
+  height: 1.4mm;
+  border-radius: 50%;
+  background: var(--ness);
+  margin-right: 1.8mm;
+  vertical-align: 0.4mm;
+}
+
+h3 {
+  font-family: var(--titulo);
+  font-size: 10pt;
+  font-weight: 500;
+  margin: 5mm 0 2mm;
+  break-after: avoid;
+}
+
+p { margin: 0 0 2.5mm; }
+strong { font-weight: 600; }
+code {
+  font-family: var(--mono);
+  font-size: 8.3pt;
+  background: var(--zebra);
+  border: 0.2mm solid var(--linha-fina);
+  padding: 0.3mm 1mm;
+  border-radius: 2px;
+}
+
+/* Bloco de comando ou de exemplo: é o que o leitor copia. Uma linha longa rola
+   dentro do bloco em tela e quebra na impressão, sem emendar no texto. */
+pre {
+  margin: 1.5mm 0 3mm;
+  padding: 2mm 3mm;
+  background: var(--zebra);
+  border: 0.2mm solid var(--linha-fina);
+  border-radius: 2px;
+  overflow-x: auto;
+  break-inside: avoid;
+}
+pre code {
+  background: none;
+  border: 0;
+  padding: 0;
+  white-space: pre;
+}
+@media print {
+  pre code { white-space: pre-wrap; overflow-wrap: anywhere; }
+}
+
+/* -------------------------------------------------------------------- tabela */
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0 0 4mm;
+  font-size: 8.8pt;
+  /* Número em coluna alinha por dígito, não por forma da letra. */
+  font-variant-numeric: tabular-nums;
+}
+th {
+  text-align: left;
+  font-family: var(--titulo);
+  font-weight: 600;
+  font-size: 7.6pt;
+  text-transform: uppercase;
+  /* Tracking discreto: em coluna estreita, cada 0,01em a mais é uma quebra
+     de linha a mais no cabeçalho. */
+  letter-spacing: 0.04em;
+  color: var(--suave);
+  border-bottom: 1.5px solid var(--tinta);
+  padding: 1.6mm 2mm;
+  /* Cabeçalho de coluna se lê como rótulo: melhor uma linha que duas. */
+  text-wrap: balance;
+}
+td {
+  border-bottom: 1px solid var(--linha-fina);
+  padding: 2.4mm 2mm;
+  vertical-align: top;
+}
+/* Faixa alternada: em tabela densa, o olho perde a linha sem ela. Tom baixo
+   o bastante para não competir com o texto nem pesar na impressão. */
+tbody tr:nth-child(even) td { background: var(--zebra); }
+/* A primeira coluna costuma ser a chave da linha — onda, item, código. */
+tbody td:first-child { font-weight: 500; }
+/* Uma pergunta não se parte entre páginas. */
+tr { break-inside: avoid; }
+thead { display: table-header-group; }
+
+/* Larguras de coluna do formulário: código estreito, "Resposta" com espaço de
+   escrita. Valem só no questionário — num relatório espremeriam a 1ª coluna e
+   pintariam a última sem motivo. */
+.questionario td:first-child { width: 7%; font-weight: 600; font-variant-numeric: tabular-nums; }
+.questionario th:last-child, .questionario td:last-child { width: 30%; background: #fafbfc; }
+.questionario td:nth-child(3) { width: 15%; color: var(--suave); font-size: 8.2pt; }
+
+/* --------------------------------------------------------------- destaques */
+
+.bloqueia {
+  display: inline-block;
+  background: var(--alerta);
+  color: #fff;
+  font-size: 6.8pt;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  padding: 0.4mm 1.4mm;
+  border-radius: 2px;
+  margin-right: 1.2mm;
+  vertical-align: 1px;
+}
+
+blockquote {
+  margin: 0 0 3mm;
+  padding: 2.5mm 3mm;
+  background: var(--fundo-alerta);
+  border-left: 3px solid var(--alerta);
+}
+blockquote p:last-child { margin-bottom: 0; }
+
+/* O `---` do Markdown separa as seções na fonte, mas no PDF a borda de `h2` já
+   faz esse trabalho: manter os dois empilha traços. */
+hr { display: none; }
+hr + h2 { margin-top: 7mm; }
+
+ul { margin: 0 0 3mm; padding-left: 5mm; }
+li { margin-bottom: 1.2mm; }
+
+.rodape {
+  margin-top: 8mm;
+  padding-top: 3mm;
+  border-top: 1px solid var(--linha);
+  font-size: 7.6pt;
+  color: var(--suave);
+}
+
+/* ---------------------------------------------------------------- impressão */
+
+/* Token longo — URL, nome de secret, identificador — não pode ultrapassar a
+   largura da A4 e sumir na borda do papel. `anywhere` só no `code`, onde o
+   token não tem espaço por onde quebrar; em texto corrido ele partiria
+   palavra no meio, inclusive em cabeçalho de tabela. `break-word` quebra
+   apenas a palavra que sozinha não caberia na linha. */
+code { overflow-wrap: anywhere; }
+td, th, .id-valor { overflow-wrap: break-word; }
+
+/* Nenhuma hifenização automática: em documento contratual, palavra partida
+   por hífen inventado atrapalha a leitura e a busca no PDF. */
+* { hyphens: none; }
+
+/* Título distribui o texto entre as linhas em vez de deixar uma palavra órfã
+   na última — vale para o título do documento e para os de seção. */
+h1, h2, h3 { text-wrap: balance; }
+
+/* ------------------------------------------------------------------ links */
+
+/* Link com a cor da casa, não o azul padrão do navegador. O BlueDot puro
+   (#00ade8) não passa 4,5:1 sobre branco em texto corrido; o tom escuro dele
+   passa, e o sublinhado fica claro o bastante para não pesar na linha. */
+a {
+  color: var(--link);
+  text-decoration: underline;
+  text-decoration-color: rgba(0, 122, 163, 0.35);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.18em;
+}
+a:hover { text-decoration-color: currentColor; }
+a:focus-visible { outline: 2px solid var(--ness); outline-offset: 2px; border-radius: 2px; }
+
+::selection { background: rgba(0, 173, 232, 0.18); color: var(--tinta); }
+
+/* Lista com uma pendência por linha: o espaço entre itens é o que deixa o
+   olho contar quantas são. */
+li + li { margin-top: 1.2mm; }
+
+/* ----------------------------------------------------------------- em tela */
+
+/* Só a versão de tela: no PDF a margem é da @page. Em tela o documento se
+   apresenta como folha sobre fundo, que é como ele será lido e impresso.
+   Fica DEPOIS das regras-base de propósito: antes delas, o `body { margin: 0;
+   font-size: 9.4pt }` vencia pela ordem, a folha encostava à esquerda e o corpo
+   saía menor do que o previsto. */
+@media screen {
+  html { background: var(--zebra); }
+  body {
+    max-width: 940px;
+    margin: 0 auto;
+    padding: 56px 56px 72px;
+    font-size: 15px;
+    background: #fff;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04),
+                0 10px 15px -3px rgba(15, 23, 42, 0.06);
+  }
+  table { font-size: 14px; }
+  code { font-size: 13px; }
+}
+
+/* Folha estreita (celular): a margem da folha encolhe junto, e a tabela rola
+   dentro dela em vez de empurrar a página para o lado. */
+@media screen and (max-width: 640px) {
+  body { padding: 28px 18px 40px; font-size: 15px; }
+  table { display: block; overflow-x: auto; }
+}
+
+@media print {
+  /* Uma linha solta no pé ou no topo da página é o defeito mais visível de um
+     documento impresso. Três linhas é o mínimo que se lê como parágrafo. */
+  p, li { orphans: 3; widows: 3; }
+  h1, h2, h3 { break-after: avoid; break-inside: avoid; }
+  /* Título de seção seguido de tabela: os dois andam juntos ou nenhum anda. */
+  h2 + table, h3 + table, h2 + p, h3 + p { break-before: avoid; }
+  table, blockquote { break-inside: auto; }
+  /* Link impresso vira texto: sublinhado só polui o papel. */
+  a { text-decoration: none; color: var(--tinta); }
+}
+</style></head><body class='relatorio'><p class="marca">ness<span>.</span></p><h1>Avaliação global do projeto e próximos passos</h1>
+<p><strong>Data:</strong> 24/09/2026, fim do dia · <strong>Referência:</strong> <code>main</code> em <code>96fd35e</code> e o
+ambiente <code>dev</code> consultado diretamente (BigQuery, Cloud Run, Cloud Scheduler,
+Cloud Monitoring, Dataform e IAM).</p>
+<p><strong>Como foi feita:</strong> quatro leituras independentes do repositório (conectores
+e dados; infraestrutura, segurança e operação; contrato, ondas e medição;
+documentação, governança e produto), guiadas pelas skills do projeto
+(<code>conector-alupdata</code>, <code>ssdlc-alupdata</code>, <code>gcp-alupdata</code> e <code>homologacao-onda</code>).
+A elas se somou a consulta ao ambiente real. Cada achado abaixo tem evidência
+no repositório ou no GCP. Onde algo é hipótese, o texto diz.</p>
+<p><strong>Escopo do texto:</strong> fatos, lacunas e um plano. Prazos da Alup aparecem como
+registro de data. Efeito contratual e cobrança ficam com a coordenação.</p>
+<hr />
+<h2>1. Em uma tela</h2>
+<ul>
+<li><strong>A infraestrutura existe, e os dados ainda não.</strong> O <code>dev</code> tem 159
+  recursos, o Dataform roda inteiro (141 ações, zero falhas às 11h de 24/09)
+  e o Portal está no ar. Mas <strong>só 3 das 28 tabelas Bronze têm linha, com 16
+  linhas no total</strong>. A Onda 0 fecha com três dias de carga. A Onda 1 depende
+  de rodar os 23 jobs públicos.</li>
+<li><strong>Se algo quebrar hoje, ninguém é avisado.</strong> Há 8 políticas de alerta em
+  <code>dev</code> e <strong>nenhum canal de notificação</strong>: <code>emails_alerta</code> e
+  <code>billing_account</code> estão vazios nos três <code>.tfvars</code>. Em 24/09 quatro jobs
+  falharam e o Hubspot errou 36 vezes, sem nenhum aviso.</li>
+<li><strong>O código está sólido e dois pontos de falha apareceram na primeira
+  carga.</strong> As 27 entidades têm os 7 componentes, e toda Silver tem asserção.
+  O primeiro contato com o GCP revelou duas coisas: uma falha ao gravar o log
+  de execução derruba o job sem deixar rastro, e uma mudança de formato na
+  origem zera a carga sem alarme.</li>
+<li><strong>Nenhuma onda está homologada, e a medição tem lacunas.</strong> No Project,
+  <strong>nenhum</strong> dos 71 itens tem <code>Validado = Sim</code>. Das 580h, <strong>480h não têm
+  apontamento</strong>, e as 100h lançadas têm origem a conferir.</li>
+<li><strong>O que falta da Alup está concentrado.</strong> São credenciais das Ondas 2 e 3
+  (A7 vence em 25/09), exemplos de planilha, orçamento, grupos do IAP e o
+  billing export. Nada disso impede fechar as Ondas 0 e 1.</li>
+</ul>
+<h2>2. Placar por onda</h2>
+<table>
+<thead>
+<tr>
+<th>Onda</th>
+<th>Prazo contratual</th>
+<th>Pronto em código</th>
+<th>Em dado real</th>
+<th>O que separa do dossiê</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0 — Fundação</td>
+<td>11/09 (postergado por A3)</td>
+<td>tudo</td>
+<td><code>bcb_juros</code> desde 24/09</td>
+<td>3 dias de <code>SUCESSO</code>, replay no GCS real, Portal com uma Gold (dossiê previsto para 30/09)</td>
+</tr>
+<tr>
+<td>1 — Mercado base</td>
+<td>16/10</td>
+<td>23 entidades públicas</td>
+<td>nenhuma</td>
+<td>carga dos 23 jobs, Gold com linha, janela em <code>hml</code> (dossiê previsto para 07/10)</td>
+</tr>
+<tr>
+<td>2 — APIs credenciadas</td>
+<td>13/11</td>
+<td>4 conectores</td>
+<td>TempoOK ENA em dia</td>
+<td>Hubspot e BBCE; acervo do TempoOK; destino das 32h do item 2.1</td>
+</tr>
+<tr>
+<td>3 — Sistemas internos</td>
+<td>18/12</td>
+<td>caminho de banco e orquestração</td>
+<td>—</td>
+<td>VPN e credenciais das quatro fontes (A7)</td>
+</tr>
+<tr>
+<td>4 — Planilhas e handoff</td>
+<td>08/01/2027</td>
+<td>motor S2, catálogo, plano do glossário</td>
+<td>—</td>
+<td>exemplos de planilha, glossário, runbook de incidente, handoff</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Das 13 fontes contratuais, 8 já têm pelo menos uma entidade escrita</strong>:
+BCB, IBGE, ANEEL, ONS, CCEE dados abertos, BBCE, Hubspot e TempoOK — BBCE e
+Hubspot ainda sem credencial. <strong>As 5 restantes não têm nenhuma, todas por
+falta de insumo</strong>: CCEE credenciada, Oracle FMB, Portal Alup, MySQL RDS e
+RM/TOTVS. As planilhas da Onda 4 correm à parte: o motor está pronto e falta
+o template. Juntas, as Ondas 2 e 3 somam 265h, ou 45,7% do contrato.</p>
+<hr />
+<h2>3. Achados</h2>
+<p>Severidade: <strong>Alta</strong> trava onda ou esconde falha; <strong>Média</strong> custa retrabalho
+ou medição; <strong>Baixa</strong> é higiene.</p>
+<h3>3.1 Operação e observabilidade</h3>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Sev.</th>
+<th>Achado</th>
+<th>Evidência</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>O1</td>
+<td>Alta</td>
+<td>Alertas sem destinatário. As 8 políticas existem e têm zero canais. O destinatário da Alup foi informado em 11/09 (E3), mas não entrou nos <code>.tfvars</code></td>
+<td>Cloud Monitoring de <code>dev</code>; <code>infra/environments/*.tfvars</code></td>
+</tr>
+<tr>
+<td>O2</td>
+<td>Alta</td>
+<td>Ninguém consegue disparar um job à mão. <code>run.jobs.run</code> só está com a SA de deploy. As Tarefas 1.2, 3.1 e 3.3 do plano de fechamento supõem uma pessoa rodando <code>gcloud run jobs execute</code></td>
+<td>403 ao tentar em 24/09</td>
+</tr>
+<tr>
+<td>O3</td>
+<td>Alta</td>
+<td>Fontes sem credencial geram erro contínuo. O Hubspot falha a cada 6h (36 erros em 24/09), e o BBCE vai falhar em todo dia útil. Quando o alerta ligar, vira ruído, e o aviso real se perde</td>
+<td>Cloud Logging de 24/09</td>
+</tr>
+<tr>
+<td>O4</td>
+<td>Média</td>
+<td>As 18 entidades semanais e mensais não têm alerta de silêncio, por causa do teto de janela do Cloud Monitoring (<a href="https://github.com/nessenergy/Alupdatalake/issues/188">#188</a>, sem decisão)</td>
+<td><code>infra/modules/monitoramento/main.tf</code>, output <code>fontes_sem_alerta_de_silencio</code></td>
+</tr>
+<tr>
+<td>O5</td>
+<td>Média</td>
+<td>A sincronização automática do quadro falha desde 24/09: o secret <code>alupdata-github-quadro-app-key</code> não tem versão. O runbook ainda descreve o comportamento antigo, que terminava em aviso</td>
+<td>run <code>36022283872</code>; <code>docs/runbook/acompanhamento-semanal.md</code></td>
+</tr>
+<tr>
+<td>O6</td>
+<td>Média</td>
+<td>Nenhum orçamento ativo. Falta o valor por ambiente (<a href="https://github.com/nessenergy/Alupdatalake/issues/87">#87</a>), e o teto da E2 é US$ 20/mês até novembro</td>
+<td><code>infra/modules/monitoramento/custo.tf</code></td>
+</tr>
+</tbody>
+</table>
+<h3>3.2 Conectores e dados</h3>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Sev.</th>
+<th>Achado</th>
+<th>Evidência</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>D1</td>
+<td>Alta</td>
+<td>Uma falha ao gravar <code>bronze._execucoes</code> derruba o job com <code>exit 1</code>, e <strong>não fica nenhuma linha de <code>ERRO</code></strong>. Foi o que escondeu os 4 jobs de 24/09</td>
+<td><code>src/core/conector.py:119</code>; <code>src/core/bigquery.py:96-115</code></td>
+</tr>
+<tr>
+<td>D2</td>
+<td>Alta</td>
+<td>Uma mudança de formato na origem zera a carga sem alarme. Em 24/09 o BCB parou de enviar <code>tipoBoletim</code> (<a href="https://github.com/nessenergy/Alupdatalake/pull/215">#215</a> corrigiu), e 100% das linhas viraram inválidas. Nenhuma regra dispara quando uma execução com linhas extraídas termina com <code>linhas_carregadas = 0</code></td>
+<td><code>src/core/conector.py:152-166</code></td>
+</tr>
+<tr>
+<td>D3</td>
+<td>Média</td>
+<td>22 das 27 entidades não têm teste contra a API real que possa ser repetido. A evidência de que "fala com a origem" vem de dry-run manual, e mudanças como a do BCB só aparecem na carga de produção</td>
+<td><code>tests/integration/</code></td>
+</tr>
+<tr>
+<td>D4</td>
+<td>Média</td>
+<td>Não há um de-para publicado entre as 13 fontes contratuais e as 27 entidades. A medição é por onda e fonte, e o relatório pode confundir as duas contagens</td>
+<td><code>docs/plano-execucao.md</code> §3.1; <code>docs/dicionario-dados/README.md</code></td>
+</tr>
+<tr>
+<td>D5</td>
+<td>Baixa</td>
+<td>O checklist da skill pede teste de idempotência por entidade, e nenhuma tem. Na prática, a garantia vem da asserção <code>uniqueKey</code> da Silver: o controle existe, só é outro</td>
+<td><code>.claude/skills/conector-alupdata</code></td>
+</tr>
+<tr>
+<td>D6</td>
+<td>Baixa</td>
+<td>O índice do dicionário ainda fala em 26 entidades e na data de 18/09</td>
+<td><code>docs/dicionario-dados/README.md</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Pontos confirmados como bons:</strong> as 27 entidades têm os 7 componentes; toda
+Bronze é particionada; toda Silver tem asserção; a Gold depende das
+asserções, com teste de grafo no CI; o HTTP tem retry; o raw permite replay.</p>
+<h3>3.3 Infraestrutura e segurança</h3>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Sev.</th>
+<th>Achado</th>
+<th>Evidência</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>S1</td>
+<td>Média</td>
+<td>A rotação do token do TempoOK está vencida pelo critério da própria ADR 020, que a queria logo depois de A3 (atendida em 23/09)</td>
+<td>ADR 020; <code>acoes-humanas.md</code> §2</td>
+</tr>
+<tr>
+<td>S2</td>
+<td>Média</td>
+<td>O RIPD tem pendências da ness.: R02 (procedimento de eliminação), R08 (revogação de acesso no handoff) e <strong>R09 (envio semanal do SAST/SCA à Alup, ainda não implementado)</strong>. R01 e R06 dependem da Alup ou da Onda 3</td>
+<td><code>docs/lgpd/ripd.md</code></td>
+</tr>
+<tr>
+<td>S3</td>
+<td>Média</td>
+<td>O <code>deploy.yml</code> roda só por <code>workflow_dispatch</code> e não repete os testes. As ações novas de autenticação (v3), atualizadas em 24/09, ainda não rodaram num deploy real</td>
+<td><code>.github/workflows/deploy.yml</code></td>
+</tr>
+<tr>
+<td>S4</td>
+<td>Baixa</td>
+<td>O log de auditoria de acesso a dados retém 30 dias; o RIPD propõe 1 ano. Depende de a política de retenção ser aprovada</td>
+<td><code>docs/runbook/deploy.md</code>; R07</td>
+</tr>
+<tr>
+<td>S5</td>
+<td>Baixa</td>
+<td><code>prod</code> não tem bootstrap. É o previsto (virada depois das Ondas 0 e 1), mas depende do orçamento (#87)</td>
+<td><code>infra/bootstrap/terraform.tfstate.d/</code></td>
+</tr>
+<tr>
+<td>S6</td>
+<td>Baixa, <strong>corrigido nesta avaliação</strong></td>
+<td>Os arquivos de plano do Terraform sem extensão (<code>tfplan</code>, <code>tfplan-dev</code>) e o PDF do brand book da Alup não estavam no <code>.gitignore</code></td>
+<td><code>.gitignore</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Pontos confirmados como bons:</strong> todas as ações do CI estão pinadas por SHA,
+com <code>permissions</code> mínimas; o WIF é sem chave; o IAM é por recurso e o acesso
+de pessoas é por grupo; o Portal falha fechado sem IAP; o bucket raw tem
+versionamento e bloqueio público; o state do bootstrap está protegido pelo
+<code>.gitignore</code>.</p>
+<h3>3.4 Contrato e medição (registro de fato)</h3>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Sev.</th>
+<th>Achado</th>
+<th>Evidência</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>C1</td>
+<td>Alta</td>
+<td>Zero itens com <code>Validado = Sim</code> no Project. O campo que separa entrega de aceite nunca foi usado</td>
+<td><code>gh project item-list 2</code>, 71 itens, 33 <code>Done</code></td>
+</tr>
+<tr>
+<td>C2</td>
+<td>Alta</td>
+<td>480h das 580h não têm apontamento em <code>Horas</code>. As 100h lançadas (7 itens, em 08/09) seguem a regra antiga de atribuir o orçamento à entrega, e a origem está marcada "a conferir"</td>
+<td>Project; <code>status.md</code> §4</td>
+</tr>
+<tr>
+<td>C3</td>
+<td>Alta</td>
+<td>O item 2.1 (CCEE credenciado, 32h) está <code>Todo</code> e sem destino. A decisão só está prevista para 07/10, e o dossiê da Onda 2 sai em 23/10</td>
+<td>Project; plano de fechamento D2</td>
+</tr>
+<tr>
+<td>C4</td>
+<td>Média</td>
+<td>27 entidades para 13 fontes contratuais. A conciliação com a planilha da proposta depende dos exemplos (A12/G3)</td>
+<td><code>status.md</code> §3</td>
+</tr>
+<tr>
+<td>C5</td>
+<td>Registro</td>
+<td>A7 vence em 25/09 sem número de chamado registrado. A9 (Hubspot) venceu em 11/09</td>
+<td><code>status.md</code> §6</td>
+</tr>
+</tbody>
+</table>
+<h3>3.5 Documentação, governança e produto</h3>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Sev.</th>
+<th>Achado</th>
+<th>Evidência</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>G1</td>
+<td>Alta</td>
+<td>O <code>README.md</code> parou em 18/09 e diz que "não há carga real em GCP", quando o <code>dev</code> está no ar desde 23/09. É a porta de entrada do repositório para a Alup e para o time do handoff</td>
+<td><code>README.md:138-142</code></td>
+</tr>
+<tr>
+<td>G2</td>
+<td>Média</td>
+<td>O <code>plano-semanal.md</code> parou na S4, sem fechamento, e não registra a virada de 23 e 24/09. Os três documentos de acompanhamento estão desalinhados</td>
+<td><code>docs/plano-semanal.md</code></td>
+</tr>
+<tr>
+<td>G3</td>
+<td>Média</td>
+<td>Não há runbook de incidente, só de diagnóstico: falta dizer quem é avisado, com que severidade e o que reprocessar primeiro. O próprio <code>observabilidade.md</code> registra a falta</td>
+<td><code>docs/runbook/observabilidade.md:82-88</code></td>
+</tr>
+<tr>
+<td>G4</td>
+<td>Média</td>
+<td>A RACI por domínio (lacuna 2) está aberta e sem data</td>
+<td><code>docs/interlocutores.md:95</code></td>
+</tr>
+<tr>
+<td>G5</td>
+<td>Média</td>
+<td>O domínio Planejamento não tem fonte nem Gold. Depende de RM/TOTVS e das planilhas</td>
+<td><code>docs/arquitetura/dominios-analiticos.md:219-233</code></td>
+</tr>
+<tr>
+<td>G6</td>
+<td>Baixa</td>
+<td>O cabeçalho "Estado atual" do <code>AGENTS.md</code> diz 18/09, e o texto abaixo dele já é de 23/09. A issue #95 e o item #1 do Project não refletem 23 e 24/09</td>
+<td><code>AGENTS.md:195</code>; Project</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>4. Plano sugerido</h2>
+<p>Ordem por efeito: primeiro o que esconde falha ou trava onda, depois medição,
+depois handoff. As horas são estimativa de trabalho da ness.</p>
+<h3>Horizonte 1 — esta semana, até 26/09</h3>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Ação</th>
+<th>Resolve</th>
+<th>Dono</th>
+<th>Esforço</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><strong>Ligar os alertas em <code>dev</code> para o grupo da ness.</strong> (<code>emails_alerta = ["operacao-datalake@ness.com.br"]</code>). O e-mail da Alup entra em <code>hml</code> e <code>prod</code>, depois de o ruído sair</td>
+<td>O1</td>
+<td>ness.</td>
+<td>0,5h</td>
+</tr>
+<tr>
+<td>2</td>
+<td><strong>Tirar o agendamento das fontes sem credencial em <code>dev</code></strong>: Hubspot, BBCE e, enquanto não houver acervo, o boletim do TempoOK. Uma variável de exclusão no módulo <code>scheduler</code>, com teste. O job continua existindo e roda à mão quando a credencial chegar</td>
+<td>O3</td>
+<td>ness.</td>
+<td>2h</td>
+</tr>
+<tr>
+<td>3</td>
+<td><strong>Criar um workflow <code>Executar ingestão</code></strong> (<code>workflow_dispatch</code>, com conector e janela como entrada), que roda o job com a SA de deploy por WIF. Fica auditável no GitHub e não amplia o IAM de pessoas. Destrava as Tarefas 1.2, 3.1 e 3.3 do plano de fechamento</td>
+<td>O2</td>
+<td>ness.</td>
+<td>3h</td>
+</tr>
+<tr>
+<td>4</td>
+<td><strong>Tornar visível a falha de <code>registrar_execucao</code></strong>: um retry curto e, se ainda falhar, log <code>ERROR</code> estruturado com o <code>ingestao_id</code> e as contagens antes de sair. Com teste que simula o 404 de 24/09</td>
+<td>D1</td>
+<td>ness.</td>
+<td>3h</td>
+</tr>
+<tr>
+<td>5</td>
+<td><strong>Alerta de "extraiu, mas não carregou nada"</strong>: uma métrica de log para <code>linhas_extraidas &gt; 0</code> e <code>linhas_carregadas = 0</code>, com o mesmo canal do item 1. Pega a próxima mudança de formato como a do BCB</td>
+<td>D2</td>
+<td>ness.</td>
+<td>2h</td>
+</tr>
+<tr>
+<td>6</td>
+<td><strong>Registrar A7 em 26/09</strong>, com chamado e responsável se houver. É só o fato e a data</td>
+<td>C5</td>
+<td>ness.</td>
+<td>0,5h</td>
+</tr>
+<tr>
+<td>7</td>
+<td><strong>Gravar a chave do GitHub App do quadro no Secret Manager</strong> e corrigir o runbook. A alternativa é desligar o agendamento até a chave existir</td>
+<td>O5</td>
+<td>Ricardo</td>
+<td>0,5h</td>
+</tr>
+</tbody>
+</table>
+<h3>Horizonte 2 — até 09/10: fechar as Ondas 0 e 1</h3>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Ação</th>
+<th>Resolve</th>
+<th>Dono</th>
+<th>Esforço</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>8</td>
+<td>Seguir as Fases 0 a 3 do <a href="2026-09-24-fechamento-das-ondas.md">plano de fechamento</a>, com o workflow do item 3 no lugar do <code>gcloud</code> manual: 3 dias de carga, replay, Portal com dado real e deploy do #216, dossiê da Onda 0 em 30/09, carga dos 23 jobs públicos, janela em <code>hml</code> e dossiê da Onda 1 em 07/10</td>
+<td>ondas 0 e 1</td>
+<td>ness.</td>
+<td>já estimado no plano</td>
+</tr>
+<tr>
+<td>9</td>
+<td><strong>Publicar o de-para entre as 13 fontes e as 27 entidades</strong>, uma tabela em <code>docs/dicionario-dados/README.md</code> e no dossiê. A medição passa a falar a língua do contrato</td>
+<td>D4, C4</td>
+<td>ness.</td>
+<td>1h</td>
+</tr>
+<tr>
+<td>10</td>
+<td><strong>Definir a fonte das horas</strong>: quem aponta, onde e com que periodicidade. Conferir a origem das 100h antes do dossiê da Onda 0</td>
+<td>C2</td>
+<td>coordenação</td>
+<td>decisão</td>
+</tr>
+<tr>
+<td>11</td>
+<td><strong>Usar <code>Validado = Sim</code></strong> no aceite de cada dossiê, item a item</td>
+<td>C1</td>
+<td>coordenação</td>
+<td>contínuo</td>
+</tr>
+<tr>
+<td>12</td>
+<td><strong>Antecipar a decisão das 32h do item 2.1 para 30/09</strong>, junto do dossiê da Onda 0, em vez de 07/10</td>
+<td>C3</td>
+<td>coordenação com a Alup</td>
+<td>decisão</td>
+</tr>
+<tr>
+<td>13</td>
+<td><strong>Pôr a documentação em dia em uma passada</strong>: <code>README.md</code>, fechamento da S4 no <code>plano-semanal.md</code>, cabeçalho do <code>AGENTS.md</code>, índice do dicionário, issue #95 e item #1 do Project</td>
+<td>G1, G2, G6, D6</td>
+<td>ness.</td>
+<td>2h</td>
+</tr>
+<tr>
+<td>14</td>
+<td><strong>Rotacionar o token do TempoOK</strong> com o fornecedor, gravando direto no Secret Manager</td>
+<td>S1</td>
+<td>ness. com o fornecedor</td>
+<td>1h</td>
+</tr>
+</tbody>
+</table>
+<h3>Horizonte 3 — até o dossiê da Onda 2 (23/10)</h3>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Ação</th>
+<th>Resolve</th>
+<th>Esforço</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>15</td>
+<td><strong>Decidir e implementar o #188</strong>, com a opção (a) recomendada: um vigia diário que lê <code>gold.saude_ingestao</code> e avisa quando uma fonte semanal ou mensal passa do prazo</td>
+<td>O4</td>
+<td>4h</td>
+</tr>
+<tr>
+<td>16</td>
+<td><strong>Canário semanal contra a origem real</strong> para as fontes públicas: dry-run de um dia por entidade, em job agendado, com alerta se o schema recusar. Troca a descoberta em produção por uma em teste</td>
+<td>D3</td>
+<td>6h</td>
+</tr>
+<tr>
+<td>17</td>
+<td><strong>Hubspot e BBCE</strong>: quando a credencial chegar, religar o agendamento (item 2), rodar a integração e ajustar</td>
+<td>Onda 2</td>
+<td>4h + 6h</td>
+</tr>
+<tr>
+<td>18</td>
+<td><strong>Implementar o R09 do RIPD</strong>: um resumo semanal de SAST e SCA gerado pelo CI, pronto para envio à Alup</td>
+<td>S2</td>
+<td>3h</td>
+</tr>
+<tr>
+<td>19</td>
+<td><strong>Glossário como código</strong>, pelo <a href="2026-09-24-glossario-como-codigo.md">plano pronto</a></td>
+<td>Onda 4</td>
+<td>4h</td>
+</tr>
+</tbody>
+</table>
+<h3>Horizonte 4 — Ondas 3 e 4, e handoff</h3>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Ação</th>
+<th>Resolve</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>20</td>
+<td>Uma fonte interna por plano, na ordem em que o acesso chegar. O MySQL RDS dispensa VPN e vem primeiro</td>
+<td>Onda 3</td>
+</tr>
+<tr>
+<td>21</td>
+<td>Runbook de incidente: severidade, quem é avisado, o que reprocessar primeiro. Parte do que o <code>observabilidade.md</code> já descreve</td>
+<td>G3</td>
+</tr>
+<tr>
+<td>22</td>
+<td>R02 (eliminação) e R08 (revogação de acesso no handoff) escritos como procedimento</td>
+<td>S2</td>
+</tr>
+<tr>
+<td>23</td>
+<td>Um passo de teste no <code>deploy.yml</code> antes do <code>apply</code>, ou a exigência de CI verde no commit do deploy</td>
+<td>S3</td>
+</tr>
+<tr>
+<td>24</td>
+<td>Retenção de 1 ano do log de auditoria, quando a política for aprovada</td>
+<td>S4</td>
+</tr>
+<tr>
+<td>25</td>
+<td>Virada de <code>prod</code> depois do aceite das Ondas 0 e 1, com o orçamento definido</td>
+<td>S5</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Esforço dos Horizontes 1 e 3 (itens da ness.):</strong> cerca de 11h e 27h. Nenhum
+depende da Alup.</p>
+<hr />
+<h2>5. Decisões que estão com você</h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Decisão</th>
+<th>Recomendação</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Para onde vão os alertas agora</td>
+<td>o grupo <code>operacao-datalake@ness.com.br</code> em <code>dev</code>; o endereço da Alup só em <code>hml</code> e <code>prod</code>, depois do item 2</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Como disparar um job à mão</td>
+<td>o workflow do item 3. A alternativa é dar ao grupo de operação <code>roles/run.jobsExecutorWithOverrides</code> em <code>dev</code> — mais rápido, mas é acesso de pessoa a execução</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Pausar o agendamento das fontes sem credencial</td>
+<td>sim, até a credencial chegar</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Antecipar a decisão das 32h do item 2.1 para 30/09</td>
+<td>sim</td>
+</tr>
+<tr>
+<td>5</td>
+<td>Fonte e regra das horas</td>
+<td>definir antes do dossiê da Onda 0</td>
+</tr>
+<tr>
+<td>6</td>
+<td>Extrair o conteúdo da previsão de ENA do TempoOK (domínio Meteorologia)</td>
+<td>conferir primeiro se está no escopo da proposta. Hoje o conector arquiva o arquivo sem abri-lo</td>
+</tr>
+</tbody>
+</table>
+<h2>6. O que já foi feito junto com esta avaliação</h2>
+<ul>
+<li><code>.gitignore</code>: passam a ser ignorados os arquivos de plano do Terraform sem
+  extensão e os PDFs fora de <code>docs/</code>, como o brand book da Alup, que não pode
+  ser versionado.</li>
+</ul><p class="rodape">ness. Processos e Tecnologia Ltda. · CNPJ 72.027.097/0001-37 · Contrato CPS-01025/2026 — AlupData Fase 1: DataLake</p></body></html>

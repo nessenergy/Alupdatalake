@@ -645,3 +645,19 @@ def test_carga_zerada_por_registro_invalido_dispara_alerta() -> None:
     assert "google_logging_metric.carga_zerada.name" in alerta
     assert _tem(r"threshold_value\s*=\s*0\b", alerta)
     assert "google_monitoring_notification_channel.email" in alerta
+
+
+def test_janela_da_geracao_por_usina_alcanca_a_defasagem_da_ccee() -> None:
+    """24/09: em 40 dias, zero linhas.
+
+    O job mensal (dia 7) usava `ultimos_dias = 40`, na premissa de que a CCEE
+    publica o mês fechado logo. Mas em 24/09 o recurso mensal mais recente no
+    CKAN da CCEE (`geracao_horaria_usina`) era `202607` — defasagem de cerca
+    de dois meses. Com janela de 40 dias (agosto e setembro), a execução de
+    24/09 extraiu zero linhas com status SUCESSO: o job nunca alcançava um
+    mês publicado.
+    """
+    bloco = _bloco(_ler("infra/modules/scheduler/main.tf"), "ccee_geracao_usina = {")
+    match = re.search(r"ultimos_dias\s*=\s*(\d+)", bloco)
+    assert match, "ultimos_dias precisa estar declarado no bloco ccee_geracao_usina"
+    assert int(match.group(1)) >= 90

@@ -104,10 +104,16 @@ variable "conectores" {
     }
     ccee_geracao_usina = {
       # Um recurso gzip de 61 MB por mês, ~3 milhões de linhas. Roda de
-      # madrugada, um dia depois das entidades mensais leves, com janela que
-      # alcança o mês fechado e o anterior (recontabilização, ADR 016).
-      # `ultimos_dias` 40, não 70: 40 cobre um mês fechado inteiro mais folga,
-      # sem abrir um quarto recurso mensal.
+      # madrugada, um dia depois das entidades mensais leves.
+      #
+      # A CCEE publica o mês com cerca de dois meses de defasagem: em 24/09
+      # o recurso mensal mais recente no CKAN (`geracao_horaria_usina`) era
+      # 202607. `ultimos_dias` 40 não alcançava essa defasagem — a execução
+      # de 24/09 extraiu zero linhas com status SUCESSO. `ultimos_dias` 100
+      # alcança o mês publicado mais recente e o anterior (recontabilização,
+      # ADR 016) — em geral três recursos mensais — e cabe no `timeout` de
+      # 1800s do job: cada mês leva cerca de 3 minutos só na extração,
+      # medido em dry-run.
       #
       # `memoria` deixou de ser premissa. Medido em 15/09 com o mês de julho
       # (2.964.096 registros), somando processo e filhos: o runner em fatias
@@ -118,7 +124,7 @@ variable "conectores" {
       # medição do dry-run não inclui o payload que o `load_table_from_json`
       # monta por fatia, que é o que a folga cobre.
       cron         = "0 3 7 * *"
-      ultimos_dias = 40
+      ultimos_dias = 100
       memoria      = "1Gi"
       cpu          = "2"
     }

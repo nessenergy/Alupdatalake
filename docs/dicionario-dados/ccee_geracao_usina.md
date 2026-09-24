@@ -130,12 +130,14 @@ o nome da coluna descritivo, não `_mwh`.
   ~4 GB de dicts), acima do limite padrão de 512Mi do Cloud Run Job. Batching
   por fatia no runner resolveria de vez, mas é mudança de framework, fora
   desta fila (`docs/proximos-passos.md` §4).
-- Por isso a janela de agendamento passou de 70 para **40 dias** (um mês
-  fechado inteiro mais folga, sem abrir um quarto mês) e o job desta entidade
-  ganhou `memoria = "4Gi"`, `cpu = "2"` no Terraform — **premissa declarada**,
-  a confirmar no primeiro `apply` real, porque o pico de memória do lote
-  materializado ainda não foi medido contra a API real.
-- Se a CCEE republicar um mês, a janela de agendamento de 40 dias (cobrindo o
+- A CCEE publica o mês com cerca de dois meses de defasagem: em 24/09/2026 o
+  recurso mensal mais recente no CKAN era `202607`. Com `ultimos_dias = 40` a
+  execução de 24/09 extraiu zero linhas com status `SUCESSO` — a janela nunca
+  alcançava um mês publicado. Por isso a janela de agendamento passou para
+  **100 dias** (o mês publicado mais recente e o anterior, recontabilização
+  ADR 016 — em geral três recursos mensais), dentro do `timeout` de 1800s do
+  job (cada mês leva cerca de 3 minutos só na extração, medido em dry-run).
+- Se a CCEE republicar um mês, a janela de agendamento de 100 dias (cobrindo o
   mês fechado e o anterior) alcança a nova publicação sem intervenção manual.
 - `PERIODO_COMERCIALIZACAO` não numérico ou fora do mês, e `DATA` em formato
   diferente de `dd/mm/aaaa`, contam como `linhas_invalidas` — nunca derrubam a

@@ -218,6 +218,7 @@ PAPEL_POR_RECURSO = {
     "google_iap_": "roles/iap.admin",
     "google_monitoring_": "roles/monitoring.editor",
     "google_logging_metric": "roles/logging.configWriter",
+    "google_dataplex_": "roles/dataplex.admin",
     "google_workflows_": "roles/workflows.admin",
 }
 

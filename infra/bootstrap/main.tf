@@ -86,6 +86,7 @@ locals {
     "roles/secretmanager.admin",               # secrets vazios e o IAM de cada um
     "roles/serviceusage.serviceUsageConsumer", # agentes de serviço do Dataform e do IAP
     "roles/storage.admin",                     # bucket raw, o IAM dele e o state
+    "roles/dataplex.admin",                    # lake, zonas e ativos do catálogo, ADR 014
     "roles/workflows.admin",                   # fluxo da Onda 3, ADR 017
   ]
 

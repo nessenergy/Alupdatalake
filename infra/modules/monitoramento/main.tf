@@ -128,6 +128,34 @@ resource "google_logging_metric" "registros_invalidos" {
   }
 }
 
+# A execução extraiu e não carregou nada: todos os registros inválidos. O
+# runner registra isso em WARNING com a fonte (`src/core/conector.py`).
+resource "google_logging_metric" "carga_zerada" {
+  project = var.project_id
+  name    = "alupdata_carga_zerada"
+
+  filter = <<-EOT
+    resource.type="cloud_run_job"
+    severity="WARNING"
+    jsonPayload.message=~"nenhuma linha carregada"
+  EOT
+
+  metric_descriptor {
+    metric_kind = "DELTA"
+    value_type  = "INT64"
+    unit        = "1"
+
+    labels {
+      key        = "fonte"
+      value_type = "STRING"
+    }
+  }
+
+  label_extractors = {
+    "fonte" = "EXTRACT(jsonPayload.fonte)"
+  }
+}
+
 # ------------------------------------------------------------------ alertas
 
 # 1. O job falhou.
@@ -281,6 +309,47 @@ resource "google_monitoring_alert_policy" "invalidos_em_alta" {
 
       Compare o payload bruto no bucket raw com o schema Pydantic do conector.
       Se a origem mudou de verdade, incremente `schema_versao`.
+    EOT
+    mime_type = "text/markdown"
+  }
+}
+
+# 3b. Carga zerada: a execução é SUCESSO, extraiu linhas e não carregou nenhuma.
+# O alerta de inválidos em alta só dispara acima de 100 por hora; em 24/09 o
+# BCB tirou um campo, 3 de 3 viraram inválidos e a carga zerou em silêncio.
+resource "google_monitoring_alert_policy" "carga_zerada" {
+  project      = var.project_id
+  display_name = "AlupData ${var.environment} — carga zerada por registro inválido"
+  combiner     = "OR"
+
+  conditions {
+    display_name = "Execução extraiu registros e não carregou nenhum"
+
+    condition_threshold {
+      filter          = "metric.type = \"logging.googleapis.com/user/${google_logging_metric.carga_zerada.name}\" AND resource.type = \"cloud_run_job\""
+      comparison      = "COMPARISON_GT"
+      threshold_value = 0
+      duration        = "0s"
+
+      aggregations {
+        alignment_period   = "300s"
+        per_series_aligner = "ALIGN_SUM"
+      }
+    }
+  }
+
+  notification_channels = [for canal in google_monitoring_notification_channel.email : canal.id]
+
+  documentation {
+    content   = <<-EOT
+      Uma execução terminou como SUCESSO sem carregar nenhuma linha: tudo que
+      a origem devolveu foi recusado pelo schema. Quase sempre a origem mudou
+      de formato.
+
+      Veja no log os avisos "registro inválido descartado" da mesma execução,
+      compare o payload no bucket raw com o schema do conector e corrija com
+      teste. O raw guardado permite reprocessar a janela depois
+      (`reprocessar-raw`), sem chamar a origem de novo.
     EOT
     mime_type = "text/markdown"
   }

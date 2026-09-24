@@ -621,3 +621,24 @@ def test_fonte_sem_credencial_fica_fora_do_agendamento_mas_o_job_existe() -> Non
 def test_alertas_de_dev_vao_para_o_grupo_de_operacao() -> None:
     dev = _ler("infra/environments/dev.tfvars")
     assert _tem(r'emails_alerta\s*=\s*\["operacao-datalake@ness\.com\.br"\]', dev)
+
+
+def test_carga_zerada_por_registro_invalido_dispara_alerta() -> None:
+    """24/09: o BCB tirou um campo, 3 de 3 viraram inválidos e ninguém soube.
+
+    O alerta de inválidos em alta só dispara acima de 100 por hora; carga
+    zerada precisa de um sinal próprio, na primeira ocorrência.
+    """
+    mensagem = "nenhuma linha carregada"
+    assert mensagem in _ler("src/core/conector.py"), "o alerta lê essa frase do log"
+
+    monitoramento = _ler("infra/modules/monitoramento/main.tf")
+    metrica = _bloco(monitoramento, 'resource "google_logging_metric" "carga_zerada"')
+    assert 'severity="WARNING"' in metrica
+    assert f'jsonPayload.message=~"{mensagem}"' in metrica
+    assert "EXTRACT(jsonPayload.fonte)" in metrica
+
+    alerta = _bloco(monitoramento, 'resource "google_monitoring_alert_policy" "carga_zerada"')
+    assert "google_logging_metric.carga_zerada.name" in alerta
+    assert _tem(r"threshold_value\s*=\s*0\b", alerta)
+    assert "google_monitoring_notification_channel.email" in alerta

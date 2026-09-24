@@ -11,6 +11,7 @@ tela: **qual é a próxima ação, de quem é, e qual comando a executa.**
 - [`plano-execucao.md`](plano-execucao.md) — escopo e estimativa por onda
 - [`acoes-humanas.md`](acoes-humanas.md) — **como** se executa o que exige uma pessoa: token, credencial, decisão e pedido à Alup
 - **este arquivo** — a fila, com dono e comando
+- [`planos/2026-09-24-fechamento-das-ondas.md`](planos/2026-09-24-fechamento-das-ondas.md) — as fases até o dossiê de cada onda, com datas e condições
 
 Quando um item fecha, sai da fila ativa; os registros datados abaixo são
 históricos. As ações externas da seção 2 ficam com a coordenação da ness.,

@@ -59,6 +59,8 @@ CI/CD, portal base):**
   Bronze, view Silver, view Gold, testes, agendamento e documentação com
   linhagem
 - Dicionário de dados e linhagem atualizados
+- Portões de segurança do pipeline (CI) aprovados
+- Recursos de nuvem versionados e aplicados no ambiente da onda
 - Reprocessamento (replay) demonstrado em pelo menos uma fonte
 - Portal com uma consulta real na camada final
 - Evidências reunidas: plano de infraestrutura sem alterações pendentes,
@@ -67,6 +69,8 @@ CI/CD, portal base):**
 **Onda 1 — APIs públicas (CCEE InfoMercado, ONS, ANEEL, IBGE, câmbio BCB):**
 - As 23 entidades públicas da onda com os sete componentes e execução com
   sucesso
+- Portões de segurança do pipeline (CI) aprovados
+- Recursos de nuvem versionados e aplicados no ambiente da onda
 - Mesmos critérios de dicionário, linhagem, reprocessamento e evidências da
   Onda 0, aplicados a cada fonte da onda
 - De-para entre as fontes do contrato e as entidades entregues, para conferir
@@ -104,8 +108,9 @@ passo, se for útil. Prazo que propomos: **12/10**.
 credencial de agente que hoje não temos — é escopo diferente do InfoMercado
 público, já entregue na Onda 1. Vemos dois caminhos: (a) solicitar essa
 credencial junto à CCEE, ou (b) realocar as 32h para os conjuntos públicos da
-CCEE já entregues, o que o contrato permite. Preferimos alinhar esse ponto na
-própria reunião de 01/10, junto com o restante da pauta.
+CCEE já entregues, o que o contrato permite. Pedimos a posição da Alup **até
+30/09, junto com a entrega dos dossiês**; se não for possível até lá,
+tratamos na reunião de 01/10.
 
 Abraço,
 Ricardo Esper — ness.

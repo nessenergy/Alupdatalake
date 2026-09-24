@@ -219,6 +219,9 @@ PAPEL_POR_RECURSO = {
     "google_monitoring_": "roles/monitoring.editor",
     "google_logging_metric": "roles/logging.configWriter",
     "google_dataplex_": "roles/dataplex.admin",
+    # Prefixo mais longo vence: o catálogo de aspectos tem papel próprio, e
+    # `dataplex.admin` não inclui `dataplex.aspectTypes.create`.
+    "google_dataplex_aspect_type": "roles/dataplex.catalogEditor",
     "google_workflows_": "roles/workflows.admin",
 }
 

@@ -24,28 +24,12 @@ destrava. Os comandos foram executados ou conferidos em 23/09, no ambiente
 
 ---
 
-## 0. Reativar o GitHub Actions — parou por cota, não por código
+## 0. ~~Reativar o GitHub Actions~~ — resolvido em 24/09
 
-**Quem**: ness., quem administra a organização no GitHub · **Bloqueia**: todo
-merge e todo deploy · **Desde**: 24/09, 03h
-
-O job `Testes pytest` deixou de iniciar, com esta anotação do próprio GitHub:
-
-> The job was not started because recent account payments have failed or your
-> spending limit needs to be increased.
-
-Não é falha de teste: o job não chega a rodar. Conferido repetindo a execução,
-que reprovou de novo sem iniciar. Como a `main` exige as seis verificações
-(ADR 010), **nenhum PR mergeia enquanto isso durar** — e o workflow de deploy
-também depende de runner.
-
-1. Abrir *Settings → Billing & plans* da organização `nessenergy`.
-2. Conferir pagamento recusado e o limite de gasto do Actions.
-3. Regularizar ou elevar o limite.
-4. Reexecutar os jobs reprovados: `gh run rerun <id> --failed`.
-
-**Deu certo quando**: `gh pr checks <numero>` volta a mostrar as oito
-verificações verdes, e o PR mergeia.
+Parou por cota às 03h e voltou no fim da manhã, com a cobrança regularizada.
+Se voltar a acontecer, o sintoma é o job que não inicia, com a anotação de
+pagamento recusado ou limite de gasto atingido: *Settings → Billing & plans*
+da organização `nessenergy`, depois `gh run rerun <id> --failed`.
 
 ---
 
@@ -140,6 +124,25 @@ gh workflow run deploy.yml -f environment=dev -f module=all
 **Deu certo quando**: o passo do Dataform no workflow termina verde, e
 `terraform output repositorio_dataform` deixa de ser vazio. Depois disso as
 tabelas Bronze existem e as ingestões agendadas param de falhar.
+
+---
+
+## 1b. Ligar o `TABLE_STORAGE` no projeto — uma vez por ambiente
+
+**Quem**: quem já é *Owner* do projeto (hoje, no `dev`: Thiago) ·
+**Bloqueia**: `gold.custo_consultas`, e com ela o Dataform diário, que
+termina em `FAILED` e dispara o alerta de workflow reprovado.
+
+É opção de projeto, não recurso: o Terraform não a cobre, e o único papel
+predefinido que permite é `bigquery.admin` — poder demais para a SA de deploy.
+
+```bash
+bq query --use_legacy_sql=false --project_id=alupar-dev-alupdata   'ALTER PROJECT `alupar-dev-alupdata` SET OPTIONS (`region-us-central1.enable_info_schema_storage` = TRUE)'
+```
+
+**Deu certo quando**: o próximo deploy termina com o Dataform em `SUCCEEDED`.
+O histórico de armazenamento leva cerca de um dia para aparecer no painel de
+custo.
 
 ---
 

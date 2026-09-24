@@ -184,16 +184,22 @@ depende da Alup.
 
 ---
 
-## 5. Decisões que estão com você
+## 5. Decisões
 
-| # | Decisão | Recomendação |
-|---|---|---|
-| 1 | Para onde vão os alertas agora | o grupo `operacao-datalake@ness.com.br` em `dev`; o endereço da Alup só em `hml` e `prod`, depois do item 2 |
-| 2 | Como disparar um job à mão | o workflow do item 3. A alternativa é dar ao grupo de operação `roles/run.jobsExecutorWithOverrides` em `dev` — mais rápido, mas é acesso de pessoa a execução |
-| 3 | Pausar o agendamento das fontes sem credencial | sim, até a credencial chegar |
-| 4 | Antecipar a decisão das 32h do item 2.1 para 30/09 | sim |
-| 5 | Fonte e regra das horas | definir antes do dossiê da Onda 0 |
-| 6 | Extrair o conteúdo da previsão de ENA do TempoOK (domínio Meteorologia) | conferir primeiro se está no escopo da proposta. Hoje o conector arquiva o arquivo sem abri-lo |
+**Todas as recomendações foram aceitas pelo Ricardo em 24/09**, inclusive a
+opção (a) do #188 (item 15).
+
+| # | Decisão | Recomendação aceita | Onde está |
+|---|---|---|---|
+| 1 | Para onde vão os alertas agora | o grupo `operacao-datalake@ness.com.br` em `dev`; o endereço da Alup só em `hml` e `prod`, depois do item 2 | [#220](https://github.com/nessenergy/Alupdatalake/pull/220) |
+| 2 | Como disparar um job à mão | o workflow `Executar ingestão`, com a SA de deploy, sem ampliar o IAM de pessoas | [#221](https://github.com/nessenergy/Alupdatalake/pull/221); o plano de fechamento já usa o workflow |
+| 3 | Pausar o agendamento das fontes sem credencial | sim, até a credencial chegar: Hubspot, BBCE e o boletim do TempoOK em `dev` | [#220](https://github.com/nessenergy/Alupdatalake/pull/220) |
+| 4 | Antecipar a decisão das 32h do item 2.1 | pedir a posição da Alup em 30/09, junto do dossiê da Onda 0 | D2 do plano de fechamento; coordenação com a Alup |
+| 5 | Fonte e regra das horas | definir quem aponta, onde e com que periodicidade, e conferir as 100h, antes do dossiê da Onda 0 (30/09) | coordenação |
+| 6 | Extrair o conteúdo da previsão de ENA do TempoOK (domínio Meteorologia) | conferir primeiro se está no escopo da proposta; fora dele, é aditivo | coordenação, antes de qualquer código |
+
+Os itens 4 e 5 do Horizonte 1 (falha de registro visível e alerta de carga
+zerada) estão em [#222](https://github.com/nessenergy/Alupdatalake/pull/222).
 
 ## 6. O que já foi feito junto com esta avaliação
 

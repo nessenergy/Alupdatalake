@@ -919,13 +919,16 @@ depois handoff. As horas são estimativa de trabalho da ness.</p>
 <p><strong>Esforço dos Horizontes 1 e 3 (itens da ness.):</strong> cerca de 11h e 27h. Nenhum
 depende da Alup.</p>
 <hr />
-<h2>5. Decisões que estão com você</h2>
+<h2>5. Decisões</h2>
+<p><strong>Todas as recomendações foram aceitas pelo Ricardo em 24/09</strong>, inclusive a
+opção (a) do #188 (item 15).</p>
 <table>
 <thead>
 <tr>
 <th>#</th>
 <th>Decisão</th>
-<th>Recomendação</th>
+<th>Recomendação aceita</th>
+<th>Onde está</th>
 </tr>
 </thead>
 <tbody>
@@ -933,34 +936,42 @@ depende da Alup.</p>
 <td>1</td>
 <td>Para onde vão os alertas agora</td>
 <td>o grupo <code>operacao-datalake@ness.com.br</code> em <code>dev</code>; o endereço da Alup só em <code>hml</code> e <code>prod</code>, depois do item 2</td>
+<td><a href="https://github.com/nessenergy/Alupdatalake/pull/220">#220</a></td>
 </tr>
 <tr>
 <td>2</td>
 <td>Como disparar um job à mão</td>
-<td>o workflow do item 3. A alternativa é dar ao grupo de operação <code>roles/run.jobsExecutorWithOverrides</code> em <code>dev</code> — mais rápido, mas é acesso de pessoa a execução</td>
+<td>o workflow <code>Executar ingestão</code>, com a SA de deploy, sem ampliar o IAM de pessoas</td>
+<td><a href="https://github.com/nessenergy/Alupdatalake/pull/221">#221</a>; o plano de fechamento já usa o workflow</td>
 </tr>
 <tr>
 <td>3</td>
 <td>Pausar o agendamento das fontes sem credencial</td>
-<td>sim, até a credencial chegar</td>
+<td>sim, até a credencial chegar: Hubspot, BBCE e o boletim do TempoOK em <code>dev</code></td>
+<td><a href="https://github.com/nessenergy/Alupdatalake/pull/220">#220</a></td>
 </tr>
 <tr>
 <td>4</td>
-<td>Antecipar a decisão das 32h do item 2.1 para 30/09</td>
-<td>sim</td>
+<td>Antecipar a decisão das 32h do item 2.1</td>
+<td>pedir a posição da Alup em 30/09, junto do dossiê da Onda 0</td>
+<td>D2 do plano de fechamento; coordenação com a Alup</td>
 </tr>
 <tr>
 <td>5</td>
 <td>Fonte e regra das horas</td>
-<td>definir antes do dossiê da Onda 0</td>
+<td>definir quem aponta, onde e com que periodicidade, e conferir as 100h, antes do dossiê da Onda 0 (30/09)</td>
+<td>coordenação</td>
 </tr>
 <tr>
 <td>6</td>
 <td>Extrair o conteúdo da previsão de ENA do TempoOK (domínio Meteorologia)</td>
-<td>conferir primeiro se está no escopo da proposta. Hoje o conector arquiva o arquivo sem abri-lo</td>
+<td>conferir primeiro se está no escopo da proposta; fora dele, é aditivo</td>
+<td>coordenação, antes de qualquer código</td>
 </tr>
 </tbody>
 </table>
+<p>Os itens 4 e 5 do Horizonte 1 (falha de registro visível e alerta de carga
+zerada) estão em <a href="https://github.com/nessenergy/Alupdatalake/pull/222">#222</a>.</p>
 <h2>6. O que já foi feito junto com esta avaliação</h2>
 <ul>
 <li><code>.gitignore</code>: passam a ser ignorados os arquivos de plano do Terraform sem

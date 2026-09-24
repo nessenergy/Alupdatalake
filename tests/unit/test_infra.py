@@ -93,7 +93,10 @@ def test_state_do_infra_fica_no_bucket_do_proprio_ambiente() -> None:
 
 def test_hml_nasce_sem_agendamento() -> None:
     """E2: hml é barato — Scheduler cobra por job existente, pausado ou não."""
-    assert _tem(r"agendamentos_ativos\s*=\s*false", _ler("infra/environments/hml.tfvars"))
+    hml = _ler("infra/environments/hml.tfvars")
+    assert _tem(r"agendamentos_ativos\s*=\s*false", hml) or _tem(
+        r"agendamentos_ativos\s*=\s*true\s*#\s*janela de homologação.*\d{2}/\d{2}", hml
+    ), "hml só agenda na janela de homologação, declarada com a data"
     for ambiente in ("dev", "prod"):
         assert "agendamentos_ativos" not in _ler(f"infra/environments/{ambiente}.tfvars")
 

@@ -144,6 +144,21 @@ continuam pendentes de liberação do ambiente pela Alup.
 > e 1 juntos em **29–30/09**, aceite conjunto em **~01/10**
 > ([plano de aceleração](planos/2026-09-24-aceleracao-do-faturamento.md)).
 
+> **24/09, madrugada — a geração por usina da CCEE carregada, e mais três
+> defeitos da primeira carga.** A carga de julho/2026 de `ccee_geracao_usina`
+> (~3 milhões de linhas) revelou três problemas, cada um corrigido com teste:
+> o lote de 8 MiB fazia ~5.900 linhas por carga e o mês estourava o tempo
+> limite do job (#231: teto configurável por conector, 32 MiB na geração); a
+> Silver recusava 7 de 1,7 milhão de linhas com geração levemente negativa,
+> que é real — a CCEE publica geração líquida, e o consumo auxiliar deixa o
+> valor abaixo de zero (#232: condição `>= -10`); e o tempo medido de um mês,
+> 1650 s, não cabia na hora prevista para a janela de 100 dias (#233: tempo
+> limite de 7200 s). Com as três correções, **julho carregou inteiro:
+> 2.964.096 linhas, zero inválidas**, e o Dataform passou. As **22 tabelas
+> Gold de mercado têm linhas** em `dev`; as vazias são as que esperam insumo
+> da Alup (BBCE, Hubspot, acervo do TempoOK) e três views operacionais.
+> `main` em `88ae32d`.
+
 Este arquivo responde "onde estamos e o que trava o próximo passo". Detalhe de
 escopo e estimativa fica em [`plano-execucao.md`](plano-execucao.md); o que sai
 em cada semana, em [`plano-semanal.md`](plano-semanal.md); os relatórios emitidos

@@ -89,6 +89,14 @@ resource "google_cloud_run_v2_service" "portal" {
   ingress     = "INGRESS_TRAFFIC_ALL"
   iap_enabled = true
 
+  # O Portal não guarda estado: lê BigQuery e devolve HTML. Recriá-lo custa um
+  # deploy, não um dado. Com a proteção ligada — o padrão do provider — o apply
+  # trava no dia em que o serviço precisa ser substituído, que foi o que
+  # aconteceu em 23/09, quando a revisão anterior ficou de pé mas sem subir:
+  # "cannot destroy service without setting deletion_protection=false".
+  # A proteção que importa está no dado, e essa fica nos datasets e no bucket.
+  deletion_protection = false
+
   template {
     service_account = google_service_account.portal.email
 

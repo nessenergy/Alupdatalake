@@ -1,7 +1,7 @@
 # Plano de Execução — AlupData Fase 1: DataLake
 
 Contrato CPS-01025/2026 · 580h · 19 semanas · 5 ondas
-Linha de base: 2026-08-25 · referências e situação revisadas em 2026-09-18
+Linha de base: 2026-08-25 · referências e situação revisadas em 2026-09-24
 
 Situação de execução, atualizada a cada entrega: [`status.md`](status.md).
 
@@ -56,9 +56,9 @@ Marco 1 — 15,52% · R$ 23.040,00
 | 0.10 | Definir os **8 domínios analíticos** a partir das respostas | 8h | 0.9 | **Concluído em 14/09** — [`arquitetura/dominios-analiticos.md`](arquitetura/dominios-analiticos.md). Os domínios são os da resposta ao B1: 8 domínios em 11 linhas, porque três têm responsáveis distintos por subtemas. A1 respondeu outra pergunta — o que o lake responde como um todo — e é dele, via A2, que sai a ordem de entrega |
 | 0.11 | Fechar as **dimensões comuns Silver** contra fontes reais | 6h | 0.9, 0.10 | **Concluído em 14/09** — regra por dimensão em [`arquitetura/visao-geral.md`](arquitetura/visao-geral.md), com as regras D3 a D7 do questionário e **duas lacunas nomeadas**: o de-para de usina (Alup) e o mês CCEE (ness.) |
 | 0.12 | Matriz RACI e data owners por domínio | 4h | **Alup** nomear | RACI publicada; cada fonte com dono nomeado |
-| 0.13 | Provisionar o ambiente GCP `dev`: projeto, APIs, WIF, Artifact Registry, backend do state | 8h | **Alup** criar `dev` primeiro, vincular billing e conceder papéis; **ness.** executar bootstrap (ADR 015). `hml` e `prod` seguem sem bloquear o primeiro apply em `dev` | `terraform apply` limpo; Dataform executado pelo deploy (`make dataform-compile` confere compilação local) |
-| 0.14 | Primeiro deploy real: imagem publicada, job agendado, BCB rodando diariamente | 6h | 0.13 | 3 dias consecutivos com `status = SUCESSO` em `bronze._execucoes` |
-| 0.15 | Portal MVP com autenticação (escopo mínimo da cláusula 4ª) | 8h → **tela pronta**, falta ligar no BigQuery e publicar | 0.13 | Login funcionando; uma tabela Gold visível. Escopo cravado na ADR 005; roda hoje com provedor simulado |
+| 0.13 | Provisionar o ambiente GCP `dev`: projeto, APIs, WIF, Artifact Registry, backend do state | 8h → **concluído em 23/09**: bootstrap e primeiro `apply` em `dev`; `hml` com bootstrap | **Alup** criar `dev` primeiro, vincular billing e conceder papéis; **ness.** executar bootstrap (ADR 015). `hml` e `prod` seguem sem bloquear o primeiro apply em `dev` | `terraform apply` limpo; Dataform executado pelo deploy (`make dataform-compile` confere compilação local) |
+| 0.14 | Primeiro deploy real: imagem publicada, job agendado, BCB rodando diariamente | 6h → **em validação**: imagem publicada e 27 jobs em `dev` desde 23/09; BCB com `SUCESSO` desde 24/09 | 0.13 | 3 dias consecutivos com `status = SUCESSO` em `bronze._execucoes` (25 a 27/09) |
+| 0.15 | Portal MVP com autenticação (escopo mínimo da cláusula 4ª) | 8h → **publicado em `dev` atrás do IAP**, ligado no BigQuery, com o grupo de operação liberado (24/09); falta mostrar uma Gold com dado real | 0.13 | Login funcionando; uma tabela Gold visível. Escopo cravado na ADR 005; roda hoje com provedor simulado |
 | — | **Homologação da Onda 0** | — | tudo acima | Evidências reunidas (ver `homologacao-onda`) |
 
 **Riscos da onda**
@@ -85,8 +85,8 @@ ela é o colchão do cronograma.
 | 1.4 | **IBGE IPCA** | 12h | baixa | **Concluído.** Período mensal, payload aninhado |
 | 1.5 | **BCB câmbio** | — | — | **Concluído na Onda 0** como conector de referência |
 | 1.6 | Tabelas Gold do domínio de mercado (ADR 012) | 16h | — | Depende dos 8 domínios (0.10) |
-| 1.7 | Agendamento e monitoramento das 4 fontes | 8h | — | Job + Scheduler por fonte; alerta em falha |
-| 1.8 | Ajustes no framework revelados pelas fontes reais | 4h | — | Reserva deliberada: a 2ª fonte é quem testa o framework de verdade |
+| 1.7 | Agendamento e monitoramento das 4 fontes | 8h → **aplicado em `dev`**: 24 disparos no Scheduler e 9 alertas com destinatário desde 24/09 | — | Job + Scheduler por fonte; alerta em falha |
+| 1.8 | Ajustes no framework revelados pelas fontes reais | 4h → **em uso**: a primeira carga em 24/09 revelou o formato novo do BCB (#215), o limite de casas do `NUMERIC` (#223) e a falha invisível do registro de execução (#222) | — | Reserva deliberada: a 2ª fonte é quem testa o framework de verdade |
 
 **Ordem executada**: BCB → IBGE → ANEEL → ONS. Cada uma exercitou um formato
 diferente (diário, mensal aninhado, cadastro paginado, CSV anual) e o framework

@@ -303,24 +303,25 @@ Faturamento é por **homologação da Onda** (cláusula 6ª) — carga real em B
 e aceitação da Alup, não volume de código. **Nenhuma onda homologou ainda.** A
 coluna "técnico" abaixo é a nossa leitura de prontidão de trabalho, calculada
 sobre as horas do plano de execução; não é métrica rastreada formalmente no
-quadro. Na consulta de 18/09, os sete lançamentos de `Horas` somam 100h,
+quadro. Na consulta de 24/09, os sete lançamentos de `Horas` somam 100h,
 com **origem a conferir**; não são horas realizadas comprovadas. As estimativas
 abaixo usam os pesos orçados dos itens tecnicamente prontos, não apontamento
 de tempo, quantidade de cartões ou PRs.
 
 | Onda | Escopo | Técnico | Situação |
 |---|---|---|---|
-| 0 — Fundação | 90h · marco 15,52% | **~82%** | Framework, CI/CD, domínios, dimensões comuns e RACI entregues (peso estimado de ~74h do plano, não horas realizadas). Restam itens com peso estimado de ~16h — provisionar o GCP, 1º deploy, ligar o portal — **desbloqueados em 23/09** com a liberação do ambiente; passam a ser trabalho da ness. (N3) |
-| 1 — Mercado base | 120h · marco 20,69% | **escopo original 100%** | As 4 fontes públicas + CCEE planejadas estão entregues. As sete novas entidades do ONS (15/09) e as nove entidades da ADR 021 (14/09) ampliam a cobertura técnica considerada na estimativa original; a conciliação com as **120h orçadas** e as 13 fontes continua pendente — por demanda dos domínios do B1, não porque a onda pedisse |
-| 2 — APIs credenciadas | 110h · marco 18,97% | **~50% escrito, 0% executável** | Hubspot, TempoOK e BBCE têm os 7 componentes escritos contra documentação, não contra API real credenciada. O TempoOK conversou com a origem e, desde 21/09, **tem um produto em dia** (previsão de ENA, `tempook_ena_prevs`); o boletim segue travado pelo acervo (#129). Esse indicador não representa horas realizadas nem percentual de homologação |
+| 0 — Fundação | 90h · marco 15,52% | **~95%** | Tudo entregue e, desde 23/09, **aplicado em `dev`**: 159 recursos, Dataform com as 141 ações sem falha, Portal atrás do IAP com o grupo de operação (#216). **Carga real desde 24/09**: `bcb_juros` e `bcb_cambio_ptax`, a fonte de referência. Resta a validação dos itens 0.14 e 0.15: três dias seguidos de `SUCESSO` (25 a 27/09), replay contra o GCS real e o Portal mostrando uma Gold. Dossiê previsto para **30/09** ([plano de fechamento](planos/2026-09-24-fechamento-das-ondas.md)) |
+| 1 — Mercado base | 120h · marco 20,69% | **escopo original 100%; carga real iniciada** | As 23 entidades públicas estão escritas e agendadas em `dev`. **Três já carregaram de verdade em 24/09** — `ons_carga`, `ons_ear` e `ons_ena` (116, 120 e 120 linhas, zero inválidas). A primeira carga revelou dois defeitos, corrigidos no mesmo dia: o BCB mudou de formato (#215) e o `NUMERIC` recusava float do ONS (#223). As outras 20 carregam pelo workflow `Executar ingestão` (#221), sem esperar o agendamento mensal. Depois vêm a Gold com linha e a janela em `hml`. Dossiê previsto para **07/10**, antes do prazo de 16/10. A conciliação das 27 entidades com as **13 fontes** e as 120h continua pendente |
+| 2 — APIs credenciadas | 110h · marco 18,97% | **~50% escrito; um produto em carga real** | A previsão de ENA do TempoOK carrega em `dev` desde 24/09 (4 arquivos por dia). Hubspot e BBCE têm os 7 componentes e esperam credencial; **saíram do agendamento de `dev` em 24/09** (#220), com os jobs mantidos. O boletim do TempoOK segue sem acervo (#129). O destino das 32h do item 2.1 será pedido à Alup em **30/09**. Dossiê em **23/10** se Hubspot e BBCE chegarem até 12/10. Esse indicador não representa horas realizadas nem percentual de homologação |
 | 3 — Sistemas internos | 155h · marco 26,72% | **~6%** | Caminho de banco pronto (ADR 008: Oracle, MySQL e SQL Server, drivers puro-Python, testado sem rede) e, desde 23/09, a **orquestração do item 3.5 entregue** (peso estimado de 10h de 155h): o fluxo do Cloud Workflows existe em `infra/modules/orquestracao` e não cria recurso enquanto a cadeia estiver vazia. **Nenhuma fonte iniciada** — bloqueadas por VPN e credencial (A7, vence 25/09). O ambiente deixou de ser parte do problema em 23/09: com os projetos criados, a rota de rede entre o GCP e a rede da Alup passa a ser configurável assim que a VPN for liberada |
-| 4 — Planilhas e handoff | 105h · marco 18,10% | **~38%** | Motor S2 Data Intake pronto e, desde 23/09, o **lake, as zonas e os ativos do Knowledge Catalog** (parte do item 4.3, peso estimado de ~10h de 20h; faltam *aspect types* e glossário, que descrevem conteúdo) (peso estimado de ~30h de 105h, não horas realizadas), adiantado por não depender de insumo. O resto é sequencial — Knowledge Catalog e handoff dependem das outras ondas; Gold sem KPI nesta fase (ADR 012), templates dependem da G3 (#142, vence 18/09) |
+| 4 — Planilhas e handoff | 105h · marco 18,10% | **~40%** | Motor S2 Data Intake pronto; lake, zonas, ativos e *aspect types* do Knowledge Catalog aplicados em 23/09; **bucket de entrada** para as planilhas criado (#211), com os exemplos pedidos à Alup até 01/10; **plano do glossário como código** pronto em 24/09 (provider já cobre o recurso). Faltam os templates (G3/#142), o glossário, as anotações, o runbook de incidente e o handoff. Gold sem KPI nesta fase (ADR 012) |
 
-> **Leitura da tabela.** Quatro das cinco ondas já têm entrega técnica. O que
-> nenhuma linha acima mede é homologação: onda fecha por aceitação e carga
-> real, não por volume de código nem por percentual de horas. O projeto está
-> simultaneamente adiantado em entrega e parado em homologação — e o segundo
-> é o que define o marco de faturamento (cláusula 6ª).
+> **Leitura da tabela.** Quatro das cinco ondas já têm entrega técnica, e
+> desde 24/09 as Ondas 0, 1 e 2 têm **carga real em BigQuery**. O que nenhuma
+> linha acima mede é homologação: onda fecha por aceitação e carga real, não
+> por volume de código nem por percentual de horas. Nenhuma onda homologou; a
+> Onda 0 é a primeira com dossiê previsto (30/09). Datas e condições de cada
+> dossiê estão no [plano de fechamento](planos/2026-09-24-fechamento-das-ondas.md).
 
 ---
 

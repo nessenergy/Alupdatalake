@@ -135,11 +135,11 @@ uv run alupdata ingerir ons_carga --de 2026-01-01 --ate 2026-01-31 --dry-run
 
 ## Progresso por Onda
 
-Em **18/09/2026**, há **26 entidades implementadas** dentro do acompanhamento das
-**13 fontes contratuais**: 23 verificadas com dados reais em dry-run, TempoOK com
-contrato da API verificado e BBCE/Hubspot aguardando credencial. Não há carga
-real em GCP nem homologação registrada. A3 tem previsão de 18/09, ainda sem
-confirmação de entrega; o prazo original de 04/09 permanece registrado.
+Em **24/09/2026**, há **27 entidades implementadas** dentro do acompanhamento das
+**13 fontes contratuais**. A Alup liberou o GCP em 23/09, e o ambiente `dev` está
+provisionado, com Dataform e Portal no ar. **A carga real começou em 24/09**
+(BCB, ONS e a previsão de ENA do TempoOK); BBCE e Hubspot aguardam credencial.
+Nenhuma onda homologou ainda: o dossiê da Onda 0 está previsto para 30/09.
 
 Detalhes e evidências em [docs/status.md](docs/status.md) e no
 [Project 2](https://github.com/orgs/nessenergy/projects/2).

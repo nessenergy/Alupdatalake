@@ -4,7 +4,7 @@ O **componente 07** do contrato: cada fonte entrega, junto do conector e das
 views, a documentação de campos e a linhagem origem → Bronze → Silver → Gold.
 Este índice diz o que já existe, o que falta e — importante — **por que falta**.
 
-Em **18/09/2026**, o índice cobre **26 entidades em 25 dicionários de fonte**
+Em **24/09/2026**, o índice cobre **27 entidades em 26 dicionários de fonte**
 (eólico e fotovoltaico compartilham um documento), além de **2 dicionários
 técnicos**. Bases reutilizáveis não entram nessa contagem. O contrato mantém
 **13 fontes**; entidade implementada não cria uma fonte contratual nova.

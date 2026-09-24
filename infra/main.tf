@@ -107,6 +107,19 @@ resource "google_project_iam_member" "pessoas_jobs" {
   member  = "group:${each.value}"
 }
 
+# Leitura do projeto inteiro para quem opera: configuração, logs, execuções de
+# job e metadado de segredo — **sem o valor de segredo nenhum**, que `viewer`
+# não inclui (`secretmanager.versions.access` fica de fora). Somado ao
+# `grupo_operacao`, que dá o dado das três camadas, é o que falta para conferir
+# carga e investigar falha sem console de ninguém. Só group:/domain: (R01).
+resource "google_project_iam_member" "leitura_projeto" {
+  for_each = toset(var.leitura_projeto)
+
+  project = var.project_id
+  role    = "roles/viewer"
+  member  = each.value
+}
+
 # ------------------------------------------------------------------- auditoria
 
 # R07 do RIPD: quem leu e quem gravou dado no BigQuery e no Cloud Storage. O

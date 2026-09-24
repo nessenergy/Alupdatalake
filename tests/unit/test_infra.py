@@ -564,3 +564,21 @@ def test_gravacao_de_segredo_e_por_grupo_e_sem_leitura() -> None:
 
     principal = _ler("infra/main.tf")
     assert principal.count("gravacao_segredos      = var.gravacao_segredos") == 2
+
+
+def test_leitura_do_projeto_e_por_grupo_e_nao_le_segredo() -> None:
+    """Quem opera precisa ler o projeto para conferir carga e investigar falha.
+
+    `roles/viewer` dá configuração, logs, jobs e metadado de segredo, mas não o
+    valor (`secretmanager.versions.access` fica de fora) — é o que torna o papel
+    aceitável para pessoas. Concedido a grupo, nunca a pessoa (R01).
+    """
+    variavel = _bloco(_ler("infra/variables.tf"), 'variable "leitura_projeto"')
+    assert "validation" in variavel and "group:" in variavel
+
+    principal = _ler("infra/main.tf")
+    bloco = _bloco(principal, 'resource "google_project_iam_member" "leitura_projeto"')
+    assert 'role    = "roles/viewer"' in bloco
+    assert "var.leitura_projeto" in bloco
+    # Nada de papel que leia segredo por esse caminho.
+    assert "secretmanager" not in bloco and "roles/owner" not in bloco and "roles/editor" not in bloco

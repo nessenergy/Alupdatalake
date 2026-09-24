@@ -116,7 +116,28 @@ class Conector(ABC):
                 logger.critical("[%s] falha adicional ao registrar a execução com erro", self.rotulo, exc_info=True)
             raise
 
-        registrar_execucao(execucao)
+        try:
+            registrar_execucao(execucao)
+        except Exception:
+            # A falha sobe (sem evidência operacional não há sucesso), mas o
+            # que foi extraído e carregado fica no log: em 24/09 um 404 em
+            # `_execucoes` derrubou o job sem dizer se a Bronze recebeu linha.
+            logger.error(
+                "[%s] execução não registrada em _execucoes: %d extraídos, %d inválidos, %d carregados",
+                self.rotulo,
+                execucao.linhas_extraidas,
+                execucao.linhas_invalidas,
+                execucao.linhas_carregadas,
+            )
+            raise
+        if execucao.linhas_extraidas and not execucao.linhas_carregadas and not get_settings().dry_run:
+            # Tudo inválido costuma ser mudança de formato na origem (o BCB
+            # tirou `tipoBoletim` em 24/09): a execução é SUCESSO e a carga zera.
+            logger.warning(
+                "[%s] nenhuma linha carregada: %d extraídos, todos inválidos",
+                self.rotulo,
+                execucao.linhas_extraidas,
+            )
         # Replay não passa por aqui: a aresta origem → Bronze já foi registrada
         # pela ingestão original (ADR 013).
         emitir_linhagem(execucao, self.origem_linhagem)

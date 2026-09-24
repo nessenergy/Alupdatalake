@@ -194,3 +194,52 @@ def test_ingestao_real_conserva_datas_e_decimais_apos_raw(espiao, monkeypatch):
     result = c.ingerir(Janela.de_texto("2026-01-01", "2026-01-01"))
     assert result.linhas_carregadas == result.linhas_extraidas == 1
     assert result.linhas_invalidas == 0
+
+
+def test_falha_ao_registrar_a_execucao_deixa_as_contagens_no_log(espiao, monkeypatch, caplog):
+    """24/09: o 404 em `_execucoes` derrubou o job sem dizer o que foi carregado."""
+
+    def recusar(_execucao):
+        raise RuntimeError("404 Not found: Table bronze._execucoes")
+
+    monkeypatch.setattr("src.core.conector.registrar_execucao", recusar)
+    conector = espiao["conector"]["c"] = ConectorFatiado(total=3)
+
+    with caplog.at_level("ERROR"), pytest.raises(RuntimeError, match="404"):
+        conector.ingerir(Janela.de_texto("2026-01-01", "2026-01-01"))
+
+    erros = [r.getMessage() for r in caplog.records if r.levelname == "ERROR"]
+    assert any("execução não registrada" in m and "3 extraídos" in m and "3 carregados" in m for m in erros), erros
+
+
+def test_extrair_e_nao_carregar_nada_avisa(espiao, caplog):
+    """Mudança de formato na origem torna tudo inválido: a carga zera sem erro."""
+    conector = espiao["conector"]["c"] = ConectorFatiado(total=3, invalidos=frozenset({0, 1, 2}))
+
+    with caplog.at_level("WARNING"):
+        execucao = conector.ingerir(Janela.de_texto("2026-01-01", "2026-01-01"))
+
+    assert execucao.status == "SUCESSO"
+    avisos = [r.getMessage() for r in caplog.records if r.levelname == "WARNING"]
+    assert any("nenhuma linha carregada" in m for m in avisos), avisos
+
+
+def test_janela_sem_registro_nao_avisa_carga_vazia(espiao, caplog):
+    conector = espiao["conector"]["c"] = ConectorFatiado(total=0)
+
+    with caplog.at_level("WARNING"):
+        conector.ingerir(Janela.de_texto("2026-01-01", "2026-01-01"))
+
+    assert not any("nenhuma linha carregada" in r.getMessage() for r in caplog.records)
+
+
+def test_dry_run_nao_avisa_carga_vazia(espiao, monkeypatch, caplog):
+    """Dry-run valida sem carregar: zero carregado ali é o esperado."""
+    monkeypatch.setenv("DRY_RUN", "true")
+    monkeypatch.setattr("src.core.conector.carregar_bronze", lambda _e, _linhas: 0)
+    conector = espiao["conector"]["c"] = ConectorFatiado(total=3)
+
+    with caplog.at_level("WARNING"):
+        conector.ingerir(Janela.de_texto("2026-01-01", "2026-01-01"))
+
+    assert not any("nenhuma linha carregada" in r.getMessage() for r in caplog.records)

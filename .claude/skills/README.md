@@ -27,15 +27,32 @@ copiada por `uv run python -m scripts.sync_skills_google`:
 | `gcloud` | guardrails da CLI |
 | `cloud-run-basics` | orquestração das Ondas 1–2 (ADR 004) |
 | `google-cloud-waf-cost-optimization` | custo de infra é da contratante (cláusula 5ª) |
+| `datalineage-bigquery-asset-impact-analysis` | o que quebra a jusante se uma tabela mudar — linhagem das ADRs 013 e 014 |
 
 **Precedência**: as do Google ensinam o produto; as do projeto dizem como *este
 contrato* usa o produto. Onde conflitarem — nomenclatura, particionamento,
 segredos, o que vai em cada camada — **vale a do projeto**. Não edite os
 arquivos em `google/`: a próxima sincronização sobrescreve.
 
-Skills de ondas futuras (`managed-airflow-dag-authoring` na Onda 3,
-`datalineage-*` e `iam-helper-*` na Onda 4) entram acrescentando o nome à
-`SHORTLIST` em `scripts/sync_skills_google.py`.
+Outras entram acrescentando o nome à `SHORTLIST` em
+`scripts/sync_skills_google.py` — `iam-helper-*` na Onda 4, por exemplo.
+`managed-airflow-dag-authoring` saiu do horizonte: a Onda 3 orquestra em Cloud
+Workflows (ADR 017).
+
+> **A `bigquery-basics` pede prefixo de atribuição em todo comando `gcloud`**
+> desde a revisão `2a1e454`. Neste projeto ele **não** se aplica — ver
+> `gcp-alupdata`, que tem precedência.
+
+## Skills da HashiCorp e do GitHub (vendorizadas)
+
+| Pasta | Skill | Para quê |
+|---|---|---|
+| `hashicorp/` | `terraform-style-guide` | estilo de HCL — com nomes em português, como o projeto já faz |
+| `hashicorp/` | `terraform-test` | `terraform test`, **só em `plan` ou com provider simulado** |
+| `github/` | `github-actions-hardening` | revisão de segurança dos workflows — o deploy assume a SA do GCP (cláusula 8ª) |
+
+Origem, revisão, licença e divergências no `UPSTREAM.md` de cada pasta. Mesma
+regra: não edite os arquivos copiados; ajuste a skill do projeto.
 
 Para editar, altere o `SKILL.md` da pasta correspondente. O bloco `description`
 do frontmatter é o que decide se a skill é acionada — descreva **quando** usar,

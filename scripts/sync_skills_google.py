@@ -23,14 +23,17 @@ RAIZ = Path(__file__).resolve().parents[1]
 DESTINO = RAIZ / ".claude" / "skills" / "google"
 UPSTREAM = "https://github.com/google/skills"
 
-# Shortlist deliberada: o que a Fase 1 usa hoje. Ampliar quando a onda pedir
-# (managed-airflow-dag-authoring na Onda 3; datalineage-* na Onda 4).
+# Shortlist deliberada: o que a Fase 1 usa hoje. Ampliar quando a onda pedir.
+# A linhagem entrou em 24/09, com o catálogo da Onda 4 já declarado (ADR 014).
+# `managed-airflow-dag-authoring` saiu do horizonte: a Onda 3 orquestra em
+# Cloud Workflows, não em Airflow (ADR 017).
 SHORTLIST = (
     "bigquery-basics",
     "google-cloud-storage-basics",
     "gcloud",
     "cloud-run-basics",
     "google-cloud-waf-cost-optimization",
+    "datalineage-bigquery-asset-impact-analysis",
 )
 
 

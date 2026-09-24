@@ -153,6 +153,8 @@ aparecer.
 | Credenciais, dependências, Bandit/pip-audit/Gitleaks | `.claude/skills/ssdlc-alupdata/SKILL.md` |
 | Fechar uma onda, medição, dependência da Alup | `.claude/skills/homologacao-onda/SKILL.md` |
 | Mecânica dos produtos Google (BigQuery, GCS, Cloud Run, gcloud) | `.claude/skills/google/*/SKILL.md` |
+| Estilo de Terraform e `terraform test` (só `plan`) | `.claude/skills/hashicorp/*/SKILL.md` |
+| Segurança dos workflows do GitHub Actions | `.claude/skills/github/github-actions-hardening/SKILL.md` |
 
 **Precedência**: as skills do projeto (`*-alupdata`, `homologacao-onda`) vencem
 as do Google onde houver conflito. As do Google ensinam o produto; as do projeto

@@ -2,7 +2,7 @@
 
 Skills copiadas de <https://github.com/google/skills> (`skills/cloud/`), licença Apache 2.0.
 
-Revisão sincronizada: `cd0b562`
+Revisão sincronizada: `2a1e454`
 
 Não edite estes arquivos à mão — a próxima sincronização sobrescreve.
 Para ajustar comportamento, altere a skill do projeto correspondente
@@ -17,3 +17,4 @@ Atualizar: `uv run python -m scripts.sync_skills_google`
 - `gcloud`
 - `cloud-run-basics`
 - `google-cloud-waf-cost-optimization`
+- `datalineage-bigquery-asset-impact-analysis`

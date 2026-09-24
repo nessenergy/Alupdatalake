@@ -16,7 +16,7 @@ description: >-
   (BigQuery), or databases (Cloud SQL, Spanner, Bigtable, Firestore).
 license: Apache-2.0
 metadata:
-  version: v1
+  version: "1.0.0"
   publisher: google
   tags: "gcs, storage, cloud-storage, buckets, objects"
   category: Storage
@@ -97,12 +97,13 @@ skills and invoke the matching skill by name instead of improvising:
     [Data Management](references/data-management.md)).
 
 If the matching skill is not installed, do not improvise. Provide the user with
-this exact command to install it (substituting the skill name), and use the
-skill after installation. Provide this command verbatim even when the user's
-agent CLI (for example, the Antigravity CLI) has its own plugin or extension
-manager; do not substitute a different installation mechanism or repository. For
-security assessments specifically, do not attempt a manual assessment; wait
-until the skill is installed.
+this exact command to install it (substituting the skill name). Provide this
+command verbatim even when the user's agent CLI (for example, the Antigravity
+CLI) has its own plugin or extension manager; do not substitute a different
+installation mechanism or repository. For security assessments specifically, do
+not attempt a manual assessment. Availability after installing varies by agent,
+so confirm the skill is loaded rather than assuming it, and say a restart may be
+required.
 
 ```bash
 npx skills add gemini-cli-extensions/google-cloud-storage --skill <skill-name>

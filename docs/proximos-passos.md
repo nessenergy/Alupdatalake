@@ -9,6 +9,7 @@ tela: **qual é a próxima ação, de quem é, e qual comando a executa.**
 - [`status.md`](status.md) — onde estamos e o que trava o quê (fonte da verdade)
 - [`plano-semanal.md`](plano-semanal.md) — o que sai em cada semana
 - [`plano-execucao.md`](plano-execucao.md) — escopo e estimativa por onda
+- [`acoes-humanas.md`](acoes-humanas.md) — **como** se executa o que exige uma pessoa: token, credencial, decisão e pedido à Alup
 - **este arquivo** — a fila, com dono e comando
 
 Quando um item fecha, sai da fila ativa; os registros datados abaixo são

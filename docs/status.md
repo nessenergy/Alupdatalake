@@ -171,10 +171,12 @@ Não há carga em BigQuery real registrada nem confirmação de entrega do ambie
 
 ### Documentação
 
-ADRs 001–022 · 25 dicionários de fonte para 26 entidades e 2 dicionários técnicos com [índice e linhagem](dicionario-dados/README.md) · plano de execução · runbook de deploy,
+ADRs 001–023 · 25 dicionários de fonte para 26 entidades e 2 dicionários técnicos com [índice e linhagem](dicionario-dados/README.md) · plano de execução · runbook de deploy,
 de primeiro deploy e de acompanhamento semanal ·
 [`proximos-passos.md`](proximos-passos.md) como fila de execução ·
-`AGENTS.md` como contexto canônico · skills do projeto e shortlist do Google.
+[`acoes-humanas.md`](acoes-humanas.md) com o passo a passo do que só uma
+pessoa executa · `AGENTS.md` como contexto canônico · skills do projeto e
+shortlist do Google.
 
 **Matriz RACI do projeto recebida da Alup em 15/09** e transcrita em
 [`raci.md`](raci.md) — governança por atividade e por fase. Não reabre nem

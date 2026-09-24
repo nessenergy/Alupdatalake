@@ -139,6 +139,19 @@ emails_alerta              = ["operacao-datalake@ness.com.br", "alup.alertas@alu
 conectores_sem_agendamento = ["hubspot_negocios", "bbce_curva_forward", "tempook_boletins"]
 ```
 
+  O teste `test_hml_nasce_sem_agendamento` exige `false` e quebra. Antes de
+  mudar o `.tfvars`, ajustar o teste para aceitar `true` só com a janela
+  declarada na mesma linha — assim a regra de custo da E2 continua cobrada:
+
+```python
+    hml = _ler("infra/environments/hml.tfvars")
+    assert _tem(r"agendamentos_ativos\s*=\s*false", hml) or _tem(
+        r"agendamentos_ativos\s*=\s*true\s*#\s*janela de homologação.*\d{2}/\d{2}", hml
+    ), "hml só agenda na janela de homologação, declarada com a data"
+```
+
+  Rodar o teste com o `.tfvars` ainda em `false` (passa), trocar a linha
+  (passa), e com `true` sem o comentário (falha — conferir e desfazer). Depois
   `uv run pytest tests/unit/test_infra.py -q` e `terraform -chdir=infra fmt
   -check -recursive`; PR, merge e `gh workflow run "Deploy GCP" -f
   environment=hml -f module=all`.

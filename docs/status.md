@@ -3,9 +3,14 @@
 Atualizado em **2026-09-23** · **A Alup liberou o GCP nos três ambientes** —
 `dev`, homologação e produção, informado à ness. em 23/09. Os projetos
 existem com os IDs `alupar-dev-alupdata`, `alupar-hm-alupdata` e
-`prod-alupdata` (ver A3). **O bootstrap do `dev` foi aplicado no mesmo dia**
-— 38 recursos, a primeira infraestrutura do contrato a existir de verdade
-(ver N3). **A conferência do ambiente foi feita
+`prod-alupdata` (ver A3). **O `dev` foi provisionado no mesmo dia**: bootstrap
+com 38 recursos (N3) e o **primeiro `apply` do `infra/` com 148** (N5) — a
+infraestrutura do contrato existe de verdade, com datasets, bucket raw, os 27
+jobs agendados e o Portal no ar atrás do IAP. **O que falta para a Onda 0
+homologar é carga real**, e o Dataform ainda não subiu: o repositório depende
+do token do GitHub no secret, que é criado à mão. O primeiro apply revelou
+**quatro defeitos**, todos corrigidos com teste no mesmo dia (ver N5). **A
+conferência do ambiente foi feita
 no mesmo dia** (A13): faturamento vinculado, os seis papéis concedidos e as
 políticas de IAM abertas. Achou também um bloqueio: a política
 `gcp.resourceLocations` herdada nos três projetos **não admite `us-east1`**,
@@ -196,9 +201,10 @@ destino, com os oito invariantes e a pauta de perguntas. **Enviado ao Google em
 | # | Item | Bloqueado por |
 |---|---|---|
 | N1 | Preparar contrato de dados das fontes das Ondas 2 e 3 | TempoOK e **BBCE já implementados** (BBCE: [PR #131](https://github.com/nessenergy/Alupdatalake/pull/131)); faltam acervo recente (#129), acesso/host BBCE (#23) e documentação/acessos das fontes internas (A7) |
-| N2 | Portal MVP: ligar contra o BigQuery e publicar no Cloud Run | escopo cravado na ADR 005; a tela existe e roda com provedor simulado — depende do N3 |
+| N2 | Portal MVP: ligar contra o BigQuery e publicar no Cloud Run | **publicado em 23/09** em `https://alupdata-portal-cgqbijljpq-uc.a.run.app`, atrás do IAP, com `PORTAL_PROVEDOR=bigquery`. O serviço está `Ready`; falta a validação com dado real, que depende da primeira carga (N5) e de a Alup informar quem passa pelo IAP |
 | N3 | **Bootstrap do `dev` aplicado em 23/09** — 38 recursos, 0 alterados, 0 destruídos: 16 APIs, o bucket de state `alupar-dev-alupdata-tfstate` em `us-central1`, o repositório `alupdata` do Artifact Registry, o pool e o provedor de WIF (condição por nome **e** ID do repositório) e a SA `alupdata-deploy`, sem chave, com 13 papéis. A cópia do state está em `gs://alupar-dev-alupdata-tfstate/bootstrap/` e as cinco variáveis estão gravadas no ambiente `dev` do GitHub, com `GCP_WIF_PROVIDER` e `GCP_DEPLOY_SA` também nas do repositório (o quadro roda sem ambiente). **Duas voltas antes de passar**, ambas registradas no runbook §0: o provider do bootstrap usava o projeto como projeto de cota, o que exige um papel que a ADR 015 não pede ([#183](https://github.com/nessenergy/Alupdatalake/pull/183)); e a ADC estava numa conta pessoal, não na da ness. | o **primeiro `apply` do `infra/`** é o próximo passo, pelo workflow `Deploy GCP`. `runbook/primeiro-deploy.md` §1 em diante |
-| N4 | Validar replay contra objeto real no GCS e conferir linhagem no BigQuery | N3 |
+| **N5** | **Primeiro `apply` do `infra/` em `dev` concluído em 23/09** — 148 recursos no state: datasets `bronze`, `silver`, `gold`, `qualidade` e `faturamento`, bucket `alupar-dev-alupdata-raw`, 27 Cloud Run Jobs com agendamento, secrets vazios, IAM por recurso, log de auditoria, alertas, painel e o Portal. **Quatro defeitos reais foram descobertos por ele**, todos corrigidos e cobertos por teste: o `README.md` fora do contexto da imagem ([#185](https://github.com/nessenergy/Alupdatalake/pull/185)); a guarda da imagem exigindo análise de vulnerabilidade ([#186](https://github.com/nessenergy/Alupdatalake/pull/186)); o `gunicorn` ausente e os alertas de silêncio acima do teto de janela ([#187](https://github.com/nessenergy/Alupdatalake/pull/187), [#189](https://github.com/nessenergy/Alupdatalake/pull/189)); e a proteção de exclusão travando a substituição do Portal ([#190](https://github.com/nessenergy/Alupdatalake/pull/190)) | **o Dataform não subiu**: o repositório depende do token do GitHub no secret `alupdata-dataform-git-token`, que ninguém gravou ainda. É o próximo passo, e é humano — o token é criado à mão |
+| N4 | Validar replay contra objeto real no GCS e conferir linhagem no BigQuery | primeira carga real, que depende do agendamento correr (os jobs diários já estão criados) |
 | N5 | Construir e executar a imagem no ambiente de desenvolvimento | Docker Desktop não disponibilizou o daemon nesta estação |
 
 ---

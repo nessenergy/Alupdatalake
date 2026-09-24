@@ -25,12 +25,17 @@ output "service_account_ingestao" {
 
 output "jobs_ingestao" {
   description = "Cloud Run Jobs agendados (vazio até existir imagem publicada)"
-  value       = try(module.scheduler[0].jobs, [])
+  value       = one(module.scheduler[*].jobs)
 }
 
+# `one()` e não `try()`: valor que só se conhece depois do apply — a URL é um
+# deles — faz o `try` cair no fallback já no plano, e o output nasce vazio e
+# assim fica. Foi o que aconteceu no primeiro apply de dev, em 23/09: o
+# serviço subiu com URL e o output veio "". Com `one()`, módulo sem instância
+# devolve `null` e módulo com instância devolve o valor de verdade.
 output "url_portal" {
-  description = "URL do Portal, atrás do IAP (vazio até existir imagem publicada)"
-  value       = try(module.portal[0].url, "")
+  description = "URL do Portal, atrás do IAP (nulo até existir imagem publicada)"
+  value       = one(module.portal[*].url)
 }
 
 output "dataset_faturamento" {

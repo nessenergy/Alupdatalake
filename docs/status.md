@@ -173,6 +173,12 @@ continuam pendentes de liberação do ambiente pela Alup.
 > TempoOK saiu do agendamento de `hml`, porque a credencial só existe em `dev`
 > e ele é Onda 2 (#240). A pauta da reunião de alinhamento está em
 > [`relatorios/2026-09-25-alinhamento.md`](relatorios/2026-09-25-alinhamento.md).
+> **Fim do dia:** em `hml`, as 23 fontes públicas carregaram com sucesso e o
+> replay do `ons_carga` passou (116 linhas, `modo = REPLAY`). **Achado do
+> Portal:** o IAP com cliente OAuth gerenciado pelo Google só admite contas da
+> organização da Alup ([documentação](https://docs.cloud.google.com/iap/docs/managed-oauth-client)), então contas da ness. não
+> entram, mesmo com a concessão ao grupo aplicada. A evidência do Portal no
+> dossiê passa a ser a demonstração com login da Alup na reunião de aceite.
 
 Este arquivo responde "onde estamos e o que trava o próximo passo". Detalhe de
 escopo e estimativa fica em [`plano-execucao.md`](plano-execucao.md); o que sai

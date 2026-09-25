@@ -43,7 +43,7 @@ datas daquele para as Ondas 0 e 1; o resto dele continua valendo.
 | 24/09 (qui) | replay da Onda 0; disparo das 18 fontes públicas restantes |
 | 25/09 (sex) | janela de `hml` aberta; correções da primeira carga |
 | 26/09 (sáb) | 3º dia seguido de `SUCESSO` no BCB — critério da Onda 0 cumprido |
-| 28/09 (seg) | carga repetida em `hml`; print do Portal |
+| 28/09 (seg) | carga repetida em `hml` (feita em 25/09) |
 | 29–30/09 | dossiês das Ondas 0 e 1 entregues juntos |
 | ~01/10 | reunião de homologação e aceite conjunto |
 
@@ -162,11 +162,17 @@ conectores_sem_agendamento = ["hubspot_negocios", "bbce_curva_forward", "tempook
   `bcb_cambio_ptax`, `bcb_juros`, `ons_carga`, `ons_ear` e `ons_ena`; e um replay
   em `hml` (`ons_carga`), como na Tarefa 1.
 
-## Tarefa 5: Portal com uma Gold real (humano, até 28/09)
+## Tarefa 5: Portal com uma Gold real — demonstração com login da Alup
 
-- [ ] Alguém do grupo `operacao-datalake@ness.com.br` abre o Portal de `dev`,
-  entra e captura a tela de `juros_mensal` com data e URL visíveis. A captura
-  vai para o dossiê da Onda 0.
+**Mudou em 25/09.** O IAP do Portal usa o cliente OAuth gerenciado pelo
+Google, e nesse modo [só entram contas da organização dona do projeto](https://docs.cloud.google.com/iap/docs/managed-oauth-client)
+— a da Alup. Contas `@ness.com.br` são recusadas mesmo com a concessão ao grupo
+(conferida no log de auditoria em 24/09). Liberar externos exigiria cliente
+OAuth próprio, configurado no console do projeto da Alup.
+
+- [ ] A evidência passa a ser a **demonstração ao vivo na reunião de aceite,
+  com o login de alguém da Alup**. Depende de a Alup informar os grupos de
+  acesso (pedido 6 da pauta de 25/09), que entram em `portal_acesso` em `hml`.
 
 ## Tarefa 6: Dossiês das Ondas 0 e 1 (29–30/09)
 

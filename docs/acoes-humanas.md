@@ -127,24 +127,23 @@ tabelas Bronze existem e as ingestões agendadas param de falhar.
 
 ---
 
-## 1b. Ligar o `TABLE_STORAGE` no projeto — uma vez por ambiente
+## 1b. Ligar o `TABLE_STORAGE` no projeto — registro
 
-**Feito em `dev` em 24/09, entre 09h45 e 11h.** A invocação do Dataform das
-09h45 ainda reprovou `gold.custo_consultas` com a mensagem de
-`TABLE_STORAGE` desligado; a das 11h (a *workflow config* `diario`) passou
-inteira, 141 ações, zero falhas. Falta o mesmo passo em `hml` e `prod`,
-quando os ambientes subirem.
+**Feito em `dev` em 24/09, entre 09h45 e 11h**, à mão, por quem já era *Owner*
+do projeto (Thiago). A invocação do Dataform das 09h45 ainda reprovou
+`gold.custo_consultas` com a mensagem de `TABLE_STORAGE` desligado; a das 11h
+(a *workflow config* `diario`) passou inteira, 141 ações, zero falhas.
 
-**Quem**: quem já é *Owner* do projeto (hoje, no `dev`: Thiago) ·
-**Bloqueia**: `gold.custo_consultas`, e com ela o Dataform diário, que
-termina em `FAILED` e dispara o alerta de workflow reprovado.
+Regra do projeto (25/09): nenhuma ação operacional no GCP depende de pessoa
+de fora da equipe ness. — e o único *Owner* de `hml` é externo. O deploy
+passa a ligar o `TABLE_STORAGE` sozinho, com a SA de deploy (passo "Ligar o
+TABLE_STORAGE do projeto" em `.github/workflows/deploy.yml`, depois do
+`terraform apply`), que precisa do papel `bigquery.config.update` — concedido
+no bootstrap (`infra/bootstrap/main.tf`, ADR 015, adendo de 25/09).
 
-É opção de projeto, não recurso: o Terraform não a cobre, e o único papel
-predefinido que permite é `bigquery.admin` — poder demais para a SA de deploy.
-
-```bash
-bq query --use_legacy_sql=false --project_id=alupar-dev-alupdata   'ALTER PROJECT `alupar-dev-alupdata` SET OPTIONS (`region-us-central1.enable_info_schema_storage` = TRUE)'
-```
+O que resta é de pessoa: o Ricardo reaplicar o bootstrap com o papel novo em
+`dev` (que já tem o efeito, mas não o papel formal) e em `hml`. Sem isso, o
+passo do deploy responde `PERMISSION_DENIED` nesses ambientes.
 
 **Deu certo quando**: o próximo deploy termina com o Dataform em `SUCCEEDED`.
 O histórico de armazenamento leva cerca de um dia para aparecer no painel de

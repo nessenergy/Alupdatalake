@@ -114,6 +114,17 @@ jobs:
             -var="dataform_git_token_versao=$DATAFORM_GIT_TOKEN_VERSION" \
             -out=tfplan
           terraform apply tfplan
+      - name: Ligar o TABLE_STORAGE do projeto
+        run: |
+          # Idempotente; roda em dev, hml e prod a cada deploy e substitui o
+          # passo manual de Owner (docs/acoes-humanas.md §1b). Exige que a SA
+          # de deploy tenha bigquery.config.update, concedido no bootstrap.
+          cd infra
+          PROJETO="$(terraform output -raw project_id)"
+          REGIAO="$(terraform output -raw region)"
+          cd ..
+          bq query --use_legacy_sql=false --project_id="$PROJETO" \
+            "ALTER PROJECT \`$PROJETO\` SET OPTIONS (\`region-$REGIAO.enable_info_schema_storage\` = TRUE)"
       - uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
         with:
           version: "0.5.11"

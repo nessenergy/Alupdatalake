@@ -94,6 +94,20 @@ terraform() { echo "terraform $*" >> calls; }
         assert not (tmp_path / "infra/calls").exists()
 
 
+def test_table_storage_step():
+    steps = workflow()["jobs"]["terraform"]["steps"]
+    step = next(s for s in steps if s.get("name") == "Ligar o TABLE_STORAGE do projeto")
+    run = step["run"]
+    assert "enable_info_schema_storage" in run
+    assert "= TRUE" in run
+    assert "terraform output -raw project_id" in run
+    assert "terraform output -raw region" in run
+    assert "${{" not in run
+    apply_index = next(i for i, s in enumerate(steps) if "terraform apply tfplan" in s.get("run", ""))
+    dataform_index = next(i for i, s in enumerate(steps) if "scripts.executar_dataform" in s.get("run", ""))
+    assert apply_index < steps.index(step) < dataform_index
+
+
 def test_terraform_image_validation(tmp_path):
     terraform = shutil.which("terraform")
     if not terraform:

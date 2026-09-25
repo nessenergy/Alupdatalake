@@ -269,6 +269,22 @@ tbody td:first-child { font-weight: 500; }
 tr { break-inside: avoid; }
 thead { display: table-header-group; }
 
+/* Diagrama em SVG embutido: ocupa a largura do texto e não se parte entre
+   páginas; a legenda fica colada nele. */
+figure.diagrama {
+  margin: 14px 0 18px;
+  padding: 10px 10px 6px;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  break-inside: avoid;
+}
+figure.diagrama svg { display: block; width: 100%; height: auto; }
+figure.diagrama figcaption {
+  margin-top: 6px;
+  font-size: 9pt;
+  color: #475569;
+}
+
 /* Larguras de coluna do formulário: código estreito, "Resposta" com espaço de
    escrita. Valem só no questionário — num relatório espremeriam a 1ª coluna e
    pintariam a última sem motivo. */

@@ -1,7 +1,7 @@
 # Próximos passos — fila de execução
 
 Documento **vivo**: é para riscar linha, não para arquivar. Atualizado em
-**2026-09-24**.
+**2026-09-25**.
 
 Ele existe para responder uma pergunta que os outros três não respondem em uma
 tela: **qual é a próxima ação, de quem é, e qual comando a executa.**
@@ -34,7 +34,7 @@ três ambientes e a cadeia passou a ser trabalho da ness.:
 | ~~1.3~~ | ~~Bootstrap do `dev` e as variáveis no GitHub~~ | ness. | **feito em 23/09**: 38 recursos aplicados, state copiado para o bucket e as cinco variáveis gravadas no ambiente `dev` e nas do repositório. Ver N3 no [`status.md`](status.md) |
 | ~~1.5~~ | ~~Primeiro `terraform apply` do `infra/` em `dev`~~ | ness. | **feito em 23/09**: 148 recursos, incluindo os 27 jobs agendados e o Portal no ar. Ver N5 no [`status.md`](status.md) |
 | ~~1.6~~ | ~~Gravar o token do GitHub no secret `alupdata-dataform-git-token`~~ **feito em 24/09; Dataform de pé** — e apontar `DATAFORM_GIT_TOKEN_VERSAO` no ambiente `dev`, depois reexecutar o deploy | ness. (humano) | **é o que falta para o Dataform existir** — e sem Dataform não há Bronze, Silver nem Gold. O token é *fine-grained*, restrito a `nessenergy/Alupdatalake`, só *Contents: Read-only*. Passo a passo em [`acoes-humanas.md`](acoes-humanas.md) §1 e no `runbook/primeiro-deploy.md` §3 |
-| **1.7** | **Bootstrap do `hml` aplicado em 23/09** — 41 recursos, state no bucket e variáveis no ambiente do GitHub | ness. | o `infra/` de `hml` sobe só na janela de homologação da onda (`agendamentos_ativos = false`, teto da E2). `prod` fica para a virada de produção |
+| ~~1.7~~ | ~~Bootstrap e `infra/` do `hml`~~ | ness. | **`hml` no ar em 25/09**: 174 recursos, Dataform em `SUCCEEDED`, janela de homologação das Ondas 0 e 1 aberta (#228). `prod` fica para depois do aceite das Ondas 0 e 1 |
 | 1.4 | **Rotação do token do TempoOK** — a [ADR 020](arquitetura/decisoes/020-token-tempook-rotacao-na-producao.md) a define como a primeira ação depois de A3 | ness./TempoOK | **desbloqueada**: o Secret Manager do `dev` existe desde 23/09 |
 
 > O atraso de A3 está registrado em

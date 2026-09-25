@@ -1,6 +1,6 @@
 # Estado do projeto
 
-Atualizado em **2026-09-24** · **A Alup liberou o GCP nos três ambientes** —
+Atualizado em **2026-09-25** · **A Alup liberou o GCP nos três ambientes** —
 `dev`, homologação e produção, informado à ness. em 23/09. Os projetos
 existem com os IDs `alupar-dev-alupdata`, `alupar-hm-alupdata` e
 `prod-alupdata` (ver A3). **O `dev` foi provisionado no mesmo dia**: bootstrap
@@ -158,6 +158,21 @@ continuam pendentes de liberação do ambiente pela Alup.
 > Gold de mercado têm linhas** em `dev`; as vazias são as que esperam insumo
 > da Alup (BBCE, Hubspot, acervo do TempoOK) e três views operacionais.
 > `main` em `88ae32d`.
+
+> **25/09 — homologação no ar, e a operação sem depender de ninguém de fora.**
+> Nova regra do projeto, do Ricardo: nenhuma ação operacional no GCP depende
+> de pessoa de fora da equipe ness. O `TABLE_STORAGE`, que só um *Owner*
+> ligava — e o único *Owner* de `hml` é externo —, passou a ser ligado pelo
+> próprio deploy, com a SA de deploy recebendo `roles/bigquery.admin` no
+> bootstrap (#236, #237; adendo na ADR 015). O primeiro deploy de `hml`
+> revelou que a condição do WIF nunca batia: o repositório usa o `sub`
+> imutável do GitHub, e a condição foi trocada pela claim `environment`
+> (#238). Com o grupo de operação gravando e lendo em `hml` (#235, #239) e o
+> token do Dataform gravado, **`hml` subiu: 174 recursos e o Dataform em
+> `SUCCEEDED`**. A carga das fontes públicas em `hml` rodou pelo workflow; o
+> TempoOK saiu do agendamento de `hml`, porque a credencial só existe em `dev`
+> e ele é Onda 2 (#240). A pauta da reunião de alinhamento está em
+> [`relatorios/2026-09-25-alinhamento.md`](relatorios/2026-09-25-alinhamento.md).
 
 Este arquivo responde "onde estamos e o que trava o próximo passo". Detalhe de
 escopo e estimativa fica em [`plano-execucao.md`](plano-execucao.md); o que sai

@@ -43,6 +43,25 @@ técnicos**. Bases reutilizáveis não entram nessa contagem. O contrato mantém
 | Log de execução | [`_execucoes.md`](_execucoes.md) | 0 | — | `saude_ingestao`, `volumetria_lake` |
 | Custo de nuvem | [`_custo_consultas.md`](_custo_consultas.md) | 0 | — | `custo_consultas` |
 
+## Das 13 fontes do contrato às 27 entidades
+
+O de-para que o dossiê das Ondas 0 e 1 usa para conferir escopo: cada fonte
+contratual e as entidades que a entregam. Entidade implementada não cria fonte
+nova; fonte sem entidade diz por quê.
+
+| Fonte contratual | Onda | Entidades |
+|---|---|---|
+| BCB | 0/1 | `bcb_cambio_ptax`, `bcb_juros` |
+| IBGE | 1 | `ibge_ipca` |
+| ANEEL | 1 | `aneel_siga` |
+| ONS | 1 | `ons_carga`, `ons_ear`, `ons_ena`, `ons_geracao_usina`, `ons_capacidade`, `ons_disponibilidade_usina`, `ons_restricao_coff_eolica`, `ons_restricao_coff_fotovoltaica` |
+| CCEE InfoMercado | 1 | `ccee_pld`, `ccee_perfil`, `ccee_agente`, `ccee_exposicao_financeira`, `ccee_contabilizacao_perfil`, `ccee_geracao_usina`, `ccee_contrato_montante`, `ccee_varejista_consumidor`, `ccee_encargo_ess`, `ccee_energia_reserva`, `ccee_cvu_estrutural` |
+| CCEE agente credenciado | 2 | nenhuma — depende de credencial de agente (item 2.1) |
+| BBCE | 2 | `bbce_curva_forward` |
+| Hubspot | 2 | `hubspot_negocios` |
+| TempoOK | 2 | `tempook_boletins`, `tempook_ena_prevs` |
+| Oracle FMB, Portal Alup, MySQL RDS, RM/TOTVS | 3 | nenhuma — dependem de VPN e credenciais (A7) |
+
 ## A linhagem, em uma figura
 
 O caminho é o mesmo para todas as fontes — é essa uniformidade que faz o

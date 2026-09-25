@@ -91,3 +91,11 @@ def test_reprocessar_raw_repassa_uri_e_janela(monkeypatch):
 
     assert main(["reprocessar-raw", "bcb_cambio_ptax", "--uri", uri, "--de", "2026-01-01", "--ate", "2026-01-02"]) == 0
     assert chamadas == [(uri, Janela.de_texto("2026-01-01", "2026-01-02"))]
+
+
+@pytest.mark.parametrize(("resultado", "codigo"), [((True, "fmb respondeu"), 0), ((False, "fmb: OSError"), 1)])
+def test_testar_conexao_devolve_o_codigo_e_imprime(monkeypatch, capsys, resultado, codigo):
+    monkeypatch.setattr("src.cli.testar_conexao", lambda fonte: resultado)
+
+    assert main(["testar-conexao", "fmb"]) == codigo
+    assert resultado[1] in capsys.readouterr().out

@@ -1,12 +1,12 @@
 # Módulo de rede
 
-**Vazio de propósito até a Onda 3.**
+**Sem recursos, de propósito** ([ADR 024](../../../docs/arquitetura/decisoes/024-rede-das-fontes-internas.md)).
 
-As fontes das Ondas 1 e 2 são APIs e arquivos públicos na internet: não há VPC,
-peering ou VPN a declarar. A rede vira necessária quando os conectores
-precisarem alcançar os sistemas internos da Alup — Oracle FMB, Portal Alup,
-MySQL RDS —, o que depende da VPN que a contratante ainda vai prover.
+A rede das fontes internas é a VPC compartilhada da Alupar, no projeto
+`alupar-networking`, administrada por ela. O AlupData entra como projeto de
+serviço e não cria VPC, sub-rede, rota, firewall nem NAT.
 
-Quando entrar, aqui ficam VPC, sub-redes, Serverless VPC Access (para o Cloud
-Run Job alcançar a rede interna) e as regras de firewall. Acesso às origens é
-sempre **read-only**.
+O que é nosso está no módulo `scheduler`: com `rede_interna` preenchida, os
+jobs de `conectores_rede_interna` e os `teste-conexao-<fonte>` saem pela
+sub-rede da Alupar (*Direct VPC egress*, todo o tráfego). Passo a passo de cada
+lado em [`docs/runbook/rede-onda3.md`](../../../docs/runbook/rede-onda3.md).

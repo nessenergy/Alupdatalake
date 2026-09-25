@@ -293,3 +293,59 @@ def test_mensagem_de_driver_desconhecido_lista_os_tres_suportados() -> None:
 
     for esquema in ("oracle", "mysql", "sqlserver"):
         assert esquema in str(exc.value)
+
+
+# ------------------------------------------------------------ teste de conexão
+# Responde "já temos VPN?" com a própria credencial da fonte, de dentro da rede
+# em que a carga vai rodar — sem ler dado nenhum.
+
+
+class ConexaoTeste:
+    def __init__(self, modulo: str = "pymysql.connections") -> None:
+        self.cursor_ = CursorFalso(["um"], [(1,)])
+        self.fechada = False
+        type(self).__module__ = modulo
+
+    def cursor(self) -> CursorFalso:
+        return self.cursor_
+
+    def close(self) -> None:
+        self.fechada = True
+
+
+def test_testar_conexao_responde_ok_e_fecha(monkeypatch: pytest.MonkeyPatch) -> None:
+    conexao = ConexaoTeste()
+    monkeypatch.setattr(banco, "ler_secret", lambda fonte, campo: "mysql://u:p@h/b")
+    monkeypatch.setattr(banco, "conectar", lambda dsn: conexao)
+
+    ok, mensagem = banco.testar_conexao("comercializacao")
+
+    assert ok
+    assert conexao.cursor_.sql == "SELECT 1"
+    assert conexao.fechada
+    assert "comercializacao" in mensagem
+
+
+def test_testar_conexao_no_oracle_usa_dual(monkeypatch: pytest.MonkeyPatch) -> None:
+    conexao = ConexaoTeste("oracledb.connection")
+    monkeypatch.setattr(banco, "ler_secret", lambda fonte, campo: "oracle://u:p@h/S")
+    monkeypatch.setattr(banco, "conectar", lambda dsn: conexao)
+
+    assert banco.testar_conexao("fmb")[0]
+    assert conexao.cursor_.sql == "SELECT 1 FROM dual"
+
+
+def test_testar_conexao_falha_sem_vazar_usuario_nem_senha(monkeypatch: pytest.MonkeyPatch) -> None:
+    def recusa(dsn: str) -> None:
+        raise OSError("login falhou para leitor_fmb com Senh4Forte em 10.0.0.9:1521")
+
+    monkeypatch.setattr(banco, "ler_secret", lambda fonte, campo: "oracle://leitor_fmb:Senh4Forte@10.0.0.9/S")
+    monkeypatch.setattr(banco, "conectar", recusa)
+
+    ok, mensagem = banco.testar_conexao("fmb")
+
+    assert not ok
+    assert "OSError" in mensagem
+    assert "Senh4Forte" not in mensagem
+    assert "leitor_fmb" not in mensagem
+    assert "10.0.0.9:1521" in mensagem, "o host fica: é o que diz se a rede chegou até lá"

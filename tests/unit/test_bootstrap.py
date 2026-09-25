@@ -86,6 +86,7 @@ APIS_ESPERADAS = {
     "billingbudgets.googleapis.com",
     "cloudresourcemanager.googleapis.com",
     "cloudscheduler.googleapis.com",
+    "compute.googleapis.com",
     "dataform.googleapis.com",
     "datalineage.googleapis.com",
     "dataplex.googleapis.com",

@@ -6,6 +6,7 @@ não existe caminho de código que só rode em produção.
     alupdata listar
     alupdata ingerir bcb_cambio_ptax --de 2026-01-01 --ate 2026-01-31
     alupdata ingerir bcb_cambio_ptax --ultimos-dias 7 --dry-run
+    alupdata testar-conexao fmb
 """
 
 from __future__ import annotations
@@ -13,6 +14,7 @@ from __future__ import annotations
 import argparse
 import sys
 
+from src.core.banco import testar_conexao
 from src.core.config import get_settings
 from src.core.execucao import Janela
 from src.core.observabilidade import configurar_logging
@@ -39,6 +41,9 @@ def _parser() -> argparse.ArgumentParser:
     replay.add_argument("--uri", required=True, help="objeto gs:// no layout raw canônico")
     replay.add_argument("--de", required=True, help="início da janela original (YYYY-MM-DD)")
     replay.add_argument("--ate", required=True, help="fim da janela original (YYYY-MM-DD)")
+
+    teste = sub.add_parser("testar-conexao", help="abre conexão com a DSN da fonte e roda SELECT 1")
+    teste.add_argument("fonte", help="fonte do secret alupdata-<fonte>-dsn, como fmb ou comercializacao")
     return parser
 
 
@@ -57,6 +62,11 @@ def main(argv: list[str] | None = None) -> int:
         for rotulo in listar():
             print(rotulo)
         return 0
+
+    if args.comando == "testar-conexao":
+        ok, mensagem = testar_conexao(args.fonte)
+        print(mensagem)
+        return 0 if ok else 1
 
     if args.comando == "reprocessar-raw":
         conector = obter(args.conector)

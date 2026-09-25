@@ -116,6 +116,31 @@ def _tls_mysql(host: str, consulta: dict[str, list[str]]) -> dict[str, Any]:
     return {"ssl": ssl.create_default_context(cafile=consulta.get("ssl_ca", [None])[0])}
 
 
+def testar_conexao(fonte: str) -> tuple[bool, str]:
+    """Abre conexão com a DSN da fonte e roda `SELECT 1`, sem ler dado.
+
+    Responde "a rede e a credencial chegam até o banco?" de dentro do Cloud Run
+    Job, que é onde a carga vai rodar. Na falha, a mensagem do driver sai sem
+    usuário e senha, mas com o host: é ele que diz até onde a rede chegou.
+    """
+    dsn = ler_secret(fonte, "dsn")
+    url = urlparse(dsn)
+    try:
+        conexao = conectar(dsn)
+        try:
+            sonda = "SELECT 1 FROM dual" if type(conexao).__module__.startswith("oracledb") else "SELECT 1"
+            list(consultar(conexao, sonda))
+        finally:
+            conexao.close()
+    except Exception as erro:  # noqa: BLE001 — qualquer falha do driver é o diagnóstico
+        mensagem = str(erro)
+        for segredo in (url.password, url.username):
+            if segredo:
+                mensagem = mensagem.replace(unquote(segredo), "***").replace(segredo, "***")
+        return False, f"{fonte}: {type(erro).__name__}: {mensagem}"
+    return True, f"{fonte}: conexão aberta e SELECT 1 respondido"
+
+
 def criar_conexao(fonte: str, campo: str = "dsn") -> Any:
     """Conexão da fonte, com a DSN lida do Secret Manager."""
     return conectar(ler_secret(fonte, campo))

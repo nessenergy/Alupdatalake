@@ -197,7 +197,8 @@ OAuth próprio, configurado no console do projeto da Alup.
 | TempoOK | 2 | `tempook_boletins`, `tempook_ena_prevs` |
 | Oracle FMB, Portal Alup, MySQL RDS, RM/TOTVS | 3 | nenhuma (A7) |
 
-  A mesma tabela entra em `docs/dicionario-dados/README.md`.
+  A mesma tabela entra em `docs/dicionario-dados/README.md` (feito em 25/09;
+  em 29/09 falta só o estado de cada linha).
 - [ ] **Passo 3:** escrever `docs/relatorios/2026-09-29-dossie-ondas-0-e-1.md`
   no formato dos relatórios, gerar o HTML e indexar:
 

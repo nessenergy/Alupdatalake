@@ -122,7 +122,11 @@ instalação com
 
 **Enquanto o projeto GCP (A3) e o App não existirem**, o job registra um aviso
 e termina com sucesso. Ele começa a sincronizar sozinho quando as três
-variáveis abaixo estiverem preenchidas e a chave estiver gravada. Não é preciso
+variáveis abaixo estiverem preenchidas e a chave estiver gravada. **Com as
+variáveis preenchidas e o secret ainda sem versão**, o passo que lê a chave
+registra o mesmo tipo de aviso e os passos seguintes ficam pulados (desde
+25/09; antes disso o job falhava todo dia). Qualquer outro erro de leitura
+continua falhando. Não é preciso
 mudar nenhum arquivo. **Workflow verde não comprova sincronização:** confira
 se o passo que executa `scripts.quadro` rodou ou foi pulado. Na
 [execução de 17/09/2026, nº 35240311826](https://github.com/nessenergy/Alupdatalake/actions/runs/35240311826),

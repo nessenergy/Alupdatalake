@@ -173,6 +173,33 @@ token antigo deixa de autenticar.
 
 ---
 
+## 2b. Gravar a chave do App do quadro
+
+**Quem**: alguém do grupo `operacao-datalake@ness.com.br` que administre o App
+na organização · **Bloqueia**: a sincronização automática do quadro (achado O5
+da avaliação de 24/09) · **Referência**:
+[`runbook/acompanhamento-semanal.md`](runbook/acompanhamento-semanal.md), passo 3
+
+O App existe e a variável `QUADRO_APP_CLIENT_ID` está preenchida; falta só a
+chave privada. Desde 25/09 o workflow avisa e termina com sucesso enquanto ela
+não existe, em vez de falhar todo dia.
+
+1. No GitHub: *nessenergy → Settings → Developer settings → GitHub Apps →* o
+   App do quadro *→ Private keys → Generate a private key*. O navegador baixa
+   um `.pem`.
+2. No console do Google Cloud, projeto `alupar-dev-alupdata`: *Segurança →
+   Secret Manager →* `alupdata-github-quadro-app-key` *→ Nova versão →
+   Fazer upload de arquivo*, escolher o `.pem` e *Adicionar nova versão*.
+3. Apagar o `.pem` do disco e da lixeira.
+4. No GitHub: *Actions → Quadro — sincronização automática → Run workflow*,
+   com **simular** marcado.
+
+**Deu certo quando**: nessa execução o passo que roda `scripts.quadro` aparece
+executado, e não pulado, e o log lista o que mudaria no quadro. A partir daí o
+agendamento das 08h grava sozinho.
+
+---
+
 ## 3. Pedidos à Alup que continuam abertos
 
 Nenhum destes é comando: é conversa, com prazo e efeito contratual. A cobrança

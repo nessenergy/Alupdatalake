@@ -10,9 +10,11 @@ environment = "hml"
 # Dataform consulta o BigQuery todo dia. Cloud Run Jobs, Portal e o Dataform
 # disparado pelo deploy continuam disponíveis. Janela aberta desde 25/09 para
 # a homologação das Ondas 0 e 1; fecha (volta para false) depois do aceite.
-agendamentos_ativos        = true # janela de homologação das Ondas 0 e 1, 25/09
-emails_alerta              = ["operacao-datalake@ness.com.br", "alup.alertas@alupar.com.br"]
-conectores_sem_agendamento = ["hubspot_negocios", "bbce_curva_forward", "tempook_boletins"]
+agendamentos_ativos = true # janela de homologação das Ondas 0 e 1, 25/09
+emails_alerta       = ["operacao-datalake@ness.com.br", "alup.alertas@alupar.com.br"]
+# Em hml, o TempoOK também fica fora: a credencial só existe em dev, e a
+# janela é das Ondas 0 e 1 — o TempoOK é Onda 2.
+conectores_sem_agendamento = ["hubspot_negocios", "bbce_curva_forward", "tempook_boletins", "tempook_ena_prevs"]
 
 # Quem grava versão de secret sem poder ler (ADR 015): o token do Dataform em
 # hml é da ness., gravado pelo grupo de operação da ness. Nunca pessoa (R01).

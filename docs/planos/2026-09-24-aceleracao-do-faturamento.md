@@ -207,17 +207,13 @@ uv run --with markdown python scripts/gerar_documento.py docs/relatorios/2026-09
 
 - [ ] **Passo 4:** PR, merge e entrega ao Ricardo para envio.
 
-## Tarefa 7: Mensagens de coordenação (redigir em 24/09; envio pelo Ricardo)
+## Tarefa 7: Mensagens de coordenação — substituída pela pauta de 25/09
 
-- [ ] Escrever `docs/envio/2026-09-24-mensagens-aceite.md` com três textos
-  curtos, cordiais e sem mencionar prazo contratual de forma cobradora:
-  1. **Quem assina o aceite** — a RACI põe um Comitê sem membros como
-     aprovador da passagem de fase; a resposta B4 põe a Taina. Pedir o nome.
-  2. **Convite da reunião de homologação** para ~01/10, com a lista de
-     critérios de cada onda anexada, para a reunião ser conferência.
-  3. **Onda 2** — reforço das credenciais do Hubspot e do BBCE (prazo pedido:
-     12/10) e a pergunta sobre as 32h do item 2.1, para responder na reunião.
-- [ ] Varrer os três textos atrás de menção a ferramenta de IA antes de entregar.
+**Mudou em 25/09.** Os três pedidos (quem assina o aceite, reunião de ~01/10 e
+Onda 2 com as 32h do item 2.1) estão na seção 4 da
+[pauta de alinhamento](../relatorios/2026-09-25-alinhamento.md), pedidos 1 a 4,
+junto com os grupos do Portal (pedido 6). A pauta é o canal: não há mensagens
+avulsas, e o que não estiver nela não vira e-mail.
 
 ## Tarefa 8: Documentos vivos (24/09 e a cada marco)
 

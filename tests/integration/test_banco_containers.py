@@ -28,7 +28,7 @@ pytestmark = pytest.mark.skipif(
 # DSN, driver e o SELECT que cada dialeto entende sem tabela.
 BANCOS = [
     pytest.param(
-        "mysql://root:alupdata-local@127.0.0.1:3306/comercializacao",
+        "mysql://root:alupdata-local@127.0.0.1:3306/comercializacao?tls=0",
         "pymysql",
         "SELECT 1 AS Numero, 'ons' AS Fonte",
         id="mysql",

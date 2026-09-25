@@ -156,6 +156,69 @@ def test_conectar_usa_porta_padrao_quando_a_dsn_omite(monkeypatch: pytest.Monkey
     assert capturado["database"] == "comercializacao"
 
 
+# ------------------------------------------------------------------ TLS no MySQL
+# ADR 013, revisão de 11/09: o MySQL RDS é lido pela internet, sem VPN, então
+# credencial e dado só passam cifrados e com o servidor verificado.
+
+
+def _mysql_capturado(monkeypatch: pytest.MonkeyPatch, dsn: str) -> dict[str, Any]:
+    capturado: dict[str, Any] = {}
+
+    class MysqlFalso:
+        @staticmethod
+        def connect(**kwargs: Any) -> str:
+            capturado.update(kwargs)
+            return "conexao"
+
+    monkeypatch.setitem(sys.modules, "pymysql", MysqlFalso)
+    banco.conectar(dsn)
+    return capturado
+
+
+def test_mysql_exige_tls_com_certificado_e_host_verificados(monkeypatch: pytest.MonkeyPatch) -> None:
+    import ssl
+
+    contexto = _mysql_capturado(monkeypatch, "mysql://app:senha@rds.exemplo/comercializacao")["ssl"]
+
+    assert isinstance(contexto, ssl.SSLContext)
+    assert contexto.verify_mode == ssl.CERT_REQUIRED
+    assert contexto.check_hostname
+
+
+def test_mysql_usa_a_ca_indicada_na_dsn(monkeypatch: pytest.MonkeyPatch) -> None:
+    import ssl
+
+    recebido: dict[str, Any] = {}
+    original = ssl.create_default_context
+
+    def contexto_falso(**kwargs: Any) -> ssl.SSLContext:
+        recebido.update(kwargs)
+        return original()
+
+    monkeypatch.setattr(ssl, "create_default_context", contexto_falso)
+    capturado = _mysql_capturado(monkeypatch, "mysql://app:senha@rds.exemplo/base?ssl_ca=/app/certs/rds.pem")
+
+    assert recebido == {"cafile": "/app/certs/rds.pem"}
+    assert capturado["database"] == "base", "a consulta da DSN não entra no nome da base"
+
+
+@pytest.mark.parametrize("host", ["127.0.0.1", "localhost"])
+def test_mysql_sem_tls_so_em_banco_local(monkeypatch: pytest.MonkeyPatch, host: str) -> None:
+    capturado = _mysql_capturado(monkeypatch, f"mysql://root:senha@{host}:3306/base?tls=0")
+
+    assert "ssl" not in capturado
+    assert capturado["ssl_disabled"] is True
+
+
+def test_mysql_recusa_desligar_tls_em_banco_remoto_sem_vazar_a_senha(monkeypatch: pytest.MonkeyPatch) -> None:
+    with pytest.raises(ValueError) as exc:
+        _mysql_capturado(monkeypatch, "mysql://usuario:SENHA_SECRETA@rds.exemplo/base?tls=0")
+
+    assert "TLS" in str(exc.value)
+    assert "SENHA_SECRETA" not in str(exc.value)
+    assert "usuario" not in str(exc.value)
+
+
 def test_erro_de_dsn_nao_vaza_a_senha() -> None:
     with pytest.raises(ValueError) as exc:
         banco.conectar("postgres://usuario:SENHA_SECRETA@host/base")

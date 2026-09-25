@@ -152,5 +152,9 @@ execução**, e não se confunde com a janela de datas da regra 3.
   reservado só se a liberação for por lista de IPs. VPN segue prevista para o
   FMB até confirmação.
 - `src/core/banco.py`: TLS no caminho `mysql://`, com teste, antes da Onda 3.
+  **Feito em 25/09**: toda conexão `mysql://` exige TLS com certificado e host
+  verificados; a CA vem de `?ssl_ca=<caminho>` na DSN, e `?tls=0` só é aceito
+  para banco local. Falta, para a primeira leitura do RDS, pôr na imagem o
+  pacote público de CAs do RDS e apontar a DSN para ele.
 - Para o MySQL RDS, a dependência A7 deixa de ser VPN e passa a ser credencial
   somente leitura e liberação de acesso pelo Leonardo.

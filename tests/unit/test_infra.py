@@ -701,3 +701,38 @@ def test_timeout_do_job_e_configuravel_por_conector() -> None:
 
     bloco_ccee = _bloco(scheduler, "ccee_geracao_usina = {")
     assert _tem(r'timeout\s*=\s*"7200s"', bloco_ccee)
+
+
+def test_onda3_sai_pela_vpc_compartilhada_so_quando_a_rede_existe() -> None:
+    """Fonte interna sai pela sub-rede da Alupar (ADR 024); sem a rede declarada, nada muda."""
+    variavel = _bloco(_ler("infra/variables.tf"), 'variable "rede_interna"')
+    assert _tem(r"default\s*=\s*null", variavel)
+    for campo in ("projeto_host", "rede", "sub_rede"):
+        assert campo in variavel
+    for nome in ("conectores_rede_interna", "fontes_teste_conexao"):
+        assert _tem(r"default\s*=\s*\[\]", _bloco(_ler("infra/variables.tf"), f'variable "{nome}"'))
+
+    modulo = _bloco(_ler("infra/main.tf"), 'module "scheduler" {')
+    for nome in ("rede_interna", "conectores_rede_interna", "fontes_teste_conexao"):
+        assert _tem(rf"{nome}\s*=\s*var\.{nome}\b", modulo), nome
+
+    scheduler = _ler("infra/modules/scheduler/main.tf")
+    job = _bloco(scheduler, 'resource "google_cloud_run_v2_job" "ingestao"')
+    assert 'dynamic "vpc_access"' in job
+    assert "contains(var.conectores_rede_interna, each.key)" in job
+    assert "var.rede_interna != null" in job
+
+    teste = _bloco(scheduler, 'resource "google_cloud_run_v2_job" "teste_conexao"')
+    assert _tem(
+        r"for_each\s*=\s*var\.rede_interna\s*==\s*null\s*\?\s*toset\(\[\]\)\s*:\s*toset\(var\.fontes_teste_conexao\)",
+        teste,
+    )
+    assert _tem(r'args\s*=\s*\["testar-conexao",\s*each\.key\]', teste)
+    assert _tem(r"max_retries\s*=\s*0", teste), "teste de rede não repete: a falha é o resultado"
+
+    # Os dois jobs usam o mesmo acesso: a sub-rede na região do projeto, e todo
+    # o tráfego pela VPC — é o que dá o IP fixo do Cloud NAT para o MySQL RDS.
+    acesso = scheduler[scheduler.index("locals {") :]
+    assert _tem(r'"projects/\$\{var\.rede_interna\.projeto_host\}/regions/\$\{var\.region\}/subnetworks/', acesso)
+    for bloco in (job, teste):
+        assert _tem(r'egress\s*=\s*"ALL_TRAFFIC"', bloco)

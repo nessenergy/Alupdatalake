@@ -52,6 +52,7 @@ locals {
     "billingbudgets.googleapis.com", # orçamento, infra/modules/monitoramento/custo.tf
     "cloudresourcemanager.googleapis.com",
     "cloudscheduler.googleapis.com",
+    "compute.googleapis.com",     # projeto de serviço da VPC compartilhada da Alupar, ADR 024
     "dataform.googleapis.com",    # ADR 012
     "datalineage.googleapis.com", # ADR 013
     "dataplex.googleapis.com",    # Knowledge Catalog, ADR 014

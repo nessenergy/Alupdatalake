@@ -192,6 +192,10 @@ module "scheduler" {
   service_account_email = google_service_account.ingestao.email
   agendar               = var.agendamentos_ativos
   sem_agendamento       = var.conectores_sem_agendamento
+
+  rede_interna            = var.rede_interna
+  conectores_rede_interna = var.conectores_rede_interna
+  fontes_teste_conexao    = var.fontes_teste_conexao
 }
 
 # Portal atrás do IAP (R01). Sobe com a imagem publicada, que é a mesma da CLI;

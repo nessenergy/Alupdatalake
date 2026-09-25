@@ -123,6 +123,10 @@ consequências:
 
 ### O caminho de rede do Oracle FMB segue a confirmar (C5)
 
+> **25/09/2026:** decidido na [ADR 024](024-rede-das-fontes-internas.md): VPC
+> compartilhada da Alupar, com o FMB alcançado pelo FortiGate dela e o MySQL
+> RDS pelo IP fixo do Cloud NAT.
+
 A Alup liberou acesso somente às views e informou host, porta e schema —
 recebidos em 11/09 e guardados fora do repositório, na DSN do Secret Manager
 (regra 2). Não informou se o banco é alcançável sem VPN. Até isso ser

@@ -193,6 +193,14 @@ continuam pendentes de liberação do ambiente pela Alup.
 > passaram nos 9 testes de integração do caminho relacional. Os conectores da
 > Onda 3 continuam dependendo do schema documentado — não se escrevem por
 > adivinhação.
+> **Rede da Onda 3 (25/09, noite):** com leitura concedida pela Alupar no
+> `alupar-networking`, o levantamento mostrou VPC compartilhada, VPN por um
+> FortiGate e **nenhum caminho até o Oracle FMB**, além de a política da
+> organização negar sub-rede compartilhada. Desenho na
+> [ADR 024](arquitetura/decisoes/024-rede-das-fontes-internas.md); do nosso lado
+> ficou pronto o Terraform (vazio até a Alupar concluir) e o job
+> `teste-conexao-<fonte>`; o passo a passo da Alupar, GCP e rede local, está em
+> [`runbook/rede-onda3.md`](runbook/rede-onda3.md).
 
 Este arquivo responde "onde estamos e o que trava o próximo passo". Detalhe de
 escopo e estimativa fica em [`plano-execucao.md`](plano-execucao.md); o que sai

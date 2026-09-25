@@ -264,11 +264,39 @@ variable "sem_agendamento" {
   default     = []
 }
 
+variable "rede_interna" {
+  description = "Sub-rede da VPC compartilhada da Alupar por onde saem as fontes internas (ADR 024); null, nenhuma sai"
+  type = object({
+    projeto_host = string
+    rede         = string
+    sub_rede     = string
+  })
+  default = null
+}
+
+variable "conectores_rede_interna" {
+  description = "Conectores que saem pela rede interna: as fontes da Onda 3"
+  type        = list(string)
+  default     = []
+}
+
+variable "fontes_teste_conexao" {
+  description = "Fontes com um job `testar-conexao`, que abre a DSN e roda SELECT 1 de dentro da rede"
+  type        = list(string)
+  default     = []
+}
+
 locals {
   # Fonte sem credencial falha a cada disparo, e o erro repetido enterra o
   # alerta que importa. Sai do Scheduler; o job fica para quando a credencial
   # chegar.
   agendados = { for k, v in var.conectores : k => v if !contains(var.sem_agendamento, k) }
+
+  # Caminho completo, no projeto host: a rede é da Alupar, não do AlupData.
+  rede_interna = var.rede_interna == null ? null : {
+    rede     = "projects/${var.rede_interna.projeto_host}/global/networks/${var.rede_interna.rede}"
+    sub_rede = "projects/${var.rede_interna.projeto_host}/regions/${var.region}/subnetworks/${var.rede_interna.sub_rede}"
+  }
 }
 
 resource "google_cloud_run_v2_job" "ingestao" {
@@ -283,6 +311,19 @@ resource "google_cloud_run_v2_job" "ingestao" {
       service_account = var.service_account_email
       max_retries     = 2
       timeout         = each.value.timeout
+
+      # Todo o tráfego pela VPC, não só o privado: é o que faz a saída para o
+      # MySQL RDS, na internet, passar pelo IP fixo do Cloud NAT da Alupar.
+      dynamic "vpc_access" {
+        for_each = var.rede_interna != null && contains(var.conectores_rede_interna, each.key) ? [local.rede_interna] : []
+        content {
+          network_interfaces {
+            network    = vpc_access.value.rede
+            subnetwork = vpc_access.value.sub_rede
+          }
+          egress = "ALL_TRAFFIC"
+        }
+      }
 
       containers {
         image = var.imagem
@@ -305,6 +346,47 @@ resource "google_cloud_run_v2_job" "ingestao" {
         env {
           name  = "GCP_REGION"
           value = var.region
+        }
+      }
+    }
+  }
+
+  labels = {
+    projeto  = "alupdata"
+    ambiente = var.environment
+  }
+}
+
+# "Já temos VPN?" respondido de onde a carga vai rodar: mesma imagem, mesma SA,
+# mesma sub-rede. Roda à mão (console, *Executar*); não lê dado.
+resource "google_cloud_run_v2_job" "teste_conexao" {
+  for_each = var.rede_interna == null ? toset([]) : toset(var.fontes_teste_conexao)
+
+  name     = "teste-conexao-${replace(each.key, "_", "-")}"
+  project  = var.project_id
+  location = var.region
+
+  template {
+    template {
+      service_account = var.service_account_email
+      max_retries     = 0
+      timeout         = "120s"
+
+      vpc_access {
+        network_interfaces {
+          network    = local.rede_interna.rede
+          subnetwork = local.rede_interna.sub_rede
+        }
+        egress = "ALL_TRAFFIC"
+      }
+
+      containers {
+        image = var.imagem
+        args  = ["testar-conexao", each.key]
+
+        env {
+          name  = "GCP_PROJECT_ID"
+          value = var.project_id
         }
       }
     }

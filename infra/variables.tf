@@ -150,3 +150,39 @@ variable "portal_acesso" {
     error_message = "Use só group:<e-mail> ou domain:<domínio>; acesso individual (user:) não entra."
   }
 }
+
+variable "rede_interna" {
+  description = <<-EOT
+    Sub-rede da VPC compartilhada da Alupar por onde saem as fontes internas da
+    Onda 3 (ADR 024). Fica null até a Alupar concluir a parte dela do
+    `docs/runbook/rede-onda3.md`; com null, nenhum job muda.
+  EOT
+  type = object({
+    projeto_host = string
+    rede         = string
+    sub_rede     = string
+  })
+  default = null
+}
+
+variable "conectores_rede_interna" {
+  description = "Conectores que saem pela rede interna: as fontes da Onda 3"
+  type        = list(string)
+  default     = []
+
+  validation {
+    condition     = alltrue([for conector in var.conectores_rede_interna : can(regex("^[a-z0-9_]+$", conector))])
+    error_message = "Use o rótulo do conector em snake_case, como `fmb_contrato`."
+  }
+}
+
+variable "fontes_teste_conexao" {
+  description = "Fontes com job `teste-conexao-<fonte>`, que abre a DSN do Secret Manager e roda SELECT 1"
+  type        = list(string)
+  default     = []
+
+  validation {
+    condition     = alltrue([for fonte in var.fontes_teste_conexao : can(regex("^[a-z0-9-]+$", fonte))])
+    error_message = "Use o nome da fonte como no secret `alupdata-<fonte>-dsn`, como `fmb` ou `portal-alup`."
+  }
+}

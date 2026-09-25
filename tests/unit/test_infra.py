@@ -306,13 +306,28 @@ def test_quadro_sem_gcp_ou_app_avisa_e_termina_com_sucesso() -> None:
     guarda = workflow[workflow.index("id: guarda") :]
     for variavel in ("vars.GCP_WIF_PROVIDER", "vars.GCP_DEPLOY_SA", "vars.QUADRO_APP_CLIENT_ID"):
         assert variavel in guarda
-    assert "::notice::" in guarda
-    assert "exit 1" not in guarda
+    passo_guarda, *passos = re.split(r"\n      - ", guarda)
+    assert "::notice::" in passo_guarda
+    assert "exit 1" not in passo_guarda
     # Todo passo depois da guarda depende dela.
-    passos = re.split(r"\n      - ", guarda)[1:]
     assert passos
     for passo in passos:
         assert "steps.guarda.outputs.pronto == 'true'" in passo, passo
+
+
+def test_quadro_sem_versao_da_chave_avisa_e_termina_com_sucesso() -> None:
+    """Secret sem versão é pendência conhecida (O5): aviso, não falha diária."""
+    workflow = _quadro()
+    chave = workflow[workflow.index("id: chave") :]
+    passo_chave, *seguintes = re.split(r"\n      - ", chave)
+    assert "NOT_FOUND" in passo_chave
+    assert "::notice::" in passo_chave
+    assert "ok=false" in passo_chave and "ok=true" in passo_chave
+    # Outro erro de leitura continua falhando: só a ausência de versão é tolerada.
+    assert "exit 1" in passo_chave
+    assert seguintes
+    for passo in seguintes:
+        assert "steps.chave.outputs.ok == 'true'" in passo, passo
 
 
 def test_scheduler_repassa_a_regiao_para_o_cloud_run_job() -> None:

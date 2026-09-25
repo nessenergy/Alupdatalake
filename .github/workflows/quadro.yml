@@ -73,11 +73,22 @@ jobs:
       # A chave vai do Secret Manager direto para a saída deste passo, que só
       # existe dentro do job: nunca para o log, o ambiente do job ou artefato.
       # `::add-mask::` cobre uma linha por vez, então cada linha do PEM é
-      # mascarada antes de qualquer uso.
+      # mascarada antes de qualquer uso. Secret sem versão (a chave do App ainda
+      # não foi gravada) é pendência conhecida: aviso e sucesso, como na guarda.
+      # O erro lido é só a mensagem do gcloud, nunca o valor.
       - id: chave
         if: steps.guarda.outputs.pronto == 'true'
         run: |
-          chave="$(gcloud secrets versions access latest --secret=alupdata-github-quadro-app-key)"
+          if ! chave="$(gcloud secrets versions access latest --secret=alupdata-github-quadro-app-key 2>erro.txt)"; then
+            if grep -q NOT_FOUND erro.txt; then
+              echo "::notice::Quadro não sincronizado: o secret alupdata-github-quadro-app-key não tem versão. Gravar a chave privada do App (docs/runbook/acompanhamento-semanal.md, passo 3)."
+              echo "ok=false" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+            cat erro.txt >&2
+            exit 1
+          fi
+          echo "ok=true" >> "$GITHUB_OUTPUT"
           while IFS= read -r linha; do
             if [ -n "$linha" ]; then echo "::add-mask::$linha"; fi
           done <<< "$chave"
@@ -87,7 +98,7 @@ jobs:
       # Project 2 é da organização, daí o `owner`; as permissões pedidas são o
       # subconjunto que o script usa.
       - id: token
-        if: steps.guarda.outputs.pronto == 'true'
+        if: steps.guarda.outputs.pronto == 'true' && steps.chave.outputs.ok == 'true'
         uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
         with:
           client-id: ${{ vars.QUADRO_APP_CLIENT_ID }}
@@ -96,13 +107,13 @@ jobs:
           permission-organization-projects: write
           permission-issues: write
           permission-pull-requests: read
-      - if: steps.guarda.outputs.pronto == 'true'
+      - if: steps.guarda.outputs.pronto == 'true' && steps.chave.outputs.ok == 'true'
         uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
         with:
           version: "0.5.11"
-      - if: steps.guarda.outputs.pronto == 'true'
+      - if: steps.guarda.outputs.pronto == 'true' && steps.chave.outputs.ok == 'true'
         run: uv sync --frozen --no-dev
-      - if: steps.guarda.outputs.pronto == 'true'
+      - if: steps.guarda.outputs.pronto == 'true' && steps.chave.outputs.ok == 'true'
         env:
           GITHUB_TOKEN: ${{ steps.token.outputs.token }}
           SIMULAR: ${{ inputs.simular }}

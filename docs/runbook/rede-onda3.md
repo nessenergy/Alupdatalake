@@ -8,6 +8,19 @@ Levantamento da rede da Alupar feito em **25/09/2026**, em leitura, no projeto
 AlupData, abre conexão com o Oracle FMB e responde `SELECT 1`. Nada aqui dá à
 ness. acesso de escrita à rede da Alupar.
 
+## Situação
+
+| Data | O que | Quem |
+|---|---|---|
+| 25/09 | N1 em `dev` e `hml` (API `compute` pelo bootstrap) | ness. |
+| 25/09 | 0, G1 a G5 em `dev` e `hml`, pelo [`rede-onda3-alupar.sh`](rede-onda3-alupar.sh), com a conta `ness@alupar.com.br`. O papel `roles/iam.infrastructureAdmin` que o grupo `operacao-datalake@` tinha no `alupar-networking` saiu; ficou só leitura | ness., a pedido da Alupar |
+| 25/09 | N2 em `dev`: `teste-conexao-fmb` criado. Rodou dentro da sub-rede e parou na DSN ausente, o que confirma a parte GCP | ness. |
+| pendente | L1 (IP e rede do FMB), G6, L2 a L6 e a credencial do FMB (N3) | Alupar |
+| depois do aceite | `prod-alupdata`: bootstrap de produção, depois o script com `prod` nas duas listas | ness. |
+
+Todos os passos da Parte G têm equivalente no script, que mostra tudo antes de
+aplicar (`bash rede-onda3-alupar.sh`) e só aplica com `APLICAR=1`.
+
 ## Valores usados em todo o documento
 
 | Nome | Valor |

@@ -201,6 +201,13 @@ continuam pendentes de liberação do ambiente pela Alup.
 > ficou pronto o Terraform (vazio até a Alupar concluir) e o job
 > `teste-conexao-<fonte>`; o passo a passo da Alupar, GCP e rede local, está em
 > [`runbook/rede-onda3.md`](runbook/rede-onda3.md).
+> **Mesmo dia, aplicado:** a parte GCP da Alupar (sub-rede `172.16.9.0/26`
+> na `vpc-dr-prd`, `dev` e `hml` ligados à VPC compartilhada, permissões,
+> exceção de política e firewall), e o `teste-conexao-fmb` rodou em `dev`
+> dentro da sub-rede (#253, #254). O acesso do grupo `operacao-datalake@` no
+> `alupar-networking` voltou a ser só leitura. **Pendente da Alupar:** IP e
+> rede do FMB, FortiGate e datacenter, e a credencial do FMB no Secret
+> Manager; pedido no e-mail de 25/09.
 
 Este arquivo responde "onde estamos e o que trava o próximo passo". Detalhe de
 escopo e estimativa fica em [`plano-execucao.md`](plano-execucao.md); o que sai

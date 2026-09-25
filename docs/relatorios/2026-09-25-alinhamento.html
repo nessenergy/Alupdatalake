@@ -1,0 +1,679 @@
+<!doctype html><html lang='pt-BR'><head><meta charset='utf-8'><meta name='viewport' content='width=device-width, initial-scale=1'><title>Alinhamento — onde estamos e o caminho até o aceite — 25/09/2026</title><link rel='preconnect' href='https://fonts.googleapis.com'><link rel='preconnect' href='https://fonts.gstatic.com' crossorigin><link href='https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap' rel='stylesheet'><style>
+@page { size: A4; margin: 16mm 14mm 16mm 14mm; }
+
+/* O documento existe para virar A4. Declarar o esquema claro impede o
+   navegador de escurecer por conta própria e descolar tela de papel. */
+:root { color-scheme: light; }
+
+/* Imprimir do navegador (Ctrl+P → Salvar como PDF) vem com "gráficos de plano
+   de fundo" DESLIGADO por padrão. Sem isto, a faixa alternada das tabelas, o
+   fundo do `code` e o bloco de alerta somem no papel — e a etiqueta vermelha
+   do questionário vira texto branco sobre branco, isto é, invisível.
+   Forçar aqui garante que tela, --print-to-pdf e impressão manual coincidam. */
+html {
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+:root {
+  --tinta: #0f172a;
+  --suave: #475569;
+  --tenue: #94a3b8;
+  --linha: #e2e8f0;
+  --linha-fina: #eef2f6;
+  --zebra: #f8fafc;
+  --ness: #00ade8;
+  --link: #007aa3;
+  --alerta: #b3261e;
+  --fundo-alerta: #fdf3f2;
+  /* Corpo em Inter, títulos e marca em Montserrat, dado técnico em mono. */
+  --texto: Inter, "Segoe UI", system-ui, sans-serif;
+  --titulo: Montserrat, "Segoe UI", system-ui, sans-serif;
+  --mono: "JetBrains Mono", "Cascadia Mono", Consolas, monospace;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: var(--texto);
+  font-size: 9.4pt;
+  line-height: 1.55;
+  color: var(--tinta);
+  margin: 0;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ---------------------------------------------------------------- cabeçalho */
+
+.marca {
+  font-family: var(--titulo);
+  font-weight: 500;
+  font-size: 15pt;
+  letter-spacing: -0.01em;
+  margin: 0 0 2mm;
+}
+/* O ponto da marca é sempre BlueDot, em qualquer fundo. */
+.marca span { color: var(--ness); }
+
+h1 {
+  font-family: var(--titulo);
+  font-size: 17pt;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+  margin: 0 0 1mm;
+  padding-bottom: 3mm;
+  border-bottom: 2px solid var(--ness);
+}
+
+/* A primeira linha depois do h1 é a tarja de identificação do documento —
+   emissão, contrato, marco. Ela se lê como etiqueta, não como parágrafo. */
+h1 + p {
+  font-size: 8.4pt;
+  color: var(--suave);
+  margin-bottom: 5mm;
+}
+
+/* ------------------------------------------------- identificação do documento */
+
+/* Ficha do documento: quem emite, para quem, sob qual contrato, em que data.
+   Fica logo abaixo do título e não se parte entre páginas — um documento
+   contratual precisa ser identificável pela primeira folha, isolada. */
+.identificacao {
+  display: grid;
+  /* Largura suficiente para "RESPONSÁVEL TÉCNICO" caber em uma linha. */
+  grid-template-columns: 37mm 1fr;
+  gap: 1.2mm 4mm;
+  margin: 4mm 0 6mm;
+  padding: 3.5mm 4mm;
+  background: var(--zebra);
+  border-left: 2px solid var(--ness);
+  font-size: 8.4pt;
+  break-inside: avoid;
+}
+.id-rotulo {
+  font-family: var(--titulo);
+  font-size: 7.2pt;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--suave);
+  padding-top: 0.4mm;
+}
+.id-valor { color: var(--tinta); }
+
+/* ------------------------------------------------------------- fecho assinado */
+
+.assinatura {
+  margin-top: 12mm;
+  break-inside: avoid;
+}
+.assinatura .local-data {
+  font-size: 8.6pt;
+  color: var(--suave);
+  margin-bottom: 12mm;
+}
+.linha-assinatura {
+  width: 68mm;
+  border-top: 1px solid var(--tinta);
+  margin-bottom: 1.6mm;
+}
+.assina-nome {
+  font-family: var(--titulo);
+  font-weight: 500;
+  font-size: 9.4pt;
+  margin: 0;
+}
+.assina-org {
+  font-size: 8pt;
+  color: var(--suave);
+  margin: 0.4mm 0 0;
+}
+
+h2 {
+  font-family: var(--titulo);
+  font-size: 11.5pt;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  margin: 8mm 0 2.5mm;
+  padding-top: 3mm;
+  border-top: 1px solid var(--linha);
+  /* Um bloco não deve abrir no rodapé e continuar na página seguinte. */
+  break-after: avoid;
+}
+
+/* Marcador BlueDot antes do título de seção: assinatura discreta, custo zero
+   de espaço, e dá ao olho um ponto de entrada por seção. */
+h2::before {
+  content: "";
+  display: inline-block;
+  width: 1.4mm;
+  height: 1.4mm;
+  border-radius: 50%;
+  background: var(--ness);
+  margin-right: 1.8mm;
+  vertical-align: 0.4mm;
+}
+
+h3 {
+  font-family: var(--titulo);
+  font-size: 10pt;
+  font-weight: 500;
+  margin: 5mm 0 2mm;
+  break-after: avoid;
+}
+
+p { margin: 0 0 2.5mm; }
+strong { font-weight: 600; }
+code {
+  font-family: var(--mono);
+  font-size: 8.3pt;
+  background: var(--zebra);
+  border: 0.2mm solid var(--linha-fina);
+  padding: 0.3mm 1mm;
+  border-radius: 2px;
+}
+
+/* Bloco de comando ou de exemplo: é o que o leitor copia. Uma linha longa rola
+   dentro do bloco em tela e quebra na impressão, sem emendar no texto. */
+pre {
+  margin: 1.5mm 0 3mm;
+  padding: 2mm 3mm;
+  background: var(--zebra);
+  border: 0.2mm solid var(--linha-fina);
+  border-radius: 2px;
+  overflow-x: auto;
+  break-inside: avoid;
+}
+pre code {
+  background: none;
+  border: 0;
+  padding: 0;
+  white-space: pre;
+}
+@media print {
+  pre code { white-space: pre-wrap; overflow-wrap: anywhere; }
+}
+
+/* -------------------------------------------------------------------- tabela */
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0 0 4mm;
+  font-size: 8.8pt;
+  /* Número em coluna alinha por dígito, não por forma da letra. */
+  font-variant-numeric: tabular-nums;
+}
+th {
+  text-align: left;
+  font-family: var(--titulo);
+  font-weight: 600;
+  font-size: 7.6pt;
+  text-transform: uppercase;
+  /* Tracking discreto: em coluna estreita, cada 0,01em a mais é uma quebra
+     de linha a mais no cabeçalho. */
+  letter-spacing: 0.04em;
+  color: var(--suave);
+  border-bottom: 1.5px solid var(--tinta);
+  padding: 1.6mm 2mm;
+  /* Cabeçalho de coluna se lê como rótulo: melhor uma linha que duas. */
+  text-wrap: balance;
+}
+td {
+  border-bottom: 1px solid var(--linha-fina);
+  padding: 2.4mm 2mm;
+  vertical-align: top;
+}
+/* Faixa alternada: em tabela densa, o olho perde a linha sem ela. Tom baixo
+   o bastante para não competir com o texto nem pesar na impressão. */
+tbody tr:nth-child(even) td { background: var(--zebra); }
+/* A primeira coluna costuma ser a chave da linha — onda, item, código. */
+tbody td:first-child { font-weight: 500; }
+/* Uma pergunta não se parte entre páginas. */
+tr { break-inside: avoid; }
+thead { display: table-header-group; }
+
+/* Diagrama em SVG embutido: ocupa a largura do texto e não se parte entre
+   páginas; a legenda fica colada nele. */
+figure.diagrama {
+  margin: 14px 0 18px;
+  padding: 10px 10px 6px;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  break-inside: avoid;
+}
+figure.diagrama svg { display: block; width: 100%; height: auto; }
+figure.diagrama figcaption {
+  margin-top: 6px;
+  font-size: 9pt;
+  color: #475569;
+}
+
+/* Larguras de coluna do formulário: código estreito, "Resposta" com espaço de
+   escrita. Valem só no questionário — num relatório espremeriam a 1ª coluna e
+   pintariam a última sem motivo. */
+.questionario td:first-child { width: 7%; font-weight: 600; font-variant-numeric: tabular-nums; }
+.questionario th:last-child, .questionario td:last-child { width: 30%; background: #fafbfc; }
+.questionario td:nth-child(3) { width: 15%; color: var(--suave); font-size: 8.2pt; }
+
+/* --------------------------------------------------------------- destaques */
+
+.bloqueia {
+  display: inline-block;
+  background: var(--alerta);
+  color: #fff;
+  font-size: 6.8pt;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  padding: 0.4mm 1.4mm;
+  border-radius: 2px;
+  margin-right: 1.2mm;
+  vertical-align: 1px;
+}
+
+blockquote {
+  margin: 0 0 3mm;
+  padding: 2.5mm 3mm;
+  background: var(--fundo-alerta);
+  border-left: 3px solid var(--alerta);
+}
+blockquote p:last-child { margin-bottom: 0; }
+
+/* O `---` do Markdown separa as seções na fonte, mas no PDF a borda de `h2` já
+   faz esse trabalho: manter os dois empilha traços. */
+hr { display: none; }
+hr + h2 { margin-top: 7mm; }
+
+ul { margin: 0 0 3mm; padding-left: 5mm; }
+li { margin-bottom: 1.2mm; }
+
+.rodape {
+  margin-top: 8mm;
+  padding-top: 3mm;
+  border-top: 1px solid var(--linha);
+  font-size: 7.6pt;
+  color: var(--suave);
+}
+
+/* ---------------------------------------------------------------- impressão */
+
+/* Token longo — URL, nome de secret, identificador — não pode ultrapassar a
+   largura da A4 e sumir na borda do papel. `anywhere` só no `code`, onde o
+   token não tem espaço por onde quebrar; em texto corrido ele partiria
+   palavra no meio, inclusive em cabeçalho de tabela. `break-word` quebra
+   apenas a palavra que sozinha não caberia na linha. */
+code { overflow-wrap: anywhere; }
+td, th, .id-valor { overflow-wrap: break-word; }
+
+/* Nenhuma hifenização automática: em documento contratual, palavra partida
+   por hífen inventado atrapalha a leitura e a busca no PDF. */
+* { hyphens: none; }
+
+/* Título distribui o texto entre as linhas em vez de deixar uma palavra órfã
+   na última — vale para o título do documento e para os de seção. */
+h1, h2, h3 { text-wrap: balance; }
+
+/* ------------------------------------------------------------------ links */
+
+/* Link com a cor da casa, não o azul padrão do navegador. O BlueDot puro
+   (#00ade8) não passa 4,5:1 sobre branco em texto corrido; o tom escuro dele
+   passa, e o sublinhado fica claro o bastante para não pesar na linha. */
+a {
+  color: var(--link);
+  text-decoration: underline;
+  text-decoration-color: rgba(0, 122, 163, 0.35);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.18em;
+}
+a:hover { text-decoration-color: currentColor; }
+a:focus-visible { outline: 2px solid var(--ness); outline-offset: 2px; border-radius: 2px; }
+
+::selection { background: rgba(0, 173, 232, 0.18); color: var(--tinta); }
+
+/* Lista com uma pendência por linha: o espaço entre itens é o que deixa o
+   olho contar quantas são. */
+li + li { margin-top: 1.2mm; }
+
+/* ----------------------------------------------------------------- em tela */
+
+/* Só a versão de tela: no PDF a margem é da @page. Em tela o documento se
+   apresenta como folha sobre fundo, que é como ele será lido e impresso.
+   Fica DEPOIS das regras-base de propósito: antes delas, o `body { margin: 0;
+   font-size: 9.4pt }` vencia pela ordem, a folha encostava à esquerda e o corpo
+   saía menor do que o previsto. */
+@media screen {
+  html { background: var(--zebra); }
+  body {
+    max-width: 940px;
+    margin: 0 auto;
+    padding: 56px 56px 72px;
+    font-size: 15px;
+    background: #fff;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04),
+                0 10px 15px -3px rgba(15, 23, 42, 0.06);
+  }
+  table { font-size: 14px; }
+  code { font-size: 13px; }
+}
+
+/* Folha estreita (celular): a margem da folha encolhe junto, e a tabela rola
+   dentro dela em vez de empurrar a página para o lado. */
+@media screen and (max-width: 640px) {
+  body { padding: 28px 18px 40px; font-size: 15px; }
+  table { display: block; overflow-x: auto; }
+}
+
+@media print {
+  /* Uma linha solta no pé ou no topo da página é o defeito mais visível de um
+     documento impresso. Três linhas é o mínimo que se lê como parágrafo. */
+  p, li { orphans: 3; widows: 3; }
+  h1, h2, h3 { break-after: avoid; break-inside: avoid; }
+  /* Título de seção seguido de tabela: os dois andam juntos ou nenhum anda. */
+  h2 + table, h3 + table, h2 + p, h3 + p { break-before: avoid; }
+  table, blockquote { break-inside: auto; }
+  /* Link impresso vira texto: sublinhado só polui o papel. */
+  a { text-decoration: none; color: var(--tinta); }
+}
+</style></head><body class='relatorio'><p class="marca">ness<span>.</span></p><h1>Onde estamos, e o caminho até o aceite</h1><section class='identificacao'><div class='id-rotulo'>Documento</div><div class='id-valor'>Pauta de alinhamento</div><div class='id-rotulo'>Referência</div><div class='id-valor'>REL-2026-09-25 · AlupData Fase 1</div><div class='id-rotulo'>Data de emissão</div><div class='id-valor'>25 de setembro de 2026</div><div class='id-rotulo'>Emitente</div><div class='id-valor'>ness. Processos e Tecnologia Ltda.</div><div class='id-rotulo'>Destinatário</div><div class='id-valor'>Alup — Leonardo Guiel Marques, Taina Ulhoa Mota, Mauricio Cardoso e Saulo Rodrigues</div><div class='id-rotulo'>Contrato</div><div class='id-valor'>CPS-01025/2026 — AlupData Fase 1: DataLake</div><div class='id-rotulo'>Marco em jogo</div><div class='id-valor'>Ondas 0 e 1 — dossiês e aceite</div><div class='id-rotulo'>Responsável técnico</div><div class='id-valor'>Ricardo Esper</div><div class='id-rotulo'>Classificação</div><div class='id-valor'>Confidencial — uso restrito das partes</div></section>
+<p>Este documento serve de pauta para a reunião de alinhamento. Em uma página:
+<strong>o lake está de pé e carregando dado real</strong>, as Ondas 0 e 1 têm dossiê
+previsto para <strong>29–30/09</strong>, e propomos a reunião de aceite para <strong>01/10</strong>.</p>
+<h2>1. O que aconteceu desde a liberação do GCP</h2>
+<p>A Alup liberou os três projetos em 23/09. Desde então:</p>
+<table>
+<thead>
+<tr>
+<th>Data</th>
+<th>O quê</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>23/09</td>
+<td>Ambiente de desenvolvimento provisionado: bases, armazenamento, 27 rotinas de carga agendadas e o Portal publicado com login</td>
+</tr>
+<tr>
+<td>24/09</td>
+<td>Transformações (Bronze, Silver e Gold) de pé; primeira carga real às 9h34</td>
+</tr>
+<tr>
+<td>24/09</td>
+<td><strong>As 23 fontes públicas carregaram com sucesso, sem registro recusado</strong> — incluindo a geração horária por usina da CCEE de julho/2026, com 2.964.096 linhas</td>
+</tr>
+<tr>
+<td>24/09</td>
+<td><strong>22 tabelas Gold de mercado com dado</strong>; as que seguem vazias esperam insumo (BBCE, Hubspot, acervo do TempoOK)</td>
+</tr>
+<tr>
+<td>25/09</td>
+<td>Ambiente de homologação provisionado e com as transformações executando; <strong>22 das 23 fontes públicas já carregadas nele</strong>, e a maior — a geração horária por usina da CCEE — em andamento</td>
+</tr>
+</tbody>
+</table>
+<p>A primeira carga real revelou sete ajustes que teste local não mostra —
+formato novo publicado pelo Banco Central, precisão de números do ONS, tempo
+e volume da carga mensal da CCEE, uma regra de qualidade que recusava dado
+legítimo, entre outros. <strong>Todos foram corrigidos no mesmo dia, com teste</strong>, e
+a carga ganhou um alarme próprio para quando uma origem mudar de formato.</p>
+<figure class="diagrama">
+<svg viewBox='0 0 720 160' width='100%' xmlns='http://www.w3.org/2000/svg' font-family='Inter, Arial, sans-serif' role='img' aria-label='Fluxo do dado, das fontes ao consumo'>
+<defs><marker id='seta' viewBox='0 0 10 10' refX='9' refY='5' markerWidth='7' markerHeight='7' orient='auto'><path d='M0,0 L10,5 L0,10 z' fill='#00ade8'/></marker></defs>
+<rect x='8' y='28' width='132' height='96' rx='8' fill='#f1f5f9' stroke='#64748b' stroke-width='1.4'/>
+<text x='74.0' y='50' text-anchor='middle' font-size='13' font-weight='700' fill='#0f172a'>Fontes</text>
+<text x='74.0' y='70' text-anchor='middle' font-size='10.5' fill='#64748b'>APIs públicas</text>
+<text x='74.0' y='85' text-anchor='middle' font-size='10.5' fill='#64748b'>APIs com credencial</text>
+<text x='74.0' y='100' text-anchor='middle' font-size='10.5' fill='#64748b'>Bancos internos</text>
+<text x='74.0' y='115' text-anchor='middle' font-size='10.5' fill='#64748b'>Planilhas</text>
+<rect x='152' y='28' width='104' height='96' rx='8' fill='#f1f5f9' stroke='#64748b' stroke-width='1.4'/>
+<text x='204.0' y='50' text-anchor='middle' font-size='13' font-weight='700' fill='#0f172a'>Dado bruto</text>
+<text x='204.0' y='70' text-anchor='middle' font-size='10.5' fill='#64748b'>guardado como veio</text>
+<text x='204.0' y='85' text-anchor='middle' font-size='10.5' fill='#64748b'>no GCS</text>
+<text x='204.0' y='100' text-anchor='middle' font-size='10.5' fill='#64748b'>permite reprocessar</text>
+<rect x='282' y='28' width='104' height='96' rx='8' fill='#f1f5f9' stroke='#64748b' stroke-width='1.4'/>
+<text x='334.0' y='50' text-anchor='middle' font-size='13' font-weight='700' fill='#0f172a'>Bronze</text>
+<text x='334.0' y='70' text-anchor='middle' font-size='10.5' fill='#64748b'>uma linha por</text>
+<text x='334.0' y='85' text-anchor='middle' font-size='10.5' fill='#64748b'>registro recebido</text>
+<text x='334.0' y='100' text-anchor='middle' font-size='10.5' fill='#64748b'>com a execução</text>
+<rect x='402' y='28' width='104' height='96' rx='8' fill='#f1f5f9' stroke='#64748b' stroke-width='1.4'/>
+<text x='454.0' y='50' text-anchor='middle' font-size='13' font-weight='700' fill='#0f172a'>Silver</text>
+<text x='454.0' y='70' text-anchor='middle' font-size='10.5' fill='#64748b'>limpa, sem</text>
+<text x='454.0' y='85' text-anchor='middle' font-size='10.5' fill='#64748b'>duplicata, com</text>
+<text x='454.0' y='100' text-anchor='middle' font-size='10.5' fill='#64748b'>regras de qualidade</text>
+<rect x='522' y='28' width='104' height='96' rx='8' fill='#e0f6fd' stroke='#00ade8' stroke-width='1.4'/>
+<text x='574.0' y='50' text-anchor='middle' font-size='13' font-weight='700' fill='#0f172a'>Gold</text>
+<text x='574.0' y='70' text-anchor='middle' font-size='10.5' fill='#64748b'>tabelas prontas</text>
+<text x='574.0' y='85' text-anchor='middle' font-size='10.5' fill='#64748b'>para análise</text>
+<text x='574.0' y='100' text-anchor='middle' font-size='10.5' fill='#64748b'>por domínio</text>
+<rect x='636' y='28' width='78' height='96' rx='8' fill='#f1f5f9' stroke='#64748b' stroke-width='1.4'/>
+<text x='675.0' y='50' text-anchor='middle' font-size='13' font-weight='700' fill='#0f172a'>Consumo</text>
+<text x='675.0' y='70' text-anchor='middle' font-size='10.5' fill='#64748b'>Portal</text>
+<text x='675.0' y='85' text-anchor='middle' font-size='10.5' fill='#64748b'>Power BI</text>
+<line x1='140' y1='76' x2='149' y2='76' stroke='#00ade8' stroke-width='2' marker-end='url(#seta)'/>
+<line x1='256' y1='76' x2='279' y2='76' stroke='#00ade8' stroke-width='2' marker-end='url(#seta)'/>
+<line x1='386' y1='76' x2='399' y2='76' stroke='#00ade8' stroke-width='2' marker-end='url(#seta)'/>
+<line x1='506' y1='76' x2='519' y2='76' stroke='#00ade8' stroke-width='2' marker-end='url(#seta)'/>
+<line x1='626' y1='76' x2='633' y2='76' stroke='#00ade8' stroke-width='2' marker-end='url(#seta)'/>
+<text x='360' y='148' text-anchor='middle' font-size='10.5' fill='#64748b'>Agendamento e execução: Cloud Scheduler e Cloud Run · Transformações: Dataform · Alertas: Cloud Monitoring</text>
+</svg>
+<figcaption>Figura 1 — O caminho do dado: da fonte ao consumo, com o bruto guardado para reprocessar.</figcaption>
+</figure>
+
+<p>Os alertas de falha de carga estão ativos e chegam à equipe de operação. Em
+homologação, também ao endereço de alertas da Alup (<code>alup.alertas@alupar.com.br</code>).</p>
+<h2>2. Onda por onda</h2>
+<table>
+<thead>
+<tr>
+<th>Onda</th>
+<th>Situação</th>
+<th>Próximo marco</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>0 — Fundação</strong></td>
+<td>entregue e em operação; falta completar três dias seguidos de carga (26/09)</td>
+<td>dossiê em <strong>29–30/09</strong></td>
+</tr>
+<tr>
+<td><strong>1 — Mercado base</strong></td>
+<td>as 23 fontes públicas carregadas com sucesso</td>
+<td>dossiê em <strong>29–30/09</strong>, junto com a Onda 0 — antes do prazo de 16/10</td>
+</tr>
+<tr>
+<td><strong>2 — APIs com credencial</strong></td>
+<td>previsão de ENA do TempoOK em carga diária; Hubspot e BBCE prontos, esperando credencial</td>
+<td>dossiê cerca de uma semana depois das credenciais</td>
+</tr>
+<tr>
+<td><strong>3 — Sistemas internos</strong></td>
+<td>caminho de banco e orquestração prontos</td>
+<td>começa quando chegarem VPN e credenciais</td>
+</tr>
+<tr>
+<td><strong>4 — Planilhas e handoff</strong></td>
+<td>motor de planilhas pronto; espaço de envio criado; catálogo de dados estruturado</td>
+<td>planilhas de exemplo; depois, templates</td>
+</tr>
+</tbody>
+</table>
+<figure class="diagrama">
+<svg viewBox='0 0 720 204' width='100%' xmlns='http://www.w3.org/2000/svg' font-family='Inter, Arial, sans-serif' role='img' aria-label='Ondas: janela do contrato e dossiê previsto'>
+<line x1='124.5' y1='22' x2='124.5' y2='182' stroke='#e2e8f0' stroke-width='1'/>
+<text x='127.5' y='18' font-size='10' fill='#64748b'>set</text>
+<line x1='258.3' y1='22' x2='258.3' y2='182' stroke='#e2e8f0' stroke-width='1'/>
+<text x='261.3' y='18' font-size='10' fill='#64748b'>out</text>
+<line x1='396.6' y1='22' x2='396.6' y2='182' stroke='#e2e8f0' stroke-width='1'/>
+<text x='399.6' y='18' font-size='10' fill='#64748b'>nov</text>
+<line x1='530.5' y1='22' x2='530.5' y2='182' stroke='#e2e8f0' stroke-width='1'/>
+<text x='533.5' y='18' font-size='10' fill='#64748b'>dez</text>
+<line x1='668.8' y1='22' x2='668.8' y2='182' stroke='#e2e8f0' stroke-width='1'/>
+<text x='671.8' y='18' font-size='10' fill='#64748b'>jan</text>
+<text x='8' y='46' font-size='11' font-weight='600' fill='#0f172a'>Onda 0 · Fundação</text>
+<rect x='120.0' y='34' width='49.099999999999994' height='16' rx='3' fill='#f1f5f9' stroke='#64748b' stroke-width='1'/>
+<path d='M253.8,34 L261.8,42 L253.8,50 L245.8,42 z' fill='#00ade8' stroke='#00ade8' stroke-width='1.6'/>
+<text x='265.8' y='46' text-anchor='start' font-size='10' fill='#64748b'>dossiê 29–30/09 (postergada por A3)</text>
+<text x='8' y='76' font-size='11' font-weight='600' fill='#0f172a'>Onda 1 · Mercado</text>
+<rect x='182.5' y='64' width='142.7' height='16' rx='3' fill='#f1f5f9' stroke='#64748b' stroke-width='1'/>
+<path d='M253.8,64 L261.8,72 L253.8,80 L245.8,72 z' fill='#00ade8' stroke='#00ade8' stroke-width='1.6'/>
+<text x='337.2' y='76' text-anchor='start' font-size='10' fill='#64748b'>dossiê 29–30/09, antes do prazo</text>
+<text x='8' y='106' font-size='11' font-weight='600' fill='#0f172a'>Onda 2 · Credenciais</text>
+<rect x='338.6' y='94' width='111.59999999999997' height='16' rx='3' fill='#f1f5f9' stroke='#64748b' stroke-width='1'/>
+<path d='M356.5,94 L364.5,102 L356.5,110 L348.5,102 z' fill='#ffffff' stroke='#00ade8' stroke-width='1.6'/>
+<text x='462.2' y='106' text-anchor='start' font-size='10' fill='#64748b'>~23/10, se credenciais até 12/10</text>
+<text x='8' y='136' font-size='11' font-weight='600' fill='#0f172a'>Onda 3 · Internos</text>
+<rect x='463.5' y='124' width='142.79999999999995' height='16' rx='3' fill='#f1f5f9' stroke='#64748b' stroke-width='1'/>
+<text x='457.5' y='136' text-anchor='end' font-size='10' fill='#64748b'>depende de VPN e credenciais</text>
+<text x='8' y='166' font-size='11' font-weight='600' fill='#0f172a'>Onda 4 · Planilhas</text>
+<rect x='619.7' y='154' width='80.29999999999995' height='16' rx='3' fill='#f1f5f9' stroke='#64748b' stroke-width='1'/>
+<text x='613.7' y='166' text-anchor='end' font-size='10' fill='#64748b'>após a Onda 3</text>
+<line x1='231.5' y1='24' x2='231.5' y2='182' stroke='#0f172a' stroke-width='1.2' stroke-dasharray='4 3'/>
+<text x='235.5' y='196' font-size='10' font-weight='600' fill='#0f172a'>hoje, 25/09</text>
+<rect x='470' y='186' width='12' height='10' fill='#f1f5f9' stroke='#64748b'/><text x='486' y='195' font-size='10' fill='#64748b'>janela do contrato</text>
+<path d='M600,186 L606,191 L600,196 L594,191 z' fill='#00ade8' stroke='#00ade8'/><text x='611' y='195' font-size='10' fill='#64748b'>dossiê previsto</text>
+</svg>
+<figcaption>Figura 2 — Cada onda na janela do contrato, e a data prevista do dossiê.</figcaption>
+</figure>
+
+<h2>3. O que o dossiê das Ondas 0 e 1 vai mostrar</h2>
+<p>Para que a reunião de aceite seja conferência, e não primeira leitura:</p>
+<ul>
+<li>cada fonte com os sete componentes do contrato — conector, Bronze, Silver,
+  Gold, testes, agendamento e documentação com linhagem;</li>
+<li>carga real com sucesso, com o registro de cada execução;</li>
+<li>três dias seguidos de carga da fonte de referência (Banco Central);</li>
+<li>reprocessamento a partir do dado bruto guardado, sem nova chamada à origem
+  (já demonstrado em 24/09);</li>
+<li>o Portal mostrando uma tabela Gold com dado real;</li>
+<li>os portões de segurança do pipeline aprovados;</li>
+<li>a correspondência entre as 13 fontes do contrato e as entidades entregues.</li>
+</ul>
+<h2>4. O que precisamos da Alup</h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Pedido</th>
+<th>Para quando</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><strong>Quem assina o aceite</strong> das Ondas 0 e 1 — a Taina, conforme o questionário (B4), ou o Comitê da matriz RACI, com os nomes</td>
+<td>antes de 29/09</td>
+</tr>
+<tr>
+<td>2</td>
+<td><strong>Confirmar a reunião de aceite</strong> em 01/10, das 10h às 11h (alternativa: 02/10)</td>
+<td>29/09</td>
+</tr>
+<tr>
+<td>3</td>
+<td><strong>Token do Hubspot e acesso e host do BBCE</strong>, gravados pelo grupo da Alup no cofre de segredos do GCP — nunca por e-mail</td>
+<td>12/10</td>
+</tr>
+<tr>
+<td>4</td>
+<td><strong>Posição sobre as 32h do item 2.1</strong> (CCEE agente credenciado): solicitar a credencial à CCEE, ou realocar as horas para os conjuntos públicos da CCEE já entregues</td>
+<td>30/09</td>
+</tr>
+<tr>
+<td>5</td>
+<td><strong>Exemplos das planilhas</strong> no espaço de envio (<code>alupar-dev-alupdata-entrada</code>, pastas <code>planilhas/</code> e <code>usinas/</code>)</td>
+<td>01/10</td>
+</tr>
+<tr>
+<td>6</td>
+<td><strong>Grupos da Alup</strong> que passam a ler os dados e a entrar no Portal em homologação</td>
+<td>antes da reunião de aceite</td>
+</tr>
+<tr>
+<td>7</td>
+<td><strong>VPN e credenciais</strong> das fontes internas (Oracle FMB, Portal Alup, MySQL RDS, RM/TOTVS)</td>
+<td>09/11</td>
+</tr>
+<tr>
+<td>8</td>
+<td><strong>Sigla interna das usinas</strong>, para completar o de-para com o código oficial (CEG)</td>
+<td>sem data — encaixamos quando vier</td>
+</tr>
+</tbody>
+</table>
+<h2>5. Calendário proposto</h2>
+<table>
+<thead>
+<tr>
+<th>Data</th>
+<th>Marco</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>26/09</td>
+<td>terceiro dia seguido de carga da fonte de referência</td>
+</tr>
+<tr>
+<td>29–30/09</td>
+<td>dossiês das Ondas 0 e 1 entregues</td>
+</tr>
+<tr>
+<td>01/10</td>
+<td>reunião de aceite das Ondas 0 e 1</td>
+</tr>
+<tr>
+<td>12/10</td>
+<td>credenciais da Onda 2</td>
+</tr>
+<tr>
+<td>~1 semana depois</td>
+<td>dossiê da Onda 2</td>
+</tr>
+</tbody>
+</table>
+<figure class="diagrama">
+<svg viewBox='0 0 720 160' width='100%' xmlns='http://www.w3.org/2000/svg' font-family='Inter, Arial, sans-serif' role='img' aria-label='Linha do tempo de 23/09 a 12/10'>
+<line x1='40' y1='84' x2='680' y2='84' stroke='#64748b' stroke-width='2'/>
+<line x1='40' y1='84' x2='253.3' y2='84' stroke='#00ade8' stroke-width='4'/>
+<circle cx='40.0' cy='84' r='7' fill='#00ade8' stroke='#00ade8' stroke-width='2'/>
+<line x1='40.0' y1='77' x2='40.0' y2='60' stroke='#e2e8f0'/>
+<text x='40.0' y='22' text-anchor='middle' font-size='11' font-weight='700' fill='#0f172a'>23/09</text>
+<text x='40.0' y='37' text-anchor='middle' font-size='10.5' fill='#0f172a'>GCP liberado</text>
+<text x='40.0' y='51' text-anchor='middle' font-size='10.5' fill='#64748b'>dev no ar</text>
+<circle cx='146.7' cy='84' r='7' fill='#00ade8' stroke='#00ade8' stroke-width='2'/>
+<line x1='146.7' y1='91' x2='146.7' y2='106' stroke='#e2e8f0'/>
+<text x='146.7' y='122' text-anchor='middle' font-size='11' font-weight='700' fill='#0f172a'>24/09</text>
+<text x='146.7' y='137' text-anchor='middle' font-size='10.5' fill='#0f172a'>1ª carga</text>
+<text x='146.7' y='151' text-anchor='middle' font-size='10.5' fill='#64748b'>23 fontes públicas</text>
+<circle cx='253.3' cy='84' r='7' fill='#00ade8' stroke='#00ade8' stroke-width='2'/>
+<line x1='253.3' y1='77' x2='253.3' y2='60' stroke='#e2e8f0'/>
+<text x='253.3' y='22' text-anchor='middle' font-size='11' font-weight='700' fill='#0f172a'>25/09</text>
+<text x='253.3' y='37' text-anchor='middle' font-size='10.5' fill='#0f172a'>homologação</text>
+<text x='253.3' y='51' text-anchor='middle' font-size='10.5' fill='#64748b'>no ar</text>
+<circle cx='360.0' cy='84' r='7' fill='#ffffff' stroke='#00ade8' stroke-width='2'/>
+<line x1='360.0' y1='91' x2='360.0' y2='106' stroke='#e2e8f0'/>
+<text x='360.0' y='122' text-anchor='middle' font-size='11' font-weight='700' fill='#0f172a'>26/09</text>
+<text x='360.0' y='137' text-anchor='middle' font-size='10.5' fill='#0f172a'>3º dia seguido</text>
+<text x='360.0' y='151' text-anchor='middle' font-size='10.5' fill='#64748b'>de carga</text>
+<circle cx='466.7' cy='84' r='7' fill='#ffffff' stroke='#00ade8' stroke-width='2'/>
+<line x1='466.7' y1='77' x2='466.7' y2='60' stroke='#e2e8f0'/>
+<text x='466.7' y='22' text-anchor='middle' font-size='11' font-weight='700' fill='#0f172a'>29–30/09</text>
+<text x='466.7' y='37' text-anchor='middle' font-size='10.5' fill='#0f172a'>dossiês</text>
+<text x='466.7' y='51' text-anchor='middle' font-size='10.5' fill='#64748b'>Ondas 0 e 1</text>
+<circle cx='573.3' cy='84' r='7' fill='#ffffff' stroke='#00ade8' stroke-width='2'/>
+<line x1='573.3' y1='91' x2='573.3' y2='106' stroke='#e2e8f0'/>
+<text x='573.3' y='122' text-anchor='middle' font-size='11' font-weight='700' fill='#0f172a'>01/10</text>
+<text x='573.3' y='137' text-anchor='middle' font-size='10.5' fill='#0f172a'>reunião</text>
+<text x='573.3' y='151' text-anchor='middle' font-size='10.5' fill='#64748b'>de aceite</text>
+<circle cx='680.0' cy='84' r='7' fill='#ffffff' stroke='#00ade8' stroke-width='2'/>
+<line x1='680.0' y1='77' x2='680.0' y2='60' stroke='#e2e8f0'/>
+<text x='680.0' y='22' text-anchor='middle' font-size='11' font-weight='700' fill='#0f172a'>12/10</text>
+<text x='680.0' y='37' text-anchor='middle' font-size='10.5' fill='#0f172a'>credenciais</text>
+<text x='680.0' y='51' text-anchor='middle' font-size='10.5' fill='#64748b'>da Onda 2</text>
+</svg>
+<figcaption>Figura 3 — Linha do tempo: marcos cumpridos (cheios) e previstos (vazados).</figcaption>
+</figure>
+
+<p>Seguimos à disposição para ajustar datas e prioridades na reunião.</p>
+<p>Ricardo Esper — ness.</p><section class='assinatura'><p class=local-data>25 de setembro de 2026</p><div class='linha-assinatura'></div><p class='assina-nome'>Ricardo Esper</p><p class='assina-org'>ness. Processos e Tecnologia Ltda.</p></section><p class="rodape">ness. Processos e Tecnologia Ltda. · CNPJ 72.027.097/0001-37 · Contrato CPS-01025/2026 — AlupData Fase 1: DataLake</p></body></html>

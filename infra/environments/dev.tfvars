@@ -30,3 +30,12 @@ emails_alerta = ["operacao-datalake@ness.com.br"]
 # boletim do TempoOK, cujo acervo parou em 2022 (A10). Os jobs continuam
 # existindo; tire da lista quando a credencial ou o acervo chegar.
 conectores_sem_agendamento = ["hubspot_negocios", "bbce_curva_forward", "tempook_boletins"]
+
+# Fontes internas saem pela VPC compartilhada da Alupar (ADR 024). A parte
+# GCP da Alupar foi aplicada em 25/09 (runbook/rede-onda3.md, G1 a G5).
+rede_interna = {
+  projeto_host = "alupar-networking"
+  rede         = "vpc-dr-prd"
+  sub_rede     = "snet-vpc-dr-prd-us-central1-alupdata"
+}
+fontes_teste_conexao = ["fmb"]

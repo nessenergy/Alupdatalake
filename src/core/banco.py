@@ -12,7 +12,7 @@ eles.
 Formato da DSN, uma linha no secret `alupdata-<fonte>-dsn`:
 
     oracle://usuario:senha@host:1521/SERVICO
-    mysql://usuario:senha@host:3306/base
+    mysql://usuario:senha@host:3306/base?ssl_ca=/caminho/da/ca.pem
     sqlserver://usuario:senha@host:1433/base
 
 O SQL Server entrou pela via (c) do adendo ao C4: a Alup já mantém o realizado
@@ -32,9 +32,10 @@ from __future__ import annotations
 
 import logging
 import re
+import ssl
 from contextlib import contextmanager
 from typing import TYPE_CHECKING, Any
-from urllib.parse import unquote, urlparse
+from urllib.parse import parse_qs, unquote, urlparse
 
 from src.core.config import get_settings
 from src.core.secrets import ler_secret
@@ -45,6 +46,7 @@ if TYPE_CHECKING:
 logger = logging.getLogger(__name__)
 
 PORTA_PADRAO = {"oracle": 1521, "mysql": 3306, "sqlserver": 1433}
+_HOSTS_LOCAIS = {"127.0.0.1", "localhost", "::1"}
 _SOMENTE_LEITURA = re.compile(r"^\s*(?:--[^\n]*\n\s*)*(SELECT|WITH)\b", re.IGNORECASE)
 
 
@@ -79,6 +81,7 @@ def conectar(dsn: str) -> Any:
             password=unquote(url.password or ""),
             database=base,
             connect_timeout=int(cfg.banco_timeout),
+            **_tls_mysql(url.hostname or "", parse_qs(url.query)),
         )
 
     if url.scheme == "sqlserver":
@@ -96,6 +99,21 @@ def conectar(dsn: str) -> Any:
 
     # Só o esquema entra na mensagem — usuário, host e senha ficam de fora.
     raise ValueError(f"driver não suportado: {url.scheme!r}; use 'oracle', 'mysql' ou 'sqlserver'")
+
+
+def _tls_mysql(host: str, consulta: dict[str, list[str]]) -> dict[str, Any]:
+    """TLS obrigatório, com certificado e host verificados (ADR 013, revisão de 11/09).
+
+    O MySQL RDS é lido pela internet, sem VPN. A CA vem de `?ssl_ca=<caminho>` na
+    DSN — a do RDS não está no repositório de CAs do sistema. `?tls=0` só vale
+    para banco local, como os contêineres de `tests/integration`.
+    """
+    if consulta.get("tls") == ["0"]:
+        if host not in _HOSTS_LOCAIS:
+            # Nem host nem usuário na mensagem: a DSN inteira é segredo.
+            raise ValueError("TLS só pode ser desligado (tls=0) para banco local")
+        return {"ssl_disabled": True}
+    return {"ssl": ssl.create_default_context(cafile=consulta.get("ssl_ca", [None])[0])}
 
 
 def criar_conexao(fonte: str, campo: str = "dsn") -> Any:

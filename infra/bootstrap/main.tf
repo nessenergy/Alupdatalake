@@ -93,10 +93,13 @@ locals {
   ]
 
   # Token do GitHub só vale se vier do repositório do projeto; em hml e prod,
-  # também só de job que roda no ambiente do GitHub de mesmo nome.
+  # também só de job que roda no ambiente do GitHub de mesmo nome. A claim
+  # `environment`, e não o `sub`: o repositório usa o `sub` imutável
+  # (`repo:<org>@<id>/<repo>@<id>:environment:<amb>`), que nunca bate com o
+  # nome — foi o que recusou o primeiro deploy de hml, em 25/09.
   condicao_repositorio = "assertion.repository == '${var.github_repositorio}'"
   condicao_id          = var.github_repositorio_id == "" ? "" : " && assertion.repository_id == '${var.github_repositorio_id}'"
-  condicao_ambiente    = var.restringir_ao_ambiente_github ? " && assertion.sub == 'repo:${var.github_repositorio}:environment:${var.environment}'" : ""
+  condicao_ambiente    = var.restringir_ao_ambiente_github ? " && assertion.environment == '${var.environment}'" : ""
   condicao_wif         = "${local.condicao_repositorio}${local.condicao_id}${local.condicao_ambiente}"
 }
 

@@ -176,9 +176,16 @@ def test_wif_aceita_so_o_repositorio_do_projeto() -> None:
 
 
 def test_wif_de_hml_e_prod_exige_o_ambiente_do_github() -> None:
-    """Com GitHub Team, o job de prod só obtém token se rodar no ambiente `prod`."""
+    """Com GitHub Team, o job de prod só obtém token se rodar no ambiente `prod`.
+
+    O repositório usa o `sub` imutável do GitHub
+    (`repo:nessenergy@<id>/Alupdatalake@<id>:environment:hml`), e comparar o
+    `sub` inteiro com o nome do repositório nunca bate — em 25/09 o primeiro
+    deploy de hml foi recusado assim. A condição confere a claim `environment`.
+    """
     codigo = _codigo()
-    assert "environment:${var.environment}" in codigo
+    assert "assertion.environment == '${var.environment}'" in codigo
+    assert "assertion.sub ==" not in codigo
     assert _tem(r'variable "restringir_ao_ambiente_github" \{[^}]*default\s*=\s*true', _ler(BOOTSTRAP / "variables.tf"))
 
     # Em dev, o quadro (quadro.yml) roda sem `environment:` e usa a mesma SA.

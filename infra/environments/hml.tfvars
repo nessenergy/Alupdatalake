@@ -18,6 +18,10 @@ conectores_sem_agendamento = ["hubspot_negocios", "bbce_curva_forward", "tempook
 # hml é da ness., gravado pelo grupo de operação da ness. Nunca pessoa (R01).
 gravacao_segredos = ["group:operacao-datalake@ness.com.br"]
 
+# Leitura do projeto inteiro, sem valor de segredo (roles/viewer), como em dev:
+# sem ela a operação não confere versão de secret nem configuração do Dataform.
+leitura_projeto = ["group:operacao-datalake@ness.com.br"]
+
 # Acesso de pessoas (R01 do RIPD): grupos Google da Alup, preenchidos por ela.
 # Vazio não concede nada.
 # grupo_consumidores = "<grupo-consumidores>@<dominio-da-alup>"

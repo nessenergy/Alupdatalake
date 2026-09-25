@@ -14,6 +14,10 @@ agendamentos_ativos        = true # janela de homologação das Ondas 0 e 1, 25/
 emails_alerta              = ["operacao-datalake@ness.com.br", "alup.alertas@alupar.com.br"]
 conectores_sem_agendamento = ["hubspot_negocios", "bbce_curva_forward", "tempook_boletins"]
 
+# Quem grava versão de secret sem poder ler (ADR 015): o token do Dataform em
+# hml é da ness., gravado pelo grupo de operação da ness. Nunca pessoa (R01).
+gravacao_segredos = ["group:operacao-datalake@ness.com.br"]
+
 # Acesso de pessoas (R01 do RIPD): grupos Google da Alup, preenchidos por ela.
 # Vazio não concede nada.
 # grupo_consumidores = "<grupo-consumidores>@<dominio-da-alup>"

@@ -1,0 +1,72 @@
+name: Testar conexão
+
+# Roda o job `teste-conexao-<fonte>` (ADR 024): abre a DSN da fonte e roda
+# SELECT 1 de dentro da sub-rede da Alupar, sem ler dado. Responde "a rede e a
+# credencial chegam até o banco?". Só a SA de deploy executa job (ADR 015);
+# pessoa dispara por aqui, e o GitHub guarda quem testou qual fonte.
+#
+# O job só existe depois que `rede_interna` e `fontes_teste_conexao` entram no
+# `.tfvars` do ambiente (runbook/rede-onda3.md, passo N2).
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Ambiente'
+        required: true
+        type: choice
+        options:
+          - dev
+          - hml
+          - prod
+      fonte:
+        description: 'Fonte, como no secret alupdata-<fonte>-dsn: fmb, portal-alup, comercializacao ou rm'
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  testar:
+    name: "Conexão ${{ inputs.fonte }} (${{ inputs.environment }})"
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    steps:
+      - name: Validar a fonte
+        env:
+          FONTE: ${{ inputs.fonte }}
+        run: |
+          [[ "$FONTE" =~ ^[a-z0-9-]+$ ]] || { echo "::error::fonte inválida: use o nome do secret, como fmb"; exit 1; }
+
+      - uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3.0.0
+        id: auth
+        with:
+          workload_identity_provider: ${{ vars.GCP_WIF_PROVIDER }}
+          service_account: ${{ vars.GCP_DEPLOY_SA }}
+      - uses: google-github-actions/setup-gcloud@aa5489c8933f4cc7a4f7d45035b3b1440c9c10db # v3.0.1
+
+      - name: Executar o teste
+        env:
+          FONTE: ${{ inputs.fonte }}
+          AMBIENTE: ${{ inputs.environment }}
+          PROJETO: ${{ steps.auth.outputs.project_id }}
+          REGIAO: ${{ vars.GCP_REGION }}
+        run: |
+          set -euo pipefail
+          [[ "$FONTE" =~ ^[a-z0-9-]+$ ]] || exit 1
+          JOB="teste-conexao-$FONTE"
+          URL="https://console.cloud.google.com/run/jobs/details/$REGIAO/$JOB/executions?project=$PROJETO"
+          {
+            echo "### Teste de conexão \`$FONTE\` em \`$AMBIENTE\`"
+            echo ""
+            echo "- Job: \`$JOB\`"
+            echo "- Mensagem do teste: nos registros da execução, em [$JOB]($URL)"
+          } >> "$GITHUB_STEP_SUMMARY"
+          if gcloud run jobs execute "$JOB" --project "$PROJETO" --region "$REGIAO" --wait; then
+            echo "- Resultado: **conexão aberta e SELECT 1 respondido**" >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "- Resultado: **falhou**; a mensagem nos registros diz em que passo do runbook/rede-onda3.md está o problema" >> "$GITHUB_STEP_SUMMARY"
+            exit 1
+          fi

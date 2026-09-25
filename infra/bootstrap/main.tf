@@ -74,6 +74,7 @@ locals {
   # básico. A publicação da imagem é concedida no repositório, mais abaixo.
   papeis_deploy = [
     "roles/bigquery.dataOwner",                # datasets e o IAM de cada um
+    "roles/bigquery.admin",                    # ALTER PROJECT do TABLE_STORAGE no deploy (bigquery.config.update)
     "roles/cloudscheduler.admin",              # disparos das ingestões
     "roles/dataform.admin",                    # repositório, configs e o IAM do repositório
     "roles/iam.serviceAccountAdmin",           # SAs de ingestão, Dataform e Portal, e o IAM delas

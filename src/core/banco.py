@@ -123,9 +123,10 @@ def testar_conexao(fonte: str) -> tuple[bool, str]:
     Job, que é onde a carga vai rodar. Na falha, a mensagem do driver sai sem
     usuário e senha, mas com o host: é ele que diz até onde a rede chegou.
     """
-    dsn = ler_secret(fonte, "dsn")
-    url = urlparse(dsn)
+    url = urlparse("")
     try:
+        dsn = ler_secret(fonte, "dsn")
+        url = urlparse(dsn)
         conexao = conectar(dsn)
         try:
             sonda = "SELECT 1 FROM dual" if type(conexao).__module__.startswith("oracledb") else "SELECT 1"

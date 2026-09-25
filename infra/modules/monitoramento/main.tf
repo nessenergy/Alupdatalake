@@ -170,6 +170,9 @@ resource "google_monitoring_alert_policy" "job_falhou" {
     condition_threshold {
       filter = join(" AND ", [
         "resource.type = \"cloud_run_job\"",
+        # Só ingestão: o `teste-conexao-<fonte>` (ADR 024) falha de propósito
+        # enquanto a rede da Onda 3 não fecha, e não é carga.
+        "resource.labels.job_name = starts_with(\"ingestao-\")",
         "metric.type = \"run.googleapis.com/job/completed_task_attempt_count\"",
         "metric.labels.result = \"failed\"",
       ])

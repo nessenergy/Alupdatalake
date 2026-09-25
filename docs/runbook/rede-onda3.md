@@ -308,6 +308,7 @@ leva ao job no console, onde a mensagem do teste está em **Registros**:
 | Saída | Significado | Onde olhar |
 |---|---|---|
 | `fmb: conexão aberta e SELECT 1 respondido` | **pronto**: rede e credencial funcionam | — |
+| `NotFound` … `alupdata-fmb-dsn not found or has no versions` | a rede da GCP está certa (o job subiu na sub-rede e alcançou o Secret Manager), mas a DSN não foi gravada | N3 |
 | `timed out` ou `DPY-6005` com o host | o pacote não chega ou não volta | G5, G6, L2, L3 e L4, nessa ordem; o log de sessões do L4 mostra se o FortiGate viu o pacote |
 | `connection refused` | chegou ao servidor, mas nada escuta na porta, ou o firewall do servidor recusa | L5 |
 | `ORA-12505`, `ORA-12514` | chegou ao listener, com serviço errado na DSN | N3 |

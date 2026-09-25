@@ -736,3 +736,11 @@ def test_onda3_sai_pela_vpc_compartilhada_so_quando_a_rede_existe() -> None:
     assert _tem(r'"projects/\$\{var\.rede_interna\.projeto_host\}/regions/\$\{var\.region\}/subnetworks/', acesso)
     for bloco in (job, teste):
         assert _tem(r'egress\s*=\s*"ALL_TRAFFIC"', bloco)
+
+
+def test_alerta_de_falha_so_olha_job_de_ingestao() -> None:
+    """O `teste-conexao-<fonte>` falha de propósito enquanto a rede não fecha: não é ingestão."""
+    alerta = _bloco(
+        _ler("infra/modules/monitoramento/main.tf"), 'resource "google_monitoring_alert_policy" "job_falhou"'
+    )
+    assert 'resource.labels.job_name = starts_with(\\"ingestao-\\")' in alerta

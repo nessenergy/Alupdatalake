@@ -349,3 +349,15 @@ def test_testar_conexao_falha_sem_vazar_usuario_nem_senha(monkeypatch: pytest.Mo
     assert "Senh4Forte" not in mensagem
     assert "leitor_fmb" not in mensagem
     assert "10.0.0.9:1521" in mensagem, "o host fica: é o que diz se a rede chegou até lá"
+
+
+def test_testar_conexao_sem_dsn_gravada_responde_sem_traceback(monkeypatch: pytest.MonkeyPatch) -> None:
+    def sem_versao(fonte: str, campo: str) -> str:
+        raise LookupError("Secret alupdata-fmb-dsn not found or has no versions")
+
+    monkeypatch.setattr(banco, "ler_secret", sem_versao)
+
+    ok, mensagem = banco.testar_conexao("fmb")
+
+    assert not ok
+    assert mensagem == "fmb: LookupError: Secret alupdata-fmb-dsn not found or has no versions"

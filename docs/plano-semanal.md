@@ -1,6 +1,6 @@
 # Plano semanal — próximas 4 semanas
 
-Emitido em **2026-08-27** · S1 revisada em **2026-08-31** e em **2026-09-04** · S4 registrada em **2026-09-24** ·
+Emitido em **2026-08-27** · S1 revisada em **2026-08-31** e em **2026-09-04** · S4 registrada em **2026-09-24** e fechada em **2026-09-25**, com a S5 ·
 Escopo e estimativa por onda: [`plano-execucao.md`](plano-execucao.md) ·
 Situação atual: [`status.md`](status.md)
 
@@ -8,11 +8,13 @@ Situação atual: [`status.md`](status.md)
 
 ## O quadro em uma frase
 
-Em **18/09/2026**, há 26 entidades implementadas: 23 com dados reais em
-dry-run, TempoOK com contrato de API verificado e acervo recente pendente,
-BBCE e Hubspot sem credencial. **Não há carga em GCP nem homologação
-registrada**. G1 encerrou em 10/09; GCP, billing e planilhas têm previsão de
-18/09, sem confirmação de entrega na conferência desta data.
+Em **25/09/2026**, as **23 entidades públicas estão carregadas em `dev` e em
+`hml`**, com os sete componentes, e o **dossiê de homologação das Ondas 0 e 1
+foi emitido e enviado** ([`relatorios/2026-09-25-dossie-ondas-0-e-1.md`](relatorios/2026-09-25-dossie-ondas-0-e-1.md)).
+A reunião de aceite está proposta para 01/10. A Onda 2 está com o dossiê
+preparado, à espera de credenciais, e a Onda 3 tem o caminho de rede pronto
+do lado da GCP ([ADR 024](arquitetura/decisoes/024-rede-das-fontes-internas.md)),
+à espera da rede local e das credenciais da Alupar.
 
 S1 e S2 abaixo preservam o **registro histórico e o plano então vigente**,
 inclusive decisões posteriormente substituídas. A região atual é `us-central1`
@@ -216,11 +218,45 @@ liberou o GCP em 23/09. O que a semana produziu, até 24/09:
 | Entregamos | Dossiê de homologação da Onda 1 | **não nesta semana**: previsto para 07/10, antes do prazo de 16/10 |
 | Destrava | A7 — pedidos de acesso da Onda 3 e tokens da Onda 2 | vence em 25/09; registro do que a Alup confirmar em 26/09 |
 
-**Da S5 em diante, a sequência está no
-[plano de fechamento das ondas](planos/2026-09-24-fechamento-das-ondas.md)**:
-dossiê da Onda 0 em 30/09, carga das fontes públicas e janela em `hml` para o
-dossiê da Onda 1 em 07/10, e Onda 2 em 23/10 se as credenciais chegarem até
-12/10. Este arquivo não repete aquele plano semana a semana.
+### Fechamento da S4 — 25/09/2026
+
+| Trilha | Item | Situação em 25/09 |
+|---|---|---|
+| Entregamos | Carga das 23 entidades públicas | **feita** em `dev` (24/09) e em `hml` (25/09), todas com sucesso |
+| Entregamos | Reprocessamento | **demonstrado** em `dev` (câmbio, 24/09) e em `hml` (carga do ONS, 25/09) |
+| Entregamos | `hml` no ar | **25/09**: 174 recursos, Dataform em `SUCCEEDED`, `TABLE_STORAGE` ligado pelo próprio deploy |
+| Entregamos | Dossiê de homologação das Ondas 0 e 1 | **emitido e enviado em 25/09**, antes dos 29–30/09 previstos, com `terraform plan` sem mudança nos dois ambientes |
+| Entregamos | Pauta de alinhamento com a Alup | [`relatorios/2026-09-25-alinhamento.md`](relatorios/2026-09-25-alinhamento.md), com os oito pedidos |
+| Entregamos | Onda 2 preparada | roteiro e rascunho do dossiê em [`planos/2026-09-25-dossie-onda-2-preparado.md`](planos/2026-09-25-dossie-onda-2-preparado.md) |
+| Entregamos | Rede da Onda 3, lado GCP | **feita em 25/09**: sub-rede na VPC compartilhada da Alupar, `dev` e `hml` ligados, teste de conexão rodando dentro da sub-rede (ADR 024) |
+| Entregamos | TLS obrigatório no MySQL | #249, item da ADR 013 para o RDS |
+| Destrava | A7 — acessos e credenciais da Onda 3 e tokens da Onda 2 | **25/09: não entregues.** Pedido reiterado em 25/09, por e-mail: IP e rede do FMB, FortiGate e datacenter, e a credencial do FMB no Secret Manager |
+
+---
+
+## S5 · 28/09 – 02/10 · Aceite das Ondas 0 e 1
+
+A sequência vem do [plano de aceleração do faturamento](planos/2026-09-24-aceleracao-do-faturamento.md),
+que substituiu as datas do [plano de fechamento](planos/2026-09-24-fechamento-das-ondas.md)
+para as Ondas 0 e 1.
+
+| Trilha | Item | Entregável verificável |
+|---|---|---|
+| Entregamos | Terceiro dia seguido de carga agendada do câmbio (26/09) | linha no `status.md` com a execução de 26/09 |
+| Entregamos | Grupos da Alup no Portal de `hml`, assim que informados | `portal_acesso` no `hml.tfvars`, deploy e acesso confirmado por alguém da Alup |
+| Entregamos | Reunião de aceite (01/10, alternativa 02/10) | Portal demonstrado com login da Alup; dúvidas do dossiê respondidas |
+| Entregamos | Rota até o FMB (G6), assim que a faixa chegar | `route-alupdata-to-fmb` aplicada e conferida |
+| Entregamos | Teste de conexão do FMB, assim que a rede local e a credencial chegarem | **Testar conexão** em `dev` respondendo `SELECT 1` |
+| Destrava | **Quem assina o aceite** (pedido 1 da pauta) | nome confirmado antes da reunião |
+| Destrava | **Grupos da Alup** para o Portal (pedido 6) | grupos informados antes da reunião |
+| Destrava | **Posição sobre as 32h do item 2.1** (pedido 4) | resposta até 30/09 |
+| Destrava | **Onda 3**: IP e rede do FMB, FortiGate e datacenter, credencial do FMB | itens L1 a L6 e N3 do [`runbook/rede-onda3.md`](runbook/rede-onda3.md) |
+
+**Marco**: Ondas 0 e 1 aceitas → 15,52% + 20,69%.
+
+Da S6 em diante: Onda 2 assim que as credenciais chegarem (dossiê em dias,
+pelo roteiro preparado), Onda 3 assim que o teste de conexão passar, e `prod`
+depois do aceite das Ondas 0 e 1.
 
 ---
 
@@ -234,7 +270,7 @@ dossiê da Onda 1 em 07/10, e Onda 2 em 23/10 se as credenciais chegarem até
 | A5/A6 · RACI e BI | 11/09 | respostas recebidas; matriz RACI em 15/09, duas questões residuais na #150 |
 | G1 · resposta do Google | encerrada em 10/09 | não é bloqueio atual |
 | A2 · decisão CCEE | 18/09 | encerrada em 14/09; acesso público destravado |
-| A7 · tokens e VPN | 25/09 | Onda 3 dispara ociosidade de 4h/dia (R$ 256/h) |
+| A7 · tokens e VPN | 25/09 | Onda 3 dispara ociosidade de 4h/dia (R$ 256/h). **25/09: não entregue**; o caminho de rede do lado GCP foi preparado pela ness. no mesmo dia, e ficam a rede local e as credenciais |
 | A8 · docs BBCE/TempoOK | 25/09 | atendida em 14/09; conectores implementados |
 
 ---

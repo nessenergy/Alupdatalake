@@ -132,6 +132,8 @@ define todos em uma página.
 - Nomes de objeto e coluna em `snake_case`, sem acento. Colunas técnicas com
   prefixo `_`.
 - Nada de dado real de cliente no repositório — nem em fixture, nem em exemplo.
+- Ação operacional no GCP não depende de pessoa de fora da equipe ness.; o que
+  o ambiente precisa, `infra/` e o deploy fazem.
 - **Identidade visual segue quem fala** ([ADR 022](docs/arquitetura/decisoes/022-identidade-visual-por-audiencia.md)):
   o que a ness. emite (relatório, proposta, apresentação) leva a marca da ness.;
   **o produto é da Alup** — Portal, painéis de BI, alertas — e leva a identidade

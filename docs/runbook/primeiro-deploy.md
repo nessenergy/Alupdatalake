@@ -140,18 +140,15 @@ terraform output
   transfere histórico entre datasets, e mover o destino dividiria a série. A
   camada F2 lê deste dataset; o `faturamento` dos demais ambientes fica
   vazio.
-- [ ] **Ligar o `INFORMATION_SCHEMA.TABLE_STORAGE` no projeto**, uma vez por
-  ambiente. Sem ele, `gold.custo_consultas` não é criada e o Dataform inteiro
-  termina em `FAILED` ("TABLE_STORAGE hasn't been enabled for project"), como
-  aconteceu em 24/09. É opção de projeto, não recurso: o provider do Terraform
-  não a cobre, e o único papel predefinido com `bigquery.config.update` é
-  `bigquery.admin` — poder demais para dar à SA de deploy por isto. Quem já é
-  *Owner* do projeto roda:
-
-  ```bash
-  bq query --use_legacy_sql=false --project_id=<projeto> \
-    'ALTER PROJECT `<projeto>` SET OPTIONS (`region-us-central1.enable_info_schema_storage` = TRUE)'
-  ```
+- [ ] **Ligar o `INFORMATION_SCHEMA.TABLE_STORAGE` no projeto.** Sem ele,
+  `gold.custo_consultas` não é criada e o Dataform inteiro termina em
+  `FAILED` ("TABLE_STORAGE hasn't been enabled for project"), como aconteceu
+  em 24/09. É opção de projeto, não recurso: o provider do Terraform não a
+  cobre. O deploy faz isso sozinho, com a SA de deploy (passo "Ligar o
+  TABLE_STORAGE do projeto" em `.github/workflows/deploy.yml`, depois do
+  `terraform apply` e antes do Dataform), desde que o `infra/bootstrap/` esteja
+  reaplicado com o papel `bigquery.config.update` (ADR 015, adendo de 25/09).
+  Sem o bootstrap reaplicado, o passo responde `PERMISSION_DENIED`.
 
   A view passa a existir no deploy seguinte; o histórico de armazenamento leva
   cerca de um dia para aparecer.

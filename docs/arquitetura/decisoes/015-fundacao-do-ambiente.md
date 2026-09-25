@@ -1,8 +1,23 @@
 # ADR 015 — Fundação do ambiente: três ambientes, bootstrap pela ness., chave gerenciada pelo Google
 
 **Status**: aceito · **Data**: 2026-09-11 · **Revisada**: 2026-09-11 ·
-**Adendo**: 2026-09-23 · **Complementa** a
+**Adendo**: 2026-09-25 · **Complementa** a
 [ADR 023](023-regiao-us-central1.md)
+
+> **Adendo de 25/09 — a SA de deploy passa a ligar o `TABLE_STORAGE`.** A
+> regra do projeto de 25/09 é que nenhuma ação operacional no GCP depende de
+> pessoa de fora da equipe ness.; o único *Owner* de `hml` é externo, e ligar
+> o `INFORMATION_SCHEMA.TABLE_STORAGE` (§1b de
+> [`docs/acoes-humanas.md`](../../acoes-humanas.md)) era, até aqui, um passo
+> manual de Owner. O deploy passa a rodar
+> `bq query ... ALTER PROJECT ... SET OPTIONS (enable_info_schema_storage = TRUE)`
+> depois do `terraform apply` e antes do Dataform
+> (`.github/workflows/deploy.yml`), com a SA de deploy. O custo: a SA ganha
+> `bigquery.config.update`, o único papel predefinido com essa permissão é
+> `bigquery.admin`, e com ele administra o BigQuery do projeto — poder que ela
+> já tem sobre IAM, Secret Manager e Storage (seção "Conta de deploy" acima).
+> A concessão é decisão do Ricardo, feita em `infra/bootstrap/main.tf`; este
+> adendo não a aplica.
 
 > **Adendo de 23/09 — os três projetos existem, e os IDs são estes.** A Alup
 > criou e liberou os três ambientes de uma vez. Os IDs ficaram

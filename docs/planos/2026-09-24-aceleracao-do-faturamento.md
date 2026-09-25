@@ -176,6 +176,9 @@ OAuth próprio, configurado no console do projeto da Alup.
 
 ## Tarefa 6: Dossiês das Ondas 0 e 1 (29–30/09)
 
+**Feita em 25/09:** [`relatorios/2026-09-25-dossie-ondas-0-e-1.md`](../relatorios/2026-09-25-dossie-ondas-0-e-1.md).
+O 3º dia de carga agendada (26/09) entra no `status.md`, não no dossiê emitido.
+
 - [ ] **Passo 1:** carregar a skill `homologacao-onda` e preencher o checklist
   para cada onda, uma evidência por linha: 7 componentes, CI verde na `main`,
   `terraform plan` sem mudança, dicionário e linhagem, replay (Tarefas 1 e 4),

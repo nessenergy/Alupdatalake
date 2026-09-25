@@ -1,0 +1,979 @@
+<!doctype html><html lang='pt-BR'><head><meta charset='utf-8'><meta name='viewport' content='width=device-width, initial-scale=1'><title>Dossiê de homologação — Ondas 0 e 1 — 25/09/2026</title><link rel='preconnect' href='https://fonts.googleapis.com'><link rel='preconnect' href='https://fonts.gstatic.com' crossorigin><link href='https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap' rel='stylesheet'><style>
+@page { size: A4; margin: 16mm 14mm 16mm 14mm; }
+
+/* O documento existe para virar A4. Declarar o esquema claro impede o
+   navegador de escurecer por conta própria e descolar tela de papel. */
+:root { color-scheme: light; }
+
+/* Imprimir do navegador (Ctrl+P → Salvar como PDF) vem com "gráficos de plano
+   de fundo" DESLIGADO por padrão. Sem isto, a faixa alternada das tabelas, o
+   fundo do `code` e o bloco de alerta somem no papel — e a etiqueta vermelha
+   do questionário vira texto branco sobre branco, isto é, invisível.
+   Forçar aqui garante que tela, --print-to-pdf e impressão manual coincidam. */
+html {
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+:root {
+  --tinta: #0f172a;
+  --suave: #475569;
+  --tenue: #94a3b8;
+  --linha: #e2e8f0;
+  --linha-fina: #eef2f6;
+  --zebra: #f8fafc;
+  --ness: #00ade8;
+  --link: #007aa3;
+  --alerta: #b3261e;
+  --fundo-alerta: #fdf3f2;
+  /* Corpo em Inter, títulos e marca em Montserrat, dado técnico em mono. */
+  --texto: Inter, "Segoe UI", system-ui, sans-serif;
+  --titulo: Montserrat, "Segoe UI", system-ui, sans-serif;
+  --mono: "JetBrains Mono", "Cascadia Mono", Consolas, monospace;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: var(--texto);
+  font-size: 9.4pt;
+  line-height: 1.55;
+  color: var(--tinta);
+  margin: 0;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ---------------------------------------------------------------- cabeçalho */
+
+.marca {
+  font-family: var(--titulo);
+  font-weight: 500;
+  font-size: 15pt;
+  letter-spacing: -0.01em;
+  margin: 0 0 2mm;
+}
+/* O ponto da marca é sempre BlueDot, em qualquer fundo. */
+.marca span { color: var(--ness); }
+
+h1 {
+  font-family: var(--titulo);
+  font-size: 17pt;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+  margin: 0 0 1mm;
+  padding-bottom: 3mm;
+  border-bottom: 2px solid var(--ness);
+}
+
+/* A primeira linha depois do h1 é a tarja de identificação do documento —
+   emissão, contrato, marco. Ela se lê como etiqueta, não como parágrafo. */
+h1 + p {
+  font-size: 8.4pt;
+  color: var(--suave);
+  margin-bottom: 5mm;
+}
+
+/* ------------------------------------------------- identificação do documento */
+
+/* Ficha do documento: quem emite, para quem, sob qual contrato, em que data.
+   Fica logo abaixo do título e não se parte entre páginas — um documento
+   contratual precisa ser identificável pela primeira folha, isolada. */
+.identificacao {
+  display: grid;
+  /* Largura suficiente para "RESPONSÁVEL TÉCNICO" caber em uma linha. */
+  grid-template-columns: 37mm 1fr;
+  gap: 1.2mm 4mm;
+  margin: 4mm 0 6mm;
+  padding: 3.5mm 4mm;
+  background: var(--zebra);
+  border-left: 2px solid var(--ness);
+  font-size: 8.4pt;
+  break-inside: avoid;
+}
+.id-rotulo {
+  font-family: var(--titulo);
+  font-size: 7.2pt;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--suave);
+  padding-top: 0.4mm;
+}
+.id-valor { color: var(--tinta); }
+
+/* ------------------------------------------------------------- fecho assinado */
+
+.assinatura {
+  margin-top: 12mm;
+  break-inside: avoid;
+}
+.assinatura .local-data {
+  font-size: 8.6pt;
+  color: var(--suave);
+  margin-bottom: 12mm;
+}
+.linha-assinatura {
+  width: 68mm;
+  border-top: 1px solid var(--tinta);
+  margin-bottom: 1.6mm;
+}
+.assina-nome {
+  font-family: var(--titulo);
+  font-weight: 500;
+  font-size: 9.4pt;
+  margin: 0;
+}
+.assina-org {
+  font-size: 8pt;
+  color: var(--suave);
+  margin: 0.4mm 0 0;
+}
+
+h2 {
+  font-family: var(--titulo);
+  font-size: 11.5pt;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  margin: 8mm 0 2.5mm;
+  padding-top: 3mm;
+  border-top: 1px solid var(--linha);
+  /* Um bloco não deve abrir no rodapé e continuar na página seguinte. */
+  break-after: avoid;
+}
+
+/* Marcador BlueDot antes do título de seção: assinatura discreta, custo zero
+   de espaço, e dá ao olho um ponto de entrada por seção. */
+h2::before {
+  content: "";
+  display: inline-block;
+  width: 1.4mm;
+  height: 1.4mm;
+  border-radius: 50%;
+  background: var(--ness);
+  margin-right: 1.8mm;
+  vertical-align: 0.4mm;
+}
+
+h3 {
+  font-family: var(--titulo);
+  font-size: 10pt;
+  font-weight: 500;
+  margin: 5mm 0 2mm;
+  break-after: avoid;
+}
+
+p { margin: 0 0 2.5mm; }
+strong { font-weight: 600; }
+code {
+  font-family: var(--mono);
+  font-size: 8.3pt;
+  background: var(--zebra);
+  border: 0.2mm solid var(--linha-fina);
+  padding: 0.3mm 1mm;
+  border-radius: 2px;
+}
+
+/* Bloco de comando ou de exemplo: é o que o leitor copia. Uma linha longa rola
+   dentro do bloco em tela e quebra na impressão, sem emendar no texto. */
+pre {
+  margin: 1.5mm 0 3mm;
+  padding: 2mm 3mm;
+  background: var(--zebra);
+  border: 0.2mm solid var(--linha-fina);
+  border-radius: 2px;
+  overflow-x: auto;
+  break-inside: avoid;
+}
+pre code {
+  background: none;
+  border: 0;
+  padding: 0;
+  white-space: pre;
+}
+@media print {
+  pre code { white-space: pre-wrap; overflow-wrap: anywhere; }
+}
+
+/* -------------------------------------------------------------------- tabela */
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0 0 4mm;
+  font-size: 8.8pt;
+  /* Número em coluna alinha por dígito, não por forma da letra. */
+  font-variant-numeric: tabular-nums;
+}
+th {
+  text-align: left;
+  font-family: var(--titulo);
+  font-weight: 600;
+  font-size: 7.6pt;
+  text-transform: uppercase;
+  /* Tracking discreto: em coluna estreita, cada 0,01em a mais é uma quebra
+     de linha a mais no cabeçalho. */
+  letter-spacing: 0.04em;
+  color: var(--suave);
+  border-bottom: 1.5px solid var(--tinta);
+  padding: 1.6mm 2mm;
+  /* Cabeçalho de coluna se lê como rótulo: melhor uma linha que duas. */
+  text-wrap: balance;
+}
+td {
+  border-bottom: 1px solid var(--linha-fina);
+  padding: 2.4mm 2mm;
+  vertical-align: top;
+}
+/* Faixa alternada: em tabela densa, o olho perde a linha sem ela. Tom baixo
+   o bastante para não competir com o texto nem pesar na impressão. */
+tbody tr:nth-child(even) td { background: var(--zebra); }
+/* A primeira coluna costuma ser a chave da linha — onda, item, código. */
+tbody td:first-child { font-weight: 500; }
+/* Uma pergunta não se parte entre páginas. */
+tr { break-inside: avoid; }
+thead { display: table-header-group; }
+
+/* Diagrama em SVG embutido: ocupa a largura do texto e não se parte entre
+   páginas; a legenda fica colada nele. */
+figure.diagrama {
+  margin: 14px 0 18px;
+  padding: 10px 10px 6px;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  break-inside: avoid;
+}
+figure.diagrama svg { display: block; width: 100%; height: auto; }
+figure.diagrama figcaption {
+  margin-top: 6px;
+  font-size: 9pt;
+  color: #475569;
+}
+
+/* Larguras de coluna do formulário: código estreito, "Resposta" com espaço de
+   escrita. Valem só no questionário — num relatório espremeriam a 1ª coluna e
+   pintariam a última sem motivo. */
+.questionario td:first-child { width: 7%; font-weight: 600; font-variant-numeric: tabular-nums; }
+.questionario th:last-child, .questionario td:last-child { width: 30%; background: #fafbfc; }
+.questionario td:nth-child(3) { width: 15%; color: var(--suave); font-size: 8.2pt; }
+
+/* --------------------------------------------------------------- destaques */
+
+.bloqueia {
+  display: inline-block;
+  background: var(--alerta);
+  color: #fff;
+  font-size: 6.8pt;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  padding: 0.4mm 1.4mm;
+  border-radius: 2px;
+  margin-right: 1.2mm;
+  vertical-align: 1px;
+}
+
+blockquote {
+  margin: 0 0 3mm;
+  padding: 2.5mm 3mm;
+  background: var(--fundo-alerta);
+  border-left: 3px solid var(--alerta);
+}
+blockquote p:last-child { margin-bottom: 0; }
+
+/* O `---` do Markdown separa as seções na fonte, mas no PDF a borda de `h2` já
+   faz esse trabalho: manter os dois empilha traços. */
+hr { display: none; }
+hr + h2 { margin-top: 7mm; }
+
+ul { margin: 0 0 3mm; padding-left: 5mm; }
+li { margin-bottom: 1.2mm; }
+
+.rodape {
+  margin-top: 8mm;
+  padding-top: 3mm;
+  border-top: 1px solid var(--linha);
+  font-size: 7.6pt;
+  color: var(--suave);
+}
+
+/* ---------------------------------------------------------------- impressão */
+
+/* Token longo — URL, nome de secret, identificador — não pode ultrapassar a
+   largura da A4 e sumir na borda do papel. `anywhere` só no `code`, onde o
+   token não tem espaço por onde quebrar; em texto corrido ele partiria
+   palavra no meio, inclusive em cabeçalho de tabela. `break-word` quebra
+   apenas a palavra que sozinha não caberia na linha. */
+code { overflow-wrap: anywhere; }
+td, th, .id-valor { overflow-wrap: break-word; }
+
+/* Nenhuma hifenização automática: em documento contratual, palavra partida
+   por hífen inventado atrapalha a leitura e a busca no PDF. */
+* { hyphens: none; }
+
+/* Título distribui o texto entre as linhas em vez de deixar uma palavra órfã
+   na última — vale para o título do documento e para os de seção. */
+h1, h2, h3 { text-wrap: balance; }
+
+/* ------------------------------------------------------------------ links */
+
+/* Link com a cor da casa, não o azul padrão do navegador. O BlueDot puro
+   (#00ade8) não passa 4,5:1 sobre branco em texto corrido; o tom escuro dele
+   passa, e o sublinhado fica claro o bastante para não pesar na linha. */
+a {
+  color: var(--link);
+  text-decoration: underline;
+  text-decoration-color: rgba(0, 122, 163, 0.35);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.18em;
+}
+a:hover { text-decoration-color: currentColor; }
+a:focus-visible { outline: 2px solid var(--ness); outline-offset: 2px; border-radius: 2px; }
+
+::selection { background: rgba(0, 173, 232, 0.18); color: var(--tinta); }
+
+/* Lista com uma pendência por linha: o espaço entre itens é o que deixa o
+   olho contar quantas são. */
+li + li { margin-top: 1.2mm; }
+
+/* ----------------------------------------------------------------- em tela */
+
+/* Só a versão de tela: no PDF a margem é da @page. Em tela o documento se
+   apresenta como folha sobre fundo, que é como ele será lido e impresso.
+   Fica DEPOIS das regras-base de propósito: antes delas, o `body { margin: 0;
+   font-size: 9.4pt }` vencia pela ordem, a folha encostava à esquerda e o corpo
+   saía menor do que o previsto. */
+@media screen {
+  html { background: var(--zebra); }
+  body {
+    max-width: 940px;
+    margin: 0 auto;
+    padding: 56px 56px 72px;
+    font-size: 15px;
+    background: #fff;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04),
+                0 10px 15px -3px rgba(15, 23, 42, 0.06);
+  }
+  table { font-size: 14px; }
+  code { font-size: 13px; }
+}
+
+/* Folha estreita (celular): a margem da folha encolhe junto, e a tabela rola
+   dentro dela em vez de empurrar a página para o lado. */
+@media screen and (max-width: 640px) {
+  body { padding: 28px 18px 40px; font-size: 15px; }
+  table { display: block; overflow-x: auto; }
+}
+
+@media print {
+  /* Uma linha solta no pé ou no topo da página é o defeito mais visível de um
+     documento impresso. Três linhas é o mínimo que se lê como parágrafo. */
+  p, li { orphans: 3; widows: 3; }
+  h1, h2, h3 { break-after: avoid; break-inside: avoid; }
+  /* Título de seção seguido de tabela: os dois andam juntos ou nenhum anda. */
+  h2 + table, h3 + table, h2 + p, h3 + p { break-before: avoid; }
+  table, blockquote { break-inside: auto; }
+  /* Link impresso vira texto: sublinhado só polui o papel. */
+  a { text-decoration: none; color: var(--tinta); }
+}
+</style></head><body class='relatorio'><p class="marca">ness<span>.</span></p><h1>Dossiê de homologação das Ondas 0 e 1</h1><section class='identificacao'><div class='id-rotulo'>Documento</div><div class='id-valor'>Dossiê de homologação</div><div class='id-rotulo'>Referência</div><div class='id-valor'>REL-2026-09-25-D · AlupData Fase 1</div><div class='id-rotulo'>Data de emissão</div><div class='id-valor'>25 de setembro de 2026</div><div class='id-rotulo'>Emitente</div><div class='id-valor'>ness. Processos e Tecnologia Ltda.</div><div class='id-rotulo'>Destinatário</div><div class='id-valor'>Alup — Leonardo Guiel Marques, Taina Ulhoa Mota, Mauricio Cardoso e Saulo Rodrigues</div><div class='id-rotulo'>Contrato</div><div class='id-valor'>CPS-01025/2026 — AlupData Fase 1: DataLake</div><div class='id-rotulo'>Marco em jogo</div><div class='id-valor'>Ondas 0 e 1 — aceite</div><div class='id-rotulo'>Responsável técnico</div><div class='id-valor'>Ricardo Esper</div><div class='id-rotulo'>Classificação</div><div class='id-valor'>Confidencial — uso restrito das partes</div></section>
+<p>Este dossiê reúne, critério por critério, a evidência de que as Ondas 0 e 1
+estão prontas para aceite. É a base da reunião de aceite proposta na
+<a href="2026-09-25-alinhamento.md">pauta de 25/09</a>: a reunião confere o que está
+aqui, e não começa do zero.</p>
+<p><strong>Em uma frase:</strong> as <strong>23 entidades públicas</strong> estão carregadas com sucesso
+nos ambientes de desenvolvimento e de homologação, cada uma com os sete
+componentes do contrato. <strong>Dois itens fecham depois desta emissão, em data
+conhecida:</strong> o terceiro dia seguido de carga agendada (26/09) e a demonstração
+do Portal com login da Alup (na reunião, depende do pedido 6 da pauta).</p>
+<p>Os números são de <strong>25/09/2026, às 15h</strong>, lidos diretamente do registro de
+execuções (<code>bronze._execucoes</code>) e das tabelas Gold de cada ambiente.</p>
+<h2>1. Resumo dos critérios</h2>
+<table>
+<thead>
+<tr>
+<th>Critério</th>
+<th>Onda 0</th>
+<th>Onda 1</th>
+<th>Evidência</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Sete componentes por fonte</td>
+<td>atendido</td>
+<td>atendido — 23 de 23</td>
+<td>§3</td>
+</tr>
+<tr>
+<td>Carga real com sucesso</td>
+<td>atendido</td>
+<td>atendido — 23 de 23, nos dois ambientes</td>
+<td>§3</td>
+</tr>
+<tr>
+<td>Portões de segurança do CI</td>
+<td>atendido</td>
+<td>atendido</td>
+<td>§4.1</td>
+</tr>
+<tr>
+<td>Infraestrutura versionada e aplicada, sem pendência</td>
+<td>atendido</td>
+<td>atendido</td>
+<td>§4.2</td>
+</tr>
+<tr>
+<td>Dicionário de dados e linhagem</td>
+<td>atendido</td>
+<td>atendido</td>
+<td>§4.3</td>
+</tr>
+<tr>
+<td>Reprocessamento sem chamar a origem</td>
+<td>atendido (câmbio, em dev)</td>
+<td>atendido (carga do ONS, em hml)</td>
+<td>§4.4</td>
+</tr>
+<tr>
+<td>Agendamento em funcionamento</td>
+<td>2 de 3 dias — o 3º em 26/09</td>
+<td>agendado; as mensais rodam no 1º ciclo de outubro</td>
+<td>§4.5</td>
+</tr>
+<tr>
+<td>Portal com consulta real na camada Gold</td>
+<td>publicado; demonstração na reunião</td>
+<td>—</td>
+<td>§4.6</td>
+</tr>
+<tr>
+<td>De-para das fontes do contrato</td>
+<td>—</td>
+<td>atendido</td>
+<td>§5</td>
+</tr>
+</tbody>
+</table>
+<h2>2. Onda 0 — Fundação</h2>
+<table>
+<thead>
+<tr>
+<th>Item do escopo</th>
+<th>Onde está</th>
+<th>Situação</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Mapeamento de fontes</td>
+<td><a href="../dicionario-dados/README.md"><code>dicionario-dados/README.md</code></a>, com o de-para do §5</td>
+<td>entregue</td>
+</tr>
+<tr>
+<td>8 domínios analíticos</td>
+<td><a href="../arquitetura/dominios-analiticos.md"><code>arquitetura/dominios-analiticos.md</code></a>, a partir da resposta da Alup ao item B1</td>
+<td>entregue</td>
+</tr>
+<tr>
+<td>Dimensões comuns</td>
+<td>seis dimensões em toda view Silver (<code>data_referencia</code>, <code>submercado</code>, <code>codigo_usina</code>, <code>agente_ccee</code>, <code>periodo_apuracao</code>, <code>periodo_apuracao_ccee</code>), cobradas por teste</td>
+<td>entregue</td>
+</tr>
+<tr>
+<td>CI/CD</td>
+<td>CI a cada mudança; deploy e ingestão manual por workflow, com identidade federada e sem chave de serviço guardada</td>
+<td>entregue</td>
+</tr>
+<tr>
+<td>Portal base</td>
+<td>publicado em dev e em hml, atrás do login corporativo (IAP)</td>
+<td>entregue; demonstração na reunião (§4.6)</td>
+</tr>
+<tr>
+<td>Fonte de referência</td>
+<td>câmbio PTAX do Banco Central (<code>bcb_cambio_ptax</code>)</td>
+<td>carregada nos dois ambientes</td>
+</tr>
+</tbody>
+</table>
+<p>A Onda 0 também entrega os dois registros técnicos que sustentam a operação:
+o log de execução (<code>_execucoes</code>), base das visões <code>saude_ingestao</code> e
+<code>volumetria_lake</code>, e o custo de consulta (<code>custo_consultas</code>), que o Portal lê.</p>
+<h2>3. Onda 1 — as 23 entidades públicas</h2>
+<p>Cada linha tem conector, tabela Bronze, view Silver, tabela Gold, testes,
+agendamento e documentação com linhagem — os sete componentes da cláusula 2ª,
+conferidos arquivo a arquivo em 25/09. As colunas de linhas são da <strong>última
+carga com sucesso</strong> de cada ambiente.</p>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Entidade</th>
+<th style="text-align: right;">Linhas — dev</th>
+<th style="text-align: right;">Linhas — hml</th>
+<th>Gold, em hml (linhas)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>BCB — PTAX<br><code>bcb_cambio_ptax</code></td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">3</td>
+<td><code>cambio_mensal</code> (1)</td>
+</tr>
+<tr>
+<td>2</td>
+<td>BCB — Selic e CDI<br><code>bcb_juros</code></td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">8</td>
+<td><code>juros_mensal</code> (2)</td>
+</tr>
+<tr>
+<td>3</td>
+<td>IBGE — IPCA<br><code>ibge_ipca</code></td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">6</td>
+<td><code>inflacao_mensal</code> (3)</td>
+</tr>
+<tr>
+<td>4</td>
+<td>ANEEL — SIGA<br><code>aneel_siga</code></td>
+<td style="text-align: right;">25.133</td>
+<td style="text-align: right;">25.133</td>
+<td><code>parque_gerador</code> (151)</td>
+</tr>
+<tr>
+<td>5</td>
+<td>ONS — carga<br><code>ons_carga</code></td>
+<td style="text-align: right;">116</td>
+<td style="text-align: right;">116</td>
+<td><code>carga_mensal_submercado</code> (8)</td>
+</tr>
+<tr>
+<td>6</td>
+<td>ONS — EAR (armazenamento)<br><code>ons_ear</code></td>
+<td style="text-align: right;">116</td>
+<td style="text-align: right;">116</td>
+<td><code>armazenamento_e_afluencia_mensal</code> (8)</td>
+</tr>
+<tr>
+<td>7</td>
+<td>ONS — ENA (afluência)<br><code>ons_ena</code></td>
+<td style="text-align: right;">116</td>
+<td style="text-align: right;">116</td>
+<td><code>armazenamento_e_afluencia_mensal</code> (8)</td>
+</tr>
+<tr>
+<td>8</td>
+<td>ONS — geração horária por usina<br><code>ons_geracao_usina</code></td>
+<td style="text-align: right;">693.120</td>
+<td style="text-align: right;">675.816</td>
+<td><code>geracao_mensal_usina_ons</code> (1.447)</td>
+</tr>
+<tr>
+<td>9</td>
+<td>ONS — capacidade instalada<br><code>ons_capacidade</code></td>
+<td style="text-align: right;">5.686</td>
+<td style="text-align: right;">5.686</td>
+<td><code>capacidade_instalada_vigente_usina</code> (2.062)</td>
+</tr>
+<tr>
+<td>10</td>
+<td>ONS — disponibilidade horária por usina<br><code>ons_disponibilidade_usina</code></td>
+<td style="text-align: right;">152.232</td>
+<td style="text-align: right;">151.620</td>
+<td><code>disponibilidade_mensal_usina</code> (317)</td>
+</tr>
+<tr>
+<td>11</td>
+<td>ONS — constrained-off eólico<br><code>ons_restricao_coff_eolica</code></td>
+<td style="text-align: right;">293.040</td>
+<td style="text-align: right;">285.696</td>
+<td><code>restricao_coff_mensal_usina</code> (475)</td>
+</tr>
+<tr>
+<td>12</td>
+<td>ONS — constrained-off fotovoltaico<br><code>ons_restricao_coff_fotovoltaica</code></td>
+<td style="text-align: right;">158.688</td>
+<td style="text-align: right;">154.800</td>
+<td><code>restricao_coff_mensal_usina</code> (475)</td>
+</tr>
+<tr>
+<td>13</td>
+<td>CCEE — PLD<br><code>ccee_pld</code></td>
+<td style="text-align: right;">6.336</td>
+<td style="text-align: right;">6.240</td>
+<td><code>pld_mensal_submercado</code> (12)</td>
+</tr>
+<tr>
+<td>14</td>
+<td>CCEE — perfis de agente<br><code>ccee_perfil</code></td>
+<td style="text-align: right;">60.509</td>
+<td style="text-align: right;">60.509</td>
+<td><code>agentes_ccee</code> (47.358)</td>
+</tr>
+<tr>
+<td>15</td>
+<td>CCEE — lista mensal de agentes<br><code>ccee_agente</code></td>
+<td style="text-align: right;">82.154</td>
+<td style="text-align: right;">82.154</td>
+<td><code>agentes_por_classe_mensal</code> (35)</td>
+</tr>
+<tr>
+<td>16</td>
+<td>CCEE — exposição financeira mensal<br><code>ccee_exposicao_financeira</code></td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">3</td>
+<td><code>exposicao_mercado_mensal</code> (3)</td>
+</tr>
+<tr>
+<td>17</td>
+<td>CCEE — contabilização por perfil<br><code>ccee_contabilizacao_perfil</code></td>
+<td style="text-align: right;">141.889</td>
+<td style="text-align: right;">141.889</td>
+<td><code>resultado_contabilizacao_mensal_perfil</code> (141.889)</td>
+</tr>
+<tr>
+<td>18</td>
+<td>CCEE — geração horária por usina<br><code>ccee_geracao_usina</code></td>
+<td style="text-align: right;">2.964.096</td>
+<td style="text-align: right;">5.821.056</td>
+<td><code>geracao_mensal_usina</code> (7.958)</td>
+</tr>
+<tr>
+<td>19</td>
+<td>CCEE — montantes contratados por perfil<br><code>ccee_contrato_montante</code></td>
+<td style="text-align: right;">79.736</td>
+<td style="text-align: right;">79.736</td>
+<td><code>posicao_contratual_mensal_perfil</code> (79.736)</td>
+</tr>
+<tr>
+<td>20</td>
+<td>CCEE — consumo de varejo<br><code>ccee_varejista_consumidor</code></td>
+<td style="text-align: right;">10.007</td>
+<td style="text-align: right;">10.007</td>
+<td><code>consumo_varejista_mensal_uf</code> (6.805)</td>
+</tr>
+<tr>
+<td>21</td>
+<td>CCEE — ESS e serviços ancilares<br><code>ccee_encargo_ess</code></td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">3</td>
+<td><code>encargos_setoriais_mensal</code> (3)</td>
+</tr>
+<tr>
+<td>22</td>
+<td>CCEE — energia de reserva (EER)<br><code>ccee_energia_reserva</code></td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">3</td>
+<td><code>encargos_setoriais_mensal</code> (3)</td>
+</tr>
+<tr>
+<td>23</td>
+<td>CCEE — CVU estrutural<br><code>ccee_cvu_estrutural</code></td>
+<td style="text-align: right;">3.150</td>
+<td style="text-align: right;">3.150</td>
+<td><code>cvu_estrutural_vigente_usina</code> (1.335)</td>
+</tr>
+</tbody>
+</table>
+<p>Três leituras da tabela:</p>
+<ul>
+<li><strong>Linhas diferentes entre dev e hml</strong> (geração e disponibilidade por usina,
+  constrained-off, PLD) refletem a data de cada carga: hml carregou em 25/09 e
+  dev em 24/09, com janelas que alcançam meses diferentes da publicação.</li>
+<li><strong>Gold pequena não é Gold vazia.</strong> Câmbio, juros, encargos e exposição são
+  mensais e resumidos: 1 a 3 linhas significam os meses publicados na janela.</li>
+<li>A entidade 1 (câmbio) abriu a Onda 0 como fonte de referência; o escopo da
+  Onda 1 inclui o câmbio do BCB, e por isso ela conta nas 23.</li>
+</ul>
+<h2>4. Evidências</h2>
+<h3>4.1 Portões de segurança</h3>
+<p>Na <code>main</code>, em 25/09, o CI e a análise de código passaram. A execução local
+dos mesmos portões, na mesma data:</p>
+<table>
+<thead>
+<tr>
+<th>Portão</th>
+<th>Resultado</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Lint e formatação</td>
+<td>sem apontamento</td>
+</tr>
+<tr>
+<td>Testes</td>
+<td>1.085 aprovados, cobertura de 94%; os pulados são os que dependem das credenciais das Ondas 2 e 3 ou não se aplicam ao caso</td>
+</tr>
+<tr>
+<td>Análise estática de segurança (bandit)</td>
+<td>sem apontamento</td>
+</tr>
+<tr>
+<td>Auditoria de dependências (pip-audit)</td>
+<td>nenhuma vulnerabilidade conhecida</td>
+</tr>
+<tr>
+<td>Segredos no código</td>
+<td>nenhum</td>
+</tr>
+</tbody>
+</table>
+<h3>4.2 Infraestrutura</h3>
+<p>Todo recurso de nuvem está declarado no repositório e é aplicado pelo
+workflow de deploy. Em 25/09, o <code>terraform plan</code> dos dois ambientes voltou
+<strong>sem nenhuma mudança</strong> — o que está na nuvem é exatamente o que está no
+código:</p>
+<table>
+<thead>
+<tr>
+<th>Ambiente</th>
+<th>Resultado do plan</th>
+<th>Execução</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>dev (<code>alupar-dev-alupdata</code>)</td>
+<td>No changes</td>
+<td><a href="https://github.com/nessenergy/Alupdatalake/actions/runs/36152867077">36152867077</a></td>
+</tr>
+<tr>
+<td>hml (<code>alupar-hm-alupdata</code>)</td>
+<td>No changes</td>
+<td><a href="https://github.com/nessenergy/Alupdatalake/actions/runs/36152874459">36152874459</a></td>
+</tr>
+</tbody>
+</table>
+<p>Para chegar a isso, uma diferença recorrente e sem efeito no Portal foi
+eliminada no mesmo dia (#245).</p>
+<h3>4.3 Dicionário de dados e linhagem</h3>
+<p>Um documento por fonte em <a href="../dicionario-dados/README.md"><code>dicionario-dados/</code></a>:
+campos, tipos, regras de qualidade e o caminho origem → dado bruto → Bronze →
+Silver → Gold. O índice traz o de-para do §5.</p>
+<h3>4.4 Reprocessamento</h3>
+<p>O dado bruto de cada carga fica guardado como veio. Reprocessar é ler esse
+arquivo de novo, sem chamar a origem — útil quando uma regra muda ou uma
+fonte sai do ar.</p>
+<table>
+<thead>
+<tr>
+<th>Ambiente</th>
+<th>Entidade</th>
+<th>Data</th>
+<th style="text-align: right;">Linhas</th>
+<th>Execução de origem</th>
+<th>Resultado</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>dev</td>
+<td><code>bcb_cambio_ptax</code></td>
+<td>24/09 17:21</td>
+<td style="text-align: right;">3</td>
+<td><code>d3b3429e…</code></td>
+<td>sucesso, registrado como <code>REPLAY</code></td>
+</tr>
+<tr>
+<td>hml</td>
+<td><code>ons_carga</code></td>
+<td>25/09 11:15</td>
+<td style="text-align: right;">116</td>
+<td><code>3be4c275…</code></td>
+<td>sucesso, registrado como <code>REPLAY</code></td>
+</tr>
+</tbody>
+</table>
+<h3>4.5 Agendamento</h3>
+<p>O Cloud Scheduler tem <strong>24 agendamentos em dev e 23 em hml</strong>, todos ativos.
+A diferença é o TempoOK, que é Onda 2 e só tem credencial em dev. Cada
+entidade roda na cadência da sua publicação: diária (câmbio, juros, carga,
+EAR, ENA), semanal (cadastros) ou mensal (CCEE e geração por usina).</p>
+<p>A fonte de referência, o câmbio, em dev:</p>
+<table>
+<thead>
+<tr>
+<th>Dia</th>
+<th>Como rodou</th>
+<th>Resultado</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>24/09</td>
+<td>primeira carga, disparada pelo workflow</td>
+<td>sucesso</td>
+</tr>
+<tr>
+<td>25/09</td>
+<td>agendamento das 09h</td>
+<td>sucesso, 3 linhas</td>
+</tr>
+<tr>
+<td>26/09</td>
+<td>agendamento das 09h</td>
+<td><strong>a conferir em 26/09</strong> — registrado no <code>status.md</code> e mostrado na reunião</td>
+</tr>
+</tbody>
+</table>
+<p>As outras quatro diárias (juros, carga, EAR e ENA) também rodaram pelo
+agendamento em 25/09, todas com sucesso. As mensais rodam no primeiro ciclo
+de outubro (dias 5 a 7); até lá, a carga delas é a do workflow, na tabela do §3.</p>
+<p><strong>Defeitos encontrados na primeira carga, todos corrigidos:</strong> a geração por
+usina da CCEE, a maior fonte (quase 6 milhões de linhas), exigiu janela, lote
+e tempo limite próprios, e uma regra de qualidade que aceita geração líquida
+levemente negativa (#229, #231, #232 e #233). A carga e a ENA do ONS tiveram
+um erro de leitura em 24/09, corrigido no mesmo dia. Desde então, nenhuma
+entidade pública falhou.</p>
+<h3>4.6 Portal</h3>
+<p>O Portal está publicado nos dois ambientes e lê as tabelas Gold. O acesso
+passa pelo login corporativo do Google (IAP), que, na configuração adotada,
+<strong>só admite contas da organização da Alup</strong> — contas da ness. são recusadas,
+como deve ser. Por isso a evidência do Portal é a <strong>demonstração na reunião
+de aceite, com o login de alguém da Alup</strong>. Para isso, a Alup indica os
+grupos que terão acesso (pedido 6 da pauta), e a ness. os libera antes da
+reunião.</p>
+<p>Um exemplo do que o Portal mostra, a tabela <code>gold.juros_mensal</code> em dev:</p>
+<table>
+<thead>
+<tr>
+<th>Mês</th>
+<th>Série</th>
+<th style="text-align: right;">Dias úteis</th>
+<th style="text-align: right;">Taxa média ao dia (%)</th>
+<th style="text-align: right;">Acumulada no mês (%)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2026-09</td>
+<td>Selic</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">0,050788</td>
+<td style="text-align: right;">0,2033068</td>
+</tr>
+<tr>
+<td>2026-09</td>
+<td>CDI</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">0,050788</td>
+<td style="text-align: right;">0,2033068</td>
+</tr>
+</tbody>
+</table>
+<h2>5. Das 13 fontes do contrato às entidades</h2>
+<table>
+<thead>
+<tr>
+<th>Fonte contratual</th>
+<th>Onda</th>
+<th>Entidades</th>
+<th>Situação em 25/09</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>BCB</td>
+<td>0/1</td>
+<td><code>bcb_cambio_ptax</code>, <code>bcb_juros</code></td>
+<td>entregue</td>
+</tr>
+<tr>
+<td>IBGE</td>
+<td>1</td>
+<td><code>ibge_ipca</code></td>
+<td>entregue</td>
+</tr>
+<tr>
+<td>ANEEL</td>
+<td>1</td>
+<td><code>aneel_siga</code></td>
+<td>entregue</td>
+</tr>
+<tr>
+<td>ONS</td>
+<td>1</td>
+<td>8 entidades (§3, linhas 5 a 12)</td>
+<td>entregue</td>
+</tr>
+<tr>
+<td>CCEE InfoMercado</td>
+<td>1</td>
+<td>11 entidades (§3, linhas 13 a 23)</td>
+<td>entregue</td>
+</tr>
+<tr>
+<td>CCEE agente credenciado</td>
+<td>2</td>
+<td>nenhuma</td>
+<td>depende de credencial de agente — pedido 4 da pauta</td>
+</tr>
+<tr>
+<td>BBCE</td>
+<td>2</td>
+<td><code>bbce_curva_forward</code></td>
+<td>conector pronto; aguarda acesso (pedido 3)</td>
+</tr>
+<tr>
+<td>Hubspot</td>
+<td>2</td>
+<td><code>hubspot_negocios</code></td>
+<td>conector pronto; aguarda token (pedido 3)</td>
+</tr>
+<tr>
+<td>TempoOK</td>
+<td>2</td>
+<td><code>tempook_boletins</code>, <code>tempook_ena_prevs</code></td>
+<td>carregando em dev; entra no dossiê da Onda 2</td>
+</tr>
+<tr>
+<td>Oracle FMB, Portal Alup, MySQL RDS, RM/TOTVS</td>
+<td>3</td>
+<td>nenhuma</td>
+<td>dependem de VPN e credenciais (pedido 7)</td>
+</tr>
+</tbody>
+</table>
+<p>As fontes das Ondas 2 e 3 <strong>não fazem parte deste aceite</strong> e estão listadas
+para que nenhuma saia do escopo em silêncio.</p>
+<h2>6. O que fica para depois desta emissão</h2>
+<table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Quando</th>
+<th>Depende de</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Terceiro dia seguido de carga agendada do câmbio</td>
+<td>26/09</td>
+<td>nada — roda sozinho</td>
+</tr>
+<tr>
+<td>Demonstração do Portal com login da Alup</td>
+<td>reunião de aceite</td>
+<td>grupos de acesso da Alup (pedido 6)</td>
+</tr>
+<tr>
+<td>Quem assina o aceite</td>
+<td>antes da reunião</td>
+<td>Alup (pedido 1)</td>
+</tr>
+</tbody>
+</table>
+<h2>7. Como conferir</h2>
+<p>Qualquer pessoa com leitura no projeto confere a §3 com uma consulta:</p>
+<pre><code class="language-sql">SELECT fonte, entidade, status, linhas_carregadas, iniciada_em
+FROM bronze._execucoes
+WHERE modo = 'FONTE'
+QUALIFY ROW_NUMBER() OVER (PARTITION BY fonte, entidade ORDER BY iniciada_em DESC) = 1
+ORDER BY fonte, entidade
+</code></pre>
+<p>E o reprocessamento, com <code>WHERE modo = 'REPLAY'</code>.</p>
+<p>Ricardo Esper — ness.</p><section class='assinatura'><p class=local-data>25 de setembro de 2026</p><div class='linha-assinatura'></div><p class='assina-nome'>Ricardo Esper</p><p class='assina-org'>ness. Processos e Tecnologia Ltda.</p></section><p class="rodape">ness. Processos e Tecnologia Ltda. · CNPJ 72.027.097/0001-37 · Contrato CPS-01025/2026 — AlupData Fase 1: DataLake</p></body></html>

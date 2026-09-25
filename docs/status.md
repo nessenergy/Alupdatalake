@@ -179,6 +179,10 @@ continuam pendentes de liberação do ambiente pela Alup.
 > organização da Alup ([documentação](https://docs.cloud.google.com/iap/docs/managed-oauth-client)), então contas da ness. não
 > entram, mesmo com a concessão ao grupo aplicada. A evidência do Portal no
 > dossiê passa a ser a demonstração com login da Alup na reunião de aceite.
+> **Dossiê das Ondas 0 e 1 emitido em 25/09**, antes do previsto:
+> [`relatorios/2026-09-25-dossie-ondas-0-e-1.md`](relatorios/2026-09-25-dossie-ondas-0-e-1.md).
+> `terraform plan` sem mudança em `dev` e `hml` (depois do #245). Ficam o 3º
+> dia de carga agendada do câmbio (26/09) e a demonstração do Portal.
 
 Este arquivo responde "onde estamos e o que trava o próximo passo". Detalhe de
 escopo e estimativa fica em [`plano-execucao.md`](plano-execucao.md); o que sai

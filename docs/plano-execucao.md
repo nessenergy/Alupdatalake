@@ -161,9 +161,9 @@ Marco 4 — 26,72% · R$ 39.680,00 · **A maior onda; bloqueada por VPN e creden
 
 | # | Fonte | Est. | Acesso necessário |
 |---|---|---|---|
-| 3.1 | **Oracle FMB** | 45h ⚠ | VPN + usuário read-only + schema documentado |
+| 3.1 | **Oracle FMB** | 45h ⚠ | VPN + usuário read-only + schema documentado. **Rede, lado GCP, pronta em 25/09** ([ADR 024](arquitetura/decisoes/024-rede-das-fontes-internas.md)): faltam a rota até o FMB, o FortiGate e o datacenter, e a credencial |
 | 3.2 | **Portal Alup** (MySQL/NoSQL/Storage) | 40h ⚠ | VPN + credenciais read-only |
-| 3.3 | **MySQL RDS Comercialização** | 30h ⚠ | Usuário read-only e conectividade; C8 dispensa VPN e peering |
+| 3.3 | **MySQL RDS Comercialização** | 30h ⚠ | Usuário read-only e conectividade; C8 dispensa VPN e peering. Sai pelo IP fixo do Cloud NAT da Alupar (ADR 024), com TLS obrigatório (#249) |
 | 3.4 | **RM/TOTVS** | 25h ⚠ | Endpoints e credencial |
 | 3.5 | Orquestração em Cloud Workflows | 10h → **mecanismo entregue em 23/09** (`infra/modules/orquestracao`): fluxo que executa as ingestões da cadeia em paralelo, compila a release do Dataform e espera o estado terminal. Com `cadeia_onda3` vazia não cria recurso — a cadeia nasce com a primeira fonte interna | — |
 | 3.6 | Tabelas Gold que cruzam interno × mercado | 5h | dado interno carregado |

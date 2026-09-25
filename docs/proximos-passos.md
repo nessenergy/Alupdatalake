@@ -21,6 +21,18 @@ em acompanhamento com a Alup; sua execução não é presumida por esta revisão
 
 ## 1. O que está travando tudo
 
+**Em 25/09, o que trava é externo e está pedido:** quem assina o aceite e os
+grupos do Portal (aceite das Ondas 0 e 1, reunião proposta para 01/10), as
+credenciais da Onda 2, e a rede local e a credencial do FMB (Onda 3). O
+dossiê das Ondas 0 e 1 foi emitido e enviado em 25/09.
+
+| # | Ação | Dono | Situação |
+|---|---|---|---|
+| 1.8 | **Rede da Onda 3** ([ADR 024](arquitetura/decisoes/024-rede-das-fontes-internas.md)) | Alupar | lado GCP **pronto em 25/09** em `dev` e `hml` (sub-rede, vínculo, permissões, exceção de política, firewall) e `teste-conexao-fmb` rodando dentro da sub-rede. Faltam, da Alupar: IP e rede do FMB (G6), FortiGate e datacenter (L2 a L6) e a credencial do FMB (N3), pedidos por e-mail em 25/09 — [`runbook/rede-onda3.md`](runbook/rede-onda3.md) |
+| 1.9 | **Bootstrap de `prod`** | ness. | depois do aceite das Ondas 0 e 1; em seguida, `prod` entra no script da rede |
+
+Histórico da liberação do ambiente:
+
 **Nada externo trava o primeiro apply desde 23/09.** A Alup liberou o GCP nos
 três ambientes e a cadeia passou a ser trabalho da ness.:
 
@@ -49,6 +61,9 @@ três ambientes e a cadeia passou a ser trabalho da ness.:
 
 | # | Ação | Como | Pronto quando |
 |---|---|---|---|
+| 2.14 | **Enviar o e-mail da rede local e da credencial do FMB** | rascunho no Gmail, para Fabrizio, Iaraujo e Bertuzzi, com Leonardo e Gabriel Paz em cópia | e-mail enviado; resposta com IP e rede do FMB |
+| 2.15 | **Gravar a chave do App do quadro** | [`acoes-humanas.md`](acoes-humanas.md) §2b, pelo console | **Quadro** com `simular` rodando o `scripts.quadro` em vez de pular |
+| 2.16 | **Acompanhar os pedidos 1, 4 e 6 da pauta** (quem assina, 32h do item 2.1, grupos do Portal) | [`relatorios/2026-09-25-alinhamento.md`](relatorios/2026-09-25-alinhamento.md) §4 | respostas antes da reunião de aceite |
 | 2.2 | **Enviar o relatório de 04/09 à Alup** | `.md` e `.html` prontos em [`relatorios/`](relatorios/) | Registro na mão da contratante |
 | 2.4 | **Enviar à Alup o registro de 09/09 sobre E1 e E2** | `.md` e `.html` prontos em [`relatorios/`](relatorios/) | Registro na mão da contratante |
 | ~~2.5~~ | ~~Confirmar a entrega prevista de A3 e o responsável~~ | **A3 entregue em 23/09** e a [#55](https://github.com/nessenergy/Alupdatalake/issues/55) fechada. No mesmo dia a ness. comunicou à Alup, por e-mail, os IDs readequados, a adoção de `us-central1` e a conta `gptorres@` sem papel | — |
@@ -186,8 +201,14 @@ Sequência, não lista — cada item depende do anterior. Detalhe em
 4. Dataform executado pelo deploy logo após o apply — DDL do Bronze, views Silver e tabelas Gold (ADR 012).
 5. Publicar a imagem e subir o Cloud Run Job + Scheduler.
 6. **Três dias consecutivos com `status = SUCESSO`** em `bronze._execucoes`.
-7. Validar o replay do raw contra objeto real no GCS.
-8. Ligar o Portal MVP no BigQuery e publicar.
+   24 e 25/09 feitos; o terceiro é 26/09.
+7. ~~Validar o replay do raw contra objeto real no GCS.~~ **Feito**: `dev` em
+   24/09 e `hml` em 25/09.
+8. ~~Ligar o Portal MVP no BigQuery e publicar.~~ **Publicado** em `dev` e
+   `hml`. Só entra conta da Alup (IAP), e a evidência é a demonstração na
+   reunião de aceite.
+
+Itens 0 a 5 feitos entre 23 e 25/09.
 
 Só depois disso a Onda 0 pode ser declarada homologada — entrega técnica não é
 homologação, e é o primeiro `apply` que revela IAM insuficiente, cota de API e
@@ -206,7 +227,7 @@ Fonte: [`status.md` §6](status.md). Repetido aqui como calendário; a tabela l�
 | ~~04/09 — vencido~~ | A3 · projeto GCP | **atendida em 23/09**, com 12 dias úteis de atraso e os três ambientes de uma vez; S2 e S3 escorregaram |
 | 11/09 — respondido | A4 Questionário, com A5 (data owners, B1), A6 (Power BI hoje; Looker Studio ou fronts internos na Fase 2, G1) e destinatário de alerta (E3). Segue aberto: A9 token Hubspot, com chamado a partir de 14/09 (C1) | Gold da Fase 1 sem KPI ([ADR 012](arquitetura/decisoes/012-dataform.md#gold-na-fase-1)); a execução real do Hubspot aguarda token |
 | 18/09 | `billing_account` (E1, E2, em acerto com a QI Network) · exemplos de planilha (G3). **A2 encerrada em 14/09**: a orientação chegou, era filtro de `User-Agent`, e as 32h da Onda 1 destravaram no mesmo dia | sem confirmação de billing (#87) e planilhas (#142) em 18/09; sem conta, sem `apply` |
-| 25/09 | A7 chamados de token e acesso, abertos a partir de 14/09 (C1); o MySQL RDS dispensa VPN (C8) · C7 RM/TOTVS. **A8 saiu daqui**: documentação recebida em 14/09 | **ociosidade de 4h/dia** — maior risco financeiro do contrato |
+| 25/09 | A7 chamados de token e acesso, abertos a partir de 14/09 (C1); o MySQL RDS dispensa VPN (C8) · C7 RM/TOTVS. **A8 saiu daqui**: documentação recebida em 14/09 | **ociosidade de 4h/dia** — maior risco financeiro do contrato. **25/09: não entregues.** No mesmo dia a ness. preparou o lado GCP da rede e reiterou o pedido de rede local e credencial por e-mail |
 
 ---
 

@@ -183,6 +183,16 @@ continuam pendentes de liberação do ambiente pela Alup.
 > [`relatorios/2026-09-25-dossie-ondas-0-e-1.md`](relatorios/2026-09-25-dossie-ondas-0-e-1.md).
 > `terraform plan` sem mudança em `dev` e `hml` (depois do #245). Ficam o 3º
 > dia de carga agendada do câmbio (26/09) e a demonstração do Portal.
+> **Tarde de 25/09, adiantado sem depender da Alup:** o quadro deixou de falhar
+> todo dia e avisa enquanto a chave do App não é gravada (#247; passo humano
+> em [`acoes-humanas.md`](acoes-humanas.md) §2b); o dossiê da Onda 2 ficou
+> preparado, com roteiro de fechamento
+> ([`planos/2026-09-25-dossie-onda-2-preparado.md`](planos/2026-09-25-dossie-onda-2-preparado.md), #248);
+> e a conexão `mysql://` passou a exigir TLS verificado (#249), item da
+> ADR 013 para o MySQL RDS. Os três bancos locais (MySQL, Oracle, SQL Server)
+> passaram nos 9 testes de integração do caminho relacional. Os conectores da
+> Onda 3 continuam dependendo do schema documentado — não se escrevem por
+> adivinhação.
 
 Este arquivo responde "onde estamos e o que trava o próximo passo". Detalhe de
 escopo e estimativa fica em [`plano-execucao.md`](plano-execucao.md); o que sai

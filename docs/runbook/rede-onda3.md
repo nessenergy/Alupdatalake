@@ -300,9 +300,10 @@ credenciais. O valor nunca passa por chat, e-mail ou repositório.
 
 ### N4. Rodar o teste
 
-Console, projeto `alupar-dev-alupdata`: **Cloud Run → Jobs →
-`teste-conexao-fmb` → Executar**. O resultado aparece em **Registros** da
-execução:
+GitHub: **Actions → Testar conexão → Run workflow**, com `environment = dev`
+e `fonte = fmb`. Pessoa não executa job direto (ADR 015): o workflow roda pela
+conta de deploy e registra quem testou. O resumo da execução diz se passou e
+leva ao job no console, onde a mensagem do teste está em **Registros**:
 
 | Saída | Significado | Onde olhar |
 |---|---|---|

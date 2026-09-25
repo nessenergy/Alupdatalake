@@ -431,6 +431,12 @@ def test_portal_publicado_pelo_terraform_atras_do_iap() -> None:
     assert _tem(r"for_each\s*=\s*toset\(var\.acesso\)", acesso)
 
 
+def test_portal_nao_deixa_deriva_no_plan() -> None:
+    """O `scaling` do serviço volta da API com zeros que o código não declara."""
+    servico = _bloco(_ler("infra/modules/portal/main.tf"), 'resource "google_cloud_run_v2_service" "portal"')
+    assert _tem(r"ignore_changes\s*=\s*\[[^\]]*scaling", servico)
+
+
 def test_portal_so_le_dado() -> None:
     modulo = _ler("infra/modules/portal/main.tf")
     assert 'resource "google_service_account" "portal"' in modulo

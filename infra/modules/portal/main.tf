@@ -97,6 +97,13 @@ resource "google_cloud_run_v2_service" "portal" {
   # A proteção que importa está no dado, e essa fica nos datasets e no bucket.
   deletion_protection = false
 
+  # O `scaling` do serviço volta da API com `min_instance_count` e
+  # `manual_instance_count` em 0, que o código não declara; sem isto, todo plan
+  # traz uma mudança que não muda nada. A escala que vale fica no `template`.
+  lifecycle {
+    ignore_changes = [scaling]
+  }
+
   template {
     service_account = google_service_account.portal.email
 

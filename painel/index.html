@@ -177,16 +177,25 @@ footer{color:var(--muted);font-size:12.5px;border-top:1px solid var(--line-stron
 .saldo.atrasada{color:var(--late-ink);background:var(--late-bg)}
 .saldo.em-dia{color:var(--muted);border:1px solid var(--line-strong)}
 .saldo small{font-weight:400;opacity:.85;margin-left:4px}
-.global{margin-top:14px;display:grid;grid-template-columns:auto 1fr;gap:6px 18px;align-items:center}
-.global .pct{font-weight:600;font-size:1.9rem;line-height:1;color:var(--band-ink)}
+.global{margin-top:14px;display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 22px;align-items:center}
+.global .pct{font-weight:600;font-size:1.9rem;line-height:1;color:var(--band-ink);white-space:nowrap}
 .global .pct small{font-size:.95rem;font-weight:500;color:var(--band-muted);margin-left:6px}
-.gbar{display:flex;height:14px;border-radius:3px;overflow:hidden;background:rgba(255,255,255,.08)}
-.gbar i{display:block;height:100%}
-.gbar .ac{background:var(--band-ink)}
-.gbar .ea{background:var(--accent)}
-.gbar .ad{background:repeating-linear-gradient(90deg,var(--accent) 0 6px,rgba(0,173,232,.35) 6px 9px)}
-.gleg{grid-column:2;display:flex;flex-wrap:wrap;gap:4px 18px;font-size:12px;color:var(--band-muted)}
-.gleg i{display:inline-block;width:12px;height:10px;border-radius:2px;margin-right:6px;vertical-align:-1px}
+.gsub{font-size:12px;color:var(--band-muted);white-space:nowrap;font-variant-numeric:tabular-nums}
+.gsub b{font-weight:600;color:var(--band-ink)}
+/* barra por onda: largura = horas da onda; preenchimento = horas prontas */
+.gbar{position:relative;display:flex;height:16px}
+.gbar .seg{position:relative;height:100%;background:rgba(255,255,255,.08);box-shadow:inset -2px 0 0 var(--band)}
+.gbar .seg:first-child{border-radius:3px 0 0 3px}.gbar .seg:last-child{border-radius:0 3px 3px 0;box-shadow:none}
+.gbar .seg i{position:absolute;inset:0 auto 0 0;background:var(--accent)}
+.gbar .seg.adi i{background:rgba(0,173,232,.5)}
+.gbar .seg.ace i{background:var(--band-ink)}
+.gbar .seg:first-child i{border-radius:3px 0 0 3px}
+.gbar .hoje{position:absolute;top:-4px;bottom:-4px;width:2px;margin-left:-1px;background:var(--band-ink)}
+.gondas{display:flex;font-size:11.5px;color:var(--band-muted);font-variant-numeric:tabular-nums}
+.gondas span{overflow:hidden;white-space:nowrap;text-overflow:ellipsis;padding-right:6px}
+.gondas b{font-weight:600;color:var(--band-ink)}
+.gondas .ent{color:var(--accent)}
+@media (max-width:700px){.global{grid-template-columns:1fr}.gsub{white-space:normal}}
 .lane .lab-est{font-weight:600}
 .cells{display:grid;gap:6px}
 .cell-row{display:grid;grid-template-columns:40px 1fr;gap:8px;align-items:center;font-size:12px;color:var(--muted)}
@@ -259,6 +268,10 @@ main.dash{display:grid;gap:24px}
   .onda-carga{padding:8px 0}
 }
 @media (min-width:1200px) and (max-width:1700px){
+  /* notebook: a barra por onda desce para uma linha inteira */
+  .band .wrap{grid-template-areas:"logo pct upd" "logo sub upd" "bar bar bar" "ondas ondas ondas" "kpis kpis kpis";row-gap:4px}
+  #global{display:contents} .global .pct{grid-area:pct} .gsub{grid-area:sub} .gbar{grid-area:bar;margin-top:8px} .gondas{grid-area:ondas}
+  #kpis{margin-top:6px}
   .wlab{font-size:11.5px} .saldo{font-size:10.5px;padding:1px 5px;margin-left:5px} .tag-entregue{font-size:10px;padding:2px 5px}
 }
 @media (min-width:1200px) and (max-height:900px){
@@ -362,13 +375,24 @@ main.dash{display:grid;gap:24px}
     var atr=d.pendencias.filter(function(p){return p.atrasada;}).length;
     var t=d.rede.teste_conexao, tn={passou:'passou',falhou:'falhou',nunca_rodou:'nunca rodou'}[t.estado];
     var g=d.progresso, w=function(h){return (h/g.horas_total*100).toFixed(2)+'%';}, h1=function(h){return Math.round(h)+'h';};
-    $('global').innerHTML='<div class="pct">'+g.pct.toFixed(1).replace('.',',')+'%<small>do projeto pronto</small></div>'+
-      '<div class="gbar" role="img" aria-label="'+g.pct.toFixed(1)+'% do projeto pronto">'+
-      (g.aceito?'<i class="ac" style="width:'+w(g.aceito)+'"></i>':'')+'<i class="ea" style="width:'+w(g.em_aceite)+'"></i><i class="ad" style="width:'+w(g.adiantado)+'"></i></div>'+
-      '<div class="gleg">'+(g.aceito?'<span><i style="background:var(--band-ink)"></i>aceito '+h1(g.aceito)+'</span>':'')+
-      '<span><i style="background:var(--accent)"></i>entregue, em aceite '+h1(g.em_aceite)+'</span>'+
-      '<span><i style="background:repeating-linear-gradient(90deg,var(--accent) 0 4px,rgba(0,173,232,.35) 4px 6px)"></i>adiantado nas ondas seguintes '+h1(g.adiantado)+'</span>'+
-      '<span>de '+g.horas_total+'h da proposta</span></div>';
+    // Previsto hoje pela proposta: cada onda avança linearmente na janela original.
+    var hj=Date.now(), prev=d.ondas.reduce(function(a,o){
+      var i=Date.parse(o.janela[0]), f=Date.parse(o.janela[1]);
+      return a+o.horas*Math.min(1,Math.max(0,(hj-i)/(f-i)));},0);
+    var pc=function(x){return x.toFixed(1).replace('.',',')+'%';}, porOnda={};
+    g.por_onda.forEach(function(p){porOnda[p.onda]=p;});
+    var segs='', rots='';
+    d.ondas.forEach(function(o){
+      var p=porOnda[o.numero], f=p.prontas/p.horas, ent=o.estado==='entregue'||o.estado==='aceita';
+      var cls=o.estado==='aceita'?'ace':ent?'':'adi';
+      segs+='<span class="seg '+cls+'" style="flex:'+o.horas+'" title="Onda '+o.numero+': '+h1(p.prontas)+' de '+o.horas+'h"><i style="width:'+(f*100).toFixed(1)+'%"></i></span>';
+      rots+='<span style="flex:'+o.horas+'">Onda '+o.numero+' <b'+(ent?' class="ent"':'')+'>'+(ent?(o.estado==='aceita'?'ACEITA':'ENTREGUE'):Math.round(f*100)+'%')+'</b></span>';
+    });
+    $('global').innerHTML='<div class="pct">'+pc(g.pct)+'<small>do projeto pronto</small></div>'+
+      '<div class="gbar" role="img" aria-label="'+pc(g.pct)+' do projeto pronto; previsto hoje '+pc(prev/g.horas_total*100)+'">'+segs+
+      '<span class="hoje" style="left:'+(prev/g.horas_total*100).toFixed(2)+'%" title="previsto hoje pela proposta"></span></div>'+
+      '<div class="gsub"><b>'+h1(g.aceito+g.em_aceite)+'</b> entregues · <b>'+h1(g.adiantado)+'</b> adiantadas · de '+g.horas_total+'h · <b>┃</b> previsto hoje '+pc(prev/g.horas_total*100)+'</div>'+
+      '<div class="gondas">'+rots+'</div>';
     $('kpis').innerHTML=[
       ['<span'+(dev===tot?' class="ok"':'')+'>'+dev+'</span><small>/'+tot+'</small>','Ondas 0 e 1 com carga ok em dev'],
       ['<span'+(hml===tot?' class="ok"':'')+'>'+hml+'</span><small>/'+tot+'</small>','Ondas 0 e 1 com carga ok em hml'],

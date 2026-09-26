@@ -151,11 +151,12 @@ def resumir_progresso(ondas: list[dict[str, Any]], dias: int, meta: int) -> dict
 def saldo_dias(onda: dict[str, Any], fracao: float, hoje: date) -> int:
     """Dias de folga (positivo) ou de atraso (negativo) da onda.
 
-    Entregue: fim da janela menos a data de entrega. Não entregue: dias de
+    Entregue: prazo (o postergado, se houver) menos a data de entrega. Não entregue: dias de
     trabalho já feitos (fração pronta × duração da janela) menos os dias já
     corridos da janela; antes de a janela abrir, tudo o que está pronto é folga.
     """
     inicio, fim = onda["janela"]
+    fim = onda.get("prazo_postergado", fim)  # cláusula 3ª: insumo atrasado posterga o prazo
     if onda.get("entregue_em"):
         return (fim - onda["entregue_em"]).days
     duracao = (fim - inicio).days

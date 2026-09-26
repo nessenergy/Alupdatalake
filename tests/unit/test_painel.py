@@ -261,3 +261,16 @@ def test_onda_com_prazo_postergado_mede_a_entrega_contra_o_prazo_vigente():
         "prazo_postergado": date(2026, 9, 30),
     }
     assert painel.saldo_dias(onda, fracao=1.0, hoje=HOJE) == 5
+
+
+def test_ritmo_compara_horas_prontas_por_dia_util_com_o_plano_da_proposta():
+    # 07/09 é feriado: de 01/09 a 11/09 são 8 dias úteis; o contrato inteiro, 1 a 18/09, 13.
+    ritmo = painel.ritmo(
+        prontas=80.0,
+        total=130,
+        desde=date(2026, 9, 1),
+        hoje=date(2026, 9, 11),
+        contrato=(date(2026, 9, 1), date(2026, 9, 18)),
+        feriados=[date(2026, 9, 7)],
+    )
+    assert ritmo == {"dias_uteis": 8, "real": 10.0, "plano": 10.0}

@@ -33,7 +33,8 @@ logger = logging.getLogger("painel")
 BRASILIA = timezone(timedelta(hours=-3))
 MARCOS = Path(__file__).resolve().parents[1] / "painel" / "marcos.toml"
 META_DIAS_SEGUIDOS = 3
-ESTADOS_ONDA = {"entregue", "em_andamento", "aguarda_alup", "nao_iniciada"}
+ESTADOS_ONDA = {"aceita", "entregue", "em_andamento", "aguarda_alup", "nao_iniciada"}
+ITENS_AUTOMATICOS = {"dias_seguidos"}
 ESTADOS_MARCO = {"feito", "previsto"}
 ESTADOS_REDE = {"feito", "pendente"}
 _PRAZO = re.compile(r"^Prazo:\s*(\d{4}-\d{2}-\d{2})\s*$", re.MULTILINE)
@@ -52,6 +53,13 @@ def carregar_marcos(caminho: Path = MARCOS) -> dict[str, Any]:
         inicio, fim = onda["janela"]
         if inicio >= fim:
             raise ValueError(f"onda {onda['numero']}: janela termina antes de começar")
+        if sum(i["horas"] for i in onda["item"]) != onda["horas"]:
+            raise ValueError(f"onda {onda['numero']}: itens não somam as {onda['horas']}h da proposta")
+        for item in onda["item"]:
+            if item.get("auto") not in (None, *ITENS_AUTOMATICOS):
+                raise ValueError(f"item {item['codigo']}: auto {item['auto']!r} fora de {sorted(ITENS_AUTOMATICOS)}")
+            if "auto" not in item and not 0 <= item["pronto"] <= 1:
+                raise ValueError(f"item {item['codigo']}: pronto {item['pronto']} fora de 0 a 1")
         repetidas = vistas.intersection(onda["entidades"])
         if repetidas:
             raise ValueError(f"onda {onda['numero']}: entidade em duas ondas: {sorted(repetidas)}")
@@ -109,6 +117,32 @@ def dias_seguidos(execucoes: list[dict[str, Any]], entidade: str, hoje: date) ->
         contagem += 1
         dia -= timedelta(days=1)
     return contagem
+
+
+# ------------------------------------------------------------------ progresso global
+
+
+def resumir_progresso(ondas: list[dict[str, Any]], dias: int, meta: int) -> dict[str, Any]:
+    """Horas prontas sobre as horas da proposta, item a item.
+
+    Separa o que já foi aceito, o que está em aceite (onda entregue) e o que está
+    adiantado (pronto em onda ainda não entregue).
+    """
+
+    def fracao(item: dict[str, Any]) -> float:
+        if item.get("auto") == "dias_seguidos":
+            return min(1.0, dias / meta)
+        return float(item["pronto"])
+
+    por_onda, faixas = [], {"aceito": 0.0, "em_aceite": 0.0, "adiantado": 0.0}
+    for onda in ondas:
+        prontas = sum(i["horas"] * fracao(i) for i in onda["item"])
+        por_onda.append({"onda": onda["numero"], "horas": onda["horas"], "prontas": prontas})
+        faixa = {"aceita": "aceito", "entregue": "em_aceite"}.get(onda["estado"], "adiantado")
+        faixas[faixa] += prontas
+    total = sum(o["horas"] for o in ondas)
+    feitas = sum(faixas.values())
+    return {"horas_total": total, **faixas, "pct": 100 * feitas / total, "por_onda": por_onda}
 
 
 # ------------------------------------------------------------------ pendências
@@ -201,6 +235,7 @@ def montar(
             "dias": dias_seguidos(execucoes, referencia, hoje),
             "meta": META_DIAS_SEGUIDOS,
         },
+        "progresso": resumir_progresso(marcos["onda"], dias_seguidos(execucoes, referencia, hoje), META_DIAS_SEGUIDOS),
         "pendencias": resumir_pendencias(issues, hoje),
         "rede": {"checklist": _datas(marcos["rede"]), "teste_conexao": resumir_teste_conexao(testes)},
     }

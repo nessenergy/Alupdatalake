@@ -1,0 +1,90 @@
+name: Painel
+
+# Atualiza o painel vivo do projeto (docs/planos/2026-09-25-painel-vivo.md).
+# Lê as execuções de dev e hml, as issues `tipo/dependencia` e o teste de
+# conexão, gera o dados.json e o publica no bucket do painel, no projeto da
+# ness. Só sai metadado de execução, nunca linha de dado.
+#
+# O hml só autentica em job do ambiente `hml`; `deployment: false` usa o
+# ambiente sem registrar um deployment a cada hora.
+
+on:
+  schedule:
+    - cron: "7 * * * *" # de hora em hora
+  workflow_run:
+    workflows: ["Deploy GCP", "Executar ingestão", "Testar conexão"]
+    types: [completed]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+  issues: read
+
+concurrency:
+  group: painel
+  cancel-in-progress: true
+
+jobs:
+  hml:
+    name: "Execuções de hml"
+    runs-on: ubuntu-latest
+    environment:
+      name: hml
+      deployment: false
+    outputs:
+      execucoes: ${{ steps.exportar.outputs.execucoes }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3.0.0
+        with:
+          workload_identity_provider: ${{ vars.GCP_WIF_PROVIDER }}
+          service_account: ${{ vars.GCP_DEPLOY_SA }}
+      - uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
+        with:
+          version: "0.5.11"
+      - run: uv sync --frozen --no-dev
+      - id: exportar
+        run: |
+          uv run python -m scripts.painel --so-execucoes --ambiente "hml=alupar-hm-alupdata" --saida execucoes-hml.json
+          fim="FIM_$(openssl rand -hex 16)"
+          { echo "execucoes<<$fim"; cat execucoes-hml.json; echo; echo "$fim"; } >> "$GITHUB_OUTPUT"
+
+  publicar:
+    name: "Gerar e publicar"
+    needs: hml
+    # Sem hml, o painel sai só com dev, em vez de não sair.
+    if: ${{ !cancelled() }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3.0.0
+        with:
+          workload_identity_provider: ${{ vars.GCP_WIF_PROVIDER }}
+          service_account: ${{ vars.GCP_DEPLOY_SA }}
+      - uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
+        with:
+          version: "0.5.11"
+      - run: uv sync --frozen --no-dev
+      - name: Gerar dados.json
+        env:
+          EXECUCOES_HML: ${{ needs.hml.outputs.execucoes }}
+          GITHUB_TOKEN: ${{ github.token }}
+          REPOSITORIO: ${{ github.repository }}
+        run: |
+          printf '%s' "$EXECUCOES_HML" > execucoes-hml.json
+          uv run python -m scripts.painel --ambiente "dev=alupar-dev-alupdata" \
+            --execucoes-de execucoes-hml.json --repositorio "$REPOSITORIO" --saida dados.json
+      # Troca de identidade: daqui em diante, a do painel no projeto da ness.,
+      # que só grava no bucket do painel.
+      - uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3.0.0
+        with:
+          workload_identity_provider: ${{ vars.PAINEL_WIF_PROVIDER }}
+          service_account: ${{ vars.PAINEL_SA }}
+      - uses: google-github-actions/setup-gcloud@aa5489c8933f4cc7a4f7d45035b3b1440c9c10db # v3.0.1
+      - name: Publicar
+        env:
+          BUCKET: ${{ vars.PAINEL_BUCKET }}
+        run: |
+          gcloud storage cp dados.json painel/index.html "gs://$BUCKET/" --cache-control="no-store"
+          echo "Painel publicado: $(date -u +%FT%TZ)" >> "$GITHUB_STEP_SUMMARY"

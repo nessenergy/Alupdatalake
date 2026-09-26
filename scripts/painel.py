@@ -145,6 +145,30 @@ def resumir_progresso(ondas: list[dict[str, Any]], dias: int, meta: int) -> dict
     return {"horas_total": total, **faixas, "pct": 100 * feitas / total, "por_onda": por_onda}
 
 
+# ------------------------------------------------------------------ ritmo da equipe
+
+
+def _dias_uteis(inicio: date, fim: date, feriados: set[date]) -> int:
+    dias = (inicio + timedelta(days=n) for n in range((fim - inicio).days + 1))
+    return sum(1 for d in dias if d.weekday() < 5 and d not in feriados)
+
+
+def ritmo(
+    prontas: float, total: int, desde: date, hoje: date, contrato: tuple[date, date], feriados: list[date]
+) -> dict[str, Any]:
+    """Horas da proposta prontas por dia útil, contra o ritmo que a proposta supõe.
+
+    Mede entrega, não apontamento de horas: é o valor produzido por dia útil.
+    """
+    f = set(feriados)
+    dias = _dias_uteis(desde, hoje, f)
+    return {
+        "dias_uteis": dias,
+        "real": round(prontas / dias, 1) if dias else 0.0,
+        "plano": round(total / _dias_uteis(*contrato, f), 1),
+    }
+
+
 # ------------------------------------------------------------------ dias adiantados ou atrasados
 
 
@@ -249,6 +273,10 @@ def montar(
         {**{k: v for k, v in o.items() if k != "entidades"}, "saldo_dias": saldo_dias(o, fracoes[o["numero"]], hoje)}
         for o in marcos["onda"]
     ]
+    desde = min(o.get("trabalho_desde", o["janela"][0]) for o in marcos["onda"])
+    feitas = progresso["aceito"] + progresso["em_aceite"] + progresso["adiantado"]
+    contrato = (marcos["inicio_contrato"], marcos["fim_contrato"])
+    progresso["ritmo"] = ritmo(feitas, progresso["horas_total"], desde, hoje, contrato, marcos.get("feriados", []))
     return {
         "gerado_em": agora.isoformat(),
         "contrato": {"inicio": marcos["inicio_contrato"].isoformat(), "fim": marcos["fim_contrato"].isoformat()},

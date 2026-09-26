@@ -7,6 +7,8 @@
 
 inicio_contrato = 2026-08-31
 fim_contrato = 2027-01-08
+# Feriados nacionais no período: entram na conta de dias úteis do ritmo.
+feriados = [2026-09-07, 2026-10-12, 2026-11-02, 2026-11-20, 2026-12-25, 2027-01-01]
 # Entidade cujos dias seguidos de carga agendada valem para o aceite da Onda 0.
 referencia_dias_seguidos = "bcb_cambio_ptax"
 

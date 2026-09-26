@@ -180,6 +180,8 @@ footer{color:var(--muted);font-size:12.5px;border-top:1px solid var(--line-stron
 .global{margin-top:14px;display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 22px;align-items:center}
 .global .pct{font-weight:600;font-size:1.9rem;line-height:1;color:var(--band-ink);white-space:nowrap}
 .global .pct small{font-size:.95rem;font-weight:500;color:var(--band-muted);margin-left:6px}
+.ritmo{display:block;margin-top:3px;font-size:11.5px;color:var(--band-muted);text-align:right;font-variant-numeric:tabular-nums}
+.ritmo b{font-weight:600;color:var(--band-ink)}
 .gsub{font-size:12px;color:var(--band-muted);white-space:nowrap;font-variant-numeric:tabular-nums}
 .gsub b{font-weight:600;color:var(--band-ink)}
 /* barra por onda: largura = horas da onda; preenchimento = horas prontas */
@@ -295,7 +297,7 @@ main.dash{display:grid;gap:24px}
   <div class="wrap">
     <div class="band-top">
       <div class="logo"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1220.80 403.20" role="img" aria-label="ness."><g transform="translate(41.230,318.938) scale(0.44362,-0.44362)"><path d="M594 305V0H498V294Q498 371 461.0 410.0Q424 449 355 449Q277 449 232.0 403.5Q187 358 187 273V0H91V530H183V450Q212 491 261.5 513.0Q311 535 374 535Q475 535 534.5 476.5Q594 418 594 305Z" fill="#FFFFFF"/><path transform="translate(681,0)" d="M568 233H138Q147 163 199.5 120.5Q252 78 330 78Q425 78 483 142L536 80Q500 38 446.5 16.0Q393 -6 327 -6Q243 -6 178.0 28.5Q113 63 77.5 125.0Q42 187 42 265Q42 342 76.5 404.0Q111 466 171.5 500.5Q232 535 308 535Q384 535 443.5 500.5Q503 466 536.5 404.0Q570 342 570 262Q570 251 568 233ZM138 302H478Q470 369 423.5 411.5Q377 454 308 454Q239 454 192.5 412.0Q146 370 138 302Z" fill="#FFFFFF"/><path transform="translate(1293,0)" d="M24 56 64 132Q99 107 149.0 92.0Q199 77 250 77Q376 77 376 149Q376 173 359.0 187.0Q342 201 316.5 207.5Q291 214 244 222Q180 232 139.5 245.0Q99 258 70.0 289.0Q41 320 41 376Q41 448 101.0 491.5Q161 535 262 535Q315 535 368.0 522.0Q421 509 455 487L414 411Q349 453 261 453Q200 453 168.0 433.0Q136 413 136 380Q136 354 154.0 339.0Q172 324 198.5 317.0Q225 310 273 301Q337 290 376.5 277.5Q416 265 444.0 235.0Q472 205 472 151Q472 79 410.5 36.5Q349 -6 243 -6Q178 -6 118.0 11.5Q58 29 24 56Z" fill="#FFFFFF"/><path transform="translate(1794,0)" d="M24 56 64 132Q99 107 149.0 92.0Q199 77 250 77Q376 77 376 149Q376 173 359.0 187.0Q342 201 316.5 207.5Q291 214 244 222Q180 232 139.5 245.0Q99 258 70.0 289.0Q41 320 41 376Q41 448 101.0 491.5Q161 535 262 535Q315 535 368.0 522.0Q421 509 455 487L414 411Q349 453 261 453Q200 453 168.0 433.0Q136 413 136 380Q136 354 154.0 339.0Q172 324 198.5 317.0Q225 310 273 301Q337 290 376.5 277.5Q416 265 444.0 235.0Q472 205 472 151Q472 79 410.5 36.5Q349 -6 243 -6Q178 -6 118.0 11.5Q58 29 24 56Z" fill="#FFFFFF"/><path transform="translate(2295,0)" d="M46 63Q46 92 66.0 111.5Q86 131 114 131Q142 131 161.0 112.0Q180 93 180 63Q180 33 160.5 13.5Q141 -6 114 -6Q86 -6 66.0 13.5Q46 33 46 63Z" fill="#00ADE8"/></g></svg><span class="proj">AlupData Fase 1</span></div>
-      <span><span class="conf">Documento confidencial</span><span class="upd" id="upd">carregando…</span></span>
+      <span><span class="conf">Documento confidencial</span><span class="upd" id="upd">carregando…</span><span class="ritmo" id="ritmo"></span></span>
     </div>
     <div class="global" id="global"></div>
     <div class="kpis" id="kpis"></div>
@@ -393,6 +395,9 @@ main.dash{display:grid;gap:24px}
       '<span class="hoje" style="left:'+(prev/g.horas_total*100).toFixed(2)+'%" title="previsto hoje pela proposta"></span></div>'+
       '<div class="gsub"><b>'+h1(g.aceito+g.em_aceite)+'</b> entregues · <b>'+h1(g.adiantado)+'</b> adiantadas · de '+g.horas_total+'h · <b>┃</b> previsto hoje '+pc(prev/g.horas_total*100)+'</div>'+
       '<div class="gondas">'+rots+'</div>';
+    var r=g.ritmo;
+    $('ritmo').innerHTML=r?'ritmo <b>'+r.real.toFixed(1).replace('.',',')+'h</b>/dia útil · proposta '+r.plano.toFixed(1).replace('.',',')+'h':'';
+    $('ritmo').title=r?'Horas da proposta prontas por dia útil nos últimos '+r.dias_uteis+' dias úteis, contra o ritmo que a proposta supõe (580h no prazo do contrato)':'';
     $('kpis').innerHTML=[
       ['<span'+(dev===tot?' class="ok"':'')+'>'+dev+'</span><small>/'+tot+'</small>','Ondas 0 e 1 com carga ok em dev'],
       ['<span'+(hml===tot?' class="ok"':'')+'>'+hml+'</span><small>/'+tot+'</small>','Ondas 0 e 1 com carga ok em hml'],

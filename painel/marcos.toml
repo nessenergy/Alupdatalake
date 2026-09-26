@@ -258,8 +258,8 @@ pronto = 0.0
 codigo = "4.3"
 titulo = "Knowledge Catalog"
 horas = 20
-pronto = 0.5
-nota = "lake, zonas e ativos declarados"
+pronto = 0.7
+nota = "lake, zonas, ativos, aspect types e glossário (19 termos) declarados; faltam as anotações"
 
 [[onda.item]]
 codigo = "4.4"

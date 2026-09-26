@@ -8,6 +8,7 @@ camada da arquitetura.
 """
 
 import re
+import unicodedata
 from pathlib import Path
 
 RAIZ = Path(__file__).resolve().parents[2]
@@ -87,3 +88,68 @@ def test_os_oito_dominios_do_b1_estao_no_aspecto():
         "planejamento",
     ):
         assert dominio in ASPECTOS, f"domínio {dominio} fora do aspect type"
+
+
+GLOSSARIO_MD = (RAIZ / "docs" / "glossario.md").read_text(encoding="utf-8")
+GLOSSARIO_TF = (RAIZ / "infra" / "modules" / "catalogo" / "glossario.tf").read_text(encoding="utf-8")
+
+SECOES_DE_NEGOCIO = ("Instituições", "Sistema e mercado", "Geração", "Unidades")
+
+
+def _fatia_secao(titulo):
+    """Texto de uma seção `## titulo` de docs/glossario.md, até o próximo `## `."""
+    bloco = GLOSSARIO_MD.split(f"## {titulo}", 1)[1]
+    return bloco.split("\n## ", 1)[0]
+
+
+def _slug(texto):
+    """Mesma regra usada nas chaves de `local.glossario_termos`: sem acento, minúsculo, `_` no espaço."""
+    sem_acento = unicodedata.normalize("NFKD", texto).encode("ascii", "ignore").decode("ascii")
+    return re.sub(r"[^a-z0-9]+", "_", sem_acento.lower()).strip("_")
+
+
+def test_todo_termo_de_negocio_do_glossario_vira_termo_do_catalogo():
+    """Termo que existe em docs/glossario.md e falta aqui é busca que a Alup faz e não acha."""
+    termos_no_md = {
+        _slug(termo)
+        for secao in SECOES_DE_NEGOCIO
+        for termo in re.findall(r"^\| \*\*(.+?)\*\* \|", _fatia_secao(secao), re.MULTILINE)
+    }
+    chaves_no_tf = set(re.findall(r"^\s{4}([a-z][a-z0-9_]*) = \{", GLOSSARIO_TF, re.MULTILINE))
+
+    assert termos_no_md, "nenhum termo encontrado nas quatro seções de negócio"
+    assert termos_no_md == chaves_no_tf
+
+
+def test_nenhum_termo_do_projeto_vaza_para_o_catalogo():
+    """'Do projeto' é jargão de repositório e contrato, não vocabulário do dado."""
+    termos_do_projeto = {
+        _slug(termo) for termo in re.findall(r"^\| \*\*(.+?)\*\* \|", _fatia_secao("Do projeto"), re.MULTILINE)
+    }
+    chaves_no_tf = set(re.findall(r"^\s{4}([a-z][a-z0-9_]*) = \{", GLOSSARIO_TF, re.MULTILINE))
+
+    assert not (termos_do_projeto & chaves_no_tf)
+
+
+def test_cada_termo_tem_categoria_display_name_e_descricao():
+    """Termo sem descrição no catálogo é pior que não ter termo: parece completo e não é."""
+    chaves = re.findall(r"^\s{4}([a-z][a-z0-9_]*) = \{", GLOSSARIO_TF, re.MULTILINE)
+    assert chaves
+    for chave in chaves:
+        entrada = re.search(rf"\n    {chave} = \{{(.*?)\n    \}}", GLOSSARIO_TF, re.DOTALL)
+        assert entrada, chave
+        corpo = entrada.group(1)
+        assert "categoria" in corpo, chave
+        assert "display_name" in corpo, chave
+        assert "description" in corpo, chave
+
+
+def test_o_glossario_e_os_termos_apontam_para_o_mesmo_glossary_id():
+    """Termo com glossary_id diferente do glossário cria uma segunda árvore, órfã."""
+    assert 'glossary_id  = "glossario-negocio"' in GLOSSARIO_TF or 'glossary_id = "glossario-negocio"' in GLOSSARIO_TF
+    assert "glossary_id = google_dataplex_glossary.negocio.glossary_id" in GLOSSARIO_TF
+
+
+def test_sem_recurso_de_categoria():
+    """Decisão registrada no plano: agrupamento por label `categoria`, sem google_dataplex_glossary_category."""
+    assert 'resource "google_dataplex_glossary_category"' not in GLOSSARIO_TF

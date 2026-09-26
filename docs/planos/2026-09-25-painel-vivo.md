@@ -1,6 +1,6 @@
 # Painel vivo do projeto
 
-Registrado em **25/09/2026**. Execução adiada; retomar a partir da Tarefa 1.
+Registrado em **25/09/2026**. Em 26/09 foram feitas as Tarefas 1 a 4; a 5 e a 6 dependem de concessão e de console.
 
 **Objetivo:** um painel de acompanhamento do AlupData que se atualiza sozinho,
 com pouco texto e dado real: marcos, cargas por onda, pendências com a Alup e
@@ -26,38 +26,38 @@ ness.
 |---|---|---|
 | Cargas por onda | `bronze._execucoes` de `dev` e `hml`: último estado por entidade, linhas, horário, e os últimos 7 dias | automática |
 | Dias seguidos de carga | calculado das mesmas execuções | automática |
-| Pendências com a Alup | issues com a etiqueta `pendencia-alup`: aberta ou fechada, desde quando, dias em aberto | automática |
+| Pendências com a Alup | issues abertas com a etiqueta `tipo/dependencia` (a convenção `[ALUP]` que o repositório já usa): prazo, dias em aberto, atraso | automática |
 | Rede da Onda 3 | última execução do `teste-conexao-fmb` (passou, ou a mensagem de onde parou) mais o checklist G, L e N | automática + arquivo |
-| Marcos e ondas | `painel/marcos.yaml` no repositório: janelas, datas e estado de cada marco | editado quando um marco muda |
+| Marcos e ondas | `painel/marcos.toml` no repositório: janelas, datas e estado de cada marco | editado quando um marco muda |
 
 Sai do ambiente da Alupar só **metadado de execução** (contagens, status e
 horários), nunca linha de dado.
 
 ## Tarefas
 
-### Tarefa 1 — Etiqueta e issues das pendências
+### Tarefa 1 — Issues das pendências (feita em 26/09)
 
-- Criar a etiqueta `pendencia-alup` e aplicá-la às issues que já são pedido à
-  Alup: #12, #13, #14, #15, #23, #24, #87, #141, #142 e #150.
-- Abrir as que faltam, dos pedidos da [pauta de 25/09](../relatorios/2026-09-25-alinhamento.md) §4: quem
+- A etiqueta já existia: `tipo/dependencia`, com o prefixo `[ALUP]` no título.
+- Abertas em 26/09 as que faltavam (#258 a #262), e a #12 recebeu a situação da rede com prazo.
+- Origem das que faltavam: dos pedidos da [pauta de 25/09](../relatorios/2026-09-25-alinhamento.md) §4: quem
   assina o aceite, confirmação da reunião, as 32h do item 2.1, grupos do
   Portal, e rede local e credencial do FMB. **O cliente lê o GitHub:** texto no
   tom da pauta, com prazo no corpo (`Prazo: AAAA-MM-DD`).
 
-### Tarefa 2 — `painel/marcos.yaml`
+### Tarefa 2 — `painel/marcos.toml` (feita em 26/09)
 
 Ondas (janela do contrato, horas, marco percentual), marcos com data e estado,
 e o checklist da rede (G1 a G6, L1 a L6, N1 a N4, conforme
 [`runbook/rede-onda3.md`](../runbook/rede-onda3.md)). Um teste valida o esquema.
 
-### Tarefa 3 — Gerador do `dados.json` (TDD)
+### Tarefa 3 — Gerador do `dados.json` (feita em 26/09)
 
 `scripts/painel.py`, que junta as quatro fontes num JSON com
 `gerado_em`. Testes com as fontes simuladas: entidade sem execução, execução
 com erro, dias seguidos interrompidos, issue sem prazo, teste de conexão que
 nunca rodou. O gerador nunca escreve credencial nem linha de dado no JSON.
 
-### Tarefa 4 — Página
+### Tarefa 4 — Página (feita em 26/09: `painel/index.html`)
 
 A página atual, lendo `dados.json` do mesmo endereço, com "atualizado há X
 min" e estado vazio explícito quando um bloco falha. Marca ness.

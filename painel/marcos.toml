@@ -1,0 +1,122 @@
+# Painel vivo do projeto (docs/planos/2026-09-25-painel-vivo.md).
+#
+# A única parte do painel editada à mão: janelas das ondas, marcos e o checklist
+# da rede. Cargas, dias seguidos, pendências e o teste de conexão vêm sozinhos
+# de `bronze._execucoes`, das issues `tipo/dependencia` e do Cloud Run.
+# Edite quando um marco mudar; o `scripts/painel.py` valida o arquivo.
+
+inicio_contrato = 2026-08-31
+fim_contrato = 2027-01-08
+# Entidade cujos dias seguidos de carga agendada valem para o aceite da Onda 0.
+referencia_dias_seguidos = "bcb_cambio_ptax"
+
+[[onda]]
+numero = 0
+nome = "Fundação"
+horas = 90
+marco_pct = 15.52
+janela = [2026-08-31, 2026-09-11]
+trabalho_desde = 2026-08-25
+estado = "entregue" # entregue | em_andamento | aguarda_alup | nao_iniciada
+entidades = ["bcb_cambio_ptax"]
+
+[[onda]]
+numero = 1
+nome = "Mercado"
+horas = 120
+marco_pct = 20.69
+janela = [2026-09-14, 2026-10-16]
+trabalho_desde = 2026-08-25
+estado = "entregue"
+entidades = [
+  "bcb_juros", "ibge_ipca", "aneel_siga",
+  "ons_carga", "ons_ear", "ons_ena", "ons_geracao_usina", "ons_capacidade",
+  "ons_disponibilidade_usina", "ons_restricao_coff_eolica", "ons_restricao_coff_fotovoltaica",
+  "ccee_pld", "ccee_perfil", "ccee_agente", "ccee_exposicao_financeira", "ccee_contabilizacao_perfil",
+  "ccee_geracao_usina", "ccee_contrato_montante", "ccee_varejista_consumidor", "ccee_encargo_ess",
+  "ccee_energia_reserva", "ccee_cvu_estrutural",
+]
+
+[[onda]]
+numero = 2
+nome = "Credenciais"
+horas = 110
+marco_pct = 18.97
+janela = [2026-10-19, 2026-11-13]
+trabalho_desde = 2026-08-26
+estado = "aguarda_alup"
+entidades = ["hubspot_negocios", "bbce_curva_forward", "tempook_boletins", "tempook_ena_prevs"]
+
+[[onda]]
+numero = 3
+nome = "Sistemas internos"
+horas = 155
+marco_pct = 26.72
+janela = [2026-11-16, 2026-12-18]
+trabalho_desde = 2026-08-30
+estado = "aguarda_alup"
+entidades = []
+
+[[onda]]
+numero = 4
+nome = "Planilhas"
+horas = 105
+marco_pct = 18.10
+janela = [2026-12-21, 2027-01-08]
+trabalho_desde = 2026-08-26
+estado = "aguarda_alup"
+entidades = []
+
+# Marcos: o que aconteceu e o que vem, em ordem de data.
+[[marco]]
+data = 2026-09-23
+titulo = "Ambientes GCP liberados; dev no ar"
+estado = "feito"
+
+[[marco]]
+data = 2026-09-24
+titulo = "Primeira carga das 23 fontes públicas"
+estado = "feito"
+
+[[marco]]
+data = 2026-09-25
+titulo = "Homologação no ar e dossiê das Ondas 0 e 1 enviado"
+estado = "feito"
+
+[[marco]]
+data = 2026-10-01
+titulo = "Reunião de aceite das Ondas 0 e 1"
+estado = "previsto"
+dono = "Alup"
+
+[[marco]]
+data = 2026-10-12
+titulo = "Credenciais da Onda 2"
+estado = "previsto"
+dono = "Alup"
+
+# Rede da Onda 3 (docs/runbook/rede-onda3.md). O resultado do teste de conexão
+# entra sozinho; este checklist diz o que falta para ele passar.
+[[rede]]
+passo = "G1–G5"
+titulo = "Sub-rede, vínculo, permissões, política e firewall (dev e hml)"
+estado = "feito"
+dono = "ness."
+
+[[rede]]
+passo = "G6"
+titulo = "Rota até a rede do FMB"
+estado = "pendente"
+dono = "Alup"
+
+[[rede]]
+passo = "L1–L5"
+titulo = "FortiGate, datacenter e listener do Oracle"
+estado = "pendente"
+dono = "Alup"
+
+[[rede]]
+passo = "N3"
+titulo = "Credencial do FMB no Secret Manager"
+estado = "pendente"
+dono = "Alup"

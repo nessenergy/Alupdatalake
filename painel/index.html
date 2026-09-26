@@ -186,6 +186,33 @@ footer{color:var(--muted);font-size:12.5px;border-top:1px solid var(--line-stron
 td a{color:var(--ink);text-decoration:none;border-bottom:1px solid var(--line-strong)}
 td a:hover{border-bottom-color:var(--accent)}
 .falha{color:var(--muted);font-size:13px;padding:8px 0}
+/* 16:9 — uma tela, sem rolar a página; cada painel rola por dentro */
+main.dash{display:grid;gap:24px}
+@media (min-width:1200px){
+  .wrap{max-width:none;padding-inline:28px}
+  body{height:100vh;display:flex;flex-direction:column;overflow:hidden}
+  .band{padding-block:14px 16px;flex:none}
+  .kpis{margin-top:12px}
+  .kpi{padding-top:10px}
+  .kpi .v{font-size:1.9rem}
+  main.dash{flex:1;min-height:0;padding-block:18px 12px;gap:18px;
+    grid-template-columns:repeat(3,minmax(0,1fr));grid-template-rows:auto minmax(0,1fr) auto;
+    grid-template-areas:"ondas ondas marcos" "cargas pend rede" "rodape rodape rodape"}
+  #s-ondas{grid-area:ondas} #s-marcos{grid-area:marcos} #s-cargas{grid-area:cargas}
+  #s-pend{grid-area:pend} #s-rede{grid-area:rede} main.dash>footer{grid-area:rodape;padding-top:10px}
+  .dash>.panel{min-height:0;display:flex;flex-direction:column;padding:18px 20px}
+  .dash .corpo{flex:1;min-height:0;overflow:auto;scrollbar-width:thin}
+  .dash .sec-h{flex:none}
+  #s-marcos .corpo{max-height:100%}
+  .dash thead th{position:sticky;top:0;z-index:1}
+  .dash .sq i{width:20px;height:20px}
+  .dash .cell-row{font-size:12.5px}
+}
+@media (min-width:1200px) and (max-height:820px){
+  .rows{gap:6px} .lane{height:28px} .done{top:7px;bottom:7px}
+  .miles li{padding:8px 0}
+}
+
 </style>
 
 <header class="band">
@@ -198,10 +225,10 @@ td a:hover{border-bottom-color:var(--accent)}
   </div>
 </header>
 
-<main class="wrap">
-  <section class="panel" aria-labelledby="t-ondas">
+<main class="wrap dash">
+  <section class="panel" id="s-ondas" aria-labelledby="t-ondas">
     <div class="sec-h"><span class="num">01</span><h2 id="t-ondas">Ondas</h2></div>
-    <div class="tbl-wrap"><div style="min-width:600px">
+    <div class="corpo"><div class="tbl-wrap"><div style="min-width:600px">
       <div class="axis" id="axis"></div>
       <div class="rows" id="rows"></div>
       <div class="legend">
@@ -210,41 +237,37 @@ td a:hover{border-bottom-color:var(--accent)}
         <span><i style="background:repeating-linear-gradient(90deg,var(--accent) 0 5px,var(--accent-soft) 5px 7px)"></i>feito · aguarda Alup</span>
         <span><i style="border-left:2px dashed var(--ink);border-radius:0;width:2px"></i>hoje</span>
       </div>
-    </div></div>
+    </div></div></div>
   </section>
-
-  <div class="grid2">
-    <div class="stack">
-      <section class="panel" aria-labelledby="t-marcos">
-        <div class="sec-h"><span class="num">02</span><h2 id="t-marcos">Marcos</h2></div>
-        <ul class="miles" id="marcos"></ul>
-      </section>
-      <section class="panel" aria-labelledby="t-pend">
-        <div class="sec-h"><span class="num">03</span><h2 id="t-pend">Pendências com a Alup</h2></div>
-        <div class="tbl-wrap"><table>
-          <thead><tr><th>#</th><th>Pedido</th><th>Prazo</th><th>Aberta</th><th>Estado</th></tr></thead>
-          <tbody id="pend"></tbody>
-        </table></div>
-      </section>
+  <section class="panel" id="s-marcos" aria-labelledby="t-marcos">
+    <div class="sec-h"><span class="num">02</span><h2 id="t-marcos">Marcos</h2></div>
+    <div class="corpo"><ul class="miles" id="marcos"></ul></div>
+  </section>
+  <section class="panel" id="s-cargas" aria-labelledby="t-carga">
+    <div class="sec-h"><span class="num">03</span><h2 id="t-carga">Cargas</h2></div>
+    <div class="corpo">
+      <div id="cargas"></div>
+      <div class="legend">
+        <span><i style="background:var(--accent)"></i>sucesso</span>
+        <span><i style="background:var(--late-bg)"></i>erro</span>
+        <span><i style="border:1px solid var(--line-strong)"></i>sem execução</span>
+      </div>
     </div>
-    <div class="stack">
-      <section class="panel" aria-labelledby="t-carga">
-        <div class="sec-h"><span class="num">04</span><h2 id="t-carga">Cargas</h2></div>
-        <div id="cargas"></div>
-        <div class="legend">
-          <span><i style="background:var(--accent)"></i>sucesso</span>
-          <span><i style="background:var(--late-bg)"></i>erro</span>
-          <span><i style="border:1px solid var(--line-strong)"></i>sem execução</span>
-        </div>
-      </section>
-      <section class="panel" aria-labelledby="t-rede">
-        <div class="sec-h"><span class="num">05</span><h2 id="t-rede">Rede da Onda 3</h2></div>
-        <div class="big" id="teste"></div>
-        <ul class="steps" id="rede"></ul>
-      </section>
+  </section>
+  <section class="panel" id="s-pend" aria-labelledby="t-pend">
+    <div class="sec-h"><span class="num">04</span><h2 id="t-pend">Pendências com a Alup</h2></div>
+    <div class="corpo"><div class="tbl-wrap"><table>
+      <thead><tr><th>#</th><th>Pedido</th><th>Prazo</th><th>Aberta</th><th>Estado</th></tr></thead>
+      <tbody id="pend"></tbody>
+    </table></div></div>
+  </section>
+  <section class="panel" id="s-rede" aria-labelledby="t-rede">
+    <div class="sec-h"><span class="num">05</span><h2 id="t-rede">Rede da Onda 3</h2></div>
+    <div class="corpo">
+      <div class="big" id="teste"></div>
+      <ul class="steps" id="rede"></ul>
     </div>
-  </div>
-
+  </section>
   <footer>
     <span>Documento confidencial</span>
     <span id="fonte">Execuções de dev e hml · issues do repositório · teste de conexão · painel/marcos.toml</span>

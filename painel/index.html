@@ -297,11 +297,15 @@ main.dash{display:grid;gap:24px}
   var hora=function(iso){return new Date(iso).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit',timeZone:'America/Sao_Paulo'});};
   var chip=function(cls,txt){return '<span class="chip '+cls+'">'+esc(txt)+'</span>';};
 
-  function render(d){
-    var agora=new Date(), gerado=new Date(d.gerado_em), min=Math.round((agora-gerado)/60000);
-    var upd=$('upd');
+  function relogio(d){
+    var min=Math.round((new Date()-new Date(d.gerado_em))/60000), upd=$('upd');
     upd.innerHTML='atualizado <b>'+(min<1?'agora':min<60?'há '+min+' min':'há '+Math.round(min/60)+' h')+'</b> · '+hora(d.gerado_em);
-    if(min>180) upd.className='upd velho';
+    upd.className=min>180?'upd velho':'upd';
+  }
+
+  function render(d){
+    var agora=new Date();
+    relogio(d);
 
     // KPIs
     var c01=d.cargas.filter(function(c){return c.onda<=1;});
@@ -377,10 +381,31 @@ main.dash{display:grid;gap:24px}
     }).join('');
   }
 
-  function falha(msg){$('upd').textContent='dados indisponíveis';document.querySelector('main').insertAdjacentHTML('afterbegin','<p class="panel falha">'+esc(msg)+'</p>');}
-  if(window.DADOS){render(window.DADOS);return;}
-  fetch('dados.json',{cache:'no-store'}).then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.json();})
-    .then(render).catch(function(e){falha('Não foi possível ler dados.json ('+e.message+'). O painel volta na próxima atualização.');});
+  // Tela ligada o dia todo: busca dados a cada 5 min e redesenha só se chegou
+  // geração nova; o "há X min" anda a cada minuto; se a própria página mudar
+  // (layout novo publicado), recarrega. Falha de rede mantém o último retrato.
+  var atual=null, versao=null, CINCO_MIN=5*60*1000;
+  function falha(msg){
+    $('upd').textContent='dados indisponíveis';
+    if(!atual) document.querySelector('main').insertAdjacentHTML('afterbegin','<p class="panel falha">'+esc(msg)+'</p>');
+  }
+  function buscar(){
+    return fetch('dados.json',{cache:'no-store'}).then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.json();})
+      .then(function(d){if(!atual||d.gerado_em!==atual.gerado_em){atual=d;render(d);}})
+      .catch(function(e){if(atual){$('upd').innerHTML+=' · <b>sem conexão</b>';}else{falha('Não foi possível ler dados.json ('+e.message+'). O painel volta na próxima atualização.');}});
+  }
+  function conferirPagina(){
+    fetch(location.pathname,{method:'HEAD',cache:'no-store'}).then(function(r){
+      var v=r.headers.get('ETag')||r.headers.get('Last-Modified');
+      if(!v) return;
+      if(versao&&v!==versao) location.reload();
+      versao=v;
+    }).catch(function(){});
+  }
+  if(window.DADOS){atual=window.DADOS;render(atual);return;}
+  buscar(); conferirPagina();
+  setInterval(function(){buscar();conferirPagina();},CINCO_MIN);
+  setInterval(function(){if(atual)relogio(atual);},60*1000);
 })();
 </script>
 

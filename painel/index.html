@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex">
-<title>Painel do AlupData</title>
+<title>Alup Datalake · painel</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&display=swap">
 <style>
@@ -233,7 +233,8 @@ main.dash{display:grid;gap:24px}
 @media (min-width:1200px){
   .wrap{max-width:none;padding-inline:28px}
   main.dash{width:100%;margin:0}
-  body{height:100vh;display:flex;flex-direction:column;overflow:hidden}
+  html.tela{overflow:hidden;height:100%}
+  html.tela body{width:var(--tela-w);height:var(--tela-h);transform:scale(var(--tela-s));transform-origin:0 0;display:flex;flex-direction:column;overflow:hidden}
   .band{padding-block:12px 12px;flex:none}
   .band .wrap{display:grid;grid-template-columns:auto minmax(0,1fr) auto;grid-template-areas:"logo global upd" "kpis kpis kpis";column-gap:28px;row-gap:10px;align-items:center}
   .band-top{display:contents} .band-top .logo{grid-area:logo} .band-top>span:last-child{grid-area:upd;text-align:right}
@@ -247,16 +248,25 @@ main.dash{display:grid;gap:24px}
   .kpi{padding-top:8px}
   .kpi .l{margin-top:3px}
   main.dash{flex:1;min-height:0;padding-block:16px;gap:16px;
-    grid-template-columns:minmax(0,1fr) minmax(0,1fr) minmax(0,1.05fr);grid-template-rows:auto minmax(0,1fr);
+    grid-template-columns:minmax(0,1fr) minmax(0,1fr) minmax(0,1.05fr);grid-template-rows:minmax(0,1fr) auto;
     grid-template-areas:"ondas ondas pend" "cargas lateral pend"}
   #s-ondas{grid-area:ondas} #s-cargas{grid-area:cargas} #s-pend{grid-area:pend} #s-lateral{grid-area:lateral}
   main.dash>footer{display:none}
   .lateral{min-height:0;gap:16px;grid-template-rows:minmax(0,1fr)}
+  /* trilha das ondas estica para ocupar a altura do painel */
+  #s-ondas .corpo{display:flex;flex-direction:column}
+  #s-ondas .tbl-wrap{flex:1 0 auto;display:flex;overflow:visible}
+  #s-ondas .tbl-wrap>div{flex:1;display:flex;flex-direction:column}
+  #s-ondas .rows{flex:1;grid-auto-rows:minmax(28px,1fr);gap:8px}
+  #s-ondas .lane{height:auto;min-height:28px}
+  #s-ondas .done{top:28%;bottom:28%}
+  #s-cargas .corpo,#s-rede .corpo{overflow:visible}
   .dash .panel{min-height:0;display:flex;flex-direction:column;padding:16px 18px}
   .dash .corpo{flex:1;min-height:0;overflow:auto;scrollbar-width:thin}
   .dash .sec-h{flex:none;padding-bottom:8px}
   .dash thead th{position:sticky;top:0;z-index:1}
-  .dash .sq i{width:18px;height:18px}
+  .dash .sq{flex-wrap:nowrap}
+  .dash .sq i{flex:0 1 18px;width:auto;height:auto;aspect-ratio:1;min-width:6px}
   .dash .cell-row{font-size:12.5px}
   /* pendências: uma linha por pedido */
   #s-pend td{padding:6px 8px;vertical-align:middle}
@@ -269,34 +279,34 @@ main.dash{display:grid;gap:24px}
   .big{padding:0 0 10px;margin-bottom:4px}
   .onda-carga{padding:8px 0}
 }
-@media (min-width:1200px) and (max-width:1700px){
-  /* notebook: a barra por onda desce para uma linha inteira */
-  .band .wrap{grid-template-areas:"logo pct upd" "logo sub upd" "bar bar bar" "ondas ondas ondas" "kpis kpis kpis";row-gap:4px}
-  #global{display:contents} .global .pct{grid-area:pct} .gsub{grid-area:sub} .gbar{grid-area:bar;margin-top:8px} .gondas{grid-area:ondas}
-  #kpis{margin-top:6px}
-  .wlab{font-size:11.5px} .saldo{font-size:10.5px;padding:1px 5px;margin-left:5px} .tag-entregue{font-size:10px;padding:2px 5px}
-}
-@media (min-width:1200px) and (max-height:900px){
-  .band{padding-block:10px 10px}
-  #kpis .kpi .v{font-size:1.1rem} #kpis .kpi .l{font-size:11.5px}
-  .global .pct{font-size:1.5rem}
-  main.dash{padding-block:12px;gap:12px} .lateral{gap:12px}
-  .dash .panel{padding:12px 16px}
-  .sec-h h2{font-size:1rem}
-  .rows{gap:5px} .lane{height:26px} .done{top:7px;bottom:7px}
-  .wname{font-size:12.5px} .wname small{font-size:11px}
-  .miles-h{margin-top:8px;padding-top:8px} .miles-h .what{font-size:12px} .steps li{padding:5px 0}
-  .dash .sq i{width:15px;height:15px}
-  .cell-row{gap:6px}
-  .onda-carga{padding:5px 0} .onda-carga h3{margin-bottom:4px}
-  #s-pend td{padding:4px 8px;font-size:12.5px}
+/* tela escalada: a barra por onda ocupa uma linha inteira, com o mesmo desenho em qualquer tamanho */
+html.tela .band .wrap{grid-template-areas:"logo pct upd" "logo sub upd" "bar bar bar" "ondas ondas ondas" "kpis kpis kpis";row-gap:4px}
+html.tela #global{display:contents}
+html.tela .global .pct{grid-area:pct} html.tela .gsub{grid-area:sub} html.tela .gbar{grid-area:bar;margin-top:8px} html.tela .gondas{grid-area:ondas}
+html.tela #kpis{margin-top:6px}
+/* densidade única da tela escalada */
+@media (min-width:1200px){
+  .band{padding-block:10px}
+  main.dash{padding-block:14px;gap:14px} .lateral{gap:14px}
+  .dash .panel{padding:14px 18px}
+  #s-pend td{padding:5px 8px;font-size:13px}
+  .miles-h{margin-top:10px;padding-top:10px}
+  .onda-carga{padding:7px 0}
+  /* nome da onda e da trilha numa linha só */
+  .row{grid-template-columns:200px 1fr} .axis{margin-left:210px}
+  .wname{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  /* cargas: uma linha por onda — nome à esquerda, dev e hml à direita */
+  .onda-carga{display:grid;grid-template-columns:150px minmax(0,1fr);gap:12px;align-items:center}
+  .onda-carga h3{display:block;margin:0;font-size:13px}
+  .onda-carga h3 span{display:block;font-size:11.5px;margin-top:2px}
+  .onda-carga .cells{gap:4px}
 }
 </style>
 
 <header class="band">
   <div class="wrap">
     <div class="band-top">
-      <div class="logo"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1220.80 403.20" role="img" aria-label="ness."><g transform="translate(41.230,318.938) scale(0.44362,-0.44362)"><path d="M594 305V0H498V294Q498 371 461.0 410.0Q424 449 355 449Q277 449 232.0 403.5Q187 358 187 273V0H91V530H183V450Q212 491 261.5 513.0Q311 535 374 535Q475 535 534.5 476.5Q594 418 594 305Z" fill="#FFFFFF"/><path transform="translate(681,0)" d="M568 233H138Q147 163 199.5 120.5Q252 78 330 78Q425 78 483 142L536 80Q500 38 446.5 16.0Q393 -6 327 -6Q243 -6 178.0 28.5Q113 63 77.5 125.0Q42 187 42 265Q42 342 76.5 404.0Q111 466 171.5 500.5Q232 535 308 535Q384 535 443.5 500.5Q503 466 536.5 404.0Q570 342 570 262Q570 251 568 233ZM138 302H478Q470 369 423.5 411.5Q377 454 308 454Q239 454 192.5 412.0Q146 370 138 302Z" fill="#FFFFFF"/><path transform="translate(1293,0)" d="M24 56 64 132Q99 107 149.0 92.0Q199 77 250 77Q376 77 376 149Q376 173 359.0 187.0Q342 201 316.5 207.5Q291 214 244 222Q180 232 139.5 245.0Q99 258 70.0 289.0Q41 320 41 376Q41 448 101.0 491.5Q161 535 262 535Q315 535 368.0 522.0Q421 509 455 487L414 411Q349 453 261 453Q200 453 168.0 433.0Q136 413 136 380Q136 354 154.0 339.0Q172 324 198.5 317.0Q225 310 273 301Q337 290 376.5 277.5Q416 265 444.0 235.0Q472 205 472 151Q472 79 410.5 36.5Q349 -6 243 -6Q178 -6 118.0 11.5Q58 29 24 56Z" fill="#FFFFFF"/><path transform="translate(1794,0)" d="M24 56 64 132Q99 107 149.0 92.0Q199 77 250 77Q376 77 376 149Q376 173 359.0 187.0Q342 201 316.5 207.5Q291 214 244 222Q180 232 139.5 245.0Q99 258 70.0 289.0Q41 320 41 376Q41 448 101.0 491.5Q161 535 262 535Q315 535 368.0 522.0Q421 509 455 487L414 411Q349 453 261 453Q200 453 168.0 433.0Q136 413 136 380Q136 354 154.0 339.0Q172 324 198.5 317.0Q225 310 273 301Q337 290 376.5 277.5Q416 265 444.0 235.0Q472 205 472 151Q472 79 410.5 36.5Q349 -6 243 -6Q178 -6 118.0 11.5Q58 29 24 56Z" fill="#FFFFFF"/><path transform="translate(2295,0)" d="M46 63Q46 92 66.0 111.5Q86 131 114 131Q142 131 161.0 112.0Q180 93 180 63Q180 33 160.5 13.5Q141 -6 114 -6Q86 -6 66.0 13.5Q46 33 46 63Z" fill="#00ADE8"/></g></svg><span class="proj">AlupData Fase 1</span></div>
+      <div class="logo"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1220.80 403.20" role="img" aria-label="ness."><g transform="translate(41.230,318.938) scale(0.44362,-0.44362)"><path d="M594 305V0H498V294Q498 371 461.0 410.0Q424 449 355 449Q277 449 232.0 403.5Q187 358 187 273V0H91V530H183V450Q212 491 261.5 513.0Q311 535 374 535Q475 535 534.5 476.5Q594 418 594 305Z" fill="#FFFFFF"/><path transform="translate(681,0)" d="M568 233H138Q147 163 199.5 120.5Q252 78 330 78Q425 78 483 142L536 80Q500 38 446.5 16.0Q393 -6 327 -6Q243 -6 178.0 28.5Q113 63 77.5 125.0Q42 187 42 265Q42 342 76.5 404.0Q111 466 171.5 500.5Q232 535 308 535Q384 535 443.5 500.5Q503 466 536.5 404.0Q570 342 570 262Q570 251 568 233ZM138 302H478Q470 369 423.5 411.5Q377 454 308 454Q239 454 192.5 412.0Q146 370 138 302Z" fill="#FFFFFF"/><path transform="translate(1293,0)" d="M24 56 64 132Q99 107 149.0 92.0Q199 77 250 77Q376 77 376 149Q376 173 359.0 187.0Q342 201 316.5 207.5Q291 214 244 222Q180 232 139.5 245.0Q99 258 70.0 289.0Q41 320 41 376Q41 448 101.0 491.5Q161 535 262 535Q315 535 368.0 522.0Q421 509 455 487L414 411Q349 453 261 453Q200 453 168.0 433.0Q136 413 136 380Q136 354 154.0 339.0Q172 324 198.5 317.0Q225 310 273 301Q337 290 376.5 277.5Q416 265 444.0 235.0Q472 205 472 151Q472 79 410.5 36.5Q349 -6 243 -6Q178 -6 118.0 11.5Q58 29 24 56Z" fill="#FFFFFF"/><path transform="translate(1794,0)" d="M24 56 64 132Q99 107 149.0 92.0Q199 77 250 77Q376 77 376 149Q376 173 359.0 187.0Q342 201 316.5 207.5Q291 214 244 222Q180 232 139.5 245.0Q99 258 70.0 289.0Q41 320 41 376Q41 448 101.0 491.5Q161 535 262 535Q315 535 368.0 522.0Q421 509 455 487L414 411Q349 453 261 453Q200 453 168.0 433.0Q136 413 136 380Q136 354 154.0 339.0Q172 324 198.5 317.0Q225 310 273 301Q337 290 376.5 277.5Q416 265 444.0 235.0Q472 205 472 151Q472 79 410.5 36.5Q349 -6 243 -6Q178 -6 118.0 11.5Q58 29 24 56Z" fill="#FFFFFF"/><path transform="translate(2295,0)" d="M46 63Q46 92 66.0 111.5Q86 131 114 131Q142 131 161.0 112.0Q180 93 180 63Q180 33 160.5 13.5Q141 -6 114 -6Q86 -6 66.0 13.5Q46 33 46 63Z" fill="#00ADE8"/></g></svg><span class="proj">Alup Datalake</span></div>
       <span><span class="conf">Documento confidencial</span><span class="upd" id="upd">carregando…</span><span class="ritmo" id="ritmo"></span></span>
     </div>
     <div class="global" id="global"></div>
@@ -466,6 +476,18 @@ main.dash{display:grid;gap:24px}
   // Tela ligada o dia todo: busca dados a cada 5 min e redesenha só se chegou
   // geração nova; o "há X min" anda a cada minuto; se a própria página mudar
   // (layout novo publicado), recarrega. Falha de rede mantém o último retrato.
+  // Tela única: acima de 1200 px, desenha numa tela de 960 px de altura
+  // (pelo menos 1500 de largura) e escala para caber na janela, sem rolagem.
+  var ALTURA=960, LARGURA_MIN=1500;
+  function ajustarTela(){
+    var h=document.documentElement, W=innerWidth, H=innerHeight;
+    if(W<1200||W<H){h.classList.remove('tela');return;}
+    var s=Math.min(H/ALTURA, W/LARGURA_MIN);
+    h.style.setProperty('--tela-s',s); h.style.setProperty('--tela-w',(W/s)+'px'); h.style.setProperty('--tela-h',(H/s)+'px');
+    h.classList.add('tela');
+  }
+  ajustarTela(); addEventListener('resize',ajustarTela);
+
   var atual=null, versao=null, CINCO_MIN=5*60*1000;
   function falha(msg){
     $('upd').textContent='dados indisponíveis';

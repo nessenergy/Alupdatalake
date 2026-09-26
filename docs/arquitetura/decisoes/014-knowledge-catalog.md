@@ -24,10 +24,12 @@ dado.
   (bootstrap), cobre `dataplex.glossaries.*`.
 
 Plano: [`planos/2026-09-24-glossario-como-codigo.md`](../../planos/2026-09-24-glossario-como-codigo.md).
-**Anotações das Gold, no mesmo dia.** `scripts/anotar_catalogo.py` grava
+
+**Anotações das Gold, em 26/09.** `scripts/anotar_catalogo.py` grava
 `origem` e `dominio-analitico` nas 26 tabelas Gold de negócio, com o domínio e o
 data owner de `dominios-analiticos.md`; as três Gold de operação da plataforma
-ficam fora. Roda no deploy, depois do Dataform, com a conta de deploy. É script,
+ficam fora. Roda no deploy, depois do Dataform, com a conta de deploy, e já
+**aplicado em `dev` e `hml`** — conferido direto na API do Dataplex. É script,
 e não `google_dataplex_entry`, porque no provider travado (6.50) o recurso exige
 importar cada entrada de sistema e atualiza com `deleteMissingAspects=true`, o
 que tentaria apagar os aspects que o BigQuery mantém; o `PATCH` do script leva

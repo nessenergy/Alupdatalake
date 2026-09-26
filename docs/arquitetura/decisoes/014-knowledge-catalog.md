@@ -2,6 +2,31 @@
 
 **Status**: aceito · **Data**: 2026-09-10
 
+## Adendo de 2026-09-26 — glossário de negócio declarado
+
+O glossário de negócio passou a ser declarado em
+`infra/modules/catalogo/glossario.tf`: um `google_dataplex_glossary` por
+ambiente e **19 termos**, das quatro seções de vocabulário do setor elétrico de
+`docs/glossario.md` (Instituições, Sistema e mercado, Geração, Unidades). A
+seção "Do projeto" fica fora: ela descreve o repositório e o contrato, não o
+dado.
+
+- **Fonte da verdade continua sendo o `.md`.** O Terraform não o lê em tempo de
+  `apply`. `tests/unit/test_catalogo.py` confere que os termos dos dois lados
+  são os mesmos, e reprova termo novo num lado só.
+- **Sem `google_dataplex_glossary_category`.** A seção vira a label
+  `categoria` do termo; hierarquia de categorias seria mais um recurso para
+  manter em sincronia com a mesma informação.
+- **Lacuna registrada: vínculo termo↔coluna.** O provider não expõe campo para
+  ligar um termo a uma coluna do BigQuery. Esse vínculo é associação de
+  metadado, fora deste módulo, e fica para quando a Alup pedir.
+- **Permissão:** `roles/dataplex.catalogEditor`, que a conta de deploy já tem
+  (bootstrap), cobre `dataplex.glossaries.*`.
+
+Plano: [`planos/2026-09-24-glossario-como-codigo.md`](../../planos/2026-09-24-glossario-como-codigo.md).
+O preenchimento das anotações (`origem`, `dominio-analitico`) segue na
+[issue #36](https://github.com/nessenergy/Alupdatalake/issues/36).
+
 ## Adendo de 2026-09-23 — lake, zonas e ativos declarados
 
 `infra/modules/catalogo` declara o lake `alupdata`, as três zonas — Bronze

@@ -8,6 +8,8 @@
 
 **Base de requisitos:** `docs/glossario.md`, ADR 014, `infra/modules/catalogo/main.tf` e `aspectos.tf`, `infra/main.tf` (bloco do módulo `catalogo` e `required_providers`), `tests/unit/test_catalogo.py`, tarefa 5.1 do plano de fechamento das ondas. HEAD no início: `d6f8533`, branch `docs/plano-ondas`.
 
+**Executado em 26/09.** Uma correção sobre o texto do plano: o teste `test_sem_recurso_de_categoria` procurava o nome do recurso em qualquer lugar do arquivo e reprovava o próprio comentário que explica a decisão; passou a procurar a declaração `resource "google_dataplex_glossary_category"`.
+
 **Execução:** uma entrega, um PR. Este documento não autoriza `terraform apply` nem representa homologação.
 
 ## Confirmação do provider (passo obrigatório, antes de escrever o resto)
@@ -66,7 +68,7 @@ Nenhum arquivo em `infra/main.tf` muda: o módulo `catalogo` já recebe `project
 
 **Interfaces:** módulo `catalogo` ganha um output `glossario`; nenhuma variável nova, nenhuma mudança em `main.tf` ou `aspectos.tf`.
 
-- [ ] Mover `import unicodedata` para o topo de `tests/unit/test_catalogo.py`, junto dos outros imports (`ruff` recusa import fora do topo, E402). Acrescentar, abaixo dos testes existentes de `aspectos.tf`, a leitura do novo arquivo e do glossário:
+- [x] Mover `import unicodedata` para o topo de `tests/unit/test_catalogo.py`, junto dos outros imports (`ruff` recusa import fora do topo, E402). Acrescentar, abaixo dos testes existentes de `aspectos.tf`, a leitura do novo arquivo e do glossário:
 
 ```python
 GLOSSARIO_MD = (RAIZ / "docs" / "glossario.md").read_text(encoding="utf-8")
@@ -87,7 +89,7 @@ def _slug(texto):
     return re.sub(r"[^a-z0-9]+", "_", sem_acento.lower()).strip("_")
 ```
 
-- [ ] Acrescentar os testes de sincronização, no mesmo arquivo:
+- [x] Acrescentar os testes de sincronização, no mesmo arquivo:
 
 ```python
 def test_todo_termo_de_negocio_do_glossario_vira_termo_do_catalogo():
@@ -138,9 +140,9 @@ def test_sem_recurso_de_categoria():
     assert "google_dataplex_glossary_category" not in GLOSSARIO_TF
 ```
 
-- [ ] Rodar `uv run pytest tests/unit/test_catalogo.py -q` e confirmar falha: `glossario.tf` ainda não existe (`FileNotFoundError` nas leituras de `GLOSSARIO_TF`).
+- [x] Rodar `uv run pytest tests/unit/test_catalogo.py -q` e confirmar falha: `glossario.tf` ainda não existe (`FileNotFoundError` nas leituras de `GLOSSARIO_TF`).
 
-- [ ] Criar `infra/modules/catalogo/glossario.tf`:
+- [x] Criar `infra/modules/catalogo/glossario.tf`:
 
 ```hcl
 # Glossário de negócio do Knowledge Catalog — ADR 014, issue #36, item 4.3 do
@@ -303,13 +305,13 @@ output "glossario" {
 }
 ```
 
-- [ ] Rodar `uv run pytest tests/unit/test_catalogo.py -q` e confirmar que os cinco testes novos, mais os já existentes do arquivo, passam.
-- [ ] Rodar `terraform -chdir=infra fmt -recursive` para alinhar o `=` dos blocos (o teste de sincronização não depende de alinhamento, mas `fmt -check` sim) e então `terraform -chdir=infra fmt -check -recursive` para confirmar.
-- [ ] Rodar `terraform -chdir=infra init -backend=false` (baixa o provider `6.50.0` já travado no lock, sem backend GCS) e, se o `init` concluir, `terraform -chdir=infra validate`. Se o ambiente não tiver acesso de rede para baixar o provider, registrar isso no lugar do resultado — não é bloqueio deste plano, é limitação do ambiente de execução local.
-- [ ] Acrescentar o adendo em `docs/arquitetura/decisoes/014-knowledge-catalog.md`, logo após o "Adendo de 2026-09-23", registrando que o glossário de negócio passou a ser declarado em `infra/modules/catalogo/glossario.tf`, com as 19 entradas das quatro seções de vocabulário do setor elétrico, a decisão de não usar `google_dataplex_glossary_category`, e a lacuna do vínculo termo↔coluna (sem campo correspondente no provider). Registrar essa lacuna como comentário na issue #36; fechar a issue é decisão da coordenação.
-- [ ] Atualizar `docs/status.md`: mover o item do glossário de "pendente" para "declarado em código, validado localmente; `apply` pendente de PR e deploy em `dev`" — mesma distinção usada no plano de 18/09 para os outros reparos.
-- [ ] Validar a mensagem de commit antes de commitar: `python scripts/verifica_atribuicao.py <arquivo-da-mensagem>`.
-- [ ] Commit: `feat(catalogo): glossario de negocio como termos do knowledge catalog`.
+- [x] Rodar `uv run pytest tests/unit/test_catalogo.py -q` e confirmar que os cinco testes novos, mais os já existentes do arquivo, passam.
+- [x] Rodar `terraform -chdir=infra fmt -recursive` para alinhar o `=` dos blocos (o teste de sincronização não depende de alinhamento, mas `fmt -check` sim) e então `terraform -chdir=infra fmt -check -recursive` para confirmar.
+- [x] Rodar `terraform -chdir=infra init -backend=false` (baixa o provider `6.50.0` já travado no lock, sem backend GCS) e, se o `init` concluir, `terraform -chdir=infra validate`. Se o ambiente não tiver acesso de rede para baixar o provider, registrar isso no lugar do resultado — não é bloqueio deste plano, é limitação do ambiente de execução local.
+- [x] Acrescentar o adendo em `docs/arquitetura/decisoes/014-knowledge-catalog.md`, logo após o "Adendo de 2026-09-23", registrando que o glossário de negócio passou a ser declarado em `infra/modules/catalogo/glossario.tf`, com as 19 entradas das quatro seções de vocabulário do setor elétrico, a decisão de não usar `google_dataplex_glossary_category`, e a lacuna do vínculo termo↔coluna (sem campo correspondente no provider). Registrar essa lacuna como comentário na issue #36; fechar a issue é decisão da coordenação.
+- [x] Atualizar `docs/status.md`: mover o item do glossário de "pendente" para "declarado em código, validado localmente; `apply` pendente de PR e deploy em `dev`" — mesma distinção usada no plano de 18/09 para os outros reparos.
+- [x] Validar a mensagem de commit antes de commitar: `python scripts/verifica_atribuicao.py <arquivo-da-mensagem>`.
+- [x] Commit: `feat(catalogo): glossario de negocio como termos do knowledge catalog`.
 
 **Aceite local:** os cinco testes novos de `test_catalogo.py` passam; `terraform fmt -check` e, se possível no ambiente, `terraform validate` aprovam; ADR 014 e `docs/status.md` refletem o estado. **Aceite posterior em GCP:** `apply` cria o glossário e os 19 termos no Knowledge Catalog do projeto; a Alup consegue buscar um termo (ex. "PLD") e ver a descrição e a categoria. Pendente de PR e deploy em `dev` — este plano não autoriza `apply`.
 

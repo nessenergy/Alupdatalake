@@ -155,7 +155,7 @@ antes da Fase 1, com o mesmo padrão do
 **Critério do plano 0.14:** 3 dias consecutivos com `status = SUCESSO` em
 `bronze._execucoes`. Os jobs diários do BCB já estão agendados.
 
-- [ ] **Passo 1: Em 28/09, rodar a consulta de continuidade**
+- [x] **Passo 1: Em 28/09, rodar a consulta de continuidade** — rodada em 26/09, quando o terceiro dia fechou (saída no Passo 2)
 
 ```bash
 bq --project_id=alupar-dev-alupdata query --use_legacy_sql=false --format=pretty '
@@ -173,7 +173,18 @@ Esperado: `dia_limpo = true` em três dias seguidos para `cambio_ptax` e
 cobre a sexta, e a execução termina `SUCESSO`. Se algum dia falhar, a
 contagem recomeça no dia seguinte e a data do dossiê anda junto.
 
-- [ ] **Passo 2: Guardar a saída** para o dossiê (Tarefa 1.4).
+- [x] **Passo 2: Guardar a saída** para o dossiê (Tarefa 1.4). Saída de 26/09, em `dev`:
+
+| entidade | dia | dia_limpo | execuções | linhas |
+|---|---|---|---|---|
+| cambio_ptax | 24/09 | true | 1 | 3 |
+| cambio_ptax | 25/09 | true | 1 | 3 |
+| cambio_ptax | 26/09 | true | 1 | 3 |
+| juros | 24/09 | true | 1 | 6 |
+| juros | 25/09 | true | 1 | 8 |
+| juros | 26/09 | true | 1 | 9 |
+
+Em `hml`, aberto em 25/09: 25 e 26/09 limpos para as duas entidades.
 
 ### Tarefa 1.2: Replay contra o GCS real *(paralela)*
 

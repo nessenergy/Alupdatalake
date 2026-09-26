@@ -17,7 +17,9 @@ horas = 90
 marco_pct = 15.52
 janela = [2026-08-31, 2026-09-11]
 trabalho_desde = 2026-08-25
-estado = "entregue" # aceita | entregue | em_andamento | aguarda_alup | nao_iniciada
+estado = "entregue"
+entregue_em = 2026-09-25
+motivo_prazo = "ambiente GCP (A3) liberado só em 23/09" # aceita | entregue | em_andamento | aguarda_alup | nao_iniciada
 entidades = ["bcb_cambio_ptax"]
 
 [[onda.item]]
@@ -79,6 +81,7 @@ marco_pct = 20.69
 janela = [2026-09-14, 2026-10-16]
 trabalho_desde = 2026-08-25
 estado = "entregue"
+entregue_em = 2026-09-25
 entidades = [
   "bcb_juros", "ibge_ipca", "aneel_siga",
   "ons_carga", "ons_ear", "ons_ena", "ons_geracao_usina", "ons_capacidade",

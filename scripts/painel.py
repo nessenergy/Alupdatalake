@@ -145,6 +145,24 @@ def resumir_progresso(ondas: list[dict[str, Any]], dias: int, meta: int) -> dict
     return {"horas_total": total, **faixas, "pct": 100 * feitas / total, "por_onda": por_onda}
 
 
+# ------------------------------------------------------------------ dias adiantados ou atrasados
+
+
+def saldo_dias(onda: dict[str, Any], fracao: float, hoje: date) -> int:
+    """Dias de folga (positivo) ou de atraso (negativo) da onda.
+
+    Entregue: fim da janela menos a data de entrega. Não entregue: dias de
+    trabalho já feitos (fração pronta × duração da janela) menos os dias já
+    corridos da janela; antes de a janela abrir, tudo o que está pronto é folga.
+    """
+    inicio, fim = onda["janela"]
+    if onda.get("entregue_em"):
+        return (fim - onda["entregue_em"]).days
+    duracao = (fim - inicio).days
+    corridos = min(max((hoje - inicio).days, 0), duracao)
+    return round(fracao * duracao - corridos)
+
+
 # ------------------------------------------------------------------ pendências
 
 
@@ -224,10 +242,16 @@ def montar(
 ) -> dict[str, Any]:
     hoje = agora.astimezone(BRASILIA).date()
     referencia = marcos["referencia_dias_seguidos"]
+    progresso = resumir_progresso(marcos["onda"], dias_seguidos(execucoes, referencia, hoje), META_DIAS_SEGUIDOS)
+    fracoes = {o["onda"]: o["prontas"] / o["horas"] for o in progresso["por_onda"]}
+    ondas = [
+        {**{k: v for k, v in o.items() if k != "entidades"}, "saldo_dias": saldo_dias(o, fracoes[o["numero"]], hoje)}
+        for o in marcos["onda"]
+    ]
     return {
         "gerado_em": agora.isoformat(),
         "contrato": {"inicio": marcos["inicio_contrato"].isoformat(), "fim": marcos["fim_contrato"].isoformat()},
-        "ondas": _datas([{k: v for k, v in o.items() if k != "entidades"} for o in marcos["onda"]]),
+        "ondas": _datas(ondas),
         "marcos": _datas(marcos["marco"]),
         "cargas": resumir_cargas(execucoes, marcos["onda"]),
         "dias_seguidos": {
@@ -235,7 +259,7 @@ def montar(
             "dias": dias_seguidos(execucoes, referencia, hoje),
             "meta": META_DIAS_SEGUIDOS,
         },
-        "progresso": resumir_progresso(marcos["onda"], dias_seguidos(execucoes, referencia, hoje), META_DIAS_SEGUIDOS),
+        "progresso": progresso,
         "pendencias": resumir_pendencias(issues, hoje),
         "rede": {"checklist": _datas(marcos["rede"]), "teste_conexao": resumir_teste_conexao(testes)},
     }

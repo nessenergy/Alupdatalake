@@ -233,3 +233,21 @@ def test_fracao_pronta_fora_de_zero_a_um_e_recusada(tmp_path):
     arquivo.write_text(texto, encoding="utf-8")
     with pytest.raises(ValueError):
         painel.carregar_marcos(arquivo)
+
+
+# ------------------------------------------------------------------ dias adiantados ou atrasados
+
+
+def test_onda_entregue_compara_a_entrega_com_o_fim_da_janela():
+    onda = {"janela": [date(2026, 9, 14), date(2026, 10, 16)], "entregue_em": date(2026, 9, 25)}
+    assert painel.saldo_dias(onda, fracao=1.0, hoje=HOJE) == 21
+    atrasada = {"janela": [date(2026, 8, 31), date(2026, 9, 11)], "entregue_em": date(2026, 9, 25)}
+    assert painel.saldo_dias(atrasada, fracao=1.0, hoje=HOJE) == -14
+
+
+def test_onda_nao_entregue_compara_o_trabalho_feito_com_o_tempo_corrido_da_janela():
+    antes = {"janela": [date(2026, 10, 19), date(2026, 11, 13)]}  # 25 dias; ainda não abriu
+    assert painel.saldo_dias(antes, fracao=0.56, hoje=HOJE) == 14
+    dentro = {"janela": [date(2026, 9, 16), date(2026, 10, 16)]}  # 30 dias; 10 corridos
+    assert painel.saldo_dias(dentro, fracao=0.2, hoje=HOJE) == -4
+    assert painel.saldo_dias(dentro, fracao=0.5, hoje=HOJE) == 5

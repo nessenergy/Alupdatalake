@@ -205,40 +205,84 @@ footer{color:var(--muted);font-size:12.5px;border-top:1px solid var(--line-stron
 td a{color:var(--ink);text-decoration:none;border-bottom:1px solid var(--line-strong)}
 td a:hover{border-bottom-color:var(--accent)}
 .falha{color:var(--muted);font-size:13px;padding:8px 0}
-/* 16:9 — uma tela, sem rolar a página; cada painel rola por dentro */
+/* marcos: faixa horizontal, na mesma linha do tempo das ondas */
+.miles-h{list-style:none;margin:14px 0 0;padding:12px 0 0;border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px 16px}
+.miles-h li{display:grid;gap:4px;align-content:start;padding-left:10px;border-left:2px solid var(--line-strong)}
+.miles-h li.feito{border-left-color:var(--accent)}
+.miles-h .date{font-size:12.5px}
+.miles-h .what{font-size:12.5px;line-height:1.35;color:var(--text)}
+.miles-h .chip{justify-self:start}
+.miles-h .topo{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.leg-h{margin:0 0 0 auto;font-size:11.5px;gap:4px 12px}
+.leg-h i{width:11px;height:11px}
+/* 16:9 — uma tela, sem rolar a página; cada painel rola por dentro só se precisar */
 main.dash{display:grid;gap:24px}
+.lateral{display:grid;gap:24px}
+.conf{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--band-muted);margin-right:14px}
 @media (min-width:1200px){
   .wrap{max-width:none;padding-inline:28px}
+  main.dash{width:100%;margin:0}
   body{height:100vh;display:flex;flex-direction:column;overflow:hidden}
-  .band{padding-block:14px 16px;flex:none}
-  .kpis{margin-top:12px}
-  .kpi{padding-top:10px}
-  .kpi .v{font-size:1.9rem}
-  main.dash{flex:1;min-height:0;padding-block:18px 12px;gap:18px;
-    grid-template-columns:repeat(3,minmax(0,1fr));grid-template-rows:auto minmax(0,1fr) auto;
-    grid-template-areas:"ondas ondas marcos" "cargas pend rede" "rodape rodape rodape"}
-  #s-ondas{grid-area:ondas} #s-marcos{grid-area:marcos} #s-cargas{grid-area:cargas}
-  #s-pend{grid-area:pend} #s-rede{grid-area:rede} main.dash>footer{grid-area:rodape;padding-top:10px}
-  .dash>.panel{min-height:0;display:flex;flex-direction:column;padding:18px 20px}
+  .band{padding-block:12px 12px;flex:none}
+  .band .wrap{display:grid;grid-template-columns:auto minmax(0,1fr) auto;grid-template-areas:"logo global upd" "kpis kpis kpis";column-gap:28px;row-gap:10px;align-items:center}
+  .band-top{display:contents} .band-top .logo{grid-area:logo} .band-top>span:last-child{grid-area:upd;text-align:right}
+  #global{grid-area:global;margin:0}
+  #kpis{grid-area:kpis;display:flex;flex-wrap:wrap;gap:6px 34px;margin:0;padding-top:9px;border-top:1px solid var(--band-line)}
+  #kpis .kpi,#kpis .kpi+.kpi{padding:0;border:0;display:flex;align-items:baseline;gap:8px}
+  #kpis .kpi .v{font-size:1.25rem}
+  #kpis .kpi .l{margin:0;font-size:12.5px}
+  .global{margin-top:10px}
+  .kpis{margin-top:10px}
+  .kpi{padding-top:8px}
+  .kpi .l{margin-top:3px}
+  main.dash{flex:1;min-height:0;padding-block:16px;gap:16px;
+    grid-template-columns:minmax(0,1fr) minmax(0,1fr) minmax(0,1.05fr);grid-template-rows:auto minmax(0,1fr);
+    grid-template-areas:"ondas ondas pend" "cargas lateral pend"}
+  #s-ondas{grid-area:ondas} #s-cargas{grid-area:cargas} #s-pend{grid-area:pend} #s-lateral{grid-area:lateral}
+  main.dash>footer{display:none}
+  .lateral{min-height:0;gap:16px;grid-template-rows:minmax(0,1fr)}
+  .dash .panel{min-height:0;display:flex;flex-direction:column;padding:16px 18px}
   .dash .corpo{flex:1;min-height:0;overflow:auto;scrollbar-width:thin}
-  .dash .sec-h{flex:none}
-  #s-marcos .corpo{max-height:100%}
+  .dash .sec-h{flex:none;padding-bottom:8px}
   .dash thead th{position:sticky;top:0;z-index:1}
-  .dash .sq i{width:20px;height:20px}
+  .dash .sq i{width:18px;height:18px}
   .dash .cell-row{font-size:12.5px}
-}
-@media (min-width:1200px) and (max-height:820px){
-  .rows{gap:6px} .lane{height:28px} .done{top:7px;bottom:7px}
+  /* pendências: uma linha por pedido */
+  #s-pend td{padding:6px 8px;vertical-align:middle}
+  #s-pend td.tit{max-width:0;width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  #s-pend tr.semprazo td{color:var(--muted)}
+  #s-pend tr.semprazo td a{color:var(--muted)}
+  #s-pend .chip{padding:4px 8px;font-size:11px}
   .miles li{padding:8px 0}
+  .steps li{padding:7px 0}
+  .big{padding:0 0 10px;margin-bottom:4px}
+  .onda-carga{padding:8px 0}
 }
-
+@media (min-width:1200px) and (max-width:1700px){
+  .wlab{font-size:11.5px} .saldo{font-size:10.5px;padding:1px 5px;margin-left:5px} .tag-entregue{font-size:10px;padding:2px 5px}
+}
+@media (min-width:1200px) and (max-height:900px){
+  .band{padding-block:10px 10px}
+  #kpis .kpi .v{font-size:1.1rem} #kpis .kpi .l{font-size:11.5px}
+  .global .pct{font-size:1.5rem}
+  main.dash{padding-block:12px;gap:12px} .lateral{gap:12px}
+  .dash .panel{padding:12px 16px}
+  .sec-h h2{font-size:1rem}
+  .rows{gap:5px} .lane{height:26px} .done{top:7px;bottom:7px}
+  .wname{font-size:12.5px} .wname small{font-size:11px}
+  .miles-h{margin-top:8px;padding-top:8px} .miles-h .what{font-size:12px} .steps li{padding:5px 0}
+  .dash .sq i{width:15px;height:15px}
+  .cell-row{gap:6px}
+  .onda-carga{padding:5px 0} .onda-carga h3{margin-bottom:4px}
+  #s-pend td{padding:4px 8px;font-size:12.5px}
+}
 </style>
 
 <header class="band">
   <div class="wrap">
     <div class="band-top">
       <div class="logo"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1220.80 403.20" role="img" aria-label="ness."><g transform="translate(41.230,318.938) scale(0.44362,-0.44362)"><path d="M594 305V0H498V294Q498 371 461.0 410.0Q424 449 355 449Q277 449 232.0 403.5Q187 358 187 273V0H91V530H183V450Q212 491 261.5 513.0Q311 535 374 535Q475 535 534.5 476.5Q594 418 594 305Z" fill="#FFFFFF"/><path transform="translate(681,0)" d="M568 233H138Q147 163 199.5 120.5Q252 78 330 78Q425 78 483 142L536 80Q500 38 446.5 16.0Q393 -6 327 -6Q243 -6 178.0 28.5Q113 63 77.5 125.0Q42 187 42 265Q42 342 76.5 404.0Q111 466 171.5 500.5Q232 535 308 535Q384 535 443.5 500.5Q503 466 536.5 404.0Q570 342 570 262Q570 251 568 233ZM138 302H478Q470 369 423.5 411.5Q377 454 308 454Q239 454 192.5 412.0Q146 370 138 302Z" fill="#FFFFFF"/><path transform="translate(1293,0)" d="M24 56 64 132Q99 107 149.0 92.0Q199 77 250 77Q376 77 376 149Q376 173 359.0 187.0Q342 201 316.5 207.5Q291 214 244 222Q180 232 139.5 245.0Q99 258 70.0 289.0Q41 320 41 376Q41 448 101.0 491.5Q161 535 262 535Q315 535 368.0 522.0Q421 509 455 487L414 411Q349 453 261 453Q200 453 168.0 433.0Q136 413 136 380Q136 354 154.0 339.0Q172 324 198.5 317.0Q225 310 273 301Q337 290 376.5 277.5Q416 265 444.0 235.0Q472 205 472 151Q472 79 410.5 36.5Q349 -6 243 -6Q178 -6 118.0 11.5Q58 29 24 56Z" fill="#FFFFFF"/><path transform="translate(1794,0)" d="M24 56 64 132Q99 107 149.0 92.0Q199 77 250 77Q376 77 376 149Q376 173 359.0 187.0Q342 201 316.5 207.5Q291 214 244 222Q180 232 139.5 245.0Q99 258 70.0 289.0Q41 320 41 376Q41 448 101.0 491.5Q161 535 262 535Q315 535 368.0 522.0Q421 509 455 487L414 411Q349 453 261 453Q200 453 168.0 433.0Q136 413 136 380Q136 354 154.0 339.0Q172 324 198.5 317.0Q225 310 273 301Q337 290 376.5 277.5Q416 265 444.0 235.0Q472 205 472 151Q472 79 410.5 36.5Q349 -6 243 -6Q178 -6 118.0 11.5Q58 29 24 56Z" fill="#FFFFFF"/><path transform="translate(2295,0)" d="M46 63Q46 92 66.0 111.5Q86 131 114 131Q142 131 161.0 112.0Q180 93 180 63Q180 33 160.5 13.5Q141 -6 114 -6Q86 -6 66.0 13.5Q46 33 46 63Z" fill="#00ADE8"/></g></svg><span class="proj">AlupData Fase 1</span></div>
-      <span class="upd" id="upd">carregando…</span>
+      <span><span class="conf">Documento confidencial</span><span class="upd" id="upd">carregando…</span></span>
     </div>
     <div class="global" id="global"></div>
     <div class="kpis" id="kpis"></div>
@@ -247,7 +291,7 @@ main.dash{display:grid;gap:24px}
 
 <main class="wrap dash">
   <section class="panel" id="s-ondas" aria-labelledby="t-ondas">
-    <div class="sec-h"><span class="num">01</span><h2 id="t-ondas">Ondas</h2></div>
+    <div class="sec-h"><span class="num">01</span><h2 id="t-ondas">Ondas e marcos</h2></div>
     <div class="corpo"><div class="tbl-wrap"><div style="min-width:600px">
       <div class="axis" id="axis"></div>
       <div class="rows" id="rows"></div>
@@ -257,21 +301,18 @@ main.dash{display:grid;gap:24px}
         <span><i style="background:repeating-linear-gradient(90deg,var(--accent) 0 5px,var(--accent-soft) 5px 7px)"></i>feito · aguarda Alup</span>
         <span><i style="border-left:2px dashed var(--ink);border-radius:0;width:2px"></i>hoje</span>
       </div>
-    </div></div></div>
+    </div></div>
+    <ul class="miles-h" id="marcos" aria-label="Marcos"></ul>
+    </div>
   </section>
-  <section class="panel" id="s-marcos" aria-labelledby="t-marcos">
-    <div class="sec-h"><span class="num">02</span><h2 id="t-marcos">Marcos</h2></div>
-    <div class="corpo"><ul class="miles" id="marcos"></ul></div>
-  </section>
-  <section class="panel" id="s-cargas" aria-labelledby="t-carga">
-    <div class="sec-h"><span class="num">03</span><h2 id="t-carga">Cargas</h2></div>
-    <div class="corpo">
-      <div id="cargas"></div>
-      <div class="legend">
+    <section class="panel" id="s-cargas" aria-labelledby="t-carga">
+    <div class="sec-h"><span class="num">02</span><h2 id="t-carga">Cargas</h2><div class="legend leg-h">
         <span><i style="background:var(--accent)"></i>sucesso</span>
         <span><i style="background:var(--late-bg)"></i>erro</span>
         <span><i style="border:1px solid var(--line-strong)"></i>sem execução</span>
-      </div>
+      </div></div>
+    <div class="corpo">
+      <div id="cargas"></div>
     </div>
   </section>
   <section class="panel" id="s-pend" aria-labelledby="t-pend">
@@ -281,13 +322,15 @@ main.dash{display:grid;gap:24px}
       <tbody id="pend"></tbody>
     </table></div></div>
   </section>
+  <div class="lateral" id="s-lateral">
   <section class="panel" id="s-rede" aria-labelledby="t-rede">
-    <div class="sec-h"><span class="num">05</span><h2 id="t-rede">Rede da Onda 3</h2></div>
+    <div class="sec-h"><span class="num">03</span><h2 id="t-rede">Rede da Onda 3</h2></div>
     <div class="corpo">
       <div class="big" id="teste"></div>
       <ul class="steps" id="rede"></ul>
     </div>
   </section>
+  </div>
   <footer>
     <span>Documento confidencial</span>
     <span id="fonte">Execuções de dev e hml · issues do repositório · teste de conexão · painel/marcos.toml</span>
@@ -346,8 +389,12 @@ main.dash{display:grid;gap:24px}
       var a=dd(o.janela[0]),b=dd(o.janela[1]),f0=dd(o.trabalho_desde),f1=o.estado==='nao_iniciada'?f0:HOJE;
       var ok=cargaDe[o.numero], pr=d.progresso.por_onda.filter(function(x){return x.onda===o.numero;})[0];
       var tag=o.estado==='entregue'||o.estado==='aceita'?'<span class="tag-entregue">'+(o.estado==='aceita'?'aceita':'entregue')+'</span>':'<span class="lab-est">'+estado[o.estado]+'</span> · ';
-      var sd=o.saldo_dias, saldo=sd>0?'<span class="saldo adiantada">+'+sd+' d adiantada</span>':sd<0?'<span class="saldo atrasada">'+(-sd)+' d atrasada'+(o.motivo_prazo?'<small>'+esc(o.motivo_prazo)+'</small>':'')+'</span>':'<span class="saldo em-dia">em dia</span>';
-      var tx=tag+Math.round(100*pr.prontas/pr.horas)+'% pronto'+(ok&&ok.total?' · '+ok.dev+'/'+ok.total+' carregadas':'')+saldo;
+      var sd=o.saldo_dias, atrasoOrig=o.prazo_postergado&&o.entregue_em?Math.round((new Date(o.entregue_em)-new Date(o.janela[1]))/864e5):0,
+        nota='',
+        orig=atrasoOrig>0?'<span class="saldo atrasada">'+atrasoOrig+' d atrasada'+(o.motivo_prazo?'<small>'+esc(o.motivo_prazo)+'</small>':'')+'</span>':'',
+        saldo=orig+(sd>0?'<span class="saldo adiantada">+'+sd+' d '+(o.prazo_postergado?'antes do prazo postergado':'adiantada')+'</span>':sd<0?'<span class="saldo atrasada">'+(-sd)+' d atrasada'+(o.motivo_prazo?'<small>'+esc(o.motivo_prazo)+'</small>':'')+'</span>':'<span class="saldo em-dia">em dia</span>');
+      var entregue=o.estado==='entregue'||o.estado==='aceita';
+      var tx=tag+(entregue?'':Math.round(100*pr.prontas/pr.horas)+'% pronto')+saldo;
       var fimLab=Math.max(b,f1), lab=fimLab>TOTAL*0.75?'<span class="wlab" style="right:calc('+pct(TOTAL-Math.min(a,f0>0?a:a))+' + 8px)">'+tx+'</span>':'<span class="wlab" style="left:calc('+pct(fimLab)+' + 8px)">'+tx+'</span>';
       var g=meses.map(function(m){return '<div class="grid-m" style="left:'+pct(m[1])+'"></div>';}).join('');
       return '<div class="row"><div class="wname">Onda '+o.numero+' · '+esc(o.nome)+'<small>'+o.horas+'h · marco '+o.marco_pct.toFixed(2).replace('.',',')+'%</small></div>'+
@@ -358,13 +405,13 @@ main.dash{display:grid;gap:24px}
 
     // Marcos
     $('marcos').innerHTML=d.marcos.map(function(m){
-      return '<li><span class="date">'+dia(m.data)+'</span><span class="what">'+esc(m.titulo)+'</span>'+
-        (m.estado==='feito'?chip('ok','feito'):chip(m.dono==='Alup'?'wait':'own',m.dono?'previsto · '+m.dono:'previsto'))+'</li>';
+      return '<li class="'+m.estado+'"><span class="topo"><span class="date">'+dia(m.data)+'</span>'+
+        (m.estado==='feito'?chip('ok','feito'):chip(m.dono==='Alup'?'wait':'own',m.dono?'previsto · '+m.dono:'previsto'))+'</span><span class="what">'+esc(m.titulo)+'</span></li>';
     }).join('');
 
     // Pendências
     $('pend').innerHTML=d.pendencias.length?d.pendencias.map(function(p){
-      return '<tr'+(p.atrasada?' class="late"':'')+'><td class="n">'+p.numero+'</td><td><a href="'+esc(p.url)+'" target="_blank" rel="noopener">'+esc(p.titulo)+'</a></td>'+
+      return '<tr class="'+(p.atrasada?'late':p.prazo?'':'semprazo')+'"><td class="n">'+p.numero+'</td><td class="tit" title="'+esc(p.titulo)+'"><a href="'+esc(p.url)+'" target="_blank" rel="noopener">'+esc(p.titulo)+'</a></td>'+
         '<td class="dt">'+(p.prazo?dia(p.prazo):'—')+'</td><td class="dt">'+p.dias_aberta+' d</td><td>'+
         (p.atrasada?chip('late','atrasada'):p.prazo?chip('wait','no prazo'):chip('wait','sem prazo'))+'</td></tr>';
     }).join(''):'<tr><td colspan="5" class="falha">Nenhuma pendência aberta.</td></tr>';

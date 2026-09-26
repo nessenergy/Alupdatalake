@@ -19,6 +19,9 @@ janela = [2026-08-31, 2026-09-11]
 trabalho_desde = 2026-08-25
 estado = "entregue"
 entregue_em = 2026-09-25
+# A3 (ambiente GCP) venceu em 04/09 e chegou em 23/09: 19 dias corridos. Cláusula 3ª:
+# o prazo que depende do insumo é postergado; 11/09 + 19 dias = 30/09.
+prazo_postergado = 2026-09-30
 motivo_prazo = "ambiente GCP (A3) liberado só em 23/09" # aceita | entregue | em_andamento | aguarda_alup | nao_iniciada
 entidades = ["bcb_cambio_ptax"]
 

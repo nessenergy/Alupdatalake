@@ -251,3 +251,13 @@ def test_onda_nao_entregue_compara_o_trabalho_feito_com_o_tempo_corrido_da_janel
     dentro = {"janela": [date(2026, 9, 16), date(2026, 10, 16)]}  # 30 dias; 10 corridos
     assert painel.saldo_dias(dentro, fracao=0.2, hoje=HOJE) == -4
     assert painel.saldo_dias(dentro, fracao=0.5, hoje=HOJE) == 5
+
+
+def test_onda_com_prazo_postergado_mede_a_entrega_contra_o_prazo_vigente():
+    """Cláusula 3ª: insumo atrasado posterga o prazo; a folga conta contra ele, não contra a janela original."""
+    onda = {
+        "janela": [date(2026, 8, 31), date(2026, 9, 11)],
+        "entregue_em": date(2026, 9, 25),
+        "prazo_postergado": date(2026, 9, 30),
+    }
+    assert painel.saldo_dias(onda, fracao=1.0, hoje=HOJE) == 5

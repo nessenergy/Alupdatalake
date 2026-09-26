@@ -213,7 +213,7 @@ registra o que pedir e por quê.
 | — | **Grupos que passam pelo IAP do Portal** (R01 do RIPD) | Leonardo (PO) | O Portal está publicado e só a Alup pode entrar: o IAP com cliente OAuth gerenciado pelo Google [admite apenas contas da organização](https://docs.cloud.google.com/iap/docs/managed-oauth-client), e contas `@ness.com.br` são recusadas (25/09). **É o que permite demonstrar o Portal no aceite das Ondas 0 e 1** |
 | — | **Ligar o billing export no console**, apontando para o dataset `faturamento` do `dev` | Alup, com papel na conta de faturamento | Dataset regional só recebe dado **a partir do dia em que o export é ligado**: cada dia de espera é histórico que não volta ([ADR 007](arquitetura/decisoes/007-portal-de-custo.md)) |
 | [#24](https://github.com/nessenergy/Alupdatalake/issues/24) · [#23](https://github.com/nessenergy/Alupdatalake/issues/23) | **Token do Hubspot** e **acesso/host do BBCE** | Leonardo (ponto focal) | Conectores escritos e parados; Onda 2 não executa |
-| [#12](https://github.com/nessenergy/Alupdatalake/issues/12) · [#13](https://github.com/nessenergy/Alupdatalake/issues/13) · [#14](https://github.com/nessenergy/Alupdatalake/issues/14) · [#15](https://github.com/nessenergy/Alupdatalake/issues/15) | **VPN e credenciais read-only**: Oracle FMB, Portal Alup, MySQL RDS, RM/TOTVS | Leonardo, com Mauricio de substituto | Onda 3 inteira, 155h. **Vence em 25/09** e é o único item que dispara ociosidade de 4h/dia |
+| [#12](https://github.com/nessenergy/Alupdatalake/issues/12) · [#13](https://github.com/nessenergy/Alupdatalake/issues/13) · [#14](https://github.com/nessenergy/Alupdatalake/issues/14) · [#15](https://github.com/nessenergy/Alupdatalake/issues/15) | **VPN e credenciais read-only**: Oracle FMB, Portal Alup, MySQL RDS, RM/TOTVS | Leonardo, com Mauricio de substituto | Onda 3 inteira, 155h. **Bloqueante, não atrasado**: o contrato dá até 16/11 (a pauta pediu 09/11). É o único item que dispara ociosidade de 4h/dia, e só depois de 5 dias úteis além do prazo |
 | [#142](https://github.com/nessenergy/Alupdatalake/issues/142) | **Exemplos reais das planilhas** (G3) | Taina / donos de dado | Sem eles não dá para declarar template nem conferir o escopo das 13 fontes contra a proposta |
 | [#141](https://github.com/nessenergy/Alupdatalake/issues/141) | **De-para de usina: a sigla interna** | dono do domínio de Geração | Três quartos do de-para já saem do dado público; falta a coluna que só a Alup tem |
 | [#174](https://github.com/nessenergy/Alupdatalake/issues/174) · [#129](https://github.com/nessenergy/Alupdatalake/issues/129) | **Caminhos do TempoOK que importam** e onde está o acervo recente de boletins | Leonardo, com o fornecedor | O token alcança a previsão de ENA em dia; o resto do produto é adivinhação sem a lista |
@@ -239,8 +239,8 @@ acompanhamento vive.
 ## 5. Ordem, se for para fazer uma coisa de cada vez
 
 1. **Token do Dataform** (item 1) — é o único que trava trabalho técnico hoje.
-2. **VPN e credenciais da Onda 3** (item 3) — vence em 25/09 e é o único com
-   cláusula financeira associada.
+2. **VPN e credenciais da Onda 3** (item 3) — bloqueante, com prazo contratual em
+   16/11 (a pauta pediu 09/11); é o único com cláusula financeira associada.
 3. **Grupos do IAP e billing export** (item 3) — o export perde histórico a
    cada dia de espera.
 4. **Rotação do TempoOK** (item 2) — dívida de segurança com condição já

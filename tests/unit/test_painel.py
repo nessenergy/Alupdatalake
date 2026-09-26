@@ -161,3 +161,34 @@ def test_dados_juntam_os_blocos_e_nao_levam_linha_de_dado():
     entidade = dados["cargas"][0]["entidades"][0]
     assert set(entidade) == {"entidade", "dev", "hml"}
     assert set(entidade["dev"]) == {"status", "linhas", "em"}
+
+
+# ------------------------------------------------------------------ entre jobs do workflow
+
+
+def test_execucoes_exportadas_voltam_iguais():
+    """O job de hml exporta; o de publicação importa. Nada se perde no caminho."""
+    execucoes = [_exec("ons_carga", "SUCESSO", 25, ambiente="hml"), _exec("ons_ear", "ERRO", 24, ambiente="hml")]
+    texto = painel.exportar_execucoes(execucoes)
+    assert painel.importar_execucoes(texto) == execucoes
+
+
+def test_importar_execucoes_vazias_nao_quebra_o_painel():
+    """Se o job de hml falhar, o painel sai só com dev, em vez de não sair."""
+    assert painel.importar_execucoes("") == []
+    assert painel.importar_execucoes("   \n") == []
+
+
+# ------------------------------------------------------------------ workflow
+
+
+def test_workflow_do_painel_le_hml_sem_deployment_e_publica_com_identidade_propria():
+    texto = (RAIZ / ".github" / "workflows" / "painel.yml").read_text(encoding="utf-8")
+    assert 'cron: "7 * * * *"' in texto
+    assert "name: hml\n      deployment: false" in texto, "hml sem registrar deployment a cada hora"
+    assert "if: ${{ !cancelled() }}" in texto, "sem hml, o painel sai só com dev"
+    assert "${{ inputs." not in texto
+    # A escrita no projeto da ness. usa a identidade do painel, nunca a de deploy da Alupar.
+    publicar = texto[texto.index("  publicar:") :]
+    assert publicar.index("vars.GCP_DEPLOY_SA") < publicar.index("vars.PAINEL_SA") < publicar.index("gcloud storage cp")
+    assert "permissions:\n  contents: read\n  id-token: write\n  issues: read\n" in texto

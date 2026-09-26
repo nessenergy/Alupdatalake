@@ -152,6 +152,21 @@ def resumir_teste_conexao(execucoes: list[dict[str, Any]]) -> dict[str, Any]:
     return {"estado": "passou" if ultima["sucesso"] else "falhou", "em": ultima["fim"].isoformat()}
 
 
+# ------------------------------------------------------------------ entre jobs do workflow
+
+
+def exportar_execucoes(execucoes: list[dict[str, Any]]) -> str:
+    """Execuções em JSON, para passar do job de hml ao de publicação."""
+    return json.dumps([{**e, "iniciada_em": e["iniciada_em"].isoformat()} for e in execucoes])
+
+
+def importar_execucoes(texto: str) -> list[dict[str, Any]]:
+    """O inverso de `exportar_execucoes`; vazio vira lista vazia (job de hml falhou)."""
+    if not texto.strip():
+        return []
+    return [{**e, "iniciada_em": datetime.fromisoformat(e["iniciada_em"])} for e in json.loads(texto)]
+
+
 # ------------------------------------------------------------------ dados.json
 
 
@@ -269,17 +284,33 @@ def ler_testes_conexao(projeto: str, regiao: str, job: str) -> list[dict[str, An
 def main(argv: list[str] | None = None) -> int:  # pragma: no cover - E/S
     parser = argparse.ArgumentParser(description="Gera o dados.json do painel vivo")
     parser.add_argument("--saida", type=Path, required=True)
-    parser.add_argument("--dev", default="alupar-dev-alupdata")
-    parser.add_argument("--hml", default="alupar-hm-alupdata")
+    parser.add_argument(
+        "--ambiente",
+        action="append",
+        metavar="NOME=PROJETO",
+        help="ambiente lido do BigQuery; repetível (padrão: dev e hml)",
+    )
+    parser.add_argument(
+        "--execucoes-de", type=Path, action="append", default=[], help="execuções já exportadas por outro job"
+    )
+    parser.add_argument("--so-execucoes", action="store_true", help="só exporta as execuções dos ambientes")
     parser.add_argument("--repositorio", default="nessenergy/Alupdatalake")
     parser.add_argument("--regiao", default="us-central1")
     args = parser.parse_args(argv)
     logging.basicConfig(level=logging.INFO, format="%(message)s")
 
+    ambientes = dict(a.split("=", 1) for a in (args.ambiente or ["dev=alupar-dev-alupdata", "hml=alupar-hm-alupdata"]))
+    execucoes = ler_execucoes(ambientes)
+    if args.so_execucoes:
+        args.saida.write_text(exportar_execucoes(execucoes), encoding="utf-8")
+        logger.info("painel: %d execuções exportadas -> %s", len(execucoes), args.saida)
+        return 0
+    for arquivo in args.execucoes_de:
+        execucoes += importar_execucoes(arquivo.read_text(encoding="utf-8") if arquivo.exists() else "")
+
     marcos = carregar_marcos()
-    execucoes = ler_execucoes({"dev": args.dev, "hml": args.hml})
     issues = ler_issues(args.repositorio, os.environ["GITHUB_TOKEN"])
-    testes = ler_testes_conexao(args.dev, args.regiao, "teste-conexao-fmb")
+    testes = ler_testes_conexao(ambientes.get("dev", "alupar-dev-alupdata"), args.regiao, "teste-conexao-fmb")
     dados = montar(marcos, execucoes, issues, testes, datetime.now(BRASILIA))
     args.saida.write_text(json.dumps(dados, ensure_ascii=False, indent=1), encoding="utf-8")
     logger.info("painel: %d execuções, %d pendências -> %s", len(execucoes), len(issues), args.saida)

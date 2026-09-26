@@ -278,7 +278,8 @@ nota = "dicionário das 27 entidades existentes"
 codigo = "4.6"
 titulo = "Handoff técnico"
 horas = 10
-pronto = 0.0
+pronto = 0.2
+nota = "runbook de incidente escrito (docs/runbook/incidentes.md)"
 
 # Marcos: o que aconteceu e o que vem, em ordem de data.
 [[marco]]

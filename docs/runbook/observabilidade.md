@@ -79,6 +79,8 @@ projeção de gasto. Detalhe em
 O orçamento precisa do `billing_account` da Alup; sem ele o recurso não é
 criado.
 
+O que fazer quando um desses alertas chega está em [`incidentes.md`](incidentes.md).
+
 ## O que ainda não existe
 
 - **Destinatário de alerta.** `emails_alerta` está vazio de propósito: quem

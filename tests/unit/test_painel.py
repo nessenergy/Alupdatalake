@@ -192,3 +192,44 @@ def test_workflow_do_painel_le_hml_sem_deployment_e_publica_com_identidade_propr
     publicar = texto[texto.index("  publicar:") :]
     assert publicar.index("vars.GCP_DEPLOY_SA") < publicar.index("vars.PAINEL_SA") < publicar.index("gcloud storage cp")
     assert "permissions:\n  contents: read\n  id-token: write\n  issues: read\n" in texto
+
+
+# ------------------------------------------------------------------ progresso global
+
+
+def test_itens_de_cada_onda_somam_as_horas_da_proposta():
+    marcos = painel.carregar_marcos(RAIZ / "painel" / "marcos.toml")
+    assert sum(o["horas"] for o in marcos["onda"]) == 580
+    for onda in marcos["onda"]:
+        assert sum(i["horas"] for i in onda["item"]) == onda["horas"], onda["numero"]
+
+
+def test_progresso_pesa_cada_item_pelas_horas_e_separa_aceito_em_aceite_e_adiantado():
+    ondas = [
+        {"numero": 0, "horas": 10, "estado": "aceita", "item": [{"horas": 10, "pronto": 1.0}]},
+        {"numero": 1, "horas": 20, "estado": "entregue", "item": [{"horas": 20, "pronto": 1.0}]},
+        {
+            "numero": 2,
+            "horas": 40,
+            "estado": "aguarda_alup",
+            "item": [{"horas": 30, "pronto": 0.5}, {"horas": 10, "pronto": 0}],
+        },
+        {"numero": 3, "horas": 30, "estado": "nao_iniciada", "item": [{"horas": 30, "auto": "dias_seguidos"}]},
+    ]
+
+    prog = painel.resumir_progresso(ondas, dias=2, meta=3)
+
+    assert prog["horas_total"] == 100
+    assert prog["aceito"] == 10
+    assert prog["em_aceite"] == 20
+    assert prog["adiantado"] == pytest.approx(15 + 20)  # 30 × 0,5 + 30 × 2/3
+    assert prog["pct"] == pytest.approx(65.0)
+    assert [o["prontas"] for o in prog["por_onda"]] == pytest.approx([10, 20, 15, 20])
+
+
+def test_fracao_pronta_fora_de_zero_a_um_e_recusada(tmp_path):
+    texto = (RAIZ / "painel" / "marcos.toml").read_text(encoding="utf-8").replace("pronto = 1.0", "pronto = 1.5", 1)
+    arquivo = tmp_path / "marcos.toml"
+    arquivo.write_text(texto, encoding="utf-8")
+    with pytest.raises(ValueError):
+        painel.carregar_marcos(arquivo)

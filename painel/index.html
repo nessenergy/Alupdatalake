@@ -171,7 +171,12 @@ footer{color:var(--muted);font-size:12.5px;border-top:1px solid var(--line-stron
 :root{--entregue:#D92D20;--entregue-bg:rgba(217,45,32,.10)}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--entregue:#FF6B61;--entregue-bg:rgba(255,107,97,.14)}}
 :root[data-theme="dark"]{--entregue:#FF6B61;--entregue-bg:rgba(255,107,97,.14)}
-.tag-entregue{display:inline-block;font-weight:700;font-size:11.5px;letter-spacing:.06em;color:var(--entregue);background:var(--entregue-bg);border:1px solid var(--entregue);border-radius:3px;padding:2px 6px;margin-right:6px;line-height:1.2}
+.tag-entregue{display:inline-block;font-weight:700;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#fff;background:var(--entregue);border-radius:3px;padding:3px 7px;margin-right:8px;line-height:1.2;vertical-align:1px}
+.saldo{display:inline-block;font-weight:600;font-size:11.5px;padding:2px 7px;border-radius:3px;margin-left:8px;vertical-align:1px}
+.saldo.adiantada{color:var(--accent-ink);background:var(--accent-soft)}
+.saldo.atrasada{color:var(--late-ink);background:var(--late-bg)}
+.saldo.em-dia{color:var(--muted);border:1px solid var(--line-strong)}
+.saldo small{font-weight:400;opacity:.85;margin-left:4px}
 .global{margin-top:14px;display:grid;grid-template-columns:auto 1fr;gap:6px 18px;align-items:center}
 .global .pct{font-weight:600;font-size:1.9rem;line-height:1;color:var(--band-ink)}
 .global .pct small{font-size:.95rem;font-weight:500;color:var(--band-muted);margin-left:6px}
@@ -340,8 +345,9 @@ main.dash{display:grid;gap:24px}
     $('rows').innerHTML=d.ondas.map(function(o,i){
       var a=dd(o.janela[0]),b=dd(o.janela[1]),f0=dd(o.trabalho_desde),f1=o.estado==='nao_iniciada'?f0:HOJE;
       var ok=cargaDe[o.numero], pr=d.progresso.por_onda.filter(function(x){return x.onda===o.numero;})[0];
-      var tag=o.estado==='entregue'||o.estado==='aceita'?'<span class="tag-entregue">['+(o.estado==='aceita'?'ACEITA':'ENTREGUE')+']</span>':'<span class="lab-est">'+estado[o.estado]+'</span> · ';
-      var tx=tag+Math.round(100*pr.prontas/pr.horas)+'% pronto'+(ok&&ok.total?' · '+ok.dev+'/'+ok.total+' carregadas':'');
+      var tag=o.estado==='entregue'||o.estado==='aceita'?'<span class="tag-entregue">'+(o.estado==='aceita'?'aceita':'entregue')+'</span>':'<span class="lab-est">'+estado[o.estado]+'</span> · ';
+      var sd=o.saldo_dias, saldo=sd>0?'<span class="saldo adiantada">+'+sd+' d adiantada</span>':sd<0?'<span class="saldo atrasada">'+(-sd)+' d atrasada'+(o.motivo_prazo?'<small>'+esc(o.motivo_prazo)+'</small>':'')+'</span>':'<span class="saldo em-dia">em dia</span>';
+      var tx=tag+Math.round(100*pr.prontas/pr.horas)+'% pronto'+(ok&&ok.total?' · '+ok.dev+'/'+ok.total+' carregadas':'')+saldo;
       var fimLab=Math.max(b,f1), lab=fimLab>TOTAL*0.75?'<span class="wlab" style="right:calc('+pct(TOTAL-Math.min(a,f0>0?a:a))+' + 8px)">'+tx+'</span>':'<span class="wlab" style="left:calc('+pct(fimLab)+' + 8px)">'+tx+'</span>';
       var g=meses.map(function(m){return '<div class="grid-m" style="left:'+pct(m[1])+'"></div>';}).join('');
       return '<div class="row"><div class="wname">Onda '+o.numero+' · '+esc(o.nome)+'<small>'+o.horas+'h · marco '+o.marco_pct.toFixed(2).replace('.',',')+'%</small></div>'+

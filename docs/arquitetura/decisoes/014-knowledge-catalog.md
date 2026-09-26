@@ -24,8 +24,15 @@ dado.
   (bootstrap), cobre `dataplex.glossaries.*`.
 
 Plano: [`planos/2026-09-24-glossario-como-codigo.md`](../../planos/2026-09-24-glossario-como-codigo.md).
-O preenchimento das anotações (`origem`, `dominio-analitico`) segue na
-[issue #36](https://github.com/nessenergy/Alupdatalake/issues/36).
+**Anotações das Gold, no mesmo dia.** `scripts/anotar_catalogo.py` grava
+`origem` e `dominio-analitico` nas 26 tabelas Gold de negócio, com o domínio e o
+data owner de `dominios-analiticos.md`; as três Gold de operação da plataforma
+ficam fora. Roda no deploy, depois do Dataform, com a conta de deploy. É script,
+e não `google_dataplex_entry`, porque no provider travado (6.50) o recurso exige
+importar cada entrada de sistema e atualiza com `deleteMissingAspects=true`, o
+que tentaria apagar os aspects que o BigQuery mantém; o `PATCH` do script leva
+`aspectKeys` só com os dois aspects do projeto. `tests/unit/test_anotar_catalogo.py`
+reprova Gold sem classificação e divergência com o documento.
 
 ## Adendo de 2026-09-23 — lake, zonas e ativos declarados
 

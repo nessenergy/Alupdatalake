@@ -144,3 +144,12 @@ jobs:
             exit 1
           fi
           uv run python -m scripts.executar_dataform --service-account "$SA" --repositorio "$REPO"
+      # Domínio, responsável e origem de cada Gold no Knowledge Catalog (ADR 014).
+      # Depois do Dataform, que é quem garante que as tabelas existem.
+      - name: Anotar as tabelas Gold no catálogo
+        run: |
+          cd infra
+          PROJETO="$(terraform output -raw project_id)"
+          REGIAO="$(terraform output -raw region)"
+          cd ..
+          uv run python -m scripts.anotar_catalogo --projeto "$PROJETO" --regiao "$REGIAO"

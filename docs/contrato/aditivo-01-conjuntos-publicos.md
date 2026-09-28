@@ -167,12 +167,21 @@ componentes estão entregues e a carga roda em `dev`.
 | # | Conjunto | Estimado | Apontado | Entregue em | PR |
 |---|---|---|---|---|---|
 | 7 | `ear-diario-por-bacia` | 4 | 4 | 28/09/2026 | [#295](https://github.com/nessenergy/Alupdatalake/pull/295) |
+| 8 | `ear-diario-por-reservatorio` | 5 | 5 | 28/09/2026 | [#297](https://github.com/nessenergy/Alupdatalake/pull/297) |
+| 9 | `ena-diario-por-bacia` | 4 | 4 | 28/09/2026 | [#297](https://github.com/nessenergy/Alupdatalake/pull/297) |
+| 10 | `ena-diario-por-reservatorio` | 5 | 5 | 28/09/2026 | [#297](https://github.com/nessenergy/Alupdatalake/pull/297) |
 
-**Apontado até agora: 4h de 168h.**
+**Apontado até agora: 18h de 162h** (itens 1–25; item 26 tratado em §4.1).
 
 Evidência do item 7: carga em `dev` de 28/09, 14.976 linhas de 01/09/2024 a
 27/09/2026, 23 bacias, zero inválidas; `gold.armazenamento_mensal_bacia`
 recalculada pelo Dataform.
+
+Evidência dos itens 8, 9 e 10: carga em `dev` de 28/09, execução SUCESSO para
+os três conectores (`ons_ear_reservatorio`, `ons_ena_bacia`,
+`ons_ena_reservatorio`) na janela 01/09/2024–27/09/2026; contagem exata de
+linhas fica pendente de consulta ao BigQuery (sem acesso interativo ao
+`gcloud` nesta sessão) — a completar antes da homologação.
 
 ## 6. Fora desta estimativa
 

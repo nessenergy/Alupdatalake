@@ -159,6 +159,13 @@ def test_compiled_gold_depends_on_silver_assertions():
         if table["target"]["name"] in GOLD_OPERACIONAL:
             assert not any(target[1] == "qualidade" for target in dependencies), table["target"]
             continue
+        if table["target"]["name"] in GOLD_DERIVADA:
+            # Depende só de Gold de negócio; cada uma delas passa pela checagem da
+            # Silver neste mesmo laço, e a garantia de qualidade vem por transitividade.
+            upstream = {target for target in dependencies if target[1] != "qualidade"}
+            assert upstream, table["target"]
+            assert all(target[1] == "gold" and target[2] not in GOLD_OPERACIONAL for target in upstream), upstream
+            continue
         silver = {target for target in dependencies if target[1] == "silver"}
         assert silver, table["target"]
         for source in silver:

@@ -125,12 +125,27 @@ resource "google_cloud_run_v2_service" "portal" {
         value = var.region
       }
 
+      # CPU extra só durante a partida: dois workers importam o app ao mesmo
+      # tempo (5-8 s cada, medido) e, com 1 vCPU sem reforço, a partida a frio
+      # passava da janela da sonda — foi o que derrubou a revisão 00006 em hml
+      # em 28/09, com a mesma imagem que subiu em dev.
+      resources {
+        limits = {
+          cpu    = "1"
+          memory = "512Mi"
+        }
+        startup_cpu_boost = true
+      }
+
       # Sonda que não toca o BigQuery: sonda que consulta banco derruba o
-      # serviço junto com o banco.
+      # serviço junto com o banco. Janela de 2 min (24 × 5 s) em vez dos
+      # ~20-30 s do padrão: partida lenta não é falha.
       startup_probe {
         http_get {
           path = "/saude"
         }
+        period_seconds    = 5
+        failure_threshold = 24
       }
     }
   }

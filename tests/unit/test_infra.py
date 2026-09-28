@@ -759,3 +759,14 @@ def test_pld_roda_todo_dia_e_o_alerta_de_silencio_acompanha() -> None:
     monitoramento = _ler("infra/modules/monitoramento/main.tf")
     linha = next(x for x in monitoramento.splitlines() if x.strip().startswith("ccee_pld "))
     assert "= 26" in linha
+
+
+def test_portal_tem_folga_para_partir_a_frio() -> None:
+    """Em 28/09 a revisão 00006 do Portal em hml não subiu: a sonda padrão dá ~20-30 s,
+    e dois workers do gunicorn importando o app (5-8 s cada, medido) em 1 vCPU
+    sem reforço passam disso. A mesma imagem subiu em dev — falha intermitente.
+    """
+    portal = _ler("infra/modules/portal/main.tf")
+    sonda = portal.split("startup_probe {", 1)[1].split("\n      }", 1)[0]
+    assert "failure_threshold" in sonda
+    assert "startup_cpu_boost = true" in portal

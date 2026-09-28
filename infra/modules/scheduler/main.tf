@@ -91,6 +91,21 @@ variable "conectores" {
       cron         = "55 9 * * *"
       ultimos_dias = 30
     }
+    ons_cmo_semi_horario = {
+      # Aditivo 01. Passo de 30 min; arquivo anual.
+      cron         = "5 10 * * *"
+      ultimos_dias = 30
+    }
+    ons_volume_espera = {
+      cron         = "15 10 * * *"
+      ultimos_dias = 30
+    }
+    ons_cvu_termica = {
+      # O CVU muda por semana operativa (PMO): semanal, sábado. A janela de 40
+      # dias cobre a semana que começa no ano anterior e a revisão atrasada.
+      cron         = "0 11 * * 6"
+      ultimos_dias = 40
+    }
     aneel_siga = {
       cron         = "0 7 * * 1" # cadastro muda devagar: semanal, segunda
       ultimos_dias = 1           # cadastro completo; a janela não se aplica

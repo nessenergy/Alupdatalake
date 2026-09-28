@@ -1,0 +1,33 @@
+config {
+  type: "view",
+  schema: "silver",
+  tags: ["silver"],
+  assertions: {
+    uniqueKey: ["instante", "submercado"],
+    nonNull: ["data_referencia", "instante", "submercado"],
+    rowConditions: [
+      "submercado IN ('N','NE','S','SE')",
+      "cmo_reais_mwh >= 0"
+    ]
+  }
+}
+
+-- Silver: CMO semi-horário por subsistema, higienizada e deduplicada. Aditivo 01.
+-- Dedup por (instante, submercado): passo de 30 min, a chave é o instante inteiro.
+SELECT
+  data_referencia,
+  submercado,
+  CAST(NULL AS STRING) AS codigo_usina,  -- sem CEG na origem
+  CAST(NULL AS STRING) AS agente_ccee,   -- o ONS não usa perfil da CCEE
+  FORMAT_DATE('%Y-%m', data_referencia) AS periodo_apuracao,
+  CAST(NULL AS STRING) AS periodo_apuracao_ccee,  -- a origem é o ONS
+  EXTRACT(HOUR FROM instante) AS hora,
+  instante,
+  cmo_reais_mwh,
+  _ingestao_id,
+  _ingestao_timestamp
+FROM ${ref("bronze", "ons_cmo_semi_horario")}
+QUALIFY ROW_NUMBER() OVER (
+  PARTITION BY instante, submercado
+  ORDER BY _ingestao_timestamp DESC
+) = 1

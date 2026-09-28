@@ -1,0 +1,28 @@
+config {
+  type: "operations",
+  schema: "bronze",
+  hasOutput: true,
+  tags: ["bronze"]
+}
+
+-- Bronze: CVU semanal das usinas térmicas (ONS). Aditivo 01.
+CREATE TABLE IF NOT EXISTS ${self()} (
+  data_referencia               DATE       NOT NULL OPTIONS(description="Início da semana operativa"),
+  fim_semana                    DATE       NOT NULL OPTIONS(description="Fim da semana operativa"),
+  ano_referencia                INT64      NOT NULL OPTIONS(description="Ano do PMO"),
+  mes_referencia                INT64      NOT NULL OPTIONS(description="Mês do PMO"),
+  revisao                       INT64      NOT NULL OPTIONS(description="Revisão do PMO; cada revisão é uma semana"),
+  semana_operativa              STRING     NOT NULL OPTIONS(description="Nome da semana (PMO Mês Ano - Revisão N)"),
+  codigo_usina_planejamento     STRING     NOT NULL OPTIONS(description="cod_usinaplanejamento"),
+  submercado                    STRING     NOT NULL OPTIONS(description="N, NE, S, SE"),
+  usina                         STRING     NOT NULL,
+  cvu_reais_mwh                 NUMERIC    NOT NULL OPTIONS(description="Custo Variável Unitário, R$/MWh; zero é valor"),
+
+  _ingestao_id        STRING    NOT NULL,
+  _ingestao_timestamp TIMESTAMP NOT NULL,
+  _fonte              STRING    NOT NULL,
+  _schema_versao      STRING    NOT NULL
+)
+PARTITION BY DATE(_ingestao_timestamp)
+CLUSTER BY data_referencia, submercado, codigo_usina_planejamento
+OPTIONS(description="CVU semanal das usinas térmicas — camada Bronze, append-only");

@@ -24,6 +24,9 @@ técnicos**. Bases reutilizáveis não entram nessa contagem. O contrato mantém
 | ONS — intercâmbio internacional | [`ons_intercambio_internacional.md`](ons_intercambio_internacional.md) | Aditivo 01 | — | `intercambio_internacional_mensal` |
 | ONS — geração para exportação | [`ons_geracao_exportacao.md`](ons_geracao_exportacao.md) | Aditivo 01 | — | `exportacao_mensal` |
 | ONS — balanço de energia | [`ons_balanco_energia.md`](ons_balanco_energia.md) | Aditivo 01 | `submercado` | `balanco_energia_mensal_subsistema` |
+| ONS — CMO semi-horário | [`ons_cmo_semi_horario.md`](ons_cmo_semi_horario.md) | Aditivo 01 | `submercado` | `cmo_mensal_submercado` |
+| ONS — volume de espera recomendado | [`ons_volume_espera.md`](ons_volume_espera.md) | Aditivo 01 | `submercado` | `volume_espera_mensal_reservatorio` |
+| ONS — CVU das térmicas | [`ons_cvu_termica.md`](ons_cvu_termica.md) | Aditivo 01 | `submercado` | `cvu_mensal_termica` |
 | CCEE — PLD | [`ccee_pld.md`](ccee_pld.md) | 1 | `submercado` | `pld_mensal_submercado` |
 | CCEE — perfis de agente | [`ccee_perfil.md`](ccee_perfil.md) | 1 | **`agente_ccee`** | `agentes_ccee` |
 | CCEE — lista mensal de agentes | [`ccee_agente.md`](ccee_agente.md) | 1 | `agente_ccee` | `agentes_por_classe_mensal` |

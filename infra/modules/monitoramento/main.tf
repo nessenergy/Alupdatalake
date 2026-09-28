@@ -28,7 +28,7 @@ variable "conectores_criticos" {
     ons_capacidade             = 180 # semanal + folga
     ons_geracao_usina          = 780 # mensal + folga
     ibge_ipca                  = 780 # mensal + folga
-    ccee_pld                   = 780 # mensal + folga; mede a execução, não a defasagem da CCEE
+    ccee_pld                   = 26  # diário desde 28/09 (dataset `pld_horario`)
     ccee_perfil                = 180 # semanal + folga
     ccee_agente                = 780 # mensal + folga
     ccee_exposicao_financeira  = 780 # mensal + folga

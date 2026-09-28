@@ -744,3 +744,18 @@ def test_alerta_de_falha_so_olha_job_de_ingestao() -> None:
         _ler("infra/modules/monitoramento/main.tf"), 'resource "google_monitoring_alert_policy" "job_falhou"'
     )
     assert 'resource.labels.job_name = starts_with(\\"ingestao-\\")' in alerta
+
+
+def test_pld_roda_todo_dia_e_o_alerta_de_silencio_acompanha() -> None:
+    """Desde 28/09 o PLD vem do `pld_horario`, atualizado todo dia (ver `ccee_pld.py`).
+
+    Agendamento mensal deixaria o mês corrente de fora por até 30 dias, e o
+    alerta de silêncio mensal não perceberia a série parada por semanas.
+    """
+    scheduler = _ler("infra/modules/scheduler/main.tf")
+    bloco = scheduler.split("ccee_pld = {", 1)[1].split("}", 1)[0]
+    assert 'cron         = "0 10 * * *"' in bloco
+
+    monitoramento = _ler("infra/modules/monitoramento/main.tf")
+    linha = next(x for x in monitoramento.splitlines() if x.strip().startswith("ccee_pld "))
+    assert "= 26" in linha

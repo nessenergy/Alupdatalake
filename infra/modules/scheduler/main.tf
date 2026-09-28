@@ -75,10 +75,11 @@ variable "conectores" {
       ultimos_dias = 2             # cobre execução perdida sem varrer o funil todo
     }
     ccee_pld = {
-      # O PLD sai por fechamento mensal, com defasagem: em 01/09/2026 o arquivo
-      # ia até julho. Rodar diariamente só varreria o mesmo CSV sem dado novo.
-      cron         = "0 9 5 * *" # dia 5, depois do fechamento do mês anterior
-      ultimos_dias = 120         # cobre a defasagem de publicação e a recontabilização (ADR 016)
+      # Desde 28/09 o dataset é o `pld_horario`, que a CCEE atualiza todo dia
+      # com o mês corrente (o `pld_horario_submercado` só saía depois do
+      # fechamento). Às 10h, fora da janela do BCB (9h e 9h30).
+      cron         = "0 10 * * *"
+      ultimos_dias = 35 # o mês inteiro mais folga; cobre republicação no fechamento (ADR 016)
     }
     ccee_perfil = {
       # Cadastro muda devagar e o retrato tem ~60 mil linhas: semanal basta, e

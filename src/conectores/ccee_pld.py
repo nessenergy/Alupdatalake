@@ -1,7 +1,15 @@
 """Conector CCEE — PLD horário por submercado (Onda 1, público).
 
-Fonte: dados abertos da CCEE (CKAN), dataset `pld_horario_submercado`.
-Catálogo: https://dadosabertos.ccee.org.br/dataset/pld_horario_submercado
+Fonte: dados abertos da CCEE (CKAN), dataset `pld_horario`.
+Catálogo: https://dadosabertos.ccee.org.br/dataset/pld_horario
+
+**Por que `pld_horario` e não `pld_horario_submercado`** (troca de 28/09/2026):
+os dois trazem o mesmo PLD — conferido nas 20.352 horas em comum, nenhuma
+diferença —, mas o `_submercado` só é publicado depois do fechamento do mês (em
+28/09 ia até julho), e o `pld_horario` é atualizado todo dia, com o mês
+corrente. A coluna do preço muda de `PLD` para `PLD_HORA`; o `transformar()`
+aceita as duas, para que o replay de raw arquivado antes da troca continue
+funcionando.
 
 **Não exige credencial.** O 403 que bloqueou esta fonte desde 25/08 era filtro
 de cliente não identificado, resolvido pelo `User-Agent` que o `src/core/http`
@@ -51,7 +59,7 @@ if TYPE_CHECKING:
 logger = logging.getLogger(__name__)
 
 CKAN_PACOTE = "https://dadosabertos.ccee.org.br/api/3/action/package_show"
-DATASET = "pld_horario_submercado"
+DATASET = "pld_horario"
 
 # A CCEE nomeia o submercado por extenso; o lake usa a sigla, a mesma que o ONS
 # publica, para que `submercado` cruze entre as duas fontes sem tradução na
@@ -189,5 +197,6 @@ class CceePld(Conector):
             "submercado": SIGLA_SUBMERCADO.get(nome, nome),
             "periodo_apuracao": f"{mes[:4]}-{mes[4:6]}",
             "periodo_comercializacao": periodo,
-            "pld_reais_mwh": bruto["PLD"],
+            # `PLD_HORA` no dataset diário; `PLD` no raw arquivado antes de 28/09.
+            "pld_reais_mwh": bruto.get("PLD_HORA") or bruto.get("PLD"),
         }

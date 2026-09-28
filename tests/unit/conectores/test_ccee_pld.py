@@ -201,3 +201,40 @@ def test_ingerir_conta_as_linhas_da_janela(conector):
     assert execucao.status == "SUCESSO"
     assert execucao.linhas_extraidas == 6
     assert execucao.linhas_invalidas == 0
+
+
+# ------------------------------------------------------- dataset diário (28/09)
+
+
+def test_le_o_dataset_diario_e_nao_o_do_fechamento():
+    """`pld_horario` traz o mês corrente; `pld_horario_submercado` só chega depois do fechamento.
+
+    Conferido em 28/09/2026: nas 20.352 horas em comum os valores são idênticos,
+    mas o `_submercado` parava em julho e o `pld_horario` já tinha setembro.
+    """
+    from src.conectores import ccee_pld
+
+    assert ccee_pld.DATASET == "pld_horario"
+
+
+def test_transformar_le_a_coluna_pld_hora_do_dataset_diario(conector):
+    bruto = {
+        "MES_REFERENCIA": "202609",
+        "SUBMERCADO": "NORDESTE",
+        "PERIODO_COMERCIALIZACAO": "649",
+        "DIA": "28",
+        "HORA": "0",
+        "PLD_HORA": "86.28",
+    }
+    registro = PldHorario.model_validate(conector.transformar(bruto))
+
+    assert registro.data_referencia == date(2026, 9, 28)  # 27 dias × 24 + 1 = 649
+    assert registro.hora == 0
+    assert registro.pld_reais_mwh == Decimal("86.28")
+
+
+def test_replay_de_raw_antigo_com_a_coluna_pld_continua_funcionando(conector):
+    """O raw arquivado antes da troca tem `PLD`, não `PLD_HORA`; o replay não pode quebrar."""
+    bruto = {"MES_REFERENCIA": "202607", "SUBMERCADO": "NORDESTE", "PERIODO_COMERCIALIZACAO": "1", "PLD": "132.03"}
+
+    assert PldHorario.model_validate(conector.transformar(bruto)).pld_reais_mwh == Decimal("132.03")

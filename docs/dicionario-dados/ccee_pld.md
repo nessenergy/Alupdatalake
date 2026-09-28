@@ -2,17 +2,26 @@
 
 | Item | Valor |
 |---|---|
-| Fonte | Dados abertos da CCEE (CKAN), dataset `pld_horario_submercado` |
-| Catálogo | `dadosabertos.ccee.org.br/api/3/action/package_show?id=pld_horario_submercado` |
+| Fonte | Dados abertos da CCEE (CKAN), dataset `pld_horario` (até 28/09/2026, `pld_horario_submercado`) |
+| Catálogo | `dadosabertos.ccee.org.br/api/3/action/package_show?id=pld_horario` |
 | Endpoint do arquivo | **descoberto pelo CKAN**, não fixo — ver particularidades |
 | Onda | 1 — arquivo público, sem credencial |
-| Frequência | Publicação mensal, com defasagem de 1 a 2 meses |
+| Frequência | **Diária**, com o mês corrente; carga agendada todo dia às 10h |
 | Granularidade | Horária, por submercado |
 | Histórico | Desde 2023 no CKAN, um arquivo por ano |
 | Encoding | **ISO-8859-1** |
 | Credencial | **nenhuma** |
 
 ## Particularidades
+
+- **Troca de dataset em 28/09/2026.** A CCEE publica o mesmo PLD horário em
+  dois datasets. O `pld_horario_submercado`, usado até aqui, só sai depois do
+  fechamento do mês — em 28/09 ia até julho. O `pld_horario` é atualizado todo
+  dia e já trazia setembro até o dia 28. Nas **20.352 horas em comum os valores
+  são idênticos**. A coluna do preço muda de `PLD` para `PLD_HORA`, e o
+  `pld_horario` traz também `DIA` e `HORA`; o conector continua derivando data
+  e hora do `PERIODO_COMERCIALIZACAO` e aceita as duas colunas de preço, para o
+  replay de raw arquivado antes da troca.
 
 - **O 403 que bloqueava esta fonte não era credencial.** Era filtro de cliente
   não identificado. Resolvido pelo `User-Agent` que `src/core/http.py` passou a
@@ -59,7 +68,7 @@
 | `MES_REFERENCIA` | `periodo_apuracao_ccee` | STRING | `AAAAMM` → `AAAA-MM`, **como a CCEE declara** |
 | — | `periodo_apuracao` | STRING | derivado de `data_referencia`, como em toda outra Silver |
 | `PERIODO_COMERCIALIZACAO` | `periodo_comercializacao` | INT64 | preservado para rastrear até a origem |
-| `PLD` | `pld_reais_mwh` | NUMERIC | R$/MWh; negativo é rejeitado (há piso regulatório positivo) |
+| `PLD_HORA` (antes de 28/09: `PLD`) | `pld_reais_mwh` | NUMERIC | R$/MWh; negativo é rejeitado (há piso regulatório positivo) |
 
 ## Dimensões comuns
 
@@ -93,7 +102,7 @@ financeiro vai errar.
 
 ```
 dadosabertos.ccee.org.br (CKAN)
-  → pld_horario_submercado_{ano}.csv (ISO-8859-1)
+  → pld_horario_{ano}.csv (ISO-8859-1; até 28/09/2026, pld_horario_submercado_{ano}.csv)
     → gs://<bucket>-raw/ccee/pld/dt=.../<ingestao_id>.json.gz
       → bronze.ccee_pld        (append-only, particionado por _ingestao_timestamp)
         → silver.ccee_pld      (QUALIFY ROW_NUMBER por data+hora+submercado)

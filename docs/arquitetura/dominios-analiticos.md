@@ -86,7 +86,7 @@ existe em Gold. Ordenados pelo B1.
 | **Fontes hoje** | `ccee_pld` (à vista, horário) · `ons_carga` · `ons_ear` · `ons_ena` · `bbce_curva_forward` (futuro negociado) · `ccee_perfil` (60 mil perfis) · `ccee_agente` · `ccee_encargo_ess` · `ccee_energia_reserva` · `ccee_cvu_estrutural` |
 | **Fontes a conectar** | — a hidrologia (EAR e ENA) entrou em 15/09 |
 | **Granularidade** | submercado e hora, para o PLD; submercado e dia, para a carga; vértice de entrega, para a curva |
-| **Cadência** | PLD mensal, por fechamento da CCEE; carga diária; curva por pregão |
+| **Cadência** | PLD diário, com o mês corrente (desde 28/09); carga diária; curva por pregão |
 | **Gold hoje** | `pld_mensal_submercado`, `carga_mensal_submercado`, `mercado_mensal_submercado`, `armazenamento_e_afluencia_mensal`, `curva_forward_vigente`, `agentes_ccee`, `agentes_por_classe_mensal`, `encargos_setoriais_mensal`, `cvu_estrutural_vigente_usina` |
 | **Situação** | **pronto do lado da CCEE** — faltam EAR e ENA, que são do ONS |
 

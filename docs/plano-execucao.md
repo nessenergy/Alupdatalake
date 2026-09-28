@@ -1,7 +1,7 @@
 # Plano de Execução — AlupData Fase 1: DataLake
 
 Contrato CPS-01025/2026 · 580h · 19 semanas · 5 ondas
-Linha de base: 2026-08-25 · referências e situação revisadas em 2026-09-24
+Linha de base: 2026-08-25 · referências e situação revisadas em 2026-09-27
 
 Situação de execução, atualizada a cada entrega: [`status.md`](status.md).
 
@@ -57,7 +57,7 @@ Marco 1 — 15,52% · R$ 23.040,00
 | 0.11 | Fechar as **dimensões comuns Silver** contra fontes reais | 6h | 0.9, 0.10 | **Concluído em 14/09** — regra por dimensão em [`arquitetura/visao-geral.md`](arquitetura/visao-geral.md), com as regras D3 a D7 do questionário e **duas lacunas nomeadas**: o de-para de usina (Alup) e o mês CCEE (ness.) |
 | 0.12 | Matriz RACI e data owners por domínio | 4h | **Alup** nomear | RACI publicada; cada fonte com dono nomeado |
 | 0.13 | Provisionar o ambiente GCP `dev`: projeto, APIs, WIF, Artifact Registry, backend do state | 8h → **concluído em 23/09**: bootstrap e primeiro `apply` em `dev`; `hml` com bootstrap | **Alup** criar `dev` primeiro, vincular billing e conceder papéis; **ness.** executar bootstrap (ADR 015). `hml` e `prod` seguem sem bloquear o primeiro apply em `dev` | `terraform apply` limpo; Dataform executado pelo deploy (`make dataform-compile` confere compilação local) |
-| 0.14 | Primeiro deploy real: imagem publicada, job agendado, BCB rodando diariamente | 6h → **em validação**: imagem publicada e 27 jobs em `dev` desde 23/09; BCB com `SUCESSO` desde 24/09 | 0.13 | 3 dias consecutivos com `status = SUCESSO` em `bronze._execucoes` (25 a 27/09) |
+| 0.14 | Primeiro deploy real: imagem publicada, job agendado, BCB rodando diariamente | 6h → **concluído em 26/09**: imagem publicada e 27 jobs em `dev` desde 23/09; BCB com `SUCESSO` em 24, 25 e 26/09, uma execução por dia | 0.13 | 3 dias consecutivos com `status = SUCESSO` em `bronze._execucoes` (25 a 27/09) |
 | 0.15 | Portal MVP com autenticação (escopo mínimo da cláusula 4ª) | 8h → **publicado em `dev` atrás do IAP**, ligado no BigQuery, com o grupo de operação liberado (24/09); falta mostrar uma Gold com dado real | 0.13 | Login funcionando; uma tabela Gold visível. Escopo cravado na ADR 005; roda hoje com provedor simulado |
 | — | **Homologação da Onda 0** | — | tudo acima | Evidências reunidas (ver `homologacao-onda`) |
 
@@ -134,7 +134,7 @@ Marco 3 — 18,97% · R$ 28.160,00 · **Bloqueada por credencial da Alup**
 
 | # | Fonte | Est. | Credencial necessária |
 |---|---|---|---|
-| 2.1 | **CCEE agente credenciado** | 32h ⚠ | Certificado/credencial de agente |
+| 2.1 | **CCEE agente credenciado** | 32h ⚠ | Certificado/credencial de agente. **Sem caminho definido em 27/09**: aguarda a posição da Alup sobre as 32h ([#260](https://github.com/nessenergy/Alupdatalake/issues/260)); se o item sair do escopo, a realocação das horas é decisão de coordenação |
 | 2.2 | **BBCE** | 28h ⚠ | Implementado no PR #131; faltam acesso e host (#23) |
 | 2.3 | **Hubspot** | 20h → **~4h restantes** | Token de API (private app). Os 7 componentes foram escritos contra documentação pública em 2026-08-26, sem acesso real; falta rodar contra a API real e ajustar |
 | 2.4 | **TempoOK** | 18h | Implementado, **dois produtos**: o boletim tem contrato verificado mas acervo só até 26/10/2022 (#129); a **previsão de ENA** (`tempook_ena_prevs`) responde para a data de hoje, verificada em 21/09 — só o caminho de exemplo é conhecido, a Alup vai indicar os demais |
@@ -193,10 +193,10 @@ Marco 5 — 18,10% · R$ 26.880,00
 |---|---|---|---|
 | 4.1 | Motor **S2 Data Intake** (CSV/XLSX): ingestão de planilha sob template | 30h → **motor pronto**; resta declarar os templates | Templates dependem dos exemplos de planilha G3/#142; A4 foi respondido em 11/09. O motor não dependia de nada e foi adiantado em 2026-08-26 — `docs/arquitetura/s2-data-intake.md` |
 | 4.2 | Fontes pendentes que ficaram de ondas anteriores | 20h | — |
-| 4.3 | **Knowledge Catalog**: catálogo e linhagem (ADR 014) | 20h → **lake, zonas e ativos declarados em 23/09** (`infra/modules/catalogo`), com descoberta desligada por custo. Os *aspect types* entraram em 23/09; falta o glossário e o preenchimento das anotações, que dependem de carga | conteúdo do catálogo depende das fontes carregadas |
-| 4.4 | Tabelas Gold consolidadas, sem KPI nesta fase (ADR 012) | 15h | 0.10 (8 domínios) |
+| 4.3 | **Knowledge Catalog**: catálogo e linhagem (ADR 014) | 20h → **lake, zonas e ativos declarados em 23/09** (`infra/modules/catalogo`), com descoberta desligada por custo. Os *aspect types* entraram em 23/09. **Concluído em 26/09**: glossário de negócio com 19 termos (`glossario.tf`) e anotações de domínio, responsável e origem nas 26 Gold de negócio, aplicados em `dev` e `hml` | conteúdo do catálogo depende das fontes carregadas |
+| 4.4 | Tabelas Gold consolidadas, sem KPI nesta fase (ADR 012) | 15h → **primeiro entregável no ar em 27/09**: `gold.indicadores_mensais`, com cinco razões técnicas do setor (numerador e denominador explícitos, sem meta), e a tela `/indicadores` do Portal, em `dev` e `hml`. A leitura "razão técnica não é KPI" depende de aceite por escrito da Alup (adendo da ADR 012); falta o histórico | 0.10 (8 domínios) |
 | 4.5 | Documentação final e dicionário completo | 10h | Todas as fontes |
-| 4.6 | **Handoff técnico**: repasse ao time que vai operar | 10h | 4.5 |
+| 4.6 | **Handoff técnico**: repasse ao time que vai operar | 10h → runbook de incidente escrito em 26/09 (`docs/runbook/incidentes.md`) | 4.5 |
 
 **Sobre 4.1**: o motor de planilha é o único componente que aceita dado
 humano-editado. Ele precisa rejeitar arquivo fora do template com erro claro —

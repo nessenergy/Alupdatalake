@@ -71,11 +71,14 @@ resource "google_bigquery_dataset_iam_member" "ingestao_bronze" {
 # individual. Os grupos são da Alup; com o e-mail vazio (padrão), nada é
 # concedido.
 #
-# As views da Gold leem Silver e Bronze e não são views autorizadas: até isso
-# ser decidido, o grupo de consumidores enxerga a Gold mas a consulta falha por
-# falta de acesso às camadas de baixo. Autorizar exige trocar o IAM aditivo por
-# `google_bigquery_dataset_access`, que o provider diz não conviver com
-# `google_bigquery_dataset_iam_member` no mesmo dataset.
+# `grupo_consumidores` com só a camada `gold` já basta para as 26 tabelas de
+# negócio: a migração para o Dataform (ADR 012) tornou a Gold de negócio
+# `type: "table"`, materializada — não é mais view sobre Silver, e a leitura
+# não depende de acesso a camada nenhuma abaixo dela. Só as três Gold
+# operacionais (`saude_ingestao`, `volumetria_lake`, `custo_consultas`)
+# continuam view sobre `bronze._execucoes`; sem `grupo_operacao`, a consulta
+# nelas falha por falta de acesso à camada de baixo — o que é o esperado,
+# porque são métrica de operação da ness., não dado de negócio da Alup.
 locals {
   camadas_por_grupo = {
     consumidores = { grupo = var.grupo_consumidores, camadas = ["gold"] }

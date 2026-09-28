@@ -24,8 +24,15 @@ gravacao_segredos = ["group:operacao-datalake@ness.com.br"]
 # sem ela a operação não confere versão de secret nem configuração do Dataform.
 leitura_projeto = ["group:operacao-datalake@ness.com.br"]
 
-# Acesso de pessoas (R01 do RIPD): grupos Google da Alup, preenchidos por ela.
-# Vazio não concede nada.
+# Acesso de pessoas (R01 do RIPD): grupo Google da Alup, pedido na issue #261.
+# Vazio não concede nada. Quando o e-mail chegar, descomente as três linhas
+# abaixo, troque as duas ocorrências de <grupo-consumidores>@<dominio-da-alup>
+# pelo e-mail exato que a Alup mandou (as três linhas usam o mesmo endereço:
+# consulta na Gold e login no Portal são o mesmo grupo) — runbook em
+# docs/runbook/portal.md#liberar-o-dado-real-para-a-alup.
 # grupo_consumidores = "<grupo-consumidores>@<dominio-da-alup>"
-# grupo_operacao     = "<grupo-operacao>@<dominio-da-alup>"
 # portal_acesso      = ["group:<grupo-consumidores>@<dominio-da-alup>"]
+#
+# grupo_operacao dá também Bronze e Silver — só se a Alup pedir explicitamente
+# mais que a Gold; não presumir.
+# grupo_operacao     = "<grupo-operacao>@<dominio-da-alup>"

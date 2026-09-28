@@ -1,0 +1,26 @@
+config {
+  type: "table",
+  schema: "gold",
+  tags: ["gold"],
+  dependOnDependencyAssertions: true
+}
+
+-- Gold: afluência (ENA) por bacia e mês. Aditivo 01.
+--
+-- Responde "em qual bacia está chovendo acima ou abaixo da média" — o detalhe
+-- que a ENA por subsistema (armazenamento_e_afluencia_mensal) agrega. Par da
+-- `armazenamento_mensal_bacia`: uma diz quanto tem, esta quanto chega. Sem KPI
+-- (ADR 012).
+
+SELECT
+  periodo_apuracao,
+  bacia,
+  COUNT(*)                            AS dias_com_ena,
+  AVG(ena_bruta_mwmed)                AS ena_bruta_media_mwmed,
+  AVG(ena_bruta_percentual_mlt)       AS ena_bruta_media_percentual_mlt,
+  MIN(ena_bruta_percentual_mlt)       AS ena_bruta_minima_percentual_mlt,
+  MAX(ena_bruta_percentual_mlt)       AS ena_bruta_maxima_percentual_mlt,
+  AVG(ena_armazenavel_mwmed)          AS ena_armazenavel_media_mwmed,
+  AVG(ena_armazenavel_percentual_mlt) AS ena_armazenavel_media_percentual_mlt
+FROM ${ref("silver", "ons_ena_bacia")}
+GROUP BY periodo_apuracao, bacia

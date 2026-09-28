@@ -60,6 +60,20 @@ variable "conectores" {
       cron         = "45 8 * * *"
       ultimos_dias = 30 # janela larga: o ONS revisa dado publicado
     }
+    ons_ena_bacia = {
+      # Aditivo 01. Hidrologia por bacia e reservatório: 10 min entre um e outro.
+      cron         = "55 8 * * *"
+      ultimos_dias = 30
+    }
+    ons_ear_reservatorio = {
+      cron         = "5 9 * * *"
+      ultimos_dias = 30
+    }
+    ons_ena_reservatorio = {
+      # O maior dos quatro: ~55 mil linhas por ano de arquivo.
+      cron         = "15 9 * * *"
+      ultimos_dias = 30
+    }
     aneel_siga = {
       cron         = "0 7 * * 1" # cadastro muda devagar: semanal, segunda
       ultimos_dias = 1           # cadastro completo; a janela não se aplica

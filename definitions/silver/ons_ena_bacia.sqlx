@@ -1,0 +1,38 @@
+config {
+  type: "view",
+  schema: "silver",
+  tags: ["silver"],
+  assertions: {
+    uniqueKey: ["data_referencia", "bacia"],
+    nonNull: ["data_referencia", "bacia"],
+    rowConditions: [
+      "ena_bruta_mwmed >= 0",
+      "ena_armazenavel_mwmed >= 0",
+      // Percentual sobre a média histórica: passa de 100 com cheia (1.048% em 2026).
+      "ena_bruta_percentual_mlt >= 0",
+      "ena_armazenavel_percentual_mlt >= 0"
+    ]
+  }
+}
+
+-- Silver: ENA diária por bacia, higienizada e deduplicada.
+-- Dedup por (data_referencia, bacia): vence a ingestão mais recente.
+SELECT
+  data_referencia,
+  CAST(NULL AS STRING) AS submercado,    -- a origem não traz; bacia pode atravessar subsistemas
+  CAST(NULL AS STRING) AS codigo_usina,  -- ENA é agregada por bacia
+  CAST(NULL AS STRING) AS agente_ccee,   -- idem
+  FORMAT_DATE('%Y-%m', data_referencia) AS periodo_apuracao,
+  CAST(NULL AS STRING) AS periodo_apuracao_ccee,  -- a origem é o ONS
+  bacia,
+  ena_bruta_mwmed,
+  ena_bruta_percentual_mlt,
+  ena_armazenavel_mwmed,
+  ena_armazenavel_percentual_mlt,
+  _ingestao_id,
+  _ingestao_timestamp
+FROM ${ref("bronze", "ons_ena_bacia")}
+QUALIFY ROW_NUMBER() OVER (
+  PARTITION BY data_referencia, bacia
+  ORDER BY _ingestao_timestamp DESC
+) = 1

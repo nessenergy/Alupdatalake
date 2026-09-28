@@ -1,0 +1,30 @@
+config {
+  type: "table",
+  schema: "gold",
+  tags: ["gold"],
+  dependOnDependencyAssertions: true
+}
+
+-- Gold: afluência (ENA) por reservatório e mês. Aditivo 01.
+--
+-- Responde "em qual reservatório a água está chegando acima ou abaixo da
+-- média histórica" — o nível abaixo da bacia. Par da
+-- `armazenamento_mensal_reservatorio`. Sem KPI (ADR 012).
+--
+-- Dias sem medição (ENA nula) não entram nas médias e são contados à parte.
+
+SELECT
+  periodo_apuracao,
+  submercado,
+  bacia,
+  reservatorio,
+  ANY_VALUE(tipo_reservatorio)             AS tipo_reservatorio,
+  COUNT(*)                                 AS dias_no_mes,
+  COUNTIF(ena_bruta_mwmed IS NOT NULL)     AS dias_com_medicao,
+  AVG(ena_bruta_mwmed)                     AS ena_bruta_media_mwmed,
+  AVG(ena_bruta_percentual_mlt)            AS ena_bruta_media_percentual_mlt,
+  MAX(ena_bruta_percentual_mlt)            AS ena_bruta_maxima_percentual_mlt,
+  AVG(ena_armazenavel_mwmed)               AS ena_armazenavel_media_mwmed,
+  ANY_VALUE(mlt_ena_mwmed)                 AS mlt_ena_mwmed
+FROM ${ref("silver", "ons_ena_reservatorio")}
+GROUP BY periodo_apuracao, submercado, bacia, reservatorio

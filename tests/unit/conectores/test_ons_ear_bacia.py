@@ -23,7 +23,7 @@ FIXTURE = Path(__file__).parents[2] / "fixtures" / "ons_ear_bacia_2026.csv"
 
 @pytest.fixture
 def conector(monkeypatch):
-    monkeypatch.setattr("src.conectores.ons_ear_bacia.criar_sessao", lambda: None)
+    monkeypatch.setattr("src.conectores.ons_csv_anual.criar_sessao", lambda: None)
     conector = OnsEarBacia()
     monkeypatch.setattr(conector, "_baixar_ano", lambda _ano: FIXTURE.read_text(encoding="utf-8"))
     return conector

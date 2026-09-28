@@ -87,6 +87,9 @@ DOMINIO_ANALITICO = {
     "ons_carga": "Mercado de Energia",
     "ons_ear": "Mercado de Energia",
     "ons_ear_bacia": "Mercado de Energia",
+    "ons_ena_bacia": "Mercado de Energia",
+    "ons_ear_reservatorio": "Mercado de Energia",
+    "ons_ena_reservatorio": "Mercado de Energia",
     "ons_ena": "Mercado de Energia",
     # Cadastro do mercado: dá nome ao que nas outras fontes é código.
     "ccee_perfil": "Mercado de Energia",

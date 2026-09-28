@@ -1,0 +1,24 @@
+config {
+  type: "operations",
+  schema: "bronze",
+  hasOutput: true,
+  tags: ["bronze"]
+}
+
+-- Bronze: energia natural afluente (ENA) diária por bacia (ONS). Aditivo 01.
+CREATE TABLE IF NOT EXISTS ${self()} (
+  data_referencia                 DATE      NOT NULL OPTIONS(description="Dia de referência da ENA"),
+  bacia                           STRING    NOT NULL OPTIONS(description="Nome da bacia (nom_bacia da origem), em maiúsculas"),
+  ena_bruta_mwmed                 NUMERIC   NOT NULL OPTIONS(description="ENA bruta, em MWmed"),
+  ena_bruta_percentual_mlt        NUMERIC   NOT NULL OPTIONS(description="ENA bruta como % da média de longo termo; passa de 100"),
+  ena_armazenavel_mwmed           NUMERIC   NOT NULL OPTIONS(description="ENA armazenável, em MWmed"),
+  ena_armazenavel_percentual_mlt  NUMERIC   NOT NULL OPTIONS(description="ENA armazenável como % da MLT; passa de 100"),
+
+  _ingestao_id        STRING    NOT NULL,
+  _ingestao_timestamp TIMESTAMP NOT NULL,
+  _fonte              STRING    NOT NULL,
+  _schema_versao      STRING    NOT NULL
+)
+PARTITION BY DATE(_ingestao_timestamp)
+CLUSTER BY data_referencia, bacia
+OPTIONS(description="ENA diária por bacia — camada Bronze, append-only");

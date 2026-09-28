@@ -1,0 +1,32 @@
+config {
+  type: "operations",
+  schema: "bronze",
+  hasOutput: true,
+  tags: ["bronze"]
+}
+
+-- Bronze: energia natural afluente (ENA) diária por reservatório (ONS). Aditivo 01.
+-- Campos de ENA anuláveis: sem medição, a origem vem vazia.
+CREATE TABLE IF NOT EXISTS ${self()} (
+  data_referencia                   DATE      NOT NULL OPTIONS(description="Dia de referência da ENA"),
+  reservatorio                      STRING    NOT NULL OPTIONS(description="Nome do reservatório (nom_reservatorio)"),
+  codigo_reservatorio_planejamento  STRING,
+  tipo_reservatorio                 STRING             OPTIONS(description="Reservatório com usina, fio d'água"),
+  bacia                             STRING,
+  ree                               STRING             OPTIONS(description="Reservatório Equivalente de Energia"),
+  submercado                        STRING    NOT NULL OPTIONS(description="N, NE, S, SE"),
+  ena_bruta_mwmed                   NUMERIC            OPTIONS(description="ENA bruta, MWmed"),
+  ena_bruta_percentual_mlt          NUMERIC            OPTIONS(description="ENA bruta como % da MLT; passa de 100"),
+  ena_armazenavel_mwmed             NUMERIC            OPTIONS(description="ENA armazenável, MWmed"),
+  ena_armazenavel_percentual_mlt    NUMERIC            OPTIONS(description="ENA armazenável como % da MLT"),
+  ena_queda_bruta_mwmed             NUMERIC            OPTIONS(description="ENA pela queda bruta, MWmed"),
+  mlt_ena_mwmed                     NUMERIC            OPTIONS(description="Média de longo termo da ENA do reservatório, MWmed"),
+
+  _ingestao_id        STRING    NOT NULL,
+  _ingestao_timestamp TIMESTAMP NOT NULL,
+  _fonte              STRING    NOT NULL,
+  _schema_versao      STRING    NOT NULL
+)
+PARTITION BY DATE(_ingestao_timestamp)
+CLUSTER BY data_referencia, submercado, reservatorio
+OPTIONS(description="ENA diária por reservatório — camada Bronze, append-only");

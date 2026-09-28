@@ -150,9 +150,13 @@ componentes estão entregues e a carga roda em `dev`.
 
 | # | Conjunto | Estimado | Apontado | Entregue em | PR |
 |---|---|---|---|---|---|
-| — | — | — | — | — | — |
+| 7 | `ear-diario-por-bacia` | 4 | 4 | 28/09/2026 | [#295](https://github.com/nessenergy/Alupdatalake/pull/295) |
 
-**Apontado até agora: 0h de 168h.**
+**Apontado até agora: 4h de 168h.**
+
+Evidência do item 7: carga em `dev` de 28/09, 14.976 linhas de 01/09/2024 a
+27/09/2026, 23 bacias, zero inválidas; `gold.armazenamento_mensal_bacia`
+recalculada pelo Dataform.
 
 ## 6. Fora desta estimativa
 

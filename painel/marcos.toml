@@ -265,8 +265,8 @@ nota = "lake, zonas, ativos, aspect types, glossário (19 termos) e anotações 
 codigo = "4.4"
 titulo = "Gold consolidadas"
 horas = 15
-pronto = 0.3
-nota = "indicadores_mensais e a tela /indicadores escritos; aceite da leitura da ADR 012 pendente"
+pronto = 0.5
+nota = "indicadores_mensais e /indicadores no ar em dev e hml; faltam o histórico e o aceite da leitura da ADR 012"
 
 [[onda.item]]
 codigo = "4.5"

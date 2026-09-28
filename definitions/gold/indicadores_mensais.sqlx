@@ -8,7 +8,7 @@ config {
     nonNull: ["periodo_apuracao", "indicador", "numerador", "denominador"],
     rowConditions: [
       "denominador > 0",
-      "unidade_valor != 'fração' OR valor BETWEEN 0 AND 1"
+      "unidade_valor != 'fração' OR valor BETWEEN 0 AND 1 OR (indicador = 'fator_capacidade' AND valor BETWEEN 0 AND 1.05)"
     ]
   }
 }
@@ -57,6 +57,9 @@ disponibilidade AS (
 -- Agregado por submercado × tipo, não usina a usina: eólica e solar trazem CEG
 -- em só 7% das linhas (o ONS publica por conjunto). A potência é a vigente;
 -- mês antigo usa a capacidade de hoje, e a coluna de unidade diz isso.
+-- Pode passar levemente de 1: medido em 08/2026, a nuclear do SE deu 1,008,
+-- porque Angra gerou um pouco acima da potência efetiva cadastrada (1.990 MW).
+-- É dado real; a asserção admite até 1,05 só neste indicador.
 capacidade AS (
   SELECT submercado, tipo_usina, SUM(potencia_efetiva_total) AS potencia_mw
   FROM ${ref("gold", "capacidade_instalada_vigente_usina")}
@@ -95,15 +98,17 @@ armazenamento AS (
   WHERE ear_media_percentual > 0
 ),
 
--- IPCA em % ao mês. Índice encadeado; o mês-base é o último com IPCA.
+-- IPCA em % ao mês. Índice encadeado; o mês-base é o último com IPCA. A coluna
+-- não se chama `indice`: dentro da CTE de mesmo nome, o BigQuery resolveria o
+-- nome para a linha inteira (STRUCT), e a divisão quebra.
 indice AS (
   SELECT
     periodo_apuracao,
-    EXP(SUM(LN(1 + ipca_mes / 100)) OVER (ORDER BY periodo_apuracao)) AS indice
+    EXP(SUM(LN(1 + ipca_mes / 100)) OVER (ORDER BY periodo_apuracao)) AS indice_acumulado
   FROM ${ref("gold", "inflacao_mensal")}
 ),
 base AS (
-  SELECT periodo_apuracao AS mes_base, indice AS indice_base
+  SELECT periodo_apuracao AS mes_base, indice_acumulado AS indice_base
   FROM indice
   QUALIFY ROW_NUMBER() OVER (ORDER BY periodo_apuracao DESC) = 1
 ),
@@ -115,7 +120,7 @@ pld_real AS (
     CAST(NULL AS STRING) AS fonte,
     p.pld_medio_reais_mwh AS numerador,
     'PLD médio nominal (R$/MWh)' AS unidade_numerador,
-    i.indice / b.indice_base AS denominador,
+    i.indice_acumulado / b.indice_base AS denominador,
     'fator de inflação até o mês-base (IPCA)' AS unidade_denominador,
     CONCAT('R$/MWh de ', b.mes_base) AS unidade_valor,
     1 AS itens_na_base

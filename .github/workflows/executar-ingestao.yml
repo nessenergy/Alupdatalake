@@ -123,10 +123,15 @@ jobs:
               echo "- Execução: \`$execucao\`" >> "$GITHUB_STEP_SUMMARY"
               echo "" >> "$GITHUB_STEP_SUMMARY"
               echo '```' >> "$GITHUB_STEP_SUMMARY"
+              # `tee -a`, não `>>`: sem isso o log só aparece no step summary,
+              # que a API do GitHub não expõe — `gh run view --log` fica cego
+              # ao mesmo erro que este passo existe para mostrar.
+              echo "::group::Log do contêiner ($execucao)"
               gcloud logging read \
                 "resource.type=\"cloud_run_job\" AND resource.labels.job_name=\"$JOB\" AND labels.\"run.googleapis.com/execution_name\"=\"$execucao\"" \
                 --project "$PROJETO" --format="value(timestamp,severity,textPayload)" --order=asc --limit=500 \
-                >> "$GITHUB_STEP_SUMMARY" || echo "(log não encontrado ou sem permissão de leitura)" >> "$GITHUB_STEP_SUMMARY"
+                2>&1 | tee -a "$GITHUB_STEP_SUMMARY" || echo "(log não encontrado ou sem permissão de leitura)" | tee -a "$GITHUB_STEP_SUMMARY"
+              echo "::endgroup::"
               echo '```' >> "$GITHUB_STEP_SUMMARY"
             fi
             exit "$status"

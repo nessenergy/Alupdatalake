@@ -1,0 +1,25 @@
+config {
+  type: "table",
+  schema: "gold",
+  tags: ["gold"],
+  dependOnDependencyAssertions: true
+}
+
+-- Gold: CVU das térmicas por mês e usina. Aditivo 01.
+--
+-- Responde "quanto custa gerar em cada térmica, na conta que o ONS usa para a
+-- ordem de despacho". O mês é o da semana operativa (início). Complementa o
+-- CVU estrutural da CCEE (`cvu_estrutural_vigente_usina`), que é o de
+-- contrato. Sem KPI (ADR 012).
+
+SELECT
+  periodo_apuracao,
+  submercado,
+  codigo_usina_planejamento,
+  ANY_VALUE(usina)    AS usina,
+  COUNT(*)            AS semanas,
+  AVG(cvu_reais_mwh)  AS cvu_medio_reais_mwh,
+  MIN(cvu_reais_mwh)  AS cvu_minimo_reais_mwh,
+  MAX(cvu_reais_mwh)  AS cvu_maximo_reais_mwh
+FROM ${ref("silver", "ons_cvu_termica")}
+GROUP BY periodo_apuracao, submercado, codigo_usina_planejamento

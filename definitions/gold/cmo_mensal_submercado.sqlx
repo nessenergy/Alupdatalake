@@ -1,0 +1,22 @@
+config {
+  type: "table",
+  schema: "gold",
+  tags: ["gold"],
+  dependOnDependencyAssertions: true
+}
+
+-- Gold: CMO por mês e submercado. Aditivo 01.
+--
+-- Responde "quanto custou, na margem, produzir energia em cada região" — a
+-- base do PLD. Lado a lado com `pld_mensal_submercado`, mostra quando o preço
+-- de liquidação se afasta do custo marginal. Sem KPI (ADR 012).
+
+SELECT
+  periodo_apuracao,
+  submercado,
+  COUNT(*)            AS meias_horas,
+  AVG(cmo_reais_mwh)  AS cmo_medio_reais_mwh,
+  MIN(cmo_reais_mwh)  AS cmo_minimo_reais_mwh,
+  MAX(cmo_reais_mwh)  AS cmo_maximo_reais_mwh
+FROM ${ref("silver", "ons_cmo_semi_horario")}
+GROUP BY periodo_apuracao, submercado

@@ -1,0 +1,39 @@
+config {
+  type: "view",
+  schema: "silver",
+  tags: ["silver"],
+  assertions: {
+    uniqueKey: ["data_referencia", "codigo_usina_planejamento"],
+    nonNull: ["data_referencia", "codigo_usina_planejamento", "submercado"],
+    rowConditions: [
+      "submercado IN ('N','NE','S','SE')",
+      "cvu_reais_mwh >= 0",
+      "fim_semana >= data_referencia"
+    ]
+  }
+}
+
+-- Silver: CVU semanal das usinas térmicas, higienizada e deduplicada. Aditivo 01.
+-- Dedup por (semana, usina): a origem publica linhas idênticas em dobro (38 em 2026), e cada revisão do PMO é uma semana diferente.
+SELECT
+  data_referencia,
+  submercado,
+  CAST(NULL AS STRING) AS codigo_usina,  -- sem CEG na origem
+  CAST(NULL AS STRING) AS agente_ccee,   -- o ONS não usa perfil da CCEE
+  FORMAT_DATE('%Y-%m', data_referencia) AS periodo_apuracao,
+  CAST(NULL AS STRING) AS periodo_apuracao_ccee,  -- a origem é o ONS
+  fim_semana,
+  ano_referencia,
+  mes_referencia,
+  revisao,
+  semana_operativa,
+  codigo_usina_planejamento,
+  usina,
+  cvu_reais_mwh,
+  _ingestao_id,
+  _ingestao_timestamp
+FROM ${ref("bronze", "ons_cvu_termica")}
+QUALIFY ROW_NUMBER() OVER (
+  PARTITION BY data_referencia, codigo_usina_planejamento
+  ORDER BY _ingestao_timestamp DESC
+) = 1

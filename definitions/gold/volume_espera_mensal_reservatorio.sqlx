@@ -1,0 +1,25 @@
+config {
+  type: "table",
+  schema: "gold",
+  tags: ["gold"],
+  dependOnDependencyAssertions: true
+}
+
+-- Gold: volume de espera recomendado por mês e reservatório. Aditivo 01.
+--
+-- Responde "quanto do reservatório o ONS mandou deixar vazio para amortecer
+-- cheia" — o limite que restringe o armazenamento, e com ele a EAR. Lê junto
+-- com `armazenamento_mensal_reservatorio`. Sem KPI (ADR 012).
+
+SELECT
+  periodo_apuracao,
+  submercado,
+  bacia,
+  codigo_reservatorio,
+  ANY_VALUE(reservatorio)            AS reservatorio,
+  COUNT(*)                           AS dias,
+  MIN(volume_espera_percentual)      AS volume_espera_minimo_percentual,
+  AVG(volume_espera_percentual)      AS volume_espera_medio_percentual,
+  MAX(volume_espera_percentual)      AS volume_espera_maximo_percentual
+FROM ${ref("silver", "ons_volume_espera")}
+GROUP BY periodo_apuracao, submercado, bacia, codigo_reservatorio

@@ -1,0 +1,4 @@
+id_subsistema;nom_subsistema;tip_reservatorio;nom_bacia;nom_ree;id_reservatorio;nom_reservatorio;num_ordemcs;cod_usina;din_instante;val_volumeespera
+NE;Nordeste;RCU;PARNAIBA       ;NORDESTE            ;PIBESP;BOA ESPERANÇA;110;190;2026-03-04;64.9
+NE;Nordeste;RCU;SAO FRANCISCO  ;NORDESTE            ;SFSOBR;SOBRADINHO;180;169;2026-03-04;83.5
+SE;Sudeste/Centro-Oeste;FIC;PARANA         ;PARANA              ;PNTIRM;ILHA + T. IRMÃOS;;44;2026-03-04;90.0

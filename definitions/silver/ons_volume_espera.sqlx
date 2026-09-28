@@ -1,0 +1,38 @@
+config {
+  type: "view",
+  schema: "silver",
+  tags: ["silver"],
+  assertions: {
+    uniqueKey: ["data_referencia", "codigo_reservatorio"],
+    nonNull: ["data_referencia", "codigo_reservatorio", "submercado"],
+    rowConditions: [
+      "submercado IN ('N','NE','S','SE')",
+      "volume_espera_percentual BETWEEN 0 AND 100"
+    ]
+  }
+}
+
+-- Silver: Volume de espera recomendado por reservatório, higienizada e deduplicada. Aditivo 01.
+-- Dedup por (data, reservatório): vence a ingestão mais recente.
+SELECT
+  data_referencia,
+  submercado,
+  CAST(NULL AS STRING) AS codigo_usina,  -- sem CEG na origem
+  CAST(NULL AS STRING) AS agente_ccee,   -- o ONS não usa perfil da CCEE
+  FORMAT_DATE('%Y-%m', data_referencia) AS periodo_apuracao,
+  CAST(NULL AS STRING) AS periodo_apuracao_ccee,  -- a origem é o ONS
+  tipo_reservatorio,
+  bacia,
+  ree,
+  codigo_reservatorio,
+  reservatorio,
+  ordem_cascata,
+  codigo_usina_ons,
+  volume_espera_percentual,
+  _ingestao_id,
+  _ingestao_timestamp
+FROM ${ref("bronze", "ons_volume_espera")}
+QUALIFY ROW_NUMBER() OVER (
+  PARTITION BY data_referencia, codigo_reservatorio
+  ORDER BY _ingestao_timestamp DESC
+) = 1

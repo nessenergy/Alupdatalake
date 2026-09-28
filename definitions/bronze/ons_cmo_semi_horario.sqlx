@@ -1,0 +1,22 @@
+config {
+  type: "operations",
+  schema: "bronze",
+  hasOutput: true,
+  tags: ["bronze"]
+}
+
+-- Bronze: CMO semi-horário por subsistema (ONS). Aditivo 01.
+CREATE TABLE IF NOT EXISTS ${self()} (
+  data_referencia               DATE       NOT NULL OPTIONS(description="Dia do instante"),
+  instante                      DATETIME   NOT NULL OPTIONS(description="Meia hora de referência (minuto 00 ou 30)"),
+  submercado                    STRING     NOT NULL OPTIONS(description="N, NE, S, SE"),
+  cmo_reais_mwh                 NUMERIC    NOT NULL OPTIONS(description="Custo Marginal de Operação, R$/MWh"),
+
+  _ingestao_id        STRING    NOT NULL,
+  _ingestao_timestamp TIMESTAMP NOT NULL,
+  _fonte              STRING    NOT NULL,
+  _schema_versao      STRING    NOT NULL
+)
+PARTITION BY DATE(_ingestao_timestamp)
+CLUSTER BY data_referencia, submercado
+OPTIONS(description="CMO semi-horário por subsistema — camada Bronze, append-only");

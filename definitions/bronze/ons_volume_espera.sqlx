@@ -1,0 +1,28 @@
+config {
+  type: "operations",
+  schema: "bronze",
+  hasOutput: true,
+  tags: ["bronze"]
+}
+
+-- Bronze: Volume de espera recomendado por reservatório (ONS). Aditivo 01.
+CREATE TABLE IF NOT EXISTS ${self()} (
+  data_referencia               DATE       NOT NULL OPTIONS(description="Dia de referência"),
+  submercado                    STRING     NOT NULL OPTIONS(description="N, NE, S, SE"),
+  tipo_reservatorio             STRING     OPTIONS(description="Sigla do tipo (RCU, FIC...)"),
+  bacia                         STRING    ,
+  ree                           STRING     OPTIONS(description="Reservatório Equivalente de Energia"),
+  codigo_reservatorio           STRING     NOT NULL OPTIONS(description="id_reservatorio da origem"),
+  reservatorio                  STRING     NOT NULL,
+  ordem_cascata                 INT64      OPTIONS(description="num_ordemcs; vazio em parte das linhas"),
+  codigo_usina_ons              STRING     OPTIONS(description="cod_usina"),
+  volume_espera_percentual      NUMERIC    NOT NULL OPTIONS(description="% do volume útil, 0 a 100"),
+
+  _ingestao_id        STRING    NOT NULL,
+  _ingestao_timestamp TIMESTAMP NOT NULL,
+  _fonte              STRING    NOT NULL,
+  _schema_versao      STRING    NOT NULL
+)
+PARTITION BY DATE(_ingestao_timestamp)
+CLUSTER BY data_referencia, codigo_reservatorio
+OPTIONS(description="Volume de espera recomendado por reservatório — camada Bronze, append-only");

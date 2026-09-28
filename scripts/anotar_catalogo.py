@@ -41,6 +41,7 @@ INTELIGENCIA = "Taina Mota · Inteligência de Mercado"
 TRADING = "Gabriel Barreto · Trading"
 PORTFOLIO = "Letícia Ferreira · Gestão de Portfólio e Back-Office"
 COMERCIAL = "Tahigo Santos · Comercial"
+PLANEJAMENTO = "gestores da Comercialização: Letícia Ferreira, Tahigo Santos e Taina Mota"
 
 ANOTACOES: dict[str, dict[str, str]] = {
     # 1 · Mercado de Energia
@@ -77,6 +78,8 @@ ANOTACOES: dict[str, dict[str, str]] = {
     "cambio_mensal": {"dominio": "economico", "responsavel": PORTFOLIO},
     "juros_mensal": {"dominio": "economico", "responsavel": PORTFOLIO},
     "inflacao_mensal": {"dominio": "economico", "responsavel": PORTFOLIO},
+    # 8 · Planejamento — razões técnicas que atravessam domínios (ADR 012, adendo de 27/09)
+    "indicadores_mensais": {"dominio": "planejamento", "responsavel": PLANEJAMENTO},
 }
 
 # Gold de operação da plataforma, não de negócio: fica fora dos domínios do B1.

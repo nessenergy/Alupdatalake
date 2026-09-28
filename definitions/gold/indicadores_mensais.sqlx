@@ -1,0 +1,147 @@
+config {
+  type: "table",
+  schema: "gold",
+  tags: ["gold"],
+  dependOnDependencyAssertions: true,
+  assertions: {
+    uniqueKey: ["periodo_apuracao", "indicador", "submercado", "fonte"],
+    nonNull: ["periodo_apuracao", "indicador", "numerador", "denominador"],
+    rowConditions: [
+      "denominador > 0",
+      "unidade_valor != 'fração' OR valor BETWEEN 0 AND 1"
+    ]
+  }
+}
+
+-- Gold: razões técnicas do setor, com numerador e denominador explícitos.
+--
+-- Única Gold que divide uma série por outra (ADR 012, adendo de 27/09). São
+-- razões de definição física ou regulatória, sem meta nem fórmula de negócio
+-- da Alup; indicador com meta é Fase 2. Formato longo: indicador novo não muda
+-- o schema e a tela do Portal lê tudo do mesmo jeito.
+
+WITH
+corte AS (
+  SELECT
+    periodo_apuracao,
+    'taxa_corte_renovavel' AS indicador,
+    submercado,
+    tecnologia AS fonte,
+    SUM(soma_nao_gerado_mw_meia_hora) AS numerador,
+    'não gerado (MW por meia hora)' AS unidade_numerador,
+    SUM(soma_gerado_mw_meia_hora) + SUM(soma_nao_gerado_mw_meia_hora) AS denominador,
+    'potencial: gerado + não gerado (MW por meia hora)' AS unidade_denominador,
+    'fração' AS unidade_valor,
+    COUNT(*) AS itens_na_base
+  FROM ${ref("gold", "restricao_coff_mensal_usina")}
+  GROUP BY periodo_apuracao, submercado, tecnologia
+),
+
+disponibilidade AS (
+  SELECT
+    periodo_apuracao,
+    'disponibilidade' AS indicador,
+    submercado,
+    tipo_usina AS fonte,
+    SUM(disponibilidade_media_mw) AS numerador,
+    'disponibilidade média (MW)' AS unidade_numerador,
+    SUM(potencia_instalada_mw) AS denominador,
+    'potência instalada (MW)' AS unidade_denominador,
+    'fração' AS unidade_valor,
+    COUNT(*) AS itens_na_base
+  FROM ${ref("gold", "disponibilidade_mensal_usina")}
+  WHERE disponibilidade_media_mw IS NOT NULL AND potencia_instalada_mw > 0
+  GROUP BY periodo_apuracao, submercado, tipo_usina
+),
+
+-- Agregado por submercado × tipo, não usina a usina: eólica e solar trazem CEG
+-- em só 7% das linhas (o ONS publica por conjunto). A potência é a vigente;
+-- mês antigo usa a capacidade de hoje, e a coluna de unidade diz isso.
+capacidade AS (
+  SELECT submercado, tipo_usina, SUM(potencia_efetiva_total) AS potencia_mw
+  FROM ${ref("gold", "capacidade_instalada_vigente_usina")}
+  GROUP BY submercado, tipo_usina
+),
+fator AS (
+  SELECT
+    g.periodo_apuracao,
+    'fator_capacidade' AS indicador,
+    g.submercado,
+    g.tipo_usina AS fonte,
+    SUM(g.geracao_mw_media_horaria) AS numerador,
+    'geração média (MW médio)' AS unidade_numerador,
+    ANY_VALUE(c.potencia_mw) AS denominador,
+    'potência efetiva vigente (MW)' AS unidade_denominador,
+    'fração' AS unidade_valor,
+    COUNT(*) AS itens_na_base
+  FROM ${ref("gold", "geracao_mensal_usina_ons")} AS g
+  JOIN capacidade AS c USING (submercado, tipo_usina)
+  GROUP BY g.periodo_apuracao, g.submercado, g.tipo_usina
+),
+
+armazenamento AS (
+  SELECT
+    periodo_apuracao,
+    'armazenamento' AS indicador,
+    submercado,
+    CAST(NULL AS STRING) AS fonte,
+    ear_media_mwmes AS numerador,
+    'energia armazenada média (MWmês)' AS unidade_numerador,
+    ear_media_mwmes / (ear_media_percentual / 100) AS denominador,
+    'capacidade de armazenamento (MWmês)' AS unidade_denominador,
+    'fração' AS unidade_valor,
+    1 AS itens_na_base
+  FROM ${ref("gold", "armazenamento_e_afluencia_mensal")}
+  WHERE ear_media_percentual > 0
+),
+
+-- IPCA em % ao mês. Índice encadeado; o mês-base é o último com IPCA.
+indice AS (
+  SELECT
+    periodo_apuracao,
+    EXP(SUM(LN(1 + ipca_mes / 100)) OVER (ORDER BY periodo_apuracao)) AS indice
+  FROM ${ref("gold", "inflacao_mensal")}
+),
+base AS (
+  SELECT periodo_apuracao AS mes_base, indice AS indice_base
+  FROM indice
+  QUALIFY ROW_NUMBER() OVER (ORDER BY periodo_apuracao DESC) = 1
+),
+pld_real AS (
+  SELECT
+    p.periodo_apuracao,
+    'pld_real' AS indicador,
+    p.submercado,
+    CAST(NULL AS STRING) AS fonte,
+    p.pld_medio_reais_mwh AS numerador,
+    'PLD médio nominal (R$/MWh)' AS unidade_numerador,
+    i.indice / b.indice_base AS denominador,
+    'fator de inflação até o mês-base (IPCA)' AS unidade_denominador,
+    CONCAT('R$/MWh de ', b.mes_base) AS unidade_valor,
+    1 AS itens_na_base
+  FROM ${ref("gold", "pld_mensal_submercado")} AS p
+  JOIN indice AS i USING (periodo_apuracao)
+  CROSS JOIN base AS b
+),
+
+unido AS (
+  SELECT * FROM corte
+  UNION ALL SELECT * FROM disponibilidade
+  UNION ALL SELECT * FROM fator
+  UNION ALL SELECT * FROM armazenamento
+  UNION ALL SELECT * FROM pld_real
+)
+
+SELECT
+  periodo_apuracao,
+  indicador,
+  submercado,
+  fonte,
+  numerador,
+  unidade_numerador,
+  denominador,
+  unidade_denominador,
+  SAFE_DIVIDE(numerador, denominador) AS valor,
+  unidade_valor,
+  itens_na_base
+FROM unido

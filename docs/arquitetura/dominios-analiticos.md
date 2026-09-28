@@ -225,7 +225,7 @@ não como conversão obrigatória, até que alguém peça.
 | **Fontes a conectar** | **RM/TOTVS** (C7, forma de integração pendente até 25/09) · planilhas pelo **S2 Data Intake** (Onda 4) |
 | **Granularidade** | a definir com os donos |
 | **Cadência** | mensal |
-| **Gold hoje** | — |
+| **Gold hoje** | `indicadores_mensais` — razões técnicas do setor que atravessam domínios, sem meta (ADR 012, adendo de 27/09) |
 | **Situação** | **não iniciado** — é o último em prontidão e o de dono mais distribuído |
 
 É o único domínio com três donos ao mesmo tempo (os gestores da

@@ -35,6 +35,11 @@ corte AS (
     COUNT(*) AS itens_na_base
   FROM ${ref("gold", "restricao_coff_mensal_usina")}
   GROUP BY periodo_apuracao, submercado, tecnologia
+  -- Meses em que a origem não publicava geracao_nao_realizada_mw ficam de
+  -- fora: NULL aqui é "campo ausente na origem" (confirmado em 09-12/2024,
+  -- fotovoltaica), não "sem restrição". Mostrar 0 ou o mês inteiro em
+  -- branco seria inventar leitura sobre um dado que não existe.
+  HAVING SUM(soma_nao_gerado_mw_meia_hora) IS NOT NULL AND SUM(soma_gerado_mw_meia_hora) IS NOT NULL
 ),
 
 disponibilidade AS (

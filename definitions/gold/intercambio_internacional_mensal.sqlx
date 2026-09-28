@@ -1,0 +1,24 @@
+config {
+  type: "table",
+  schema: "gold",
+  tags: ["gold"],
+  dependOnDependencyAssertions: true
+}
+
+-- Gold: intercâmbio do SIN com outros países por mês e país. Aditivo 01.
+--
+-- Responde "o Brasil está exportando ou importando, e quanto". O sinal na
+-- origem é o sentido; aqui ele vira duas colunas, para a média de um mês com
+-- exportação e importação não se anular em zero.
+
+SELECT
+  periodo_apuracao,
+  pais,
+  COUNT(*)                                         AS horas,
+  COUNTIF(intercambio_mwmed > 0)                   AS horas_exportando,
+  COUNTIF(intercambio_mwmed < 0)                   AS horas_importando,
+  AVG(intercambio_mwmed)                           AS intercambio_liquido_medio_mwmed,
+  AVG(GREATEST(intercambio_mwmed, 0))              AS exportacao_media_mwmed,
+  AVG(GREATEST(-intercambio_mwmed, 0))             AS importacao_media_mwmed
+FROM ${ref("silver", "ons_intercambio_internacional")}
+GROUP BY periodo_apuracao, pais

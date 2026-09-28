@@ -90,6 +90,10 @@ DOMINIO_ANALITICO = {
     "ons_ena_bacia": "Mercado de Energia",
     "ons_ear_reservatorio": "Mercado de Energia",
     "ons_ena_reservatorio": "Mercado de Energia",
+    "ons_intercambio_nacional": "Mercado de Energia",
+    "ons_intercambio_internacional": "Mercado de Energia",
+    "ons_geracao_exportacao": "Mercado de Energia",
+    "ons_balanco_energia": "Mercado de Energia",
     "ons_ena": "Mercado de Energia",
     # Cadastro do mercado: dá nome ao que nas outras fontes é código.
     "ccee_perfil": "Mercado de Energia",

@@ -74,6 +74,23 @@ variable "conectores" {
       cron         = "15 9 * * *"
       ultimos_dias = 30
     }
+    ons_intercambio_nacional = {
+      # Aditivo 01. Horários, um CSV por ano: 10 min entre um e outro.
+      cron         = "25 9 * * *"
+      ultimos_dias = 30
+    }
+    ons_intercambio_internacional = {
+      cron         = "35 9 * * *"
+      ultimos_dias = 30
+    }
+    ons_geracao_exportacao = {
+      cron         = "45 9 * * *"
+      ultimos_dias = 30
+    }
+    ons_balanco_energia = {
+      cron         = "55 9 * * *"
+      ultimos_dias = 30
+    }
     aneel_siga = {
       cron         = "0 7 * * 1" # cadastro muda devagar: semanal, segunda
       ultimos_dias = 1           # cadastro completo; a janela não se aplica

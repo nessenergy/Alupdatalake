@@ -58,6 +58,10 @@ ANOTACOES: dict[str, dict[str, str]] = {
     "afluencia_mensal_bacia": {"dominio": "mercado_de_energia", "responsavel": INTELIGENCIA},  # Aditivo 01
     "armazenamento_mensal_reservatorio": {"dominio": "mercado_de_energia", "responsavel": INTELIGENCIA},  # Aditivo 01
     "afluencia_mensal_reservatorio": {"dominio": "mercado_de_energia", "responsavel": INTELIGENCIA},  # Aditivo 01
+    "intercambio_mensal_subsistemas": {"dominio": "mercado_de_energia", "responsavel": INTELIGENCIA},  # Aditivo 01
+    "intercambio_internacional_mensal": {"dominio": "mercado_de_energia", "responsavel": INTELIGENCIA},  # Aditivo 01
+    "exportacao_mensal": {"dominio": "mercado_de_energia", "responsavel": INTELIGENCIA},  # Aditivo 01
+    "balanco_energia_mensal_subsistema": {"dominio": "mercado_de_energia", "responsavel": INTELIGENCIA},  # Aditivo 01
     # 2 · Geração e Operacional — usinas do SIN, dado público
     "parque_gerador": {"dominio": "geracao_e_operacional", "responsavel": INTELIGENCIA},
     "geracao_mensal_usina": {"dominio": "geracao_e_operacional", "responsavel": INTELIGENCIA},

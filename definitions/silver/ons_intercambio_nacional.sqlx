@@ -1,0 +1,36 @@
+config {
+  type: "view",
+  schema: "silver",
+  tags: ["silver"],
+  assertions: {
+    uniqueKey: ["instante", "subsistema_origem", "subsistema_destino"],
+    nonNull: ["data_referencia", "instante", "subsistema_origem", "subsistema_destino"],
+    rowConditions: [
+      "subsistema_origem IN ('N','NE','S','SE')",
+      "subsistema_destino IN ('N','NE','S','SE')"
+    ]
+  }
+}
+
+-- Silver: Intercâmbio horário entre subsistemas, higienizada e deduplicada. Aditivo 01.
+-- Dedup pela chave natural, vence a ingestão mais recente (o ONS revisa dado publicado).
+SELECT
+  data_referencia,
+  CAST(NULL AS STRING) AS submercado,  -- o fluxo liga dois submercados: origem e destino têm coluna própria
+  CAST(NULL AS STRING) AS codigo_usina,  -- dado agregado, sem usina
+  CAST(NULL AS STRING) AS agente_ccee,   -- o ONS não usa perfil da CCEE
+  FORMAT_DATE('%Y-%m', data_referencia) AS periodo_apuracao,
+  CAST(NULL AS STRING) AS periodo_apuracao_ccee,  -- a origem é o ONS
+  EXTRACT(HOUR FROM instante) AS hora,
+  instante,
+  subsistema_origem,
+  subsistema_destino,
+  intercambio_mwmed,
+  intercambio_programado_mwmed,
+  _ingestao_id,
+  _ingestao_timestamp
+FROM ${ref("bronze", "ons_intercambio_nacional")}
+QUALIFY ROW_NUMBER() OVER (
+  PARTITION BY instante, subsistema_origem, subsistema_destino
+  ORDER BY _ingestao_timestamp DESC
+) = 1

@@ -1,0 +1,27 @@
+config {
+  type: "table",
+  schema: "gold",
+  tags: ["gold"],
+  dependOnDependencyAssertions: true
+}
+
+-- Gold: balanço de energia por mês e subsistema. Aditivo 01.
+--
+-- Responde "de onde veio a energia de cada região no mês — água, térmica,
+-- vento ou sol — e quanto ela consumiu e trocou". Inclui a linha SIN (total
+-- do sistema), que a origem já publica. Sem KPI (ADR 012): as médias por
+-- fonte, sem participação percentual calculada.
+
+SELECT
+  periodo_apuracao,
+  subsistema,
+  submercado,
+  COUNT(*)                      AS horas,
+  AVG(geracao_hidraulica_mwmed) AS geracao_hidraulica_media_mwmed,
+  AVG(geracao_termica_mwmed)    AS geracao_termica_media_mwmed,
+  AVG(geracao_eolica_mwmed)     AS geracao_eolica_media_mwmed,
+  AVG(geracao_solar_mwmed)      AS geracao_solar_media_mwmed,
+  AVG(carga_mwmed)              AS carga_media_mwmed,
+  AVG(intercambio_mwmed)        AS intercambio_liquido_medio_mwmed
+FROM ${ref("silver", "ons_balanco_energia")}
+GROUP BY periodo_apuracao, subsistema, submercado

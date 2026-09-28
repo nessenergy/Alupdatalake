@@ -52,6 +52,11 @@ def submercado(valor: str | None) -> str | None:
     return sigla
 
 
+def instante(texto: str) -> str:
+    """`din_instante` da origem (`AAAA-MM-DD HH:MM:SS`) no formato ISO que o Pydantic lê."""
+    return texto.strip().replace(" ", "T")
+
+
 class OnsCsvAnual(Conector):
     """Um CSV por ano, recortado pela janela na extração.
 

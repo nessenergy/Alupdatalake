@@ -20,6 +20,10 @@ técnicos**. Bases reutilizáveis não entram nessa contagem. O contrato mantém
 | ONS — ENA por bacia | [`ons_ena_bacia.md`](ons_ena_bacia.md) | Aditivo 01 | — | `afluencia_mensal_bacia` |
 | ONS — EAR por reservatório | [`ons_ear_reservatorio.md`](ons_ear_reservatorio.md) | Aditivo 01 | `submercado` | `armazenamento_mensal_reservatorio` |
 | ONS — ENA por reservatório | [`ons_ena_reservatorio.md`](ons_ena_reservatorio.md) | Aditivo 01 | `submercado` | `afluencia_mensal_reservatorio` |
+| ONS — intercâmbio entre subsistemas | [`ons_intercambio_nacional.md`](ons_intercambio_nacional.md) | Aditivo 01 | — | `intercambio_mensal_subsistemas` |
+| ONS — intercâmbio internacional | [`ons_intercambio_internacional.md`](ons_intercambio_internacional.md) | Aditivo 01 | — | `intercambio_internacional_mensal` |
+| ONS — geração para exportação | [`ons_geracao_exportacao.md`](ons_geracao_exportacao.md) | Aditivo 01 | — | `exportacao_mensal` |
+| ONS — balanço de energia | [`ons_balanco_energia.md`](ons_balanco_energia.md) | Aditivo 01 | `submercado` | `balanco_energia_mensal_subsistema` |
 | CCEE — PLD | [`ccee_pld.md`](ccee_pld.md) | 1 | `submercado` | `pld_mensal_submercado` |
 | CCEE — perfis de agente | [`ccee_perfil.md`](ccee_perfil.md) | 1 | **`agente_ccee`** | `agentes_ccee` |
 | CCEE — lista mensal de agentes | [`ccee_agente.md`](ccee_agente.md) | 1 | `agente_ccee` | `agentes_por_classe_mensal` |

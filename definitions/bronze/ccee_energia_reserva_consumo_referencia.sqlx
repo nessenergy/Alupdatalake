@@ -1,0 +1,23 @@
+config {
+  type: "operations",
+  schema: "bronze",
+  hasOutput: true,
+  tags: ["bronze"]
+}
+
+-- Bronze: TRC de segurança energética, mensal, mercado inteiro (CCEE, dados abertos). Aditivo 01.
+CREATE TABLE IF NOT EXISTS ${self()} (
+  data_referencia            DATE      NOT NULL OPTIONS(description="Primeiro dia do mês de referência"),
+  periodo_apuracao_ccee      STRING    NOT NULL OPTIONS(description="AAAA-MM, como a CCEE declara"),
+  versao_publicacao          DATE      NOT NULL OPTIONS(description="last_modified do recurso no CKAN (ADR 016)"),
+  trc_seguranca_energetica     NUMERIC   NOT NULL OPTIONS(description="Unidade não documentada pela CCEE"),
+  trc_seguranca_energetica_suc NUMERIC            OPTIONS(description="Unidade não documentada pela CCEE"),
+
+  _ingestao_id            STRING    NOT NULL,
+  _ingestao_timestamp     TIMESTAMP NOT NULL,
+  _fonte                  STRING    NOT NULL,
+  _schema_versao          STRING    NOT NULL
+)
+PARTITION BY DATE(_ingestao_timestamp)
+CLUSTER BY data_referencia
+OPTIONS(description="TRC de segurança energética mensal — camada Bronze, append-only");

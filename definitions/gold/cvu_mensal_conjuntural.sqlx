@@ -1,0 +1,18 @@
+config {
+  type: "table",
+  schema: "gold",
+  tags: ["gold"],
+  dependOnDependencyAssertions: true
+}
+
+-- Gold: CVU conjuntural por mês, agregado entre os agentes vendedores.
+-- Sem KPI (ADR 012): média/mínimo/máximo, como o CVU merchant.
+SELECT
+  periodo_apuracao,
+  COUNT(DISTINCT agente_vendedor) AS agentes_vendedores,
+  AVG(custo_combustivel)          AS custo_combustivel_medio,
+  AVG(cvu_conjuntural)            AS cvu_conjuntural_medio,
+  MIN(cvu_conjuntural)            AS cvu_conjuntural_minimo,
+  MAX(cvu_conjuntural)            AS cvu_conjuntural_maximo
+FROM ${ref("silver", "ccee_cvu_conjuntural")}
+GROUP BY periodo_apuracao

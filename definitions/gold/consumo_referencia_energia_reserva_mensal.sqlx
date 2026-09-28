@@ -1,0 +1,17 @@
+config {
+  type: "table",
+  schema: "gold",
+  tags: ["gold"],
+  dependOnDependencyAssertions: true
+}
+
+-- Gold: TRC de segurança energética por mês, com a variação absoluta contra o
+-- mês anterior — o que a série mensal isolada não mostra. Sem KPI (ADR 012);
+-- só a diferença, nunca a razão entre os dois meses (ADR 012, adendo de
+-- 27/09): dividir série por série fica reservado a `indicadores_mensais`.
+SELECT
+  periodo_apuracao,
+  trc_seguranca_energetica,
+  trc_seguranca_energetica_suc,
+  trc_seguranca_energetica - LAG(trc_seguranca_energetica) OVER (ORDER BY periodo_apuracao) AS variacao_mes_anterior
+FROM ${ref("silver", "ccee_energia_reserva_consumo_referencia")}

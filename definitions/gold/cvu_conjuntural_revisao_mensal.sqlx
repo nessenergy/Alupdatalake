@@ -1,0 +1,32 @@
+config {
+  type: "table",
+  schema: "gold",
+  tags: ["gold"],
+  dependOnDependencyAssertions: true
+}
+
+-- Gold: quanto a revisão mudou o CVU conjuntural, por mês e modelo de preço.
+-- Cruza `ccee_cvu_conjuntural` (item 21) com `ccee_cvu_conjuntural_revisado`
+-- (item 22) — a pergunta que só existe comparando os dois: o quanto o custo de
+-- combustível revisado no fim do mês difere do valor conjuntural inicial.
+-- FULL OUTER JOIN porque as duas fontes fecham em datas diferentes (mesmo
+-- motivo de `encargos_setoriais_mensal`): um modelo sem revisão publicada
+-- ainda não deve sumir, e `cvu_revisado` fica NULL, não igual ao original.
+-- Sem KPI (ADR 012). Só a diferença em R$/MWh, nunca a razão entre os dois
+-- valores (ADR 012, adendo de 27/09): dividir série por série fica reservado
+-- a `indicadores_mensais`.
+SELECT
+  COALESCE(conj.periodo_apuracao_ccee, rev.periodo_apuracao_ccee) AS periodo_apuracao,
+  COALESCE(conj.codigo_modelo_preco, rev.codigo_modelo_preco)     AS codigo_modelo_preco,
+  COALESCE(conj.agente_vendedor, rev.agente_vendedor)             AS agente_vendedor,
+  conj.cvu_conjuntural                                            AS cvu_conjuntural,
+  rev.cvu_conjuntural                                             AS cvu_conjuntural_revisado,
+  IF(
+    conj.cvu_conjuntural IS NULL OR rev.cvu_conjuntural IS NULL,
+    NULL,
+    rev.cvu_conjuntural - conj.cvu_conjuntural
+  )                                                                AS delta_reais_mwh
+FROM ${ref("silver", "ccee_cvu_conjuntural")} AS conj
+FULL OUTER JOIN ${ref("silver", "ccee_cvu_conjuntural_revisado")} AS rev
+  ON rev.periodo_apuracao_ccee = conj.periodo_apuracao_ccee
+  AND rev.codigo_modelo_preco = conj.codigo_modelo_preco

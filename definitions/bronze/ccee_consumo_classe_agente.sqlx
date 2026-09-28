@@ -1,0 +1,25 @@
+config {
+  type: "operations",
+  schema: "bronze",
+  hasOutput: true,
+  tags: ["bronze"]
+}
+
+-- Bronze: consumo por classe de agente, mensal (CCEE, dados abertos). Aditivo 01.
+CREATE TABLE IF NOT EXISTS ${self()} (
+  data_referencia                        DATE      NOT NULL OPTIONS(description="Primeiro dia do mês de referência"),
+  periodo_apuracao_ccee                  STRING    NOT NULL OPTIONS(description="AAAA-MM, como a CCEE declara"),
+  versao_publicacao                      DATE      NOT NULL OPTIONS(description="last_modified do recurso no CKAN (ADR 016)"),
+  classe_agente                          STRING    NOT NULL,
+  consumo                                NUMERIC   NOT NULL OPTIONS(description="Unidade não documentada pela CCEE"),
+  consumo_ponto_conexao_classe_acr       NUMERIC   NOT NULL OPTIONS(description="Unidade não documentada pela CCEE"),
+  consumo_ponto_conexao_classe_acl       NUMERIC   NOT NULL OPTIONS(description="Unidade não documentada pela CCEE"),
+
+  _ingestao_id            STRING    NOT NULL,
+  _ingestao_timestamp     TIMESTAMP NOT NULL,
+  _fonte                  STRING    NOT NULL,
+  _schema_versao          STRING    NOT NULL
+)
+PARTITION BY DATE(_ingestao_timestamp)
+CLUSTER BY data_referencia, classe_agente
+OPTIONS(description="Consumo por classe de agente, mensal — camada Bronze, append-only");

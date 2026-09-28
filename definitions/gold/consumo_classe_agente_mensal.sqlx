@@ -1,0 +1,20 @@
+config {
+  type: "table",
+  schema: "gold",
+  tags: ["gold"],
+  dependOnDependencyAssertions: true
+}
+
+-- Gold: consumo de cada classe de agente por mês, ao lado do consumo total do
+-- mês — numerador e denominador na linha (mesmo princípio de auditabilidade
+-- do ADR 012), sem calcular a participação percentual aqui: dividir série
+-- por série fica reservado a `indicadores_mensais` (ADR 012, adendo de
+-- 27/09). Sem KPI.
+SELECT
+  periodo_apuracao,
+  classe_agente,
+  consumo,
+  consumo_ponto_conexao_classe_acr,
+  consumo_ponto_conexao_classe_acl,
+  SUM(consumo) OVER (PARTITION BY periodo_apuracao) AS consumo_total_mes
+FROM ${ref("silver", "ccee_consumo_classe_agente")}

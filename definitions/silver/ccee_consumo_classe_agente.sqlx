@@ -1,0 +1,35 @@
+config {
+  type: "view",
+  schema: "silver",
+  tags: ["silver"],
+  assertions: {
+    uniqueKey: ["periodo_apuracao_ccee", "classe_agente"],
+    nonNull: ["data_referencia", "periodo_apuracao_ccee", "classe_agente"],
+    rowConditions: [
+      "consumo >= 0",
+      "consumo_ponto_conexao_classe_acr >= 0",
+      "consumo_ponto_conexao_classe_acl >= 0"
+    ]
+  }
+}
+
+-- Silver: uma linha por mês e classe de agente, pela publicação mais recente.
+SELECT
+  data_referencia,
+  CAST(NULL AS STRING) AS submercado,
+  CAST(NULL AS STRING) AS codigo_usina,
+  CAST(NULL AS STRING) AS agente_ccee,  -- classe, não agente individual
+  FORMAT_DATE('%Y-%m', data_referencia) AS periodo_apuracao,
+  periodo_apuracao_ccee,
+  versao_publicacao,
+  classe_agente,
+  consumo,
+  consumo_ponto_conexao_classe_acr,
+  consumo_ponto_conexao_classe_acl,
+  _ingestao_id,
+  _ingestao_timestamp
+FROM ${ref("bronze", "ccee_consumo_classe_agente")}
+QUALIFY ROW_NUMBER() OVER (
+  PARTITION BY periodo_apuracao_ccee, classe_agente
+  ORDER BY versao_publicacao DESC, _ingestao_timestamp DESC
+) = 1

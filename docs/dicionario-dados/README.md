@@ -38,6 +38,12 @@ técnicos**. Bases reutilizáveis não entram nessa contagem. O contrato mantém
 | CCEE — ESS e serviços ancilares | [`ccee_encargo_ess.md`](ccee_encargo_ess.md) | 1 | — | `encargos_setoriais_mensal` |
 | CCEE — energia de reserva (EER) | [`ccee_energia_reserva.md`](ccee_energia_reserva.md) | 1 | — | `encargos_setoriais_mensal` |
 | CCEE — CVU estrutural | [`ccee_cvu_estrutural.md`](ccee_cvu_estrutural.md) | 1 | — | `cvu_estrutural_vigente_usina` |
+| CCEE — CVU merchant | [`ccee_cvu_merchant.md`](ccee_cvu_merchant.md) | Aditivo 01 | — | `cvu_mensal_merchant` |
+| CCEE — CVU conjuntural | [`ccee_cvu_conjuntural.md`](ccee_cvu_conjuntural.md) | Aditivo 01 | `agente_ccee` | `cvu_mensal_conjuntural` |
+| CCEE — CVU conjuntural revisado | [`ccee_cvu_conjuntural_revisado.md`](ccee_cvu_conjuntural_revisado.md) | Aditivo 01 | `agente_ccee` | `cvu_conjuntural_revisao_mensal` |
+| CCEE — encargo de reserva (CONER) | [`ccee_reserva_encargo.md`](ccee_reserva_encargo.md) | Aditivo 01 | — | `reserva_encargo_mensal` |
+| CCEE — TRC de segurança energética | [`ccee_energia_reserva_consumo_referencia.md`](ccee_energia_reserva_consumo_referencia.md) | Aditivo 01 | — | `consumo_referencia_energia_reserva_mensal` |
+| CCEE — consumo por classe de agente | [`ccee_consumo_classe_agente.md`](ccee_consumo_classe_agente.md) | Aditivo 01 | — | `consumo_classe_agente_mensal` |
 | ANEEL — SIGA | [`aneel_siga.md`](aneel_siga.md) | 1 | **`codigo_usina`** | `parque_gerador` |
 | ONS — geração horária por usina | [`ons_geracao_usina.md`](ons_geracao_usina.md) | 1 | `submercado`, `codigo_usina` | `geracao_mensal_usina_ons` |
 | ONS — capacidade instalada | [`ons_capacidade.md`](ons_capacidade.md) | 1 | `submercado`, `codigo_usina` | `capacidade_instalada_vigente_usina` |

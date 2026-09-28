@@ -1,0 +1,31 @@
+config {
+  type: "view",
+  schema: "silver",
+  tags: ["silver"],
+  assertions: {
+    uniqueKey: ["periodo_apuracao_ccee"],
+    nonNull: ["data_referencia", "periodo_apuracao_ccee", "trc_seguranca_energetica"],
+    rowConditions: [
+      "trc_seguranca_energetica >= 0"
+    ]
+  }
+}
+
+-- Silver: uma linha por mês, pela publicação mais recente (ADR 016, opção B).
+SELECT
+  data_referencia,
+  CAST(NULL AS STRING) AS submercado,
+  CAST(NULL AS STRING) AS codigo_usina,
+  CAST(NULL AS STRING) AS agente_ccee,
+  FORMAT_DATE('%Y-%m', data_referencia) AS periodo_apuracao,
+  periodo_apuracao_ccee,
+  versao_publicacao,
+  trc_seguranca_energetica,
+  trc_seguranca_energetica_suc,
+  _ingestao_id,
+  _ingestao_timestamp
+FROM ${ref("bronze", "ccee_energia_reserva_consumo_referencia")}
+QUALIFY ROW_NUMBER() OVER (
+  PARTITION BY periodo_apuracao_ccee
+  ORDER BY versao_publicacao DESC, _ingestao_timestamp DESC
+) = 1

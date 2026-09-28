@@ -1,0 +1,22 @@
+config {
+  type: "table",
+  schema: "gold",
+  tags: ["gold"],
+  dependOnDependencyAssertions: true
+}
+
+-- Gold: CVU merchant por mês, agregado entre os empreendimentos térmicos.
+-- Responde "quanto custa, em média, despachar uma térmica merchant neste
+-- mês" — sem KPI (ADR 012), apenas média/mínimo/máximo das duas parcelas.
+SELECT
+  periodo_apuracao,
+  COUNT(*)                       AS empreendimentos,
+  COUNTIF(recupera_custo_fixo)   AS empreendimentos_com_recuperacao_custo_fixo,
+  AVG(cvu_sem_custo_fixo)        AS cvu_sem_custo_fixo_medio,
+  MIN(cvu_sem_custo_fixo)        AS cvu_sem_custo_fixo_minimo,
+  MAX(cvu_sem_custo_fixo)        AS cvu_sem_custo_fixo_maximo,
+  AVG(cvu_com_custo_fixo)        AS cvu_com_custo_fixo_medio,
+  MIN(cvu_com_custo_fixo)        AS cvu_com_custo_fixo_minimo,
+  MAX(cvu_com_custo_fixo)        AS cvu_com_custo_fixo_maximo
+FROM ${ref("silver", "ccee_cvu_merchant")}
+GROUP BY periodo_apuracao

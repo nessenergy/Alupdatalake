@@ -1,0 +1,26 @@
+config {
+  type: "table",
+  schema: "gold",
+  tags: ["gold"],
+  dependOnDependencyAssertions: true
+}
+
+-- Gold: encargo de reserva (CONER) por mês, com o acumulado do ano civil —
+-- o que a série mensal isolada não mostra. Sem KPI (ADR 012); nenhuma coluna
+-- divide série por série (ADR 012, adendo de 27/09): a razão fica reservada a
+-- `indicadores_mensais`.
+SELECT
+  periodo_apuracao,
+  encargo_energia_reserva,
+  total_pagamento_liquido_er,
+  fundo_garantia_operacional_contratos_er,
+  total_receita_retida_coner,
+  custo_administrativo_financeiro_tributario_ccee,
+  saldo_efetivo_coner,
+  SUM(encargo_energia_reserva) OVER (
+    PARTITION BY LEFT(periodo_apuracao, 4) ORDER BY periodo_apuracao
+  ) AS encargo_energia_reserva_acumulado_no_ano,
+  SUM(total_pagamento_liquido_er) OVER (
+    PARTITION BY LEFT(periodo_apuracao, 4) ORDER BY periodo_apuracao
+  ) AS total_pagamento_liquido_er_acumulado_no_ano
+FROM ${ref("silver", "ccee_reserva_encargo")}

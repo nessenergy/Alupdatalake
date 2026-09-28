@@ -54,6 +54,15 @@ ANOTACOES: dict[str, dict[str, str]] = {
     "agentes_por_classe_mensal": {"dominio": "mercado_de_energia", "responsavel": INTELIGENCIA},
     "encargos_setoriais_mensal": {"dominio": "mercado_de_energia", "responsavel": INTELIGENCIA},
     "cvu_estrutural_vigente_usina": {"dominio": "mercado_de_energia", "responsavel": INTELIGENCIA},
+    "cvu_mensal_merchant": {"dominio": "mercado_de_energia", "responsavel": INTELIGENCIA},  # Aditivo 01
+    "cvu_mensal_conjuntural": {"dominio": "mercado_de_energia", "responsavel": INTELIGENCIA},  # Aditivo 01
+    "cvu_conjuntural_revisao_mensal": {"dominio": "mercado_de_energia", "responsavel": INTELIGENCIA},  # Aditivo 01
+    "reserva_encargo_mensal": {"dominio": "mercado_de_energia", "responsavel": INTELIGENCIA},  # Aditivo 01
+    "consumo_referencia_energia_reserva_mensal": {
+        "dominio": "mercado_de_energia",
+        "responsavel": INTELIGENCIA,
+    },  # Aditivo 01
+    "consumo_classe_agente_mensal": {"dominio": "mercado_de_energia", "responsavel": INTELIGENCIA},  # Aditivo 01
     "armazenamento_mensal_bacia": {"dominio": "mercado_de_energia", "responsavel": INTELIGENCIA},  # Aditivo 01
     "afluencia_mensal_bacia": {"dominio": "mercado_de_energia", "responsavel": INTELIGENCIA},  # Aditivo 01
     "armazenamento_mensal_reservatorio": {"dominio": "mercado_de_energia", "responsavel": INTELIGENCIA},  # Aditivo 01

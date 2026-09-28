@@ -1,0 +1,41 @@
+config {
+  type: "view",
+  schema: "silver",
+  tags: ["silver"],
+  assertions: {
+    uniqueKey: ["periodo_apuracao_ccee", "codigo_modelo_preco"],
+    nonNull: ["data_referencia", "periodo_apuracao_ccee", "codigo_modelo_preco"],
+    rowConditions: [
+      "custo_combustivel >= 0",
+      "cvu_conjuntural >= 0"
+    ]
+  }
+}
+
+-- Silver: CVU conjuntural, higienizada e deduplicada pela publicação mais recente.
+SELECT
+  data_referencia,
+  CAST(NULL AS STRING) AS submercado,    -- a origem não publica submercado, só o agente vendedor
+  CAST(NULL AS STRING) AS codigo_usina,  -- CODIGO_MODELO_PRECO é código de modelo de preço, não CEG
+  cnpj_agente_vendedor AS agente_ccee,   -- CNPJ é o identificador de agente que a origem publica
+  FORMAT_DATE('%Y-%m', data_referencia) AS periodo_apuracao,
+  periodo_apuracao_ccee,
+  versao_publicacao,
+  agente_vendedor,
+  cnpj_agente_vendedor,
+  sigla_parcela,
+  tipo_combustivel,
+  leilao,
+  produto,
+  custo_combustivel,
+  cvu_conjuntural,
+  codigo_modelo_preco,
+  inicio_suprimento,
+  termino_suprimento,
+  _ingestao_id,
+  _ingestao_timestamp
+FROM ${ref("bronze", "ccee_cvu_conjuntural")}
+QUALIFY ROW_NUMBER() OVER (
+  PARTITION BY periodo_apuracao_ccee, codigo_modelo_preco
+  ORDER BY versao_publicacao DESC, _ingestao_timestamp DESC
+) = 1

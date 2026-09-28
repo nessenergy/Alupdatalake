@@ -137,10 +137,26 @@ medição; a hora que vale é a apontada na §5, item a item.
 | 23 | `reserva_encargo` | 4 |
 | 24 | `energia_reserva_consumo_referencia` | 4 |
 | 25 | `consumo_classe_agente` | 4 |
-| 26 | `consumo_horario_perfil_agente` | 6 |
-| | **Subtotal CCEE** | **30** |
+| 26 | `consumo_horario_perfil_agente` | ~~6~~ ver nota | ver §4.1 |
+| | **Subtotal CCEE (20–25)** | **24** |
 
-**Total estimado: 168 horas** — 29% das 580h do contrato.
+**Total estimado (itens 1–25): 162 horas** — 28% das 580h do contrato. Item
+26 fica fora do subtotal, tratado a seguir.
+
+### 4.1 Item 26 — achado que revisa a estimativa
+
+Perfilado contra o recurso real da CCEE em 28/09/2026
+(`consumo_horario_perfil_agente_202607`): **34,9 milhões de linhas, ~7,7 GB de
+texto por mês**, 46.890 cargas distintas — granularidade por carga e hora, não
+por agregado mensal como os outros seis itens da CCEE (que somam poucas
+centenas de linhas por mês cada). Vinte e quatro meses de histórico são cerca
+de **185 GB** de texto de origem.
+
+As 6h estimadas seguiam o padrão dos outros conjuntos CKAN da CCEE (4-6h cada)
+e não previam esse volume. Fica **fora desta entrega**, com dimensionamento
+próprio a fazer antes de estimar — inclusive quanto histórico carregar em
+`dev` e o custo de BigQuery esperado (regra 4 do contrato: o custo de
+varredura é da Alup). Não bloqueia os itens 1–25.
 
 ## 5. Controle de horas
 

@@ -277,6 +277,36 @@ variable "conectores" {
       cron         = "0 10 6 * *"
       ultimos_dias = 120
     }
+    ccee_cvu_merchant = {
+      # Aditivo 01. Mesmo ritmo mensal das demais entidades CKAN da CCEE.
+      cron         = "0 10 6 * *"
+      ultimos_dias = 120
+    }
+    ccee_cvu_conjuntural = {
+      # Aditivo 01. Mesmo ritmo mensal das demais entidades CKAN da CCEE.
+      cron         = "0 10 6 * *"
+      ultimos_dias = 120
+    }
+    ccee_cvu_conjuntural_revisado = {
+      # Aditivo 01. Mesmo ritmo mensal das demais entidades CKAN da CCEE.
+      cron         = "0 10 6 * *"
+      ultimos_dias = 120
+    }
+    ccee_reserva_encargo = {
+      # Aditivo 01. Mesmo ritmo mensal das demais entidades CKAN da CCEE.
+      cron         = "0 10 6 * *"
+      ultimos_dias = 120
+    }
+    ccee_energia_reserva_consumo_referencia = {
+      # Aditivo 01. Mesmo ritmo mensal das demais entidades CKAN da CCEE.
+      cron         = "0 10 6 * *"
+      ultimos_dias = 120
+    }
+    ccee_consumo_classe_agente = {
+      # Aditivo 01. Mesmo ritmo mensal das demais entidades CKAN da CCEE.
+      cron         = "0 10 6 * *"
+      ultimos_dias = 120
+    }
     bbce_curva_forward = {
       # A curva sai por pregão, em dia útil. Janela curta porque cada dia é uma
       # requisição própria; 7 dias cobrem feriado prolongado e execução perdida.

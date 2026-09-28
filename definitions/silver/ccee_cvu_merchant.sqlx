@@ -1,0 +1,43 @@
+config {
+  type: "view",
+  schema: "silver",
+  tags: ["silver"],
+  assertions: {
+    uniqueKey: ["periodo_apuracao_ccee", "codigo_modelo_preco"],
+    nonNull: ["data_referencia", "periodo_apuracao_ccee", "codigo_modelo_preco"],
+    rowConditions: [
+      "cvu_sem_custo_fixo >= 0",
+      "cvu_com_custo_fixo IS NULL OR cvu_com_custo_fixo >= 0"
+    ]
+  }
+}
+
+-- Silver: CVU merchant, higienizada e deduplicada pela publicação mais recente.
+-- Chave (mês, modelo de preço): mesma lógica que zerou as duplicatas do CVU
+-- estrutural (ver `ccee_cvu_estrutural.sqlx`).
+SELECT
+  data_referencia,
+  CAST(NULL AS STRING) AS submercado,    -- a origem não publica submercado, só o empreendimento
+  CAST(NULL AS STRING) AS codigo_usina,  -- CODIGO_MODELO_PRECO é código de modelo de preço, não CEG
+  CAST(NULL AS STRING) AS agente_ccee,   -- a origem não usa perfil da CCEE
+  FORMAT_DATE('%Y-%m', data_referencia) AS periodo_apuracao,
+  periodo_apuracao_ccee,
+  versao_publicacao,
+  codigo_modelo_preco,
+  empreendimento,
+  despacho,
+  tipo_combustivel,
+  cvu_sem_custo_fixo,
+  cvu_com_custo_fixo,
+  recupera_custo_fixo,
+  inicio_suprimento,
+  termino_suprimento,
+  origem_cotacao,
+  periodo_cotacao,
+  _ingestao_id,
+  _ingestao_timestamp
+FROM ${ref("bronze", "ccee_cvu_merchant")}
+QUALIFY ROW_NUMBER() OVER (
+  PARTITION BY periodo_apuracao_ccee, codigo_modelo_preco
+  ORDER BY versao_publicacao DESC, _ingestao_timestamp DESC
+) = 1

@@ -1,0 +1,28 @@
+config {
+  type: "operations",
+  schema: "bronze",
+  hasOutput: true,
+  tags: ["bronze"]
+}
+
+-- Bronze: Balanço de energia horário nos subsistemas (ONS). Aditivo 01.
+CREATE TABLE IF NOT EXISTS ${self()} (
+  data_referencia                   DATE       NOT NULL OPTIONS(description="Dia do instante"),
+  instante                          DATETIME   NOT NULL OPTIONS(description="Hora de referência"),
+  subsistema                        STRING     NOT NULL OPTIONS(description="N, NE, S, SE ou SIN (total do sistema)"),
+  nome_subsistema                   STRING     NOT NULL,
+  geracao_hidraulica_mwmed          NUMERIC    NOT NULL OPTIONS(description="MWmed"),
+  geracao_termica_mwmed             NUMERIC    NOT NULL OPTIONS(description="MWmed"),
+  geracao_eolica_mwmed              NUMERIC    NOT NULL OPTIONS(description="MWmed"),
+  geracao_solar_mwmed               NUMERIC    NOT NULL OPTIONS(description="MWmed"),
+  carga_mwmed                       NUMERIC    NOT NULL OPTIONS(description="MWmed; pode ser negativa"),
+  intercambio_mwmed                 NUMERIC    NOT NULL OPTIONS(description="Líquido, MWmed; negativo é importação"),
+
+  _ingestao_id        STRING    NOT NULL,
+  _ingestao_timestamp TIMESTAMP NOT NULL,
+  _fonte              STRING    NOT NULL,
+  _schema_versao      STRING    NOT NULL
+)
+PARTITION BY DATE(_ingestao_timestamp)
+CLUSTER BY data_referencia, subsistema
+OPTIONS(description="Balanço de energia horário nos subsistemas — camada Bronze, append-only");

@@ -1,0 +1,24 @@
+config {
+  type: "operations",
+  schema: "bronze",
+  hasOutput: true,
+  tags: ["bronze"]
+}
+
+-- Bronze: Intercâmbio horário entre subsistemas (ONS). Aditivo 01.
+CREATE TABLE IF NOT EXISTS ${self()} (
+  data_referencia                   DATE       NOT NULL OPTIONS(description="Dia do instante"),
+  instante                          DATETIME   NOT NULL OPTIONS(description="Hora de referência"),
+  subsistema_origem                 STRING     NOT NULL OPTIONS(description="N, NE, S, SE"),
+  subsistema_destino                STRING     NOT NULL OPTIONS(description="N, NE, S, SE"),
+  intercambio_mwmed                 NUMERIC    NOT NULL OPTIONS(description="Intercâmbio verificado, MWmed"),
+  intercambio_programado_mwmed      NUMERIC    NOT NULL OPTIONS(description="Intercâmbio programado, MWmed; pode ser negativo"),
+
+  _ingestao_id        STRING    NOT NULL,
+  _ingestao_timestamp TIMESTAMP NOT NULL,
+  _fonte              STRING    NOT NULL,
+  _schema_versao      STRING    NOT NULL
+)
+PARTITION BY DATE(_ingestao_timestamp)
+CLUSTER BY data_referencia, subsistema_origem, subsistema_destino
+OPTIONS(description="Intercâmbio horário entre subsistemas — camada Bronze, append-only");

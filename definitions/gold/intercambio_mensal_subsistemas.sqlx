@@ -1,0 +1,23 @@
+config {
+  type: "table",
+  schema: "gold",
+  tags: ["gold"],
+  dependOnDependencyAssertions: true
+}
+
+-- Gold: intercâmbio entre subsistemas por mês e par origem→destino. Aditivo 01.
+--
+-- Responde "quanto de energia atravessou de uma região para outra, e quanto o
+-- ONS tinha programado" — é o intercâmbio no limite que descola o PLD entre
+-- submercados. Sem KPI (ADR 012): sem razão entre verificado e programado.
+
+SELECT
+  periodo_apuracao,
+  subsistema_origem,
+  subsistema_destino,
+  COUNT(*)                          AS horas,
+  AVG(intercambio_mwmed)            AS intercambio_medio_mwmed,
+  MAX(intercambio_mwmed)            AS intercambio_maximo_mwmed,
+  AVG(intercambio_programado_mwmed) AS intercambio_programado_medio_mwmed
+FROM ${ref("silver", "ons_intercambio_nacional")}
+GROUP BY periodo_apuracao, subsistema_origem, subsistema_destino

@@ -1,0 +1,23 @@
+config {
+  type: "table",
+  schema: "gold",
+  tags: ["gold"],
+  dependOnDependencyAssertions: true
+}
+
+-- Gold: geração para exportação e exportação efetiva por mês. Aditivo 01.
+--
+-- Responde "quanto foi gerado para vender fora, de que tipo, e quanto saiu
+-- para cada país". Complementa `intercambio_internacional_mensal`, que diz o
+-- fluxo físico. Sem KPI (ADR 012).
+
+SELECT
+  periodo_apuracao,
+  COUNT(*)                                     AS horas,
+  AVG(geracao_exportacao_evt_argentina_mwmed)  AS geracao_evt_argentina_media_mwmed,
+  AVG(geracao_exportacao_evt_uruguai_mwmed)    AS geracao_evt_uruguai_media_mwmed,
+  AVG(geracao_exportacao_termica_mwmed)        AS geracao_termica_media_mwmed,
+  AVG(exportacao_argentina_mwmed)              AS exportacao_argentina_media_mwmed,
+  AVG(exportacao_uruguai_mwmed)                AS exportacao_uruguai_media_mwmed
+FROM ${ref("silver", "ons_geracao_exportacao")}
+GROUP BY periodo_apuracao

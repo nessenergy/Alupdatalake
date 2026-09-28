@@ -1,0 +1,23 @@
+config {
+  type: "operations",
+  schema: "bronze",
+  hasOutput: true,
+  tags: ["bronze"]
+}
+
+-- Bronze: Intercâmbio horário do SIN com outros países (ONS). Aditivo 01.
+CREATE TABLE IF NOT EXISTS ${self()} (
+  data_referencia                   DATE       NOT NULL OPTIONS(description="Dia do instante"),
+  instante                          DATETIME   NOT NULL OPTIONS(description="Hora de referência"),
+  pais                              STRING     NOT NULL OPTIONS(description="País, sem os espaços à direita da origem"),
+  intercambio_mwmed                 NUMERIC    NOT NULL OPTIONS(description="Positivo: exportação; negativo: importação, MWmed"),
+  intercambio_programado_mwmed      NUMERIC    NOT NULL OPTIONS(description="Programado, MWmed"),
+
+  _ingestao_id        STRING    NOT NULL,
+  _ingestao_timestamp TIMESTAMP NOT NULL,
+  _fonte              STRING    NOT NULL,
+  _schema_versao      STRING    NOT NULL
+)
+PARTITION BY DATE(_ingestao_timestamp)
+CLUSTER BY data_referencia, pais
+OPTIONS(description="Intercâmbio horário do SIN com outros países — camada Bronze, append-only");

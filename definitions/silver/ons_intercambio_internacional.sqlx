@@ -1,0 +1,34 @@
+config {
+  type: "view",
+  schema: "silver",
+  tags: ["silver"],
+  assertions: {
+    uniqueKey: ["instante", "pais"],
+    nonNull: ["data_referencia", "instante", "pais"],
+    rowConditions: [
+      "pais != ''"
+    ]
+  }
+}
+
+-- Silver: Intercâmbio horário do SIN com outros países, higienizada e deduplicada. Aditivo 01.
+-- Dedup pela chave natural, vence a ingestão mais recente (o ONS revisa dado publicado).
+SELECT
+  data_referencia,
+  CAST(NULL AS STRING) AS submercado,  -- fluxo do SIN inteiro com outro país
+  CAST(NULL AS STRING) AS codigo_usina,  -- dado agregado, sem usina
+  CAST(NULL AS STRING) AS agente_ccee,   -- o ONS não usa perfil da CCEE
+  FORMAT_DATE('%Y-%m', data_referencia) AS periodo_apuracao,
+  CAST(NULL AS STRING) AS periodo_apuracao_ccee,  -- a origem é o ONS
+  EXTRACT(HOUR FROM instante) AS hora,
+  instante,
+  pais,
+  intercambio_mwmed,
+  intercambio_programado_mwmed,
+  _ingestao_id,
+  _ingestao_timestamp
+FROM ${ref("bronze", "ons_intercambio_internacional")}
+QUALIFY ROW_NUMBER() OVER (
+  PARTITION BY instante, pais
+  ORDER BY _ingestao_timestamp DESC
+) = 1

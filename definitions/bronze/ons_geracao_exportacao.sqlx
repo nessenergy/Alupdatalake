@@ -1,0 +1,25 @@
+config {
+  type: "operations",
+  schema: "bronze",
+  hasOutput: true,
+  tags: ["bronze"]
+}
+
+-- Bronze: Geração comercial horária para exportação internacional (ONS). Aditivo 01.
+CREATE TABLE IF NOT EXISTS ${self()} (
+  data_referencia                   DATE       NOT NULL OPTIONS(description="Dia do instante"),
+  instante                          DATETIME   NOT NULL OPTIONS(description="Hora de referência"),
+  geracao_exportacao_evt_argentina_mwmedNUMERIC    NOT NULL OPTIONS(description="Energia vertida turbinável gerada para a Argentina, MWmed"),
+  geracao_exportacao_evt_uruguai_mwmedNUMERIC    NOT NULL OPTIONS(description="Idem, Uruguai"),
+  geracao_exportacao_termica_mwmed  NUMERIC    NOT NULL OPTIONS(description="Geração térmica para exportação, MWmed"),
+  exportacao_argentina_mwmed        NUMERIC    NOT NULL OPTIONS(description="Exportação efetiva à Argentina, MWmed"),
+  exportacao_uruguai_mwmed          NUMERIC    NOT NULL OPTIONS(description="Exportação efetiva ao Uruguai, MWmed"),
+
+  _ingestao_id        STRING    NOT NULL,
+  _ingestao_timestamp TIMESTAMP NOT NULL,
+  _fonte              STRING    NOT NULL,
+  _schema_versao      STRING    NOT NULL
+)
+PARTITION BY DATE(_ingestao_timestamp)
+CLUSTER BY data_referencia
+OPTIONS(description="Geração comercial horária para exportação internacional — camada Bronze, append-only");

@@ -55,6 +55,11 @@ variable "conectores" {
       cron         = "30 8 * * *"
       ultimos_dias = 30 # janela larga: o ONS revisa dado publicado
     }
+    ons_ear_bacia = {
+      # Aditivo 01. Mesmo catálogo do ons_ear, 15 min depois do ons_ena.
+      cron         = "45 8 * * *"
+      ultimos_dias = 30 # janela larga: o ONS revisa dado publicado
+    }
     aneel_siga = {
       cron         = "0 7 * * 1" # cadastro muda devagar: semanal, segunda
       ultimos_dias = 1           # cadastro completo; a janela não se aplica

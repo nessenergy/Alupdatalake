@@ -82,6 +82,7 @@ locals {
     "roles/iam.serviceAccountUser",            # Cloud Run, Scheduler e Dataform agem como essas SAs
     "roles/iap.admin",                         # quem passa pelo IAP do Portal
     "roles/logging.configWriter",              # métricas de log
+    "roles/logging.viewer",                    # log do contêiner na falha de um job (executar-ingestao.yml)
     "roles/monitoring.editor",                 # canais, alertas e painel
     "roles/resourcemanager.projectIamAdmin",   # papéis de projeto e log de auditoria
     "roles/run.admin",                         # Jobs, Portal e o IAM de cada um

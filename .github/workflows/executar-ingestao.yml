@@ -106,5 +106,29 @@ jobs:
             echo "- Job: \`$JOB\`"
             echo "- Janela: $JANELA"
           } >> "$GITHUB_STEP_SUMMARY"
-          gcloud run jobs execute "$JOB" --project "$PROJETO" --region "$REGIAO" --wait "${ARGS[@]}"
+
+          # `gcloud run jobs execute --wait` só devolve "The execution failed"
+          # — sem o motivo. Captura a saída para achar o id da execução e, se
+          # o job falhar, busca o log de contêiner no Cloud Logging: sem isso,
+          # todo erro real (código ou origem) fica invisível no GitHub.
+          set +e
+          gcloud run jobs execute "$JOB" --project "$PROJETO" --region "$REGIAO" --wait "${ARGS[@]}" 2>&1 | tee /tmp/execucao.log
+          status="${PIPESTATUS[0]}"
+          set -e
+
+          if [[ "$status" -ne 0 ]]; then
+            execucao=$(grep -oE 'executions describe [a-zA-Z0-9-]+' /tmp/execucao.log | awk '{print $3}' | head -1)
+            echo "- Resultado: **falhou**" >> "$GITHUB_STEP_SUMMARY"
+            if [[ -n "$execucao" ]]; then
+              echo "- Execução: \`$execucao\`" >> "$GITHUB_STEP_SUMMARY"
+              echo "" >> "$GITHUB_STEP_SUMMARY"
+              echo '```' >> "$GITHUB_STEP_SUMMARY"
+              gcloud logging read \
+                "resource.type=\"cloud_run_job\" AND resource.labels.job_name=\"$JOB\" AND labels.\"run.googleapis.com/execution_name\"=\"$execucao\"" \
+                --project "$PROJETO" --format="value(timestamp,severity,textPayload)" --order=asc --limit=500 \
+                >> "$GITHUB_STEP_SUMMARY" || echo "(log não encontrado ou sem permissão de leitura)" >> "$GITHUB_STEP_SUMMARY"
+              echo '```' >> "$GITHUB_STEP_SUMMARY"
+            fi
+            exit "$status"
+          fi
           echo "- Resultado: execução concluída; confira \`bronze._execucoes\`" >> "$GITHUB_STEP_SUMMARY"

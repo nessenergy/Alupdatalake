@@ -28,7 +28,7 @@ from flask import Flask, Response, request
 from src.core.config import get_settings
 from src.core.observabilidade import configurar_logging
 from src.core.seguranca import sanitizar
-from src.portal.dados import Painel, SaudeConector, SerieVolumetria, obter_provedor
+from src.portal.dados import Indicador, Painel, SaudeConector, SerieVolumetria, obter_provedor
 from src.portal.grafico import _milhar, area, barras_custo, cor_do_conector, legenda_custo, tabela, usd
 
 if TYPE_CHECKING:
@@ -160,6 +160,20 @@ def custo() -> Response:
     usuario = _usuario(request.headers.get(CABECALHO_IDENTIDADE))
     return Response(
         _pagina_custo(obter_provedor().custo(), usuario, simulado=cfg.portal_provedor != "bigquery"),
+        mimetype="text/html",
+    )
+
+
+@app.get("/indicadores")
+def indicadores() -> Response:
+    """Razões técnicas do setor, com numerador e denominador — sem meta (ADR 012, adendo de 27/09).
+
+    A conta é do Dataform (`gold.indicadores_mensais`); a tela só mostra.
+    """
+    cfg = get_settings()
+    usuario = _usuario(request.headers.get(CABECALHO_IDENTIDADE))
+    return Response(
+        _pagina_indicadores(obter_provedor().indicadores(), usuario, simulado=cfg.portal_provedor != "bigquery"),
         mimetype="text/html",
     )
 
@@ -435,7 +449,12 @@ def _pagina(dados: Painel, usuario: str, *, simulado: bool) -> str:
 
 def _naves(atual: str) -> str:
     """As três telas do Portal. Uma barra só, para não haver tela órfã."""
-    rotas = (("/", "Dado de negócio"), ("/lake", "Saúde do lake"), ("/custo", "Custo de nuvem"))
+    rotas = (
+        ("/", "Dado de negócio"),
+        ("/indicadores", "Indicadores"),
+        ("/lake", "Saúde do lake"),
+        ("/custo", "Custo de nuvem"),
+    )
     itens = []
     for rota, nome in rotas:
         classe = ' class="atual"' if rota == atual else ""
@@ -604,4 +623,93 @@ def _pagina_custo(dados: PainelCusto, usuario: str, *, simulado: bool) -> str:
  o número aqui superestima de propósito. Compute aparece no agregado e não por fonte: existe
  um Cloud Run Job para todas elas.
  Plano e enquadramento em <code>docs/arquitetura/portal-finops.md</code>.</p>
+</body></html>"""
+
+
+# Ordem, título e o que cada razão mede — em linguagem de quem lê, não de SQL.
+INDICADORES = (
+    (
+        "taxa_corte_renovavel",
+        "Taxa de corte renovável",
+        "Quanto da geração eólica e solar possível o sistema mandou não gerar (constrained-off).",
+    ),
+    ("disponibilidade", "Disponibilidade", "Quanto da potência instalada das usinas despachadas estava apta a gerar."),
+    (
+        "fator_capacidade",
+        "Fator de capacidade",
+        "Quanto a geração média ocupou da potência efetiva, por submercado e fonte.",
+    ),
+    ("armazenamento", "Armazenamento", "Quanto dos reservatórios estava cheio, em energia armazenada."),
+    ("pld_real", "PLD real", "O PLD médio descontada a inflação, em reais do mês-base."),
+)
+
+
+def _valor_indicador(linha: Indicador) -> str:
+    if linha.valor is None:
+        return "—"
+    if linha.unidade_valor == "fração":
+        return f"{linha.valor * 100:.1f}%".replace(".", ",")
+    return f"R$ {linha.valor:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
+
+
+def _secao_indicador(nome: str, titulo: str, frase: str, linhas: list[Indicador]) -> str:
+    if not linhas:
+        return ""
+    meses = sorted({ind.periodo_apuracao for ind in linhas})
+    recortes: dict[str, dict[str, Indicador]] = {}
+    for ind in linhas:
+        recorte = " · ".join(p for p in (ind.submercado, ind.fonte) if p) or "Brasil"
+        recortes.setdefault(recorte, {})[ind.periodo_apuracao] = ind
+    exemplo = linhas[0]
+    cabeca = "".join(f"<th>{html.escape(m)}</th>" for m in meses)
+    corpo = ""
+    for recorte, por_mes in sorted(recortes.items()):
+        celulas = ""
+        for mes in meses:
+            ind = por_mes.get(mes)
+            if ind is None:
+                celulas += "<td>—</td>"
+                continue
+            dica = f"{ind.numerador:.2f} {ind.unidade_numerador} ÷ {ind.denominador:.4f} {ind.unidade_denominador}"
+            celulas += f'<td title="{html.escape(dica)}">{_valor_indicador(ind)}</td>'
+        corpo += f"<tr><td>{html.escape(recorte)}</td>{celulas}</tr>"
+    return f"""<section class="visao">
+  <h2>{html.escape(titulo)}</h2>
+  <p class="premissa">{html.escape(frase)} <strong>Conta:</strong> {html.escape(exemplo.unidade_numerador)}
+   ÷ {html.escape(exemplo.unidade_denominador)}. <strong>Unidade:</strong> {html.escape(exemplo.unidade_valor)}.</p>
+  <div class="rolagem-tabela"><table class="lista">
+  <thead><tr><th>Recorte</th>{cabeca}</tr></thead><tbody>{corpo}</tbody>
+  </table></div>
+</section>"""
+
+
+def _pagina_indicadores(linhas: list[Indicador], usuario: str, *, simulado: bool) -> str:
+    aviso = (
+        '<p class="aviso">Dados de exemplo — números inventados para mostrar o formato. '
+        "Nenhum valor desta tela veio do DataLake.</p>"
+        if simulado
+        else ""
+    )
+    secoes = "".join(
+        _secao_indicador(nome, titulo, frase, [ind for ind in linhas if ind.indicador == nome])
+        for nome, titulo, frase in INDICADORES
+    )
+    return f"""<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AlupData — indicadores</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600
+&family=Zilla+Slab:wght@500;600&display=swap">
+{ESTILO}</style></head>
+<body>
+<header><h1>AlupData · indicadores</h1><span class="quem">{html.escape(usuario)}</span></header>
+{_naves("/indicadores")}
+{aviso}
+{secoes or '<p class="premissa">Nenhum indicador calculado ainda.</p>'}
+<p class="premissa"><strong>O que esta tela é.</strong> Razões técnicas do setor, com o numerador
+ e o denominador de cada uma (passe o mouse sobre o valor). Não têm meta nem comparação entre
+ coligadas: indicador de negócio é da Fase 2 (ADR 012). A conta mora em
+ <code>gold.indicadores_mensais</code>, e esta tela só mostra.</p>
 </body></html>"""

@@ -69,11 +69,28 @@ class SerieVolumetria:
         return sum(self.linhas)
 
 
+@dataclass(frozen=True)
+class Indicador:
+    """Uma linha de `gold.indicadores_mensais`: a razão e as duas grandezas."""
+
+    periodo_apuracao: str
+    indicador: str
+    submercado: str | None
+    fonte: str | None
+    numerador: Decimal
+    unidade_numerador: str
+    denominador: Decimal
+    unidade_denominador: str
+    valor: Decimal | None
+    unidade_valor: str
+
+
 class ProvedorDados(Protocol):
     def painel(self, view: str) -> Painel: ...
     def saude(self) -> list[SaudeConector]: ...
     def volumetria(self, dias: int = 30) -> list[SerieVolumetria]: ...
     def custo(self, dias: int = 30) -> PainelCusto: ...
+    def indicadores(self, meses: int = 12) -> list[Indicador]: ...
 
 
 class ProvedorSimulado:
@@ -180,6 +197,9 @@ class ProvedorSimulado:
     VARREDURA_INTEGRAL = "aneel_siga"
 
     ORCADO_MENSAL_USD = Decimal("120.00")
+
+    def indicadores(self, meses: int = 12) -> list[Indicador]:
+        return _indicadores_de_exemplo()
 
     def custo(self, dias: int = 30) -> PainelCusto:
         """Custo derivado da própria volumetria simulada — não é número solto.
@@ -310,6 +330,73 @@ class ProvedorSimulado:
 NOME_VALIDO = re.compile(r"[a-z][a-z0-9_]{2,62}")
 
 
+def _indicadores_de_exemplo() -> list[Indicador]:
+    """Números inventados, um recorte por indicador e dois meses — só para a tela existir."""
+    exemplos = [
+        (
+            "taxa_corte_renovavel",
+            "NE",
+            "Eólica",
+            "12000",
+            "não gerado (MW por meia hora)",
+            "48000",
+            "potencial: gerado + não gerado (MW por meia hora)",
+            "fração",
+        ),
+        (
+            "disponibilidade",
+            "SE",
+            "UHE",
+            "41000",
+            "disponibilidade média (MW)",
+            "52000",
+            "potência instalada (MW)",
+            "fração",
+        ),
+        (
+            "fator_capacidade",
+            "NE",
+            "EOLIELÉTRICA",
+            "9000",
+            "geração média (MW médio)",
+            "25000",
+            "potência efetiva vigente (MW)",
+            "fração",
+        ),
+        (
+            "armazenamento",
+            "SE",
+            None,
+            "120000",
+            "energia armazenada média (MWmês)",
+            "200000",
+            "capacidade de armazenamento (MWmês)",
+            "fração",
+        ),
+        (
+            "pld_real",
+            "SE",
+            None,
+            "180",
+            "PLD médio nominal (R$/MWh)",
+            "0.99",
+            "fator de inflação até o mês-base (IPCA)",
+            "R$/MWh de 2026-08",
+        ),
+    ]
+    linhas = []
+    for periodo, ajuste in (("2026-07", Decimal("0.95")), ("2026-08", Decimal("1"))):
+        for nome, sub, fonte, num, un_num, den, un_den, un_val in exemplos:
+            numerador = Decimal(num) * ajuste
+            denominador = Decimal(den)
+            linhas.append(
+                Indicador(
+                    periodo, nome, sub, fonte, numerador, un_num, denominador, un_den, numerador / denominador, un_val
+                )
+            )
+    return linhas
+
+
 class ProvedorBigQuery:
     """Lê a view Gold e o log de ingestão do BigQuery.
 
@@ -408,6 +495,40 @@ class ProvedorBigQuery:
         return [
             SerieVolumetria(conector, [d for d, _ in pontos], [v for _, v in pontos])
             for conector, pontos in por_conector.items()
+        ]
+
+    def indicadores(self, meses: int = 12) -> list[Indicador]:
+        """Lê `gold.indicadores_mensais` — a conta é do Dataform, a tela só mostra."""
+        from google.cloud import bigquery  # import tardio
+
+        cfg = get_settings()
+        linhas = (
+            cliente()
+            .query(
+                "SELECT * "  # noqa: S608  # nosec B608 — projeto e dataset vêm da configuração, não do usuário
+                f"FROM `{cfg.gcp_project_id}.{cfg.bq_dataset_gold}.indicadores_mensais` "
+                "WHERE periodo_apuracao >= FORMAT_DATE('%Y-%m', DATE_SUB(CURRENT_DATE(), INTERVAL @meses MONTH)) "
+                "ORDER BY indicador, submercado, fonte, periodo_apuracao",
+                job_config=bigquery.QueryJobConfig(
+                    query_parameters=[bigquery.ScalarQueryParameter("meses", "INT64", meses)]
+                ),
+            )
+            .result()
+        )
+        return [
+            Indicador(
+                r.periodo_apuracao,
+                r.indicador,
+                r.submercado,
+                r.fonte,
+                r.numerador,
+                r.unidade_numerador,
+                r.denominador,
+                r.unidade_denominador,
+                r.valor,
+                r.unidade_valor,
+            )
+            for r in linhas
         ]
 
     def custo(self, dias: int = 30) -> PainelCusto:

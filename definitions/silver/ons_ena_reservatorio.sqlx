@@ -1,0 +1,43 @@
+config {
+  type: "view",
+  schema: "silver",
+  tags: ["silver"],
+  assertions: {
+    uniqueKey: ["data_referencia", "reservatorio"],
+    nonNull: ["data_referencia", "reservatorio", "submercado"],
+    rowConditions: [
+      "submercado IN ('N','NE','S','SE')",
+      // Percentual sobre a MLT: 1.750% em 2026. Nulo é dia sem medição.
+      "ena_bruta_percentual_mlt IS NULL OR ena_bruta_percentual_mlt >= 0",
+      "ena_bruta_mwmed IS NULL OR ena_bruta_mwmed >= 0"
+    ]
+  }
+}
+
+-- Silver: ENA diária por reservatório, higienizada e deduplicada.
+-- Dedup por (data_referencia, reservatorio): vence a ingestão mais recente.
+SELECT
+  data_referencia,
+  submercado,
+  CAST(NULL AS STRING) AS codigo_usina,  -- a origem identifica o reservatório, não traz CEG
+  CAST(NULL AS STRING) AS agente_ccee,   -- o ONS não usa perfil da CCEE
+  FORMAT_DATE('%Y-%m', data_referencia) AS periodo_apuracao,
+  CAST(NULL AS STRING) AS periodo_apuracao_ccee,  -- a origem é o ONS
+  reservatorio,
+  codigo_reservatorio_planejamento,
+  tipo_reservatorio,
+  bacia,
+  ree,
+  ena_bruta_mwmed,
+  ena_bruta_percentual_mlt,
+  ena_armazenavel_mwmed,
+  ena_armazenavel_percentual_mlt,
+  ena_queda_bruta_mwmed,
+  mlt_ena_mwmed,
+  _ingestao_id,
+  _ingestao_timestamp
+FROM ${ref("bronze", "ons_ena_reservatorio")}
+QUALIFY ROW_NUMBER() OVER (
+  PARTITION BY data_referencia, reservatorio
+  ORDER BY _ingestao_timestamp DESC
+) = 1

@@ -1,0 +1,4 @@
+nom_reservatorio;cod_resplanejamento;tip_reservatorio;nom_bacia;nom_ree;id_subsistema;nom_subsistema;ena_data;ena_bruta_res_mwmed;ena_bruta_res_percentualmlt;ena_armazenavel_res_mwmed;ena_armazenavel_res_percentualmlt;ena_queda_bruta;mlt_ena
+14 DE JULHO;99;Fio dagua;JACUI;SUL;S;SUL;2026-03-04;10.086;20.901;10.086;20.901;10.138;48.256
+A. VERMELHA;18;Reservatório com Usina;GRANDE;PARANA;SE;SUDESTE;2026-03-04;1441.455;92.7301;1441.455;92.7301;1434.636;1554.4625
+CANASTRA;87;Fio dagua;JACUI;SUL;S;SUL;2026-03-04;;;;;;

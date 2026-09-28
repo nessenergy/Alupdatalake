@@ -1,0 +1,42 @@
+config {
+  type: "operations",
+  schema: "bronze",
+  hasOutput: true,
+  tags: ["bronze"]
+}
+
+-- Bronze: energia armazenada (EAR) diária por reservatório (ONS). Aditivo 01.
+-- Campos de EAR anuláveis: reservatório sem medição vem vazio na origem.
+CREATE TABLE IF NOT EXISTS ${self()} (
+  data_referencia                          DATE      NOT NULL OPTIONS(description="Dia de referência da EAR"),
+  reservatorio                             STRING    NOT NULL OPTIONS(description="Nome do reservatório (nom_reservatorio)"),
+  codigo_reservatorio_planejamento         STRING             OPTIONS(description="cod_resplanejamento; vazio em parte das linhas"),
+  tipo_reservatorio                        STRING             OPTIONS(description="Reservatório com usina, sem usina, fio d'água"),
+  bacia                                    STRING,
+  ree                                      STRING             OPTIONS(description="Reservatório Equivalente de Energia"),
+  submercado                               STRING    NOT NULL OPTIONS(description="N, NE, S, SE"),
+  subsistema_jusante                       STRING             OPTIONS(description="Subsistema a jusante, quando o reservatório contribui para outro"),
+  ear_proprio_mwmes                        NUMERIC            OPTIONS(description="EAR no subsistema próprio, MWmês"),
+  ear_jusante_mwmes                        NUMERIC            OPTIONS(description="EAR no subsistema a jusante, MWmês"),
+  ear_max_proprio_mwmes                    NUMERIC            OPTIONS(description="Capacidade máxima no subsistema próprio, MWmês"),
+  ear_max_jusante_mwmes                    NUMERIC            OPTIONS(description="Capacidade máxima no subsistema a jusante, MWmês"),
+  ear_percentual                           NUMERIC            OPTIONS(description="EAR como % da capacidade; passa de 100"),
+  ear_total_mwmes                          NUMERIC            OPTIONS(description="EAR total do reservatório, MWmês"),
+  ear_max_total_mwmes                      NUMERIC            OPTIONS(description="Capacidade máxima total, MWmês"),
+  contribuicao_ear_bacia                   NUMERIC            OPTIONS(description="Fração da EAR da bacia"),
+  contribuicao_ear_max_bacia               NUMERIC,
+  contribuicao_ear_subsistema              NUMERIC            OPTIONS(description="Fração da EAR do subsistema"),
+  contribuicao_ear_max_subsistema          NUMERIC,
+  contribuicao_ear_subsistema_jusante      NUMERIC,
+  contribuicao_ear_max_subsistema_jusante  NUMERIC,
+  contribuicao_ear_sin                     NUMERIC            OPTIONS(description="Fração da EAR do SIN"),
+  contribuicao_ear_max_sin                 NUMERIC,
+
+  _ingestao_id        STRING    NOT NULL,
+  _ingestao_timestamp TIMESTAMP NOT NULL,
+  _fonte              STRING    NOT NULL,
+  _schema_versao      STRING    NOT NULL
+)
+PARTITION BY DATE(_ingestao_timestamp)
+CLUSTER BY data_referencia, submercado, reservatorio
+OPTIONS(description="EAR diária por reservatório — camada Bronze, append-only");

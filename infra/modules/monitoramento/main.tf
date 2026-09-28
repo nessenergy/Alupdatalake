@@ -25,6 +25,9 @@ variable "conectores_criticos" {
     ons_ear                    = 26  # diário
     ons_ena                    = 26  # diário
     ons_ear_bacia              = 26  # diário (Aditivo 01)
+    ons_ena_bacia              = 26  # diário (Aditivo 01)
+    ons_ear_reservatorio       = 26  # diário (Aditivo 01)
+    ons_ena_reservatorio       = 26  # diário (Aditivo 01)
     aneel_siga                 = 180 # semanal + folga
     ons_capacidade             = 180 # semanal + folga
     ons_geracao_usina          = 780 # mensal + folga

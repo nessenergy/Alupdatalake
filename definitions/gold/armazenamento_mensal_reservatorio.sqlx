@@ -1,0 +1,33 @@
+config {
+  type: "table",
+  schema: "gold",
+  tags: ["gold"],
+  dependOnDependencyAssertions: true
+}
+
+-- Gold: armazenamento (EAR) por reservatório e mês. Aditivo 01.
+--
+-- Responde "qual reservatório está enchendo ou esvaziando, e quanto ele pesa
+-- no subsistema" — o nível abaixo da bacia. Leva a participação média do
+-- reservatório na EAR do subsistema, para separar o reservatório grande que
+-- move o agregado do pequeno que não move. Sem KPI (ADR 012).
+--
+-- Dias sem medição (EAR nula) não entram nas médias e são contados à parte:
+-- mês com poucos dias medidos não pode passar por mês completo.
+
+SELECT
+  periodo_apuracao,
+  submercado,
+  bacia,
+  reservatorio,
+  ANY_VALUE(tipo_reservatorio)          AS tipo_reservatorio,
+  COUNT(*)                              AS dias_no_mes,
+  COUNTIF(ear_percentual IS NOT NULL)   AS dias_com_medicao,
+  AVG(ear_percentual)                   AS ear_media_percentual,
+  MIN(ear_percentual)                   AS ear_minima_percentual,
+  MAX(ear_percentual)                   AS ear_maxima_percentual,
+  AVG(ear_total_mwmes)                  AS ear_total_media_mwmes,
+  MAX(ear_max_total_mwmes)              AS ear_max_total_mwmes,
+  AVG(contribuicao_ear_subsistema)      AS contribuicao_media_ear_subsistema
+FROM ${ref("silver", "ons_ear_reservatorio")}
+GROUP BY periodo_apuracao, submercado, bacia, reservatorio

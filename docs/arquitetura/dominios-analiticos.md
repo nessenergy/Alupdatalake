@@ -87,7 +87,7 @@ existe em Gold. Ordenados pelo B1.
 | **Fontes a conectar** | — a hidrologia (EAR e ENA) entrou em 15/09 |
 | **Granularidade** | submercado e hora, para o PLD; submercado e dia, para a carga; vértice de entrega, para a curva |
 | **Cadência** | PLD diário, com o mês corrente (desde 28/09); carga diária; curva por pregão |
-| **Gold hoje** | `pld_mensal_submercado`, `carga_mensal_submercado`, `mercado_mensal_submercado`, `armazenamento_e_afluencia_mensal`, `curva_forward_vigente`, `agentes_ccee`, `agentes_por_classe_mensal`, `encargos_setoriais_mensal`, `cvu_estrutural_vigente_usina`, `armazenamento_mensal_bacia` (Aditivo 01) |
+| **Gold hoje** | `pld_mensal_submercado`, `carga_mensal_submercado`, `mercado_mensal_submercado`, `armazenamento_e_afluencia_mensal`, `curva_forward_vigente`, `agentes_ccee`, `agentes_por_classe_mensal`, `encargos_setoriais_mensal`, `cvu_estrutural_vigente_usina`, `armazenamento_mensal_bacia`, `afluencia_mensal_bacia`, `armazenamento_mensal_reservatorio`, `afluencia_mensal_reservatorio` (Aditivo 01) |
 | **Situação** | **pronto do lado da CCEE** — faltam EAR e ENA, que são do ONS |
 
 É o domínio mais maduro e o que sustenta os demais: quase toda pergunta

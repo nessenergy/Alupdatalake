@@ -58,6 +58,32 @@ Consequências operacionais:
   `group:<e-mail>` ou `domain:<domínio>` da Alup; `user:` é recusado na
   validação. Vazia, que é o padrão, o serviço sobe sem ninguém autorizado.
 
+## Liberar o dado real para a Alup
+
+Pedido em aberto: issue [#261](https://github.com/nessenergy/Alupdatalake/issues/261).
+Falta só o e-mail do grupo Google da Alup — nada do lado da ness. bloqueia.
+Quando ele chegar:
+
+1. Em `infra/environments/hml.tfvars`, descomente as duas linhas
+   `grupo_consumidores` e `portal_acesso`, e troque
+   `<grupo-consumidores>@<dominio-da-alup>` (as duas ocorrências) pelo e-mail
+   exato. Repita em `dev.tfvars` se a Alup também pedir acesso ao ambiente
+   de desenvolvimento — não é o padrão.
+2. PR, merge, e o deploy normal (`Deploy GCP`, `hml`, `infra` ou `all`)
+   aplica. Não precisa de passo manual no console.
+3. `grupo_consumidores` dá `roles/bigquery.dataViewer` na camada Gold e
+   `roles/bigquery.jobUser` no projeto — quem estiver no grupo roda
+   `SELECT * FROM gold.<tabela>` direto no BigQuery, para as 26 tabelas de
+   negócio (materializadas, ADR 012). As três Gold operacionais
+   (`saude_ingestao`, `volumetria_lake`, `custo_consultas`) não entram: são
+   view sobre `bronze._execucoes`, métrica de operação da ness., e exigiriam
+   `grupo_operacao` — não conceder sem pedido explícito.
+4. `portal_acesso` libera o mesmo grupo no IAP do Portal, para a demonstração
+   com login da Alup na reunião de aceite (item 0.15).
+5. Avisar quem pediu (Leonardo, Taina) que o acesso está de pé, com o nome
+   das 26 tabelas Gold como ponto de partida — `docs/dicionario-dados/` tem
+   o campo a campo e a frequência de cada uma.
+
 ## Publicação
 
 O serviço, o IAP e a SA `alupdata-portal` estão em `infra/modules/portal` e

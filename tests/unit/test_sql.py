@@ -29,6 +29,9 @@ ARQUIVOS = [c for camada in CAMADAS for c in sorted((DEFINICOES / camada).glob("
 # precisa de dado atual — materializada uma vez por dia, mostraria a falha de
 # hoje só amanhã. Gold nova é de negócio até entrar nesta lista.
 GOLD_OPERACIONAL = {"saude_ingestao", "volumetria_lake", "custo_consultas"}
+# Gold que lê outras Gold. Fechado e com motivo: a agregação por usina e mês já
+# está feita na Gold de domínio, e refazê-la sobre a Silver duplicaria a regra.
+GOLD_DERIVADA = {"indicadores_mensais"}
 
 _CONFIG = re.compile(r"^config \{.*?^\}\n", re.DOTALL | re.MULTILINE)
 _REF = re.compile(r'\$\{ref\("([a-z_]+)", "([a-z_]+)"\)\}')
@@ -156,6 +159,13 @@ def test_compiled_gold_depends_on_silver_assertions():
         if table["target"]["name"] in GOLD_OPERACIONAL:
             assert not any(target[1] == "qualidade" for target in dependencies), table["target"]
             continue
+        if table["target"]["name"] in GOLD_DERIVADA:
+            # Depende só de Gold de negócio; cada uma delas passa pela checagem da
+            # Silver neste mesmo laço, e a garantia de qualidade vem por transitividade.
+            upstream = {target for target in dependencies if target[1] != "qualidade"}
+            assert upstream, table["target"]
+            assert all(target[1] == "gold" and target[2] not in GOLD_OPERACIONAL for target in upstream), upstream
+            continue
         silver = {target for target in dependencies if target[1] == "silver"}
         assert silver, table["target"]
         for source in silver:
@@ -184,6 +194,11 @@ def test_view_referencia_a_camada_anterior(arquivo):
         if arvore
         for t in arvore.find_all(exp.Table)
     ]
+    if camada == "gold" and arquivo.stem in GOLD_DERIVADA:
+        # Compõe dentro da camada, não pula: lê só Gold, nunca Bronze nem Silver.
+        fisicas = [t for t in tabelas if "`" in t]  # CTE não tem projeto nem crase
+        assert fisicas and all(".gold." in t for t in fisicas), f"{arquivo.name} deveria ler só Gold: {fisicas}"
+        return
     if camada == "gold" and any("_execucoes" in t for t in tabelas):
         assert not any(f".{anterior}." in t for t in tabelas), (
             "view de monitoramento não deve misturar o log de execução com dado de negócio"
@@ -298,3 +313,31 @@ def test_coluna_anulavel_nao_declara_null_sozinho() -> None:
                 soltos.append(f"{arquivo.name}:{numero}: {linha.strip()}")
 
     assert not soltos, "coluna com NULL solto — tire a palavra, anulável é o padrão:\n" + "\n".join(soltos)
+
+
+INDICADORES = DEFINICOES / "gold" / "indicadores_mensais.sqlx"
+NOMES_DE_INDICADOR = {"taxa_corte_renovavel", "disponibilidade", "fator_capacidade", "armazenamento", "pld_real"}
+# Gold de domínio que já divide duas colunas, e por quê. A lista é fechada: Gold
+# nova com razão entra aqui com o motivo, ou vai para `indicadores_mensais`.
+RAZAO_PERMITIDA = {
+    "exposicao_mercado_mensal": "cobertura ÷ exposição, as duas em R$ e do mesmo relatório da CCEE",
+}
+
+
+def test_indicadores_declara_os_cinco_indicadores_e_as_assercoes():
+    sql = INDICADORES.read_text(encoding="utf-8")
+    corpo = _sem_comentarios(sql)
+
+    for nome in NOMES_DE_INDICADOR:
+        assert f"'{nome}' AS indicador" in corpo, nome
+    assert 'uniqueKey: ["periodo_apuracao", "indicador", "submercado", "fonte"]' in sql
+    assert "denominador > 0" in sql
+    assert "SAFE_DIVIDE(numerador, denominador)" in corpo
+
+
+def test_so_indicadores_mensais_divide_uma_serie_por_outra():
+    """ADR 012: a razão mora numa tabela só, rotulada como tal; Gold de domínio agrega."""
+    for arquivo in (DEFINICOES / "gold").glob("*.sqlx"):
+        if arquivo.stem == "indicadores_mensais" or arquivo.stem in GOLD_OPERACIONAL or arquivo.stem in RAZAO_PERMITIDA:
+            continue
+        assert "SAFE_DIVIDE(" not in _sem_comentarios(arquivo.read_text(encoding="utf-8")), arquivo.name

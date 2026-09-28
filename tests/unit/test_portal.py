@@ -471,3 +471,24 @@ def test_todas_as_telas_usam_o_mesmo_tema(cliente, rota) -> None:
     corpo = cliente.get(rota).get_data(as_text=True)
 
     assert "--primary:" in corpo
+
+
+def test_indicadores_mostra_os_cinco_com_numerador_e_denominador(cliente) -> None:
+    corpo = cliente.get("/indicadores").get_data(as_text=True)
+    for titulo in ("Taxa de corte renovável", "Disponibilidade", "Fator de capacidade", "Armazenamento", "PLD real"):
+        assert titulo in corpo
+    assert "potência instalada (MW)" in corpo  # o denominador aparece, não só o valor
+
+
+def test_indicadores_simulado_e_rotulado(cliente) -> None:
+    assert "Dados de exemplo" in cliente.get("/indicadores").get_data(as_text=True)
+
+
+def test_barra_de_navegacao_tem_indicadores(cliente) -> None:
+    assert 'href="/indicadores"' in cliente.get("/").get_data(as_text=True)
+
+
+def test_indicador_fracao_vira_percentual_e_pld_real_vira_reais(cliente) -> None:
+    corpo = cliente.get("/indicadores").get_data(as_text=True)
+    assert "%" in corpo
+    assert "R$" in corpo

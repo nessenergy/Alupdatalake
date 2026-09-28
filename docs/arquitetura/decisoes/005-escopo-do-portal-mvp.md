@@ -102,3 +102,12 @@ sanitizador que o restante do projeto aplica nas fronteiras de log (cláusula
 
 Nada disso adiciona funcionalidade: não há tela nova, rota nova nem dado novo.
 As exclusões de escopo da tabela acima seguem valendo integralmente.
+
+## Adendo de 2026-09-27 — tela de indicadores
+
+A rota `/indicadores` entra pelo mesmo motivo da `/lake` (ADR 006) e da
+`/custo`: prova o caminho da Gold até o usuário, não substitui o BI. Mostra as
+razões técnicas de `gold.indicadores_mensais` com o numerador e o denominador
+de cada uma. Continuam fora filtros, exportação, meta e comparação entre
+coligadas. Desenho em
+[`planos/2026-09-27-indicadores-no-portal.md`](../../planos/2026-09-27-indicadores-no-portal.md).

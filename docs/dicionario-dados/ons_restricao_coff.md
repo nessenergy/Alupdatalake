@@ -52,6 +52,10 @@ e nenhuma outra fonte pública do lake responde isso:
   do submercado NE. Sul 19.344, Norte e Sudeste 1.488 cada.
 - **`val_geracao` pode ser negativo** — 4 linhas em agosto/2026. É usina parada
   consumindo da rede, não erro de sinal.
+- **`minutos_restricao` às vezes é 31, não só 0–30.** Confirmado no histórico
+  reprocessado (09/2024 a 09/2026): ~40 linhas de 7,7 milhões, nas duas
+  fontes. É a origem arredondando a meia hora para cima; a asserção da
+  Silver aceita 0 a 31.
 
 ## Códigos que a origem usa
 

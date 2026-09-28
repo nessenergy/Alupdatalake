@@ -9,7 +9,9 @@ config {
       "submercado IN ('N','NE','S','SE')",
       "razao_restricao IS NULL OR razao_restricao IN ('REL','CNF','ENE')",
       "origem_restricao IS NULL OR origem_restricao IN ('SIS','LOC')",
-      "minutos_restricao IS NULL OR minutos_restricao BETWEEN 0 AND 30"
+      // ONS publica 31 min em ~40 de 7,7M linhas (histórico 09/2024-09/2026):
+      // meia hora com 1 min a mais, arredondamento na origem.
+      "minutos_restricao IS NULL OR minutos_restricao BETWEEN 0 AND 31"
     ]
   }
 }

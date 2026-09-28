@@ -54,6 +54,7 @@ ANOTACOES: dict[str, dict[str, str]] = {
     "agentes_por_classe_mensal": {"dominio": "mercado_de_energia", "responsavel": INTELIGENCIA},
     "encargos_setoriais_mensal": {"dominio": "mercado_de_energia", "responsavel": INTELIGENCIA},
     "cvu_estrutural_vigente_usina": {"dominio": "mercado_de_energia", "responsavel": INTELIGENCIA},
+    "armazenamento_mensal_bacia": {"dominio": "mercado_de_energia", "responsavel": INTELIGENCIA},  # Aditivo 01
     # 2 · Geração e Operacional — usinas do SIN, dado público
     "parque_gerador": {"dominio": "geracao_e_operacional", "responsavel": INTELIGENCIA},
     "geracao_mensal_usina": {"dominio": "geracao_e_operacional", "responsavel": INTELIGENCIA},

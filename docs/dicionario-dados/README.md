@@ -16,6 +16,7 @@ técnicos**. Bases reutilizáveis não entram nessa contagem. O contrato mantém
 | ONS — carga | [`ons_carga.md`](ons_carga.md) | 1 | **`submercado`** | `carga_mensal_submercado` |
 | ONS — EAR (armazenamento) | [`ons_ear.md`](ons_ear.md) | 1 | `submercado` | `armazenamento_e_afluencia_mensal` |
 | ONS — ENA (afluência) | [`ons_ena.md`](ons_ena.md) | 1 | `submercado` | `armazenamento_e_afluencia_mensal` |
+| ONS — EAR por bacia | [`ons_ear_bacia.md`](ons_ear_bacia.md) | Aditivo 01 | — | `armazenamento_mensal_bacia` |
 | CCEE — PLD | [`ccee_pld.md`](ccee_pld.md) | 1 | `submercado` | `pld_mensal_submercado` |
 | CCEE — perfis de agente | [`ccee_perfil.md`](ccee_perfil.md) | 1 | **`agente_ccee`** | `agentes_ccee` |
 | CCEE — lista mensal de agentes | [`ccee_agente.md`](ccee_agente.md) | 1 | `agente_ccee` | `agentes_por_classe_mensal` |

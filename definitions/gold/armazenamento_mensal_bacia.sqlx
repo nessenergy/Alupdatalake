@@ -1,0 +1,28 @@
+config {
+  type: "table",
+  schema: "gold",
+  tags: ["gold"],
+  dependOnDependencyAssertions: true
+}
+
+-- Gold: armazenamento (EAR) por bacia e mês. Aditivo 01.
+--
+-- Responde "qual bacia está enchendo ou esvaziando" — o detalhe que a EAR por
+-- subsistema (armazenamento_e_afluencia_mensal) agrega e esconde. Sem KPI
+-- (ADR 012): média, mínimo, máximo e fim do mês, sem razão entre séries.
+--
+-- `ear_fim_mes_percentual` é o último dia com dado no mês: é o número que se
+-- compara mês contra mês, porque a média suaviza a tendência.
+
+SELECT
+  periodo_apuracao,
+  bacia,
+  COUNT(*)                        AS dias_com_ear,
+  ANY_VALUE(ear_max_mwmes HAVING MAX data_referencia) AS ear_max_mwmes,
+  AVG(ear_verificada_percentual)  AS ear_media_percentual,
+  MIN(ear_verificada_percentual)  AS ear_minima_percentual,
+  MAX(ear_verificada_percentual)  AS ear_maxima_percentual,
+  ANY_VALUE(ear_verificada_percentual HAVING MAX data_referencia) AS ear_fim_mes_percentual,
+  AVG(ear_verificada_mwmes)       AS ear_media_mwmes
+FROM ${ref("silver", "ons_ear_bacia")}
+GROUP BY periodo_apuracao, bacia

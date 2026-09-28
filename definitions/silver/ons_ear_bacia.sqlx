@@ -1,0 +1,40 @@
+config {
+  type: "view",
+  schema: "silver",
+  tags: ["silver"],
+  assertions: {
+    uniqueKey: ["data_referencia", "bacia"],
+    nonNull: ["data_referencia", "bacia"],
+    rowConditions: [
+      "ear_max_mwmes >= 0",
+      "ear_verificada_mwmes >= 0",
+      // Sem teto em 100: a bacia do Paraguaçu passou da capacidade máxima em
+      // 176 dias de 2026 (até 154%), com o percentual batendo com a conta.
+      "ear_verificada_percentual >= 0"
+    ]
+  }
+}
+
+-- Silver: EAR diária por bacia, higienizada e deduplicada.
+-- Dedup por (data_referencia, bacia): o ONS revisa dado publicado, então vence
+-- a ingestão mais recente — mesma regra do ons_ear.
+-- A origem não traz subsistema: uma bacia pode atravessar subsistemas, então
+-- `submercado` fica nulo em vez de inventado.
+SELECT
+  data_referencia,
+  CAST(NULL AS STRING) AS submercado,    -- a origem não traz; bacia pode atravessar subsistemas
+  CAST(NULL AS STRING) AS codigo_usina,  -- EAR é agregada por bacia
+  CAST(NULL AS STRING) AS agente_ccee,   -- idem
+  FORMAT_DATE('%Y-%m', data_referencia) AS periodo_apuracao,
+  CAST(NULL AS STRING) AS periodo_apuracao_ccee,  -- a origem é o ONS, não a CCEE
+  bacia,
+  ear_max_mwmes,
+  ear_verificada_mwmes,
+  ear_verificada_percentual,
+  _ingestao_id,
+  _ingestao_timestamp
+FROM ${ref("bronze", "ons_ear_bacia")}
+QUALIFY ROW_NUMBER() OVER (
+  PARTITION BY data_referencia, bacia
+  ORDER BY _ingestao_timestamp DESC
+) = 1

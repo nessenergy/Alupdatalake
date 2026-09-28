@@ -193,3 +193,21 @@ da fase.
 - A seção *Gold na Fase 1* não reescreve as cinco Gold de negócio existentes:
   conferir unidade no nome da coluna e arredondamento de R$/MWh entra na
   homologação de cada fonte.
+
+## Adendo de 2026-09-27 — razão técnica não é KPI
+
+`gold.indicadores_mensais` calcula cinco razões com definição física ou
+regulatória: taxa de corte renovável, disponibilidade, fator de capacidade,
+armazenamento e PLD real. Nenhuma tem meta, comparação entre coligadas ou
+fórmula de negócio da Alup. É isso que as separa do KPI que a Alup deixou
+para a Fase 2 (A5, A6).
+
+- **Uma tabela só divide série por série.** As Gold de domínio continuam
+  agregando; `tests/unit/test_sql.py` reprova `SAFE_DIVIDE` fora de
+  `indicadores_mensais`, com duas exceções declaradas e justificadas (as Gold
+  operacionais e a fração que a CCEE já publica em `exposicao_mercado_mensal`).
+- **Numerador e denominador ficam na linha.** A razão é auditável, e quem
+  discordar da conta vê as duas grandezas.
+- **Essa leitura depende de aceite por escrito da Alup**, pedido na reunião de
+  aceite. Sem ele, a tabela continua de pé, mas não entra na medição como
+  componente 04.

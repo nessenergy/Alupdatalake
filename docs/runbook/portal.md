@@ -58,16 +58,47 @@ Consequências operacionais:
   `group:<e-mail>` ou `domain:<domínio>` da Alup; `user:` é recusado na
   validação. Vazia, que é o padrão, o serviço sobe sem ninguém autorizado.
 
+## Acesso da ness. (dev e hml)
+
+**Quem entrega confere o que entregou.** O grupo `operacao-datalake@ness.com.br`
+está em `portal_acesso` de `dev` e `hml`. Em `prod`, só a Alup.
+
+A concessão sozinha não basta: o IAP com o cliente OAuth gerenciado pelo Google
+só aceita contas da organização dona do projeto (a Alupar), e recusa
+`@ness.com.br` mesmo concedida (visto no log de auditoria, #242). A saída é a
+mesma do painel vivo: **cliente OAuth próprio, público "Externo"**, em cada
+projeto (`alupar-dev-alupdata` e `alupar-hm-alupdata`). O cliente OAuth
+externo não se declara em Terraform — é passo de console, registrado aqui.
+
+No console do Google Cloud, no projeto do ambiente:
+
+1. **Google Auth Platform → Público → Externo** (status "Em produção").
+2. **Clientes → Criar cliente → Aplicativo da Web**. Copie o ID e ponha em
+   *URIs de redirecionamento autorizados*:
+   `https://iap.googleapis.com/v1/oauth/clientIds/<ID>:handleRedirect`.
+3. **Segurança → Identity-Aware Proxy** → serviço `alupdata-portal` →
+   **Configurações** → *Cliente OAuth personalizado*: cole o ID e o segredo.
+   O segredo só é digitado no console; nunca em chat, issue ou repositório.
+
+Quem executa precisa de `roles/oauthconfig.editor` e `roles/iap.admin` no
+projeto. Se faltar, é pedido à Alup, como os papéis de bootstrap (ADR 015).
+Enquanto isso, a conferência é local, com a conta da pessoa e o dado real:
+
+```powershell
+gcloud auth application-default login --account=<voce>@ness.com.br
+$env:PORTAL_PROVEDOR = "bigquery"; $env:GCP_PROJECT_ID = "alupar-dev-alupdata"
+uv run flask --app src.portal.app run   # http://127.0.0.1:5000/lake
+```
+
 ## Liberar o dado real para a Alup
 
 Pedido em aberto: issue [#261](https://github.com/nessenergy/Alupdatalake/issues/261).
 Falta só o e-mail do grupo Google da Alup — nada do lado da ness. bloqueia.
 Quando ele chegar:
 
-1. Em `infra/environments/hml.tfvars`, descomente as duas linhas
-   `grupo_consumidores` e `portal_acesso`, e troque
-   `<grupo-consumidores>@<dominio-da-alup>` (as duas ocorrências) pelo e-mail
-   exato. Repita em `dev.tfvars` se a Alup também pedir acesso ao ambiente
+1. Em `infra/environments/hml.tfvars`, descomente `grupo_consumidores` com o
+   e-mail exato e **acrescente** `"group:<e-mail>"` à lista `portal_acesso`,
+   que já tem o grupo de operação da ness. (não troque: os dois ficam). Repita em `dev.tfvars` se a Alup também pedir acesso ao ambiente
    de desenvolvimento — não é o padrão.
 2. PR, merge, e o deploy normal (`Deploy GCP`, `hml`, `infra` ou `all`)
    aplica. Não precisa de passo manual no console.

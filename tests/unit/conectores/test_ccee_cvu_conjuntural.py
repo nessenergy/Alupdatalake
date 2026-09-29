@@ -66,6 +66,30 @@ def test_cnpj_com_tamanho_errado_e_rejeitado():
         )
 
 
+def test_arquivo_de_2025_tem_cedilha_no_codigo_e_cnpj_sem_zero(monkeypatch):
+    """2025 publica `CODIGO_MODELO_PREÇO` (com Ç) e CNPJ que perdeu o zero à esquerda.
+
+    Na carga real de 28/09, isso descartou 48% das linhas. E o código de modelo
+    de preço se repete no mês (duas parcelas, mesmo código), então não é chave.
+    """
+    arquivo = Path(__file__).parents[2] / "fixtures" / "ccee_cvu_conjuntural_2025.csv"
+    monkeypatch.setattr("src.conectores.ccee_ckan.criar_sessao", lambda: None)
+    c = CceeCvuConjuntural()
+    monkeypatch.setattr(
+        c,
+        "_pacote",
+        lambda: {"resources": [{"name": "x_2025", "url": "u", "last_modified": "2026-09-01T00:00:00"}]},
+    )
+    monkeypatch.setattr(c, "_abrir", lambda _s: io.BytesIO(arquivo.read_bytes()))
+
+    brutos = c.extrair(Janela.de_texto("2025-04-01", "2025-04-30"))
+    registros = [CvuConjuntural.model_validate(c.transformar(b)) for b in brutos]
+
+    assert [r.codigo_modelo_preco for r in registros] == ["235", "235"]
+    assert {r.cnpj_agente_vendedor for r in registros} == {"03795050000109"}
+    assert len({(r.sigla_parcela, r.leilao, r.produto) for r in registros}) == 2
+
+
 def test_ingerir_em_dry_run(conector):
     execucao = conector.ingerir(Janela.de_texto("2026-06-01", "2026-07-31"))
 

@@ -69,6 +69,14 @@ checklist na [#294](https://github.com/nessenergy/Alupdatalake/issues/294).
   editado junto com o documento do aditivo.
 - **Quadro do GitHub Projects:** entraram a #294 e as pendências abertas
   #188 e #258–#262.
+- **Correção de conceito — acesso da ness. ao Portal:** a leitura do #242
+  ("o Portal só admite contas da Alup; a evidência vira demonstração") estava
+  errada como decisão: quem entrega precisa conferir o que entregou. O grupo
+  de operação da ness. entra em `portal_acesso` de `dev` e `hml` (em `prod`,
+  só a Alup), e o login passa a exigir cliente OAuth "Externo" em cada
+  projeto, passo de console descrito em
+  [`runbook/portal.md`](runbook/portal.md#acesso-da-ness-dev-e-hml).
+  Até lá, conferência local com dado real (mesmo runbook).
 
 ## Reparos técnicos durante a espera pelo ambiente — 18/09
 

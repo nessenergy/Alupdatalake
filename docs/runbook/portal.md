@@ -72,13 +72,24 @@ externo não se declara em Terraform — é passo de console, registrado aqui.
 
 No console do Google Cloud, no projeto do ambiente:
 
-1. **Google Auth Platform → Público → Externo** (status "Em produção").
-2. **Clientes → Criar cliente → Aplicativo da Web**. Copie o ID e ponha em
+1. **Google Auth Platform → Branding**: nome do app e e-mails de suporte e de
+   contato do desenvolvedor. Sem eles o público não publica.
+2. **Google Auth Platform → Público → Externo** → **Publicar app** (status
+   "Em produção"). Em `hml` isso é obrigatório: no status "Teste" só entram
+   usuários de teste cadastrados um a um, e a Alup fica de fora. O login só
+   pede e-mail e perfil, que não exigem verificação do Google.
+3. **Clientes → Criar cliente → Aplicativo da Web**, criado sem URI (o ID só
+   existe depois de criar). Abra o cliente, copie o ID e ponha em
    *URIs de redirecionamento autorizados*:
    `https://iap.googleapis.com/v1/oauth/clientIds/<ID>:handleRedirect`.
-3. **Segurança → Identity-Aware Proxy** → serviço `alupdata-portal` →
+4. **Segurança → Identity-Aware Proxy** → serviço `alupdata-portal` →
    **Configurações** → *Cliente OAuth personalizado*: cole o ID e o segredo.
    O segredo só é digitado no console; nunca em chat, issue ou repositório.
+5. Teste em aba anônima com uma conta de cada lado (ness. e, em `hml`, Alup).
+   Para desfazer, volte o passo 4 ao cliente gerenciado pelo Google.
+
+Quem entra continua definido por `portal_acesso`: o público "Externo" só
+decide quem consegue fazer login, não quem passa pelo IAP.
 
 Quem executa precisa de `roles/oauthconfig.editor`, `roles/iap.settingsAdmin` e `roles/iap.admin` no
 projeto. Se faltar, é pedido à Alup, como os papéis de bootstrap (ADR 015).

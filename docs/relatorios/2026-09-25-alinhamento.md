@@ -5,7 +5,7 @@ referencia: REL-2026-09-25 · AlupData Fase 1
 emitido_em: 25 de setembro de 2026
 emitente: ness. Processos e Tecnologia Ltda.
 destinatario: Alup — Leonardo Guiel Marques, Taina Ulhoa Mota, Mauricio Cardoso e Saulo Rodrigues
-contrato: CPS-01025/2026 — AlupData Fase 1: DataLake
+contrato: "CPS-01025/2026 — AlupData Fase 1: DataLake"
 marco: Ondas 0 e 1 — dossiês e aceite
 responsavel: Ricardo Esper
 classificacao: Confidencial — uso restrito das partes

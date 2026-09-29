@@ -33,8 +33,9 @@ configuracao_login_portal = ["group:operacao-datalake@ness.com.br"]
 # ness."). O grupo da Alup, pedido na #261, entra ao lado quando chegar —
 # descomente grupo_consumidores e acrescente o mesmo e-mail à lista abaixo
 # (runbook em docs/runbook/portal.md#liberar-o-dado-real-para-a-alup).
-portal_acesso = ["group:operacao-datalake@ness.com.br"]
-# grupo_consumidores = "<grupo-consumidores>@<dominio-da-alup>"
+# Grupo da Alup informado pela Tainá em 29/09 (#261).
+portal_acesso      = ["group:operacao-datalake@ness.com.br", "group:alup.alertas@alupar.com.br"]
+grupo_consumidores = "alup.alertas@alupar.com.br"
 #
 # grupo_operacao dá também Bronze e Silver — só se a Alup pedir explicitamente
 # mais que a Gold; não presumir.

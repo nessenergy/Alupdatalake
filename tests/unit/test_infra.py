@@ -616,7 +616,8 @@ def test_login_do_portal_so_configura_oauth_e_iap_por_grupo() -> None:
 
     bloco = _bloco(_ler("infra/main.tf"), 'resource "google_project_iam_member" "configuracao_login_portal"')
     assert "var.configuracao_login_portal" in bloco
-    assert "roles/oauthconfig.editor" in bloco and "roles/iap.admin" in bloco
+    assert "roles/oauthconfig.editor" in bloco and "roles/iap.settingsAdmin" in bloco
+    assert "roles/iap.admin" not in bloco, "iap.admin não troca o cliente OAuth"
     for papel in ("roles/owner", "roles/editor", "secretmanager", "bigquery"):
         assert papel not in bloco
 

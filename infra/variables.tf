@@ -129,7 +129,7 @@ variable "leitura_projeto" {
 variable "configuracao_login_portal" {
   description = <<-EOT
     Quem configura o login do Portal no console: cliente OAuth "Externo" e o
-    IAP (`roles/oauthconfig.editor` e `roles/iap.admin`). Sem acesso a dado.
+    IAP (`roles/oauthconfig.editor` e `roles/iap.settingsAdmin`). Sem acesso a dado.
     Só group:<e-mail> ou domain:<domínio> (R01).
   EOT
   type        = list(string)

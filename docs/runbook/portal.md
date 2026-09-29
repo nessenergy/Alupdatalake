@@ -80,7 +80,7 @@ No console do Google Cloud, no projeto do ambiente:
    **Configurações** → *Cliente OAuth personalizado*: cole o ID e o segredo.
    O segredo só é digitado no console; nunca em chat, issue ou repositório.
 
-Quem executa precisa de `roles/oauthconfig.editor` e `roles/iap.admin` no
+Quem executa precisa de `roles/oauthconfig.editor` e `roles/iap.settingsAdmin` no
 projeto. Se faltar, é pedido à Alup, como os papéis de bootstrap (ADR 015).
 Enquanto isso, a conferência é local, com a conta da pessoa e o dado real:
 

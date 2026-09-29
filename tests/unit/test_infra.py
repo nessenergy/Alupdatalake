@@ -608,6 +608,19 @@ def test_leitura_do_projeto_e_por_grupo_e_nao_le_segredo() -> None:
     assert "secretmanager" not in bloco and "roles/owner" not in bloco and "roles/editor" not in bloco
 
 
+def test_login_do_portal_so_configura_oauth_e_iap_por_grupo() -> None:
+    """Quem entrega confere o que entregou (28/09): o cliente OAuth "Externo" do
+    IAP é passo de console, e exige estes dois papéis — nenhum outro."""
+    variavel = _bloco(_ler("infra/variables.tf"), 'variable "configuracao_login_portal"')
+    assert "validation" in variavel and "group:" in variavel
+
+    bloco = _bloco(_ler("infra/main.tf"), 'resource "google_project_iam_member" "configuracao_login_portal"')
+    assert "var.configuracao_login_portal" in bloco
+    assert "roles/oauthconfig.editor" in bloco and "roles/iap.admin" in bloco
+    for papel in ("roles/owner", "roles/editor", "secretmanager", "bigquery"):
+        assert papel not in bloco
+
+
 def test_bucket_de_entrada_e_fechado_e_nao_concede_acesso_novo() -> None:
     """Dado de negócio da Alup chega aqui em vez de e-mail ou GitHub (24/09).
 

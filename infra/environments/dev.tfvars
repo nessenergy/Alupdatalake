@@ -18,6 +18,10 @@ gravacao_segredos = ["group:operacao-datalake@ness.com.br"]
 # Leitura do projeto inteiro, sem valor de segredo (roles/viewer).
 leitura_projeto = ["group:operacao-datalake@ness.com.br"]
 
+# Quem configura o login do Portal no console (cliente OAuth "Externo" e IAP):
+# a ness. confere o que entrega. Sem acesso a dado (runbook/portal.md).
+configuracao_login_portal = ["group:operacao-datalake@ness.com.br"]
+
 # Validação do Portal com dado real (Onda 0). O grupo da Alup entra em hml.
 portal_acesso = ["group:operacao-datalake@ness.com.br"]
 

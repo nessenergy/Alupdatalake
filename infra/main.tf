@@ -125,12 +125,12 @@ resource "google_project_iam_member" "leitura_projeto" {
 
 # Login do Portal para quem entrega (runbook/portal.md, "Acesso da ness."): o
 # cliente OAuth "Externo" do IAP só se cria no console — a API foi desligada
-# pelo Google em 03/2026 — e exige estes dois papéis. Nenhum deles lê dado.
-# `iap.settingsAdmin`, não `iap.admin`: este só gere quem acessa, não troca o
-# cliente OAuth (`iap.webServices.updateSettings`, visto em 28/09).
+# pelo Google em 03/2026 — e exige estes três papéis. Nenhum deles lê dado.
+# `iap.settingsAdmin` troca o cliente OAuth (`iap.webServices.updateSettings`);
+# `iap.admin` abre a página do IAP no console (`iap.web.getIamPolicy`). Os dois.
 resource "google_project_iam_member" "configuracao_login_portal" {
   for_each = {
-    for par in setproduct(var.configuracao_login_portal, ["roles/oauthconfig.editor", "roles/iap.settingsAdmin"]) :
+    for par in setproduct(var.configuracao_login_portal, ["roles/oauthconfig.editor", "roles/iap.settingsAdmin", "roles/iap.admin"]) :
     "${par[0]} ${par[1]}" => { membro = par[0], papel = par[1] }
   }
 

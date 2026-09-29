@@ -9,10 +9,12 @@ config {
 -- painel de monitoramento consome. Não é relatório de negócio: a matéria-prima
 -- é o log de execução, não o dado ingerido.
 --
--- O intervalo esperado entre execuções é **inferido do próprio histórico**
--- (mediana dos intervalos observados), não declarado. Declarar significaria
--- repetir o cron do Terraform aqui, e as duas cópias divergiriam na primeira
--- vez que alguém mudasse o agendamento sem lembrar desta view.
+-- Atraso é medido contra o **limite de silêncio do alerta**
+-- (`includes/silencio.js`, igual ao mapa do monitoramento e conferido por
+-- teste): "atrasada" aqui é o mesmo que alerta disparado. Inferir a cadência
+-- do histórico falhava com carga manual — dez recargas num dia faziam uma
+-- fonte diária parecer atrasada horas depois do sucesso (visto em 29/09).
+-- A cadência inferida fica só para conector fora do mapa.
 WITH execucoes AS (
   SELECT
     CONCAT(fonte, '_', entidade) AS conector,
@@ -57,7 +59,10 @@ agregado AS (
     SAFE_DIVIDE(SUM(linhas_invalidas), NULLIF(SUM(linhas_extraidas), 0)) AS taxa_invalidas,
     APPROX_QUANTILES(duracao_segundos, 100)[OFFSET(50)] AS duracao_p50_seg,
     APPROX_QUANTILES(duracao_segundos, 100)[OFFSET(95)] AS duracao_p95_seg,
-    MAX(IF(status = 'ERRO', erro, NULL))            AS ultimo_erro
+    -- O erro mais recente por data, não por ordem alfabética do texto.
+    ARRAY_AGG(IF(status = 'ERRO', erro, NULL) IGNORE NULLS ORDER BY encerrada_em DESC LIMIT 1)[SAFE_OFFSET(0)]
+      AS erro_mais_recente,
+    MAX(IF(status = 'ERRO', encerrada_em, NULL))    AS ultimo_erro_em
   FROM execucoes
   GROUP BY conector
 )
@@ -73,16 +78,20 @@ SELECT
   a.linhas_carregadas_total,
   a.duracao_p50_seg,
   a.duracao_p95_seg,
-  a.ultimo_erro,
-  -- Semáforo. Atraso é medido contra a cadência da própria fonte: o dobro do
-  -- intervalo típico. Sem histórico suficiente, cai para 26h — um dia mais a
-  -- folga de um atraso de publicação.
+  -- Erro já superado por um sucesso posterior não é notícia: some da tela.
+  IF(a.ultimo_erro_em > COALESCE(a.ultimo_sucesso, TIMESTAMP '1970-01-01'), a.erro_mais_recente, NULL)
+    AS ultimo_erro,
+  -- Semáforo. Atraso: o limite de silêncio do alerta; fora do mapa, o dobro do
+  -- intervalo típico observado, e sem histórico, 26h.
   CASE
     WHEN a.ultimo_sucesso IS NULL THEN 'SEM_SUCESSO'
     WHEN TIMESTAMP_DIFF(CURRENT_TIMESTAMP(), a.ultimo_sucesso, MINUTE)
-         > 2 * COALESCE(c.intervalo_tipico_min, 1560) THEN 'ATRASADA'
-    WHEN a.ultima_execucao > a.ultimo_sucesso THEN 'FALHA_RECENTE'
+         > COALESCE(l.limite_h * 60, 2 * COALESCE(c.intervalo_tipico_min, 1560)) THEN 'ATRASADA'
+    WHEN a.ultimo_erro_em > a.ultimo_sucesso THEN 'FALHA_RECENTE'
     ELSE 'OK'
   END AS situacao
 FROM agregado a
 LEFT JOIN cadencia c USING (conector)
+LEFT JOIN UNNEST([
+    ${silencio.valores()}
+  ]) l USING (conector)

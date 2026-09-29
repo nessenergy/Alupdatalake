@@ -50,7 +50,8 @@ class CvuConjuntural(BaseModel):
     @field_validator("cnpj_agente_vendedor")
     @classmethod
     def _cnpj_normalizado(cls, valor: str) -> str:
-        digitos = "".join(c for c in valor if c.isdigit())
+        # O arquivo de 2025 perdeu o zero à esquerda (13 dígitos, planilha).
+        digitos = "".join(c for c in valor if c.isdigit()).zfill(14)
         if len(digitos) != 14:
             raise ValueError(f"CNPJ deve ter 14 dígitos, veio com {len(digitos)}")
         return digitos
@@ -88,7 +89,8 @@ def transformar_cvu_conjuntural(bruto: dict[str, Any]) -> dict[str, Any]:
         "produto": limpar(bruto.get("PRODUTO")),
         "custo_combustivel": numero_ou_nulo(bruto.get("CUSTO_COMBUSTIVEL")),
         "cvu_conjuntural": numero_ou_nulo(bruto.get("CVU_CONJUNTURAL")),
-        "codigo_modelo_preco": limpar(bruto.get("CODIGO_MODELO_PRECO")),
+        # 2025 publica o cabeçalho com cedilha (`CODIGO_MODELO_PREÇO`); 2026, sem.
+        "codigo_modelo_preco": limpar(bruto.get("CODIGO_MODELO_PRECO") or bruto.get("CODIGO_MODELO_PREÇO")),
         "inicio_suprimento": bruto.get("INICIO_SUPRIMENTO"),
         "termino_suprimento": bruto.get("TERMINO_SUPRIMENTO"),
     }

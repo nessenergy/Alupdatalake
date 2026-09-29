@@ -3,8 +3,8 @@ config {
   schema: "silver",
   tags: ["silver"],
   assertions: {
-    uniqueKey: ["periodo_apuracao_ccee", "codigo_modelo_preco"],
-    nonNull: ["data_referencia", "periodo_apuracao_ccee", "codigo_modelo_preco"],
+    uniqueKey: ["periodo_apuracao_ccee", "sigla_parcela", "leilao", "produto"],
+    nonNull: ["data_referencia", "periodo_apuracao_ccee", "sigla_parcela", "leilao", "produto"],
     rowConditions: [
       "custo_combustivel >= 0",
       "cvu_conjuntural >= 0"
@@ -13,6 +13,8 @@ config {
 }
 
 -- Silver: CVU conjuntural revisado, higienizada e deduplicada pela publicação mais recente.
+-- Chave: (mês, parcela, leilão, produto). O código de modelo de preço se
+-- repete no mês (28 casos em 2025 e em 2026) e não identifica a linha.
 SELECT
   data_referencia,
   CAST(NULL AS STRING) AS submercado,
@@ -36,6 +38,6 @@ SELECT
   _ingestao_timestamp
 FROM ${ref("bronze", "ccee_cvu_conjuntural_revisado")}
 QUALIFY ROW_NUMBER() OVER (
-  PARTITION BY periodo_apuracao_ccee, codigo_modelo_preco
+  PARTITION BY periodo_apuracao_ccee, sigla_parcela, leilao, produto
   ORDER BY versao_publicacao DESC, _ingestao_timestamp DESC
 ) = 1

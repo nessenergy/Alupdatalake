@@ -49,12 +49,12 @@ O CVU conjuntural depois da revisão do custo de combustível do mês — public
 
 ## Deduplicação
 
-Chave natural: (`periodo_apuracao_ccee`, `codigo_modelo_preco`). Vence a publicação mais recente (`versao_publicacao`,
+Chave natural: (`periodo_apuracao_ccee`, `sigla_parcela`, `leilao`, `produto`). O código de modelo de preço se repete no mês (28 casos em 2025 e em 2026) e não identifica a linha; o arquivo de 2025 o publica como `CODIGO_MODELO_PREÇO` e traz CNPJ sem o zero à esquerda (13 dígitos, completado). Vence a publicação mais recente (`versao_publicacao`,
 `last_modified` do recurso no CKAN — ADR 016, opção B).
 
 ## Gold
 
-`gold.cvu_conjuntural_revisao_mensal` — cruza este item com o 21 (`FULL OUTER JOIN` por mês e modelo de preço): CVU conjuntural, CVU revisado, e a diferença em R$/MWh (nunca a razão entre os dois — ADR 012, adendo de 27/09). Sem KPI (ADR 012).
+`gold.cvu_conjuntural_revisao_mensal` — cruza este item com o 21 (`FULL OUTER JOIN` por mês, parcela, leilão e produto): CVU conjuntural, CVU revisado, e a diferença em R$/MWh (nunca a razão entre os dois — ADR 012, adendo de 27/09). Sem KPI (ADR 012).
 
 A Gold **não é a mesma forma** dos demais itens deste lote: em vez de agregar entre agentes, ela cruza este dataset com o item 21 na granularidade de mês + modelo de preço, porque a pergunta de negócio é "quanto a revisão mudou", não "qual a média do mês". `FULL OUTER JOIN` pelo mesmo motivo de `encargos_setoriais_mensal`: as duas fontes fecham em datas diferentes, e um modelo sem revisão publicada não pode sumir.
 

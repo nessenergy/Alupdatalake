@@ -5,7 +5,7 @@ config {
   dependOnDependencyAssertions: true
 }
 
--- Gold: quanto a revisão mudou o CVU conjuntural, por mês e modelo de preço.
+-- Gold: quanto a revisão mudou o CVU conjuntural, por mês e parcela (leilão e produto).
 -- Cruza `ccee_cvu_conjuntural` (item 21) com `ccee_cvu_conjuntural_revisado`
 -- (item 22) — a pergunta que só existe comparando os dois: o quanto o custo de
 -- combustível revisado no fim do mês difere do valor conjuntural inicial.
@@ -17,6 +17,9 @@ config {
 -- a `indicadores_mensais`.
 SELECT
   COALESCE(conj.periodo_apuracao_ccee, rev.periodo_apuracao_ccee) AS periodo_apuracao,
+  COALESCE(conj.sigla_parcela, rev.sigla_parcela)                 AS sigla_parcela,
+  COALESCE(conj.leilao, rev.leilao)                               AS leilao,
+  COALESCE(conj.produto, rev.produto)                             AS produto,
   COALESCE(conj.codigo_modelo_preco, rev.codigo_modelo_preco)     AS codigo_modelo_preco,
   COALESCE(conj.agente_vendedor, rev.agente_vendedor)             AS agente_vendedor,
   conj.cvu_conjuntural                                            AS cvu_conjuntural,
@@ -29,4 +32,6 @@ SELECT
 FROM ${ref("silver", "ccee_cvu_conjuntural")} AS conj
 FULL OUTER JOIN ${ref("silver", "ccee_cvu_conjuntural_revisado")} AS rev
   ON rev.periodo_apuracao_ccee = conj.periodo_apuracao_ccee
-  AND rev.codigo_modelo_preco = conj.codigo_modelo_preco
+  AND rev.sigla_parcela = conj.sigla_parcela
+  AND rev.leilao = conj.leilao
+  AND rev.produto = conj.produto

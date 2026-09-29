@@ -190,22 +190,40 @@ Evidência do item 7: carga em `dev` de 28/09, 14.976 linhas de 01/09/2024 a
 27/09/2026, 23 bacias, zero inválidas; `gold.armazenamento_mensal_bacia`
 recalculada pelo Dataform.
 
-Evidência dos itens 8, 9 e 10: carga em `dev` de 28/09, execução SUCESSO para
-os três conectores (`ons_ear_reservatorio`, `ons_ena_bacia`,
-`ons_ena_reservatorio`) na janela 01/09/2024–27/09/2026; contagem exata de
-linhas fica pendente de consulta ao BigQuery (sem acesso interativo ao
-`gcloud` nesta sessão) — a completar antes da homologação.
+Evidência dos itens 1–6, 8–11 e 20–25: carga de 24 meses em `dev`, com
+execução SUCESSO e Dataform recalculado. Linhas na Silver (vigente, já
+deduplicada), contadas em 29/09/2026:
 
-Evidência dos itens 1–6, 11 e 20–25: carga completa de 24 meses
-(01/09/2024–28/09/2026) em `dev`, todos os 13 conectores com execução
-SUCESSO, Dataform recalculado. Os itens 1 e 2 exigiram correção de bug
-(#305): `intercambio_programado_mwmed` só existe na origem a partir de
-2026, e o acesso direto ao campo (sem `.get()`) derrubava a execução
-inteira para 2024/2025 — achado só depois do diagnóstico de log real
-adicionado em #303/#304 (a SA de deploy não tinha `roles/logging.viewer`;
-aplicado via `infra/bootstrap` em 28/09). Contagem exata de linhas por
-conector fica pendente de consulta ao BigQuery, mesma ressalva dos itens
-8–10.
+| # | Conector | Linhas | De | Até |
+|---|---|---:|---|---|
+| 1 | `ons_intercambio_nacional` | 72.672 | 01/09/2024 | 27/09/2026 |
+| 2 | `ons_intercambio_internacional` | 35.688 | 01/09/2024 | 27/09/2026 |
+| 3 | `ons_balanco_energia` | 90.720 | 01/09/2024 | 26/09/2026 |
+| 4 | `ons_cmo_semi_horario` | 143.860 | 01/09/2024 | 28/09/2026 |
+| 5 | `ons_cvu_termica` | 10.453 | 31/08/2024 | 19/09/2026 |
+| 6 | `ons_volume_espera` | 21.224 | 01/09/2024 | 28/09/2026 |
+| 8 | `ons_ear_reservatorio` | 57.259 | 01/09/2024 | 26/09/2026 |
+| 9 | `ons_ena_bacia` | 17.411 | 01/09/2024 | 27/09/2026 |
+| 10 | `ons_ena_reservatorio` | 117.167 | 01/09/2024 | 26/09/2026 |
+| 11 | `ons_geracao_exportacao` | 18.024 | 01/09/2024 | 27/09/2026 |
+| 20 | `ccee_cvu_merchant` | 349 | 02/2025 | 09/2026 |
+| 21 | `ccee_cvu_conjuntural` | 1.229 | 03/2025 | 09/2026 |
+| 22 | `ccee_cvu_conjuntural_revisado` | 1.125 | 02/2025 | 09/2026 |
+| 23 | `ccee_reserva_encargo` | 24 | 09/2024 | 08/2026 |
+| 24 | `ccee_energia_reserva_consumo_referencia` | 23 | 09/2024 | 07/2026 |
+| 25 | `ccee_consumo_classe_agente` | 138 | 09/2024 | 07/2026 |
+
+Os três CVU da CCEE começam em 2025 porque a própria CCEE só publica esses
+conjuntos a partir de 2025. As datas finais seguem a defasagem de publicação
+de cada origem.
+
+Correções que a carga real exigiu: nos itens 1 e 2,
+`intercambio_programado_mwmed` só existe na origem a partir de 2026, e o
+acesso direto ao campo derrubava a execução de 2024/2025 (#305), achado pelo
+log do contêiner (#303/#304, com `roles/logging.viewer` na SA de deploy). Nos
+itens 21 e 22, o arquivo de 2025 publica o cabeçalho `CODIGO_MODELO_PREÇO`
+(com cedilha) e CNPJ sem o zero à esquerda, e o código de modelo de preço se
+repete no mês: a chave passou a ser (mês, parcela, leilão, produto) (#317).
 
 ## 6. Fora desta estimativa
 

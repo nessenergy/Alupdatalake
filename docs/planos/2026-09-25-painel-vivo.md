@@ -1,6 +1,6 @@
 # Painel vivo do projeto
 
-Registrado em **25/09/2026**. Em 26/09 foram feitas as Tarefas 1 a 5: o workflow **Painel** publica sozinho no bucket do painel desde 02h35. Falta só o cliente OAuth "Externo" (Tarefa 6), sem o qual as contas da Alupar ainda não passam pelo login.
+Registrado em **25/09/2026**. Em 26/09 foram feitas as Tarefas 1 a 6: o workflow **Painel** publica sozinho no bucket do painel e as contas da Alupar entram pelo IAP (cliente OAuth Externo). **Em 28/09** ganhou a tela do Aditivo 01 (`aditivo.html`, fonte `painel/aditivo.toml`, gerada por `scripts/painel_aditivo.py` no mesmo workflow), com o mesmo layout do principal e um indicador no principal que a abre.
 
 **Objetivo:** um painel de acompanhamento do AlupData que se atualiza sozinho,
 com pouco texto e dado real: marcos, cargas por onda, pendências com a Alup e

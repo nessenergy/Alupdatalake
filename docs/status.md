@@ -38,6 +38,38 @@ A10 e a [ADR 020](arquitetura/decisoes/020-token-tempook-rotacao-na-producao.md)
 Referência do código: `main` em `4bbe4a2`, de 23/09. O feriado de 07/09 não entra na contagem: primeiro dia útil de atraso
 em 08/09. G1 encerrou na reunião de 10/09 e não é bloqueio atual.
 
+## Aditivo 01 — registro de 28/09
+
+Pedido da Alup de 28/09 (26 conjuntos públicos do ONS e da CCEE), tratado
+**como aditivo, fora das 580h**: fundamento e controle de horas em
+[`contrato/aditivo-01-conjuntos-publicos.md`](contrato/aditivo-01-conjuntos-publicos.md),
+checklist na [#294](https://github.com/nessenergy/Alupdatalake/issues/294).
+
+- **Entregue em 28/09: 17 dos 25 itens do subtotal, 83h de 162h.** Itens 1–11
+  (ONS, CSV anual) e 20–25 (CCEE, CKAN), com os 7 componentes e carga de 24
+  meses (01/09/2024–28/09/2026) confirmada em `dev`, Dataform recalculado.
+  PRs #295, #297–#299, #301; correções #300, #305, #306.
+- **Item 26** (`consumo_horario_perfil_agente`) fora do subtotal: ~185 GB de
+  histórico em 24 meses (34,9 milhões de linhas por mês). Estimativa em
+  revisão (§4.1 do documento).
+- **Falta:** padrões B (4 itens), C (2) e D (2), 57h; contagem exata de linhas
+  por conector no BigQuery, para a evidência da §5.
+- **Achado na carga real:** nos dois intercâmbios, `val_intercambioprogmwmed`
+  só existe na origem a partir de 2026. O acesso direto derrubava 2024/2025;
+  corrigido em #305. A coluna do Bronze ficou anulável por um `ALTER TABLE`
+  pontual (#306 explica por que não fica no `.sqlx`).
+- **Diagnóstico de ingestão manual:** o workflow `Executar ingestão` passa a
+  imprimir o log do contêiner quando o job falha (#303, #304). Para isso a SA
+  de deploy recebeu `roles/logging.viewer` em `infra/bootstrap`, aplicado em
+  `dev` em 28/09.
+- **Painel vivo:** tela própria do aditivo,
+  [`painel.alupdata.ness.com.br/aditivo.html`](https://painel.alupdata.ness.com.br/aditivo.html),
+  no mesmo layout do painel principal. No principal, o indicador "Aditivo 01"
+  abre essa tela (#308–#310). Fonte: `painel/aditivo.toml`, que precisa ser
+  editado junto com o documento do aditivo.
+- **Quadro do GitHub Projects:** entraram a #294 e as pendências abertas
+  #188 e #258–#262.
+
 ## Reparos técnicos durante a espera pelo ambiente — 18/09
 
 A liberação do GCP permanece sob responsabilidade da Alup. O plano de

@@ -29,7 +29,17 @@ from src.core.config import get_settings
 from src.core.observabilidade import configurar_logging
 from src.core.seguranca import sanitizar
 from src.portal.dados import Indicador, Painel, SaudeConector, SerieVolumetria, obter_provedor
-from src.portal.grafico import _milhar, area, barras_custo, cor_do_conector, legenda_custo, tabela, usd
+from src.portal.grafico import (
+    CORES,
+    _milhar,
+    area,
+    barras_custo,
+    cor_do_conector,
+    legenda_custo,
+    tabela,
+    tendencia,
+    usd,
+)
 
 if TYPE_CHECKING:
     from src.portal.custo import PainelCusto
@@ -218,17 +228,17 @@ ESTILO = """<style>
  }
  *{box-sizing:border-box}
  body{font-family:'Hanken Grotesk',system-ui,-apple-system,Segoe UI,Arial,sans-serif;
-   color:var(--foreground);background:var(--background);margin:0;
-   padding:clamp(24px,4vw,48px);-webkit-font-smoothing:antialiased}
- header{display:flex;justify-content:space-between;align-items:baseline;gap:16px;
+   color:var(--foreground);background:var(--background);margin:0 auto;max-width:1320px;
+   padding:clamp(24px,4vw,48px);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased}
+ header{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:4px 16px;
    border-bottom:1px solid var(--border);padding-bottom:16px}
  h1{font-family:'Zilla Slab',Georgia,serif;font-weight:600;font-size:clamp(20px,2.4vw,27px);
    margin:0;letter-spacing:-.01em}
- .quem{font-size:13px;color:var(--muted-foreground)}
+ .quem{font-size:14px;color:var(--muted-foreground)}
  .cabeca-secao{display:flex;justify-content:space-between;align-items:baseline;
    flex-wrap:wrap;gap:8px;margin:26px 0 2px}
  .resumo{font-size:16px;font-weight:600;margin:0}
- .muted{font-size:13px;color:var(--muted-foreground);margin:0;font-variant-numeric:tabular-nums}
+ .muted{font-size:14px;color:var(--muted-foreground);margin:0;font-variant-numeric:tabular-nums}
  .aviso{background:#fff8ec;border:1px solid #f0dcb8;border-radius:var(--radius);
    padding:12px 16px;font-size:14px;margin-top:20px}
  .grade{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));
@@ -238,47 +248,48 @@ ESTILO = """<style>
  .topo{display:flex;align-items:center;gap:8px;font-size:15px;letter-spacing:-.01em}
  .topo strong{font-weight:600}
  .ponto{width:8px;height:8px;border-radius:50%;flex:none}
- .estado{font-size:12.5px;color:var(--muted-foreground);margin:6px 0 16px}
+ .estado{font-size:13.5px;color:var(--muted-foreground);margin:6px 0 16px}
  dl{display:grid;grid-template-columns:1fr 1fr;gap:12px 16px;margin:0}
- dt{font-size:10.5px;letter-spacing:.07em;text-transform:uppercase;
+ dt{font-size:11.5px;letter-spacing:.07em;text-transform:uppercase;
    color:var(--muted-foreground);margin:0}
  dd{margin:3px 0 0;font-size:16px;font-variant-numeric:tabular-nums;letter-spacing:-.01em}
  .figura{margin:18px 0 0}
- .figura figcaption{font-size:10.5px;letter-spacing:.07em;text-transform:uppercase;
+ .figura figcaption{font-size:11.5px;letter-spacing:.07em;text-transform:uppercase;
    color:var(--muted-foreground);margin-bottom:6px}
  .grafico{width:100%;height:64px;display:block;overflow:visible}
- .erro{margin:14px 0 0;font-size:12.5px;color:var(--critical);word-break:break-word}
+ .erro{margin:14px 0 0;font-size:13.5px;color:var(--critical);word-break:break-word}
  .tabela{margin-top:26px;border:1px solid var(--border);border-radius:var(--radius);
    background:var(--card)}
- .tabela summary{cursor:pointer;padding:12px 16px;font-size:14px;font-weight:500}
+ .tabela summary{cursor:pointer;padding:14px 16px;font-size:15px;font-weight:500}
  .rolagem{overflow-x:auto;padding:0 16px 16px}
- .tabela table{border-collapse:collapse;font-size:12.5px;font-variant-numeric:tabular-nums}
+ .tabela table{border-collapse:collapse;font-size:13.5px;font-variant-numeric:tabular-nums}
  .tabela th,.tabela td{padding:6px 10px;text-align:right;white-space:nowrap;
    border-bottom:1px solid var(--border)}
  .tabela thead th{text-align:right;color:var(--muted-foreground);font-weight:500}
  .tabela tbody th{text-align:left;font-weight:500}
  .tabela .total{font-weight:600}
- footer{margin-top:28px;font-size:12.5px;color:var(--muted-foreground)}
+ footer{margin-top:28px;font-size:13.5px;color:var(--muted-foreground)}
  a{color:var(--primary)}
 
  /* Custo — a rota /custo reaproveita tudo acima e acrescenta só o que é dela. */
- .naves{display:flex;gap:18px;flex-wrap:wrap;font-size:13px;margin:14px 0 0}
+ .naves{display:flex;gap:24px;flex-wrap:wrap;font-size:15px;margin:14px 0 0}
  .naves a{text-decoration:none;color:var(--muted-foreground);padding-bottom:3px;
-   border-bottom:2px solid transparent}
- .naves a.atual{color:var(--foreground);border-bottom-color:var(--primary);font-weight:500}
+   border-bottom:2px solid transparent;padding:10px 0 8px}
+ .naves a.atual{color:var(--primary);border-bottom-color:var(--primary);font-weight:600}
+ .naves a:hover{color:var(--foreground)}
  .visao{margin-top:34px}
  .visao > h2{font-family:'Zilla Slab',Georgia,serif;font-size:19px;font-weight:600;
    margin:0;letter-spacing:-.01em}
- .visao > .para-quem{font-size:12.5px;color:var(--muted-foreground);margin:4px 0 0}
+ .visao > .para-quem{font-size:14px;max-width:80ch;color:var(--muted-foreground);margin:4px 0 0}
  .tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));
    gap:16px;margin-top:16px}
  .tile{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
    padding:16px 18px}
- .tile .rot{font-size:10.5px;letter-spacing:.07em;text-transform:uppercase;
+ .tile .rot{font-size:11.5px;letter-spacing:.07em;text-transform:uppercase;
    color:var(--muted-foreground)}
  .tile .val{font-size:27px;margin-top:6px;font-variant-numeric:tabular-nums;
    letter-spacing:-.02em;line-height:1.1}
- .tile .sub{font-size:12.5px;color:var(--muted-foreground);margin-top:6px}
+ .tile .sub{font-size:13.5px;color:var(--muted-foreground);margin-top:6px}
  .tile .val.alerta{color:var(--critical)}
  .tile .val.bom{color:var(--good)}
  .barra{height:7px;border-radius:4px;background:var(--muted);margin-top:12px;overflow:hidden}
@@ -286,13 +297,13 @@ ESTILO = """<style>
  .barra span.estoura{background:var(--critical)}
  .grafico-alto{height:132px}
  .legenda{display:flex;gap:16px;list-style:none;padding:0;margin:10px 0 0;
-   font-size:12px;color:var(--muted-foreground);flex-wrap:wrap}
+   font-size:13px;color:var(--muted-foreground);flex-wrap:wrap}
  .legenda .chave{display:inline-block;width:9px;height:9px;border-radius:2px;
    margin-right:6px;vertical-align:baseline}
- .lista{width:100%;border-collapse:collapse;font-size:13px;margin-top:14px;
+ .lista{width:100%;border-collapse:collapse;font-size:14px;margin-top:14px;
    font-variant-numeric:tabular-nums}
  .lista th{text-align:right;font-weight:500;color:var(--muted-foreground);
-   padding:8px 10px;border-bottom:1px solid var(--border);font-size:11px;
+   padding:8px 10px;border-bottom:1px solid var(--border);font-size:12px;
    letter-spacing:.05em;text-transform:uppercase}
  .lista th:first-child,.lista td:first-child{text-align:left}
  .lista td{padding:9px 10px;border-bottom:1px solid var(--border);text-align:right}
@@ -300,10 +311,24 @@ ESTILO = """<style>
  .marca{display:inline-block;font-size:10.5px;font-weight:600;letter-spacing:.05em;
    text-transform:uppercase;padding:2px 6px;border-radius:3px;
    background:#fdecef;color:var(--critical)}
- .nota{font-size:12.5px;color:var(--muted-foreground);margin:12px 0 0;max-width:70ch}
+ .nota{font-size:14px;color:var(--muted-foreground);margin:12px 0 0;max-width:70ch}
  .rolagem-tabela{overflow-x:auto;margin-top:12px}
  .premissa{background:var(--muted);border-radius:var(--radius);padding:14px 16px;
-   font-size:12.5px;color:var(--muted-foreground);margin-top:26px;max-width:80ch}
+   font-size:14px;color:var(--muted-foreground);margin-top:26px;max-width:80ch}
+ a:focus-visible,summary:focus-visible{outline:2px solid var(--ring);outline-offset:3px;border-radius:3px}
+
+ /* Indicadores — um cartão por recorte, legível a distância (reunião em telão). */
+ .intro{font-size:15px;color:var(--muted-foreground);max-width:80ch;margin:22px 0 0}
+ .indicador .recorte{font-size:15px;font-weight:600;margin:0;letter-spacing:-.01em}
+ .valor-destaque{font-size:clamp(30px,3.2vw,38px);font-weight:600;line-height:1.1;margin-top:10px;
+   font-variant-numeric:tabular-nums;letter-spacing:-.02em;color:var(--primary)}
+ .quando{font-size:13.5px;color:var(--muted-foreground);margin:6px 0 0;font-variant-numeric:tabular-nums}
+ .conta{font-size:13.5px;margin:12px 0 0;padding:8px 10px;background:var(--muted);
+   border-radius:calc(var(--radius) - .2rem);font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+ .rot-conta{font-size:11.5px;letter-spacing:.07em;text-transform:uppercase;
+   color:var(--muted-foreground);margin-right:6px}
+ .indicador .figura{margin-top:14px}
+ details.tabela{margin-top:18px}
 """
 
 
@@ -394,6 +419,7 @@ def _pagina_lake(
 {ESTILO}</style></head>
 <body>
 <header><h1>AlupData · saúde do DataLake</h1><span class="quem">{html.escape(usuario)}</span></header>
+{_naves("/lake")}
 {aviso}
 <div class="cabeca-secao">
   <p class="resumo">{resumo}</p>
@@ -644,12 +670,66 @@ INDICADORES = (
 )
 
 
+MESES = ("jan", "fev", "mar", "abr", "mai", "jun", "jul", "ago", "set", "out", "nov", "dez")
+
+
+def _mes(periodo: str) -> str:
+    """`2026-08` vira `ago/2026`; formato inesperado passa como veio."""
+    ano, _, mes = periodo.partition("-")
+    return f"{MESES[int(mes) - 1]}/{ano}" if mes.isdigit() and 1 <= int(mes) <= 12 else periodo
+
+
+def _br(valor: float, casas: int) -> str:
+    return f"{valor:,.{casas}f}".replace(",", "X").replace(".", ",").replace("X", ".")
+
+
+def _grandeza(valor: Decimal) -> str:
+    """Numerador e denominador com as casas que a ordem de grandeza pede."""
+    absoluto = abs(float(valor))
+    return _br(float(valor), 0 if absoluto >= 100 else 2 if absoluto >= 1 else 4)
+
+
 def _valor_indicador(linha: Indicador) -> str:
     if linha.valor is None:
         return "—"
     if linha.unidade_valor == "fração":
-        return f"{linha.valor * 100:.1f}%".replace(".", ",")
-    return f"R$ {linha.valor:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
+        return f"{_br(float(linha.valor) * 100, 1)}%"
+    return f"R$ {_br(float(linha.valor), 2)}"
+
+
+def _variacao(atual: Indicador, anterior: Indicador | None) -> str:
+    """Diferença contra o mês anterior, em texto e sem cor: não há meta (ADR 012)."""
+    if anterior is None or atual.valor is None or anterior.valor is None:
+        return "sem mês anterior para comparar"
+    delta = float(atual.valor) - float(anterior.valor)
+    seta = "▲" if delta > 0 else "▼" if delta < 0 else "="
+    if atual.unidade_valor == "fração":
+        texto = f"{'+' if delta >= 0 else '−'}{_br(abs(delta) * 100, 1)} p.p."
+    else:
+        texto = f"{'+' if delta >= 0 else '−'}R$ {_br(abs(delta), 2)}"
+    return f'<span aria-hidden="true">{seta}</span> {texto} vs {_mes(anterior.periodo_apuracao)}'
+
+
+def _cartao_indicador(recorte: str, por_mes: dict[str, Indicador]) -> str:
+    meses = sorted(por_mes)
+    atual = por_mes[meses[-1]]
+    anterior = por_mes[meses[-2]] if len(meses) > 1 else None
+    pontos = [
+        (m, float(ind.valor), f"{_mes(m)} · {_valor_indicador(ind)}")
+        for m in meses
+        if (ind := por_mes[m]).valor is not None
+    ]
+    rotulo = f"{recorte}: {_valor_indicador(atual)} em {_mes(atual.periodo_apuracao)}, série de {len(pontos)} meses"
+    # Só os números: as unidades estão uma vez no subtítulo da seção, e repeti-las
+    # em cada cartão tornava a conta ilegível a distância.
+    conta = f"{_grandeza(atual.numerador)} ÷ {_grandeza(atual.denominador)}"
+    return f"""<article class="cartao indicador">
+  <h3 class="recorte">{html.escape(recorte)}</h3>
+  <div class="valor-destaque">{_valor_indicador(atual)}</div>
+  <p class="quando">{_mes(atual.periodo_apuracao)} · {_variacao(atual, anterior)}</p>
+  <p class="conta"><span class="rot-conta">Conta</span> {conta}</p>
+  <figure class="figura">{tendencia(pontos, CORES[0], rotulo)}</figure>
+</article>"""
 
 
 def _secao_indicador(nome: str, titulo: str, frase: str, linhas: list[Indicador]) -> str:
@@ -661,25 +741,21 @@ def _secao_indicador(nome: str, titulo: str, frase: str, linhas: list[Indicador]
         recorte = " · ".join(p for p in (ind.submercado, ind.fonte) if p) or "Brasil"
         recortes.setdefault(recorte, {})[ind.periodo_apuracao] = ind
     exemplo = linhas[0]
-    cabeca = "".join(f"<th>{html.escape(m)}</th>" for m in meses)
+    cartoes = "".join(_cartao_indicador(r, por_mes) for r, por_mes in sorted(recortes.items()))
+    cabeca = "".join(f"<th>{_mes(m)}</th>" for m in meses)
     corpo = ""
     for recorte, por_mes in sorted(recortes.items()):
-        celulas = ""
-        for mes in meses:
-            ind = por_mes.get(mes)
-            if ind is None:
-                celulas += "<td>—</td>"
-                continue
-            dica = f"{ind.numerador:.2f} {ind.unidade_numerador} ÷ {ind.denominador:.4f} {ind.unidade_denominador}"
-            celulas += f'<td title="{html.escape(dica)}">{_valor_indicador(ind)}</td>'
+        celulas = "".join(f"<td>{_valor_indicador(por_mes[m])}</td>" if m in por_mes else "<td>—</td>" for m in meses)
         corpo += f"<tr><td>{html.escape(recorte)}</td>{celulas}</tr>"
-    return f"""<section class="visao">
+    return f"""<section class="visao" id="{html.escape(nome)}">
   <h2>{html.escape(titulo)}</h2>
-  <p class="premissa">{html.escape(frase)} <strong>Conta:</strong> {html.escape(exemplo.unidade_numerador)}
-   ÷ {html.escape(exemplo.unidade_denominador)}. <strong>Unidade:</strong> {html.escape(exemplo.unidade_valor)}.</p>
-  <div class="rolagem-tabela"><table class="lista">
+  <p class="para-quem">{html.escape(frase)} Conta: {html.escape(exemplo.unidade_numerador)}
+   ÷ {html.escape(exemplo.unidade_denominador)}.</p>
+  <div class="grade">{cartoes}</div>
+  <details class="tabela"><summary>Série completa, mês a mês ({len(meses)} meses)</summary>
+  <div class="rolagem"><table class="lista">
   <thead><tr><th>Recorte</th>{cabeca}</tr></thead><tbody>{corpo}</tbody>
-  </table></div>
+  </table></div></details>
 </section>"""
 
 
@@ -706,10 +782,11 @@ def _pagina_indicadores(linhas: list[Indicador], usuario: str, *, simulado: bool
 <body>
 <header><h1>AlupData · indicadores</h1><span class="quem">{html.escape(usuario)}</span></header>
 {_naves("/indicadores")}
+<main>
 {aviso}
+<p class="intro">Razões técnicas do setor, calculadas em <code>gold.indicadores_mensais</code>. Cada
+ cartão mostra o último mês, a conta que o produz e a tendência. Sem meta nem comparação entre
+ coligadas: indicador de negócio é da Fase 2 (ADR 012).</p>
 {secoes or '<p class="premissa">Nenhum indicador calculado ainda.</p>'}
-<p class="premissa"><strong>O que esta tela é.</strong> Razões técnicas do setor, com o numerador
- e o denominador de cada uma (passe o mouse sobre o valor). Não têm meta nem comparação entre
- coligadas: indicador de negócio é da Fase 2 (ADR 012). A conta mora em
- <code>gold.indicadores_mensais</code>, e esta tela só mostra.</p>
+</main>
 </body></html>"""

@@ -6,12 +6,19 @@ config {
 }
 
 -- Bronze: Intercâmbio horário do SIN com outros países (ONS). Aditivo 01.
+--
+-- `intercambio_programado_mwmed` só existe na origem a partir de 2026
+-- (confirmado no cabeçalho real em 28/09/2026); nula em 2024 e 2025. Mesmo
+-- ALTER de `ons_intercambio_nacional.sqlx` — ver o comentário lá.
+ALTER TABLE IF EXISTS ${self()}
+  ALTER COLUMN IF EXISTS intercambio_programado_mwmed DROP NOT NULL;
+
 CREATE TABLE IF NOT EXISTS ${self()} (
   data_referencia                   DATE       NOT NULL OPTIONS(description="Dia do instante"),
   instante                          DATETIME   NOT NULL OPTIONS(description="Hora de referência"),
   pais                              STRING     NOT NULL OPTIONS(description="País, sem os espaços à direita da origem"),
   intercambio_mwmed                 NUMERIC    NOT NULL OPTIONS(description="Positivo: exportação; negativo: importação, MWmed"),
-  intercambio_programado_mwmed      NUMERIC    NOT NULL OPTIONS(description="Programado, MWmed"),
+  intercambio_programado_mwmed      NUMERIC             OPTIONS(description="Programado, MWmed; nulo antes de 2026"),
 
   _ingestao_id        STRING    NOT NULL,
   _ingestao_timestamp TIMESTAMP NOT NULL,

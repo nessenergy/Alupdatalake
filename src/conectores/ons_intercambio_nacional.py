@@ -8,6 +8,12 @@ com o intercâmbio verificado e o programado. O verificado veio sempre positivo
 em 2026 (o sentido está no par); o **programado chega a negativo** (-5.507
 MWmed), então sinal não é validado. O nome do subsistema vem com espaço à
 esquerda (`" NORTE"`); o lake usa a sigla.
+
+**`val_intercambioprogmwmed` só existe a partir de 2026** — os arquivos de
+2024 e 2025 não têm a coluna (confirmado no cabeçalho real em 28/09/2026);
+não é vazio, é ausente. Vinha por acesso direto (`bruto[...]`), que estourava
+`KeyError` e derrubava a execução inteira nesses dois anos, sem contar como
+linha inválida — achado ao investigar a falha real da carga de 24 meses.
 """
 
 from __future__ import annotations
@@ -30,7 +36,7 @@ class IntercambioNacional(BaseModel):
     subsistema_origem: str
     subsistema_destino: str
     intercambio_mwmed: Decimal
-    intercambio_programado_mwmed: Decimal
+    intercambio_programado_mwmed: Decimal | None = None
 
     @field_validator("subsistema_origem", "subsistema_destino")
     @classmethod
@@ -57,5 +63,5 @@ class OnsIntercambioNacional(OnsCsvAnual):
             "subsistema_origem": bruto.get("id_subsistema_origem", ""),
             "subsistema_destino": bruto.get("id_subsistema_destino", ""),
             "intercambio_mwmed": bruto["val_intercambiomwmed"],
-            "intercambio_programado_mwmed": bruto["val_intercambioprogmwmed"],
+            "intercambio_programado_mwmed": bruto.get("val_intercambioprogmwmed"),
         }

@@ -7,6 +7,12 @@ Extração na base `OnsCsvAnual`. Uma linha por hora e país. **O sinal é o
 sentido do fluxo**: positivo é exportação, negativo é importação (em janeiro
 de 2026, -500 MWmed da Argentina). Sinal, portanto, não é validado. O nome do
 país vem com espaços à direita; o trim vive no validador.
+
+**`val_intercambioprogmwmed` só existe a partir de 2026** — os arquivos de
+2024 e 2025 não têm a coluna (confirmado no cabeçalho real em 28/09/2026);
+não é vazio, é ausente. Vinha por acesso direto (`bruto[...]`), que estourava
+`KeyError` e derrubava a execução inteira nesses dois anos, sem contar como
+linha inválida — mesmo achado do `ons_intercambio_nacional`.
 """
 
 from __future__ import annotations
@@ -29,7 +35,7 @@ class IntercambioInternacional(BaseModel):
     pais: str
     intercambio_mwmed: Decimal
     """Positivo: exportação. Negativo: importação."""
-    intercambio_programado_mwmed: Decimal
+    intercambio_programado_mwmed: Decimal | None = None
 
     @field_validator("pais")
     @classmethod
@@ -55,5 +61,5 @@ class OnsIntercambioInternacional(OnsCsvAnual):
             "instante": instante(bruto["din_instante"]),
             "pais": bruto.get("nom_paisdestino", ""),
             "intercambio_mwmed": bruto["val_intercambiomwmed"],
-            "intercambio_programado_mwmed": bruto["val_intercambioprogmwmed"],
+            "intercambio_programado_mwmed": bruto.get("val_intercambioprogmwmed"),
         }

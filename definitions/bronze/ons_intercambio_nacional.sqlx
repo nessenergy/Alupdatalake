@@ -6,13 +6,23 @@ config {
 }
 
 -- Bronze: Intercâmbio horário entre subsistemas (ONS). Aditivo 01.
+--
+-- `intercambio_programado_mwmed` só existe na origem a partir de 2026
+-- (confirmado no cabeçalho real em 28/09/2026); nula em 2024 e 2025.
+-- ALTER antes do CREATE: a tabela já existia com NOT NULL quando o achado
+-- veio à tona, e CREATE TABLE IF NOT EXISTS não evolui coluna de tabela
+-- existente. IF EXISTS nos dois lados torna o script idempotente também
+-- num ambiente novo, onde a tabela ainda não existe.
+ALTER TABLE IF EXISTS ${self()}
+  ALTER COLUMN IF EXISTS intercambio_programado_mwmed DROP NOT NULL;
+
 CREATE TABLE IF NOT EXISTS ${self()} (
   data_referencia                   DATE       NOT NULL OPTIONS(description="Dia do instante"),
   instante                          DATETIME   NOT NULL OPTIONS(description="Hora de referência"),
   subsistema_origem                 STRING     NOT NULL OPTIONS(description="N, NE, S, SE"),
   subsistema_destino                STRING     NOT NULL OPTIONS(description="N, NE, S, SE"),
   intercambio_mwmed                 NUMERIC    NOT NULL OPTIONS(description="Intercâmbio verificado, MWmed"),
-  intercambio_programado_mwmed      NUMERIC    NOT NULL OPTIONS(description="Intercâmbio programado, MWmed; pode ser negativo"),
+  intercambio_programado_mwmed      NUMERIC             OPTIONS(description="Intercâmbio programado, MWmed; pode ser negativo; nulo antes de 2026"),
 
   _ingestao_id        STRING    NOT NULL,
   _ingestao_timestamp TIMESTAMP NOT NULL,

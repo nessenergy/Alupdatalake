@@ -44,6 +44,13 @@ def config(caminho: Path) -> str:
     return achado.group(0)
 
 
+def _silencio_valores() -> str:
+    """O que `silencio.valores()` (includes/silencio.js) gera, lido do próprio arquivo."""
+    js = (RAIZ / "includes" / "silencio.js").read_text(encoding="utf-8")
+    pares = re.findall(r"^\s+([a-z0-9_]+):\s*(\d+),", js, re.M)
+    return ",\n    ".join(f"STRUCT('{c}' AS conector, {h} AS limite_h)" for c, h in pares)
+
+
 def renderizar(caminho: Path) -> str:
     """Reduz o `.sqlx` ao SQL que o Dataform geraria, com projeto e região de teste."""
     texto = _CONFIG.sub("", caminho.read_text(encoding="utf-8"), count=1)
@@ -52,6 +59,7 @@ def renderizar(caminho: Path) -> str:
         texto.replace("${self()}", f"`{PROJETO}.{caminho.parent.name}.{caminho.stem}`")
         .replace("${dataform.projectConfig.defaultDatabase}", PROJETO)
         .replace("${dataform.projectConfig.vars.regiao}", REGIAO)
+        .replace("${silencio.valores()}", _silencio_valores())
     )
 
 
@@ -341,3 +349,26 @@ def test_so_indicadores_mensais_divide_uma_serie_por_outra():
         if arquivo.stem == "indicadores_mensais" or arquivo.stem in GOLD_OPERACIONAL or arquivo.stem in RAZAO_PERMITIDA:
             continue
         assert "SAFE_DIVIDE(" not in _sem_comentarios(arquivo.read_text(encoding="utf-8")), arquivo.name
+
+
+def test_limite_de_atraso_do_portal_e_o_mesmo_do_alerta() -> None:
+    """`saude_ingestao` marca ATRASADA pelo limite de silêncio do alerta (29/09).
+
+    As duas listas — o mapa do Terraform e `includes/silencio.js` — têm de ser
+    iguais, ou o Portal e o alerta discordam sobre o que é atraso.
+    """
+    raiz = Path(__file__).resolve().parents[2]
+    tf = (raiz / "infra/modules/monitoramento/main.tf").read_text(encoding="utf-8")
+    bloco = tf[tf.index('variable "conectores_criticos"') :]
+    bloco = bloco[bloco.index("default") : bloco.index("\n  }\n")]
+    do_alerta = dict(re.findall(r"^\s+([a-z0-9_]+)\s*=\s*(\d+)", bloco, re.M))
+
+    js = (raiz / "includes/silencio.js").read_text(encoding="utf-8")
+    js = js[js.index("const limites_horas") : js.index("};")]
+    do_portal = dict(re.findall(r"^\s+([a-z0-9_]+):\s*(\d+),", js, re.M))
+
+    assert do_alerta and do_portal == do_alerta
+
+    saude = (raiz / "definitions/gold/saude_ingestao.sqlx").read_text(encoding="utf-8")
+    assert "${silencio.valores()}" in saude
+    assert "l.limite_h * 60" in saude

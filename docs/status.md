@@ -38,6 +38,31 @@ A10 e a [ADR 020](arquitetura/decisoes/020-token-tempook-rotacao-na-producao.md)
 Referência do código: `main` em `4bbe4a2`, de 23/09. O feriado de 07/09 não entra na contagem: primeiro dia útil de atraso
 em 08/09. G1 encerrou na reunião de 10/09 e não é bloqueio atual.
 
+## Registro de 29/09
+
+- **Portal aberto para a ness.** em `dev` e `hml`. A causa de ninguém da ness.
+  entrar era o cliente OAuth gerenciado pelo Google, que só aceita contas da
+  Alupar. Cliente OAuth "Externo" criado no console e papéis para configurá-lo
+  no grupo de operação (#313, #314, #316). Contas da ness. entram como usuárias
+  de teste do app. Sem papel básico: `owner` e `run.developer` concedidos à mão
+  a uma conta em `dev` e um convite de `owner` em `hml` foram removidos.
+- **Acesso da Alup liberado em `hml`** (#261, #315): grupo
+  `alup.alertas@alupar.com.br` com login no Portal e leitura da Gold.
+- **CVU conjuntural e revisado recusavam ~50% das linhas** de 2025: corrigido
+  e recarregado (#317).
+- **Saúde da ingestão:** "atrasada" passa a usar o limite de silêncio do alerta
+  e o último erro só aparece se for posterior ao último sucesso (#318). Antes,
+  as recargas manuais faziam fonte diária parecer atrasada.
+- **Assertion do `ons_carga` barrou dado errado:** o ONS publicou um valor
+  provisório negativo de carga e o corrigiu depois. A Gold não recebeu o valor;
+  a recarga de 20–29/09 trouxe o corrigido, e o Dataform voltou a passar em
+  `dev` e `hml`.
+- **Evidência do Aditivo 01 completa:** linhas por conector na §5 do
+  [documento](contrato/aditivo-01-conjuntos-publicos.md).
+- **`hml` recebendo 24 meses** dos conectores do aditivo e das fontes pesadas do
+  ONS, para a reunião de 01/10; carga, EAR e ENA do ONS ganham 24 meses também
+  em `dev`.
+
 ## Aditivo 01 — registro de 28/09
 
 Pedido da Alup de 28/09 (26 conjuntos públicos do ONS e da CCEE), tratado

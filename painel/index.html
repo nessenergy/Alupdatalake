@@ -216,8 +216,10 @@ footer{color:var(--muted);font-size:12.5px;border-top:1px solid var(--line-stron
 td a{color:var(--ink);text-decoration:none;border-bottom:1px solid var(--line-strong)}
 td a:hover{border-bottom-color:var(--accent)}
 .falha{color:var(--muted);font-size:13px;padding:8px 0}
-.aditivo-link{font-weight:500;font-size:12px;color:var(--accent);text-decoration:none;border:1px solid var(--accent);border-radius:999px;padding:3px 10px;margin:0 14px}
-.aditivo-link:hover{background:var(--accent);color:var(--band)}
+/* Aditivo 01: indicador que abre a tela própria (aditivo.html); fora das 580h */
+a.kpi{text-decoration:none;color:inherit}
+a.kpi .l{color:var(--accent)}
+a.kpi:hover .l{text-decoration:underline}
 /* marcos: faixa horizontal, na mesma linha do tempo das ondas */
 .miles-h{list-style:none;margin:14px 0 0;padding:12px 0 0;border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px 16px}
 .miles-h li{display:grid;gap:4px;align-content:start;padding-left:10px;border-left:2px solid var(--line-strong)}
@@ -309,7 +311,7 @@ html.tela #kpis{margin-top:6px}
   <div class="wrap">
     <div class="band-top">
       <div class="logo"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1220.80 403.20" role="img" aria-label="ness."><g transform="translate(41.230,318.938) scale(0.44362,-0.44362)"><path d="M594 305V0H498V294Q498 371 461.0 410.0Q424 449 355 449Q277 449 232.0 403.5Q187 358 187 273V0H91V530H183V450Q212 491 261.5 513.0Q311 535 374 535Q475 535 534.5 476.5Q594 418 594 305Z" fill="#FFFFFF"/><path transform="translate(681,0)" d="M568 233H138Q147 163 199.5 120.5Q252 78 330 78Q425 78 483 142L536 80Q500 38 446.5 16.0Q393 -6 327 -6Q243 -6 178.0 28.5Q113 63 77.5 125.0Q42 187 42 265Q42 342 76.5 404.0Q111 466 171.5 500.5Q232 535 308 535Q384 535 443.5 500.5Q503 466 536.5 404.0Q570 342 570 262Q570 251 568 233ZM138 302H478Q470 369 423.5 411.5Q377 454 308 454Q239 454 192.5 412.0Q146 370 138 302Z" fill="#FFFFFF"/><path transform="translate(1293,0)" d="M24 56 64 132Q99 107 149.0 92.0Q199 77 250 77Q376 77 376 149Q376 173 359.0 187.0Q342 201 316.5 207.5Q291 214 244 222Q180 232 139.5 245.0Q99 258 70.0 289.0Q41 320 41 376Q41 448 101.0 491.5Q161 535 262 535Q315 535 368.0 522.0Q421 509 455 487L414 411Q349 453 261 453Q200 453 168.0 433.0Q136 413 136 380Q136 354 154.0 339.0Q172 324 198.5 317.0Q225 310 273 301Q337 290 376.5 277.5Q416 265 444.0 235.0Q472 205 472 151Q472 79 410.5 36.5Q349 -6 243 -6Q178 -6 118.0 11.5Q58 29 24 56Z" fill="#FFFFFF"/><path transform="translate(1794,0)" d="M24 56 64 132Q99 107 149.0 92.0Q199 77 250 77Q376 77 376 149Q376 173 359.0 187.0Q342 201 316.5 207.5Q291 214 244 222Q180 232 139.5 245.0Q99 258 70.0 289.0Q41 320 41 376Q41 448 101.0 491.5Q161 535 262 535Q315 535 368.0 522.0Q421 509 455 487L414 411Q349 453 261 453Q200 453 168.0 433.0Q136 413 136 380Q136 354 154.0 339.0Q172 324 198.5 317.0Q225 310 273 301Q337 290 376.5 277.5Q416 265 444.0 235.0Q472 205 472 151Q472 79 410.5 36.5Q349 -6 243 -6Q178 -6 118.0 11.5Q58 29 24 56Z" fill="#FFFFFF"/><path transform="translate(2295,0)" d="M46 63Q46 92 66.0 111.5Q86 131 114 131Q142 131 161.0 112.0Q180 93 180 63Q180 33 160.5 13.5Q141 -6 114 -6Q86 -6 66.0 13.5Q46 33 46 63Z" fill="#00ADE8"/></g></svg><span class="proj">alup datalake</span></div>
-      <span><span class="conf">Documento confidencial</span><a class="aditivo-link" href="aditivo.html">Aditivo 01 →</a><span class="upd" id="upd">carregando…</span><span class="ritmo" id="ritmo"></span></span>
+      <span><span class="conf">Documento confidencial</span><span class="upd" id="upd">carregando…</span><span class="ritmo" id="ritmo"></span></span>
     </div>
     <div class="global" id="global"></div>
     <div class="kpis" id="kpis"></div>
@@ -417,6 +419,7 @@ html.tela #kpis{margin-top:6px}
       [d.pendencias.length+(atr?' <span class="late">'+atr+' atrasada'+(atr>1?'s':'')+'</span>':''),'pendências com a Alup'],
       ['<span'+(t.estado==='passou'?' class="ok"':'')+'>'+tn+'</span>','teste de conexão do FMB']
     ].map(function(k){return '<div class="kpi"><div class="v">'+k[0]+'</div><div class="l">'+k[1]+'</div></div>';}).join('');
+    kpiAditivo();
 
     // Ondas
     var ini=new Date(d.contrato.inicio+'T00:00:00-03:00'), fim=new Date(d.contrato.fim+'T00:00:00-03:00');
@@ -490,6 +493,21 @@ html.tela #kpis{margin-top:6px}
   }
   ajustarTela(); addEventListener('resize',ajustarTela);
 
+  // Aditivo 01: dado próprio (dados-aditivo.json), mostrado como indicador que
+  // leva à tela do aditivo. Falha aqui não derruba o painel.
+  var adit=null;
+  function kpiAditivo(){
+    if(!adit||!$('kpis').firstChild) return;
+    var s=adit.subtotal, el=$('kpi-aditivo');
+    var html='<a class="kpi" id="kpi-aditivo" href="aditivo.html" title="Aditivo 01, fora das 580h: '+s.itens_entregues+' de '+s.itens_total+' itens entregues">'+
+      '<div class="v">'+s.apontado+'h<small>/'+s.estimado+'h</small></div><div class="l">Aditivo 01 · '+s.itens_entregues+'/'+s.itens_total+' itens →</div></a>';
+    if(el) el.outerHTML=html; else $('kpis').insertAdjacentHTML('beforeend',html);
+  }
+  function buscarAditivo(){
+    fetch('dados-aditivo.json',{cache:'no-store'}).then(function(r){if(!r.ok)throw 0;return r.json();})
+      .then(function(d){adit=d;kpiAditivo();}).catch(function(){});
+  }
+
   var atual=null, versao=null, CINCO_MIN=5*60*1000;
   function falha(msg){
     $('upd').textContent='dados indisponíveis';
@@ -509,8 +527,8 @@ html.tela #kpis{margin-top:6px}
     }).catch(function(){});
   }
   if(window.DADOS){atual=window.DADOS;render(atual);return;}
-  buscar(); conferirPagina();
-  setInterval(function(){buscar();conferirPagina();},CINCO_MIN);
+  buscar(); buscarAditivo(); conferirPagina();
+  setInterval(function(){buscar();buscarAditivo();conferirPagina();},CINCO_MIN);
   setInterval(function(){if(atual)relogio(atual);},60*1000);
 })();
 </script>

@@ -75,8 +75,8 @@ nota = "fração = dias seguidos de carga / 3"
 codigo = "0.15"
 titulo = "Portal MVP com autenticação"
 horas = 8
-pronto = 0.9
-nota = "publicado; falta a demonstração com login da Alup"
+pronto = 0.95
+nota = "grupo alup.alertas confirmado em 29/09, com 7 usuários nomeados; falta o primeiro login efetivo"
 
 [[onda]]
 numero = 1
@@ -296,6 +296,11 @@ estado = "feito"
 [[marco]]
 data = 2026-09-25
 titulo = "Homologação no ar e dossiê das Ondas 0 e 1 enviado"
+estado = "feito"
+
+[[marco]]
+data = 2026-09-29
+titulo = "Acesso da Alup ao Portal confirmado, carga de 24 meses em hml, evidência de linhas por conector publicada"
 estado = "feito"
 
 [[marco]]

@@ -123,6 +123,20 @@ resource "google_project_iam_member" "leitura_projeto" {
   member  = each.value
 }
 
+# Login do Portal para quem entrega (runbook/portal.md, "Acesso da ness."): o
+# cliente OAuth "Externo" do IAP só se cria no console — a API foi desligada
+# pelo Google em 03/2026 — e exige estes dois papéis. Nenhum deles lê dado.
+resource "google_project_iam_member" "configuracao_login_portal" {
+  for_each = {
+    for par in setproduct(var.configuracao_login_portal, ["roles/oauthconfig.editor", "roles/iap.admin"]) :
+    "${par[0]} ${par[1]}" => { membro = par[0], papel = par[1] }
+  }
+
+  project = var.project_id
+  role    = each.value.papel
+  member  = each.value.membro
+}
+
 # ------------------------------------------------------------------- auditoria
 
 # R07 do RIPD: quem leu e quem gravou dado no BigQuery e no Cloud Storage. O

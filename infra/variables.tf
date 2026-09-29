@@ -126,6 +126,20 @@ variable "leitura_projeto" {
   }
 }
 
+variable "configuracao_login_portal" {
+  description = <<-EOT
+    Quem configura o login do Portal no console: cliente OAuth "Externo" e o
+    IAP (`roles/oauthconfig.editor` e `roles/iap.admin`). Sem acesso a dado.
+    Só group:<e-mail> ou domain:<domínio> (R01).
+  EOT
+  type        = list(string)
+  default     = []
+  validation {
+    condition     = alltrue([for m in var.configuracao_login_portal : can(regex("^(group|domain):[^\\s]+$", m))])
+    error_message = "Use só group:<e-mail> ou domain:<domínio>; acesso individual (user:) não entra."
+  }
+}
+
 variable "gravacao_segredos" {
   description = <<-EOT
     Quem grava versão nova de secret — o token do Dataform e as credenciais das

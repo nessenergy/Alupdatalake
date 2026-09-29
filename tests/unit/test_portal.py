@@ -494,6 +494,15 @@ def test_toda_tela_tem_a_barra_de_navegacao(cliente, rota) -> None:
     assert '<nav class="naves">' in cliente.get(rota).get_data(as_text=True)
 
 
+@pytest.mark.parametrize("rota", ["/", "/lake", "/custo", "/indicadores"])
+def test_navegacao_fica_no_cabecalho_fixo(cliente, rota) -> None:
+    """Título e navegação não rolam com a página: a barra mora dentro do <header>."""
+    corpo = cliente.get(rota).get_data(as_text=True)
+    cabecalho = corpo.split("<header>", 1)[1].split("</header>", 1)[0]
+    assert '<nav class="naves">' in cabecalho
+    assert "position:sticky" in corpo
+
+
 def test_indicador_destaca_o_ultimo_mes_de_cada_recorte(cliente) -> None:
     """Em telão não há mouse: o último mês aparece grande, com o mês escrito."""
     corpo = cliente.get("/indicadores").get_data(as_text=True)

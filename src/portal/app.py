@@ -230,8 +230,10 @@ ESTILO = """<style>
  body{font-family:'Hanken Grotesk',system-ui,-apple-system,Segoe UI,Arial,sans-serif;
    color:var(--foreground);background:var(--background);margin:0 auto;max-width:1320px;
    padding:clamp(24px,4vw,48px);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased}
+ /* Cabeçalho fixo: título e navegação não rolam com a página. */
  header{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:4px 16px;
-   border-bottom:1px solid var(--border);padding-bottom:16px}
+   border-bottom:1px solid var(--border);padding:12px 0 0;position:sticky;top:0;z-index:10;
+   background:var(--background)}
  h1{font-family:'Zilla Slab',Georgia,serif;font-weight:600;font-size:clamp(20px,2.4vw,27px);
    margin:0;letter-spacing:-.01em}
  .quem{font-size:14px;color:var(--muted-foreground)}
@@ -272,7 +274,7 @@ ESTILO = """<style>
  a{color:var(--primary)}
 
  /* Custo — a rota /custo reaproveita tudo acima e acrescenta só o que é dela. */
- .naves{display:flex;gap:24px;flex-wrap:wrap;font-size:15px;margin:14px 0 0}
+ .naves{display:flex;gap:24px;flex-wrap:wrap;font-size:15px;margin:6px 0 0;flex-basis:100%}
  .naves a{text-decoration:none;color:var(--muted-foreground);padding-bottom:3px;
    border-bottom:2px solid transparent;padding:10px 0 8px}
  .naves a.atual{color:var(--primary);border-bottom-color:var(--primary);font-weight:600}
@@ -418,8 +420,8 @@ def _pagina_lake(
 &family=Zilla+Slab:wght@500;600&display=swap">
 {ESTILO}</style></head>
 <body>
-<header><h1>AlupData · saúde do DataLake</h1><span class="quem">{html.escape(usuario)}</span></header>
-{_naves("/lake")}
+<header><h1>AlupData · saúde do DataLake</h1><span class="quem">{html.escape(usuario)}</span>
+{_naves("/lake")}</header>
 {aviso}
 <div class="cabeca-secao">
   <p class="resumo">{resumo}</p>
@@ -463,8 +465,8 @@ def _pagina(dados: Painel, usuario: str, *, simulado: bool) -> str:
 &family=Zilla+Slab:wght@500;600&display=swap">
 {ESTILO}</style></head>
 <body>
-<header><h1>AlupData · {html.escape(dados.view)}</h1><span class="quem">{html.escape(usuario)}</span></header>
-{_naves("/")}
+<header><h1>AlupData · {html.escape(dados.view)}</h1><span class="quem">{html.escape(usuario)}</span>
+{_naves("/")}</header>
 {aviso}
 <div class="rolagem-tabela"><table class="lista">
 <thead><tr>{cabecalhos}</tr></thead><tbody>{linhas}</tbody>
@@ -635,8 +637,8 @@ def _pagina_custo(dados: PainelCusto, usuario: str, *, simulado: bool) -> str:
 &family=Zilla+Slab:wght@500;600&display=swap">
 {ESTILO}</style></head>
 <body>
-<header><h1>AlupData · custo de nuvem</h1><span class="quem">{html.escape(usuario)}</span></header>
-{_naves("/custo")}
+<header><h1>AlupData · custo de nuvem</h1><span class="quem">{html.escape(usuario)}</span>
+{_naves("/custo")}</header>
 {aviso}
 {_visao_operacional(dados)}
 {_visao_orcamento(dados)}
@@ -780,8 +782,8 @@ def _pagina_indicadores(linhas: list[Indicador], usuario: str, *, simulado: bool
 &family=Zilla+Slab:wght@500;600&display=swap">
 {ESTILO}</style></head>
 <body>
-<header><h1>AlupData · indicadores</h1><span class="quem">{html.escape(usuario)}</span></header>
-{_naves("/indicadores")}
+<header><h1>AlupData · indicadores</h1><span class="quem">{html.escape(usuario)}</span>
+{_naves("/indicadores")}</header>
 <main>
 {aviso}
 <p class="intro">Razões técnicas do setor, calculadas em <code>gold.indicadores_mensais</code>. Cada

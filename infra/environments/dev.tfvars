@@ -11,9 +11,10 @@ grupo_operacao = "operacao-datalake@ness.com.br"
 # portal_acesso      = ["group:<grupo-consumidores>@<dominio-da-alup>"]
 
 # Quem grava versão de secret sem poder ler — o token do Dataform e as
-# credenciais das fontes (ADR 015, acesso de operação). Grupo da ness., nunca
-# pessoa (R01). Vazio não concede nada.
-gravacao_segredos = ["group:operacao-datalake@ness.com.br"]
+# credenciais das fontes (ADR 015, acesso de operação). Por grupo, nunca
+# pessoa (R01). O da Alup foi confirmado por e-mail em 29/09 (item 1 das
+# pendências de 24/09). Vazio não concede nada.
+gravacao_segredos = ["group:operacao-datalake@ness.com.br", "group:alup.alertas@alupar.com.br"]
 
 # Leitura do projeto inteiro, sem valor de segredo (roles/viewer).
 leitura_projeto = ["group:operacao-datalake@ness.com.br"]

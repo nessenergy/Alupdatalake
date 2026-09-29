@@ -5,7 +5,7 @@ referencia: REL-2026-09-08 · AlupData Fase 1
 emitido_em: 08 de setembro de 2026
 emitente: ness. Processos e Tecnologia Ltda.
 destinatario: Alup
-contrato: CPS-01025/2026 — AlupData Fase 1: DataLake
+contrato: "CPS-01025/2026 — AlupData Fase 1: DataLake"
 marco: Onda 0 · 15,52% · R$ 23.040,00
 responsavel: Ricardo Esper
 classificacao: Confidencial — uso restrito das partes

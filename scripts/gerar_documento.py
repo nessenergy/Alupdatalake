@@ -455,7 +455,8 @@ def separar_frontmatter(texto: str) -> tuple[dict[str, str], str]:
     for linha in texto[4:fim].splitlines():
         if ":" in linha:
             chave, _, valor = linha.partition(":")
-            meta[chave.strip()] = valor.strip()
+            # Valor com ": " vai entre aspas, senão o GitHub não lê o YAML.
+            meta[chave.strip()] = valor.strip().removeprefix('"').removesuffix('"')
     return meta, texto[fim + 5 :].lstrip("\n")
 
 

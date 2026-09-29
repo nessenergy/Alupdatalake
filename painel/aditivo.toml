@@ -1,0 +1,222 @@
+# Tela do Aditivo 01 no painel vivo (docs/planos/2026-09-25-painel-vivo.md).
+#
+# Espelha docs/contrato/aditivo-01-conjuntos-publicos.md — os dois são
+# editados juntos. `scripts/painel_aditivo.py` valida e monta o dados-aditivo.json.
+# Horas daqui não entram no progresso das 580h (painel/marcos.toml): o
+# Aditivo 01 é apontado à parte, por decisão registrada no próprio documento.
+
+titulo = "Aditivo 01 — conjuntos públicos do ONS e da CCEE"
+pedido_em = 2026-09-28
+issue = 294
+documento = "docs/contrato/aditivo-01-conjuntos-publicos.md"
+
+[[grupo]]
+codigo = "A"
+nome = "ONS — CSV anual"
+
+[[grupo.item]]
+numero = 1
+titulo = "Intercâmbios entre Subsistemas"
+horas = 6
+estado = "entregue"
+entregue_em = 2026-09-28
+prs = [298, 305]
+
+[[grupo.item]]
+numero = 2
+titulo = "Intercâmbio do SIN com Outros Países"
+horas = 5
+estado = "entregue"
+entregue_em = 2026-09-28
+prs = [298, 305]
+
+[[grupo.item]]
+numero = 3
+titulo = "Balanço de Energia nos Subsistemas"
+horas = 6
+estado = "entregue"
+entregue_em = 2026-09-28
+prs = [298]
+
+[[grupo.item]]
+numero = 4
+titulo = "CMO Semi-Horário"
+horas = 6
+estado = "entregue"
+entregue_em = 2026-09-28
+prs = [299]
+
+[[grupo.item]]
+numero = 5
+titulo = "CVU das Usinas Térmicas"
+horas = 8
+estado = "entregue"
+entregue_em = 2026-09-28
+prs = [299]
+
+[[grupo.item]]
+numero = 6
+titulo = "Volume de Espera Recomendado"
+horas = 5
+estado = "entregue"
+entregue_em = 2026-09-28
+prs = [299]
+
+[[grupo.item]]
+numero = 7
+titulo = "EAR Diário por Bacia"
+horas = 4
+estado = "entregue"
+entregue_em = 2026-09-28
+prs = [295]
+
+[[grupo.item]]
+numero = 8
+titulo = "EAR Diário por Reservatório"
+horas = 5
+estado = "entregue"
+entregue_em = 2026-09-28
+prs = [297]
+
+[[grupo.item]]
+numero = 9
+titulo = "ENA Diário por Bacia"
+horas = 4
+estado = "entregue"
+entregue_em = 2026-09-28
+prs = [297]
+
+[[grupo.item]]
+numero = 10
+titulo = "ENA Diário por Reservatório"
+horas = 5
+estado = "entregue"
+entregue_em = 2026-09-28
+prs = [297]
+
+[[grupo.item]]
+numero = 11
+titulo = "Geração Comercial para Exportação"
+horas = 5
+estado = "entregue"
+entregue_em = 2026-09-28
+prs = [298]
+
+[[grupo]]
+codigo = "B"
+nome = "ONS — CSV mensal pesado"
+
+[[grupo.item]]
+numero = 12
+titulo = "Dados Hidrológicos por Reservatório, horário"
+horas = 10
+estado = "pendente"
+
+[[grupo.item]]
+numero = 13
+titulo = "Energia Vertida Turbinável"
+horas = 9
+estado = "pendente"
+
+[[grupo.item]]
+numero = 14
+titulo = "Geração Térmica por Motivo de Despacho"
+horas = 10
+estado = "pendente"
+
+[[grupo.item]]
+numero = 15
+titulo = "Fator de Capacidade Eólica e Solar"
+horas = 10
+estado = "pendente"
+
+[[grupo]]
+codigo = "C"
+nome = "ONS — arquivo diário"
+
+[[grupo.item]]
+numero = 16
+titulo = "Previsão vs. Programado Eólicas/Solares"
+horas = 12
+estado = "pendente"
+
+[[grupo.item]]
+numero = 17
+titulo = "DESSEM, Balanço de Energia Geral"
+horas = 10
+estado = "pendente"
+
+[[grupo]]
+codigo = "D"
+nome = "ONS — API"
+
+[[grupo.item]]
+numero = 18
+titulo = "Carga de Energia Programada"
+horas = 12
+estado = "pendente"
+
+[[grupo.item]]
+numero = 19
+titulo = "Carga de Energia Verificada"
+horas = 6
+estado = "pendente"
+
+[[grupo]]
+codigo = "CCEE"
+nome = "CCEE — CKAN"
+
+[[grupo.item]]
+numero = 20
+titulo = "CVU Merchant"
+horas = 4
+estado = "entregue"
+entregue_em = 2026-09-28
+prs = [301]
+
+[[grupo.item]]
+numero = 21
+titulo = "CVU Conjuntural"
+horas = 4
+estado = "entregue"
+entregue_em = 2026-09-28
+prs = [301]
+
+[[grupo.item]]
+numero = 22
+titulo = "CVU Conjuntural Revisado"
+horas = 4
+estado = "entregue"
+entregue_em = 2026-09-28
+prs = [301]
+
+[[grupo.item]]
+numero = 23
+titulo = "Encargo de Reserva (CONER)"
+horas = 4
+estado = "entregue"
+entregue_em = 2026-09-28
+prs = [301]
+
+[[grupo.item]]
+numero = 24
+titulo = "TRC de Segurança Energética"
+horas = 4
+estado = "entregue"
+entregue_em = 2026-09-28
+prs = [301]
+
+[[grupo.item]]
+numero = 25
+titulo = "Consumo por Classe de Agente"
+horas = 4
+estado = "entregue"
+entregue_em = 2026-09-28
+prs = [301]
+
+[[grupo.item]]
+numero = 26
+titulo = "Consumo Horário por Perfil de Agente"
+horas = 6
+estado = "revisao"
+nota = "~185 GB de histórico em 24 meses (34,9 milhões de linhas/mês) — ordem de grandeza maior que os outros 6 itens CCEE. Estimativa revista, fora do subtotal (ver §4.1 do documento)."

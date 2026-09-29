@@ -85,6 +85,16 @@ No console do Google Cloud, no projeto do ambiente:
 4. **Segurança → Identity-Aware Proxy** → serviço `alupdata-portal` →
    **Configurações** → *Cliente OAuth personalizado*: cole o ID e o segredo.
    O segredo só é digitado no console; nunca em chat, issue ou repositório.
+   **Se a tela do IAP não listar o serviço** (ela exige `run.services.update`,
+   que a ness. não tem em `hml`), faça pelo Cloud Shell, que só exige
+   `iap.settingsAdmin`. O comando espera o segredo sem mostrá-lo:
+
+   ```bash
+   read -rs S && umask 077 && printf 'accessSettings:\n  oauthSettings:\n    clientId: <ID>\n    clientSecret: %s\n' "$S" > /tmp/iap.yaml && gcloud iap settings set /tmp/iap.yaml --project=<projeto> --resource-type=cloud-run --service=alupdata-portal --region=us-central1; rm -f /tmp/iap.yaml; unset S
+   ```
+
+   Não use "Corrigir acesso" nessa tela: ele concede papel fora do `infra/`.
+   Em `hml`, aplicado assim em 29/09.
 5. Teste em aba anônima com uma conta de cada lado (ness. e, em `hml`, Alup).
    Para desfazer, volte o passo 4 ao cliente gerenciado pelo Google.
 

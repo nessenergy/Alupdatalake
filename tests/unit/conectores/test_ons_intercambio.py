@@ -6,7 +6,10 @@ O que estes testes protegem:
 - no internacional, **valor negativo é importação**, não erro — o sentido do
   fluxo está no sinal (conferido em 2026: -500 MWmed da Argentina);
 - o nome do país vem com espaços à direita, e o do subsistema com espaço à
-  esquerda (`" NORTE"`).
+  esquerda (`" NORTE"`);
+- `val_intercambioprogmwmed` (programado) só existe na origem a partir de
+  2026 — os arquivos de 2024 e 2025 não têm a coluna, e isso não pode
+  derrubar a execução inteira (achado em 28/09/2026, na carga real).
 """
 
 from datetime import date, datetime
@@ -76,3 +79,34 @@ def test_internacional_negativo_e_importacao(internacional):
 def test_internacional_ingere_sem_descartar(internacional):
     execucao = internacional.ingerir(Janela.de_texto("2026-01-01", "2026-01-31"))
     assert (execucao.linhas_extraidas, execucao.linhas_invalidas) == (4, 0)
+
+
+def test_nacional_sem_coluna_de_programado_fica_nula(monkeypatch):
+    """2024 e 2025 não têm `val_intercambioprogmwmed`: ausente, não vazio."""
+    conector = _conector(monkeypatch, OnsIntercambioNacional, "ons_intercambio_nacional_2024.csv")
+    bruto = next(iter(conector.extrair(Janela.de_texto("2024-09-04", "2024-09-04"))))
+    registro = IntercambioNacional.model_validate(conector.transformar(bruto))
+
+    assert registro.intercambio_mwmed == Decimal("2103.400")
+    assert registro.intercambio_programado_mwmed is None
+
+
+def test_nacional_sem_coluna_de_programado_nao_derruba_a_execucao(monkeypatch):
+    conector = _conector(monkeypatch, OnsIntercambioNacional, "ons_intercambio_nacional_2024.csv")
+    execucao = conector.ingerir(Janela.de_texto("2024-09-01", "2024-09-30"))
+    assert (execucao.status, execucao.linhas_extraidas, execucao.linhas_invalidas) == ("SUCESSO", 2, 0)
+
+
+def test_internacional_sem_coluna_de_programado_fica_nula(monkeypatch):
+    conector = _conector(monkeypatch, OnsIntercambioInternacional, "ons_intercambio_internacional_2024.csv")
+    bruto = next(iter(conector.extrair(Janela.de_texto("2024-09-04", "2024-09-04"))))
+    registro = IntercambioInternacional.model_validate(conector.transformar(bruto))
+
+    assert registro.pais == "Argentina"
+    assert registro.intercambio_programado_mwmed is None
+
+
+def test_internacional_sem_coluna_de_programado_nao_derruba_a_execucao(monkeypatch):
+    conector = _conector(monkeypatch, OnsIntercambioInternacional, "ons_intercambio_internacional_2024.csv")
+    execucao = conector.ingerir(Janela.de_texto("2024-09-01", "2024-09-30"))
+    assert (execucao.status, execucao.linhas_extraidas, execucao.linhas_invalidas) == ("SUCESSO", 2, 0)

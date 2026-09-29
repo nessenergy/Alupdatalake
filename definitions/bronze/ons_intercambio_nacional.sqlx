@@ -8,14 +8,13 @@ config {
 -- Bronze: Intercâmbio horário entre subsistemas (ONS). Aditivo 01.
 --
 -- `intercambio_programado_mwmed` só existe na origem a partir de 2026
--- (confirmado no cabeçalho real em 28/09/2026); nula em 2024 e 2025.
--- ALTER antes do CREATE: a tabela já existia com NOT NULL quando o achado
--- veio à tona, e CREATE TABLE IF NOT EXISTS não evolui coluna de tabela
--- existente. IF EXISTS nos dois lados torna o script idempotente também
--- num ambiente novo, onde a tabela ainda não existe.
-ALTER TABLE IF EXISTS ${self()}
-  ALTER COLUMN IF EXISTS intercambio_programado_mwmed DROP NOT NULL;
-
+-- (confirmado no cabeçalho real em 28/09/2026); nula em 2024 e 2025. Em
+-- 28-29/09/2026 a tabela já existia com NOT NULL nessa coluna — um
+-- `ALTER TABLE ... DROP NOT NULL` rodou uma vez em `dev` para corrigir.
+-- Não fica aqui: `DROP NOT NULL` não é idempotente no BigQuery (erro se a
+-- coluna já é anulável), e `CREATE TABLE IF NOT EXISTS` não evolui coluna
+-- de tabela existente — só serve daqui para a frente, num ambiente novo,
+-- onde já nasce sem NOT NULL.
 CREATE TABLE IF NOT EXISTS ${self()} (
   data_referencia                   DATE       NOT NULL OPTIONS(description="Dia do instante"),
   instante                          DATETIME   NOT NULL OPTIONS(description="Hora de referência"),

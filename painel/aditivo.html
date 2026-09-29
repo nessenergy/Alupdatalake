@@ -112,7 +112,36 @@ code{font-family:var(--font);font-weight:500;font-size:12.5px;background:var(--t
 footer{color:var(--muted);font-size:12.5px;border-top:1px solid var(--line-strong);padding-top:16px;display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px 24px}
 footer a{color:var(--muted)}
 
-@media (min-width:1200px){.wrap{max-width:960px}}
+/* grupos: uma lista compacta por padrão técnico */
+.grupos{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:20px;align-items:start}
+.gcol{display:grid;gap:20px;align-content:start}
+.gh{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.gh span{font-weight:500;font-size:12.5px;color:var(--muted);white-space:nowrap}
+.itens{list-style:none;margin:0;padding:0}
+.itens li{display:grid;grid-template-columns:26px minmax(0,1fr) 34px auto;gap:10px;align-items:center;padding:7px 0;border-top:1px solid var(--line);font-size:13.5px}
+.itens li:first-child{border-top:0}
+.itens .n{font-weight:600;font-size:12px;color:var(--muted)}
+.itens .t{color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.itens .t a{color:inherit;text-decoration:none}
+.itens .t a:hover{border-bottom:1px solid var(--accent)}
+.itens .h{font-weight:500;font-size:12.5px;color:var(--muted);text-align:right}
+.itens li.pend .t{color:var(--muted)}
+.itens li.rev{grid-template-columns:26px minmax(0,1fr) 34px auto}
+.itens li.rev small{grid-column:2 / -1;color:var(--muted);font-size:12px;line-height:1.35;margin-top:-2px}
+
+/* tela única ≥1200 px, como o painel principal: desenha em 960 px de altura e escala */
+@media (min-width:1200px){
+  .wrap{max-width:none;padding-inline:28px}
+  html.tela{overflow:hidden;height:100%}
+  html.tela body{width:var(--tela-w);height:var(--tela-h);transform:scale(var(--tela-s));transform-origin:0 0;display:flex;flex-direction:column;overflow:hidden}
+  .band{padding-block:14px;flex:none}
+  .kicker{margin-top:10px} h1{margin:4px 0 6px;font-size:1.7rem} .rule{margin-bottom:8px}
+  .global{margin-top:10px}
+  main{flex:1;min-height:0;padding-block:16px;gap:14px}
+  .grupos{grid-template-columns:1.15fr 1fr 1fr;height:100%}
+  .panel{padding:14px 18px}
+  footer{display:none}
+}
 </style>
 </head>
 <body>
@@ -132,21 +161,7 @@ footer a{color:var(--muted)}
 </header>
 
 <main class="wrap">
-  <section class="panel" id="s-itens" aria-labelledby="t-itens">
-    <div class="sec-h">
-      <span class="num">01</span><h2 id="t-itens">Itens, por padrão técnico</h2>
-      <div class="legend">
-        <span><i style="background:var(--accent)"></i>entregue</span>
-        <span><i style="border:1px solid var(--line-strong)"></i>pendente</span>
-        <span><i style="background:var(--late-bg)"></i>estimativa em revisão</span>
-      </div>
-    </div>
-    <p class="sub">"Entregue" = os 7 componentes da cláusula 2ª no ar e carga de 24 meses confirmada em <code>dev</code>.</p>
-    <div class="tbl-wrap"><table>
-      <thead><tr><th>#</th><th>Item</th><th>Horas</th><th>Estado</th><th>Entregue em</th><th>PR</th></tr></thead>
-      <tbody id="itens"></tbody>
-    </table></div>
-  </section>
+  <div class="grupos" id="grupos"></div>
   <footer>
     <span>Documento confidencial</span>
     <span id="fonte">painel/aditivo.toml · <a href="index.html">painel principal</a></span>
@@ -182,22 +197,39 @@ footer a{color:var(--muted)}
     var s=d.subtotal, pc=(s.apontado/s.estimado*100);
     $('global').innerHTML='<div class="pct">'+s.apontado+'h<small> de '+s.estimado+'h estimadas</small></div>'+
       '<div><div class="gbar" role="img" aria-label="'+s.apontado+' de '+s.estimado+' horas apontadas"><i style="width:'+pc.toFixed(1)+'%"></i></div>'+
-      '<div class="gsub"><b>'+s.itens_entregues+'</b> de <b>'+s.itens_total+'</b> itens entregues · item 26 fora do subtotal, estimativa em revisão</div></div>';
+      '<div class="gsub"><b>'+s.itens_entregues+'</b> de <b>'+s.itens_total+'</b> itens entregues (7 componentes + carga de 24 meses em dev) · item 26 fora do subtotal, estimativa em revisão</div></div>';
 
-    var linhas='';
-    d.grupos.forEach(function(g){
-      linhas+='<tr><td colspan="6" style="border:0;padding-top:16px"><span class="grp">'+esc(g.codigo)+' · '+esc(g.nome)+'</span></td></tr>';
-      g.item.forEach(function(it){
-        var estadoChip=it.estado==='entregue'?chip('ok','entregue'):it.estado==='revisao'?chip('rev','em revisão'):chip('wait','pendente');
-        var prs=(it.prs||[]).map(function(p){return '<a href="'+GHP+p+'" target="_blank" rel="noopener">#'+p+'</a>';}).join(', ');
-        linhas+='<tr class="'+(it.estado==='revisao'?'rev':'')+'"><td class="n">'+it.numero+'</td>'+
-          '<td>'+esc(it.titulo)+(it.nota?'<small>'+esc(it.nota)+'</small>':'')+'</td>'+
-          '<td class="h">'+it.horas+'h</td><td>'+estadoChip+'</td>'+
-          '<td class="dt">'+(it.entregue_em?dia(it.entregue_em):'—')+'</td><td>'+(prs||'—')+'</td></tr>';
-      });
-    });
-    $('itens').innerHTML=linhas;
+    // Um painel por padrão técnico; três colunas equilibradas na tela única:
+    // A (11 itens) | CCEE (7) + D (2) | B (4) + C (2).
+    var num=0;
+    var painel=function(g){
+      var feitos=g.item.filter(function(i){return i.estado==='entregue';}).length;
+      var h=g.item.reduce(function(a,i){return a+(i.estado==='entregue'?i.horas:0);},0);
+      var t=g.item.reduce(function(a,i){return a+(i.estado==='revisao'?0:i.horas);},0);
+      num++;
+      return '<section class="panel"><div class="sec-h gh"><span><span class="num">0'+num+'</span> <h2 style="display:inline">'+esc(g.nome)+'</h2></span>'+
+        '<span>'+feitos+'/'+g.item.length+' · '+h+'h de '+t+'h</span></div><ul class="itens">'+
+        g.item.map(function(it){
+          var st=it.estado==='entregue'?chip('ok','entregue '+dia(it.entregue_em).slice(0,5)):it.estado==='revisao'?chip('rev','em revisão'):chip('wait','pendente');
+          var pr=(it.prs||[])[0], tit=pr?'<a href="'+GHP+pr+'" target="_blank" rel="noopener" title="'+esc(it.titulo)+' · PR '+(it.prs||[]).map(function(p){return '#'+p;}).join(', ')+'">'+esc(it.titulo)+'</a>':esc(it.titulo);
+          return '<li class="'+(it.estado==='entregue'?'':it.estado==='revisao'?'rev':'pend')+'"><span class="n">'+it.numero+'</span><span class="t">'+tit+'</span>'+
+            '<span class="h">'+it.horas+'h</span>'+st+(it.nota?'<small>'+esc(it.nota)+'</small>':'')+'</li>';
+        }).join('')+'</ul></section>';
+    };
+    var por={};d.grupos.forEach(function(g){por[g.codigo]=g;});
+    var col=function(cods){return '<div class="gcol">'+cods.filter(function(c){return por[c];}).map(function(c){return painel(por[c]);}).join('')+'</div>';};
+    $('grupos').innerHTML=col(['A'])+col(['CCEE','D'])+col(['B','C']);
   }
+
+  var ALTURA=960, LARGURA_MIN=1500;
+  function ajustarTela(){
+    var h=document.documentElement, W=innerWidth, H=innerHeight;
+    if(W<1200||W<H){h.classList.remove('tela');return;}
+    var s=Math.min(H/ALTURA, W/LARGURA_MIN);
+    h.style.setProperty('--tela-s',s); h.style.setProperty('--tela-w',(W/s)+'px'); h.style.setProperty('--tela-h',(H/s)+'px');
+    h.classList.add('tela');
+  }
+  ajustarTela(); addEventListener('resize',ajustarTela);
 
   var CINCO_MIN=5*60*1000, atual=null;
   function falha(msg){

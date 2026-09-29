@@ -166,12 +166,25 @@ componentes estão entregues e a carga roda em `dev`.
 
 | # | Conjunto | Estimado | Apontado | Entregue em | PR |
 |---|---|---|---|---|---|
+| 1 | `intercambio-nacional` | 6 | 6 | 28/09/2026 | [#298](https://github.com/nessenergy/Alupdatalake/pull/298), fix [#305](https://github.com/nessenergy/Alupdatalake/pull/305) |
+| 2 | `intercambio-internacional` | 5 | 5 | 28/09/2026 | [#298](https://github.com/nessenergy/Alupdatalake/pull/298), fix [#305](https://github.com/nessenergy/Alupdatalake/pull/305) |
+| 3 | `balanco-energia-subsistema` | 6 | 6 | 28/09/2026 | [#298](https://github.com/nessenergy/Alupdatalake/pull/298) |
+| 4 | `cmo-semi-horario` | 6 | 6 | 28/09/2026 | [#299](https://github.com/nessenergy/Alupdatalake/pull/299) |
+| 5 | `cvu-usitermica` | 8 | 8 | 28/09/2026 | [#299](https://github.com/nessenergy/Alupdatalake/pull/299) |
+| 6 | `res_volumeespera` | 5 | 5 | 28/09/2026 | [#299](https://github.com/nessenergy/Alupdatalake/pull/299) |
 | 7 | `ear-diario-por-bacia` | 4 | 4 | 28/09/2026 | [#295](https://github.com/nessenergy/Alupdatalake/pull/295) |
 | 8 | `ear-diario-por-reservatorio` | 5 | 5 | 28/09/2026 | [#297](https://github.com/nessenergy/Alupdatalake/pull/297) |
 | 9 | `ena-diario-por-bacia` | 4 | 4 | 28/09/2026 | [#297](https://github.com/nessenergy/Alupdatalake/pull/297) |
 | 10 | `ena-diario-por-reservatorio` | 5 | 5 | 28/09/2026 | [#297](https://github.com/nessenergy/Alupdatalake/pull/297) |
+| 11 | `geracao-exportacao-internacional` | 5 | 5 | 28/09/2026 | [#298](https://github.com/nessenergy/Alupdatalake/pull/298) |
+| 20 | `custo_variavel_unitario_merchant` | 4 | 4 | 28/09/2026 | [#301](https://github.com/nessenergy/Alupdatalake/pull/301) |
+| 21 | `custo_variavel_unitario_conjuntural` | 4 | 4 | 28/09/2026 | [#301](https://github.com/nessenergy/Alupdatalake/pull/301) |
+| 22 | `custo_variavel_unitario_conjuntural_revisado` | 4 | 4 | 28/09/2026 | [#301](https://github.com/nessenergy/Alupdatalake/pull/301) |
+| 23 | `reserva_encargo` | 4 | 4 | 28/09/2026 | [#301](https://github.com/nessenergy/Alupdatalake/pull/301) |
+| 24 | `energia_reserva_consumo_referencia` | 4 | 4 | 28/09/2026 | [#301](https://github.com/nessenergy/Alupdatalake/pull/301) |
+| 25 | `consumo_classe_agente` | 4 | 4 | 28/09/2026 | [#301](https://github.com/nessenergy/Alupdatalake/pull/301) |
 
-**Apontado até agora: 18h de 162h** (itens 1–25; item 26 tratado em §4.1).
+**Apontado até agora: 83h de 162h** (itens 1–25; item 26 tratado em §4.1).
 
 Evidência do item 7: carga em `dev` de 28/09, 14.976 linhas de 01/09/2024 a
 27/09/2026, 23 bacias, zero inválidas; `gold.armazenamento_mensal_bacia`
@@ -182,6 +195,17 @@ os três conectores (`ons_ear_reservatorio`, `ons_ena_bacia`,
 `ons_ena_reservatorio`) na janela 01/09/2024–27/09/2026; contagem exata de
 linhas fica pendente de consulta ao BigQuery (sem acesso interativo ao
 `gcloud` nesta sessão) — a completar antes da homologação.
+
+Evidência dos itens 1–6, 11 e 20–25: carga completa de 24 meses
+(01/09/2024–28/09/2026) em `dev`, todos os 13 conectores com execução
+SUCESSO, Dataform recalculado. Os itens 1 e 2 exigiram correção de bug
+(#305): `intercambio_programado_mwmed` só existe na origem a partir de
+2026, e o acesso direto ao campo (sem `.get()`) derrubava a execução
+inteira para 2024/2025 — achado só depois do diagnóstico de log real
+adicionado em #303/#304 (a SA de deploy não tinha `roles/logging.viewer`;
+aplicado via `infra/bootstrap` em 28/09). Contagem exata de linhas por
+conector fica pendente de consulta ao BigQuery, mesma ressalva dos itens
+8–10.
 
 ## 6. Fora desta estimativa
 

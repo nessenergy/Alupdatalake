@@ -1,0 +1,219 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>Alup Datalake · Aditivo 01</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&display=swap">
+<style>
+/* ness. — tokens da marca (references/tokens.css); mesmo tema do painel principal */
+:root{
+  --ness-cyan:#00ADE8; --ness-cyan-escuro:#0090C4; --ness-cyan-nevoa:#E5F6FD;
+  --ness-tinta:#0E1116; --ness-grafite:#2B333B; --ness-cinza:#5A6473;
+  --ness-linha:#C7D2DE; --ness-fio:#E4E8EC; --ness-nevoa:#EEF3F8; --ness-branco:#FFFFFF;
+
+  --ground:var(--ness-nevoa); --surface:var(--ness-branco);
+  --ink:var(--ness-tinta); --text:var(--ness-grafite); --muted:var(--ness-cinza);
+  --line:var(--ness-fio); --line-strong:var(--ness-linha);
+  --accent:var(--ness-cyan); --accent-ink:var(--ness-cyan-escuro); --accent-soft:var(--ness-cyan-nevoa);
+  --th-bg:var(--ness-tinta); --th-ink:var(--ness-branco);
+  --late-bg:var(--ness-tinta); --late-ink:var(--ness-branco);
+  --band:var(--ness-tinta); --band-ink:var(--ness-branco); --band-muted:#8A94A0; --band-line:rgba(255,255,255,.1);
+  --track:var(--ness-nevoa);
+  --font:"Montserrat",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --ground:#0E1116; --surface:#161B22; --ink:#FFFFFF; --text:#D5DBE2; --muted:#8A94A0;
+    --line:#252C35; --line-strong:#353E49; --accent-ink:#4CC6F0; --accent-soft:rgba(0,173,232,.14);
+    --th-bg:#252C35; --th-ink:#FFFFFF; --late-bg:#FFFFFF; --late-ink:#0E1116;
+    --band:#07090C; --track:#1C222A;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --ground:#0E1116; --surface:#161B22; --ink:#FFFFFF; --text:#D5DBE2; --muted:#8A94A0;
+  --line:#252C35; --line-strong:#353E49; --accent-ink:#4CC6F0; --accent-soft:rgba(0,173,232,.14);
+  --th-bg:#252C35; --th-ink:#FFFFFF; --late-bg:#FFFFFF; --late-ink:#0E1116;
+  --band:#07090C; --track:#1C222A;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ground);color:var(--text);font:400 15px/1.55 var(--font);font-variant-numeric:tabular-nums}
+.wrap{max-width:1180px;margin:0 auto;padding-inline:20px}
+
+.band{background:var(--band);color:var(--band-ink);padding-block:28px 28px}
+.band-top{display:flex;flex-wrap:wrap;justify-content:space-between;gap:10px 24px;align-items:center}
+.logo{display:grid;justify-items:start;row-gap:2px}
+.logo svg{width:104px;height:auto;display:block}
+.logo .proj{font-weight:500;font-size:13px;letter-spacing:.02em;color:var(--band-muted);padding-left:3.5px;line-height:1.2}
+.voltar{font-weight:500;font-size:12.5px;color:var(--band-muted);text-decoration:none;border-bottom:1px solid transparent}
+.voltar:hover{color:var(--band-ink);border-bottom-color:var(--accent)}
+.stamp{font-weight:500;font-size:12px;color:var(--band-muted);letter-spacing:.04em}
+.conf{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--band-muted);margin-right:14px}
+.upd{font-weight:500;font-size:12px;color:var(--band-muted)}
+.upd b{color:var(--band-ink);font-weight:600}
+.kicker{color:var(--accent);font-weight:600;font-size:11px;letter-spacing:.16em;text-transform:uppercase;margin:26px 0 0}
+h1{font-weight:600;font-size:clamp(1.55rem,3.2vw,2.15rem);letter-spacing:-.01em;line-height:1.18;margin:8px 0 10px;text-wrap:balance;color:var(--band-ink)}
+.rule{width:64px;height:3px;background:var(--accent);margin:0 0 14px}
+.lede{color:var(--band-muted);max-width:70ch;margin:0}
+.lede a{color:var(--band-muted)}
+.lede b{color:var(--band-ink);font-weight:500}
+
+.global{margin-top:20px;display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 22px;align-items:center}
+.global .pct{font-weight:600;font-size:1.9rem;line-height:1;color:var(--band-ink);white-space:nowrap}
+.global .pct small{font-size:.95rem;font-weight:500;color:var(--band-muted);margin-left:6px}
+.gsub{font-size:12px;color:var(--band-muted);white-space:nowrap;font-variant-numeric:tabular-nums}
+.gsub b{font-weight:600;color:var(--band-ink)}
+.gbar{position:relative;height:16px;border-radius:3px;background:rgba(255,255,255,.08);overflow:hidden}
+.gbar i{position:absolute;inset:0 auto 0 0;background:var(--accent);border-radius:3px 0 0 3px}
+@media (max-width:700px){.global{grid-template-columns:1fr}.gsub{white-space:normal}}
+
+main{padding-block:32px 48px;display:grid;gap:28px}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:22px}
+.sec-h{display:flex;align-items:baseline;gap:12px;margin:0 0 6px;padding-bottom:10px;border-bottom:1px solid var(--line)}
+.sec-h .num{color:var(--accent);font-weight:600;font-size:14px;letter-spacing:.04em}
+.sec-h h2{font-weight:600;font-size:1.12rem;letter-spacing:-.01em;margin:0;color:var(--ink)}
+.sec-h .legend{margin-left:auto}
+.sub{color:var(--muted);font-size:13.5px;margin:10px 0 16px}
+.grp{color:var(--accent-ink);font-weight:500;font-size:13px;margin:18px 0 4px}
+.grp::before{content:"▸ ";color:var(--accent)}
+.grp:first-of-type{margin-top:0}
+
+.chip{display:inline-flex;align-items:center;gap:6px;font-weight:500;font-size:11.5px;line-height:1;padding:5px 10px;border-radius:999px;white-space:nowrap}
+.chip::before{content:"";width:7px;height:7px;border-radius:50%;box-sizing:border-box}
+.chip.ok{color:var(--accent-ink);background:var(--accent-soft)}
+.chip.ok::before{background:var(--accent)}
+.chip.wait{color:var(--muted);border:1px solid var(--line-strong)}
+.chip.wait::before{border:1.5px solid currentColor}
+.chip.rev{color:var(--late-ink);background:var(--late-bg)}
+.chip.rev::before{background:var(--accent)}
+.legend{display:flex;flex-wrap:wrap;gap:6px 20px;font-size:12.5px;color:var(--muted)}
+.legend i{display:inline-block;width:14px;height:12px;border-radius:2px;vertical-align:-2px;margin-right:6px}
+
+.tbl-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+th{background:var(--th-bg);color:var(--th-ink);text-align:left;font-weight:600;font-size:11.5px;letter-spacing:.04em;padding:9px 10px}
+th:first-child{border-radius:4px 0 0 0} th:last-child{border-radius:0 4px 0 0}
+td{padding:11px 10px;border-bottom:1px solid var(--line);vertical-align:top;color:var(--text)}
+tr:last-child td{border-bottom:0}
+td.n{font-weight:600;font-size:12.5px;color:var(--muted);width:34px}
+td.h{font-weight:500;font-size:12.5px;white-space:nowrap;color:var(--ink);width:60px}
+td.dt{font-weight:500;font-size:12.5px;white-space:nowrap;color:var(--ink)}
+td small{display:block;color:var(--muted);font-size:12px;margin-top:2px}
+tr.rev td{background:var(--accent-soft)}
+tr.rev td:first-child{box-shadow:inset 3px 0 0 var(--accent)}
+td a{color:var(--ink);text-decoration:none;border-bottom:1px solid var(--line-strong)}
+td a:hover{border-bottom-color:var(--accent)}
+code{font-family:var(--font);font-weight:500;font-size:12.5px;background:var(--track);color:var(--ink);padding:1px 6px;border-radius:3px}
+
+footer{color:var(--muted);font-size:12.5px;border-top:1px solid var(--line-strong);padding-top:16px;display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px 24px}
+footer a{color:var(--muted)}
+
+@media (min-width:1200px){.wrap{max-width:960px}}
+</style>
+</head>
+<body>
+
+<header class="band">
+  <div class="wrap">
+    <div class="band-top">
+      <div class="logo"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1220.80 403.20" role="img" aria-label="ness."><g transform="translate(41.230,318.938) scale(0.44362,-0.44362)"><path d="M594 305V0H498V294Q498 371 461.0 410.0Q424 449 355 449Q277 449 232.0 403.5Q187 358 187 273V0H91V530H183V450Q212 491 261.5 513.0Q311 535 374 535Q475 535 534.5 476.5Q594 418 594 305Z" fill="#FFFFFF"/><path transform="translate(681,0)" d="M568 233H138Q147 163 199.5 120.5Q252 78 330 78Q425 78 483 142L536 80Q500 38 446.5 16.0Q393 -6 327 -6Q243 -6 178.0 28.5Q113 63 77.5 125.0Q42 187 42 265Q42 342 76.5 404.0Q111 466 171.5 500.5Q232 535 308 535Q384 535 443.5 500.5Q503 466 536.5 404.0Q570 342 570 262Q570 251 568 233ZM138 302H478Q470 369 423.5 411.5Q377 454 308 454Q239 454 192.5 412.0Q146 370 138 302Z" fill="#FFFFFF"/><path transform="translate(1293,0)" d="M24 56 64 132Q99 107 149.0 92.0Q199 77 250 77Q376 77 376 149Q376 173 359.0 187.0Q342 201 316.5 207.5Q291 214 244 222Q180 232 139.5 245.0Q99 258 70.0 289.0Q41 320 41 376Q41 448 101.0 491.5Q161 535 262 535Q315 535 368.0 522.0Q421 509 455 487L414 411Q349 453 261 453Q200 453 168.0 433.0Q136 413 136 380Q136 354 154.0 339.0Q172 324 198.5 317.0Q225 310 273 301Q337 290 376.5 277.5Q416 265 444.0 235.0Q472 205 472 151Q472 79 410.5 36.5Q349 -6 243 -6Q178 -6 118.0 11.5Q58 29 24 56Z" fill="#FFFFFF"/><path transform="translate(1794,0)" d="M24 56 64 132Q99 107 149.0 92.0Q199 77 250 77Q376 77 376 149Q376 173 359.0 187.0Q342 201 316.5 207.5Q291 214 244 222Q180 232 139.5 245.0Q99 258 70.0 289.0Q41 320 41 376Q41 448 101.0 491.5Q161 535 262 535Q315 535 368.0 522.0Q421 509 455 487L414 411Q349 453 261 453Q200 453 168.0 433.0Q136 413 136 380Q136 354 154.0 339.0Q172 324 198.5 317.0Q225 310 273 301Q337 290 376.5 277.5Q416 265 444.0 235.0Q472 205 472 151Q472 79 410.5 36.5Q349 -6 243 -6Q178 -6 118.0 11.5Q58 29 24 56Z" fill="#FFFFFF"/><path transform="translate(2295,0)" d="M46 63Q46 92 66.0 111.5Q86 131 114 131Q142 131 161.0 112.0Q180 93 180 63Q180 33 160.5 13.5Q141 -6 114 -6Q86 -6 66.0 13.5Q46 33 46 63Z" fill="#00ADE8"/></g></svg><span class="proj">alup datalake</span></div>
+      <span><span class="conf">Documento confidencial</span><span class="upd" id="upd">carregando…</span></span>
+    </div>
+    <p class="kicker">Fora do contrato · CPS-01025/2026</p>
+    <h1 id="titulo">Aditivo 01</h1>
+    <div class="rule"></div>
+    <p class="lede">Pedido pela Alup em <b id="pedido">—</b>, fora das 13 fontes e das 580h do plano de execução original. Fundamento técnico, estimativa e controle de horas em <a href="#" id="link-doc"><code id="cod-doc">docs/contrato/…</code></a> e na issue <a href="#" id="link-issue">#—</a>. <a class="voltar" href="index.html">← voltar ao painel</a></p>
+    <div class="global" id="global"></div>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="panel" id="s-itens" aria-labelledby="t-itens">
+    <div class="sec-h">
+      <span class="num">01</span><h2 id="t-itens">Itens, por padrão técnico</h2>
+      <div class="legend">
+        <span><i style="background:var(--accent)"></i>entregue</span>
+        <span><i style="border:1px solid var(--line-strong)"></i>pendente</span>
+        <span><i style="background:var(--late-bg)"></i>estimativa em revisão</span>
+      </div>
+    </div>
+    <p class="sub">"Entregue" = os 7 componentes da cláusula 2ª no ar e carga de 24 meses confirmada em <code>dev</code>.</p>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>#</th><th>Item</th><th>Horas</th><th>Estado</th><th>Entregue em</th><th>PR</th></tr></thead>
+      <tbody id="itens"></tbody>
+    </table></div>
+  </section>
+  <footer>
+    <span>Documento confidencial</span>
+    <span id="fonte">painel/aditivo.toml · <a href="index.html">painel principal</a></span>
+  </footer>
+</main>
+
+<script>
+(function(){
+  var $=function(id){return document.getElementById(id);};
+  var esc=function(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});};
+  var dia=function(iso){var d=new Date(iso.length===10?iso+'T12:00:00-03:00':iso);return d.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric',timeZone:'America/Sao_Paulo'});};
+  var hora=function(iso){return new Date(iso).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit',timeZone:'America/Sao_Paulo'});};
+  var chip=function(cls,txt){return '<span class="chip '+cls+'">'+esc(txt)+'</span>';};
+  var GH='https://github.com/nessenergy/Alupdatalake/blob/main/';
+  var GHI='https://github.com/nessenergy/Alupdatalake/issues/';
+  var GHP='https://github.com/nessenergy/Alupdatalake/pull/';
+
+  function relogio(d){
+    var min=Math.round((new Date()-new Date(d.gerado_em))/60000), upd=$('upd');
+    upd.innerHTML='atualizado <b>'+(min<1?'agora':min<60?'há '+min+' min':'há '+Math.round(min/60)+' h')+'</b> · '+hora(d.gerado_em);
+  }
+
+  function render(d){
+    relogio(d);
+    document.title='Alup Datalake · '+d.titulo;
+    $('titulo').textContent=d.titulo;
+    $('pedido').textContent=dia(d.pedido_em);
+    $('link-doc').href=GH+d.documento;
+    $('cod-doc').textContent=d.documento;
+    $('link-issue').href=GHI+d.issue;
+    $('link-issue').textContent='#'+d.issue;
+
+    var s=d.subtotal, pc=(s.apontado/s.estimado*100);
+    $('global').innerHTML='<div class="pct">'+s.apontado+'h<small> de '+s.estimado+'h estimadas</small></div>'+
+      '<div><div class="gbar" role="img" aria-label="'+s.apontado+' de '+s.estimado+' horas apontadas"><i style="width:'+pc.toFixed(1)+'%"></i></div>'+
+      '<div class="gsub"><b>'+s.itens_entregues+'</b> de <b>'+s.itens_total+'</b> itens entregues · item 26 fora do subtotal, estimativa em revisão</div></div>';
+
+    var linhas='';
+    d.grupos.forEach(function(g){
+      linhas+='<tr><td colspan="6" style="border:0;padding-top:16px"><span class="grp">'+esc(g.codigo)+' · '+esc(g.nome)+'</span></td></tr>';
+      g.item.forEach(function(it){
+        var estadoChip=it.estado==='entregue'?chip('ok','entregue'):it.estado==='revisao'?chip('rev','em revisão'):chip('wait','pendente');
+        var prs=(it.prs||[]).map(function(p){return '<a href="'+GHP+p+'" target="_blank" rel="noopener">#'+p+'</a>';}).join(', ');
+        linhas+='<tr class="'+(it.estado==='revisao'?'rev':'')+'"><td class="n">'+it.numero+'</td>'+
+          '<td>'+esc(it.titulo)+(it.nota?'<small>'+esc(it.nota)+'</small>':'')+'</td>'+
+          '<td class="h">'+it.horas+'h</td><td>'+estadoChip+'</td>'+
+          '<td class="dt">'+(it.entregue_em?dia(it.entregue_em):'—')+'</td><td>'+(prs||'—')+'</td></tr>';
+      });
+    });
+    $('itens').innerHTML=linhas;
+  }
+
+  var CINCO_MIN=5*60*1000, atual=null;
+  function falha(msg){
+    $('upd').textContent='dados indisponíveis';
+    if(!atual) document.querySelector('main').insertAdjacentHTML('afterbegin','<p class="panel">'+esc(msg)+'</p>');
+  }
+  function buscar(){
+    return fetch('dados-aditivo.json',{cache:'no-store'}).then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.json();})
+      .then(function(d){if(!atual||d.gerado_em!==atual.gerado_em){atual=d;render(d);}})
+      .catch(function(e){if(atual){$('upd').innerHTML+=' · <b>sem conexão</b>';}else{falha('Não foi possível ler dados-aditivo.json ('+e.message+'). A tela volta na próxima atualização.');}});
+  }
+  buscar();
+  setInterval(buscar,CINCO_MIN);
+  setInterval(function(){if(atual)relogio(atual);},60*1000);
+})();
+</script>
+
+</body>
+</html>

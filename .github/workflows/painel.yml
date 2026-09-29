@@ -5,6 +5,9 @@ name: Painel
 # conexão, gera o dados.json e o publica no bucket do painel, no projeto da
 # ness. Só sai metadado de execução, nunca linha de dado.
 #
+# A tela do Aditivo 01 (painel/aditivo.html) vem junto: dados-aditivo.json sai
+# só de painel/aditivo.toml, hand-editado — sem consulta a BigQuery ou GitHub.
+#
 # O hml só autentica em job do ambiente `hml`; `deployment: false` usa o
 # ambiente sem registrar um deployment a cada hora.
 
@@ -75,6 +78,10 @@ jobs:
           printf '%s' "$EXECUCOES_HML" > execucoes-hml.json
           uv run python -m scripts.painel --ambiente "dev=alupar-dev-alupdata" \
             --execucoes-de execucoes-hml.json --repositorio "$REPOSITORIO" --saida dados.json
+      - name: Gerar dados-aditivo.json
+        # Sem BigQuery nem GitHub: painel/aditivo.toml já traz o estado de cada
+        # item, editado à mão junto com docs/contrato/aditivo-01-conjuntos-publicos.md.
+        run: uv run python -m scripts.painel_aditivo --saida dados-aditivo.json
       # Troca de identidade: daqui em diante, a do painel no projeto da ness.,
       # que só grava no bucket do painel.
       - uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3.0.0
@@ -86,5 +93,5 @@ jobs:
         env:
           BUCKET: ${{ vars.PAINEL_BUCKET }}
         run: |
-          gcloud storage cp dados.json painel/index.html "gs://$BUCKET/" --cache-control="no-store"
+          gcloud storage cp dados.json dados-aditivo.json painel/index.html painel/aditivo.html "gs://$BUCKET/" --cache-control="no-store"
           echo "Painel publicado: $(date -u +%FT%TZ)" >> "$GITHUB_STEP_SUMMARY"

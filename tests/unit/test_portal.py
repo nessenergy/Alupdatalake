@@ -488,6 +488,38 @@ def test_barra_de_navegacao_tem_indicadores(cliente) -> None:
     assert 'href="/indicadores"' in cliente.get("/").get_data(as_text=True)
 
 
+@pytest.mark.parametrize("rota", ["/", "/lake", "/custo", "/indicadores"])
+def test_toda_tela_tem_a_barra_de_navegacao(cliente, rota) -> None:
+    """A /lake não tinha a barra: quem chegava nela não passava às outras telas."""
+    assert '<nav class="naves">' in cliente.get(rota).get_data(as_text=True)
+
+
+def test_indicador_destaca_o_ultimo_mes_de_cada_recorte(cliente) -> None:
+    """Em telão não há mouse: o último mês aparece grande, com o mês escrito."""
+    corpo = cliente.get("/indicadores").get_data(as_text=True)
+    assert corpo.count('class="cartao indicador"') == 5  # um cartão por recorte do exemplo
+    assert "ago/2026" in corpo
+
+
+def test_indicador_mostra_a_conta_fora_do_mouse(cliente) -> None:
+    """A conta do último mês é texto da página, não só `title` de célula."""
+    corpo = cliente.get("/indicadores").get_data(as_text=True)
+    assert '<p class="conta">' in corpo
+    assert "÷" in corpo.split('<p class="conta">', 1)[1].split("</p>", 1)[0]
+
+
+def test_indicador_tem_tendencia_e_serie_completa_recolhida(cliente) -> None:
+    corpo = cliente.get("/indicadores").get_data(as_text=True)
+    assert corpo.count('class="grafico tendencia"') == 5
+    assert "<details" in corpo and "Série completa" in corpo
+
+
+def test_indicador_variacao_escrita_nao_so_por_cor(cliente) -> None:
+    """Sem meta (ADR 012): a variação é neutra e vem em texto, com o mês anterior."""
+    corpo = cliente.get("/indicadores").get_data(as_text=True)
+    assert "vs jul/2026" in corpo
+
+
 def test_indicador_fracao_vira_percentual_e_pld_real_vira_reais(cliente) -> None:
     corpo = cliente.get("/indicadores").get_data(as_text=True)
     assert "%" in corpo

@@ -68,6 +68,44 @@ def area(serie: SerieVolumetria, cor: str) -> str:
     )
 
 
+def tendencia(pontos: list[tuple[str, float, str]], cor: str, rotulo: str) -> str:
+    """Linha mensal de uma razão: (mês, valor, texto do ponto).
+
+    Linha e não área: razão não tem baseline em zero que faça sentido, e a
+    escala vai do menor ao maior valor da série, com folga. O último ponto é
+    marcado, porque é o número em destaque no cartão.
+    """
+    if not pontos:
+        return f'<svg viewBox="0 0 {LARGURA} {ALTURA}" class="grafico tendencia" role="img"></svg>'
+
+    valores = [v for _, v, _ in pontos]
+    piso, teto = min(valores), max(valores)
+    folga = (teto - piso) * 0.15 or abs(teto) * 0.05 or 1
+    piso, teto = piso - folga, teto + folga
+    passo = LARGURA / max(len(pontos) - 1, 1)
+    util = ALTURA - 2 * MARGEM
+    xy = [(i * passo, ALTURA - MARGEM - (v - piso) / (teto - piso) * util) for i, (_, v, _) in enumerate(pontos)]
+    linha = " ".join(f"{x:.1f},{y:.1f}" for x, y in xy)
+    x_fim, y_fim = xy[-1]
+
+    faixas = "".join(
+        f'<rect x="{x - passo / 2:.1f}" y="0" width="{passo:.1f}" height="{ALTURA}" fill="transparent">'
+        f"<title>{html.escape(texto)}</title></rect>"
+        for (x, _), (_, _, texto) in zip(xy, pontos, strict=True)
+    )
+    return (
+        f'<svg viewBox="0 0 {LARGURA} {ALTURA}" class="grafico tendencia" role="img" '
+        f'aria-label="{html.escape(rotulo)}" preserveAspectRatio="none">'
+        f'<polyline points="{linha}" fill="none" stroke="{cor}" stroke-width="2" '
+        'stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/>'
+        # Ponto do último mês: traço de comprimento zero com ponta redonda. Um
+        # <circle> viraria elipse com preserveAspectRatio="none".
+        f'<polyline points="{x_fim:.1f},{y_fim:.1f} {x_fim:.1f},{y_fim:.1f}" stroke="{cor}" '
+        'stroke-width="8" stroke-linecap="round" vector-effect="non-scaling-stroke"/>'
+        f"{faixas}</svg>"
+    )
+
+
 def tabela(series: list[SerieVolumetria]) -> str:
     """Mesma informação em texto — exigência de acessibilidade do gráfico."""
     if not series:

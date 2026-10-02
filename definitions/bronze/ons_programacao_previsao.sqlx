@@ -1,0 +1,25 @@
+config {
+  type: "operations",
+  schema: "bronze",
+  hasOutput: true,
+  tags: ["bronze"]
+}
+
+-- Bronze: Previsão versus programado de eólicas e solares, por usina do PDP e patamar de meia hora (ONS). Aditivo 01.
+-- Um arquivo por dia, ~30 mil linhas cada: a janela diária re-lê poucos dias, e a Silver deduplica.
+CREATE TABLE IF NOT EXISTS ${self()} (
+  data_referencia     DATE       NOT NULL OPTIONS(description="Dia da programação (dat_programacao)"),
+  patamar             INT64      NOT NULL OPTIONS(description="Patamar de meia hora, 1 a 48 (num_patamar)"),
+  codigo_usina_pdp    STRING     NOT NULL OPTIONS(description="Código da usina no PDP (cod_usinapdp), sem espaços; não é o CEG"),
+  nome_usina          STRING     NOT NULL OPTIONS(description="nom_usinapdp, sem espaços nas pontas"),
+  previsao_mw         NUMERIC    NOT NULL OPTIONS(description="Geração prevista, MW (val_previsao)"),
+  programado_mw       NUMERIC    NOT NULL OPTIONS(description="Geração programada, MW (val_programado)"),
+
+  _ingestao_id        STRING    NOT NULL,
+  _ingestao_timestamp TIMESTAMP NOT NULL,
+  _fonte              STRING    NOT NULL,
+  _schema_versao      STRING    NOT NULL
+)
+PARTITION BY DATE(_ingestao_timestamp)
+CLUSTER BY data_referencia, codigo_usina_pdp
+OPTIONS(description="Previsão versus programado de eólicas e solares — camada Bronze, append-only");

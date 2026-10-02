@@ -100,6 +100,19 @@ variable "conectores" {
       cron         = "15 10 * * *"
       ultimos_dias = 30
     }
+    ons_programacao_previsao = {
+      # Aditivo 01, padrão C (um arquivo por dia, ~2 MB). O ONS publica o arquivo
+      # do dia seguinte à noite e não o regrava; a janela de 3 dias cobre execução
+      # perdida sem reabrir 30 arquivos de 30 mil linhas na Bronze a cada dia.
+      cron         = "45 10 * * *"
+      ultimos_dias = 3
+    }
+    ons_balanco_dessem = {
+      # Aditivo 01, padrão C (um arquivo por dia, 11 KB). Já houve arquivo regravado
+      # 3 dias depois; o arquivo é pequeno, e 7 dias saem de graça.
+      cron         = "55 10 * * *"
+      ultimos_dias = 7
+    }
     ons_cvu_termica = {
       # O CVU muda por semana operativa (PMO): semanal, sábado. A janela de 40
       # dias cobre a semana que começa no ano anterior e a revisão atrasada.

@@ -1,0 +1,42 @@
+config {
+  type: "view",
+  schema: "silver",
+  tags: ["silver"],
+  assertions: {
+    uniqueKey: ["data_referencia", "patamar", "submercado"],
+    nonNull: ["data_referencia", "patamar", "submercado"],
+    rowConditions: [
+      "submercado IN ('N','NE','S','SE')",
+      "patamar BETWEEN 1 AND 48",
+      "demanda_mw >= 0",
+      "geracao_renovavel_mw >= 0",
+      "geracao_hidraulica_mw >= 0",
+      "geracao_termica_mw >= 0",
+      "consumo_elevatoria_mw >= 0"
+    ]
+  }
+}
+
+-- Silver: Balanço de energia do DESSEM, higienizada e deduplicada. Aditivo 01.
+-- Dedup pela chave natural (dia, patamar, subsistema), vence a ingestão mais recente: o ONS
+-- avisa que o dado publicado pode ser revisado (um arquivo foi regravado 3 dias depois).
+SELECT
+  data_referencia,
+  submercado,
+  CAST(NULL AS STRING) AS codigo_usina,  -- dado agregado, sem usina
+  CAST(NULL AS STRING) AS agente_ccee,   -- o ONS não usa perfil da CCEE
+  FORMAT_DATE('%Y-%m', data_referencia) AS periodo_apuracao,
+  CAST(NULL AS STRING) AS periodo_apuracao_ccee,  -- a origem é o ONS
+  patamar,
+  demanda_mw,
+  geracao_renovavel_mw,
+  geracao_hidraulica_mw,
+  geracao_termica_mw,
+  consumo_elevatoria_mw,
+  _ingestao_id,
+  _ingestao_timestamp
+FROM ${ref("bronze", "ons_balanco_dessem")}
+QUALIFY ROW_NUMBER() OVER (
+  PARTITION BY data_referencia, patamar, submercado
+  ORDER BY _ingestao_timestamp DESC
+) = 1

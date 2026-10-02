@@ -236,12 +236,12 @@ ESTILO = """<style>
 
 /* ---------- 11. Modo telão (?telao=1) ---------- */
 .ad-telao{display:none}
-.ad-page--telao{height:100vh;overflow:hidden}
+.ad-page--telao{min-height:100vh}
 .ad-page--telao .ad-head{position:relative}
 .ad-page--telao .ad-nav,.ad-page--telao .ad-telao-link{display:none}
 .ad-page--telao .ad-telao{display:flex;align-items:center;gap:14px;font:500 16px/1 var(--font-text);color:var(--band-fg-2)}
 .ad-page--telao .ad-telao a{color:var(--band-fg)}
-.ad-page--telao .ad-band{height:var(--telao-band-h);overflow:hidden}
+.ad-page--telao .ad-band{min-height:var(--telao-band-h)}
 .ad-page--telao .ad-band--centered{justify-content:center}
 .ad-page--telao .ad-main{padding-top:16px;padding-bottom:16px;gap:12px}
 .ad-page--telao .ad-cards{grid-template-columns:repeat(6,minmax(0,1fr))}
@@ -295,6 +295,7 @@ ESTILO = """<style>
 .ad-page--telao .ad-sources--densa .ad-row__age{font-size:15px}
 .ad-page--telao .ad-sources--densa .ad-group__head{min-height:30px}
 .ad-page--telao .ad-sources--densa .ad-group{margin-bottom:8px}
+
 .ad-page--telao .ad-quem{display:none}
 /* Cartão de indicador: o recorte vai abaixo do título, que assim nunca quebra em três linhas. */
 .ad-card__head{flex-direction:column;align-items:flex-start;gap:6px;min-height:0}
@@ -308,4 +309,76 @@ ESTILO = """<style>
 .ad-page--telao .ad-band{padding-bottom:14px;gap:14px}
 .ad-page--telao .ad-calc__terms,.ad-page--telao .ad-series{display:none}
 
+/* Telão em janela menor que a tela cheia (barra de favoritos, zoom do sistema): o desenho
+   é de 1080 px de altura, e janela menor cortava o fim da página sem como rolar.
+   Primeiro nada é cortado: a página rola se não couber. Depois os blocos encolhem em
+   dois degraus, para a janela comum (~950 px) e a pequena (~780 px) caberem sem rolar. */
+.ad-page--telao{height:auto;min-height:100vh;overflow:visible}
+.ad-page--telao .ad-band{height:auto;min-height:var(--telao-band-h)}
+@media (max-height:1040px){
+.ad-page--telao{--head-h:60px;--telao-band-h:204px;--fs-verdict:52px;--fs-summary-num:68px;--fs-card-num:40px}
+.ad-page--telao .ad-band{padding-top:8px;padding-bottom:10px;gap:10px}
+.ad-page--telao .ad-lamps{padding:7px;gap:5px}
+.ad-page--telao .ad-lamp{width:30px;height:30px}
+.ad-page--telao .ad-lamp svg{inset:6px;width:18px;height:18px}
+.ad-page--telao .ad-verdict{gap:22px}
+.ad-page--telao .ad-verdict__sub{font-size:20px;margin-top:4px}
+.ad-page--telao .ad-tile{padding:8px 16px 10px;gap:6px}
+.ad-page--telao .ad-tile__name{font-size:22px}
+.ad-page--telao .ad-tile__name .ad-ico{width:22px;height:22px}
+.ad-page--telao .ad-summary__title{font-size:28px}
+.ad-page--telao .ad-summary__sub{font-size:18px}
+.ad-page--telao .ad-main{padding-top:10px;padding-bottom:10px;gap:8px}
+.ad-page--telao .ad-card{padding:10px 16px 8px}
+.ad-page--telao .ad-card__title{font-size:17px}
+.ad-page--telao .ad-spark{max-height:56px}
+.ad-page--telao .ad-block{padding:12px 18px;gap:8px}
+.ad-page--telao .ad-block__title{font-size:22px}
+}
+@media (max-height:820px){
+.ad-page--telao{--head-h:50px;--telao-band-h:150px;--fs-verdict:38px;--fs-summary-num:50px;--fs-card-num:32px}
+.ad-page--telao .ad-title{font-size:19px}
+.ad-page--telao .ad-stamp{font-size:17px}
+.ad-page--telao .ad-logo{height:28px}
+.ad-page--telao .ad-band{padding-top:6px;padding-bottom:8px;gap:8px}
+.ad-page--telao .ad-lamps{padding:5px;gap:4px}
+.ad-page--telao .ad-lamp{width:22px;height:22px}
+.ad-page--telao .ad-lamp svg{inset:4px;width:14px;height:14px}
+.ad-page--telao .ad-verdict{gap:16px}
+.ad-page--telao .ad-verdict__sub{font-size:16px;margin-top:2px}
+.ad-page--telao .ad-tile{padding:5px 12px 7px;gap:4px}
+.ad-page--telao .ad-tile__name{font-size:18px}
+.ad-page--telao .ad-tile__name .ad-ico{width:18px;height:18px}
+.ad-page--telao .ad-pill{font-size:13px;padding:2px 10px 2px 4px}
+.ad-page--telao .ad-pill .ad-ico{width:16px;height:16px}
+.ad-page--telao .ad-summary__title{font-size:22px}
+.ad-page--telao .ad-summary__sub{font-size:15px}
+.ad-page--telao .ad-main{padding-top:8px;padding-bottom:8px;gap:6px}
+.ad-page--telao .ad-cards{gap:10px}
+.ad-page--telao .ad-card{padding:8px 12px 6px;gap:2px}
+.ad-page--telao .ad-card__head{gap:4px}
+.ad-page--telao .ad-card__title{font-size:15px}
+.ad-page--telao .ad-chip{font-size:11px;padding:1px 6px}
+.ad-page--telao .ad-calc,.ad-page--telao .ad-delta{font-size:13px}
+.ad-page--telao .ad-spark{max-height:40px}
+.ad-page--telao .ad-sources--densa .ad-row>summary{min-height:21px;padding:1px 8px}
+.ad-page--telao .ad-sources--densa .ad-row__name{font-size:15px}
+.ad-page--telao .ad-sources--densa .ad-row__age{font-size:13px}
+.ad-page--telao .ad-sources--densa{--cell-h:12px}
+.ad-page--telao .ad-sources--densa .ad-group__head{min-height:24px}
+.ad-page--telao .ad-sources--densa .ad-group__head h2{font-size:17px}
+.ad-page--telao .ad-sources--densa .ad-group{margin-bottom:4px}
+.ad-page--telao .ad-legend{padding-top:6px;font-size:12px}
+.ad-page--telao .ad-foot{font-size:11px}
+.ad-page--telao .ad-block{padding:8px 14px;gap:5px}
+.ad-page--telao .ad-block__title{font-size:18px}
+.ad-page--telao .ad-block h3{font-size:14px}
+.ad-page--telao .ad-qrow{padding:3px 8px}
+.ad-page--telao .ad-qrow__name,.ad-page--telao .ad-qrow__cost{font-size:14px}
+.ad-page--telao .ad-qrow__meta{font-size:12px}
+.ad-page--telao .ad-glance{gap:8px}
+.ad-page--telao .ad-glance dd{font-size:24px}
+.ad-page--telao .ad-glance dt{font-size:13px}
+.ad-page--telao .grafico-alto{height:96px}
+}
 </style>"""

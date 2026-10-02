@@ -23,7 +23,7 @@ Consultas feitas em 02/10/2026, entre 01h e 05h (horário de Brasília). O contr
 | As Ondas 0 e 1 estão entregues? | **Sim, em aceite.** As 23 fontes carregam em `dev` e `hml`, com os sete componentes cada. Nenhuma onda está **aceita**: o pedido de aprovação por escrito seguiu a Eduardo Pires em 01/10 e não há resposta. |
 | Quanto do projeto está pronto? | **343,8 de 580 h (59,3%)** pelo critério do painel. Só 208,6 h estão em aceite (Ondas 0 e 1); **0 h estão aceitas**. |
 | O que está nos 59,3%? | Ondas 0 e 1 (208,6 h) e **135,2 h adiantadas** das Ondas 2, 3 e 4, que dependem da Alup. |
-| Há dado incompleto? | **Sim, em duas fontes pesadas do ONS em `hml`** (§6). A tela de saúde não mostra, porque falta registro de execução. |
+| Há dado incompleto? | **Havia, em duas fontes pesadas do ONS** (§6). **Corrigido no mesmo dia (02/10):** recarga em janelas de 3 meses e conferência mês a mês; `dev` e `hml` ficaram com 25 de 25 meses, idênticos. O ponto cego do monitoramento continua aberto. |
 | Há algo vencido do lado da Alup? | Sim: **#258** (quem assina o aceite, prazo 29/09) e **#260** (32 h do item 2.1, prazo 30/09). A **#259** (confirmar a reunião de aceite) foi **fechada em 02/10**: a reunião ocorreu em 01/10 (§10). |
 | O que trava a próxima onda? | Credenciais da Onda 2 (#262, contrato 19/10) e da Onda 3 (contrato 16/11), rede do FMB e planilhas (G3). Tudo externo. |
 | Produção existe? | **Não.** O projeto `prod-alupdata` está ativo, mas sem a API do Cloud Run e sem infra aplicada. O bootstrap (item 1.9) espera o aceite. |
@@ -144,7 +144,7 @@ qualidade dos testes aparece na cobertura (§7).
 | | `dev` | `hml` | `prod` |
 |---|---|---|---|
 | Projeto GCP | ativo | ativo | ativo; **API do Cloud Run desabilitada: o Portal não existe** |
-| Portal | revisão 00037, commit `22edae1` | **revisão 00018, commit `cdae310` (= main)** | não existe |
+| Portal | **revisão 00038, commit `5ec8c58` (= main)** | **revisão 00018, commit `cdae310`** | não existe |
 | Tabelas Bronze / Silver / Gold | 45 / 45 / 47 | 45 / 45 / 47 | não existe |
 | Fontes com dado na Bronze | 41 de 44 | 40 de 44 | n/a |
 | Gold com linhas | 43 de 47 | 42 de 47 | n/a |
@@ -152,9 +152,10 @@ qualidade dos testes aparece na cobertura (§7).
 | Políticas de alerta | 20 habilitadas, 1 canal de e-mail | 20 habilitadas, 2 canais de e-mail | n/a |
 | Dataform | não reexecutado desde o deploy de 29–30/09: a Gold não tem a coluna `aguardando_credencial` | `SUCCEEDED` em 02/10 03h31 | n/a |
 
-- **`dev` está atrás da `main`:** o Portal e o Gold de `dev` são de 29–30/09. A `saude_ingestao` de `dev` ainda não
-  tem a coluna `aguardando_credencial`, e as três fontes mensais do ONS aparecem como atrasadas nele pelo mesmo falso
-  atraso já corrigido na `main` (limite de silêncio, PR #332). Falta um deploy em `dev`.
+- **`dev` estava atrás da `main` e foi alinhado em 02/10:** o Portal de `dev` era de 29–30/09 e a `saude_ingestao` não
+  tinha a coluna `aguardando_credencial`; as três fontes mensais do ONS apareciam como atrasadas pelo falso atraso já
+  corrigido (PR #332). Deploy feito: Portal na revisão 00038 (`main`), Gold com a coluna nova. Em `dev` ficam fora de
+  OK só `hubspot_negocios` (aguardando credencial) e `tempook_boletins` (atrasada: acervo termina em 2022).
 - **Gold com linhas:** as 4 vazias em `hml` são as de BBCE, Hubspot e TempoOK (`curva_forward_vigente`,
   `funil_comercial`, `cobertura_boletins_tempook`, `cobertura_ena_prevs_tempook`). `custo_consultas` não pude ler
   (a minha conta não tem `INFORMATION_SCHEMA`); a conta de serviço do Portal lê.
@@ -162,6 +163,9 @@ qualidade dos testes aparece na cobertura (§7).
   IAP continua o de 29/09.
 
 ## 6. Completude do dado: o achado desta auditoria
+
+> **Corrigido em 02/10, entre 08h e 10h.** As seções "O que foi encontrado" a "Impacto" descrevem o estado **antes** da
+> correção; o resultado está em "Correção executada", ao fim desta seção.
 
 A carga **com sucesso** das 23 fontes está comprovada. O histórico de **24 meses** das fontes pesadas do ONS não está
 completo, e a tela de saúde não mostra isso, por um ponto cego do monitoramento.
@@ -207,7 +211,7 @@ cego: "último sucesso recente" não prova que o histórico está inteiro.
 - **Aceite:** o dossiê das Ondas 0 e 1 não depende disso (afirma sucesso de carga). O pedido de aprovação do Portal
   mostra os indicadores de `hml`, então vale recarregar antes que alguém compare séries.
 
-### Correção recomendada (não executada)
+### Correção recomendada
 
 1. Recarregar em `hml`, em janelas de 3 meses, `ons_geracao_usina` (jun/2025 a jul/2026, mais mai/2025 e ago/2026
    inteiros) e `ons_restricao_coff_eolica` (set/2025 a jul/2026, mais ago/2025 e ago/2026). Cerca de 9 minutos por
@@ -217,6 +221,44 @@ cego: "último sucesso recente" não prova que o histórico está inteiro.
 4. **Fechar o ponto cego:** execução do Cloud Run que falha ou estoura o tempo deve gerar alerta, e a saúde deve
    desconfiar de Bronze sem execução registrada. Hoje o limite de silêncio só enxerga o último sucesso.
 5. Documentar no runbook que recarga longa se faz em janelas de até 3 meses.
+
+### Correção executada (02/10)
+
+Passos 1 a 3 feitos pelo workflow `Executar ingestão`, uma janela por vez (11 a 16 minutos cada, bem abaixo do limite
+de 30):
+
+| Ambiente | Fonte | Janelas | Resultado |
+|---|---|---|---|
+| `hml` | `ons_geracao_usina` | 6 (mai/2025 a ago/2026) | todas `success` |
+| `hml` | `ons_restricao_coff_eolica` | 5 (ago/2025 a ago/2026) | todas `success` |
+| `dev` | `ons_geracao_usina` | 1 (jun a ago/2025) | `success` |
+| `dev` | `ons_restricao_coff_eolica` | 1 (mar a mai/2025) | `success` |
+
+Em seguida o Dataform rodou nos dois ambientes (`SUCCEEDED`), com `terraform apply` **sem nenhuma mudança** (0 a
+adicionar, 0 a alterar, 0 a destruir). Conferência no BigQuery:
+
+| Fonte (Silver) | `hml` | `dev` |
+|---|---|---|
+| `ons_geracao_usina` | **25/25 meses**, 12.441.587 linhas | **25/25**, 12.441.587 |
+| `ons_restricao_coff_eolica` | **25/25**, 5.583.456 | **25/25**, 5.583.456 |
+| `ons_restricao_coff_fotovoltaica` | 25/25, 2.533.824 | 25/25, 2.513.664 |
+| `ons_disponibilidade_usina` | 25/25, 4.196.981 | 25/25, 4.175.675 |
+
+Indicadores, antes e depois da recarga:
+
+| Indicador | `hml` antes | `hml` depois | `dev` antes | `dev` depois |
+|---|---|---|---|---|
+| fator de capacidade | 165 linhas, 11 meses | **375, 25 meses** | 330, 22 meses | **375, 25 meses** |
+| taxa de corte renovável | 87 linhas | **133** | 124 | **133** |
+| armazenamento, disponibilidade | 25 meses | 25 meses | 25 meses | 25 meses |
+| PLD real | 3 meses | 3 meses | 3 meses | 3 meses |
+
+`dev` e `hml` ficaram **iguais** nas fontes e nos indicadores. O PLD real segue com 3 meses nos dois; a causa não foi
+investigada, mas não é a recarga. As pequenas diferenças da fotovoltaica e da disponibilidade (0,1% a 0,8%) vêm de
+cargas diárias em instantes diferentes.
+
+**Continua aberto:** o ponto cego do passo 4 (execução que estoura o tempo ou deixa dado sem registro) e a nota de
+runbook do passo 5.
 
 ## 7. Qualidade e segurança
 
@@ -278,8 +320,7 @@ e o enquadramento contratual é da coordenação com a Alup.
 
 ### ness.
 
-- **Recarga do histórico de `hml` e `dev`** (§6): nova; é trabalho da ness.
-- **Deploy em `dev`** para igualar a `main`.
+- ~~Recarga do histórico de `hml` e `dev`~~ e ~~deploy em `dev`~~: **feitos em 02/10** (§6).
 - Aditivo B, C e D (79 h) e decisão sobre o item 26.
 - Bootstrap de `prod` (item 1.9), depois do aceite.
 - Enviar o pedido de aprovação do Portal (rascunho pronto).
@@ -316,13 +357,13 @@ e o enquadramento contratual é da coordenação com a Alup.
 
 ## 12. Riscos, em ordem
 
-1. **Histórico incompleto em `hml` sem alerta** (§6): mostra OK onde há buraco.
+1. **Ponto cego do monitoramento** (§6): carga parcial por tempo limite não deixa registro e a saúde mostra OK. O dado já foi corrigido; a causa de fundo não.
 2. **Portal sem login efetivo da Alup** confirmado: o aceite do 0.15 e o pedido de aprovação do Portal dependem de
    alguém da Alup conseguir abrir.
 3. **Aceite não assinado:** nenhuma onda está aceita; o faturamento não começa antes disso.
 4. **Credenciais da Onda 2:** 12/10 interno e 19/10 contratual; se atrasarem, o dossiê de 23/10 também.
 5. **Rede da Onda 3:** quatro pendências da Alup em cadeia, e o prazo contratual é 16/11.
-6. **`dev` fora de sincronia com a `main`:** deploy de `dev` e `hml` não ocorrem juntos; o Gold de `dev` já diverge.
+6. **`dev` e `hml` evoluem por deploys separados:** divergiram por cinco dias e foram alinhados em 02/10; vale deployar os dois juntos.
 7. **Dependência do token do TempoOK:** o segredo de `hml` está vazio por decisão (ADR 020).
 
 ## Anexo: como cada número foi obtido

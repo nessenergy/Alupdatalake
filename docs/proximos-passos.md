@@ -33,9 +33,9 @@ dossiê das Ondas 0 e 1 foi emitido e enviado em 25/09.
 | 1.10 | **Aditivo 01 — padrões B, C e D** (itens 12–19, 79h) | ness. | 17 de 25 itens entregues em 28/09 (83h de 162h). Seguem os ONS mensais pesados (B), os arquivos diários (C) e a API (D). Cada entrega atualiza juntos o [documento](contrato/aditivo-01-conjuntos-publicos.md) §5, a #294 e `painel/aditivo.toml` |
 | 1.11 | **Aditivo 01 — item 26** (`consumo_horario_perfil_agente`) | ness. | dimensionar antes de estimar: histórico de 24 meses tem ~185 GB. Decidir a janela carregada em `dev` e o custo de BigQuery (§4.1) |
 | 1.12 | ~~**Aditivo 01 — contagem de linhas por conector**~~ | ness. | **feito em 29/09**: linhas por conector na §5 do documento |
-| 1.13 | **Recarga do histórico em janelas de 3 meses** | ness. | `hml`: `ons_geracao_usina` (11 de 25 meses) e `ons_restricao_coff_eolica` (14 de 25); `dev`: jun–ago/2025 e mar–mai/2025. Janela única de 25 meses estourou o limite de 1800 s ([auditoria de 02/10](relatorios/2026-10-02-auditoria-de-ponta-a-ponta.md) §6). Depois, Dataform e conferência dos meses por fonte |
+| 1.13 | ~~**Recarga do histórico em janelas de 3 meses**~~ **feito em 02/10** | ness. | `hml`: `ons_geracao_usina` (11 de 25 meses) e `ons_restricao_coff_eolica` (14 de 25); `dev`: jun–ago/2025 e mar–mai/2025. Janela única de 25 meses estourou o limite de 1800 s ([auditoria de 02/10](relatorios/2026-10-02-auditoria-de-ponta-a-ponta.md) §6). Depois, Dataform e conferência dos meses por fonte |
 | 1.14 | **Alerta para execução que estoura o tempo ou deixa dado sem registro** | ness. | hoje a saúde só enxerga o último sucesso; carga parcial sem linha em `_execucoes` mostra OK (§6 da auditoria) |
-| 1.15 | **Deploy em `dev`** | ness. | `dev` está em `22edae1`, atrás da `main`; falta o Gold com `aguardando_credencial` e o limite de silêncio das mensais |
+| 1.15 | ~~**Deploy em `dev`**~~ **feito em 02/10** | ness. | `dev` está em `22edae1`, atrás da `main`; falta o Gold com `aguardando_credencial` e o limite de silêncio das mensais |
 | 1.16 | **Enviar o pedido de aprovação do Portal** | ness. | rascunho pronto; independente do pedido das Ondas 0 e 1, enviado em 01/10 |
 
 Histórico da liberação do ambiente:

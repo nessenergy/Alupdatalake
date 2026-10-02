@@ -267,7 +267,7 @@ codigo = "4.4"
 titulo = "Gold consolidadas"
 horas = 15
 pronto = 0.7
-nota = "indicadores_mensais com 25 meses em dev (fator de capacidade com 22) e em hml (fator de capacidade com 11: geração e constrained-off do ONS recarregando em janelas); aceite da leitura da ADR 012 pendente"
+nota = "indicadores_mensais com 25 meses em dev e hml, idênticos (PLD real com 3); aceite da leitura da ADR 012 pendente"
 
 [[onda.item]]
 codigo = "4.5"
@@ -301,7 +301,7 @@ estado = "feito"
 
 [[marco]]
 data = 2026-09-29
-titulo = "Acesso da Alup ao Portal confirmado, evidência de linhas por conector publicada e carga de 24 meses em hml (completa em 42 das 44 fontes; geração por usina e constrained-off eólico do ONS ficaram parciais por tempo limite)"
+titulo = "Acesso da Alup ao Portal confirmado, evidência de linhas por conector publicada e carga de 24 meses em hml (duas fontes pesadas do ONS só fecharam em 02/10)"
 estado = "feito"
 
 [[marco]]
@@ -317,6 +317,11 @@ estado = "feito"
 [[marco]]
 data = 2026-10-02
 titulo = "Portal redesenhado para o telão no ar em hml, com Indicadores como tela de abertura"
+estado = "feito"
+
+[[marco]]
+data = 2026-10-02
+titulo = "Histórico de 24 meses completo e idêntico em dev e hml: geração por usina e constrained-off do ONS recarregados em janelas de 3 meses"
 estado = "feito"
 
 [[marco]]

@@ -132,6 +132,13 @@ variable "conectores" {
       cron         = "0 7 * * 1" # cadastro muda devagar: semanal, segunda
       ultimos_dias = 1           # cadastro completo; a janela não se aplica
     }
+    ace_prc = {
+      # Onda 1, "referência (PRC)" da cláusula 4ª. A ACE Comercializadora (Alup) divulga o PRC numa tabela HTML em
+      # alup.io/valores-de-energia; a página é um retrato sem janela e muda raramente (a data era 01/10/2025). Lê
+      # toda segunda às 11h: barato (uma página) e a Gold mostra a idade da tabela, não a da leitura.
+      cron         = "0 11 * * 1"
+      ultimos_dias = 1 # retrato da página; a janela não se aplica
+    }
     aneel_tarifas = {
       # Onda 1, "ANEEL tarifas regulatórias". O CSV (89 MB, 328 mil linhas) é
       # reescrito inteiro; o conector lê tudo em stream e fica com as linhas cujo

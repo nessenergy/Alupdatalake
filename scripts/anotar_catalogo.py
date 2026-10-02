@@ -84,6 +84,7 @@ ANOTACOES: dict[str, dict[str, str]] = {
     },  # Aditivo 01
     "balanco_dessem_mensal_subsistema": {"dominio": "mercado_de_energia", "responsavel": INTELIGENCIA},  # Aditivo 01
     "tarifa_vigente_distribuidora": {"dominio": "mercado_de_energia", "responsavel": INTELIGENCIA},  # Onda 1
+    "prc_vigente_comercializadora": {"dominio": "mercado_de_energia", "responsavel": INTELIGENCIA},  # Onda 1
     # 2 · Geração e Operacional — usinas do SIN, dado público
     "parque_gerador": {"dominio": "geracao_e_operacional", "responsavel": INTELIGENCIA},
     "geracao_mensal_usina": {"dominio": "geracao_e_operacional", "responsavel": INTELIGENCIA},

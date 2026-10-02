@@ -1,0 +1,28 @@
+config {
+  type: "operations",
+  schema: "bronze",
+  hasOutput: true,
+  tags: ["bronze"]
+}
+
+-- Bronze: PRC (Preço de Referência Comparável) da ACE Comercializadora, lido de alup.io/valores-de-energia.
+-- Append-only: cada execução grava o retrato da página; a Silver deduplica por data de atualização.
+CREATE TABLE IF NOT EXISTS ${self()} (
+  comercializadora  STRING    NOT NULL OPTIONS(description="Quem divulga o PRC"),
+  data_atualizacao  DATE      NOT NULL OPTIONS(description="'Atualizado em' declarado pela página"),
+  submercado        STRING    NOT NULL OPTIONS(description="Sigla: SE (SE/CO na página), S, NE ou N"),
+  tipo_energia      STRING    NOT NULL OPTIONS(description="convencional ou incentivada_50 (50% de desconto na TUSD)"),
+  ano               INT64     OPTIONS(description="Ano da linha, quando a tabela é por ano; a ACE publica por prazo"),
+  prazo_meses       INT64     OPTIONS(description="Prazo de suprimento: 12, 36 ou 60 meses"),
+  preco_rs_mwh      NUMERIC   NOT NULL OPTIONS(description="PRC em R$/MWh; indicativo, não é proposta comercial"),
+  indexador         STRING    OPTIONS(description="Indexador de reajuste, quando a origem o traz"),
+  premissas         STRING    OPTIONS(description="Premissas da tabela, em texto, quando a origem as traz"),
+
+  _ingestao_id        STRING    NOT NULL OPTIONS(description="Identificador da execução de ingestão"),
+  _ingestao_timestamp TIMESTAMP NOT NULL OPTIONS(description="Quando o registro entrou no lake"),
+  _fonte              STRING    NOT NULL OPTIONS(description="Identificador da fonte"),
+  _schema_versao      STRING    NOT NULL OPTIONS(description="Versão do contrato lido na origem")
+)
+PARTITION BY DATE(_ingestao_timestamp)
+CLUSTER BY submercado, data_atualizacao
+OPTIONS(description="PRC da ACE Comercializadora — camada Bronze, append-only");

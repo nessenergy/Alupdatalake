@@ -1,0 +1,42 @@
+config {
+  type: "view",
+  schema: "silver",
+  tags: ["silver"],
+  assertions: {
+    uniqueKey: ["comercializadora", "data_atualizacao", "submercado", "tipo_energia", "prazo_meses"],
+    nonNull: ["comercializadora", "data_atualizacao", "submercado", "tipo_energia", "prazo_meses", "preco_rs_mwh"],
+    rowConditions: [
+      "submercado IN ('SE', 'S', 'NE', 'N')",
+      "tipo_energia IN ('convencional', 'incentivada_50')",
+      "prazo_meses IN (12, 36, 60)",
+      "preco_rs_mwh >= 1 AND preco_rs_mwh <= 2000"
+    ]
+  }
+}
+
+-- Silver: PRC da ACE higienizado, deduplicado e com as dimensões comuns.
+-- Dedup: para cada comercializadora, data de atualização, submercado, tipo de energia e prazo, vence a ingestão
+-- mais recente. Quando a ACE republicar a tabela com outra data, as duas ficam aqui e a Gold escolhe a mais nova.
+-- `data_referencia` é a data que a página declara, não a da leitura: sem ela o retrato semanal pareceria preço novo.
+SELECT
+  data_atualizacao AS data_referencia,
+  submercado,
+  CAST(NULL AS STRING) AS codigo_usina,  -- preço de comercialização não é dado de usina
+  CAST(NULL AS STRING) AS agente_ccee,   -- a ACE é a vendedora; o consumidor não está na tabela
+  FORMAT_DATE('%Y-%m', data_atualizacao) AS periodo_apuracao,
+  CAST(NULL AS STRING) AS periodo_apuracao_ccee,  -- a origem não declara período próprio
+  comercializadora,
+  data_atualizacao,
+  tipo_energia,
+  ano,
+  prazo_meses,
+  preco_rs_mwh,
+  indexador,
+  premissas,
+  _ingestao_id,
+  _ingestao_timestamp
+FROM ${ref("bronze", "ace_prc")}
+QUALIFY ROW_NUMBER() OVER (
+  PARTITION BY comercializadora, data_atualizacao, submercado, tipo_energia, prazo_meses
+  ORDER BY _ingestao_timestamp DESC
+) = 1

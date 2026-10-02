@@ -1,0 +1,42 @@
+config {
+  type: "operations",
+  schema: "bronze",
+  hasOutput: true,
+  tags: ["bronze"]
+}
+
+-- Bronze: fator de capacidade de eólicas e solares, por usina (ou conjunto) e
+-- hora (ONS, dados abertos, CSV mensal desde 2022-01). Aditivo 01. ~170 mil
+-- linhas por mês (09/2026, 236 usinas e conjuntos).
+CREATE TABLE IF NOT EXISTS ${self()} (
+  data_referencia      DATE      NOT NULL OPTIONS(description="Dia do instante"),
+  instante             DATETIME  NOT NULL OPTIONS(description="Hora; o arquivo se chama _di no catálogo, mas o passo é horário"),
+  submercado           STRING    NOT NULL OPTIONS(description="N, NE, S, SE"),
+  nome_subsistema      STRING    NOT NULL,
+  uf                   STRING    NOT NULL,
+  nome_uf              STRING    NOT NULL,
+  codigo_ponto_conexao STRING    NOT NULL,
+  nome_ponto_conexao   STRING    NOT NULL,
+  localizacao          STRING    OPTIONS(description="Interior ou Litoral; só o Nordeste traz"),
+  modalidade_operacao  STRING    NOT NULL OPTIONS(description="Conjunto de Usinas, Tipo I ou Tipo II-B"),
+  tipo_usina           STRING    NOT NULL OPTIONS(description="Eólica ou Solar"),
+  nome_usina_conjunto  STRING    NOT NULL,
+  id_ons               STRING    NOT NULL OPTIONS(description="Identificador ONS da usina ou do conjunto (CJU_...)"),
+  codigo_usina         STRING    OPTIONS(description="CEG; nulo em conjunto de usinas, onde a origem publica traço"),
+  latitude_coletora        NUMERIC OPTIONS(description="Graus; vazio em alguns conjuntos"),
+  longitude_coletora       NUMERIC OPTIONS(description="Graus; vazio em alguns conjuntos"),
+  latitude_ponto_conexao   NUMERIC OPTIONS(description="Graus"),
+  longitude_ponto_conexao  NUMERIC OPTIONS(description="Graus"),
+  geracao_programada_mwmed NUMERIC OPTIONS(description="MWmed; vazio quando não houve programação (~2% das linhas em 09/2026)"),
+  geracao_verificada_mwmed NUMERIC OPTIONS(description="MWmed; pode ser levemente negativa na origem (até -1,4)"),
+  capacidade_instalada_mw  NUMERIC OPTIONS(description="MW"),
+  fator_capacidade         NUMERIC OPTIONS(description="Publicado pelo ONS: geração verificada / capacidade instalada; pode ser negativo e passar de 1 na origem"),
+
+  _ingestao_id        STRING    NOT NULL,
+  _ingestao_timestamp TIMESTAMP NOT NULL,
+  _fonte              STRING    NOT NULL,
+  _schema_versao      STRING    NOT NULL
+)
+PARTITION BY DATE(_ingestao_timestamp)
+CLUSTER BY data_referencia, submercado
+OPTIONS(description="Fator de capacidade de eólicas e solares por usina e hora (ONS) — camada Bronze, append-only");

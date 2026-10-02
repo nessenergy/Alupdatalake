@@ -1,0 +1,70 @@
+config {
+  type: "operations",
+  schema: "bronze",
+  hasOutput: true,
+  tags: ["bronze"]
+}
+
+-- Bronze: geração térmica por motivo de despacho, por usina e hora (ONS, dados
+-- abertos, CSV mensal desde 2022-01). Aditivo 01. ~103 mil linhas por mês
+-- (09/2026, 143 usinas), 47 colunas na origem.
+-- O cabeçalho do ONS cresceu em 2024-09, 2026-02 e 2026-04: as colunas que o mês
+-- não traz ficam NULL, nunca zero (ver o dicionário de dados).
+CREATE TABLE IF NOT EXISTS ${self()} (
+  data_referencia           DATE      NOT NULL OPTIONS(description="Dia do instante"),
+  instante                  DATETIME  NOT NULL OPTIONS(description="Hora de INÍCIO do período de agregação"),
+  patamar                   STRING    NOT NULL OPTIONS(description="LEVE, MÉDIA ou PESADA, em maiúsculas (a origem mudou a caixa em 2026-04)"),
+  submercado                STRING    NOT NULL OPTIONS(description="N, NE, S, SE"),
+  nome_subsistema           STRING    NOT NULL,
+  nome_usina                STRING    NOT NULL,
+  codigo_usina_planejamento INT64     OPTIONS(description="Código da usina nos modelos de planejamento e programação da operação; vazio em parte das usinas"),
+  codigo_usina              STRING    OPTIONS(description="CEG; não é único por usina (usinas distintas compartilham CEG na origem)"),
+  prog_geracao_mwmed                     NUMERIC OPTIONS(description="Geração programada total, MWmed"),
+  prog_ordem_merito_mwmed                NUMERIC OPTIONS(description="Programada por ordem de mérito (CVU menor que o CMO)"),
+  prog_ordem_merito_ref_mwmed            NUMERIC OPTIONS(description="Referência para o despacho por ordem de mérito"),
+  prog_ordem_merito_acima_inflex_mwmed   NUMERIC OPTIONS(description="Programada por ordem de mérito, sem a inflexibilidade embutida"),
+  prog_inflexibilidade_mwmed             NUMERIC OPTIONS(description="Programada por inflexibilidade declarada pelo agente"),
+  prog_inflex_embutida_merito_mwmed      NUMERIC OPTIONS(description="Inflexibilidade embutida na ordem de mérito"),
+  prog_inflex_pura_mwmed                 NUMERIC OPTIONS(description="Inflexibilidade pura, fora da ordem de mérito"),
+  prog_razao_eletrica_mwmed              NUMERIC OPTIONS(description="Programada por razão elétrica ou necessidade do SIN"),
+  prog_garantia_energetica_mwmed         NUMERIC OPTIONS(description="Programada para garantia da segurança energética (decisão do CMSE)"),
+  prog_gfom_mwmed                        NUMERIC OPTIONS(description="Programada em usina fora da ordem de mérito para compensar falta futura de combustível"),
+  prog_reposicao_perdas_mwmed            NUMERIC OPTIONS(description="Programada para repor perdas na transmissão ou variação de térmicas alocadas à exportação"),
+  prog_exportacao_mwmed                  NUMERIC OPTIONS(description="Programada para exportação a países vizinhos"),
+  prog_reserva_potencia_mwmed            NUMERIC OPTIONS(description="Programada para recompor a reserva de potência operativa (REN 822/2018)"),
+  prog_gsub_mwmed                        NUMERIC OPTIONS(description="Programada em substituição a usina de CVU menor sem combustível"),
+  prog_unit_commitment_mwmed             NUMERIC OPTIONS(description="Programada por unit commitment (rampa, tempo mínimo ligada ou desligada); desde 01/2020"),
+  prog_constrained_off_mwmed             NUMERIC OPTIONS(description="Restrição programada em usina despachada por ordem de mérito"),
+  prog_inflexibilidade_dessem_mwmed      NUMERIC OPTIONS(description="Inflexibilidade prevista nos modelos, referência do deslocamento hidráulico"),
+  verif_geracao_mwmed                    NUMERIC OPTIONS(description="Geração verificada total, MWmed"),
+  verif_ordem_merito_mwmed               NUMERIC OPTIONS(description="Verificada por ordem de mérito (CVU menor que o CMO)"),
+  verif_ordem_merito_acima_inflex_mwmed  NUMERIC OPTIONS(description="Verificada por ordem de mérito, sem a inflexibilidade embutida"),
+  verif_inflexibilidade_mwmed            NUMERIC OPTIONS(description="Verificada por inflexibilidade declarada pelo agente"),
+  verif_inflex_embutida_merito_mwmed     NUMERIC OPTIONS(description="Inflexibilidade embutida na ordem de mérito"),
+  verif_inflex_pura_mwmed                NUMERIC OPTIONS(description="Inflexibilidade pura, fora da ordem de mérito"),
+  verif_razao_eletrica_mwmed             NUMERIC OPTIONS(description="Verificada por razão elétrica ou necessidade do SIN"),
+  verif_garantia_energetica_mwmed        NUMERIC OPTIONS(description="Verificada para garantia da segurança energética (decisão do CMSE)"),
+  verif_gfom_mwmed                       NUMERIC OPTIONS(description="Verificada em usina fora da ordem de mérito para compensar falta futura de combustível"),
+  verif_reposicao_perdas_mwmed           NUMERIC OPTIONS(description="Verificada para repor perdas na transmissão ou variação de térmicas alocadas à exportação"),
+  verif_exportacao_mwmed                 NUMERIC OPTIONS(description="Verificada para exportação a países vizinhos"),
+  verif_reserva_potencia_mwmed           NUMERIC OPTIONS(description="Verificada para recompor a reserva de potência operativa (REN 822/2018)"),
+  verif_gsub_mwmed                       NUMERIC OPTIONS(description="Verificada em substituição a usina de CVU menor sem combustível"),
+  verif_unit_commitment_mwmed            NUMERIC OPTIONS(description="Verificada por unit commitment (rampa, tempo mínimo ligada ou desligada); desde 01/2020"),
+  verif_constrained_off_mwmed            NUMERIC OPTIONS(description="Restrição verificada em usina despachada por ordem de mérito"),
+  verif_fator_exportacao                 NUMERIC OPTIONS(description="Código de exportação semi-horária: 0 nenhuma, 0,5 um patamar, 1 dois (código, não MW); a origem só traz desde 09/2024"),
+  prog_disponibilidade_mwmed             NUMERIC OPTIONS(description="Disponibilidade declarada considerada na programação diária; a origem só traz desde 02/2026"),
+  geracao_despachada_mwmed               NUMERIC OPTIONS(description="Potência a gerar para o SIN, definida pelo ONS em tempo real; a origem só traz desde 04/2026"),
+  atendimento_rpo           INT64     OPTIONS(description="Reserva de potência operativa: 0 não despachada por esse motivo, 1 satisfatório, 2 insatisfatório"),
+  tipo_restricao_eletrica   INT64     OPTIONS(description="0 a 9, conforme o dicionário do ONS"),
+  combustivel               STRING    OPTIONS(description="Combustível da usina; a origem só traz desde 04/2026"),
+  motivo_restricao          STRING    OPTIONS(description="Tipo de motivo da restrição; vazio quando não há restrição; a origem só traz desde 04/2026"),
+  publicado_em              DATETIME  OPTIONS(description="Quando o ONS publicou a linha (din_publicacao); a origem só traz desde 04/2026"),
+
+  _ingestao_id        STRING    NOT NULL,
+  _ingestao_timestamp TIMESTAMP NOT NULL,
+  _fonte              STRING    NOT NULL,
+  _schema_versao      STRING    NOT NULL
+)
+PARTITION BY DATE(_ingestao_timestamp)
+CLUSTER BY data_referencia, submercado
+OPTIONS(description="Geração térmica por motivo de despacho (ONS) — camada Bronze, append-only");

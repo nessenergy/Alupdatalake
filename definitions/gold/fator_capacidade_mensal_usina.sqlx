@@ -1,0 +1,38 @@
+config {
+  type: "table",
+  schema: "gold",
+  tags: ["gold"],
+  dependOnDependencyAssertions: true
+}
+
+-- Gold: fator de capacidade de eólicas e solares por usina (ou conjunto) e mês.
+-- Aditivo 01.
+--
+-- Responde "quanto da capacidade instalada cada usina renovável aproveitou no
+-- mês, e quanto a programação errou". É a média do fator que o ONS publica a
+-- cada hora, ao lado da geração e da capacidade médias; não recalcula a razão
+-- (ADR 012: Gold de domínio agrega, não divide séries).
+--
+-- Horas sem programação (geração programada vazia) não entram na média da
+-- programada e são contadas à parte: mês com programação rala não pode passar
+-- por mês programado. A origem publica fator acima de 1 e negativo; as médias
+-- não filtram, e o máximo e o mínimo mostram o quanto.
+SELECT
+  periodo_apuracao,
+  submercado,
+  uf,
+  tipo_usina,
+  modalidade_operacao,
+  id_ons,
+  ANY_VALUE(nome_usina_conjunto)                AS nome_usina_conjunto,
+  ANY_VALUE(codigo_usina)                       AS codigo_usina,
+  COUNT(*)                                      AS horas_no_mes,
+  COUNTIF(geracao_programada_mwmed IS NOT NULL) AS horas_com_programacao,
+  AVG(fator_capacidade)                         AS fator_capacidade_medio,
+  MIN(fator_capacidade)                         AS fator_capacidade_minimo,
+  MAX(fator_capacidade)                         AS fator_capacidade_maximo,
+  AVG(geracao_verificada_mwmed)                 AS geracao_verificada_media_mwmed,
+  AVG(geracao_programada_mwmed)                 AS geracao_programada_media_mwmed,
+  AVG(capacidade_instalada_mw)                  AS capacidade_instalada_media_mw
+FROM ${ref("silver", "ons_fator_capacidade")}
+GROUP BY periodo_apuracao, submercado, uf, tipo_usina, modalidade_operacao, id_ons

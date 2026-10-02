@@ -1,0 +1,43 @@
+config {
+  type: "table",
+  schema: "gold",
+  tags: ["gold"],
+  dependOnDependencyAssertions: true
+}
+
+-- Gold: despacho térmico por usina e mês, aberto por motivo. Aditivo 01.
+--
+-- Responde "quanto cada térmica gerou no mês, e por que ela foi chamada": por
+-- mérito (CVU abaixo do CMO), por inflexibilidade, por razão elétrica, por
+-- segurança energética (CMSE), por reserva de potência, em substituição, por
+-- unit commitment — e quanto foi cortado (constrained-off). Lado a lado com o
+-- programado, mostra onde o verificado se afastou do plano. Sem KPI (ADR 012).
+--
+-- Os motivos **não somam** a geração verificada: a inflexibilidade pode estar
+-- embutida no despacho por mérito (ver o dicionário do ONS). Por isso cada
+-- motivo é uma coluna, e nenhuma é calculada como resto.
+-- As colunas `_soma_mwmed` somam as médias horárias do mês. Cada linha é o MWmed
+-- de uma hora, então a soma equivale a MWh; sem `_mwh` no nome, pela regra de
+-- `geracao_mensal_usina_ons`.
+-- `combustivel` só existe na origem desde 04/2026; antes, é NULL.
+SELECT
+  periodo_apuracao,
+  submercado,
+  nome_usina,
+  codigo_usina,
+  MAX(combustivel)                     AS combustivel,
+  COUNT(*)                             AS horas_no_mes,
+  COUNTIF(verif_geracao_mwmed > 0)     AS horas_gerando,
+  SUM(prog_geracao_mwmed)              AS prog_geracao_soma_mwmed,
+  SUM(verif_geracao_mwmed)             AS verif_geracao_soma_mwmed,
+  SUM(verif_ordem_merito_mwmed)        AS verif_ordem_merito_soma_mwmed,
+  SUM(verif_inflexibilidade_mwmed)     AS verif_inflexibilidade_soma_mwmed,
+  SUM(verif_razao_eletrica_mwmed)      AS verif_razao_eletrica_soma_mwmed,
+  SUM(verif_garantia_energetica_mwmed) AS verif_garantia_energetica_soma_mwmed,
+  SUM(verif_reserva_potencia_mwmed)    AS verif_reserva_potencia_soma_mwmed,
+  SUM(verif_gsub_mwmed)                AS verif_gsub_soma_mwmed,
+  SUM(verif_unit_commitment_mwmed)     AS verif_unit_commitment_soma_mwmed,
+  SUM(verif_constrained_off_mwmed)     AS verif_constrained_off_soma_mwmed,
+  MAX(verif_geracao_mwmed)             AS verif_geracao_maxima_mwmed
+FROM ${ref("silver", "ons_geracao_termica_despacho")}
+GROUP BY periodo_apuracao, submercado, nome_usina, codigo_usina

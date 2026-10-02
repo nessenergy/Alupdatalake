@@ -1,0 +1,38 @@
+config {
+  type: "operations",
+  schema: "bronze",
+  hasOutput: true,
+  tags: ["bronze"]
+}
+
+-- Bronze: energia vertida turbinável por usina e hora (ONS, dados abertos, CSV
+-- mensal desde 2024-01). Aditivo 01. ~109 mil linhas por mês (09/2026, 153 usinas).
+CREATE TABLE IF NOT EXISTS ${self()} (
+  data_referencia     DATE      NOT NULL OPTIONS(description="Dia do instante"),
+  instante            DATETIME  NOT NULL OPTIONS(description="Hora de INÍCIO: 00:00 cobre 00:00 a 00:59:59 (dicionário do ONS)"),
+  submercado          STRING    NOT NULL OPTIONS(description="N, NE, S, SE"),
+  nome_subsistema     STRING    NOT NULL,
+  bacia               STRING    NOT NULL,
+  rio                 STRING    NOT NULL,
+  agente              STRING    NOT NULL OPTIONS(description="Agente proprietário da usina"),
+  reservatorio        STRING    NOT NULL,
+  codigo_usina_modelo INT64     NOT NULL OPTIONS(description="Código da usina nos modelos de otimização do ONS (não é o CEG)"),
+  geracao_mwmed                    NUMERIC OPTIONS(description="MWmed"),
+  disponibilidade_mwmed            NUMERIC OPTIONS(description="MWmed"),
+  vazao_turbinada_m3s              NUMERIC OPTIONS(description="m3/s"),
+  vazao_vertida_m3s                NUMERIC OPTIONS(description="m3/s"),
+  vazao_vertida_nao_turbinavel_m3s NUMERIC OPTIONS(description="m3/s"),
+  produtividade_mw_por_m3s         NUMERIC OPTIONS(description="MW/(m3/s)"),
+  folga_geracao_mwmed              NUMERIC OPTIONS(description="MWmed"),
+  energia_vertida_mwmed            NUMERIC OPTIONS(description="MWmed"),
+  vazao_vertida_turbinavel_m3s     NUMERIC OPTIONS(description="m3/s: a parte do vertimento que poderia ter sido turbinada"),
+  energia_vertida_turbinavel_mwmed NUMERIC OPTIONS(description="MWmed que a usina deixou de gerar vertendo água turbinável"),
+
+  _ingestao_id        STRING    NOT NULL,
+  _ingestao_timestamp TIMESTAMP NOT NULL,
+  _fonte              STRING    NOT NULL,
+  _schema_versao      STRING    NOT NULL
+)
+PARTITION BY DATE(_ingestao_timestamp)
+CLUSTER BY data_referencia, submercado
+OPTIONS(description="Energia vertida turbinável por usina e hora (ONS) — camada Bronze, append-only");

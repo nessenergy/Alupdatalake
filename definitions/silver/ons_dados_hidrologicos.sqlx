@@ -1,0 +1,55 @@
+config {
+  type: "view",
+  schema: "silver",
+  tags: ["silver"],
+  assertions: {
+    uniqueKey: ["id_reservatorio", "instante"],
+    nonNull: ["data_referencia", "instante", "id_reservatorio", "submercado"],
+    rowConditions: [
+      "submercado IN ('N','NE','S','SE')"
+    ]
+  }
+}
+
+-- Silver: dados hidrológicos por reservatório e hora, higienizada e deduplicada.
+-- Aditivo 01.
+-- Dedup por (id_reservatorio, instante): o instante inteiro, porque o fim do dia
+-- vem como 23:59:00 e não como 24:00 (ver `hora_fim`). Vence a ingestão mais
+-- recente: o ONS revisa dado publicado, e o mês corrente é republicado todo dia.
+-- Sem condição de sinal nem de faixa: a origem publica volume útil negativo e
+-- acima de 100% e afluência negativa (arquivo de 09/2026), e recusá-los aqui
+-- esconderia o defeito da origem em vez de mostrá-lo. A faixa é tratada, e
+-- declarada, na Gold.
+SELECT
+  data_referencia,
+  submercado,
+  CAST(NULL AS STRING) AS codigo_usina,  -- `cod_usina` do ONS é código de modelo, não o CEG
+  CAST(NULL AS STRING) AS agente_ccee,   -- o ONS não usa perfil da CCEE
+  FORMAT_DATE('%Y-%m', data_referencia) AS periodo_apuracao,
+  CAST(NULL AS STRING) AS periodo_apuracao_ccee,  -- a origem não declara período próprio
+  instante,
+  -- hora fim, como no dicionário do ONS: 01:00 -> 1 ... 23:00 -> 23, 23:59 -> 24
+  IF(EXTRACT(MINUTE FROM instante) = 59, 24, EXTRACT(HOUR FROM instante)) AS hora_fim,
+  nome_subsistema,
+  tipo_reservatorio,
+  bacia,
+  id_reservatorio,
+  nome_reservatorio,
+  codigo_usina_modelo,
+  nivel_montante_m,
+  nivel_jusante_m,
+  volume_util_percentual,
+  vazao_afluente_m3s,
+  vazao_defluente_m3s,
+  vazao_turbinada_m3s,
+  vazao_vertida_m3s,
+  vazao_outras_estruturas_m3s,
+  vazao_transferida_m3s,
+  vazao_vertida_nao_turbinavel_m3s,
+  _ingestao_id,
+  _ingestao_timestamp
+FROM ${ref("bronze", "ons_dados_hidrologicos")}
+QUALIFY ROW_NUMBER() OVER (
+  PARTITION BY id_reservatorio, instante
+  ORDER BY _ingestao_timestamp DESC
+) = 1

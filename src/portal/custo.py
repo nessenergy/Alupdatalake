@@ -104,6 +104,7 @@ DOMINIO_ANALITICO = {
     "ons_cmo_semi_horario": "Mercado de Energia",
     "ons_volume_espera": "Mercado de Energia",
     "ons_cvu_termica": "Mercado de Energia",
+    "ons_dados_hidrologicos": "Mercado de Energia",
     "ons_ena": "Mercado de Energia",
     # Cadastro do mercado: dá nome ao que nas outras fontes é código.
     "ccee_perfil": "Mercado de Energia",
@@ -128,6 +129,9 @@ DOMINIO_ANALITICO = {
     "ons_disponibilidade_usina": "Geração e Operacional",
     "ons_restricao_coff_eolica": "Geração e Operacional",
     "ons_restricao_coff_fotovoltaica": "Geração e Operacional",
+    "ons_energia_vertida_turbinavel": "Geração e Operacional",
+    "ons_geracao_termica_despacho": "Geração e Operacional",
+    "ons_fator_capacidade": "Geração e Operacional",
     "tempook_boletins": "Meteorologia",
     "tempook_ena_prevs": "Meteorologia",
     "hubspot_negocios": "Comercial e Contratos",
@@ -150,6 +154,11 @@ BYTES_POR_LINHA = {
     "ons_disponibilidade_usina": 200,  # 14 colunas + 4 técnicas, três NUMERIC sempre preenchidas
     "ons_restricao_coff_eolica": 340,  # 24 colunas + 4 técnicas; metade das linhas com os campos de restrição nulos
     "ons_restricao_coff_fotovoltaica": 340,  # mesmo schema da eólica
+    # Aditivo 01, mensais pesados: largura lógica do BigQuery (NUMERIC = 16 B), estimada do schema.
+    "ons_dados_hidrologicos": 300,  # 10 NUMERIC, 8 textos aparados, instante
+    "ons_energia_vertida_turbinavel": 300,  # 10 NUMERIC, 6 textos, instante
+    "ons_geracao_termica_despacho": 720,  # 35 NUMERIC (16 B cada) e 8 textos/inteiros; ~103 mil linhas por mês
+    "ons_fator_capacidade": 380,  # 8 NUMERIC, 10 textos longos (ponto de conexão, usina), instante
 }
 BYTES_POR_LINHA_PADRAO = 256
 

@@ -1,0 +1,36 @@
+config {
+  type: "table",
+  schema: "gold",
+  tags: ["gold"],
+  dependOnDependencyAssertions: true
+}
+
+-- Gold: vertimento turbinável por usina hidrelétrica e mês. Aditivo 01.
+--
+-- Responde "quanta energia cada hidrelétrica deixou de gerar vertendo água que
+-- poderia ter turbinado" — para a hidráulica, o que o constrained-off é para a
+-- eólica e a solar. Leva a geração e a disponibilidade médias ao lado, para
+-- separar a usina que verte porque está cheia da que verte porque não tem
+-- carga. Sem KPI (ADR 012).
+--
+-- `energia_vertida_turbinavel_soma_mwmed` é a soma das médias horárias. Cada
+-- linha é o MWmed de uma hora, então a soma equivale a MWh; a coluna não leva
+-- `_mwh` no nome sem a confirmação do dono do domínio (mesma regra de
+-- `geracao_mensal_usina_ons`).
+SELECT
+  periodo_apuracao,
+  submercado,
+  bacia,
+  agente,
+  codigo_usina_modelo,
+  ANY_VALUE(reservatorio)                       AS reservatorio,
+  COUNT(*)                                      AS horas_no_mes,
+  COUNTIF(energia_vertida_turbinavel_mwmed > 0) AS horas_com_vertimento_turbinavel,
+  AVG(geracao_mwmed)                            AS geracao_media_mwmed,
+  AVG(disponibilidade_mwmed)                    AS disponibilidade_media_mwmed,
+  AVG(energia_vertida_turbinavel_mwmed)         AS energia_vertida_turbinavel_media_mwmed,
+  MAX(energia_vertida_turbinavel_mwmed)         AS energia_vertida_turbinavel_maxima_mwmed,
+  SUM(energia_vertida_turbinavel_mwmed)         AS energia_vertida_turbinavel_soma_mwmed,
+  AVG(vazao_vertida_turbinavel_m3s)             AS vazao_vertida_turbinavel_media_m3s
+FROM ${ref("silver", "ons_energia_vertida_turbinavel")}
+GROUP BY periodo_apuracao, submercado, bacia, agente, codigo_usina_modelo

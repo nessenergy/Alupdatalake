@@ -1,0 +1,81 @@
+config {
+  type: "view",
+  schema: "silver",
+  tags: ["silver"],
+  assertions: {
+    uniqueKey: ["instante", "nome_usina"],
+    nonNull: ["data_referencia", "instante", "nome_usina", "submercado"],
+    rowConditions: [
+      "submercado IN ('N','NE','S','SE')",
+      "patamar IN ('LEVE','MÉDIA','PESADA')"
+    ]
+  }
+}
+
+-- Silver: geração térmica por motivo de despacho, por usina e hora,
+-- higienizada e deduplicada. Aditivo 01.
+-- Dedup por (instante, nome_usina): o CEG não serve de chave, porque usinas
+-- distintas compartilham CEG na origem (visto em 09/2026). Vence a ingestão mais
+-- recente; `publicado_em` mostra a republicação do arquivo.
+-- Os valores programados e verificados são >= 0 em 09/2024 e em 09/2026, mas não
+-- há condição de sinal: o que não foi visto em 24 meses não vira regra.
+SELECT
+  data_referencia,
+  submercado,
+  codigo_usina,
+  CAST(NULL AS STRING) AS agente_ccee,  -- o ONS não usa perfil da CCEE
+  FORMAT_DATE('%Y-%m', data_referencia) AS periodo_apuracao,
+  CAST(NULL AS STRING) AS periodo_apuracao_ccee,  -- a origem não declara período próprio
+  instante,
+  EXTRACT(HOUR FROM instante) AS hora,
+  patamar,
+  nome_subsistema,
+  nome_usina,
+  codigo_usina_planejamento,
+  prog_geracao_mwmed,
+  prog_ordem_merito_mwmed,
+  prog_ordem_merito_ref_mwmed,
+  prog_ordem_merito_acima_inflex_mwmed,
+  prog_inflexibilidade_mwmed,
+  prog_inflex_embutida_merito_mwmed,
+  prog_inflex_pura_mwmed,
+  prog_razao_eletrica_mwmed,
+  prog_garantia_energetica_mwmed,
+  prog_gfom_mwmed,
+  prog_reposicao_perdas_mwmed,
+  prog_exportacao_mwmed,
+  prog_reserva_potencia_mwmed,
+  prog_gsub_mwmed,
+  prog_unit_commitment_mwmed,
+  prog_constrained_off_mwmed,
+  prog_inflexibilidade_dessem_mwmed,
+  verif_geracao_mwmed,
+  verif_ordem_merito_mwmed,
+  verif_ordem_merito_acima_inflex_mwmed,
+  verif_inflexibilidade_mwmed,
+  verif_inflex_embutida_merito_mwmed,
+  verif_inflex_pura_mwmed,
+  verif_razao_eletrica_mwmed,
+  verif_garantia_energetica_mwmed,
+  verif_gfom_mwmed,
+  verif_reposicao_perdas_mwmed,
+  verif_exportacao_mwmed,
+  verif_reserva_potencia_mwmed,
+  verif_gsub_mwmed,
+  verif_unit_commitment_mwmed,
+  verif_constrained_off_mwmed,
+  verif_fator_exportacao,
+  prog_disponibilidade_mwmed,
+  geracao_despachada_mwmed,
+  atendimento_rpo,
+  tipo_restricao_eletrica,
+  combustivel,
+  motivo_restricao,
+  publicado_em,
+  _ingestao_id,
+  _ingestao_timestamp
+FROM ${ref("bronze", "ons_geracao_termica_despacho")}
+QUALIFY ROW_NUMBER() OVER (
+  PARTITION BY instante, nome_usina
+  ORDER BY _ingestao_timestamp DESC
+) = 1

@@ -458,3 +458,24 @@ def test_layout_denso_do_telao_mantem_a_tira_na_mesma_linha_do_nome() -> None:
     assert regra
     assert '"ico name age strip chev"' in regra[0]  # vence a regra de container que desce a tira
     assert "--strip-w:calc(30 * 6px + 29 * 2px)" in ESTILO  # a variável derivada precisa ser refeita
+
+
+def test_telao_nao_corta_o_que_nao_cabe_na_janela() -> None:
+    """Em janela menor que a tela cheia (barra de favoritos, zoom de 125%) o telão cortava a
+    segunda fileira de indicadores e o fim da saúde, sem como rolar (visto em hml, 02/10)."""
+    from src.portal.estilo import ESTILO
+
+    regras = [r for r in ESTILO.splitlines() if r.startswith(".ad-page--telao{")]
+    assert ".ad-page--telao{min-height:100vh}" in regras  # sem altura fixa e sem overflow:hidden
+    assert not any("overflow:hidden" in r for r in regras)
+    assert "@media (max-height:1040px)" in ESTILO  # janela comum: ~950 px
+    assert "@media (max-height:820px)" in ESTILO  # janela pequena: ~780 px
+
+
+def test_degraus_de_altura_vem_depois_das_regras_que_eles_sobrescrevem() -> None:
+    """Regra de mesma especificidade vale pela ordem: os degraus precisam ficar no fim."""
+    from src.portal.estilo import ESTILO
+
+    ultima_altura_base = ESTILO.rindex("--telao-band-h:296px")
+    assert ESTILO.index("@media (max-height:1040px)") > ultima_altura_base
+    assert ESTILO.index("@media (max-height:820px)") > ESTILO.index("@media (max-height:1040px)")

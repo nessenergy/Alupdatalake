@@ -67,6 +67,10 @@ quando consultou, não quando o dado chegou.
 - **Duas decisões de negócio ficam como estavam**: a anomalia de custo é consulta
   com custo mais que o dobro da própria média, e o atraso é o limite de silêncio do
   alerta. Mudar qualquer uma é decisão separada.
+- **Janela menor que a tela cheia:** o telão é desenhado para 1080 px de altura. Em janela
+  menor (barra de favoritos, zoom de 125%) nada é cortado: a página rola, e abaixo de
+  1040 px e de 820 px os blocos encolhem em dois degraus, de modo que ~950 e ~780 px
+  cabem sem rolar. Tela cheia (F11) continua sendo o uso recomendado.
 - **Limite do telão na Saúde:** um grupo com mais de ~22 fontes deixa de caber em uma
   coluna e o fim dele é cortado. Hoje o maior (ONS) tem 19. Se passar, a saída é paginar
   a Saúde por grupo, como os Indicadores.

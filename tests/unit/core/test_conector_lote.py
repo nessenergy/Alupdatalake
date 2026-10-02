@@ -304,3 +304,15 @@ def test_decimal_alem_de_nove_casas_e_arredondado_para_o_numeric(espiao, monkeyp
     conector.ingerir(Janela.de_texto("2026-01-01", "2026-01-01"))
 
     assert linhas[0]["valor"] == carregado
+
+
+def test_marca_de_inicio_e_gravada_antes_de_extrair_e_antes_do_fim(espiao, monkeypatch):
+    c = ConectorFatiado(total=3)
+    espiao["conector"]["c"] = c
+    ordem: list[str] = []
+    monkeypatch.setattr("src.core.conector.registrar_inicio", lambda e: ordem.append(f"inicio:{e.status}"))
+    monkeypatch.setattr("src.core.conector.registrar_execucao", lambda e: ordem.append(f"fim:{e.status}"))
+
+    c.ingerir(Janela.de_texto("2026-01-01", "2026-01-01"))
+
+    assert ordem == ["inicio:EM_EXECUCAO", "fim:SUCESSO"]

@@ -93,6 +93,25 @@ def carregar_bronze(execucao: Execucao, linhas: list[dict[str, Any]]) -> int:
     return len(linhas)
 
 
+def registrar_inicio(execucao: Execucao) -> None:
+    """Grava a marca de início (`EM_EXECUCAO`) em `bronze._execucoes`.
+
+    Execução morta pelo tempo limite do Cloud Run grava dado na Bronze e some sem a linha final
+    (visto em 29/09, em `ons_geracao_usina`). Com a marca de início, a saúde enxerga o par sem
+    fim. É melhor esforço: falhar aqui só tira a evidência, não pode impedir a carga.
+    """
+    cfg = get_settings()
+    if cfg.dry_run:
+        return
+    tabela = f"{cfg.gcp_project_id}.{cfg.bq_dataset_bronze}.{TABELA_EXECUCOES}"
+    try:
+        erros = cliente().insert_rows_json(tabela, [execucao.to_row()])
+        if erros:
+            logger.warning("marca de início recusada em %s: %s", tabela, sanitizar(str(erros)))
+    except Exception as exc:  # noqa: BLE001 — a carga não depende da marca
+        logger.warning("marca de início não gravada em %s: %s", tabela, sanitizar(str(exc)))
+
+
 def registrar_execucao(execucao: Execucao) -> None:
     """Grava a linha de controle em `bronze._execucoes`.
 

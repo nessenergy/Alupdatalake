@@ -7,7 +7,7 @@ import uuid
 
 import pytest
 from src.core import bigquery as bq
-from src.core.bigquery import RegistroExecucaoError, registrar_execucao
+from src.core.bigquery import RegistroExecucaoError, registrar_execucao, registrar_inicio
 from src.core.config import get_settings
 from src.core.execucao import Execucao, Janela
 
@@ -44,6 +44,48 @@ def test_erro_do_cliente_e_sanitizado(monkeypatch: pytest.MonkeyPatch) -> None:
         registrar_execucao(_execucao())
 
     assert marcador not in str(erro.value)
+
+
+def test_marca_de_inicio_grava_em_execucao_na_tabela_de_controle(monkeypatch: pytest.MonkeyPatch) -> None:
+    gravadas: list[tuple[str, list[dict]]] = []
+
+    class ClienteFalso:
+        def insert_rows_json(self, tabela, linhas):
+            gravadas.append((tabela, linhas))
+            return []
+
+    get_settings().dry_run = False
+    monkeypatch.setattr("src.core.bigquery.cliente", ClienteFalso)
+    execucao = Execucao(fonte="teste", entidade="medicao", janela=Janela.de_texto("2026-01-01", "2026-01-01"))
+
+    registrar_inicio(execucao)
+
+    [(tabela, [linha])] = gravadas
+    assert tabela.endswith("._execucoes")
+    assert linha["status"] == "EM_EXECUCAO"
+    assert linha["encerrada_em"] is None
+    assert linha["ingestao_id"] == execucao.ingestao_id
+
+
+def test_marca_de_inicio_nao_derruba_a_carga_quando_o_bigquery_falha(monkeypatch: pytest.MonkeyPatch) -> None:
+    class ClienteFalso:
+        def insert_rows_json(self, _tabela, _linhas):
+            raise RuntimeError("fora do ar")
+
+    get_settings().dry_run = False
+    monkeypatch.setattr("src.core.bigquery.cliente", ClienteFalso)
+
+    registrar_inicio(Execucao(fonte="t", entidade="m", janela=Janela.de_texto("2026-01-01", "2026-01-01")))
+
+
+def test_marca_de_inicio_em_dry_run_nao_toca_o_bigquery(monkeypatch: pytest.MonkeyPatch) -> None:
+    def proibido():
+        raise AssertionError("dry-run não fala com o BigQuery")
+
+    get_settings().dry_run = True
+    monkeypatch.setattr("src.core.bigquery.cliente", proibido)
+
+    registrar_inicio(Execucao(fonte="t", entidade="m", janela=Janela.de_texto("2026-01-01", "2026-01-01")))
 
 
 # ---------------------------------------------------------------- rótulos FinOps

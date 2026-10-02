@@ -405,3 +405,12 @@ def test_toda_fonte_agendada_tem_limite_de_silencio_ou_motivo() -> None:
     sem_sucesso_possivel = {"bbce_curva_forward", "hubspot_negocios", "tempook_boletins", "tempook_ena_prevs"}
     assert agendadas, "a regex não achou nenhuma fonte agendada"
     assert not (agendadas - com_limite - sem_sucesso_possivel)
+
+
+def test_saude_trata_execucao_sem_fim_como_erro() -> None:
+    """Execução morta por tempo limite deixa só a marca de início; a saúde não pode mostrar OK (29/09)."""
+    caminho = Path(__file__).resolve().parents[2] / "definitions" / "gold" / "saude_ingestao.sqlx"
+    sql = caminho.read_text(encoding="utf-8")
+    assert "status = 'EM_EXECUCAO'" in sql
+    assert "INTERVAL 40 MINUTE" in sql
+    assert "NOT EXISTS" in sql

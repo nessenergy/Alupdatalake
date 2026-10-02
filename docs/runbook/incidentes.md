@@ -122,7 +122,7 @@ Workflow **Executar ingestão**, com `environment`, `conector` (como
 **Recarga longa: janelas de até 3 meses.** O job do Cloud Run tem limite de 1800 s por execução
 (com 2 novas tentativas). Uma fonte pesada, como as usinas do ONS, leva de 9 a 16 minutos por
 3 meses; uma janela de 2 anos estoura o limite, o job é cortado e o registro da execução pode
-não chegar a ser gravado (ver `docs/proximos-passos.md`, item 1.14). Para recarregar histórico,
+não chegar a ser gravado; a saúde mostra a fonte em `FALHA_RECENTE` com o texto "sem registro de fim: provável tempo limite" até um sucesso posterior (item 1.14). Para recarregar histórico,
 dispare uma execução por trecho de até 3 meses, **uma de cada vez**, e confira cada uma em
 `bronze._execucoes` antes de seguir. Fontes leves (mensais, ou de um arquivo por ano, como
 `ccee_pld`) aguentam a janela inteira. Na dúvida, observe a primeira execução antes de decidir o tamanho.

@@ -15,7 +15,30 @@ config {
 -- do histórico falhava com carga manual — dez recargas num dia faziam uma
 -- fonte diária parecer atrasada horas depois do sucesso (visto em 29/09).
 -- A cadência inferida fica só para conector fora do mapa.
-WITH execucoes AS (
+WITH -- O job grava `EM_EXECUCAO` ao começar e a linha final ao terminar. Marca de início sem linha final
+-- depois de 40 minutos é execução morta (o limite do Cloud Run é 30): ela já gravou dado na Bronze e
+-- não deixou registro, e o último sucesso antigo fazia a fonte parecer OK (visto em 29/09). Conta como
+-- erro até um sucesso posterior.
+interrompidas AS (
+  SELECT
+    CONCAT(i.fonte, '_', i.entidade) AS conector,
+    'ERRO' AS status,
+    CAST(NULL AS INT64) AS linhas_extraidas,
+    CAST(NULL AS INT64) AS linhas_invalidas,
+    CAST(NULL AS INT64) AS linhas_carregadas,
+    i.iniciada_em AS encerrada_em,
+    CAST(NULL AS FLOAT64) AS duracao_segundos,
+    CONCAT('Execução de ', FORMAT_TIMESTAMP('%d/%m %H:%M', i.iniciada_em, 'America/Sao_Paulo'),
+           ' sem registro de fim: provável tempo limite; pode ter carga parcial na Bronze') AS erro
+  FROM ${ref("bronze", "_execucoes")} AS i
+  WHERE i.status = 'EM_EXECUCAO'
+    AND i.iniciada_em < TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL 40 MINUTE)
+    AND NOT EXISTS (
+      SELECT 1 FROM ${ref("bronze", "_execucoes")} AS f
+      WHERE f.ingestao_id = i.ingestao_id AND f.encerrada_em IS NOT NULL
+    )
+),
+execucoes AS (
   SELECT
     CONCAT(fonte, '_', entidade) AS conector,
     status,
@@ -27,6 +50,8 @@ WITH execucoes AS (
     erro
   FROM ${ref("bronze", "_execucoes")}
   WHERE encerrada_em IS NOT NULL
+  UNION ALL
+  SELECT * FROM interrompidas
 ),
 intervalos AS (
   SELECT

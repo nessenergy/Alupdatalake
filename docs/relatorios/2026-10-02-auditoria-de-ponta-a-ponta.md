@@ -300,7 +300,7 @@ e o enquadramento contratual é da coordenação com a Alup.
   (cargas, dias seguidos, pendências, teste de conexão) vem de `bronze._execucoes`, das issues
   `tipo/dependencia` e do Cloud Run; o que é editado à mão (`painel/marcos.toml`, `painel/aditivo.toml`) foi
   conferido item a item.
-- **Alerta de aprovação do Portal:** o pedido de aprovação do Portal está **em rascunho**, não enviado.
+- **Aprovação do Portal:** o pedido foi **enviado** a Eduardo Pires em 02/10 (01h40), sem resposta até aqui.
 
 ## 10. Pendências por dono
 
@@ -314,16 +314,20 @@ e o enquadramento contratual é da coordenação com a Alup.
 | **#262** credenciais da Onda 2 (Hubspot e BBCE) | 12/10 (contrato: 19/10) | aberta |
 | **#12–#15** VPN e credenciais das fontes internas | 09/11 (contrato: 16/11) | abertas |
 | Rede da Onda 3: rota (G6), FortiGate e listener (L1–L5), credencial (N3) | sem data | abertas; teste de conexão falhou em 25/09 |
-| **#142** planilhas da proposta (G3) | 01/10 | passou sem confirmação de recebimento |
-| **#141** de-para de usina; **#129/#174** acervo e caminhos do TempoOK; **#150** RACI; **#87** destinatários e orçamento | sem data | abertas |
-| Billing export (console) | sem data | aberta; cada dia perde histórico de custo |
+| **#142** planilhas da proposta (G3) | 01/10, **movido por acordo** | Leonardo propôs (01/10) data perto da Onda 4 e a ness. aceitou; sem nova data. **Não está vencido.** |
+| **#141** de-para de usina | 01/10 | **`usinas.csv` chegou** em 01/10 (14 usinas; Usinas, Nome do ativo, UC/CEG); falta confirmar o recebimento e ver o que cobre |
+| **#129/#174** acervo e caminhos do TempoOK; **#150** RACI | sem data | abertas |
+| **#87** orçamento e destinatários dos alertas | — | **orçamento respondido** ("manter o recomendado": US$ 20/mês até novembro, US$ 400 depois); falta o papel de Costs Manager para as contas de serviço (item 12) |
+| Billing export (console) | — | **feito pela QI Network em 01/10** em `dev`: duas tabelas no dataset `faturamento`; histórico desde 01/10 |
 
 ### ness.
 
 - ~~Recarga do histórico de `hml` e `dev`~~ e ~~deploy em `dev`~~: **feitos em 02/10** (§6).
 - Aditivo B, C e D (79 h) e decisão sobre o item 26.
 - Bootstrap de `prod` (item 1.9), depois do aceite.
-- Enviar o pedido de aprovação do Portal (rascunho pronto).
+- ~~Enviar o pedido de aprovação do Portal~~: **enviado em 02/10**.
+- Confirmar na #141 o recebimento do `usinas.csv` e conferir o que ele cobre.
+- Trocar o orçado do Portal de US$ 120 para a referência da Alup (US$ 20 até novembro).
 - Fechar issues já cumpridas (lista na §11).
 - **#188** mecanismo de alerta para fonte semanal e mensal, hoje sem alerta próprio.
 
@@ -345,8 +349,9 @@ e o enquadramento contratual é da coordenação com a Alup.
 
 **Para decisão de quem coordena** (não alterei):
 
-- **Quem assina o aceite:** `interlocutores.md` nomeia Taina Mota como aprovadora (B4). O pedido de 01/10 foi dirigido
-  a Eduardo Pires, por decisão do Ricardo. A #258 segue aberta. Atualizar `interlocutores.md` quando a Alup confirmar.
+- **Quem assina o aceite:** `interlocutores.md` nomeia Taina Mota como aprovadora (B4). Em 29/09 o Leonardo
+  respondeu que **Eduardo Pires é o membro do comitê aprovador de passagem de fase**, e os pedidos de aprovação foram
+  dirigidos a ele. Falta a Alup confirmar que ele também assina o aceite (#258). Atualizar `interlocutores.md` então.
 - **13 fontes × 27 × 44:** o contrato fala em 13 fontes; o repositório tem 44 conectores. A conciliação continua
   "pendente" no `status.md` desde 24/09 e depende da #142.
 - **Aditivo e as 580 h:** `aditivo.toml` diz "fora das 580 h"; o documento do aditivo usa "28% das 580 h" como

@@ -36,7 +36,7 @@ dossiê das Ondas 0 e 1 foi emitido e enviado em 25/09.
 | 1.13 | ~~**Recarga do histórico em janelas de 3 meses**~~ **feito em 02/10** | ness. | `hml`: `ons_geracao_usina` (11 de 25 meses) e `ons_restricao_coff_eolica` (14 de 25); `dev`: jun–ago/2025 e mar–mai/2025. Janela única de 25 meses estourou o limite de 1800 s ([auditoria de 02/10](relatorios/2026-10-02-auditoria-de-ponta-a-ponta.md) §6). Depois, Dataform e conferência dos meses por fonte |
 | 1.14 | **Alerta para execução que estoura o tempo ou deixa dado sem registro** | ness. | hoje a saúde só enxerga o último sucesso; carga parcial sem linha em `_execucoes` mostra OK (§6 da auditoria) |
 | 1.15 | ~~**Deploy em `dev`**~~ **feito em 02/10** | ness. | `dev` está em `22edae1`, atrás da `main`; falta o Gold com `aguardando_credencial` e o limite de silêncio das mensais |
-| 1.16 | **Enviar o pedido de aprovação do Portal** | ness. | rascunho pronto; independente do pedido das Ondas 0 e 1, enviado em 01/10 |
+| 1.16 | ~~**Enviar o pedido de aprovação do Portal**~~ **enviado em 02/10** | ness. | a Eduardo Pires; independente do pedido das Ondas 0 e 1 (01/10); sem resposta |
 
 Histórico da liberação do ambiente:
 

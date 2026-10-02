@@ -383,3 +383,25 @@ def test_saude_marca_fonte_que_aguarda_credencial() -> None:
     assert "AS aguardando_credencial" in saude
     assert "a.ultimo_sucesso IS NULL" in saude
     assert "secret|cofre local" in saude
+
+
+def test_toda_fonte_agendada_tem_limite_de_silencio_ou_motivo() -> None:
+    """Fonte mensal fora do mapa cai no padrão de 52 h e o Portal a marca como atrasada
+    uma semana depois da carga (visto em 02/10 com a restrição de corte eólica).
+
+    Só fica de fora o que não pode ter sucesso por motivo documentado.
+    """
+    agendadas = set(
+        re.findall(
+            r"^ {4}([a-z0-9_]+)\s*=\s*\{\n(?:.*\n)*?\s+cron\s*=",
+            (RAIZ / "infra/modules/scheduler/main.tf").read_text(encoding="utf-8"),
+            re.M,
+        )
+    )
+    js = (RAIZ / "includes/silencio.js").read_text(encoding="utf-8")
+    com_limite = set(re.findall(r"^\s+([a-z0-9_]+):\s*\d+,", js, re.M))
+    # Onda 2: dependem de token ou de entrada da Alup (ADR 020, A9) e ainda não executam
+    # com sucesso. Quando uma delas passar a rodar, sai desta lista e ganha limite.
+    sem_sucesso_possivel = {"bbce_curva_forward", "hubspot_negocios", "tempook_boletins", "tempook_ena_prevs"}
+    assert agendadas, "a regex não achou nenhuma fonte agendada"
+    assert not (agendadas - com_limite - sem_sucesso_possivel)

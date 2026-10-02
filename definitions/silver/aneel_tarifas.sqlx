@@ -1,0 +1,66 @@
+config {
+  type: "view",
+  schema: "silver",
+  tags: ["silver"],
+  assertions: {
+    uniqueKey: [
+      "cnpj_distribuidora", "data_referencia", "fim_vigencia", "base_tarifaria", "subgrupo", "modalidade",
+      "classe", "subclasse", "detalhe", "posto", "unidade", "acessante", "reh"
+    ],
+    nonNull: ["data_referencia", "fim_vigencia", "cnpj_distribuidora", "base_tarifaria", "subgrupo", "modalidade", "unidade"],
+    rowConditions: [
+      "fim_vigencia >= data_referencia",
+      "COALESCE(tusd, 0) >= 0 AND COALESCE(te, 0) >= 0",
+      "base_tarifaria IN ('Tarifa de Aplicação', 'Base Econômica')",
+      "unidade IN ('kW', 'MWh')"
+    ]
+  }
+}
+
+-- Silver: tarifas homologadas das distribuidoras, uma linha por tarifa e vigência.
+-- Dedup pela chave natural completa (distribuidora, início e fim da vigência,
+-- base, subgrupo, modalidade, classe, subclasse, detalhe, posto, unidade,
+-- acessante e resolução); vence a ingestão mais recente, que é a leitura em que a
+-- ANEEL corrigiu o valor. A resolução entra na chave de propósito: duas
+-- resoluções podem fixar a mesma vigência (295 casos com valor diferente no
+-- arquivo, todos até 2021) e a ordem entre elas não se tira do número (a REH
+-- nº 3.556 é de 12/2025 e a nº 3.318, de 08/2026); quem escolhe é a Gold, pela
+-- vigência mais nova.
+-- O arquivo ainda traz 516 chaves repetidas COM a mesma resolução (2010 a 2018),
+-- que a origem não resolve: o desempate é pelo maior valor, só para o resultado
+-- ser determinístico, e não tem sentido regulatório.
+-- `Não se aplica` vira NULL (classe, subclasse, detalhe, posto, acessante): é
+-- ausência de critério, não um valor.
+SELECT
+  data_referencia,  -- início da vigência
+  CAST(NULL AS STRING) AS submercado,    -- a tarifa é da distribuidora, não do submercado
+  CAST(NULL AS STRING) AS codigo_usina,  -- a distribuidora não é usina
+  CAST(NULL AS STRING) AS agente_ccee,   -- o arquivo traz o CNPJ, não o perfil CCEE
+  FORMAT_DATE('%Y-%m', data_referencia) AS periodo_apuracao,
+  CAST(NULL AS STRING) AS periodo_apuracao_ccee,  -- a origem não declara período próprio
+  fim_vigencia,
+  data_geracao,
+  reh,
+  sigla_distribuidora,
+  cnpj_distribuidora,
+  base_tarifaria,
+  subgrupo,
+  modalidade,
+  NULLIF(classe, 'Não se aplica') AS classe,
+  NULLIF(subclasse, 'Não se aplica') AS subclasse,
+  NULLIF(detalhe, 'Não se aplica') AS detalhe,
+  NULLIF(posto, 'Não se aplica') AS posto,
+  unidade,
+  NULLIF(acessante, 'Não se aplica') AS acessante,
+  tusd,
+  te,
+  _ingestao_id,
+  _ingestao_timestamp
+FROM ${ref("bronze", "aneel_tarifas")}
+QUALIFY ROW_NUMBER() OVER (
+  PARTITION BY
+    cnpj_distribuidora, data_referencia, fim_vigencia, base_tarifaria, subgrupo, modalidade,
+    NULLIF(classe, 'Não se aplica'), NULLIF(subclasse, 'Não se aplica'), NULLIF(detalhe, 'Não se aplica'),
+    NULLIF(posto, 'Não se aplica'), unidade, NULLIF(acessante, 'Não se aplica'), reh
+  ORDER BY _ingestao_timestamp DESC, tusd DESC, te DESC
+) = 1

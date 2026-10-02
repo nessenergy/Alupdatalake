@@ -1,0 +1,40 @@
+config {
+  type: "operations",
+  schema: "bronze",
+  hasOutput: true,
+  tags: ["bronze"]
+}
+
+-- Bronze: tarifas homologadas das distribuidoras de energia elétrica (ANEEL,
+-- dados abertos, CSV único reescrito inteiro). Onda 1, "ANEEL tarifas
+-- regulatórias". ~328 mil linhas no arquivo inteiro (02/10/2026); cada execução
+-- carrega só as linhas cuja vigência começa dentro da janela, e o append-only
+-- guarda o que a ANEEL publicou em cada leitura. Fiel à origem: `Não se aplica`
+-- e a resolução vazia chegam como vieram (a limpeza é da Silver).
+CREATE TABLE IF NOT EXISTS ${self()} (
+  data_referencia      DATE      NOT NULL OPTIONS(description="Início da vigência da tarifa (DatInicioVigencia); é por ela que a janela recorta"),
+  data_geracao         DATE      NOT NULL OPTIONS(description="Dia em que a ANEEL gerou o arquivo (DatGeracaoConjuntoDados)"),
+  fim_vigencia         DATE      NOT NULL OPTIONS(description="Fim da vigência da tarifa (DatFimVigencia)"),
+  reh                  STRING    OPTIONS(description="Resolução homologatória ou despacho que fixou a tarifa; vazio em 274 linhas"),
+  sigla_distribuidora  STRING    NOT NULL OPTIONS(description="SigAgente; a sigla já mudou para o mesmo CNPJ (CPFL Jaguari, CPFL Santa Cruz)"),
+  cnpj_distribuidora   STRING    NOT NULL OPTIONS(description="14 dígitos, com zero à esquerda"),
+  base_tarifaria       STRING    NOT NULL OPTIONS(description="Tarifa de Aplicação (a que fatura o acessante) ou Base Econômica (só para o cálculo tarifário)"),
+  subgrupo             STRING    NOT NULL OPTIONS(description="A1, A2, A3, A3a, A4, A4a, A4b, AS, B, B1, B2, B3, B4"),
+  modalidade           STRING    NOT NULL OPTIONS(description="Azul, Verde, Branca, Convencional, Geração, Distribuição, ... (14 valores em 02/10/2026)"),
+  classe               STRING    NOT NULL OPTIONS(description="Residencial, Rural, Iluminação pública ou `Não se aplica`"),
+  subclasse            STRING    NOT NULL OPTIONS(description="Subdivisão da classe ou `Não se aplica`"),
+  detalhe              STRING    NOT NULL OPTIONS(description="Critério de aplicação (APE, SCEE, TIPO 01, ...) ou `Não se aplica`"),
+  posto                STRING    NOT NULL OPTIONS(description="Ponta, Fora ponta, Intermediário, ... ou `Não se aplica`"),
+  unidade              STRING    NOT NULL OPTIONS(description="kW ou MWh: a grandeza da TUSD; a TE é sempre R$/MWh"),
+  acessante            STRING    OPTIONS(description="Sigla do acessante nas tarifas nominais; `Não se aplica` na regra geral, vazio em 22 linhas"),
+  tusd                 NUMERIC   OPTIONS(description="Tarifa de Uso do Sistema de Distribuição, R$/kW ou R$/MWh conforme `unidade`"),
+  te                   NUMERIC   OPTIONS(description="Tarifa de Energia, R$/MWh; zero em toda linha em kW (02/10/2026)"),
+
+  _ingestao_id         STRING    NOT NULL,
+  _ingestao_timestamp  TIMESTAMP NOT NULL,
+  _fonte               STRING    NOT NULL,
+  _schema_versao       STRING    NOT NULL
+)
+PARTITION BY DATE(_ingestao_timestamp)
+CLUSTER BY data_referencia, cnpj_distribuidora
+OPTIONS(description="Tarifas homologadas das distribuidoras (ANEEL) — camada Bronze, append-only");

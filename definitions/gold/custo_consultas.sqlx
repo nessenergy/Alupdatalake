@@ -75,6 +75,10 @@ carga AS (
   WHERE status = 'SUCESSO' AND encerrada_em IS NOT NULL
   GROUP BY dia, fonte
 )
+-- Custo de consulta: uma linha por dia, fonte, camada e consulta. O armazenamento NÃO se junta
+-- aqui. Antes ele entrava por `LEFT JOIN armazenamento ON a.fonte = c.fonte`, e como a consulta
+-- do Dataform não leva o rótulo `fonte` (vira 'não rotulado'), nenhum nome de tabela casava e o
+-- custo de armazenamento sumia da tela; casando, ele se repetiria em cada consulta do dia.
 SELECT
   c.dia,
   c.fonte,
@@ -83,7 +87,7 @@ SELECT
   c.execucoes,
   c.bytes_varridos,
   c.custo_query_usd,
-  IFNULL(a.custo_armazenamento_dia_usd, 0) AS custo_armazenamento_usd,
+  CAST(0 AS FLOAT64) AS custo_armazenamento_usd,
   IFNULL(g.linhas_carregadas, 0) AS linhas_carregadas,
   -- Desvio da consulta contra a média móvel dela mesma, em 7 dias. É o que
   -- separa "esta consulta é cara" de "esta consulta ficou cara" — só a segunda
@@ -103,5 +107,23 @@ SELECT
     )
   ) AS variacao_vs_media
 FROM consultas AS c
-LEFT JOIN armazenamento AS a ON a.fonte = c.fonte
 LEFT JOIN carga AS g ON g.dia = c.dia AND g.fonte = c.fonte
+
+UNION ALL
+
+-- Armazenamento: uma linha por tabela Bronze e por dia em que houve consulta, com
+-- `consulta = 'armazenamento'`. A atribuição é pelo nome da tabela, que é o nome da fonte.
+SELECT
+  d.dia,
+  a.fonte,
+  'bronze' AS camada,
+  'armazenamento' AS consulta,
+  CAST(0 AS INT64) AS execucoes,
+  CAST(0 AS INT64) AS bytes_varridos,
+  CAST(0 AS FLOAT64) AS custo_query_usd,
+  a.custo_armazenamento_dia_usd AS custo_armazenamento_usd,
+  IFNULL(g.linhas_carregadas, 0) AS linhas_carregadas,
+  CAST(NULL AS FLOAT64) AS variacao_vs_media
+FROM (SELECT DISTINCT dia FROM consultas) AS d
+CROSS JOIN armazenamento AS a
+LEFT JOIN carga AS g ON g.dia = d.dia AND g.fonte = a.fonte

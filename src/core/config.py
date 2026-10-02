@@ -47,7 +47,11 @@ class Settings(BaseSettings):
         description="Quanto tempo o Portal guarda cada leitura do BigQuery; 0 desliga (o telão consulta a cada 20 s)",
     )
     portal_orcamento_mensal_usd: float = Field(
-        default=120.0, description="Orçamento mensal de nuvem, em USD, contra o qual a rota /custo compara"
+        default=20.0,
+        description=(
+            "Orçamento mensal de nuvem, em USD, contra o qual a rota /custo compara. Referência da Alup "
+            "(29/09, #87): US$ 20 por mês até novembro e US$ 400 depois; revisar na virada."
+        ),
     )
 
     @property

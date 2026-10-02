@@ -12,6 +12,7 @@ import html
 from decimal import Decimal
 from typing import TYPE_CHECKING
 
+from src.portal.custo import DIAS_MINIMOS_PARA_PROJETAR
 from src.portal.formato import bytes_humano, milhar, pct
 from src.portal.grafico import barras_custo, legenda_custo, usd
 from src.portal.pagina import icone
@@ -39,6 +40,8 @@ TETO_DO_MEDIDOR = 1.12
 LINHAS_NO_TELAO = 4
 # Na tela normal, "as mais caras" é o topo, não a lista inteira.
 LINHAS_NA_TELA = 10
+# Acima desta fatia sem rótulo de fonte, dividir o custo por fonte ou por domínio é inventar.
+LIMITE_SEM_ROTULO = 0.5
 
 
 def _plural(n: int, singular: str, plural: str) -> str:
@@ -54,7 +57,7 @@ def banda(dados: PainelCusto) -> str:
             f'<span class="ad-pill ad-pill--warn" role="status">{icone("warn", "")}'
             f"{_plural(len(anomalas), 'consulta pede', 'consultas pedem')} atenção</span>"
         )
-    if o.estoura:
+    if o.projecao_confiavel and o.estoura:
         pilulas += (
             f'<span class="ad-pill ad-pill--warn" role="status">{icone("warn", "")}'
             f"a projeção passa o orçado em {usd(o.projetado_usd - o.orcado_usd)}</span>"
@@ -97,6 +100,13 @@ def _operacional(dados: PainelCusto, *, telao: bool) -> str:
         f'</span><span class="ad-qrow__cost">{usd(f.total_usd)}</span></li>'
         for f in por_fonte
     )
+    if dados.parcela_sem_rotulo > LIMITE_SEM_ROTULO:
+        bloco_fontes = (
+            '<p class="ad-stat"><span>Sem atribuição por fonte: as consultas ainda não levam o rótulo de fonte, '
+            "então o custo não se divide entre elas.</span></p>"
+        )
+    else:
+        bloco_fontes = f'<ul class="ad-qlist">{linhas_fonte}</ul>'
     varredura = (
         f'<p class="ad-stat"><b>{_plural(len(anomalas), "consulta", "consultas")}</b>'
         f"<span>varrendo mais que o dobro da própria média · {bytes_humano(sum(c.bytes_varridos for c in anomalas))} · "
@@ -109,7 +119,7 @@ def _operacional(dados: PainelCusto, *, telao: bool) -> str:
         '<h2 class="ad-block__title" id="op">O que mudar hoje</h2>'
         f'<h3>Consultas mais caras · 30 dias</h3><ul class="ad-qlist">{linhas_consulta}</ul>'
         f"<h3>Fora do padrão</h3>{varredura}"
-        f'<h3>Fontes que mais custam</h3><ul class="ad-qlist">{linhas_fonte}</ul></section>'
+        f"<h3>Fontes que mais custam</h3>{bloco_fontes}</section>"
     )
 
 
@@ -125,44 +135,79 @@ def _medidor(consumo: float, rotulo: str) -> str:
 def _orcamento(dados: PainelCusto) -> str:
     o = dados.orcamento
     dia = f"{o.dias_decorridos} de {o.dias_do_mes} dias"
+    if o.projecao_confiavel:
+        projecao = (
+            f"<dt>Projeção de fechamento</dt><dd><b>{usd(o.projetado_usd)}</b> · "
+            f"{pct(o.projecao_pct, 0)} do orçado</dd>"
+            f"{_medidor(o.projecao_pct, f'projeção de {pct(o.projecao_pct, 0)} do orçado')}"
+        )
+    else:
+        projecao = ""
+    nota_projecao = (
+        ""
+        if o.projecao_confiavel
+        else (
+            f'<p class="ad-nota">Projeção: poucos dias no mês ({dia}). Só aparece a partir de '
+            f"{DIAS_MINIMOS_PARA_PROJETAR} dias, porque menos que isso é ruído.</p>"
+        )
+    )
+    dias_do_grafico = len(dados.dias)
     return (
         '<section class="ad-block" aria-labelledby="orc"><p class="ad-block__eyebrow">2 · Orçamento</p>'
         '<h2 class="ad-block__title" id="orc">Gasto vs. orçado</h2>'
         f'<dl class="ad-budget"><dt>Realizado no mês</dt><dd><b>{usd(o.realizado_usd)}</b> de {usd(o.orcado_usd)}</dd>'
-        f"{_medidor(o.consumo_pct, f'{pct(o.consumo_pct, 0)} do orçado, {dia}')}"
-        f"<dt>Projeção de fechamento</dt><dd><b>{usd(o.projetado_usd)}</b> · {pct(o.projecao_pct, 0)} do orçado</dd>"
-        f"{_medidor(o.projecao_pct, f'projeção de {pct(o.projecao_pct, 0)} do orçado')}</dl>"
-        f"<h3>Gasto por dia · composição · 30 dias</h3>{barras_custo(dados.dias)}{legenda_custo()}</section>"
+        f"{_medidor(o.consumo_pct, f'{pct(o.consumo_pct, 0)} do orçado, {dia}')}{projecao}</dl>"
+        f"{nota_projecao}"
+        '<p class="ad-nota">O orçado é a referência da Alup: US$ 20 por mês até novembro e US$ 400 depois.</p>'
+        f"<h3>Gasto por dia · composição · {_plural(dias_do_grafico, 'dia', 'dias')}</h3>"
+        f"{barras_custo(dados.dias)}{legenda_custo()}</section>"
     )
 
 
-def _diretoria(dados: PainelCusto, *, telao: bool) -> str:
+def _diretoria(dados: PainelCusto, *, telao: bool, fontes_em_producao: int | None) -> str:
+    sem_atribuicao = dados.parcela_sem_rotulo > LIMITE_SEM_ROTULO
+    o = dados.orcamento
+    itens = []
+    if o.projecao_confiavel:
+        itens.append(("Custo mensal projetado", usd(o.projetado_usd)))
+    periodo = len(dados.dias)
+    itens.append(
+        ("Gasto em 30 dias" if periodo >= 30 else f"Gasto em {_plural(periodo, 'dia', 'dias')}", usd(dados.total_usd))
+    )
     dominios = dados.por_dominio
-    total = sum((valor for _, valor in dominios), Decimal(0)) or Decimal(1)
-    maior = dominios[0][0] if dominios else "—"
-    exibidos = dominios[:LINHAS_NO_TELAO] if telao else dominios
-    linhas = "".join(
-        f'<li class="ad-qrow ad-qrow--ok">{icone("ok", "")}<span class="ad-qrow__name">{html.escape(nome)}</span>'
-        f'<span class="ad-qrow__meta">{pct(float(valor / total), 0)}</span>'
-        f'<span class="ad-qrow__cost">{usd(valor)}</span></li>'
-        for nome, valor in exibidos
-    )
+    if dominios and not sem_atribuicao:
+        itens.append(("Maior domínio", html.escape(dominios[0][0])))
+    if fontes_em_producao is not None:
+        itens.append(("Fontes em produção", str(fontes_em_producao)))
+    glance = "".join(f"<div><dt>{rotulo}</dt><dd>{valor}</dd></div>" for rotulo, valor in itens)
+
+    if sem_atribuicao:
+        por_dominio = (
+            f'<p class="ad-stat"><span>Atribuição por fonte indisponível: {pct(dados.parcela_sem_rotulo, 0)} do custo '
+            "está em consultas sem rótulo de fonte, então não dá para dividir o gasto por domínio.</span></p>"
+        )
+    else:
+        total = sum((valor for _, valor in dominios), Decimal(0)) or Decimal(1)
+        exibidos = dominios[:LINHAS_NO_TELAO] if telao else dominios
+        linhas = "".join(
+            f'<li class="ad-qrow ad-qrow--ok">{icone("ok", "")}<span class="ad-qrow__name">{html.escape(nome)}</span>'
+            f'<span class="ad-qrow__meta">{pct(float(valor / total), 0)}</span>'
+            f'<span class="ad-qrow__cost">{usd(valor)}</span></li>'
+            for nome, valor in exibidos
+        )
+        por_dominio = f'<ul class="ad-qlist">{linhas}</ul>'
     return (
         '<section class="ad-block" aria-labelledby="dir"><p class="ad-block__eyebrow">3 · Diretoria</p>'
         '<h2 class="ad-block__title" id="dir">Resumo</h2>'
-        '<dl class="ad-glance">'
-        f"<div><dt>Custo mensal projetado</dt><dd>{usd(dados.orcamento.projetado_usd)}</dd></div>"
-        f"<div><dt>Gasto em 30 dias</dt><dd>{usd(dados.total_usd)}</dd></div>"
-        f"<div><dt>Maior domínio</dt><dd>{html.escape(maior)}</dd></div>"
-        f"<div><dt>Fontes em produção</dt><dd>{len(dados.fontes)}</dd></div></dl>"
-        f'<h3>Por domínio de negócio · 30 dias</h3><ul class="ad-qlist">{linhas}</ul></section>'
+        f'<dl class="ad-glance">{glance}</dl>'
+        f"<h3>Por domínio de negócio</h3>{por_dominio}</section>"
     )
 
 
-def corpo(dados: PainelCusto, *, telao: bool = False) -> str:
+def corpo(dados: PainelCusto, *, telao: bool = False, fontes_em_producao: int | None = None) -> str:
     blocos = (
         f'<div class="ad-cost">{_operacional(dados, telao=telao)}{_orcamento(dados)}'
-        f"{_diretoria(dados, telao=telao)}</div>"
+        f"{_diretoria(dados, telao=telao, fontes_em_producao=fontes_em_producao)}</div>"
     )
     if telao:
         premissa = (

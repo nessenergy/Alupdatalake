@@ -64,6 +64,14 @@ ingestão, então cinco minutos não escondem nada. Erro não é guardado, e o c
 `/indicadores` e leva a consulta junto, de modo que `/?telao=1` já entra no rodízio. A tela de
 dado de negócio passa a ser `/dado`, e a navegação começa por Indicadores.
 
+**Custo: a tela não afirma o que não sabe (02/10).** Com dado real de `hml` o bloco de diretoria mostrava "1 fonte em
+produção", "100% Não classificado" e uma projeção de 2 dias multiplicada por 31, cinco vezes o gasto de 30 dias. Agora:
+"fontes em produção" conta as fontes que carregam (as da Saúde); se mais da metade do custo não tem rótulo de fonte, a
+tela diz "atribuição por fonte indisponível" em vez de um ranking; a projeção só aparece depois de 7 dias no mês e usa o
+número real de dias; o orçado parte da referência da Alup (US$ 20 por mês até novembro e US$ 400 depois, #87), que é
+configuração e precisa ser revista na virada; o gráfico diz quantos dias tem. No Gold, o armazenamento deixou de se
+juntar às consultas pelo rótulo do job (sumia) e virou linhas próprias por tabela.
+
 **Casca comum.** Faixa de topo, navegação e carimbo iguais nas quatro rotas
 (`src/portal/pagina.py`). O carimbo diz "consultado às HH:MM (Brasília)": o Portal sabe
 quando consultou, não quando o dado chegou.

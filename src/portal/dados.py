@@ -7,6 +7,7 @@ tela antes disso. A troca é a variável `portal_provedor`.
 
 from __future__ import annotations
 
+import calendar
 import re
 import threading
 import time
@@ -20,6 +21,7 @@ from src.core.config import get_settings
 from src.portal.custo import (
     BYTES_POR_LINHA,
     BYTES_POR_LINHA_PADRAO,
+    SEM_ROTULO,
     TARIFA_EXECUCAO_JOB_USD,
     ConsultaCara,
     CustoDia,
@@ -212,7 +214,7 @@ class ProvedorSimulado:
     # a Gold da ANEEL varre a tabela inteira em vez da partição.
     VARREDURA_INTEGRAL = "aneel_siga"
 
-    ORCADO_MENSAL_USD = Decimal("120.00")
+    ORCADO_MENSAL_USD = Decimal("20.00")
 
     def indicadores(self, meses: int = 12) -> list[Indicador]:
         return _indicadores_de_exemplo()
@@ -339,7 +341,7 @@ class ProvedorSimulado:
             orcado_usd=self.ORCADO_MENSAL_USD,
             realizado_usd=sum((d.total_usd for d in do_mes), Decimal(0)),
             dias_decorridos=ultimo.day,
-            dias_do_mes=31,
+            dias_do_mes=calendar.monthrange(ultimo.year, ultimo.month)[1],
         )
 
 
@@ -587,56 +589,65 @@ class ProvedorBigQuery:
         )
         linhas = list(cliente.query(sql, job_config=config).result())
 
-        por_dia: dict[date, dict[str, Decimal]] = {}
-        por_fonte: dict[str, dict[str, Decimal | int]] = {}
-        for linha in linhas:
-            dia = por_dia.setdefault(
-                linha.dia, {"query": Decimal(0), "armazenamento": Decimal(0), "compute": Decimal(0)}
-            )
-            dia["query"] += Decimal(str(linha.custo_query_usd or 0))
-            dia["armazenamento"] += Decimal(str(linha.custo_armazenamento_usd or 0))
+        return montar_painel_de_custo(linhas, Decimal(str(cfg.portal_orcamento_mensal_usd)))
 
-            fonte = por_fonte.setdefault(
-                linha.fonte or "não rotulado",
-                {"query": Decimal(0), "armazenamento": Decimal(0), "bytes": 0, "linhas": 0},
-            )
-            fonte["query"] += Decimal(str(linha.custo_query_usd or 0))
-            fonte["armazenamento"] += Decimal(str(linha.custo_armazenamento_usd or 0))
-            fonte["bytes"] += linha.bytes_varridos or 0
-            fonte["linhas"] += linha.linhas_carregadas or 0
 
-        dias_custo = [CustoDia(dia, v["query"], v["armazenamento"], v["compute"]) for dia, v in sorted(por_dia.items())]
-        fontes = sorted(
-            (
-                CustoFonte(nome, v["query"], v["armazenamento"], int(v["bytes"]), int(v["linhas"]))  # type: ignore[arg-type]
-                for nome, v in por_fonte.items()
-            ),
-            key=lambda f: f.total_usd,
-            reverse=True,
+def montar_painel_de_custo(linhas: Any, orcado_usd: Decimal) -> PainelCusto:
+    """Linhas de `gold.custo_consultas` → o painel. Pura, para poder ser testada sem BigQuery.
+
+    O armazenamento chega em linhas próprias (`consulta = 'armazenamento'`, uma por tabela e dia):
+    entra no gasto do dia e na conta da fonte, mas não é uma consulta e não disputa a lista das mais caras.
+    """
+    linhas = list(linhas)
+    por_dia: dict[date, dict[str, Decimal]] = {}
+    por_fonte: dict[str, dict[str, Decimal | int]] = {}
+    for linha in linhas:
+        dia = por_dia.setdefault(linha.dia, {"query": Decimal(0), "armazenamento": Decimal(0), "compute": Decimal(0)})
+        dia["query"] += Decimal(str(linha.custo_query_usd or 0))
+        dia["armazenamento"] += Decimal(str(linha.custo_armazenamento_usd or 0))
+
+        fonte = por_fonte.setdefault(
+            linha.fonte or SEM_ROTULO,
+            {"query": Decimal(0), "armazenamento": Decimal(0), "bytes": 0, "linhas": 0},
         )
-        consultas = [
-            ConsultaCara(
-                rotulo=linha.consulta,
-                fonte=linha.fonte or "não rotulado",
-                camada=linha.camada or "—",
-                execucoes=linha.execucoes or 0,
-                bytes_varridos=linha.bytes_varridos or 0,
-                custo_usd=Decimal(str(linha.custo_query_usd or 0)),
-                variacao_vs_media=float(linha.variacao_vs_media or 0.0),
-            )
-            for linha in sorted(linhas, key=lambda linha: linha.bytes_varridos or 0, reverse=True)[:10]
-        ]
+        fonte["query"] += Decimal(str(linha.custo_query_usd or 0))
+        fonte["armazenamento"] += Decimal(str(linha.custo_armazenamento_usd or 0))
+        fonte["bytes"] += linha.bytes_varridos or 0
+        fonte["linhas"] += linha.linhas_carregadas or 0
 
-        ultimo = dias_custo[-1].dia if dias_custo else date.today()  # noqa: DTZ011
-        do_mes = [d for d in dias_custo if (d.dia.year, d.dia.month) == (ultimo.year, ultimo.month)]
-        orcamento = Orcamento(
-            mes=ultimo.replace(day=1),
-            orcado_usd=Decimal(str(cfg.portal_orcamento_mensal_usd)),
-            realizado_usd=sum((d.total_usd for d in do_mes), Decimal(0)),
-            dias_decorridos=ultimo.day,
-            dias_do_mes=31,
+    dias_custo = [CustoDia(dia, v["query"], v["armazenamento"], v["compute"]) for dia, v in sorted(por_dia.items())]
+    fontes = sorted(
+        (
+            CustoFonte(nome, v["query"], v["armazenamento"], int(v["bytes"]), int(v["linhas"]))  # type: ignore[arg-type]
+            for nome, v in por_fonte.items()
+        ),
+        key=lambda f: f.total_usd,
+        reverse=True,
+    )
+    so_consultas = [linha for linha in linhas if linha.consulta != "armazenamento"]
+    consultas = [
+        ConsultaCara(
+            rotulo=linha.consulta,
+            fonte=linha.fonte or SEM_ROTULO,
+            camada=linha.camada or "—",
+            execucoes=linha.execucoes or 0,
+            bytes_varridos=linha.bytes_varridos or 0,
+            custo_usd=Decimal(str(linha.custo_query_usd or 0)),
+            variacao_vs_media=float(linha.variacao_vs_media or 0.0),
         )
-        return PainelCusto(dias=dias_custo, fontes=fontes, consultas=consultas, orcamento=orcamento)
+        for linha in sorted(so_consultas, key=lambda linha: linha.bytes_varridos or 0, reverse=True)[:10]
+    ]
+
+    ultimo = dias_custo[-1].dia if dias_custo else date.today()  # noqa: DTZ011
+    do_mes = [d for d in dias_custo if (d.dia.year, d.dia.month) == (ultimo.year, ultimo.month)]
+    orcamento = Orcamento(
+        mes=ultimo.replace(day=1),
+        orcado_usd=orcado_usd,
+        realizado_usd=sum((d.total_usd for d in do_mes), Decimal(0)),
+        dias_decorridos=ultimo.day,
+        dias_do_mes=calendar.monthrange(ultimo.year, ultimo.month)[1],
+    )
+    return PainelCusto(dias=dias_custo, fontes=fontes, consultas=consultas, orcamento=orcamento)
 
 
 class ProvedorComCache:

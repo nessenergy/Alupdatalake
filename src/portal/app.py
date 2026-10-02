@@ -177,6 +177,8 @@ def custo() -> Response:
     cfg = get_settings()
     provedor = obter_provedor()
     dados = provedor.custo()
+    # "Fontes em produção" é quantas fontes de dado carregam, não quantos grupos de custo existem.
+    fontes_em_producao = sum(1 for c in provedor.saude() if c.ultimo_sucesso)
     telao = _telao("/custo", nome="Custo de nuvem")
     aviso = (
         "Dados de exemplo, derivados da volumetria simulada — o ambiente GCP ainda não existe (pendência A3). "
@@ -190,10 +192,10 @@ def custo() -> Response:
             rota="/custo",
             usuario=_usuario(request.headers.get(CABECALHO_IDENTIDADE)),
             banda=custo_tela.banda(dados),
-            corpo=custo_tela.corpo(dados, telao=telao is not None),
+            corpo=custo_tela.corpo(dados, telao=telao is not None, fontes_em_producao=fontes_em_producao),
             aviso=aviso,
             telao=telao,
-            agora=_instante(provedor, "custo"),
+            agora=_instante(provedor, "custo", "saude"),
         )
     )
 

@@ -25,6 +25,7 @@ const limites_horas = {
   ons_balanco_dessem: 26,
   ons_cvu_termica: 180,
   aneel_siga: 180,
+  aneel_tarifas: 180,
   ons_capacidade: 180,
   ons_geracao_usina: 780,
   ons_disponibilidade_usina: 780,

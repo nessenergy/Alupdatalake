@@ -132,6 +132,19 @@ variable "conectores" {
       cron         = "0 7 * * 1" # cadastro muda devagar: semanal, segunda
       ultimos_dias = 1           # cadastro completo; a janela não se aplica
     }
+    aneel_tarifas = {
+      # Onda 1, "ANEEL tarifas regulatórias". O CSV (89 MB, 328 mil linhas) é
+      # reescrito inteiro; o conector lê tudo em stream e fica com as linhas cujo
+      # início de vigência cai na janela. A ANEEL declara frequência semanal (o
+      # PDF do dicionário diz mensal); o arquivo trazia `Last-Modified` de
+      # 02/10/2026. Semanal, segunda às 9h, depois do SIGA e do ons_capacidade.
+      # A janela de 400 dias cobre um ciclo tarifário inteiro, para apanhar a
+      # correção de uma vigência publicada há meses (se a ANEEL a fizer; não se
+      # sabe). Reler custa pouco (~50 mil linhas, 02/10/2026; dry-run: 50.202 linhas, 46 MiB de pico), o Bronze é
+      # append-only e a Silver fica com a versão mais recente.
+      cron         = "0 9 * * 1"
+      ultimos_dias = 400
+    }
     ons_capacidade = {
       # Cadastro de unidades geradoras; muda devagar, como o aneel_siga.
       # Segunda de manhã, uma hora depois do SIGA, para não disputar a mesma

@@ -128,6 +128,7 @@ DOMINIO_ANALITICO = {
     "ccee_energia_reserva_consumo_referencia": "Mercado de Energia",
     "ccee_consumo_classe_agente": "Mercado de Energia",
     "aneel_siga": "Geração e Operacional",
+    "aneel_tarifas": "Mercado de Energia",
     "ons_geracao_usina": "Geração e Operacional",
     "ons_capacidade": "Geração e Operacional",
     "ons_disponibilidade_usina": "Geração e Operacional",
@@ -154,6 +155,7 @@ BYTES_POR_LINHA = {
     "bcb_igpm": 64,  # data e uma NUMERIC por mês
     "ons_carga": 184,
     "aneel_siga": 640,
+    "aneel_tarifas": 280,  # 7 textos e 3 datas, 2 NUMERIC; ~50 mil linhas por execução semanal
     "hubspot_negocios": 512,
     "ccee_geracao_usina": 420,  # 36 colunas, 25 quase sempre nulas
     "ons_geracao_usina": 220,  # 14 colunas + 4 técnicas; ver estimativa no relatório da entrega

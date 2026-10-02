@@ -1,0 +1,46 @@
+config {
+  type: "table",
+  schema: "gold",
+  tags: ["gold"],
+  dependOnDependencyAssertions: true
+}
+
+-- Gold: a tarifa de aplicação em vigor de cada distribuidora, por subgrupo,
+-- modalidade, classe, subclasse, detalhe, posto, acessante e unidade.
+--
+-- Responde "quanto cada distribuidora cobra hoje de TUSD e de TE em cada
+-- combinação tarifária". É a leitura da vigência, sem cálculo: TUSD e TE seguem
+-- separadas, porque a unidade da TUSD (kW ou MWh) nem sempre é a da TE (sempre
+-- R$/MWh), e somá-las seria inventar um número. Sem KPI e sem comparar
+-- distribuidoras (ADR 012).
+--
+-- Só a Tarifa de Aplicação, a que a distribuidora usa para faturar; a Base
+-- Econômica é insumo do cálculo tarifário e fica na Silver. Vigente é
+-- `data_referencia <= hoje <= fim_vigencia`; quando duas vigências cobrem o dia
+-- (a nova começa antes de a velha acabar: 517 de 10.366 chaves em 02/10/2026)
+-- vence a que começou por último. Distribuidora sem vigência hoje não aparece (81 das 115 do
+-- arquivo tinham em 02/10/2026): `vigente_em` mostra o dia da leitura.
+SELECT
+  CURRENT_DATE() AS vigente_em,
+  cnpj_distribuidora,
+  sigla_distribuidora,
+  data_referencia AS inicio_vigencia,
+  fim_vigencia,
+  reh,
+  subgrupo,
+  modalidade,
+  classe,
+  subclasse,
+  detalhe,
+  posto,
+  acessante,
+  unidade,
+  tusd,
+  te
+FROM ${ref("silver", "aneel_tarifas")}
+WHERE base_tarifaria = 'Tarifa de Aplicação'
+  AND CURRENT_DATE() BETWEEN data_referencia AND fim_vigencia
+QUALIFY ROW_NUMBER() OVER (
+  PARTITION BY cnpj_distribuidora, subgrupo, modalidade, classe, subclasse, detalhe, posto, acessante, unidade
+  ORDER BY data_referencia DESC, fim_vigencia DESC, reh DESC, tusd DESC, te DESC
+) = 1

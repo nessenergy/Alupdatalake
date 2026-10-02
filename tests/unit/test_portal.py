@@ -96,89 +96,6 @@ def test_nome_de_view_invalido_nao_chega_na_query() -> None:
         ProvedorBigQuery().painel("gold`; DROP TABLE x --")
 
 
-def test_lake_mostra_cada_conector_com_situacao(cliente) -> None:
-    corpo = cliente.get("/lake").get_data(as_text=True)
-    for conector in ("bcb_cambio_ptax", "ons_carga", "aneel_siga", "ibge_ipca", "hubspot_negocios"):
-        assert conector in corpo
-    assert "3 de 5 conectores em dia" in corpo  # aneel atrasada, hubspot sem token
-
-
-def test_lake_destaca_atraso_e_erro(cliente) -> None:
-    corpo = cliente.get("/lake").get_data(as_text=True)
-    assert "atrasada" in corpo
-    assert "nunca teve sucesso" in corpo
-    assert "pendência A9" in corpo  # o erro da última execução aparece na tela
-
-
-def test_lake_formata_numero_para_leitura_humana(cliente) -> None:
-    corpo = cliente.get("/lake").get_data(as_text=True)
-    assert "75.789" in corpo  # separador de milhar brasileiro
-    assert "há 9 dias" in corpo  # 13.055 minutos, não "13055 min"
-    assert "97,0%" in corpo  # taxa com vírgula decimal
-
-
-def test_lake_sem_conector_nao_quebra(cliente, monkeypatch: pytest.MonkeyPatch) -> None:
-    monkeypatch.setattr(
-        "src.portal.app.obter_provedor",
-        lambda: type("P", (), {"saude": lambda _s: [], "volumetria": lambda _s, dias=30: []})(),
-    )
-    corpo = cliente.get("/lake").get_data(as_text=True)
-    assert "Nenhum conector executou ainda" in corpo
-
-
-def test_lake_escapa_mensagem_de_erro(cliente, monkeypatch: pytest.MonkeyPatch) -> None:
-    from src.portal.dados import SaudeConector
-
-    ruim = SaudeConector("x", "OK", None, None, None, None, None, 0, None, "<img src=x onerror=alert(1)>")
-    monkeypatch.setattr(
-        "src.portal.app.obter_provedor",
-        lambda: type("P", (), {"saude": lambda _s: [ruim], "volumetria": lambda _s, dias=30: []})(),
-    )
-    corpo = cliente.get("/lake").get_data(as_text=True)
-    assert "<img" not in corpo
-    assert "&lt;img" in corpo
-
-
-def test_lake_desenha_serie_temporal_por_conector(cliente) -> None:
-    corpo = cliente.get("/lake").get_data(as_text=True)
-    assert corpo.count("<polyline") == 4  # os 4 com dado; hubspot sem token não desenha
-    assert "Linhas por dia · 30 dias" in corpo
-    assert "linhas carregadas nos últimos 30 dias" in corpo
-
-
-def test_grafico_tem_alternativa_em_texto(cliente) -> None:
-    corpo = cliente.get("/lake").get_data(as_text=True)
-    assert "Ver os números em tabela" in corpo
-    assert "25.263" in corpo  # o pico semanal da ANEEL aparece na tabela
-
-
-def test_cor_da_serie_segue_o_conector_nao_a_posicao() -> None:
-    from src.portal.grafico import cor_do_conector
-
-    ordem = ["aneel_siga", "bcb_cambio_ptax", "hubspot_negocios", "ibge_ipca", "ons_carga"]
-    antes = cor_do_conector("ons_carga", ordem)
-    assert cor_do_conector("ons_carga", ordem) == antes
-    assert cor_do_conector("aneel_siga", ordem) != antes
-
-
-def test_ponto_do_grafico_tem_rotulo_para_hover_e_leitor_de_tela() -> None:
-    from src.portal.dados import ProvedorSimulado
-    from src.portal.grafico import area
-
-    serie = next(s for s in ProvedorSimulado().volumetria() if s.conector == "aneel_siga")
-    svg = area(serie, "#8B2A78")
-    assert svg.count("<title>") == len(serie.linhas)
-    assert "25.263 linhas" in svg
-    assert 'aria-label="aneel_siga: 101.052 linhas em 30 dias"' in svg
-
-
-def test_area_de_serie_vazia_nao_quebra() -> None:
-    from src.portal.dados import SerieVolumetria
-    from src.portal.grafico import area
-
-    assert "<polyline" not in area(SerieVolumetria("x", [], []), "#8B2A78")
-
-
 # --- custo de nuvem (rota /custo) -------------------------------------------
 
 
@@ -235,7 +152,7 @@ def test_varredura_integral_e_marcada_como_anomala(cliente) -> None:
 
     anomalas = [c for c in ProvedorSimulado().custo().consultas if c.anomala]
     assert [c.fonte for c in anomalas] == ["aneel_siga"]
-    assert "varredura integral" in cliente.get("/custo").get_data(as_text=True)
+    assert "pede atenção" in cliente.get("/custo").get_data(as_text=True)
 
 
 def test_orcamento_projeta_o_fechamento_do_mes() -> None:
@@ -486,50 +403,3 @@ def test_indicadores_simulado_e_rotulado(cliente) -> None:
 
 def test_barra_de_navegacao_tem_indicadores(cliente) -> None:
     assert 'href="/indicadores"' in cliente.get("/").get_data(as_text=True)
-
-
-@pytest.mark.parametrize("rota", ["/", "/lake", "/custo", "/indicadores"])
-def test_toda_tela_tem_a_barra_de_navegacao(cliente, rota) -> None:
-    """A /lake não tinha a barra: quem chegava nela não passava às outras telas."""
-    assert '<nav class="naves">' in cliente.get(rota).get_data(as_text=True)
-
-
-@pytest.mark.parametrize("rota", ["/", "/lake", "/custo", "/indicadores"])
-def test_navegacao_fica_no_cabecalho_fixo(cliente, rota) -> None:
-    """Título e navegação não rolam com a página: a barra mora dentro do <header>."""
-    corpo = cliente.get(rota).get_data(as_text=True)
-    cabecalho = corpo.split("<header>", 1)[1].split("</header>", 1)[0]
-    assert '<nav class="naves">' in cabecalho
-    assert "position:sticky" in corpo
-
-
-def test_indicador_destaca_o_ultimo_mes_de_cada_recorte(cliente) -> None:
-    """Em telão não há mouse: o último mês aparece grande, com o mês escrito."""
-    corpo = cliente.get("/indicadores").get_data(as_text=True)
-    assert corpo.count('class="cartao indicador"') == 5  # um cartão por recorte do exemplo
-    assert "ago/2026" in corpo
-
-
-def test_indicador_mostra_a_conta_fora_do_mouse(cliente) -> None:
-    """A conta do último mês é texto da página, não só `title` de célula."""
-    corpo = cliente.get("/indicadores").get_data(as_text=True)
-    assert '<p class="conta">' in corpo
-    assert "÷" in corpo.split('<p class="conta">', 1)[1].split("</p>", 1)[0]
-
-
-def test_indicador_tem_tendencia_e_serie_completa_recolhida(cliente) -> None:
-    corpo = cliente.get("/indicadores").get_data(as_text=True)
-    assert corpo.count('class="grafico tendencia"') == 5
-    assert "<details" in corpo and "Série completa" in corpo
-
-
-def test_indicador_variacao_escrita_nao_so_por_cor(cliente) -> None:
-    """Sem meta (ADR 012): a variação é neutra e vem em texto, com o mês anterior."""
-    corpo = cliente.get("/indicadores").get_data(as_text=True)
-    assert "vs jul/2026" in corpo
-
-
-def test_indicador_fracao_vira_percentual_e_pld_real_vira_reais(cliente) -> None:
-    corpo = cliente.get("/indicadores").get_data(as_text=True)
-    assert "%" in corpo
-    assert "R$" in corpo

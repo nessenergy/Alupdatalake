@@ -47,6 +47,10 @@ src = ["src"]
 select = ["E", "F", "W", "I", "N", "UP", "S", "B", "A", "C4", "SIM", "TCH"]
 ignore = ["S101"]
 
+[tool.ruff.lint.per-file-ignores]
+# Folha de estilo do Portal: uma regra CSS por linha, como no pacote de design aprovado.
+"src/portal/estilo.py" = ["E501"]
+
 [tool.ruff.lint.flake8-type-checking]
 # Pydantic resolve as anotações em runtime: os imports dos tipos usados nos
 # modelos precisam continuar fora do bloco TYPE_CHECKING.

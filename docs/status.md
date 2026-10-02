@@ -38,6 +38,14 @@ A10 e a [ADR 020](arquitetura/decisoes/020-token-tempook-rotacao-na-producao.md)
 Referência do código: `main` em `4bbe4a2`, de 23/09. O feriado de 07/09 não entra na contagem: primeiro dia útil de atraso
 em 08/09. G1 encerrou na reunião de 10/09 e não é bloqueio atual.
 
+## Registro de 01/10
+
+- **Portal redesenhado para o telão** ([ADR 025](arquitetura/decisoes/025-portal-redesenhado-e-modo-telao.md)):
+  Saúde do lake com veredito, grupos de origem e uma linha por fonte com tira de
+  30 dias; Indicadores e Custo na mesma faixa; modo de rodízio `?telao=1`, sem
+  JavaScript. "Aguardando credencial" passa a ser decidido no Gold
+  (`saude_ingestao.aguardando_credencial`) e não pesa no veredito.
+
 ## Registro de 29/09
 
 - **Portal aberto para a ness.** em `dev` e `hml`. A causa de ninguém da ness.

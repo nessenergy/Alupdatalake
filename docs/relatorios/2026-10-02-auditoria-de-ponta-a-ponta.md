@@ -253,8 +253,9 @@ Indicadores, antes e depois da recarga:
 | armazenamento, disponibilidade | 25 meses | 25 meses | 25 meses | 25 meses |
 | PLD real | 3 meses | 3 meses | 3 meses | 3 meses |
 
-`dev` e `hml` ficaram **iguais** nas fontes e nos indicadores. O PLD real segue com 3 meses nos dois; a causa não foi
-investigada, mas não é a recarga. As pequenas diferenças da fotovoltaica e da disponibilidade (0,1% a 0,8%) vêm de
+`dev` e `hml` ficaram **iguais** nas fontes e nos indicadores. O PLD real tinha 3 meses nos dois: **a causa era o IPCA**, que só
+tinha 3 meses (jun a ago/2026) e é o deflator do PLD real; o PLD em si começava em 28/05/2026. **Corrigido em 02/10:** `ccee_pld` e
+`ibge_ipca` recarregados de 09/2024 em `dev` e `hml` e Dataform rodado; o PLD real passou a ter 24 meses (09/2024 a 08/2026) nos dois. As pequenas diferenças da fotovoltaica e da disponibilidade (0,1% a 0,8%) vêm de
 cargas diárias em instantes diferentes.
 
 **Continua aberto:** o ponto cego do passo 4 (execução que estoura o tempo ou deixa dado sem registro) e a nota de

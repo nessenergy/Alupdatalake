@@ -11,11 +11,12 @@ import html
 from typing import TYPE_CHECKING
 
 from src.portal.grafico import tendencia_mensal
+from src.portal.pagina import BRASILIA
 
 if TYPE_CHECKING:
     from decimal import Decimal
 
-    from src.portal.dados import Indicador
+    from src.portal.dados import Indicador, SaudeConector
 
 POR_PAGINA_NO_TELAO = 12
 
@@ -35,6 +36,19 @@ INDICADORES = (
     ("armazenamento", "Armazenamento", "Quanto dos reservatórios estava cheio, em energia armazenada."),
     ("pld_real", "PLD real", "O PLD médio descontada a inflação, em reais do mês-base."),
 )
+
+# De onde vem cada razão: o nome que quem lê reconhece e os conectores que a alimentam (as fontes
+# Silver de `gold.indicadores_mensais`). A carga mais antiga entre eles é a frescura do cartão.
+ORIGEM = {
+    "taxa_corte_renovavel": (
+        "ONS · restrição eólica e solar",
+        ("ons_restricao_coff_eolica", "ons_restricao_coff_fotovoltaica"),
+    ),
+    "disponibilidade": ("ONS · disponibilidade de usina", ("ons_disponibilidade_usina",)),
+    "fator_capacidade": ("ONS · geração e capacidade", ("ons_geracao_usina", "ons_capacidade")),
+    "armazenamento": ("ONS · energia armazenada", ("ons_ear", "ons_ena")),
+    "pld_real": ("CCEE · PLD e IBGE · IPCA", ("ccee_pld", "ibge_ipca")),
+}
 
 MESES = ("jan", "fev", "mar", "abr", "mai", "jun", "jul", "ago", "set", "out", "nov", "dez")
 
@@ -88,7 +102,23 @@ def _variacao(atual: Indicador, anterior: Indicador | None) -> str:
     return f'<span aria-hidden="true">{seta}</span> <b>{texto}</b> vs. {mes(anterior.periodo_apuracao)}'
 
 
-def _cartao(titulo: str, recorte: str, por_mes: dict[str, Indicador]) -> str:
+def _origem(indicador: str, ate: str, carga: dict[str, SaudeConector] | None) -> str:
+    """Fonte, até que mês vão os dados e quando o lake os carregou pela última vez."""
+    nome, conectores = ORIGEM[indicador]
+    partes = [f"dados até {mes(ate)}"]
+    quando = [carga[c].ultimo_sucesso for c in conectores if carga and c in carga]
+    if carga is not None:
+        if quando and all(quando):
+            partes.append("carga em " + min(quando).astimezone(BRASILIA).strftime("%d/%m %Hh"))  # type: ignore[type-var]
+        else:
+            partes.append("sem carga registrada")
+    datas = html.escape(" · ".join(partes))
+    return f'<p class="ad-origem"><span>Fonte: {html.escape(nome)}</span><span>{datas}</span></p>'
+
+
+def _cartao(
+    indicador: str, titulo: str, recorte: str, por_mes: dict[str, Indicador], carga: dict[str, SaudeConector] | None
+) -> str:
     meses = sorted(por_mes)
     atual = por_mes[meses[-1]]
     anterior = por_mes[meses[-2]] if len(meses) > 1 else None
@@ -112,14 +142,16 @@ def _cartao(titulo: str, recorte: str, por_mes: dict[str, Indicador]) -> str:
         f'<p class="ad-card__value">{_valor_destaque(atual)}</p>'
         f'<p class="ad-calc">{conta}<span class="ad-calc__terms">{termos}</span></p>'
         f'<p class="ad-delta">{_variacao(atual, anterior)}</p>'
+        f"{_origem(indicador, meses[-1], carga)}"
         f"{tendencia_mensal(pontos, rotulo)}"
         f'<details class="ad-series"><summary>Série completa ({len(meses)} meses)</summary>'
         f"<table><tbody>{serie}</tbody></table></details></article>"
     )
 
 
-def cartoes(linhas: list[Indicador]) -> list[str]:
+def cartoes(linhas: list[Indicador], saude: list[SaudeConector] | None = None) -> list[str]:
     """Um cartão por (indicador, recorte), na ordem do catálogo e depois pelo recorte."""
+    carga = {c.conector: c for c in saude} if saude is not None else None
     prontos = []
     for nome, titulo, _ in INDICADORES:
         recortes: dict[str, dict[str, Indicador]] = {}
@@ -127,7 +159,7 @@ def cartoes(linhas: list[Indicador]) -> list[str]:
             if ind.indicador == nome:
                 recorte = " · ".join(p for p in (ind.submercado, ind.fonte) if p) or "Brasil"
                 recortes.setdefault(recorte, {})[ind.periodo_apuracao] = ind
-        prontos += [_cartao(titulo, r, por_mes) for r, por_mes in sorted(recortes.items())]
+        prontos += [_cartao(nome, titulo, r, por_mes, carga) for r, por_mes in sorted(recortes.items())]
     return prontos
 
 

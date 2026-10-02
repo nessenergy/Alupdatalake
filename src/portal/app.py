@@ -210,7 +210,7 @@ def indicadores() -> Response:
     cfg = get_settings()
     provedor = obter_provedor()
     linhas = provedor.indicadores()
-    prontos = indicadores_tela.cartoes(linhas)
+    prontos = indicadores_tela.cartoes(linhas, provedor.saude())
     paginas = indicadores_tela.paginas_do_telao(len(prontos))
     numero = min(max(_inteiro(request.args.get("p"), 1), 1), paginas)
     telao = _telao("/indicadores", numero, paginas, nome="Indicadores")
@@ -228,7 +228,7 @@ def indicadores() -> Response:
             corpo=indicadores_tela.corpo(prontos, pagina=numero if telao else None),
             aviso=aviso,
             telao=telao,
-            agora=_instante(provedor, "indicadores"),
+            agora=_instante(provedor, "indicadores", "saude"),
         )
     )
 

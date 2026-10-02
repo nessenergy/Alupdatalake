@@ -315,8 +315,18 @@ titulo = "Pedido de aprovação por escrito das Ondas 0 e 1 enviado a Eduardo Pi
 estado = "feito"
 
 [[marco]]
+data = 2026-10-01
+titulo = "Exportação de faturamento para o BigQuery ligada em dev (pela QI Network)"
+estado = "feito"
+
+[[marco]]
 data = 2026-10-02
 titulo = "Portal redesenhado para o telão no ar em hml, com Indicadores como tela de abertura"
+estado = "feito"
+
+[[marco]]
+data = 2026-10-02
+titulo = "Pedido de aprovação do Portal enviado a Eduardo Pires"
 estado = "feito"
 
 [[marco]]

@@ -24,7 +24,15 @@ Atualizado em **2026-10-02**. Auditoria de ponta a ponta, com a conferência de 
 - **Monitoramento:** 20 políticas de alerta habilitadas em cada ambiente (eram 9 em 24/09).
 - **Produção não existe:** projeto ativo, API do Cloud Run desabilitada. O bootstrap espera o aceite.
 - **Portal:** quatro telas na identidade da Alup, Indicadores como abertura, modo telão e cache (ADR 025). O pedido de
-  aprovação do Portal está em rascunho.
+  aprovação do Portal foi **enviado** a Eduardo Pires em 02/10 (01h40), sem resposta, e é independente do das Ondas 0 e 1.
+- **O que a Alupar respondeu entre 29/09 e 01/10** (e-mails de Leonardo e da QI Network):
+  - **Eduardo Pires é o membro do comitê aprovador de passagem de fase** (29/09). A #258 segue aberta: falta
+    confirmar que ele também assina o aceite.
+  - **Planilhas (#142):** o prazo de 01/10 foi **movido por acordo**: Leonardo propôs data perto da Onda 4 (01/10) e a ness. aceitou. Não está vencido.
+  - **Credenciais da Onda 2:** prometidas para 01/10, **não chegaram** (os segredos do Hubspot e do BBCE não têm versão em `dev` nem em `hml`).
+  - **`usinas.csv` chegou** em 01/10, 08h56, na pasta de entrada (14 usinas; colunas Usinas, Nome do ativo e UC/CEG). O recebimento ainda não foi confirmado na #141.
+  - **Orçamento (#87):** a Alup disse "manter o recomendado": **US$ 20/mês até novembro e US$ 400/mês depois**. O Portal ainda usa US$ 120 como premissa.
+  - **Exportação de faturamento ligada pela QI Network em `dev`** (01/10, 14h41): as duas tabelas de exportação já existem no dataset `faturamento`. O histórico começa em 01/10. A mensagem não cita o papel de Costs Manager para as contas de serviço (item 12).
 
 ## Histórico até 25/09 (superado pela situação acima)
 

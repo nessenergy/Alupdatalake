@@ -91,6 +91,15 @@ variable "conectores" {
       cron         = "55 9 * * *"
       ultimos_dias = 30
     }
+    ons_carga_programada = {
+      # Aditivo 01. API pública (apicarga.ons.org.br), 33 chamadas por execução; 31 dias por chamada.
+      cron         = "25 10 * * *"
+      ultimos_dias = 30 # o ONS revisa dado publicado
+    }
+    ons_carga_verificada = {
+      cron         = "35 10 * * *"
+      ultimos_dias = 30 # a verificada é revisada nos dias seguintes (din_atualizacao)
+    }
     ons_cmo_semi_horario = {
       # Aditivo 01. Passo de 30 min; arquivo anual.
       cron         = "5 10 * * *"

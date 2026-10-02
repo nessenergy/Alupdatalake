@@ -1,0 +1,22 @@
+config {
+  type: "operations",
+  schema: "bronze",
+  hasOutput: true,
+  tags: ["bronze"]
+}
+
+-- Bronze: carga programada semi-horária por área de carga (ONS, API). Aditivo 01.
+CREATE TABLE IF NOT EXISTS ${self()} (
+  data_referencia         DATE      NOT NULL OPTIONS(description="Dia de referência (fuso de Brasília). A última meia hora do dia tem instante_utc já no dia seguinte"),
+  instante_utc            TIMESTAMP NOT NULL OPTIONS(description="Fim da meia hora (din_referenciautc da origem), em UTC"),
+  area_carga              STRING    NOT NULL OPTIONS(description="Código da área de carga (cod_areacarga): subsistema, área geoelétrica ou perdas"),
+  carga_programada_mwmed  NUMERIC   NOT NULL OPTIONS(description="Carga global programada na meia hora, em MWmed (val_cargaglobalprogramada)"),
+
+  _ingestao_id        STRING    NOT NULL,
+  _ingestao_timestamp TIMESTAMP NOT NULL,
+  _fonte              STRING    NOT NULL,
+  _schema_versao      STRING    NOT NULL
+)
+PARTITION BY DATE(_ingestao_timestamp)
+CLUSTER BY data_referencia, area_carga
+OPTIONS(description="Carga programada semi-horária por área de carga — camada Bronze, append-only");

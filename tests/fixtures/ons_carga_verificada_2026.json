@@ -1,0 +1,129 @@
+{
+ "N": [
+  {
+   "cod_areacarga": "N",
+   "din_atualizacao": "2026-09-30T03:21:44.320Z",
+   "dat_referencia": "2026-09-20",
+   "din_referenciautc": "2026-09-20T03:30:00.000Z",
+   "val_cargaglobal": 10038.321,
+   "val_cargaglobalcons": 10038.321,
+   "val_cargaglobalsmmgd": 10036.081,
+   "val_cargasupervisionada": 9966.96,
+   "val_carganaosupervisionada": 69.1208,
+   "val_cargammgd": 2.24,
+   "val_consistencia": 0
+  },
+  {
+   "cod_areacarga": "N",
+   "din_atualizacao": "2026-09-30T03:21:44.320Z",
+   "dat_referencia": "2026-09-20",
+   "din_referenciautc": "2026-09-20T04:00:00.000Z",
+   "val_cargaglobal": 9976.461,
+   "val_cargaglobalcons": 9976.461,
+   "val_cargaglobalsmmgd": 9974.221,
+   "val_cargasupervisionada": 9905.354,
+   "val_carganaosupervisionada": 68.8675,
+   "val_cargammgd": 2.24,
+   "val_consistencia": 0
+  },
+  {
+   "cod_areacarga": "N",
+   "din_atualizacao": "2026-09-30T03:21:44.320Z",
+   "dat_referencia": "2026-09-20",
+   "din_referenciautc": "2026-09-20T04:30:00.000Z",
+   "val_cargaglobal": 9843.524,
+   "val_cargaglobalcons": 9843.524,
+   "val_cargaglobalsmmgd": 9841.284,
+   "val_cargasupervisionada": 9772.441,
+   "val_carganaosupervisionada": 68.8426,
+   "val_cargammgd": 2.24,
+   "val_consistencia": 0
+  }
+ ],
+ "SECO": [
+  {
+   "cod_areacarga": "SECO",
+   "din_atualizacao": "2026-09-30T03:21:43.475Z",
+   "dat_referencia": "2026-09-20",
+   "din_referenciautc": "2026-09-20T03:30:00.000Z",
+   "val_cargaglobal": 40593.727,
+   "val_cargaglobalcons": 40593.727,
+   "val_cargaglobalsmmgd": 40476.816,
+   "val_cargasupervisionada": 36912.035,
+   "val_carganaosupervisionada": 3564.7825,
+   "val_cargammgd": 116.91,
+   "val_consistencia": 0
+  },
+  {
+   "cod_areacarga": "SECO",
+   "din_atualizacao": "2026-09-30T03:21:43.475Z",
+   "dat_referencia": "2026-09-20",
+   "din_referenciautc": "2026-09-20T04:00:00.000Z",
+   "val_cargaglobal": 39539.05,
+   "val_cargaglobalcons": 39539.05,
+   "val_cargaglobalsmmgd": 39422.14,
+   "val_cargasupervisionada": 35866.668,
+   "val_carganaosupervisionada": 3555.4712,
+   "val_cargammgd": 116.91,
+   "val_consistencia": 0
+  }
+ ],
+ "PEN": [
+  {
+   "cod_areacarga": "PEN",
+   "din_atualizacao": "2026-09-21T03:02:25.665Z",
+   "dat_referencia": "2026-09-20",
+   "din_referenciautc": "2026-09-20T03:30:00.000Z",
+   "val_cargaglobal": 525.78,
+   "val_cargaglobalcons": 525.78,
+   "val_cargaglobalsmmgd": 525.78,
+   "val_cargasupervisionada": 525.78,
+   "val_carganaosupervisionada": 0,
+   "val_cargammgd": 0,
+   "val_consistencia": 0
+  },
+  {
+   "cod_areacarga": "PEN",
+   "din_atualizacao": "2026-09-21T03:02:25.665Z",
+   "dat_referencia": "2026-09-20",
+   "din_referenciautc": "2026-09-20T04:00:00.000Z",
+   "val_cargaglobal": 532.8898,
+   "val_cargaglobalcons": 532.8898,
+   "val_cargaglobalsmmgd": 532.8898,
+   "val_cargasupervisionada": 532.8898,
+   "val_carganaosupervisionada": 0,
+   "val_cargammgd": 0,
+   "val_consistencia": 0
+  }
+ ],
+ "NE": [
+  {
+   "cod_areacarga": "NE",
+   "din_atualizacao": "2026-10-02T03:16:37.300Z",
+   "dat_referencia": "2026-09-30",
+   "din_referenciautc": "2026-10-01T03:00:00.000Z",
+   "val_cargaglobal": 16460.23,
+   "val_cargaglobalcons": 16460.23,
+   "val_cargaglobalsmmgd": 16427.791,
+   "val_cargasupervisionada": 15653.57,
+   "val_carganaosupervisionada": 774.2198,
+   "val_cargammgd": 32.44,
+   "val_consistencia": 0
+  }
+ ],
+ "MT": [
+  {
+   "cod_areacarga": "MT",
+   "din_atualizacao": "2026-09-30T03:20:07.912Z",
+   "dat_referencia": "2026-09-07",
+   "din_referenciautc": "2026-09-07T13:30:00.000Z",
+   "val_cargaglobal": 1437.7515,
+   "val_cargaglobalcons": 1437.7515,
+   "val_cargaglobalsmmgd": -238.70529,
+   "val_cargasupervisionada": -703.7008,
+   "val_carganaosupervisionada": 464.9955,
+   "val_cargammgd": 1676.4568,
+   "val_consistencia": 0
+  }
+ ]
+}

@@ -1,0 +1,41 @@
+config {
+  type: "table",
+  schema: "gold",
+  tags: ["gold"],
+  dependOnDependencyAssertions: true,
+  assertions: {
+    uniqueKey: ["periodo_apuracao", "area_carga"],
+    nonNull: ["periodo_apuracao", "area_carga", "meias_horas_pareadas"],
+    rowConditions: ["meias_horas_pareadas > 0", "desvio_absoluto_medio_mwmed >= 0"]
+  }
+}
+
+-- Gold: quanto a carga programada se afasta da verificada, por área e mês. Aditivo 01.
+--
+-- Responde "a programação do ONS acerta a carga que de fato ocorre, e erra
+-- para mais ou para menos?". Sem KPI (ADR 012): são diferenças em MWmed, sem
+-- meta, sem tolerância e sem razão entre séries.
+--
+-- Só entram as meias horas em que as duas séries existem (a programada tem
+-- dias sem publicação em alguns meses); `meias_horas_pareadas` mostra a base.
+-- Compara com `carga_global_mwmed`, a série que acompanha a programada: a
+-- líquida de MMGD fica milhares de MWmed abaixo (conferido em set/2026).
+-- Desvio = verificada − programada: positivo é carga maior que a programada.
+--
+-- Uma linha por área, sem somar áreas: elas se sobrepõem (`tipo_area`).
+
+SELECT
+  v.periodo_apuracao,
+  v.area_carga,
+  ANY_VALUE(v.tipo_area) AS tipo_area,
+  ANY_VALUE(v.submercado) AS submercado,
+  COUNT(*) AS meias_horas_pareadas,
+  AVG(p.carga_programada_mwmed) AS carga_programada_media_mwmed,
+  AVG(v.carga_global_mwmed) AS carga_verificada_media_mwmed,
+  AVG(v.carga_global_mwmed - p.carga_programada_mwmed) AS desvio_medio_mwmed,
+  AVG(ABS(v.carga_global_mwmed - p.carga_programada_mwmed)) AS desvio_absoluto_medio_mwmed,
+  MAX(ABS(v.carga_global_mwmed - p.carga_programada_mwmed)) AS desvio_absoluto_maximo_mwmed
+FROM ${ref("silver", "ons_carga_verificada")} AS v
+JOIN ${ref("silver", "ons_carga_programada")} AS p
+  ON p.area_carga = v.area_carga AND p.instante_utc = v.instante_utc
+GROUP BY v.periodo_apuracao, v.area_carga

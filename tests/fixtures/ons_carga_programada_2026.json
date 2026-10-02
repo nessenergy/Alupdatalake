@@ -1,0 +1,58 @@
+{
+ "N": [
+  {
+   "cod_areacarga": "N",
+   "dat_referencia": "2026-09-20",
+   "din_referenciautc": "2026-09-20T03:30:00.000Z",
+   "val_cargaglobalprogramada": 10045.855
+  },
+  {
+   "cod_areacarga": "N",
+   "dat_referencia": "2026-09-20",
+   "din_referenciautc": "2026-09-20T04:00:00.000Z",
+   "val_cargaglobalprogramada": 9958.877
+  },
+  {
+   "cod_areacarga": "N",
+   "dat_referencia": "2026-09-20",
+   "din_referenciautc": "2026-09-20T04:30:00.000Z",
+   "val_cargaglobalprogramada": 9837.77
+  }
+ ],
+ "SECO": [
+  {
+   "cod_areacarga": "SECO",
+   "dat_referencia": "2026-09-20",
+   "din_referenciautc": "2026-09-20T03:30:00.000Z",
+   "val_cargaglobalprogramada": 40086.77
+  },
+  {
+   "cod_areacarga": "SECO",
+   "dat_referencia": "2026-09-20",
+   "din_referenciautc": "2026-09-20T04:00:00.000Z",
+   "val_cargaglobalprogramada": 39558.086
+  }
+ ],
+ "PEN": [
+  {
+   "cod_areacarga": "PEN",
+   "dat_referencia": "2026-09-20",
+   "din_referenciautc": "2026-09-20T03:30:00.000Z",
+   "val_cargaglobalprogramada": 634.2053
+  },
+  {
+   "cod_areacarga": "PEN",
+   "dat_referencia": "2026-09-20",
+   "din_referenciautc": "2026-09-20T04:00:00.000Z",
+   "val_cargaglobalprogramada": 631.2927
+  }
+ ],
+ "NE": [
+  {
+   "cod_areacarga": "NE",
+   "dat_referencia": "2026-09-30",
+   "din_referenciautc": "2026-10-01T03:00:00.000Z",
+   "val_cargaglobalprogramada": 16483.43
+  }
+ ]
+}

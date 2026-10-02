@@ -33,6 +33,8 @@ variable "conectores_criticos" {
     ons_geracao_exportacao                  = 26  # diário (Aditivo 01)
     ons_balanco_energia                     = 26  # diário (Aditivo 01)
     ons_cmo_semi_horario                    = 26  # diário (Aditivo 01)
+    ons_carga_programada                    = 26  # diário (Aditivo 01)
+    ons_carga_verificada                    = 26  # diário (Aditivo 01)
     ons_volume_espera                       = 26  # diário (Aditivo 01)
     ons_cvu_termica                         = 180 # semanal + folga (Aditivo 01)
     aneel_siga                              = 180 # semanal + folga

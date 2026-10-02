@@ -142,6 +142,7 @@ DOMINIO_ANALITICO = {
     "bcb_cambio_ptax": "Econômico",
     "bcb_juros": "Econômico",
     "ibge_ipca": "Econômico",
+    "bcb_igpm": "Econômico",
 }
 
 # Quanto ocupa uma linha de cada fonte, em bytes. Estimativa de largura de
@@ -150,6 +151,7 @@ BYTES_POR_LINHA = {
     "bcb_cambio_ptax": 96,
     "bcb_juros": 64,  # data, série curta e uma NUMERIC
     "ibge_ipca": 128,
+    "bcb_igpm": 64,  # data e uma NUMERIC por mês
     "ons_carga": 184,
     "aneel_siga": 640,
     "hubspot_negocios": 512,

@@ -1,0 +1,27 @@
+config {
+  type: "table",
+  schema: "gold",
+  tags: ["gold"],
+  dependOnDependencyAssertions: true
+}
+
+-- Gold: IGP-M do mês e acumulado em 12 meses — o número que reajusta contrato.
+-- O acumulado é o produto dos fatores (1 + variação/100) dos 12 meses até o corrente, e só
+-- existe quando os 12 meses consecutivos estão no lake: com menos (ou com buraco), ele ficaria
+-- NULL em vez de subestimado.
+WITH mensal AS (
+  SELECT periodo_apuracao, data_referencia, variacao_percentual_mes
+  FROM ${ref("silver", "bcb_igpm")}
+)
+SELECT
+  periodo_apuracao,
+  data_referencia,
+  variacao_percentual_mes AS igpm_mes,
+  IF(
+    COUNT(*) OVER janela12 = 12
+      AND DATE_DIFF(data_referencia, MIN(data_referencia) OVER janela12, MONTH) = 11,
+    (EXP(SUM(LN(1 + variacao_percentual_mes / 100)) OVER janela12) - 1) * 100,
+    NULL
+  ) AS igpm_acumulado_12m
+FROM mensal
+WINDOW janela12 AS (ORDER BY data_referencia ROWS BETWEEN 11 PRECEDING AND CURRENT ROW)

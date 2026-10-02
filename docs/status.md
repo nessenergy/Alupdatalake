@@ -45,6 +45,10 @@ em 08/09. G1 encerrou na reunião de 10/09 e não é bloqueio atual.
   30 dias; Indicadores e Custo na mesma faixa; modo de rodízio `?telao=1`, sem
   JavaScript. "Aguardando credencial" passa a ser decidido no Gold
   (`saude_ingestao.aguardando_credencial`) e não pesa no veredito.
+- **Falso atraso em fonte mensal** (02/10): `ons_restricao_coff_eolica` aparecia
+  atrasada seis dias depois da carga porque estava fora do mapa de limites de silêncio
+  e caía no padrão de 52 h. Entraram no mapa (780 h) as três mensais que faltavam, com
+  teste que reprova fonte agendada sem limite.
 
 ## Registro de 29/09
 

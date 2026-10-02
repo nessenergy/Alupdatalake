@@ -211,10 +211,10 @@ calendários convivem em colunas separadas, com asserção que avisa se divergir
 
 | | |
 |---|---|
-| **Fontes hoje** | `bcb_cambio_ptax` · `bcb_juros` (Selic e CDI) · `ibge_ipca` |
-| **Granularidade** | diária para câmbio, Selic e CDI; mensal para IPCA |
+| **Fontes hoje** | `bcb_cambio_ptax` · `bcb_juros` (Selic e CDI) · `bcb_igpm` · `ibge_ipca` |
+| **Granularidade** | diária para câmbio, Selic e CDI; mensal para IPCA e IGP-M |
 | **Cadência** | diária e mensal |
-| **Gold hoje** | `cambio_mensal`, `juros_mensal`, `inflacao_mensal` |
+| **Gold hoje** | `cambio_mensal`, `juros_mensal`, `inflacao_mensal`, `igpm_mensal` |
 | **Situação** | **pronto** — os quatro itens nomeados no B1 estão no lake |
 
 Selic e CDI entraram em 14/09 pelas séries 11 e 12 do SGS, mesmo BCB do PTAX:

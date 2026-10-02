@@ -156,6 +156,10 @@ variable "conectores" {
       cron         = "0 10 12 * *" # IPCA sai por volta do dia 10
       ultimos_dias = 90            # janela larga: o IBGE revisa série publicada
     }
+    bcb_igpm = {
+      cron         = "0 11 2 * *" # o IGP-M do mês sai na virada; a FGV não revisa o publicado
+      ultimos_dias = 90           # cobre execução perdida de um ou dois meses
+    }
     hubspot_negocios = {
       cron         = "0 */6 * * *" # CRM muda ao longo do dia; 4x por dia basta
       ultimos_dias = 2             # cobre execução perdida sem varrer o funil todo

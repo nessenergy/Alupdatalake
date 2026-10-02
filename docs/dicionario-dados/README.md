@@ -61,6 +61,7 @@ técnicos**. Bases reutilizáveis não entram nessa contagem. O contrato mantém
 | ONS — fator de capacidade de eólicas e solares | [`ons_fator_capacidade.md`](ons_fator_capacidade.md) | Aditivo 01 | `submercado`, `codigo_usina` | `fator_capacidade_mensal_usina` |
 | BCB — PTAX | [`bcb_cambio_ptax.md`](bcb_cambio_ptax.md) | 0 | — | `cambio_mensal` |
 | BCB — Selic e CDI | [`bcb_juros.md`](bcb_juros.md) | 1 | — | `juros_mensal` |
+| BCB — IGP-M | [`bcb_igpm.md`](bcb_igpm.md) | 1 | — | `igpm_mensal` |
 | IBGE — IPCA | [`ibge_ipca.md`](ibge_ipca.md) | 1 | — | `inflacao_mensal` |
 | Hubspot — negócios | [`hubspot_negocios.md`](hubspot_negocios.md) | 2 | — | `funil_comercial` |
 | TempoOK — boletins | [`tempook_boletins.md`](tempook_boletins.md) | 2 | — | `cobertura_boletins_tempook` |
@@ -77,7 +78,7 @@ nova; fonte sem entidade diz por quê.
 
 | Fonte contratual | Onda | Entidades |
 |---|---|---|
-| BCB | 0/1 | `bcb_cambio_ptax`, `bcb_juros` |
+| BCB | 0/1 | `bcb_cambio_ptax`, `bcb_juros`, `bcb_igpm` |
 | IBGE | 1 | `ibge_ipca` |
 | ANEEL | 1 | `aneel_siga`, `aneel_tarifas` |
 | ONS | 1 | `ons_carga`, `ons_ear`, `ons_ena`, `ons_geracao_usina`, `ons_capacidade`, `ons_disponibilidade_usina`, `ons_restricao_coff_eolica`, `ons_restricao_coff_fotovoltaica` |

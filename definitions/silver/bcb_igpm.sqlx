@@ -1,0 +1,31 @@
+config {
+  type: "view",
+  schema: "silver",
+  tags: ["silver"],
+  assertions: {
+    uniqueKey: ["data_referencia"],
+    nonNull: ["data_referencia", "variacao_percentual_mes"],
+    rowConditions: [
+      "EXTRACT(DAY FROM data_referencia) = 1",
+      "variacao_percentual_mes >= -20 AND variacao_percentual_mes <= 100"
+    ]
+  }
+}
+
+-- Silver: IGP-M higienizado, deduplicado e com as dimensões comuns.
+-- Dedup: para cada mês, vence a ingestão mais recente.
+SELECT
+  data_referencia,
+  CAST(NULL AS STRING)  AS submercado,      -- índice de preços não é dado de submercado
+  CAST(NULL AS STRING)  AS codigo_usina,    -- idem
+  CAST(NULL AS STRING)  AS agente_ccee,     -- idem
+  FORMAT_DATE('%Y-%m', data_referencia) AS periodo_apuracao,
+  CAST(NULL AS STRING) AS periodo_apuracao_ccee,  -- a origem não declara período próprio
+  variacao_percentual_mes,
+  _ingestao_id,
+  _ingestao_timestamp
+FROM ${ref("bronze", "bcb_igpm")}
+QUALIFY ROW_NUMBER() OVER (
+  PARTITION BY data_referencia
+  ORDER BY _ingestao_timestamp DESC
+) = 1

@@ -118,6 +118,7 @@ ANOTACOES: dict[str, dict[str, str]] = {
     "cambio_mensal": {"dominio": "economico", "responsavel": PORTFOLIO},
     "juros_mensal": {"dominio": "economico", "responsavel": PORTFOLIO},
     "inflacao_mensal": {"dominio": "economico", "responsavel": PORTFOLIO},
+    "igpm_mensal": {"dominio": "economico", "responsavel": PORTFOLIO},
     # 8 · Planejamento — razões técnicas que atravessam domínios (ADR 012, adendo de 27/09)
     "indicadores_mensais": {"dominio": "planejamento", "responsavel": PLANEJAMENTO},
 }

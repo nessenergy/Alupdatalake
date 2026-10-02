@@ -372,3 +372,14 @@ def test_limite_de_atraso_do_portal_e_o_mesmo_do_alerta() -> None:
     saude = (raiz / "definitions/gold/saude_ingestao.sqlx").read_text(encoding="utf-8")
     assert "${silencio.valores()}" in saude
     assert "l.limite_h * 60" in saude
+
+
+def test_saude_marca_fonte_que_aguarda_credencial() -> None:
+    """Falta de segredo numa fonte que nunca carregou é espera da Alup, não falha (01/10).
+
+    A decisão fica no Gold: o Portal só mostra, sem lista de fontes escrita na tela.
+    """
+    saude = (RAIZ / "definitions/gold/saude_ingestao.sqlx").read_text(encoding="utf-8")
+    assert "AS aguardando_credencial" in saude
+    assert "a.ultimo_sucesso IS NULL" in saude
+    assert "secret|cofre local" in saude

@@ -37,8 +37,18 @@ Variáveis (todas com padrão em `src/core/config.py`):
 | Rota | O quê |
 |---|---|
 | `/` | uma view Gold de negócio (item 0.15 do plano — [ADR 005](../arquitetura/decisoes/005-escopo-do-portal-mvp.md)) |
-| `/lake` | painel de saúde da ingestão ([ADR 006](../arquitetura/decisoes/006-painel-de-saude.md)) |
+| `/indicadores` | razões técnicas do setor, um cartão por recorte (ADR 012) |
+| `/lake` | painel de saúde da ingestão ([ADR 006](../arquitetura/decisoes/006-painel-de-saude.md), [ADR 025](../arquitetura/decisoes/025-portal-redesenhado-e-modo-telao.md)) |
+| `/custo` | custo de nuvem, em três leituras |
 | `/saude` | sonda do Cloud Run — responde sem tocar no BigQuery |
+
+### Modo telão
+
+Para a reunião: abra `<url do Portal>/indicadores?telao=1` (ou `/lake?telao=1`,
+`/custo?telao=1`) em tela cheia (F11). As telas passam sozinhas a cada 20 s —
+Indicadores, Saúde do lake, Custo — e voltam ao começo. O link "sair do modo telão"
+no canto devolve a tela normal. Não há JavaScript: cada página manda o navegador
+para a próxima. A navegação some no telão, e o modo só liga com `?telao=1`.
 
 ## Autenticação
 

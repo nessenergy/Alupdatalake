@@ -8,7 +8,7 @@ tela antes disso. A troca é a variável `portal_provedor`.
 from __future__ import annotations
 
 import re
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import UTC, date, datetime, timedelta
 from decimal import Decimal
 from typing import Any, Protocol
@@ -54,15 +54,25 @@ class SaudeConector:
     linhas_carregadas_total: int
     duracao_p95_seg: float | None
     ultimo_erro: str | None = None
+    execucoes_30d: int = 0
+    # Fonte que nunca carregou e cujo erro é falta de credencial: espera a Alup,
+    # não está quebrada. Quem decide é o Gold (`saude_ingestao`), não a tela.
+    aguardando_credencial: bool = False
 
 
 @dataclass(frozen=True)
 class SerieVolumetria:
-    """Linhas carregadas por dia, de um conector — `gold.volumetria_lake`."""
+    """Um conector, dia a dia — `gold.volumetria_lake`.
+
+    `dias` é o calendário inteiro, com os dias sem execução incluídos; `falhas`
+    (execuções com erro por dia) tem o mesmo tamanho, ou vem vazio quando a
+    origem não distingue.
+    """
 
     conector: str
     dias: list[date]
     linhas: list[int]
+    falhas: list[int] = field(default_factory=list)
 
     @property
     def total(self) -> int:
@@ -161,6 +171,7 @@ class ProvedorSimulado:
                 0,
                 None,
                 "PermissionDenied: 401 — token ausente (pendência A9)",
+                aguardando_credencial=True,
             ),
         ]
 
@@ -451,7 +462,7 @@ class ProvedorBigQuery:
         sql = (
             "SELECT conector, situacao, ultimo_sucesso, minutos_desde_sucesso, "  # noqa: S608  # nosec B608
             "intervalo_tipico_min, taxa_sucesso_30d, taxa_invalidas, "
-            "linhas_carregadas_total, duracao_p95_seg, ultimo_erro "
+            "linhas_carregadas_total, duracao_p95_seg, ultimo_erro, execucoes_30d, aguardando_credencial "
             f"FROM `{cfg.gcp_project_id}.{cfg.bq_dataset_gold}.saude_ingestao` "
             "ORDER BY conector"
         )
@@ -468,6 +479,8 @@ class ProvedorBigQuery:
                 linhas_carregadas_total=linha.linhas_carregadas_total or 0,
                 duracao_p95_seg=linha.duracao_p95_seg,
                 ultimo_erro=linha.ultimo_erro,
+                execucoes_30d=linha.execucoes_30d or 0,
+                aguardando_credencial=bool(linha.aguardando_credencial),
             )
             for linha in linhas
         ]
@@ -479,9 +492,9 @@ class ProvedorBigQuery:
         linhas = (
             cliente()
             .query(
-                f"SELECT conector, dia, linhas_carregadas "  # noqa: S608  # nosec B608
+                f"SELECT conector, dia, linhas_carregadas, execucoes_com_erro "  # noqa: S608  # nosec B608
                 f"FROM `{cfg.gcp_project_id}.{cfg.bq_dataset_gold}.volumetria_lake` "
-                "WHERE dia >= DATE_SUB(CURRENT_DATE(), INTERVAL @dias DAY) ORDER BY conector, dia",
+                "WHERE dia > DATE_SUB(CURRENT_DATE(), INTERVAL @dias DAY) ORDER BY conector, dia",
                 job_config=bigquery.QueryJobConfig(
                     query_parameters=[bigquery.ScalarQueryParameter("dias", "INT64", dias)]
                 ),
@@ -489,11 +502,24 @@ class ProvedorBigQuery:
             .result()
         )
 
-        por_conector: dict[str, list[tuple[date, int]]] = {}
+        por_conector: dict[str, dict[date, tuple[int, int]]] = {}
         for linha in linhas:
-            por_conector.setdefault(linha.conector, []).append((linha.dia, linha.linhas_carregadas or 0))
+            por_conector.setdefault(linha.conector, {})[linha.dia] = (
+                linha.linhas_carregadas or 0,
+                linha.execucoes_com_erro or 0,
+            )
+        # Calendário inteiro, terminando hoje: dia sem execução também é informação
+        # (a tira de 30 dias mostra o buraco), e o fim em "hoje" impede que uma fonte
+        # parada há dois dias pareça em dia só porque a série acabou ali.
+        hoje = datetime.now(UTC).date()
+        calendario = [hoje - timedelta(days=i) for i in reversed(range(dias))]
         return [
-            SerieVolumetria(conector, [d for d, _ in pontos], [v for _, v in pontos])
+            SerieVolumetria(
+                conector,
+                calendario,
+                [pontos.get(dia, (0, 0))[0] for dia in calendario],
+                [pontos.get(dia, (0, 0))[1] for dia in calendario],
+            )
             for conector, pontos in por_conector.items()
         ]
 

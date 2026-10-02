@@ -81,6 +81,11 @@ SELECT
   -- Erro já superado por um sucesso posterior não é notícia: some da tela.
   IF(a.ultimo_erro_em > COALESCE(a.ultimo_sucesso, TIMESTAMP '1970-01-01'), a.erro_mais_recente, NULL)
     AS ultimo_erro,
+  -- Espera da Alup, não quebra: nunca houve sucesso e o erro é falta de segredo
+  -- (Secret Manager sem versão ou sem permissão, ou cofre local). O Portal mostra
+  -- "aguardando credencial" em vez de pintar a fonte de vermelho.
+  (a.ultimo_sucesso IS NULL
+    AND REGEXP_CONTAINS(COALESCE(a.erro_mais_recente, ''), r'(?i)secret|cofre local')) AS aguardando_credencial,
   -- Semáforo. Atraso: o limite de silêncio do alerta; fora do mapa, o dobro do
   -- intervalo típico observado, e sem histórico, 26h.
   CASE

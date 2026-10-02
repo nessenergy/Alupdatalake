@@ -1,7 +1,8 @@
 """Portal MVP — item 0.15 do plano. Escopo cravado na ADR 005.
 
-Uma tela: uma view Gold e quando o lake foi alimentado pela última vez. Não é
-ferramenta de BI, e a ADR 005 lista o que deliberadamente não faz.
+Quatro telas — dado de negócio, indicadores, saúde do lake e custo de nuvem —,
+todas HTML do servidor, na identidade da Alup (ADR 022). Não é ferramenta de BI,
+e a ADR 005 lista o que deliberadamente não faz.
 
 Autenticação não é escrita aqui. No Cloud Run o acesso é restrito por IAM /
 IAP, e a identidade chega no cabeçalho `X-Goog-Authenticated-User-Email` — a
@@ -21,28 +22,19 @@ from __future__ import annotations
 import html
 import logging
 from datetime import datetime
-from decimal import Decimal
 from typing import TYPE_CHECKING, Any
 
 from flask import Flask, Response, request
 from src.core.config import get_settings
 from src.core.observabilidade import configurar_logging
 from src.core.seguranca import sanitizar
-from src.portal.dados import Indicador, Painel, SaudeConector, SerieVolumetria, obter_provedor
-from src.portal.grafico import (
-    CORES,
-    _milhar,
-    area,
-    barras_custo,
-    cor_do_conector,
-    legenda_custo,
-    tabela,
-    tendencia,
-    usd,
-)
+from src.portal import custo_tela, saude
+from src.portal import indicadores as indicadores_tela
+from src.portal.dados import Painel, obter_provedor
+from src.portal.pagina import Telao, pagina, proxima_do_telao
 
 if TYPE_CHECKING:
-    from src.portal.custo import PainelCusto
+    from src.core.config import Settings
 
 configurar_logging()
 logger = logging.getLogger("portal")
@@ -147,15 +139,19 @@ def lake() -> Response:
     """
     cfg = get_settings()
     provedor = obter_provedor()
-    usuario = _usuario(request.headers.get(CABECALHO_IDENTIDADE))
-    return Response(
-        _pagina_lake(
-            provedor.saude(),
-            provedor.volumetria(),
-            usuario,
-            simulado=cfg.portal_provedor != "bigquery",
-        ),
-        mimetype="text/html",
+    fontes = saude.montar(provedor.saude(), provedor.volumetria())
+    telao = _telao("/lake", nome="Saúde do lake")
+    aviso = "Dados de exemplo — o ambiente GCP ainda não existe (pendência A3)." if _simulado(cfg) else ""
+    return _responder(
+        pagina(
+            titulo="Saúde do lake",
+            rota="/lake",
+            usuario=_usuario(request.headers.get(CABECALHO_IDENTIDADE)),
+            banda=saude.banda(fontes),
+            corpo=saude.corpo(fontes, telao=telao is not None),
+            aviso=aviso,
+            telao=telao,
+        )
     )
 
 
@@ -167,10 +163,24 @@ def custo() -> Response:
     enquadramento contratual em `docs/arquitetura/portal-finops.md`.
     """
     cfg = get_settings()
-    usuario = _usuario(request.headers.get(CABECALHO_IDENTIDADE))
-    return Response(
-        _pagina_custo(obter_provedor().custo(), usuario, simulado=cfg.portal_provedor != "bigquery"),
-        mimetype="text/html",
+    dados = obter_provedor().custo()
+    telao = _telao("/custo", nome="Custo de nuvem")
+    aviso = (
+        "Dados de exemplo, derivados da volumetria simulada — o ambiente GCP ainda não existe (pendência A3). "
+        "Nenhum valor desta tela veio de uma fatura."
+        if _simulado(cfg)
+        else ""
+    )
+    return _responder(
+        pagina(
+            titulo="Custo de nuvem",
+            rota="/custo",
+            usuario=_usuario(request.headers.get(CABECALHO_IDENTIDADE)),
+            banda=custo_tela.banda(dados),
+            corpo=custo_tela.corpo(dados, telao=telao is not None),
+            aviso=aviso,
+            telao=telao,
+        )
     )
 
 
@@ -178,20 +188,60 @@ def custo() -> Response:
 def indicadores() -> Response:
     """Razões técnicas do setor, com numerador e denominador — sem meta (ADR 012, adendo de 27/09).
 
-    A conta é do Dataform (`gold.indicadores_mensais`); a tela só mostra.
+    A conta é do Dataform (`gold.indicadores_mensais`); a tela só mostra. No modo
+    telão os cartões vêm em páginas de 12, para nenhum ficar escondido por rolagem.
     """
     cfg = get_settings()
-    usuario = _usuario(request.headers.get(CABECALHO_IDENTIDADE))
-    return Response(
-        _pagina_indicadores(obter_provedor().indicadores(), usuario, simulado=cfg.portal_provedor != "bigquery"),
-        mimetype="text/html",
+    linhas = obter_provedor().indicadores()
+    prontos = indicadores_tela.cartoes(linhas)
+    paginas = indicadores_tela.paginas_do_telao(len(prontos))
+    numero = min(max(_inteiro(request.args.get("p"), 1), 1), paginas)
+    telao = _telao("/indicadores", numero, paginas, nome="Indicadores")
+    aviso = (
+        "Dados de exemplo — números inventados para mostrar o formato. Nenhum valor desta tela veio do DataLake."
+        if _simulado(cfg)
+        else ""
+    )
+    return _responder(
+        pagina(
+            titulo="Indicadores",
+            rota="/indicadores",
+            usuario=_usuario(request.headers.get(CABECALHO_IDENTIDADE)),
+            banda=indicadores_tela.banda(len(prontos), indicadores_tela.referencia(linhas)),
+            corpo=indicadores_tela.corpo(prontos, pagina=numero if telao else None),
+            aviso=aviso,
+            telao=telao,
+        )
     )
 
 
 @app.get("/saude")
-def saude() -> dict[str, str]:
+def sonda() -> dict[str, str]:
     """Sonda do Cloud Run: responde sem tocar no BigQuery."""
     return {"status": "ok"}
+
+
+def _responder(documento: str) -> Response:
+    return Response(documento, mimetype="text/html")
+
+
+def _simulado(cfg: Settings) -> bool:
+    return cfg.portal_provedor != "bigquery"
+
+
+def _inteiro(texto: str | None, padrao: int) -> int:
+    try:
+        return int(texto) if texto else padrao
+    except ValueError:
+        return padrao
+
+
+def _telao(rota: str, pagina_atual: int = 1, paginas: int = 1, *, nome: str) -> Telao | None:
+    """Modo telão: só liga com `?telao=1`, e nunca por acidente."""
+    if request.args.get("telao") != "1":
+        return None
+    rotulo = f"{nome} {pagina_atual} de {paginas}" if paginas > 1 else nome
+    return Telao(rotulo, proxima_do_telao(rota, pagina_atual, paginas))
 
 
 def _usuario(cabecalho: str | None) -> str:
@@ -209,231 +259,6 @@ def _celula(valor: Any) -> str:
     return html.escape(str(valor))
 
 
-# Estilo compartilhado por `/lake` e `/custo`. Uma cópia só: divergir o token
-# entre duas telas do mesmo Portal é como o desalinho visual começa.
-ESTILO = """<style>
- /* Tokens no formato do shadcn/ui, com a paleta do alup.io.
-    Sem React e sem build: a ADR 005 mantém o Portal renderizado no servidor.
-    O Portal é produto da Alup (ADR 022): é aqui, e só aqui, que o design
-    system da Alup entra — trocar o tema é trocar estes valores. A paleta atual
-    é provisória, derivada do site da Alup, até o design system ser validado. */
- :root{
-   --background:#fcfcfb; --foreground:#212121;
-   --card:#ffffff; --card-foreground:#212121;
-   --muted:#f4f4f4; --muted-foreground:#6b6675;
-   --border:#e6e3ea; --ring:#520042;
-   --primary:#520042; --primary-foreground:#ffffff;
-   --radius:.6rem;
-   --good:#0E8A6B; --warning:#B26A00; --critical:#C2185B; --idle:#8A94A0;
- }
- *{box-sizing:border-box}
- body{font-family:'Hanken Grotesk',system-ui,-apple-system,Segoe UI,Arial,sans-serif;
-   color:var(--foreground);background:var(--background);margin:0 auto;max-width:1320px;
-   padding:clamp(24px,4vw,48px);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased}
- /* Cabeçalho fixo: título e navegação não rolam com a página. */
- header{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:4px 16px;
-   border-bottom:1px solid var(--border);padding:12px 0 0;position:sticky;top:0;z-index:10;
-   background:var(--background)}
- h1{font-family:'Zilla Slab',Georgia,serif;font-weight:600;font-size:clamp(20px,2.4vw,27px);
-   margin:0;letter-spacing:-.01em}
- .quem{font-size:14px;color:var(--muted-foreground)}
- .cabeca-secao{display:flex;justify-content:space-between;align-items:baseline;
-   flex-wrap:wrap;gap:8px;margin:26px 0 2px}
- .resumo{font-size:16px;font-weight:600;margin:0}
- .muted{font-size:14px;color:var(--muted-foreground);margin:0;font-variant-numeric:tabular-nums}
- .aviso{background:#fff8ec;border:1px solid #f0dcb8;border-radius:var(--radius);
-   padding:12px 16px;font-size:14px;margin-top:20px}
- .grade{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));
-   gap:16px;margin-top:16px}
- .cartao{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
-   padding:18px 18px 14px;display:flex;flex-direction:column}
- .topo{display:flex;align-items:center;gap:8px;font-size:15px;letter-spacing:-.01em}
- .topo strong{font-weight:600}
- .ponto{width:8px;height:8px;border-radius:50%;flex:none}
- .estado{font-size:13.5px;color:var(--muted-foreground);margin:6px 0 16px}
- dl{display:grid;grid-template-columns:1fr 1fr;gap:12px 16px;margin:0}
- dt{font-size:11.5px;letter-spacing:.07em;text-transform:uppercase;
-   color:var(--muted-foreground);margin:0}
- dd{margin:3px 0 0;font-size:16px;font-variant-numeric:tabular-nums;letter-spacing:-.01em}
- .figura{margin:18px 0 0}
- .figura figcaption{font-size:11.5px;letter-spacing:.07em;text-transform:uppercase;
-   color:var(--muted-foreground);margin-bottom:6px}
- .grafico{width:100%;height:64px;display:block;overflow:visible}
- .erro{margin:14px 0 0;font-size:13.5px;color:var(--critical);word-break:break-word}
- .tabela{margin-top:26px;border:1px solid var(--border);border-radius:var(--radius);
-   background:var(--card)}
- .tabela summary{cursor:pointer;padding:14px 16px;font-size:15px;font-weight:500}
- .rolagem{overflow-x:auto;padding:0 16px 16px}
- .tabela table{border-collapse:collapse;font-size:13.5px;font-variant-numeric:tabular-nums}
- .tabela th,.tabela td{padding:6px 10px;text-align:right;white-space:nowrap;
-   border-bottom:1px solid var(--border)}
- .tabela thead th{text-align:right;color:var(--muted-foreground);font-weight:500}
- .tabela tbody th{text-align:left;font-weight:500}
- .tabela .total{font-weight:600}
- footer{margin-top:28px;font-size:13.5px;color:var(--muted-foreground)}
- a{color:var(--primary)}
-
- /* Custo — a rota /custo reaproveita tudo acima e acrescenta só o que é dela. */
- .naves{display:flex;gap:24px;flex-wrap:wrap;font-size:15px;margin:6px 0 0;flex-basis:100%}
- .naves a{text-decoration:none;color:var(--muted-foreground);padding-bottom:3px;
-   border-bottom:2px solid transparent;padding:10px 0 8px}
- .naves a.atual{color:var(--primary);border-bottom-color:var(--primary);font-weight:600}
- .naves a:hover{color:var(--foreground)}
- .visao{margin-top:34px}
- .visao > h2{font-family:'Zilla Slab',Georgia,serif;font-size:19px;font-weight:600;
-   margin:0;letter-spacing:-.01em}
- .visao > .para-quem{font-size:14px;max-width:80ch;color:var(--muted-foreground);margin:4px 0 0}
- .tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));
-   gap:16px;margin-top:16px}
- .tile{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
-   padding:16px 18px}
- .tile .rot{font-size:11.5px;letter-spacing:.07em;text-transform:uppercase;
-   color:var(--muted-foreground)}
- .tile .val{font-size:27px;margin-top:6px;font-variant-numeric:tabular-nums;
-   letter-spacing:-.02em;line-height:1.1}
- .tile .sub{font-size:13.5px;color:var(--muted-foreground);margin-top:6px}
- .tile .val.alerta{color:var(--critical)}
- .tile .val.bom{color:var(--good)}
- .barra{height:7px;border-radius:4px;background:var(--muted);margin-top:12px;overflow:hidden}
- .barra span{display:block;height:100%;background:var(--good)}
- .barra span.estoura{background:var(--critical)}
- .grafico-alto{height:132px}
- .legenda{display:flex;gap:16px;list-style:none;padding:0;margin:10px 0 0;
-   font-size:13px;color:var(--muted-foreground);flex-wrap:wrap}
- .legenda .chave{display:inline-block;width:9px;height:9px;border-radius:2px;
-   margin-right:6px;vertical-align:baseline}
- .lista{width:100%;border-collapse:collapse;font-size:14px;margin-top:14px;
-   font-variant-numeric:tabular-nums}
- .lista th{text-align:right;font-weight:500;color:var(--muted-foreground);
-   padding:8px 10px;border-bottom:1px solid var(--border);font-size:12px;
-   letter-spacing:.05em;text-transform:uppercase}
- .lista th:first-child,.lista td:first-child{text-align:left}
- .lista td{padding:9px 10px;border-bottom:1px solid var(--border);text-align:right}
- .lista tr:last-child td{border-bottom:none}
- .marca{display:inline-block;font-size:10.5px;font-weight:600;letter-spacing:.05em;
-   text-transform:uppercase;padding:2px 6px;border-radius:3px;
-   background:#fdecef;color:var(--critical)}
- .nota{font-size:14px;color:var(--muted-foreground);margin:12px 0 0;max-width:70ch}
- .rolagem-tabela{overflow-x:auto;margin-top:12px}
- .premissa{background:var(--muted);border-radius:var(--radius);padding:14px 16px;
-   font-size:14px;color:var(--muted-foreground);margin-top:26px;max-width:80ch}
- a:focus-visible,summary:focus-visible{outline:2px solid var(--ring);outline-offset:3px;border-radius:3px}
-
- /* Indicadores — um cartão por recorte, legível a distância (reunião em telão). */
- .intro{font-size:15px;color:var(--muted-foreground);max-width:80ch;margin:22px 0 0}
- .indicador .recorte{font-size:15px;font-weight:600;margin:0;letter-spacing:-.01em}
- .valor-destaque{font-size:clamp(30px,3.2vw,38px);font-weight:600;line-height:1.1;margin-top:10px;
-   font-variant-numeric:tabular-nums;letter-spacing:-.02em;color:var(--primary)}
- .quando{font-size:13.5px;color:var(--muted-foreground);margin:6px 0 0;font-variant-numeric:tabular-nums}
- .conta{font-size:13.5px;margin:12px 0 0;padding:8px 10px;background:var(--muted);
-   border-radius:calc(var(--radius) - .2rem);font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
- .rot-conta{font-size:11.5px;letter-spacing:.07em;text-transform:uppercase;
-   color:var(--muted-foreground);margin-right:6px}
- .indicador .figura{margin-top:14px}
- details.tabela{margin-top:18px}
-"""
-
-
-# Cores de estado são reservadas: nunca reaproveitadas como cor de série.
-SITUACOES = {
-    "OK": ("var(--good)", "em dia"),
-    "ATRASADA": ("var(--warning)", "atrasada"),
-    "FALHA_RECENTE": ("var(--critical)", "falha na última execução"),
-    "SEM_SUCESSO": ("var(--idle)", "nunca teve sucesso"),
-}
-
-
-def _duracao(minutos: int | None) -> str:
-    """Minutos como algo que uma pessoa lê sem converter de cabeça."""
-    if minutos is None:
-        return "—"
-    if minutos < 90:
-        return f"há {minutos} min"
-    if minutos < 60 * 36:
-        return f"há {minutos // 60} h"
-    return f"há {minutos // 1440} dias"
-
-
-def _pct(valor: float | None) -> str:
-    return "—" if valor is None else f"{valor * 100:.1f}%".replace(".", ",")
-
-
-def _cartao(c: SaudeConector, serie: SerieVolumetria | None, cor_serie: str) -> str:
-    cor, rotulo = SITUACOES.get(c.situacao, ("var(--idle)", c.situacao))
-    p95 = "—" if c.duracao_p95_seg is None else f"{c.duracao_p95_seg:.0f}s"
-    erro = f'<p class="erro">{html.escape(c.ultimo_erro)}</p>' if c.ultimo_erro else ""
-    grafico = (
-        f'<figure class="figura"><figcaption>Linhas por dia · 30 dias</figcaption>{area(serie, cor_serie)}</figure>'
-        if serie and any(serie.linhas)
-        else ""
-    )
-    return f"""<article class="cartao">
-  <div class="topo"><span class="ponto" style="background:{cor}"></span>
-    <strong>{html.escape(c.conector)}</strong></div>
-  <div class="estado">{rotulo} · último sucesso {_duracao(c.minutos_desde_sucesso)}</div>
-  <dl>
-    <div><dt>Sucesso 30d</dt><dd>{_pct(c.taxa_sucesso_30d)}</dd></div>
-    <div><dt>Inválidas</dt><dd>{_pct(c.taxa_invalidas)}</dd></div>
-    <div><dt>Linhas carregadas</dt><dd>{_milhar(c.linhas_carregadas_total)}</dd></div>
-    <div><dt>Duração p95</dt><dd>{p95}</dd></div>
-  </dl>
-  {grafico}
-  {erro}
-</article>"""
-
-
-def _pagina_lake(
-    conectores: list[SaudeConector],
-    series: list[SerieVolumetria],
-    usuario: str,
-    *,
-    simulado: bool,
-) -> str:
-    atrasados = [c for c in conectores if c.situacao != "OK"]
-    por_conector = {s.conector: s for s in series}
-    ordem = sorted(por_conector)
-    resumo = (
-        f"{len(conectores) - len(atrasados)} de {len(conectores)} conectores em dia"
-        if conectores
-        else "Nenhum conector executou ainda"
-    )
-
-    cartoes = "".join(
-        _cartao(c, por_conector.get(c.conector), cor_do_conector(c.conector, ordem))
-        if c.conector in ordem
-        else _cartao(c, None, "#8A94A0")
-        for c in conectores
-    )
-    total_linhas = sum(s.total for s in series)
-
-    aviso = (
-        '<p class="aviso">Dados de exemplo — o ambiente GCP ainda não existe (pendência A3).</p>' if simulado else ""
-    )
-
-    return f"""<!doctype html>
-<html lang="pt-BR"><head><meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>AlupData — saúde do DataLake</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600
-&family=Zilla+Slab:wght@500;600&display=swap">
-{ESTILO}</style></head>
-<body>
-<header><h1>AlupData · saúde do DataLake</h1><span class="quem">{html.escape(usuario)}</span>
-{_naves("/lake")}</header>
-{aviso}
-<div class="cabeca-secao">
-  <p class="resumo">{resumo}</p>
-  <p class="muted">{_milhar(total_linhas)} linhas carregadas nos últimos 30 dias</p>
-</div>
-<div class="grade">{cartoes}</div>
-{tabela(series)}
-<footer>Atraso é medido contra a cadência da própria fonte, não contra um limite fixo.
- · <a href="/">ver dado de negócio</a></footer>
-</body></html>"""
-
-
 def _pagina(dados: Painel, usuario: str, *, simulado: bool) -> str:
     cabecalhos = "".join(f"<th>{html.escape(c)}</th>" for c in dados.colunas)
     linhas = "".join(
@@ -447,348 +272,18 @@ def _pagina(dados: Painel, usuario: str, *, simulado: bool) -> str:
         )
     else:
         rodape = "Nenhuma ingestão registrada ainda."
-
     aviso = (
-        '<p class="aviso">Dados de exemplo — o ambiente GCP ainda não existe (pendência A3). '
-        "Nenhum número nesta tela veio do DataLake.</p>"
+        "Dados de exemplo — o ambiente GCP ainda não existe (pendência A3). Nenhum número nesta tela veio do DataLake."
         if simulado
         else ""
     )
-
-    return f"""<!doctype html>
-<html lang="pt-BR"><head><meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>AlupData — {html.escape(dados.view)}</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600
-&family=Zilla+Slab:wght@500;600&display=swap">
-{ESTILO}</style></head>
-<body>
-<header><h1>AlupData · {html.escape(dados.view)}</h1><span class="quem">{html.escape(usuario)}</span>
-{_naves("/")}</header>
-{aviso}
-<div class="rolagem-tabela"><table class="lista">
-<thead><tr>{cabecalhos}</tr></thead><tbody>{linhas}</tbody>
-</table></div>
-<footer>{rodape}</footer>
-</body></html>"""
-
-
-def _naves(atual: str) -> str:
-    """As três telas do Portal. Uma barra só, para não haver tela órfã."""
-    rotas = (
-        ("/", "Dado de negócio"),
-        ("/indicadores", "Indicadores"),
-        ("/lake", "Saúde do lake"),
-        ("/custo", "Custo de nuvem"),
+    banda = (
+        '<section class="ad-band ad-band--centered" aria-label="Resumo"><div class="ad-summary">'
+        f'<div class="ad-summary__text"><h2 class="ad-summary__title">{html.escape(dados.view)}</h2>'
+        f'<p class="ad-summary__sub">{rodape}</p></div></div></section>'
     )
-    itens = []
-    for rota, nome in rotas:
-        classe = ' class="atual"' if rota == atual else ""
-        itens.append(f'<a href="{rota}"{classe}>{html.escape(nome)}</a>')
-    return '<nav class="naves">' + "".join(itens) + "</nav>"
-
-
-def _tile(rotulo: str, valor: str, sub: str = "", classe: str = "") -> str:
-    extra = f' class="val {classe}"' if classe else ' class="val"'
-    sublinha = f'<div class="sub">{sub}</div>' if sub else ""
-    return f'<div class="tile"><div class="rot">{html.escape(rotulo)}</div><div{extra}>{valor}</div>{sublinha}</div>'
-
-
-def _bytes_humano(valor: int) -> str:
-    """Byte varrido só significa alguma coisa na unidade em que se cobra."""
-    for unidade, divisor in (("TiB", 1024**4), ("GiB", 1024**3), ("MiB", 1024**2)):
-        if valor >= divisor:
-            return f"{valor / divisor:.2f} {unidade}".replace(".", ",")
-    return f"{_milhar(valor)} B"
-
-
-def _visao_operacional(dados: PainelCusto) -> str:
-    """O que eu mudo hoje: consulta cara, view degradada, dataset que cresce."""
-    anomalas = [c for c in dados.consultas if c.anomala]
-    linhas = "".join(
-        f"<tr><td>{html.escape(c.rotulo)}"
-        + (' <span class="marca">varredura integral</span>' if c.anomala else "")
-        + f"</td><td>{_milhar(c.execucoes)}</td><td>{_bytes_humano(c.bytes_varridos)}</td>"
-        f"<td>{usd(c.custo_usd)}</td>"
-        f"<td>{'+' if c.variacao_vs_media >= 0 else ''}{c.variacao_vs_media * 100:.0f}%</td></tr>"
-        for c in dados.consultas
+    corpo = (
+        f'<div class="ad-rolagem"><table class="ad-lista"><thead><tr>{cabecalhos}</tr></thead>'
+        f"<tbody>{linhas}</tbody></table></div>"
     )
-    alerta = (
-        f'<p class="nota"><span class="marca">atenção</span> '
-        f"{len(anomalas)} consulta(s) varrendo mais que o dobro da própria média. "
-        "Varredura integral quase sempre é filtro de partição faltando na view. "
-        "Vale corrigir antes que o volume cresça — mas repare na coluna de custo: "
-        "hoje ela não é a consulta mais cara.</p>"
-        if anomalas
-        else '<p class="nota">Nenhuma consulta destoando da própria média.</p>'
-    )
-    return f"""<section class="visao">
-  <h2>Operacional</h2>
-  <p class="para-quem">Para quem opera o pipeline · o que dá para mudar hoje</p>
-  <figure class="figura">
-    <figcaption>Gasto por dia · composição · 30 dias</figcaption>
-    {barras_custo(dados.dias)}
-    {legenda_custo()}
-  </figure>
-  <table class="lista">
-    <thead><tr><th>Consulta</th><th>Execuções</th><th>Varrido</th><th>Custo</th><th>vs. média</th></tr></thead>
-    <tbody>{linhas}</tbody>
-  </table>
-  {alerta}
-  <p class="nota">A lista está ordenada por custo, não por byte varrido — e o gráfico
-    acima explica por quê: nesta escala a conta é quase toda <strong>custo fixo por
-    execução</strong>, não volume. O job de ingestão e o mínimo faturado por consulta
-    somam mais que todo o byte varrido do lake. Enquanto for assim, <strong>reduzir
-    número de execuções rende mais que otimizar varredura</strong>. Isso se inverte
-    quando a Onda 3 trouxer os sistemas internos, e é aí que a varredura integral
-    marcada acima passa a doer — corrigir antes é mais barato que corrigir depois.</p>
-</section>"""
-
-
-def _visao_orcamento(dados: PainelCusto) -> str:
-    """Estamos dentro do previsto, e para onde a curva do mês aponta."""
-    o = dados.orcamento
-    largura = min(o.consumo_pct, 1.0) * 100
-    classe_barra = " estoura" if o.estoura else ""
-    projecao = (
-        f"projeta {_pct(o.projecao_pct)} do orçado — estouro de {usd(o.projetado_usd - o.orcado_usd)}"
-        if o.estoura
-        else f"projeta {_pct(o.projecao_pct)} do orçado"
-    )
-
-    linhas = "".join(
-        f"<tr><td>{html.escape(f.fonte)}</td><td>{usd(f.query_usd)}</td>"
-        f"<td>{usd(f.armazenamento_usd)}</td><td>{usd(f.total_usd)}</td>"
-        f"<td>{'—' if f.usd_por_milhao_de_linhas is None else usd(f.usd_por_milhao_de_linhas)}</td></tr>"
-        for f in dados.fontes
-    )
-    return f"""<section class="visao">
-  <h2>Orçamento</h2>
-  <p class="para-quem">Para quem responde pelo orçamento de nuvem · fecha o mês</p>
-  <div class="tiles">
-    {_tile("Realizado no mês", usd(o.realizado_usd), f"{o.dias_decorridos} de {o.dias_do_mes} dias")}
-    {_tile("Orçado", usd(o.orcado_usd), "premissa de configuração")}
-    {
-        _tile(
-            "Projeção de fechamento",
-            usd(o.projetado_usd),
-            projecao,
-            "alerta" if o.estoura else "bom",
-        )
-    }
-    {_tile("Gasto em 30 dias", usd(dados.total_usd), "consulta + armazenamento + compute")}
-  </div>
-  <div class="barra"><span class="{classe_barra.strip()}" style="width:{largura:.0f}%"></span></div>
-  <table class="lista">
-    <thead><tr><th>Fonte</th><th>Consulta</th><th>Armazenamento</th><th>Total</th>
-      <th>US$ por milhão de linhas</th></tr></thead>
-    <tbody>{linhas}</tbody>
-  </table>
-  <p class="nota">A última coluna é a que separa fonte cara de fonte cara à toa:
-    ela mede o custo pelo que a fonte entrega, não pelo que ela consome.
-    Só existe porque o job é rotulado por fonte (camada F0 do plano).</p>
-</section>"""
-
-
-def _visao_diretoria(dados: PainelCusto) -> str:
-    """Vale o que custa. Poucos números, cada um defensável em reunião."""
-    dominios = dados.por_dominio
-    total = sum((valor for _, valor in dominios), Decimal(0)) or Decimal(1)
-    linhas = "".join(
-        f"<tr><td>{html.escape(nome)}</td><td>{usd(valor)}</td><td>{_pct(float(valor / total))}</td></tr>"
-        for nome, valor in dominios
-    )
-    maior = dominios[0][0] if dominios else "—"
-    return f"""<section class="visao">
-  <h2>Diretoria</h2>
-  <p class="para-quem">Para quem decide renovar · trimestral</p>
-  <div class="tiles">
-    {_tile("Custo mensal projetado", usd(dados.orcamento.projetado_usd), "todo o DataLake")}
-    {_tile("Maior domínio", html.escape(maior), "onde o dinheiro está")}
-    {_tile("Fontes em produção", str(len(dados.fontes)), "custo atribuído a cada uma")}
-  </div>
-  <table class="lista">
-    <thead><tr><th>Domínio de negócio</th><th>Custo em 30 dias</th><th>Participação</th></tr></thead>
-    <tbody>{linhas}</tbody>
-  </table>
-  <p class="nota">O agrupamento segue os <strong>8 domínios analíticos</strong> definidos
-    em 14/09 a partir do Questionário de Gaps — <code>docs/arquitetura/dominios-analiticos.md</code>.
-    Os domínios são os da resposta B1 do questionário, com um responsável da Alup
-    nomeado para cada um.</p>
-</section>"""
-
-
-def _pagina_custo(dados: PainelCusto, usuario: str, *, simulado: bool) -> str:
-    aviso = (
-        '<p class="aviso">Dados de exemplo, derivados da volumetria simulada — o ambiente GCP '
-        "ainda não existe (pendência A3). Nenhum valor desta tela veio de uma fatura.</p>"
-        if simulado
-        else ""
-    )
-    return f"""<!doctype html>
-<html lang="pt-BR"><head><meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>AlupData — custo de nuvem</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600
-&family=Zilla+Slab:wght@500;600&display=swap">
-{ESTILO}</style></head>
-<body>
-<header><h1>AlupData · custo de nuvem</h1><span class="quem">{html.escape(usuario)}</span>
-{_naves("/custo")}</header>
-{aviso}
-{_visao_operacional(dados)}
-{_visao_orcamento(dados)}
-{_visao_diretoria(dados)}
-<p class="premissa"><strong>Premissas.</strong> Os valores usam a tarifa por byte varrido e por
- GiB armazenado declaradas em <code>src/portal/custo.py</code>, e não enxergam crédito nem
- desconto por uso comprometido — isso só chega com o billing export (camada F2 do plano).
- <strong>Nem a camada gratuita:</strong> o BigQuery dá 1 TB de consulta por mês sem cobrar, e
- o lake inteiro cabe nesse teto hoje — a linha de consulta da fatura real tende a ser zero, e
- o número aqui superestima de propósito. Compute aparece no agregado e não por fonte: existe
- um Cloud Run Job para todas elas.
- Plano e enquadramento em <code>docs/arquitetura/portal-finops.md</code>.</p>
-</body></html>"""
-
-
-# Ordem, título e o que cada razão mede — em linguagem de quem lê, não de SQL.
-INDICADORES = (
-    (
-        "taxa_corte_renovavel",
-        "Taxa de corte renovável",
-        "Quanto da geração eólica e solar possível o sistema mandou não gerar (constrained-off).",
-    ),
-    ("disponibilidade", "Disponibilidade", "Quanto da potência instalada das usinas despachadas estava apta a gerar."),
-    (
-        "fator_capacidade",
-        "Fator de capacidade",
-        "Quanto a geração média ocupou da potência efetiva, por submercado e fonte.",
-    ),
-    ("armazenamento", "Armazenamento", "Quanto dos reservatórios estava cheio, em energia armazenada."),
-    ("pld_real", "PLD real", "O PLD médio descontada a inflação, em reais do mês-base."),
-)
-
-
-MESES = ("jan", "fev", "mar", "abr", "mai", "jun", "jul", "ago", "set", "out", "nov", "dez")
-
-
-def _mes(periodo: str) -> str:
-    """`2026-08` vira `ago/2026`; formato inesperado passa como veio."""
-    ano, _, mes = periodo.partition("-")
-    return f"{MESES[int(mes) - 1]}/{ano}" if mes.isdigit() and 1 <= int(mes) <= 12 else periodo
-
-
-def _br(valor: float, casas: int) -> str:
-    return f"{valor:,.{casas}f}".replace(",", "X").replace(".", ",").replace("X", ".")
-
-
-def _grandeza(valor: Decimal) -> str:
-    """Numerador e denominador com as casas que a ordem de grandeza pede."""
-    absoluto = abs(float(valor))
-    return _br(float(valor), 0 if absoluto >= 100 else 2 if absoluto >= 1 else 4)
-
-
-def _valor_indicador(linha: Indicador) -> str:
-    if linha.valor is None:
-        return "—"
-    if linha.unidade_valor == "fração":
-        return f"{_br(float(linha.valor) * 100, 1)}%"
-    return f"R$ {_br(float(linha.valor), 2)}"
-
-
-def _variacao(atual: Indicador, anterior: Indicador | None) -> str:
-    """Diferença contra o mês anterior, em texto e sem cor: não há meta (ADR 012)."""
-    if anterior is None or atual.valor is None or anterior.valor is None:
-        return "sem mês anterior para comparar"
-    delta = float(atual.valor) - float(anterior.valor)
-    seta = "▲" if delta > 0 else "▼" if delta < 0 else "="
-    if atual.unidade_valor == "fração":
-        texto = f"{'+' if delta >= 0 else '−'}{_br(abs(delta) * 100, 1)} p.p."
-    else:
-        texto = f"{'+' if delta >= 0 else '−'}R$ {_br(abs(delta), 2)}"
-    return f'<span aria-hidden="true">{seta}</span> {texto} vs {_mes(anterior.periodo_apuracao)}'
-
-
-def _cartao_indicador(recorte: str, por_mes: dict[str, Indicador]) -> str:
-    meses = sorted(por_mes)
-    atual = por_mes[meses[-1]]
-    anterior = por_mes[meses[-2]] if len(meses) > 1 else None
-    pontos = [
-        (m, float(ind.valor), f"{_mes(m)} · {_valor_indicador(ind)}")
-        for m in meses
-        if (ind := por_mes[m]).valor is not None
-    ]
-    rotulo = f"{recorte}: {_valor_indicador(atual)} em {_mes(atual.periodo_apuracao)}, série de {len(pontos)} meses"
-    # Só os números: as unidades estão uma vez no subtítulo da seção, e repeti-las
-    # em cada cartão tornava a conta ilegível a distância.
-    conta = f"{_grandeza(atual.numerador)} ÷ {_grandeza(atual.denominador)}"
-    return f"""<article class="cartao indicador">
-  <h3 class="recorte">{html.escape(recorte)}</h3>
-  <div class="valor-destaque">{_valor_indicador(atual)}</div>
-  <p class="quando">{_mes(atual.periodo_apuracao)} · {_variacao(atual, anterior)}</p>
-  <p class="conta"><span class="rot-conta">Conta</span> {conta}</p>
-  <figure class="figura">{tendencia(pontos, CORES[0], rotulo)}</figure>
-</article>"""
-
-
-def _secao_indicador(nome: str, titulo: str, frase: str, linhas: list[Indicador]) -> str:
-    if not linhas:
-        return ""
-    meses = sorted({ind.periodo_apuracao for ind in linhas})
-    recortes: dict[str, dict[str, Indicador]] = {}
-    for ind in linhas:
-        recorte = " · ".join(p for p in (ind.submercado, ind.fonte) if p) or "Brasil"
-        recortes.setdefault(recorte, {})[ind.periodo_apuracao] = ind
-    exemplo = linhas[0]
-    cartoes = "".join(_cartao_indicador(r, por_mes) for r, por_mes in sorted(recortes.items()))
-    cabeca = "".join(f"<th>{_mes(m)}</th>" for m in meses)
-    corpo = ""
-    for recorte, por_mes in sorted(recortes.items()):
-        celulas = "".join(f"<td>{_valor_indicador(por_mes[m])}</td>" if m in por_mes else "<td>—</td>" for m in meses)
-        corpo += f"<tr><td>{html.escape(recorte)}</td>{celulas}</tr>"
-    return f"""<section class="visao" id="{html.escape(nome)}">
-  <h2>{html.escape(titulo)}</h2>
-  <p class="para-quem">{html.escape(frase)} Conta: {html.escape(exemplo.unidade_numerador)}
-   ÷ {html.escape(exemplo.unidade_denominador)}.</p>
-  <div class="grade">{cartoes}</div>
-  <details class="tabela"><summary>Série completa, mês a mês ({len(meses)} meses)</summary>
-  <div class="rolagem"><table class="lista">
-  <thead><tr><th>Recorte</th>{cabeca}</tr></thead><tbody>{corpo}</tbody>
-  </table></div></details>
-</section>"""
-
-
-def _pagina_indicadores(linhas: list[Indicador], usuario: str, *, simulado: bool) -> str:
-    aviso = (
-        '<p class="aviso">Dados de exemplo — números inventados para mostrar o formato. '
-        "Nenhum valor desta tela veio do DataLake.</p>"
-        if simulado
-        else ""
-    )
-    secoes = "".join(
-        _secao_indicador(nome, titulo, frase, [ind for ind in linhas if ind.indicador == nome])
-        for nome, titulo, frase in INDICADORES
-    )
-    return f"""<!doctype html>
-<html lang="pt-BR"><head><meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>AlupData — indicadores</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600
-&family=Zilla+Slab:wght@500;600&display=swap">
-{ESTILO}</style></head>
-<body>
-<header><h1>AlupData · indicadores</h1><span class="quem">{html.escape(usuario)}</span>
-{_naves("/indicadores")}</header>
-<main>
-{aviso}
-<p class="intro">Razões técnicas do setor, calculadas em <code>gold.indicadores_mensais</code>. Cada
- cartão mostra o último mês, a conta que o produz e a tendência. Sem meta nem comparação entre
- coligadas: indicador de negócio é da Fase 2 (ADR 012).</p>
-{secoes or '<p class="premissa">Nenhum indicador calculado ainda.</p>'}
-</main>
-</body></html>"""
+    return pagina(titulo="Dado de negócio", rota="/", usuario=usuario, banda=banda, corpo=corpo, aviso=aviso)

@@ -1,13 +1,9 @@
-"""Gráficos do painel: SVG gerado no servidor, sem biblioteca e sem JavaScript.
+"""Gráficos do portal: SVG gerado no servidor, sem biblioteca e sem JavaScript.
 
-Cinco séries pequenas de 30 pontos não justificam trazer uma biblioteca de
-charts, um bundler e um build para dentro do Portal. O SVG sai pronto do
-servidor e é acessível: cada ponto carrega `<title>`, que o navegador mostra no
-hover e o leitor de tela anuncia, e a página oferece a tabela completa.
-
-Paleta validada em `scripts/validate_palette.js` do skill dataviz — os seis
-checks passam (banda de luminosidade, croma, separação para daltonismo,
-piso de visão normal e contraste com a superfície).
+A tendência mensal dos indicadores e as barras de custo são pequenas demais para
+justificar uma biblioteca de charts, um bundler e um build dentro do Portal. O SVG
+sai pronto do servidor e é acessível: cada gráfico traz `aria-label` em texto, e as
+barras de custo carregam `<title>` por dia, que o leitor de tela anuncia.
 """
 
 from __future__ import annotations
@@ -17,111 +13,36 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from src.portal.custo import CustoDia
-    from src.portal.dados import SerieVolumetria
-
-# Ordem fixa: a cor segue o conector, nunca a posição na lista. Filtrar não
-# repinta quem sobrou.
-CORES = ("#8B2A78", "#1863dc", "#0E8A6B", "#B26A00", "#C2185B")
-
-LARGURA = 260
-ALTURA = 64
-MARGEM = 3
-
-
-def cor_do_conector(conector: str, ordem: list[str]) -> str:
-    """Cor fixa por conector, atribuída na ordem alfabética estável."""
-    return CORES[ordem.index(conector) % len(CORES)]
 
 
 def _milhar(valor: int) -> str:
     return f"{valor:,}".replace(",", ".")
 
 
-def area(serie: SerieVolumetria, cor: str) -> str:
-    """Área de 30 dias. Baseline em zero — área nunca tem eixo truncado."""
-    if not serie.linhas:
-        return f'<svg viewBox="0 0 {LARGURA} {ALTURA}" class="grafico" role="img"></svg>'
+def tendencia_mensal(pontos: list[tuple[str, float]], rotulo: str) -> str:
+    """Linha mensal de uma razão, no desenho do cartão: (rótulo do mês, valor).
 
-    teto = max(serie.linhas) or 1
-    passo = LARGURA / max(len(serie.linhas) - 1, 1)
-    altura_util = ALTURA - 2 * MARGEM
-
-    pontos = [(i * passo, ALTURA - MARGEM - (valor / teto) * altura_util) for i, valor in enumerate(serie.linhas)]
-    linha = " ".join(f"{x:.1f},{y:.1f}" for x, y in pontos)
-    area_fechada = f"{pontos[0][0]:.1f},{ALTURA} {linha} {pontos[-1][0]:.1f},{ALTURA}"
-
-    # Alvo de hover maior que a marca: uma faixa por dia, invisível.
-    faixas = "".join(
-        f'<rect x="{x - passo / 2:.1f}" y="0" width="{passo:.1f}" height="{ALTURA}" fill="transparent">'
-        f"<title>{serie.dias[i].strftime('%d/%m')} · {_milhar(serie.linhas[i])} linhas</title></rect>"
-        for i, (x, _) in enumerate(pontos)
-    )
-
-    rotulo = f"{serie.conector}: {_milhar(serie.total)} linhas em {len(serie.linhas)} dias"
-    return (
-        f'<svg viewBox="0 0 {LARGURA} {ALTURA}" class="grafico" role="img" '
-        f'aria-label="{html.escape(rotulo)}" preserveAspectRatio="none">'
-        f'<polygon points="{area_fechada}" fill="{cor}" opacity=".14"/>'
-        f'<polyline points="{linha}" fill="none" stroke="{cor}" stroke-width="2" '
-        'stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/>'
-        f"{faixas}</svg>"
-    )
-
-
-def tendencia(pontos: list[tuple[str, float, str]], cor: str, rotulo: str) -> str:
-    """Linha mensal de uma razão: (mês, valor, texto do ponto).
-
-    Linha e não área: razão não tem baseline em zero que faça sentido, e a
-    escala vai do menor ao maior valor da série, com folga. O último ponto é
-    marcado, porque é o número em destaque no cartão.
+    Razão não tem baseline em zero que faça sentido: a escala vai do menor ao maior
+    valor da série. O último ponto é marcado, porque é o número em destaque no
+    cartão, e os meses das pontas ficam escritos para a linha não flutuar sem tempo.
     """
     if not pontos:
-        return f'<svg viewBox="0 0 {LARGURA} {ALTURA}" class="grafico tendencia" role="img"></svg>'
-
-    valores = [v for _, v, _ in pontos]
+        return ""
+    valores = [v for _, v in pontos]
     piso, teto = min(valores), max(valores)
-    folga = (teto - piso) * 0.15 or abs(teto) * 0.05 or 1
-    piso, teto = piso - folga, teto + folga
-    passo = LARGURA / max(len(pontos) - 1, 1)
-    util = ALTURA - 2 * MARGEM
-    xy = [(i * passo, ALTURA - MARGEM - (v - piso) / (teto - piso) * util) for i, (_, v, _) in enumerate(pontos)]
+    amplitude = teto - piso
+    passo = 240 / max(len(pontos) - 1, 1)
+    xy = [
+        (i * passo if len(pontos) > 1 else 120.0, 25.0 if not amplitude else 46 - (v - piso) / amplitude * 42)
+        for i, v in enumerate(valores)
+    ]
     linha = " ".join(f"{x:.1f},{y:.1f}" for x, y in xy)
     x_fim, y_fim = xy[-1]
-
-    faixas = "".join(
-        f'<rect x="{x - passo / 2:.1f}" y="0" width="{passo:.1f}" height="{ALTURA}" fill="transparent">'
-        f"<title>{html.escape(texto)}</title></rect>"
-        for (x, _), (_, _, texto) in zip(xy, pontos, strict=True)
-    )
     return (
-        f'<svg viewBox="0 0 {LARGURA} {ALTURA}" class="grafico tendencia" role="img" '
-        f'aria-label="{html.escape(rotulo)}" preserveAspectRatio="none">'
-        f'<polyline points="{linha}" fill="none" stroke="{cor}" stroke-width="2" '
-        'stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/>'
-        # Ponto do último mês: traço de comprimento zero com ponta redonda. Um
-        # <circle> viraria elipse com preserveAspectRatio="none".
-        f'<polyline points="{x_fim:.1f},{y_fim:.1f} {x_fim:.1f},{y_fim:.1f}" stroke="{cor}" '
-        'stroke-width="8" stroke-linecap="round" vector-effect="non-scaling-stroke"/>'
-        f"{faixas}</svg>"
-    )
-
-
-def tabela(series: list[SerieVolumetria]) -> str:
-    """Mesma informação em texto — exigência de acessibilidade do gráfico."""
-    if not series:
-        return ""
-    dias = series[0].dias
-    cabecalho = "".join(f"<th>{dia.strftime('%d/%m')}</th>" for dia in dias)
-    corpo = "".join(
-        f'<tr><th scope="row">{html.escape(s.conector)}</th>'
-        + "".join(f"<td>{_milhar(v)}</td>" for v in s.linhas)
-        + f"<td class='total'>{_milhar(s.total)}</td></tr>"
-        for s in series
-    )
-    return (
-        "<details class='tabela'><summary>Ver os números em tabela</summary>"
-        f"<div class='rolagem'><table><thead><tr><th>Conector</th>{cabecalho}<th>Total</th></tr></thead>"
-        f"<tbody>{corpo}</tbody></table></div></details>"
+        f'<svg class="ad-spark" viewBox="0 0 240 64" role="img" aria-label="{html.escape(rotulo)}">'
+        f'<polyline points="{linha}"/><circle cx="{x_fim:.1f}" cy="{y_fim:.1f}" r="4"/>'
+        f'<text x="0" y="63">{html.escape(pontos[0][0])}</text>'
+        f'<text x="240" y="63" text-anchor="end">{html.escape(pontos[-1][0])}</text></svg>'
     )
 
 
@@ -129,8 +50,8 @@ def tabela(series: list[SerieVolumetria]) -> str:
 # diferentes e não podem compartilhar paleta com as séries de volumetria.
 CORES_CUSTO = {
     "query": ("#1863dc", "Consulta"),
-    "armazenamento": ("#0E8A6B", "Armazenamento"),
-    "compute": ("#B26A00", "Compute"),
+    "armazenamento": ("#8B2A78", "Armazenamento"),
+    "compute": ("#6b6675", "Compute"),
 }
 
 LARGURA_BARRAS = 720

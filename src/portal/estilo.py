@@ -178,6 +178,8 @@ ESTILO = """<style>
 .ad-card__value small{font-size:.5em;font-weight:500;letter-spacing:0;margin-left:2px}
 .ad-calc{margin:0;font:600 16px/1.35 var(--font-text)}
 .ad-calc__terms{display:block;font:400 13px/1.35 var(--font-text);color:var(--muted-foreground)}
+.ad-origem{margin:4px 0 0;font:500 13px/1.35 var(--font-text);color:var(--muted-foreground)}
+.ad-origem span{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .ad-delta{margin:4px 0 0;font:500 16px/1.3 var(--font-text);color:var(--muted-foreground)}
 .ad-delta b{color:var(--foreground);font-weight:600}
 .ad-spark{display:block;width:100%;height:auto;margin-top:6px;overflow:visible}
@@ -361,6 +363,7 @@ ESTILO = """<style>
 .ad-page--telao .ad-card__title{font-size:15px}
 .ad-page--telao .ad-chip{font-size:11px;padding:1px 6px}
 .ad-page--telao .ad-calc,.ad-page--telao .ad-delta{font-size:13px}
+.ad-page--telao .ad-origem{font-size:11px;margin-top:2px}
 .ad-page--telao .ad-spark{max-height:40px}
 .ad-page--telao .ad-sources--densa .ad-row>summary{min-height:21px;padding:1px 8px}
 .ad-page--telao .ad-sources--densa .ad-row__name{font-size:15px}

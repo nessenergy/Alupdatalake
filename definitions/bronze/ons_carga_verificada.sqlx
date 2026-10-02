@@ -1,0 +1,29 @@
+config {
+  type: "operations",
+  schema: "bronze",
+  hasOutput: true,
+  tags: ["bronze"]
+}
+
+-- Bronze: carga verificada semi-horária por área de carga (ONS, API). Aditivo 01.
+CREATE TABLE IF NOT EXISTS ${self()} (
+  data_referencia                 DATE      NOT NULL OPTIONS(description="Dia de referência (fuso de Brasília). A última meia hora do dia tem instante_utc já no dia seguinte"),
+  instante_utc                    TIMESTAMP NOT NULL OPTIONS(description="Fim da meia hora (din_referenciautc da origem), em UTC"),
+  area_carga                      STRING    NOT NULL OPTIONS(description="Código da área de carga (cod_areacarga): subsistema, área geoelétrica ou perdas"),
+  atualizado_em                   TIMESTAMP NOT NULL OPTIONS(description="Quando o ONS gravou ou revisou o valor (din_atualizacao)"),
+  carga_global_mwmed              NUMERIC   NOT NULL OPTIONS(description="Carga global, em MWmed (val_cargaglobal)"),
+  carga_global_consistida_mwmed   NUMERIC   NOT NULL OPTIONS(description="Carga global consistida, em MWmed (val_cargaglobalcons)"),
+  carga_global_sem_mmgd_mwmed     NUMERIC   NOT NULL OPTIONS(description="Carga global líquida de MMGD, em MWmed (val_cargaglobalsmmgd; o dicionário do ONS grafa smmg)"),
+  carga_mmgd_mwmed                NUMERIC   NOT NULL OPTIONS(description="Carga atendida por micro e minigeração distribuída, em MWmed (val_cargammgd)"),
+  carga_supervisionada_mwmed      NUMERIC   NOT NULL OPTIONS(description="Parcela supervisionada pelo ONS, em MWmed; pode ser negativa (val_cargasupervisionada)"),
+  carga_nao_supervisionada_mwmed  NUMERIC   NOT NULL OPTIONS(description="Parcela não supervisionada, do sistema de medição da CCEE (geração tipo III), em MWmed (val_carganaosupervisionada)"),
+  consistencia_mwmed              NUMERIC   NOT NULL OPTIONS(description="Valor da consistência aplicado pelo ONS, em MWmed; pode ser negativo (val_consistencia)"),
+
+  _ingestao_id        STRING    NOT NULL,
+  _ingestao_timestamp TIMESTAMP NOT NULL,
+  _fonte              STRING    NOT NULL,
+  _schema_versao      STRING    NOT NULL
+)
+PARTITION BY DATE(_ingestao_timestamp)
+CLUSTER BY data_referencia, area_carga
+OPTIONS(description="Carga verificada semi-horária por área de carga — camada Bronze, append-only");

@@ -1,0 +1,49 @@
+config {
+  type: "view",
+  schema: "silver",
+  tags: ["silver"],
+  assertions: {
+    uniqueKey: ["instante_utc", "area_carga"],
+    nonNull: ["data_referencia", "instante_utc", "area_carga"],
+    rowConditions: [
+      // Sem condição de sinal: a origem publica carga líquida, supervisionada,
+      // perdas e consistência negativas (ex.: MT em 07/09/2026).
+      "area_carga IN ('SECO','S','NE','N','RJ','SP','MG','ES','MT','MS','DF','GO','AC','RO','PR','SC','RS','BASE','BAOE','ALPE','PBRN','CE','PI','TON','PA','MA','AP','AM','RR','PESE','PES','PENE','PEN')"
+    ]
+  }
+}
+
+-- Silver: carga verificada semi-horária por área de carga, deduplicada. Aditivo 01.
+-- Dedup por (instante_utc, area_carga): o ONS revisa o dado publicado
+-- (atualizado_em), então vence a ingestão mais recente.
+-- As áreas se sobrepõem (estado dentro de subsistema): somar áreas diferentes
+-- conta a mesma carga duas vezes. `tipo_area` existe para filtrar antes de somar.
+SELECT
+  data_referencia,
+  CASE area_carga WHEN 'SECO' THEN 'SE' WHEN 'S' THEN 'S' WHEN 'NE' THEN 'NE' WHEN 'N' THEN 'N' END AS submercado,  -- só os 4 subsistemas; estado e perdas ficam nulos
+  CAST(NULL AS STRING) AS codigo_usina,  -- carga agregada por área
+  CAST(NULL AS STRING) AS agente_ccee,   -- o ONS não usa perfil da CCEE
+  FORMAT_DATE('%Y-%m', data_referencia) AS periodo_apuracao,
+  CAST(NULL AS STRING) AS periodo_apuracao_ccee,  -- a origem é o ONS
+  instante_utc,
+  area_carga,
+  CASE
+    WHEN area_carga IN ('SECO', 'S', 'NE', 'N') THEN 'subsistema'
+    WHEN area_carga IN ('PESE', 'PES', 'PENE', 'PEN') THEN 'perdas'
+    ELSE 'area_geoeletrica'
+  END AS tipo_area,
+  atualizado_em,
+  carga_global_mwmed,
+  carga_global_consistida_mwmed,
+  carga_global_sem_mmgd_mwmed,
+  carga_mmgd_mwmed,
+  carga_supervisionada_mwmed,
+  carga_nao_supervisionada_mwmed,
+  consistencia_mwmed,
+  _ingestao_id,
+  _ingestao_timestamp
+FROM ${ref("bronze", "ons_carga_verificada")}
+QUALIFY ROW_NUMBER() OVER (
+  PARTITION BY instante_utc, area_carga
+  ORDER BY _ingestao_timestamp DESC
+) = 1

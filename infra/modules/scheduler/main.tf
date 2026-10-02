@@ -91,6 +91,15 @@ variable "conectores" {
       cron         = "55 9 * * *"
       ultimos_dias = 30
     }
+    ons_carga_programada = {
+      # Aditivo 01. API pública (apicarga.ons.org.br), 33 chamadas por execução; 31 dias por chamada.
+      cron         = "25 10 * * *"
+      ultimos_dias = 30 # o ONS revisa dado publicado
+    }
+    ons_carga_verificada = {
+      cron         = "35 10 * * *"
+      ultimos_dias = 30 # a verificada é revisada nos dias seguintes (din_atualizacao)
+    }
     ons_cmo_semi_horario = {
       # Aditivo 01. Passo de 30 min; arquivo anual.
       cron         = "5 10 * * *"
@@ -99,6 +108,19 @@ variable "conectores" {
     ons_volume_espera = {
       cron         = "15 10 * * *"
       ultimos_dias = 30
+    }
+    ons_programacao_previsao = {
+      # Aditivo 01, padrão C (um arquivo por dia, ~2 MB). O ONS publica o arquivo
+      # do dia seguinte à noite e não o regrava; a janela de 3 dias cobre execução
+      # perdida sem reabrir 30 arquivos de 30 mil linhas na Bronze a cada dia.
+      cron         = "45 10 * * *"
+      ultimos_dias = 3
+    }
+    ons_balanco_dessem = {
+      # Aditivo 01, padrão C (um arquivo por dia, 11 KB). Já houve arquivo regravado
+      # 3 dias depois; o arquivo é pequeno, e 7 dias saem de graça.
+      cron         = "55 10 * * *"
+      ultimos_dias = 7
     }
     ons_cvu_termica = {
       # O CVU muda por semana operativa (PMO): semanal, sábado. A janela de 40

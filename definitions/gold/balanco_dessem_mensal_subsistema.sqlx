@@ -1,0 +1,27 @@
+config {
+  type: "table",
+  schema: "gold",
+  tags: ["gold"],
+  dependOnDependencyAssertions: true
+}
+
+-- Gold: o que o DESSEM programou por mês e subsistema. Aditivo 01.
+--
+-- Responde "quanta demanda o modelo de despacho previu para cada região no mês,
+-- e de que fonte — água, térmica ou renováveis — ele programou atendê-la". É a
+-- programação do dia seguinte, não o realizado (para o realizado, veja
+-- `balanco_energia_mensal_subsistema`). Médias de MW por patamar de meia hora;
+-- sem KPI (ADR 012): nenhuma participação percentual calculada.
+
+SELECT
+  periodo_apuracao,
+  submercado,
+  COUNT(DISTINCT data_referencia)  AS dias,
+  COUNT(*)                         AS patamares,
+  AVG(demanda_mw)                  AS demanda_media_mw,
+  AVG(geracao_renovavel_mw)        AS geracao_renovavel_media_mw,
+  AVG(geracao_hidraulica_mw)       AS geracao_hidraulica_media_mw,
+  AVG(geracao_termica_mw)          AS geracao_termica_media_mw,
+  AVG(consumo_elevatoria_mw)       AS consumo_elevatoria_medio_mw
+FROM ${ref("silver", "ons_balanco_dessem")}
+GROUP BY periodo_apuracao, submercado

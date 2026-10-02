@@ -72,12 +72,17 @@ ANOTACOES: dict[str, dict[str, str]] = {
     "exportacao_mensal": {"dominio": "mercado_de_energia", "responsavel": INTELIGENCIA},  # Aditivo 01
     "balanco_energia_mensal_subsistema": {"dominio": "mercado_de_energia", "responsavel": INTELIGENCIA},  # Aditivo 01
     "cmo_mensal_submercado": {"dominio": "mercado_de_energia", "responsavel": INTELIGENCIA},  # Aditivo 01
+    "desvio_carga_programada_verificada_mensal": {
+        "dominio": "mercado_de_energia",
+        "responsavel": INTELIGENCIA,
+    },  # Aditivo 01
     "volume_espera_mensal_reservatorio": {"dominio": "mercado_de_energia", "responsavel": INTELIGENCIA},  # Aditivo 01
     "cvu_mensal_termica": {"dominio": "mercado_de_energia", "responsavel": INTELIGENCIA},  # Aditivo 01
     "operacao_hidraulica_mensal_reservatorio": {
         "dominio": "mercado_de_energia",
         "responsavel": INTELIGENCIA,
     },  # Aditivo 01
+    "balanco_dessem_mensal_subsistema": {"dominio": "mercado_de_energia", "responsavel": INTELIGENCIA},  # Aditivo 01
     # 2 · Geração e Operacional — usinas do SIN, dado público
     "parque_gerador": {"dominio": "geracao_e_operacional", "responsavel": INTELIGENCIA},
     "geracao_mensal_usina": {"dominio": "geracao_e_operacional", "responsavel": INTELIGENCIA},
@@ -92,6 +97,10 @@ ANOTACOES: dict[str, dict[str, str]] = {
     "despacho_termico_mensal_usina": {"dominio": "geracao_e_operacional", "responsavel": INTELIGENCIA},  # Aditivo 01
     "fator_capacidade_mensal_usina": {"dominio": "geracao_e_operacional", "responsavel": INTELIGENCIA},  # Aditivo 01
     "de_para_usina": {"dominio": "geracao_e_operacional", "responsavel": INTELIGENCIA},
+    "previsao_x_programado_mensal_usina": {
+        "dominio": "geracao_e_operacional",
+        "responsavel": INTELIGENCIA,
+    },  # Aditivo 01
     # 3 · Meteorologia
     "cobertura_boletins_tempook": {"dominio": "meteorologia", "responsavel": INTELIGENCIA},
     "cobertura_ena_prevs_tempook": {"dominio": "meteorologia", "responsavel": INTELIGENCIA},

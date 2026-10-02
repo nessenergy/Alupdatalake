@@ -4,7 +4,7 @@ O **componente 07** do contrato: cada fonte entrega, junto do conector e das
 views, a documentação de campos e a linhagem origem → Bronze → Silver → Gold.
 Este índice diz o que já existe, o que falta e — importante — **por que falta**.
 
-Em **02/10/2026**, o índice cobre **48 fontes em 47 dicionários de fonte**
+Em **02/10/2026**, o índice cobre **52 fontes em 51 dicionários de fonte**
 (eólico e fotovoltaico compartilham um documento), além de **2 dicionários
 técnicos**. Bases reutilizáveis não entram nessa contagem. O contrato mantém
 **13 fontes**; entidade implementada não cria uma fonte contratual nova.
@@ -25,8 +25,12 @@ técnicos**. Bases reutilizáveis não entram nessa contagem. O contrato mantém
 | ONS — geração para exportação | [`ons_geracao_exportacao.md`](ons_geracao_exportacao.md) | Aditivo 01 | — | `exportacao_mensal` |
 | ONS — balanço de energia | [`ons_balanco_energia.md`](ons_balanco_energia.md) | Aditivo 01 | `submercado` | `balanco_energia_mensal_subsistema` |
 | ONS — CMO semi-horário | [`ons_cmo_semi_horario.md`](ons_cmo_semi_horario.md) | Aditivo 01 | `submercado` | `cmo_mensal_submercado` |
+| ONS — carga programada (API) | [`ons_carga_programada.md`](ons_carga_programada.md) | Aditivo 01 | `submercado` (só nos 4 subsistemas) | `desvio_carga_programada_verificada_mensal` |
+| ONS — carga verificada (API) | [`ons_carga_verificada.md`](ons_carga_verificada.md) | Aditivo 01 | `submercado` (só nos 4 subsistemas) | `desvio_carga_programada_verificada_mensal` |
 | ONS — volume de espera recomendado | [`ons_volume_espera.md`](ons_volume_espera.md) | Aditivo 01 | `submercado` | `volume_espera_mensal_reservatorio` |
 | ONS — CVU das térmicas | [`ons_cvu_termica.md`](ons_cvu_termica.md) | Aditivo 01 | `submercado` | `cvu_mensal_termica` |
+| ONS — previsão versus programado (eólicas e solares) | [`ons_programacao_previsao.md`](ons_programacao_previsao.md) | Aditivo 01 | — | `previsao_x_programado_mensal_usina` |
+| ONS — DESSEM, balanço de energia | [`ons_balanco_dessem.md`](ons_balanco_dessem.md) | Aditivo 01 | `submercado` | `balanco_dessem_mensal_subsistema` |
 | CCEE — PLD | [`ccee_pld.md`](ccee_pld.md) | 1 | `submercado` | `pld_mensal_submercado` |
 | CCEE — perfis de agente | [`ccee_perfil.md`](ccee_perfil.md) | 1 | **`agente_ccee`** | `agentes_ccee` |
 | CCEE — lista mensal de agentes | [`ccee_agente.md`](ccee_agente.md) | 1 | `agente_ccee` | `agentes_por_classe_mensal` |

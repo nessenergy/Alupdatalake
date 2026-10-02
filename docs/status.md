@@ -1,6 +1,33 @@
 # Estado do projeto
 
-Atualizado em **2026-09-25** · **A Alup liberou o GCP nos três ambientes** —
+Atualizado em **2026-10-02**. Auditoria de ponta a ponta, com a conferência de cada número:
+[`relatorios/2026-10-02-auditoria-de-ponta-a-ponta.md`](relatorios/2026-10-02-auditoria-de-ponta-a-ponta.md).
+
+## Situação em 02/10/2026 (conferida)
+
+- **Ondas 0 e 1: entregues, em aceite; nenhuma onda está aceita.** O pedido de aprovação por escrito seguiu a
+  Eduardo Pires em 01/10, com o dossiê; sem resposta. Aceito: 0 h de 580 (R$ 0 dos R$ 148.480).
+- **Progresso: 343,8 de 580 h (59,3%).** 208,6 h em aceite (Ondas 0 e 1) e 135,2 h adiantadas das Ondas 2, 3 e 4,
+  que aguardam a Alup.
+- **44 fontes registradas, as 44 com os sete componentes** (conferido por script contra o registro do código).
+  Com dado na Bronze: 41 em `dev` e 40 em `hml`; as demais são BBCE, Hubspot e TempoOK, sem credencial.
+- **Achado: histórico incompleto.** Em `hml`, `ons_geracao_usina` tem 11 dos 25 meses e `ons_restricao_coff_eolica`
+  14; em `dev` faltam 3 meses em cada. Causa: recarga em janela única de 25 meses estourou o limite de 1800 s do
+  Cloud Run (3 tentativas) e deixou Bronze duplicada, sem registro em `_execucoes`. A saúde mostra OK porque usa o
+  último sucesso. Recarga em janelas de 3 meses pendente (ness.).
+- **`dev` está atrás da `main`:** Portal de 29–30/09 e Gold sem `aguardando_credencial`. `hml` está na `main`
+  (`cdae310`).
+- **Alup, vencidas:** #258 (quem assina, prazo 29/09) e #260 (32 h do item 2.1, prazo 30/09). A #259 (confirmar a
+  reunião de aceite) foi fechada em 02/10: a reunião ocorreu em 01/10. **A vencer:** #262 (credenciais da Onda 2, 12/10; contrato 19/10) e as da Onda 3 (09/11;
+  contrato 16/11).
+- **Monitoramento:** 20 políticas de alerta habilitadas em cada ambiente (eram 9 em 24/09).
+- **Produção não existe:** projeto ativo, API do Cloud Run desabilitada. O bootstrap espera o aceite.
+- **Portal:** quatro telas na identidade da Alup, Indicadores como abertura, modo telão e cache (ADR 025). O pedido de
+  aprovação do Portal está em rascunho.
+
+## Histórico até 25/09 (superado pela situação acima)
+
+**A Alup liberou o GCP nos três ambientes** —
 `dev`, homologação e produção, informado à ness. em 23/09. Os projetos
 existem com os IDs `alupar-dev-alupdata`, `alupar-hm-alupdata` e
 `prod-alupdata` (ver A3). **O `dev` foi provisionado no mesmo dia**: bootstrap
@@ -89,7 +116,7 @@ checklist na [#294](https://github.com/nessenergy/Alupdatalake/issues/294).
 - **Item 26** (`consumo_horario_perfil_agente`) fora do subtotal: ~185 GB de
   histórico em 24 meses (34,9 milhões de linhas por mês). Estimativa em
   revisão (§4.1 do documento).
-- **Falta:** padrões B (4 itens), C (2) e D (2), 57h; contagem exata de linhas
+- **Falta:** padrões B (4 itens), C (2) e D (2), 79h; contagem exata de linhas
   por conector no BigQuery, para a evidência da §5.
 - **Achado na carga real:** nos dois intercâmbios, `val_intercambioprogmwmed`
   só existe na origem a partir de 2026. O acesso direto derrubava 2024/2025;
@@ -390,7 +417,7 @@ Não há carga em BigQuery real registrada nem confirmação de entrega do ambie
 
 ### Documentação
 
-ADRs 001–023 · 25 dicionários de fonte para 26 entidades e 2 dicionários técnicos com [índice e linhagem](dicionario-dados/README.md) · plano de execução · runbook de deploy,
+ADRs 001–025 · 43 dicionários para as 44 fontes registradas e 2 dicionários técnicos com [índice e linhagem](dicionario-dados/README.md) · plano de execução · runbook de deploy,
 de primeiro deploy e de acompanhamento semanal ·
 [`proximos-passos.md`](proximos-passos.md) como fila de execução ·
 [`acoes-humanas.md`](acoes-humanas.md) com o passo a passo do que só uma
@@ -475,7 +502,7 @@ de tempo, quantidade de cartões ou PRs.
 | 1 — Mercado base | 120h · marco 20,69% | **escopo original 100%; as 23 fontes públicas carregadas** | As 23 entidades públicas estão escritas e agendadas em `dev`, e **todas carregaram com `SUCESSO` em 24/09** pelo workflow `Executar ingestão` (#221), zero inválidas — de `bcb_cambio_ptax` (3 linhas) a `ons_geracao_usina` (693.120), cerca de 1,6 milhão de linhas ao todo. A primeira carga revelou dois defeitos, corrigidos no mesmo dia: o BCB mudou de formato (#215) e o `NUMERIC` recusava float do ONS (#223). Um terceiro apareceu na sequência: `ccee_geracao_usina` terminou em `SUCESSO` com zero linhas — a janela de 40 dias não alcançava a defasagem de publicação da CCEE, de cerca de dois meses (em 24/09 o mais recente era 202607) — corrigida para 100 dias (#229), com uma carga de janela explícita de julho/2026 disparada para a evidência do dossiê. Depois vêm a Gold com linha e a janela em `hml`. Dossiê junto com o da Onda 0, em **29–30/09**, aceite conjunto em **~01/10**, antes do prazo de 16/10 — novo alvo do [plano de aceleração](planos/2026-09-24-aceleracao-do-faturamento.md). A conciliação das 27 entidades com as **13 fontes** e as 120h continua pendente |
 | 2 — APIs credenciadas | 110h · marco 18,97% | **~50% escrito; um produto em carga real** | A previsão de ENA do TempoOK carrega em `dev` desde 24/09 (4 arquivos por dia). Hubspot e BBCE têm os 7 componentes e esperam credencial; **saíram do agendamento de `dev` em 24/09** (#220), com os jobs mantidos. O boletim do TempoOK segue sem acervo (#129). O destino das 32h do item 2.1 será pedido à Alup em **30/09**. Dossiê em **23/10** se Hubspot e BBCE chegarem até 12/10. Esse indicador não representa horas realizadas nem percentual de homologação |
 | 3 — Sistemas internos | 155h · marco 26,72% | **~6%** | Caminho de banco pronto (ADR 008: Oracle, MySQL e SQL Server, drivers puro-Python, testado sem rede) e, desde 23/09, a **orquestração do item 3.5 entregue** (peso estimado de 10h de 155h): o fluxo do Cloud Workflows existe em `infra/modules/orquestracao` e não cria recurso enquanto a cadeia estiver vazia. **Nenhuma fonte iniciada** — bloqueadas por VPN e credencial (A7, **bloqueante, não atrasado**: o contrato dá até 16/11; a pauta pediu 09/11). O ambiente deixou de ser parte do problema em 23/09: com os projetos criados, a rota de rede entre o GCP e a rede da Alup passa a ser configurável assim que a VPN for liberada |
-| 4 — Planilhas e handoff | 105h · marco 18,10% | **~44%** | Motor S2 Data Intake pronto; lake, zonas, ativos, *aspect types*, glossário (19 termos) e anotações (26 Gold) do Knowledge Catalog completos em 26/09; **bucket de entrada** para as planilhas criado (#211), com os exemplos pedidos à Alup até 01/10; **glossário de negócio declarado em código em 26/09** (19 termos, ADR 014; validado com `terraform validate`, `apply` no próximo deploy de `dev`). **Runbook de incidente escrito em 26/09** ([`runbook/incidentes.md`](runbook/incidentes.md)): um caminho por alerta do monitoramento, diagnóstico por `bronze._execucoes` e reprocessamento pelo workflow. **Anotações das 26 Gold de negócio** (domínio, responsável e origem) aplicadas em `dev` e `hml` em 26/09, conferidas direto na API do Dataplex. **Indicadores proporcionais** (item 4.4): `gold.indicadores_mensais` e a tela `/indicadores` **no ar em `dev` e `hml`**. **Histórico de 24 meses (09/2024–09/2026) reprocessado em `dev` em 28/09** para geração, disponibilidade e constrained-off: disponibilidade e fator de capacidade cobrem os 24 meses, taxa de corte cobre 22 (dois meses de 2024 sem o campo de origem, excluídos por decisão explícita no SQL — #287). PLD real e armazenamento seguem com 2 meses; `hml` segue com 2 meses em todos os indicadores. A leitura "razão técnica não é KPI" pendente de aceite da Alup (ADRs 005 e 012, adendos de 27/09). Faltam os templates (G3/#142) e o handoff. Gold sem KPI nesta fase (ADR 012) |
+| 4 — Planilhas e handoff | 105h · marco 18,10% | **~44%** | Motor S2 Data Intake pronto; lake, zonas, ativos, *aspect types*, glossário (19 termos) e anotações (26 Gold) do Knowledge Catalog completos em 26/09; **bucket de entrada** para as planilhas criado (#211), com os exemplos pedidos à Alup até 01/10; **glossário de negócio declarado em código em 26/09** (19 termos, ADR 014; validado com `terraform validate`, `apply` no próximo deploy de `dev`). **Runbook de incidente escrito em 26/09** ([`runbook/incidentes.md`](runbook/incidentes.md)): um caminho por alerta do monitoramento, diagnóstico por `bronze._execucoes` e reprocessamento pelo workflow. **Anotações das 26 Gold de negócio** (domínio, responsável e origem) aplicadas em `dev` e `hml` em 26/09, conferidas direto na API do Dataplex. **Indicadores proporcionais** (item 4.4): `gold.indicadores_mensais` e a tela `/indicadores` **no ar em `dev` e `hml`**. **Histórico de 24 meses (09/2024–09/2026) reprocessado em `dev` em 28/09** para geração, disponibilidade e constrained-off: **conferido em 02/10:** `dev` com 25 meses em armazenamento, disponibilidade e taxa de corte, **22 no fator de capacidade** (jun–ago/2025 sem carga de geração) e 3 no PLD real; `hml` com 25 meses nos mesmos três, **11 no fator de capacidade** (recarga em janelas pendente) e 3 no PLD real. A leitura "razão técnica não é KPI" pendente de aceite da Alup (ADRs 005 e 012, adendos de 27/09). Faltam os templates (G3/#142) e o handoff. Gold sem KPI nesta fase (ADR 012) |
 
 > **Leitura da tabela.** Quatro das cinco ondas já têm entrega técnica, e
 > desde 24/09 as Ondas 0, 1 e 2 têm **carga real em BigQuery** — a Onda 1 com

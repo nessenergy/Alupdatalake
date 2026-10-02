@@ -69,7 +69,9 @@ entrega o resto.
 - **Unidade:** `DscUnidadeTerciaria` é `kW` (99.408) ou `MWh` (228.885) e é a
   grandeza da TUSD. A TE é R$/MWh e **é zero em toda linha em kW**.
 - **`,00` é zero de verdade** (TE zero em 144.645 linhas, TUSD zero em 5.388).
-  Nenhum valor vazio, nenhum negativo, no máximo 7 caracteres.
+  Nenhum valor vazio e no máximo 7 caracteres. **2.433 linhas (0,7%) têm TUSD ou TE negativa**, de 2010 a 2026 e
+  em dezenas de distribuidoras (mínimo −289,92; 1.190 delas em 2026): a ANEEL as publica assim, e a Silver as
+  mantém. Foi o Dataform que as achou, no primeiro carregamento do arquivo inteiro.
 - **Resolução vazia em 274 linhas** (CEA, 2026-04-13); **`DESPACHO` e `DSP
   RETIFICAÇÃO`** no lugar de resolução em 524 linhas; `N°` e `Nº` convivem. O
   número da resolução **não ordena no tempo** (a nº 3.556 é de 12/2025 e a
@@ -185,8 +187,8 @@ de pico e 62 s (com `tracemalloc` ligado, que encarece).
 - O arquivo real foi baixado em 02/10/2026 e lido pelo conector, sem fixture: 328.293
   linhas, **nenhuma recusada** pelo schema, na janela cheia; 50.202 na janela de
   09/2025 a 02/10/2026.
-- Cabeçalho, separador, encoding, tipos, vazios, `,00`, negativos e chaves repetidas
-  foram medidos no arquivo inteiro.
+- Cabeçalho, separador, encoding, tipos, vazios, `,00` e chaves repetidas foram medidos no arquivo inteiro. Os
+  negativos, não: a medição inicial só olhou a janela de 400 dias, e o arquivo inteiro os tem (ver acima).
 - A fixture (`tests/fixtures/aneel_tarifas.csv`) tem 11 linhas **reais** do arquivo.
 - A Gold e a Silver foram lidas pelo `sqlglot` (`tests/unit/test_sql.py`).
 

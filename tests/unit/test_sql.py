@@ -414,3 +414,9 @@ def test_saude_trata_execucao_sem_fim_como_erro() -> None:
     assert "status = 'EM_EXECUCAO'" in sql
     assert "INTERVAL 40 MINUTE" in sql
     assert "NOT EXISTS" in sql
+
+
+def test_silver_das_tarifas_nao_reprova_valor_negativo_que_a_aneel_publica() -> None:
+    """2.433 linhas do arquivo real têm TUSD ou TE negativa; a asserção de piso em zero reprovou o Dataform (02/10)."""
+    caminho = Path(__file__).resolve().parents[2] / "definitions" / "silver" / "aneel_tarifas.sqlx"
+    assert ">= 0" not in caminho.read_text(encoding="utf-8").split("SELECT", 1)[0]

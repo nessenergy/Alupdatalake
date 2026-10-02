@@ -10,7 +10,6 @@ config {
     nonNull: ["data_referencia", "fim_vigencia", "cnpj_distribuidora", "base_tarifaria", "subgrupo", "modalidade", "unidade"],
     rowConditions: [
       "fim_vigencia >= data_referencia",
-      "COALESCE(tusd, 0) >= 0 AND COALESCE(te, 0) >= 0",
       "base_tarifaria IN ('Tarifa de Aplicação', 'Base Econômica')",
       "unidade IN ('kW', 'MWh')"
     ]
@@ -29,6 +28,9 @@ config {
 -- O arquivo ainda traz 516 chaves repetidas COM a mesma resolução (2010 a 2018),
 -- que a origem não resolve: o desempate é pelo maior valor, só para o resultado
 -- ser determinístico, e não tem sentido regulatório.
+-- TUSD e TE negativas existem na origem (2.433 linhas, 0,7%, de 2010 a 2026 e em dezenas de distribuidoras, até
+-- -289,92) e ficam: é o que a ANEEL publica. Uma asserção de piso em zero reprovou o Dataform em 02/10, no
+-- primeiro carregamento do arquivo inteiro; a medição anterior só olhava a janela de 400 dias.
 -- `Não se aplica` vira NULL (classe, subclasse, detalhe, posto, acessante): é
 -- ausência de critério, não um valor.
 SELECT

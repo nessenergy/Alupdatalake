@@ -48,16 +48,22 @@ armazenamento, que são a maior parcela da conta do lake, não a conta inteira.
 | `execucoes` | INT64 | quantidade de jobs no dia, por fonte, camada e consulta |
 | `bytes_varridos` | INT64 | soma de bytes processados — o que se lê, não o que se cobra |
 | `custo_query_usd` | FLOAT64 | bytes **faturados** convertidos pela tarifa; respeita o mínimo por job |
-| `custo_armazenamento_usd` | FLOAT64 | rateio diário do custo mensal de armazenamento ativo do Bronze |
+| `custo_armazenamento_usd` | FLOAT64 | rateio diário do custo mensal de armazenamento ativo do Bronze. **Só nas linhas de armazenamento** (`consulta = 'armazenamento'`, uma por tabela e dia); nas linhas de consulta vale 0 |
 | `linhas_carregadas` | INT64 | do `_execucoes`; é o denominador que separa "fonte cara" de "fonte cara à toa" |
 | `variacao_vs_media` | FLOAT64 | desvio contra a média móvel de 7 dias da própria consulta |
 
-### Duas escolhas que precisam estar explícitas
+### Três escolhas que precisam estar explícitas
 
 **`bytes_varridos` e `custo_query_usd` não são proporcionais.** O custo usa
 bytes *faturados*, que respeitam o mínimo de 10 MB por job; o varrido é o
 número real. Consulta pequena e frequente custa mais do que o varrido sugere —
 e é exatamente esse o caso que o campo separado revela.
+
+**O armazenamento tem linhas próprias.** Até 02/10 ele era juntado às consultas pelo rótulo `fonte`
+do job. Como a consulta do Dataform não leva esse rótulo, nenhum nome de tabela casava e o custo de
+armazenamento sumia da tela; se casasse, repetiria em cada consulta do dia. Agora cada tabela Bronze gera uma
+linha por dia com consulta (`consulta = 'armazenamento'`, `camada = 'bronze'`, `fonte` = nome da tabela), e o
+Portal a soma no gasto do dia e na conta da fonte, sem tratá-la como consulta.
 
 **`variacao_vs_media` separa "é cara" de "ficou cara".** Só a segunda é
 acionável. Uma consulta consistentemente cara é um fato conhecido; uma que

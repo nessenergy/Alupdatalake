@@ -279,6 +279,7 @@ ESTILO = """<style>
 .ad-qrow{grid-template-columns:22px minmax(0,1fr) auto}.ad-qrow__meta{grid-column:2;text-align:left}
 }
 /* ---------- 13. Peças do Portal fora do pacote de design ---------- */
+.ad-nota{margin:0;font:400 14px/1.45 var(--font-text);color:var(--muted-foreground)}
 .ad-lista{width:100%;border-collapse:collapse;font:400 16px/1.4 var(--font-text)}
 .ad-lista th{text-align:left;padding:8px 10px;border-bottom:2px solid var(--border);font:700 13px/1.2 var(--font-text);letter-spacing:.06em;text-transform:uppercase;color:var(--muted-foreground)}
 .ad-lista td{padding:8px 10px;border-bottom:1px solid var(--border)}

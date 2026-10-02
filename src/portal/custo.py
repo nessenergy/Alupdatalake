@@ -61,6 +61,13 @@ TARIFA_EXECUCAO_JOB_USD = Decimal("0.004")
 # que é exatamente o nosso hoje.
 MINIMO_BYTES_FATURADOS = 10 * 1024**2
 
+# Projetar o mês a partir de poucos dias é multiplicar ruído: dois dias de recarga e deploy viraram,
+# em hml, uma projeção cinco vezes maior que o gasto dos últimos 30 dias (02/10).
+DIAS_MINIMOS_PARA_PROJETAR = 7
+
+# Como o Gold chama o custo de job sem o rótulo `fonte`: é o caso de toda consulta do Dataform.
+SEM_ROTULO = "não rotulado"
+
 # Os 8 domínios analíticos da resposta da Alup ao item B1, de 11/09:
 # `docs/arquitetura/dominios-analiticos.md`. Deixou de ser agrupamento
 # provisório por afinidade — a visão de diretoria fala o vocabulário que a
@@ -238,6 +245,11 @@ class Orcamento:
     def estoura(self) -> bool:
         return self.projetado_usd > self.orcado_usd
 
+    @property
+    def projecao_confiavel(self) -> bool:
+        """Só projeta o mês com dias suficientes para a média querer dizer alguma coisa."""
+        return self.dias_decorridos >= DIAS_MINIMOS_PARA_PROJETAR
+
 
 @dataclass(frozen=True)
 class PainelCusto:
@@ -251,6 +263,15 @@ class PainelCusto:
     @property
     def total_usd(self) -> Decimal:
         return sum((d.total_usd for d in self.dias), Decimal(0))
+
+    @property
+    def parcela_sem_rotulo(self) -> float:
+        """Fatia do custo que o Gold não consegue atribuir a uma fonte (0 a 1)."""
+        total = sum((f.total_usd for f in self.fontes), Decimal(0))
+        if not total:
+            return 0.0
+        sem = sum((f.total_usd for f in self.fontes if f.fonte == SEM_ROTULO), Decimal(0))
+        return float(sem / total)
 
     @property
     def por_dominio(self) -> list[tuple[str, Decimal]]:

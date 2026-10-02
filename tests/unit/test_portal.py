@@ -22,25 +22,25 @@ def cliente():
 
 
 def test_pagina_mostra_a_view_e_as_linhas(cliente) -> None:
-    corpo = cliente.get("/").get_data(as_text=True)
+    corpo = cliente.get("/dado").get_data(as_text=True)
     assert "cambio_mensal" in corpo
     assert "2026-08" in corpo
     assert "5.4501" in corpo
 
 
 def test_pagina_diz_quando_foi_a_ultima_ingestao(cliente) -> None:
-    corpo = cliente.get("/").get_data(as_text=True)
+    corpo = cliente.get("/dado").get_data(as_text=True)
     assert "26/08/2026 09:00" in corpo
     assert "bcb_cambio_ptax" in corpo
 
 
 def test_dado_simulado_e_rotulado_como_tal(cliente) -> None:
-    corpo = cliente.get("/").get_data(as_text=True)
+    corpo = cliente.get("/dado").get_data(as_text=True)
     assert "Dados de exemplo" in corpo  # ninguém pode confundir com dado do lake
 
 
 def test_identidade_vem_do_cabecalho_do_iap(cliente) -> None:
-    corpo = cliente.get("/", headers={CABECALHO_IDENTIDADE: "accounts.google.com:fulano@alupar.com.br"}).get_data(
+    corpo = cliente.get("/dado", headers={CABECALHO_IDENTIDADE: "accounts.google.com:fulano@alupar.com.br"}).get_data(
         as_text=True
     )
     assert "fulano@alupar.com.br" in corpo
@@ -48,7 +48,7 @@ def test_identidade_vem_do_cabecalho_do_iap(cliente) -> None:
 
 
 def test_sem_cabecalho_a_tela_diz_que_nao_ha_autenticacao(cliente) -> None:
-    assert "não autenticado" in cliente.get("/").get_data(as_text=True)
+    assert "não autenticado" in cliente.get("/dado").get_data(as_text=True)
 
 
 def test_conteudo_de_celula_e_escapado(cliente, monkeypatch: pytest.MonkeyPatch) -> None:
@@ -60,7 +60,7 @@ def test_conteudo_de_celula_e_escapado(cliente, monkeypatch: pytest.MonkeyPatch)
         fonte_ultima_ingestao="<b>x</b>",
     )
     monkeypatch.setattr("src.portal.app.obter_provedor", lambda: type("P", (), {"painel": lambda _s, _v: malicioso})())
-    corpo = cliente.get("/").get_data(as_text=True)
+    corpo = cliente.get("/dado").get_data(as_text=True)
     assert "<script>" not in corpo
     assert "&lt;script&gt;" in corpo
 
@@ -74,7 +74,7 @@ def test_celula_vazia_vira_travessao_nao_none(cliente, monkeypatch: pytest.Monke
         fonte_ultima_ingestao=None,
     )
     monkeypatch.setattr("src.portal.app.obter_provedor", lambda: type("P", (), {"painel": lambda _s, _v: vazio})())
-    corpo = cliente.get("/").get_data(as_text=True)
+    corpo = cliente.get("/dado").get_data(as_text=True)
     assert "<td>—</td>" in corpo
     assert "None" not in corpo
     assert "Nenhuma ingestão registrada" in corpo
@@ -239,12 +239,12 @@ def _cliente_em_modo_real(monkeypatch: pytest.MonkeyPatch):
 
 def test_modo_real_sem_identidade_responde_403(monkeypatch: pytest.MonkeyPatch) -> None:
     """Deploy com --allow-unauthenticated ou IAP mal configurado não serve dado."""
-    resposta = _cliente_em_modo_real(monkeypatch).get("/")
+    resposta = _cliente_em_modo_real(monkeypatch).get("/dado")
     assert resposta.status_code == 403
     assert b"Acesso restrito" in resposta.data
 
 
-@pytest.mark.parametrize("rota", ["/", "/lake", "/custo"])
+@pytest.mark.parametrize("rota", ["/dado", "/lake", "/custo"])
 def test_a_trava_vale_para_toda_tela_com_dado(monkeypatch: pytest.MonkeyPatch, rota: str) -> None:
     assert _cliente_em_modo_real(monkeypatch).get(rota).status_code == 403
 
@@ -269,7 +269,7 @@ def test_modo_real_com_identidade_do_iap_passa(monkeypatch: pytest.MonkeyPatch) 
 
 def test_modo_simulado_nao_e_travado(cliente) -> None:
     """Desenvolvimento local não tem IAP na frente e não serve dado real."""
-    assert cliente.get("/").status_code == 200
+    assert cliente.get("/dado").status_code == 200
 
 
 # ------------------------------------------------- endurecimento das respostas
@@ -304,7 +304,7 @@ def test_recusa_por_falta_de_identidade_tambem_e_endurecida(cliente, monkeypatch
 
     monkeypatch.setattr(modulo, "get_settings", lambda: _cfg_real())
 
-    resposta = cliente.get("/")
+    resposta = cliente.get("/dado")
 
     assert resposta.status_code == 403
     assert resposta.headers["X-Content-Type-Options"] == "nosniff"
@@ -330,7 +330,7 @@ def test_falha_do_provedor_nao_vaza_o_motivo_na_tela(cliente, monkeypatch) -> No
     # queremos justamente exercitar o handler, como em produção.
     cliente.application.config.update(TESTING=False, PROPAGATE_EXCEPTIONS=False)
     try:
-        resposta = cliente.get("/")
+        resposta = cliente.get("/dado")
         corpo = resposta.get_data(as_text=True)
     finally:
         cliente.application.config.update(TESTING=True, PROPAGATE_EXCEPTIONS=None)
@@ -371,7 +371,7 @@ def test_os_dominios_usados_sao_os_oito_documentados():
 # ------------------------------------------------ identidade do produto (ADR 022)
 
 
-@pytest.mark.parametrize("rota", ["/", "/lake", "/custo"])
+@pytest.mark.parametrize("rota", ["/dado", "/lake", "/custo"])
 def test_o_produto_nao_carrega_a_marca_da_ness(cliente, rota) -> None:
     """O Portal é da Alup (cláusula 7ª): a identidade da ness. vale para o que a
     ness. emite, não para o que ela entrega. Nem a cor, nem o nome."""
@@ -381,7 +381,7 @@ def test_o_produto_nao_carrega_a_marca_da_ness(cliente, rota) -> None:
     assert "ness." not in corpo
 
 
-@pytest.mark.parametrize("rota", ["/", "/lake", "/custo"])
+@pytest.mark.parametrize("rota", ["/dado", "/lake", "/custo"])
 def test_todas_as_telas_usam_o_mesmo_tema(cliente, rota) -> None:
     """O design system da Alup entra trocando os tokens de um lugar só. Tela com
     estilo próprio escapa da troca — foi assim que a `/` divergiu."""
@@ -402,4 +402,4 @@ def test_indicadores_simulado_e_rotulado(cliente) -> None:
 
 
 def test_barra_de_navegacao_tem_indicadores(cliente) -> None:
-    assert 'href="/indicadores"' in cliente.get("/").get_data(as_text=True)
+    assert 'href="/indicadores"' in cliente.get("/dado").get_data(as_text=True)

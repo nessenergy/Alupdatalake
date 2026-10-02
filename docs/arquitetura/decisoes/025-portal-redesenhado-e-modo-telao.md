@@ -60,6 +60,10 @@ cada leitura por 300 s (`PORTAL_CACHE_SEGUNDOS`; `0` desliga). As views mudam po
 ingestão, então cinco minutos não escondem nada. Erro não é guardado, e o carimbo
 "consultado às" mostra a hora em que o dado foi lido de verdade, não a da página.
 
+**Abertura.** O endereço raiz do Portal (`/`) abre em Indicadores: redireciona para
+`/indicadores` e leva a consulta junto, de modo que `/?telao=1` já entra no rodízio. A tela de
+dado de negócio passa a ser `/dado`, e a navegação começa por Indicadores.
+
 **Casca comum.** Faixa de topo, navegação e carimbo iguais nas quatro rotas
 (`src/portal/pagina.py`). O carimbo diz "consultado às HH:MM (Brasília)": o Portal sabe
 quando consultou, não quando o dado chegou.

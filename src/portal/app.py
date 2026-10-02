@@ -24,7 +24,7 @@ import logging
 from datetime import datetime
 from typing import TYPE_CHECKING, Any
 
-from flask import Flask, Response, request
+from flask import Flask, Response, redirect, request
 from src.core.config import get_settings
 from src.core.observabilidade import configurar_logging
 from src.core.seguranca import sanitizar
@@ -124,6 +124,13 @@ def _falha(exc: Exception) -> tuple[str, int]:
 
 
 @app.get("/")
+def raiz() -> Response:
+    """A tela de abertura é a de indicadores. O que vier na consulta (como `?telao=1`) segue junto."""
+    consulta = request.query_string.decode("utf-8", errors="ignore")
+    return redirect(f"/indicadores?{consulta}" if consulta else "/indicadores")
+
+
+@app.get("/dado")
 def painel() -> Response:
     cfg = get_settings()
     provedor = obter_provedor()
@@ -302,5 +309,5 @@ def _pagina(dados: Painel, usuario: str, *, simulado: bool, agora: datetime | No
         f"<tbody>{linhas}</tbody></table></div>"
     )
     return pagina(
-        titulo="Dado de negócio", rota="/", usuario=usuario, banda=banda, corpo=corpo, aviso=aviso, agora=agora
+        titulo="Dado de negócio", rota="/dado", usuario=usuario, banda=banda, corpo=corpo, aviso=aviso, agora=agora
     )

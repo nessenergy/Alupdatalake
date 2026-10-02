@@ -8,10 +8,12 @@ tela antes disso. A troca é a variável `portal_provedor`.
 from __future__ import annotations
 
 import re
+import threading
+import time
 from dataclasses import dataclass, field
 from datetime import UTC, date, datetime, timedelta
 from decimal import Decimal
-from typing import Any, Protocol
+from typing import TYPE_CHECKING, Any, Protocol
 
 from src.core.bigquery import cliente
 from src.core.config import get_settings
@@ -27,6 +29,9 @@ from src.portal.custo import (
     custo_de_armazenamento_dia,
     custo_de_query,
 )
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
 
 
 @dataclass(frozen=True)
@@ -634,6 +639,75 @@ class ProvedorBigQuery:
         return PainelCusto(dias=dias_custo, fontes=fontes, consultas=consultas, orcamento=orcamento)
 
 
+class ProvedorComCache:
+    """Guarda cada leitura por `ttl` segundos, para o telão não consultar o BigQuery a cada 20 s.
+
+    O BigQuery cobra no mínimo 10 MiB por consulta, mesmo varrendo quase nada, e cada
+    consulta leva de 1 a 3 s. As views de saúde, volumetria, custo e indicadores mudam
+    por lote de ingestão, não por segundo: guardar por alguns minutos não esconde nada.
+    Erro não é guardado. `consultado_em` devolve quando o dado foi lido de verdade,
+    para a tela não afirmar uma hora que não foi a da consulta.
+    """
+
+    def __init__(
+        self,
+        base: ProvedorDados,
+        ttl: float,
+        *,
+        relogio: Callable[[], float] = time.monotonic,
+        agora: Callable[[], datetime] | None = None,
+    ) -> None:
+        self.ttl = ttl
+        self._base = base
+        self._relogio = relogio
+        self._agora = agora or (lambda: datetime.now(UTC))
+        self._guardado: dict[tuple[Any, ...], tuple[float, datetime, Any]] = {}
+        # Uma trava só: fila de leituras novas é melhor que várias iguais ao mesmo tempo.
+        self._trava = threading.Lock()
+
+    def _ler(self, nome: str, *args: Any) -> Any:
+        chave = (nome, *args)
+        with self._trava:
+            achado = self._guardado.get(chave)
+            if achado and self._relogio() - achado[0] < self.ttl:
+                return achado[2]
+            valor = getattr(self._base, nome)(*args)
+            self._guardado[chave] = (self._relogio(), self._agora(), valor)
+            return valor
+
+    def painel(self, view: str) -> Painel:
+        return self._ler("painel", view)
+
+    def saude(self) -> list[SaudeConector]:
+        return self._ler("saude")
+
+    def volumetria(self, dias: int = 30) -> list[SerieVolumetria]:
+        return self._ler("volumetria", dias)
+
+    def custo(self, dias: int = 30) -> PainelCusto:
+        return self._ler("custo", dias)
+
+    def indicadores(self, meses: int = 12) -> list[Indicador]:
+        return self._ler("indicadores", meses)
+
+    def consultado_em(self, *nomes: str) -> datetime | None:
+        """O instante da leitura mais antiga entre as pedidas, ou None se ainda não houve."""
+        with self._trava:
+            instantes = [quando for (nome, *_), (_, quando, _) in self._guardado.items() if nome in nomes]
+        return min(instantes) if instantes else None
+
+
+_COM_CACHE: ProvedorComCache | None = None
+
+
 def obter_provedor() -> ProvedorDados:
     """Provedor conforme a configuração. `simulado` enquanto A3 não chega."""
-    return ProvedorBigQuery() if get_settings().portal_provedor == "bigquery" else ProvedorSimulado()
+    global _COM_CACHE  # noqa: PLW0603
+    cfg = get_settings()
+    if cfg.portal_provedor != "bigquery":
+        return ProvedorSimulado()
+    if cfg.portal_cache_segundos <= 0:
+        return ProvedorBigQuery()
+    if _COM_CACHE is None or _COM_CACHE.ttl != cfg.portal_cache_segundos:
+        _COM_CACHE = ProvedorComCache(ProvedorBigQuery(), cfg.portal_cache_segundos)
+    return _COM_CACHE

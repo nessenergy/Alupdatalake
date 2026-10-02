@@ -41,6 +41,11 @@ class Settings(BaseSettings):
     portal_provedor: str = Field(default="simulado", description="'simulado' ou 'bigquery' (ver ADR 005)")
     portal_view: str = Field(default="cambio_mensal", description="View Gold exibida pelo Portal MVP")
     portal_limite_linhas: int = Field(default=200, description="Teto de linhas lidas por request")
+    portal_cache_segundos: int = Field(
+        default=300,
+        ge=0,
+        description="Quanto tempo o Portal guarda cada leitura do BigQuery; 0 desliga (o telão consulta a cada 20 s)",
+    )
     portal_orcamento_mensal_usd: float = Field(
         default=120.0, description="Orçamento mensal de nuvem, em USD, contra o qual a rota /custo compara"
     )

@@ -87,7 +87,7 @@ existe em Gold. Ordenados pelo B1.
 | **Fontes a conectar** | — a hidrologia (EAR e ENA) entrou em 15/09 |
 | **Granularidade** | submercado e hora, para o PLD; submercado e dia, para a carga; vértice de entrega, para a curva |
 | **Cadência** | PLD diário, com o mês corrente (desde 28/09); carga diária; curva por pregão |
-| **Gold hoje** | `pld_mensal_submercado`, `carga_mensal_submercado`, `mercado_mensal_submercado`, `armazenamento_e_afluencia_mensal`, `curva_forward_vigente`, `agentes_ccee`, `agentes_por_classe_mensal`, `encargos_setoriais_mensal`, `cvu_estrutural_vigente_usina`, `armazenamento_mensal_bacia`, `afluencia_mensal_bacia`, `armazenamento_mensal_reservatorio`, `afluencia_mensal_reservatorio`, `intercambio_mensal_subsistemas`, `intercambio_internacional_mensal`, `exportacao_mensal`, `balanco_energia_mensal_subsistema`, `cmo_mensal_submercado`, `desvio_carga_programada_verificada_mensal`, `volume_espera_mensal_reservatorio`, `cvu_mensal_termica`, `cvu_mensal_merchant`, `cvu_mensal_conjuntural`, `cvu_conjuntural_revisao_mensal`, `reserva_encargo_mensal`, `consumo_referencia_energia_reserva_mensal`, `consumo_classe_agente_mensal` (Aditivo 01) |
+| **Gold hoje** | `pld_mensal_submercado`, `carga_mensal_submercado`, `mercado_mensal_submercado`, `armazenamento_e_afluencia_mensal`, `curva_forward_vigente`, `agentes_ccee`, `agentes_por_classe_mensal`, `encargos_setoriais_mensal`, `cvu_estrutural_vigente_usina`, `armazenamento_mensal_bacia`, `afluencia_mensal_bacia`, `armazenamento_mensal_reservatorio`, `afluencia_mensal_reservatorio`, `intercambio_mensal_subsistemas`, `intercambio_internacional_mensal`, `exportacao_mensal`, `balanco_energia_mensal_subsistema`, `cmo_mensal_submercado`, `desvio_carga_programada_verificada_mensal`, `volume_espera_mensal_reservatorio`, `cvu_mensal_termica`, `cvu_mensal_merchant`, `cvu_mensal_conjuntural`, `cvu_conjuntural_revisao_mensal`, `reserva_encargo_mensal`, `consumo_referencia_energia_reserva_mensal`, `consumo_classe_agente_mensal`, `balanco_dessem_mensal_subsistema` (Aditivo 01) |
 | **Situação** | **pronto do lado da CCEE** — faltam EAR e ENA, que são do ONS |
 
 É o domínio mais maduro e o que sustenta os demais: quase toda pergunta
@@ -113,7 +113,7 @@ do Gabriel Barreto.
 | **Fontes a conectar** | térmicas do ONS (`cvu-usitermica`, `geracao-termica-despacho-2`) · `fator-capacidade-2` · DESSEM · **Oracle FMB** (Onda 3, medição do portfólio) — o constrained-off de eólica e solar entrou em 15/09 |
 | **Granularidade** | **usina** — a granularidade que A7 fixa para dado de portfólio |
 | **Cadência** | semanal para o cadastro público; mensal para a geração da CCEE; diária para medição, na janela das 22h às 6h (C9) |
-| **Gold hoje** | `parque_gerador`, `geracao_mensal_usina`, `geracao_mensal_usina_ons`, `capacidade_instalada_vigente_usina`, `disponibilidade_mensal_usina`, `restricao_coff_mensal_usina`, `de_para_usina` |
+| **Gold hoje** | `parque_gerador`, `geracao_mensal_usina`, `geracao_mensal_usina_ons`, `capacidade_instalada_vigente_usina`, `disponibilidade_mensal_usina`, `restricao_coff_mensal_usina`, `de_para_usina`, `previsao_x_programado_mensal_usina` (Aditivo 01) |
 | **Situação** | **parcial** — geração na granularidade de usina entregue; `codigo_usina` cruza ANEEL↔ONS desde 15/09 (`gold.de_para_usina`); falta a sigla interna (#141) |
 
 **Tem um bloqueio nomeado**: o item D1 informa que a Alup identifica os ativos

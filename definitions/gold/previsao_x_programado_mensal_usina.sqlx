@@ -1,0 +1,28 @@
+config {
+  type: "table",
+  schema: "gold",
+  tags: ["gold"],
+  dependOnDependencyAssertions: true
+}
+
+-- Gold: previsão versus programado de eólicas e solares por mês e usina. Aditivo 01.
+--
+-- Responde "o quanto o que o ONS previu para cada usina eólica ou solar
+-- divergiu do que programou no mês". A divergência é a diferença absoluta média
+-- por patamar de meia hora, em MW, e a média com sinal (programado menos
+-- previsto) mostra se a programação ficou acima ou abaixo da previsão. Sem KPI
+-- (ADR 012): nenhuma razão entre as séries.
+
+SELECT
+  periodo_apuracao,
+  codigo_usina_pdp,
+  ARRAY_AGG(nome_usina ORDER BY data_referencia DESC LIMIT 1)[OFFSET(0)] AS nome_usina,
+  COUNT(DISTINCT data_referencia)              AS dias,
+  COUNT(*)                                     AS patamares,
+  AVG(previsao_mw)                             AS previsao_media_mw,
+  AVG(programado_mw)                           AS programado_medio_mw,
+  AVG(programado_mw - previsao_mw)             AS diferenca_media_mw,
+  AVG(ABS(programado_mw - previsao_mw))        AS diferenca_absoluta_media_mw,
+  MAX(ABS(programado_mw - previsao_mw))        AS diferenca_absoluta_maxima_mw
+FROM ${ref("silver", "ons_programacao_previsao")}
+GROUP BY periodo_apuracao, codigo_usina_pdp

@@ -106,6 +106,8 @@ DOMINIO_ANALITICO = {
     "ons_carga_verificada": "Mercado de Energia",
     "ons_volume_espera": "Mercado de Energia",
     "ons_cvu_termica": "Mercado de Energia",
+    "ons_programacao_previsao": "Geração e Operacional",
+    "ons_balanco_dessem": "Mercado de Energia",
     "ons_ena": "Mercado de Energia",
     # Cadastro do mercado: dá nome ao que nas outras fontes é código.
     "ccee_perfil": "Mercado de Energia",

@@ -1,0 +1,27 @@
+config {
+  type: "operations",
+  schema: "bronze",
+  hasOutput: true,
+  tags: ["bronze"]
+}
+
+-- Bronze: Balanço de energia do DESSEM por subsistema e patamar de meia hora (ONS). Aditivo 01.
+-- Um arquivo por dia, 192 linhas cada (4 subsistemas x 48 patamares).
+CREATE TABLE IF NOT EXISTS ${self()} (
+  data_referencia         DATE       NOT NULL OPTIONS(description="Dia da programação (din_programacaodia)"),
+  patamar                 INT64      NOT NULL OPTIONS(description="Patamar de meia hora, 1 a 48 (num_patamar)"),
+  submercado              STRING     NOT NULL OPTIONS(description="N, NE, S ou SE (cod_subsistema)"),
+  demanda_mw              NUMERIC    NOT NULL OPTIONS(description="MW (val_demanda)"),
+  geracao_renovavel_mw    NUMERIC    NOT NULL OPTIONS(description="MW (val_geracao_renovavel)"),
+  geracao_hidraulica_mw   NUMERIC    NOT NULL OPTIONS(description="MW (val_geracao_hidraulica)"),
+  geracao_termica_mw      NUMERIC    NOT NULL OPTIONS(description="MW (val_geracao_termica)"),
+  consumo_elevatoria_mw   NUMERIC    NOT NULL OPTIONS(description="Consumo das usinas elevatórias, MW (val_cons_elevatoria)"),
+
+  _ingestao_id        STRING    NOT NULL,
+  _ingestao_timestamp TIMESTAMP NOT NULL,
+  _fonte              STRING    NOT NULL,
+  _schema_versao      STRING    NOT NULL
+)
+PARTITION BY DATE(_ingestao_timestamp)
+CLUSTER BY data_referencia, submercado
+OPTIONS(description="Balanço de energia do DESSEM — camada Bronze, append-only");

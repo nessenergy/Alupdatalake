@@ -586,3 +586,9 @@ def test_provedor_real_usa_cache_e_zero_desliga(monkeypatch: pytest.MonkeyPatch)
     get_settings.cache_clear()
     assert isinstance(obter_provedor(), ProvedorBigQuery)
     get_settings.cache_clear()
+
+
+def test_bloco_da_diretoria_se_chama_resumo(cliente) -> None:
+    corpo = cliente.get("/custo").get_data(as_text=True)
+    assert '<h2 class="ad-block__title" id="dir">Resumo</h2>' in corpo
+    assert "Numa olhada" not in corpo

@@ -149,7 +149,7 @@ def _diretoria(dados: PainelCusto, *, telao: bool) -> str:
     )
     return (
         '<section class="ad-block" aria-labelledby="dir"><p class="ad-block__eyebrow">3 · Diretoria</p>'
-        '<h2 class="ad-block__title" id="dir">Numa olhada</h2>'
+        '<h2 class="ad-block__title" id="dir">Resumo</h2>'
         '<dl class="ad-glance">'
         f"<div><dt>Custo mensal projetado</dt><dd>{usd(dados.orcamento.projetado_usd)}</dd></div>"
         f"<div><dt>Gasto em 30 dias</dt><dd>{usd(dados.total_usd)}</dd></div>"

@@ -479,3 +479,110 @@ def test_degraus_de_altura_vem_depois_das_regras_que_eles_sobrescrevem() -> None
     ultima_altura_base = ESTILO.rindex("--telao-band-h:296px")
     assert ESTILO.index("@media (max-height:1040px)") > ultima_altura_base
     assert ESTILO.index("@media (max-height:820px)") > ESTILO.index("@media (max-height:1040px)")
+
+
+# --- cache das leituras --------------------------------------------------------
+
+
+class _BaseContada:
+    """Conta quantas vezes o BigQuery seria consultado."""
+
+    def __init__(self) -> None:
+        self.chamadas: list[str] = []
+        self.falhar = False
+
+    def saude(self):
+        self.chamadas.append("saude")
+        if self.falhar:
+            raise RuntimeError("bigquery fora")
+        return [_conector("ons_carga")]
+
+    def volumetria(self, dias=30):
+        self.chamadas.append(f"volumetria{dias}")
+        return []
+
+
+def _com_cache(ttl=300):
+    from src.portal.dados import ProvedorComCache
+
+    base = _BaseContada()
+    tempo = {"t": 0.0, "dia": datetime(2026, 10, 2, 12, 0, tzinfo=UTC)}
+    cache = ProvedorComCache(
+        base, ttl, relogio=lambda: tempo["t"], agora=lambda: tempo["dia"] + timedelta(seconds=tempo["t"])
+    )
+    return cache, base, tempo
+
+
+def test_cache_evita_consultar_o_bigquery_de_novo_dentro_do_prazo() -> None:
+    cache, base, tempo = _com_cache()
+    cache.saude()
+    tempo["t"] = 299
+    cache.saude()
+    assert base.chamadas == ["saude"]  # o telão pede a cada 20 s e o BigQuery foi consultado uma vez
+
+
+def test_cache_expira_depois_do_prazo() -> None:
+    cache, base, tempo = _com_cache()
+    cache.saude()
+    tempo["t"] = 301
+    cache.saude()
+    assert base.chamadas == ["saude", "saude"]
+
+
+def test_argumento_diferente_e_outra_leitura() -> None:
+    cache, base, _ = _com_cache()
+    cache.volumetria(30)
+    cache.volumetria(7)
+    cache.volumetria(30)
+    assert base.chamadas == ["volumetria30", "volumetria7"]
+
+
+def test_erro_nao_e_guardado() -> None:
+    cache, base, _ = _com_cache()
+    base.falhar = True
+    with pytest.raises(RuntimeError):
+        cache.saude()
+    base.falhar = False
+    assert cache.saude()  # a falha de agora não vira resposta ruim pelos próximos minutos
+    assert base.chamadas == ["saude", "saude"]
+
+
+def test_consultado_em_e_a_hora_da_leitura_nao_a_da_pagina() -> None:
+    cache, _, tempo = _com_cache()
+    assert cache.consultado_em("saude") is None
+    cache.saude()
+    tempo["t"] = 120  # a página é montada dois minutos depois, com o dado do cache
+    cache.saude()
+    assert cache.consultado_em("saude") == datetime(2026, 10, 2, 12, 0, tzinfo=UTC)
+
+
+def test_consultado_em_toma_a_leitura_mais_antiga_das_pedidas() -> None:
+    cache, _, tempo = _com_cache()
+    cache.saude()
+    tempo["t"] = 60
+    cache.volumetria()
+    assert cache.consultado_em("saude", "volumetria") == datetime(2026, 10, 2, 12, 0, tzinfo=UTC)
+    assert cache.consultado_em("volumetria") == datetime(2026, 10, 2, 12, 1, tzinfo=UTC)
+
+
+def test_tela_mostra_a_hora_em_que_o_dado_foi_lido(cliente, monkeypatch: pytest.MonkeyPatch) -> None:
+    provedor = _provedor(saude=[_conector("ons_carga")])
+    provedor.consultado_em = lambda *leituras: datetime(2026, 10, 2, 17, 32, tzinfo=UTC)
+    monkeypatch.setattr("src.portal.app.obter_provedor", lambda: provedor)
+    assert ">14:32</time> (Brasília)" in cliente.get("/lake").get_data(as_text=True)
+
+
+def test_provedor_real_usa_cache_e_zero_desliga(monkeypatch: pytest.MonkeyPatch) -> None:
+    from src.core.config import get_settings
+    from src.portal import dados
+    from src.portal.dados import ProvedorBigQuery, ProvedorComCache, obter_provedor
+
+    monkeypatch.setenv("PORTAL_PROVEDOR", "bigquery")
+    monkeypatch.setattr(dados, "_COM_CACHE", None)
+    get_settings.cache_clear()
+    assert isinstance(obter_provedor(), ProvedorComCache)
+    assert obter_provedor() is obter_provedor()  # um só, para o cache valer entre requisições
+    monkeypatch.setenv("PORTAL_CACHE_SEGUNDOS", "0")
+    get_settings.cache_clear()
+    assert isinstance(obter_provedor(), ProvedorBigQuery)
+    get_settings.cache_clear()

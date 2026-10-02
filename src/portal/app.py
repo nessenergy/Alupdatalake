@@ -126,9 +126,13 @@ def _falha(exc: Exception) -> tuple[str, int]:
 @app.get("/")
 def painel() -> Response:
     cfg = get_settings()
-    dados = obter_provedor().painel(cfg.portal_view)
+    provedor = obter_provedor()
+    dados = provedor.painel(cfg.portal_view)
     usuario = _usuario(request.headers.get(CABECALHO_IDENTIDADE))
-    return Response(_pagina(dados, usuario, simulado=cfg.portal_provedor != "bigquery"), mimetype="text/html")
+    return Response(
+        _pagina(dados, usuario, simulado=cfg.portal_provedor != "bigquery", agora=_instante(provedor, "painel")),
+        mimetype="text/html",
+    )
 
 
 @app.get("/lake")
@@ -151,6 +155,7 @@ def lake() -> Response:
             corpo=saude.corpo(fontes, telao=telao is not None),
             aviso=aviso,
             telao=telao,
+            agora=_instante(provedor, "saude", "volumetria"),
         )
     )
 
@@ -163,7 +168,8 @@ def custo() -> Response:
     enquadramento contratual em `docs/arquitetura/portal-finops.md`.
     """
     cfg = get_settings()
-    dados = obter_provedor().custo()
+    provedor = obter_provedor()
+    dados = provedor.custo()
     telao = _telao("/custo", nome="Custo de nuvem")
     aviso = (
         "Dados de exemplo, derivados da volumetria simulada — o ambiente GCP ainda não existe (pendência A3). "
@@ -180,6 +186,7 @@ def custo() -> Response:
             corpo=custo_tela.corpo(dados, telao=telao is not None),
             aviso=aviso,
             telao=telao,
+            agora=_instante(provedor, "custo"),
         )
     )
 
@@ -192,7 +199,8 @@ def indicadores() -> Response:
     telão os cartões vêm em páginas de 12, para nenhum ficar escondido por rolagem.
     """
     cfg = get_settings()
-    linhas = obter_provedor().indicadores()
+    provedor = obter_provedor()
+    linhas = provedor.indicadores()
     prontos = indicadores_tela.cartoes(linhas)
     paginas = indicadores_tela.paginas_do_telao(len(prontos))
     numero = min(max(_inteiro(request.args.get("p"), 1), 1), paginas)
@@ -211,6 +219,7 @@ def indicadores() -> Response:
             corpo=indicadores_tela.corpo(prontos, pagina=numero if telao else None),
             aviso=aviso,
             telao=telao,
+            agora=_instante(provedor, "indicadores"),
         )
     )
 
@@ -219,6 +228,12 @@ def indicadores() -> Response:
 def sonda() -> dict[str, str]:
     """Sonda do Cloud Run: responde sem tocar no BigQuery."""
     return {"status": "ok"}
+
+
+def _instante(provedor: Any, *leituras: str) -> datetime | None:
+    """Quando o dado foi lido de verdade. Só o provedor com cache sabe; sem ele, é agora."""
+    consultado_em = getattr(provedor, "consultado_em", None)
+    return consultado_em(*leituras) if consultado_em else None
 
 
 def _responder(documento: str) -> Response:
@@ -259,7 +274,7 @@ def _celula(valor: Any) -> str:
     return html.escape(str(valor))
 
 
-def _pagina(dados: Painel, usuario: str, *, simulado: bool) -> str:
+def _pagina(dados: Painel, usuario: str, *, simulado: bool, agora: datetime | None = None) -> str:
     cabecalhos = "".join(f"<th>{html.escape(c)}</th>" for c in dados.colunas)
     linhas = "".join(
         "<tr>" + "".join(f"<td>{_celula(linha.get(coluna))}</td>" for coluna in dados.colunas) + "</tr>"
@@ -286,4 +301,6 @@ def _pagina(dados: Painel, usuario: str, *, simulado: bool) -> str:
         f'<div class="ad-rolagem"><table class="ad-lista"><thead><tr>{cabecalhos}</tr></thead>'
         f"<tbody>{linhas}</tbody></table></div>"
     )
-    return pagina(titulo="Dado de negócio", rota="/", usuario=usuario, banda=banda, corpo=corpo, aviso=aviso)
+    return pagina(
+        titulo="Dado de negócio", rota="/", usuario=usuario, banda=banda, corpo=corpo, aviso=aviso, agora=agora
+    )

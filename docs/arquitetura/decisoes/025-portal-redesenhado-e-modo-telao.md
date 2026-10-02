@@ -52,6 +52,14 @@ exibição, não tela nova, filtro nem exportação, então não contradiz a ADR
 telão cada tela cabe em 1920×1080 sem rolagem: a Saúde passa a três colunas compactas acima de
 26 fontes (hml tem 41: ONS 19, CCEE 17, ANEEL 1, BCB 2, IBGE 1, TempoOK 1), os Indicadores paginam e o Custo mostra o topo de cada lista.
 
+**Cache das leituras.** O telão recarrega a cada 20 s, e cada recarga consultava o BigQuery.
+Medido em hml em 02/10: cada consulta do Portal varre menos de 1 MiB, mas o BigQuery cobra no
+mínimo 10 MiB por consulta e cada uma leva de 1 a 3 s; uma volta do rodízio são cerca de
+30 MiB faturados e, deixado ligado o mês inteiro, passa de 1 TiB. O Portal passa a guardar
+cada leitura por 300 s (`PORTAL_CACHE_SEGUNDOS`; `0` desliga). As views mudam por lote de
+ingestão, então cinco minutos não escondem nada. Erro não é guardado, e o carimbo
+"consultado às" mostra a hora em que o dado foi lido de verdade, não a da página.
+
 **Casca comum.** Faixa de topo, navegação e carimbo iguais nas quatro rotas
 (`src/portal/pagina.py`). O carimbo diz "consultado às HH:MM (Brasília)": o Portal sabe
 quando consultou, não quando o dado chegou.

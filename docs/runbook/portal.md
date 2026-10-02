@@ -42,6 +42,13 @@ Variáveis (todas com padrão em `src/core/config.py`):
 | `/custo` | custo de nuvem, em três leituras |
 | `/saude` | sonda do Cloud Run — responde sem tocar no BigQuery |
 
+### Cache das leituras
+
+O Portal guarda cada leitura do BigQuery por 300 s (variável `PORTAL_CACHE_SEGUNDOS`, `0`
+desliga), para o modo telão não consultar a cada 20 s. O carimbo "consultado às" mostra a
+hora da leitura. Depois de uma carga, o dado novo aparece em até cinco minutos; reiniciar
+a revisão do Cloud Run zera o cache.
+
 ### Modo telão
 
 Para a reunião: abra `<url do Portal>/indicadores?telao=1` (ou `/lake?telao=1`,

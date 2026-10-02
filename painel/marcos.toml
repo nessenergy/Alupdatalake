@@ -76,7 +76,7 @@ codigo = "0.15"
 titulo = "Portal MVP com autenticação"
 horas = 8
 pronto = 0.95
-nota = "grupo alup.alertas confirmado em 29/09, com 7 usuários nomeados; falta o primeiro login efetivo"
+nota = "no ar em dev e hml; redesenhado em 02/10 (ADR 025); grupo alup.alertas confirmado em 29/09, com 7 usuários nomeados; falta o primeiro login efetivo da Alup"
 
 [[onda]]
 numero = 1
@@ -174,7 +174,7 @@ codigo = "2.4"
 titulo = "TempoOK"
 horas = 18
 pronto = 0.8
-nota = "previsão de ENA carregando em dev; boletins dependem do acervo"
+nota = "previsão de ENA carregando em dev; em hml o segredo está vazio (ADR 020); boletins dependem do acervo"
 
 [[onda.item]]
 codigo = "2.5"
@@ -224,6 +224,7 @@ codigo = "3.5"
 titulo = "Orquestração em Cloud Workflows"
 horas = 10
 pronto = 1.0
+nota = "mecanismo escrito e validado (infra/modules/orquestracao); só é implantado quando houver fonte interna, e hoje não há workflow em dev nem em hml"
 
 [[onda.item]]
 codigo = "3.6"
@@ -259,21 +260,21 @@ codigo = "4.3"
 titulo = "Knowledge Catalog"
 horas = 20
 pronto = 1.0
-nota = "lake, zonas, ativos, aspect types, glossário (19 termos) e anotações das 26 Gold"
+nota = "lake, zonas, ativos, aspect types, glossário (19 termos) e anotações de 44 das 47 Gold (as 3 operacionais ficam de fora)"
 
 [[onda.item]]
 codigo = "4.4"
 titulo = "Gold consolidadas"
 horas = 15
 pronto = 0.7
-nota = "indicadores_mensais com 24 meses de historico em dev; hml e o aceite da leitura da ADR 012 pendentes"
+nota = "indicadores_mensais com 25 meses em dev (fator de capacidade com 22) e em hml (fator de capacidade com 11: geração e constrained-off do ONS recarregando em janelas); aceite da leitura da ADR 012 pendente"
 
 [[onda.item]]
 codigo = "4.5"
 titulo = "Documentação final e dicionário"
 horas = 10
 pronto = 0.3
-nota = "dicionário das 27 entidades existentes"
+nota = "dicionário das 44 fontes registradas, em 43 documentos (eólica e fotovoltaica de restrição compartilham um)"
 
 [[onda.item]]
 codigo = "4.6"
@@ -300,18 +301,39 @@ estado = "feito"
 
 [[marco]]
 data = 2026-09-29
-titulo = "Acesso da Alup ao Portal confirmado, carga de 24 meses em hml, evidência de linhas por conector publicada"
+titulo = "Acesso da Alup ao Portal confirmado, evidência de linhas por conector publicada e carga de 24 meses em hml (completa em 42 das 44 fontes; geração por usina e constrained-off eólico do ONS ficaram parciais por tempo limite)"
 estado = "feito"
 
 [[marco]]
 data = 2026-10-01
 titulo = "Reunião de aceite das Ondas 0 e 1"
-estado = "previsto"
-dono = "Alup"
+estado = "feito"
+
+[[marco]]
+data = 2026-10-01
+titulo = "Pedido de aprovação por escrito das Ondas 0 e 1 enviado a Eduardo Pires, com o dossiê (marcos 1 e 2, R$ 53.760)"
+estado = "feito"
+
+[[marco]]
+data = 2026-10-02
+titulo = "Portal redesenhado para o telão no ar em hml, com Indicadores como tela de abertura"
+estado = "feito"
 
 [[marco]]
 data = 2026-10-12
 titulo = "Credenciais da Onda 2"
+estado = "previsto"
+dono = "Alup"
+
+[[marco]]
+data = 2026-10-16
+titulo = "Fim da janela contratual da Onda 1 (marco 2, R$ 30.720)"
+estado = "previsto"
+dono = "Alup"
+
+[[marco]]
+data = 2026-10-19
+titulo = "Prazo contratual dos tokens da Onda 2: CCEE, BBCE, Hubspot e TempoOK (cláusula 3ª)"
 estado = "previsto"
 dono = "Alup"
 

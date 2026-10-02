@@ -1,6 +1,6 @@
 # Ações que dependem de gente
 
-Atualizado em **2026-09-23**.
+Atualizado em **2026-09-23**; a seção 5 foi revisada em 02/10.
 
 Este documento responde uma pergunta só: **o que uma pessoa precisa fazer, e
 como exatamente se faz.** Ele não repete o que já está automatizado nem o que
@@ -238,7 +238,7 @@ acompanhamento vive.
 
 ## 5. Ordem, se for para fazer uma coisa de cada vez
 
-1. **Token do Dataform** (item 1) — é o único que trava trabalho técnico hoje.
+1. **Token do Dataform** (item 1) — **resolvido em 24/09**; nenhuma ação humana trava trabalho técnico hoje (revisado em 02/10).
 2. **VPN e credenciais da Onda 3** (item 3) — bloqueante, com prazo contratual em
    16/11 (a pauta pediu 09/11); é o único com cláusula financeira associada.
 3. **Grupos do IAP e billing export** (item 3) — o export perde histórico a

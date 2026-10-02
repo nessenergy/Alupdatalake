@@ -286,6 +286,15 @@ ESTILO = """<style>
 .ad-rolagem{overflow-x:auto}
 .ad-premissa{margin:0;padding:12px 16px;border-radius:var(--radius);background:var(--muted);font:400 14px/1.5 var(--font-text);color:var(--muted-foreground)}
 .ad-page--telao .ad-sources--densa{column-count:3;column-gap:40px}
+/* Telão com muitas fontes (hml tem 41): três colunas, linha de uma altura só e tira menor.
+   A regra do container (<640px) desceria a tira para baixo do nome e dobraria cada linha. */
+.ad-page--telao .ad-sources--densa{--cell-w:6px;--cell-gap:2px;--cell-h:16px;--strip-w:calc(30 * 6px + 29 * 2px)}
+.ad-page--telao .ad-sources--densa .ad-row>summary{grid-template-columns:20px minmax(0,1fr) 78px var(--strip-w) 0;grid-template-areas:"ico name age strip chev";row-gap:0;column-gap:10px;padding:2px 8px;min-height:26px}
+.ad-page--telao .ad-sources--densa .ad-chev{display:none}
+.ad-page--telao .ad-sources--densa .ad-row__name{font-size:17px}
+.ad-page--telao .ad-sources--densa .ad-row__age{font-size:15px}
+.ad-page--telao .ad-sources--densa .ad-group__head{min-height:30px}
+.ad-page--telao .ad-sources--densa .ad-group{margin-bottom:8px}
 .ad-page--telao .ad-quem{display:none}
 /* Cartão de indicador: o recorte vai abaixo do título, que assim nunca quebra em três linhas. */
 .ad-card__head{flex-direction:column;align-items:flex-start;gap:6px;min-height:0}

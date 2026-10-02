@@ -49,8 +49,8 @@ Portal ainda não tem. A cor da composição do gasto deixou de ser a cor de ate
 `<meta http-equiv="refresh">`: Indicadores (em páginas de 12 cartões) → Saúde →
 Custo → volta. Sem JavaScript, e o modo só liga com o parâmetro. É um modo de
 exibição, não tela nova, filtro nem exportação, então não contradiz a ADR 005. No
-telão cada tela cabe em 1920×1080 sem rolagem: a Saúde passa a três colunas acima de
-26 fontes, os Indicadores paginam e o Custo mostra o topo de cada lista.
+telão cada tela cabe em 1920×1080 sem rolagem: a Saúde passa a três colunas compactas acima de
+26 fontes (hml tem 41: ONS 19, CCEE 17, ANEEL 1, BCB 2, IBGE 1, TempoOK 1), os Indicadores paginam e o Custo mostra o topo de cada lista.
 
 **Casca comum.** Faixa de topo, navegação e carimbo iguais nas quatro rotas
 (`src/portal/pagina.py`). O carimbo diz "consultado às HH:MM (Brasília)": o Portal sabe
@@ -67,6 +67,9 @@ quando consultou, não quando o dado chegou.
 - **Duas decisões de negócio ficam como estavam**: a anomalia de custo é consulta
   com custo mais que o dobro da própria média, e o atraso é o limite de silêncio do
   alerta. Mudar qualquer uma é decisão separada.
+- **Limite do telão na Saúde:** um grupo com mais de ~22 fontes deixa de caber em uma
+  coluna e o fim dele é cortado. Hoje o maior (ONS) tem 19. Se passar, a saída é paginar
+  a Saúde por grupo, como os Indicadores.
 - **Não verificado** no navegador real: o layout em celular (o navegador sem cabeça
   não renderiza abaixo de ~500 px) e o texto exato do erro de Secret Manager em
   `hml`, de que depende a regex de `aguardando_credencial`. Se a fonte da Onda 2

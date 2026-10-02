@@ -440,3 +440,21 @@ def test_saude_do_bigquery_traz_execucoes_e_credencial(monkeypatch: pytest.Monke
     assert conector.aguardando_credencial is True
     assert conector.execucoes_30d == 4
     assert conector.linhas_carregadas_total == 0
+
+
+def test_telao_com_muitas_fontes_usa_o_layout_denso() -> None:
+    """hml tem 41 fontes: em duas colunas a linha dobra de altura e o telão corta o fim da lista."""
+    muitas = tela_saude.montar([_conector(f"ons_fonte_{i:02d}") for i in range(41)], [])
+    poucas = tela_saude.montar([_conector(f"ons_fonte_{i:02d}") for i in range(26)], [])
+    assert "ad-sources--densa" in tela_saude.corpo(muitas, telao=True)
+    assert "ad-sources--densa" not in tela_saude.corpo(poucas, telao=True)
+    assert "ad-sources--densa" not in tela_saude.corpo(muitas)  # fora do telão a página rola
+
+
+def test_layout_denso_do_telao_mantem_a_tira_na_mesma_linha_do_nome() -> None:
+    from src.portal.estilo import ESTILO
+
+    regra = [r for r in ESTILO.splitlines() if r.startswith(".ad-page--telao .ad-sources--densa .ad-row>summary")]
+    assert regra
+    assert '"ico name age strip chev"' in regra[0]  # vence a regra de container que desce a tira
+    assert "--strip-w:calc(30 * 6px + 29 * 2px)" in ESTILO  # a variável derivada precisa ser refeita

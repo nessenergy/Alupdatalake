@@ -45,6 +45,10 @@ variable "conectores_criticos" {
     ons_disponibilidade_usina               = 780 # mensal (dia 7) + folga
     ons_restricao_coff_eolica               = 780 # mensal (dia 7) + folga
     ons_restricao_coff_fotovoltaica         = 780 # mensal (dia 7) + folga
+    ons_dados_hidrologicos                  = 780 # mensal (dia 8) + folga (Aditivo 01)
+    ons_energia_vertida_turbinavel          = 780 # mensal (dia 8) + folga (Aditivo 01)
+    ons_geracao_termica_despacho            = 780 # mensal (dia 8) + folga (Aditivo 01)
+    ons_fator_capacidade                    = 780 # mensal (dia 8) + folga (Aditivo 01)
     ibge_ipca                               = 780 # mensal + folga
     ccee_pld                                = 26  # diário desde 28/09 (dataset `pld_horario`)
     ccee_perfil                             = 180 # semanal + folga

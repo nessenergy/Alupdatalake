@@ -269,6 +269,44 @@ variable "conectores" {
       memoria      = "1Gi"
       cpu          = "1"
     }
+    ons_dados_hidrologicos = {
+      # Aditivo 01. CSV mensal de ~20 MB e ~122 mil linhas (09/2026). Dia 8, para
+      # não disputar a janela dos quatro mensais do dia 7; os quatro do Aditivo
+      # ficam a meia hora um do outro.
+      #
+      # Memória: o pico medido em dry-run local com o mês de 09/2026, lendo o
+      # arquivo em stream, foi de 98 MiB. 1 GiB mantém a folga dos outros mensais
+      # pesados, que cobre o payload do `load_table_from_json` por fatia e o raw
+      # no GCS, que o dry-run não exercita.
+      cron         = "0 4 8 * *"
+      ultimos_dias = 40 # o mês fechado e o anterior (republicação)
+      memoria      = "1Gi"
+      cpu          = "1"
+    }
+    ons_energia_vertida_turbinavel = {
+      # Aditivo 01. ~16 MB e ~109 mil linhas por mês; pico medido de 09/2026 em
+      # dry-run local: ver `ons_dados_hidrologicos` (mesma ordem de grandeza).
+      cron         = "30 4 8 * *"
+      ultimos_dias = 40
+      memoria      = "1Gi"
+      cpu          = "1"
+    }
+    ons_geracao_termica_despacho = {
+      # Aditivo 01. ~33 MB e ~103 mil linhas por mês, 47 colunas. Medido em
+      # dry-run local com 09/2026: 95 MiB de pico, 28 s.
+      cron         = "0 5 8 * *"
+      ultimos_dias = 40
+      memoria      = "1Gi"
+      cpu          = "1"
+    }
+    ons_fator_capacidade = {
+      # Aditivo 01. O maior dos quatro: ~41 MB e ~170 mil linhas por mês. Medido em
+      # dry-run local com 09/2026: 91 MiB de pico, 15 s.
+      cron         = "30 5 8 * *"
+      ultimos_dias = 40
+      memoria      = "1Gi"
+      cpu          = "1"
+    }
     ccee_contrato_montante = {
       # Publicação mensal; dia 6, depois do PLD (dia 5). Janela de 120 dias
       # cobre a recontabilização (ADR 016), como as demais entidades mensais.

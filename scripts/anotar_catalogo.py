@@ -78,6 +78,10 @@ ANOTACOES: dict[str, dict[str, str]] = {
     },  # Aditivo 01
     "volume_espera_mensal_reservatorio": {"dominio": "mercado_de_energia", "responsavel": INTELIGENCIA},  # Aditivo 01
     "cvu_mensal_termica": {"dominio": "mercado_de_energia", "responsavel": INTELIGENCIA},  # Aditivo 01
+    "operacao_hidraulica_mensal_reservatorio": {
+        "dominio": "mercado_de_energia",
+        "responsavel": INTELIGENCIA,
+    },  # Aditivo 01
     "balanco_dessem_mensal_subsistema": {"dominio": "mercado_de_energia", "responsavel": INTELIGENCIA},  # Aditivo 01
     # 2 · Geração e Operacional — usinas do SIN, dado público
     "parque_gerador": {"dominio": "geracao_e_operacional", "responsavel": INTELIGENCIA},
@@ -86,6 +90,12 @@ ANOTACOES: dict[str, dict[str, str]] = {
     "capacidade_instalada_vigente_usina": {"dominio": "geracao_e_operacional", "responsavel": INTELIGENCIA},
     "disponibilidade_mensal_usina": {"dominio": "geracao_e_operacional", "responsavel": INTELIGENCIA},
     "restricao_coff_mensal_usina": {"dominio": "geracao_e_operacional", "responsavel": INTELIGENCIA},
+    "vertimento_turbinavel_mensal_usina": {
+        "dominio": "geracao_e_operacional",
+        "responsavel": INTELIGENCIA,
+    },  # Aditivo 01
+    "despacho_termico_mensal_usina": {"dominio": "geracao_e_operacional", "responsavel": INTELIGENCIA},  # Aditivo 01
+    "fator_capacidade_mensal_usina": {"dominio": "geracao_e_operacional", "responsavel": INTELIGENCIA},  # Aditivo 01
     "de_para_usina": {"dominio": "geracao_e_operacional", "responsavel": INTELIGENCIA},
     "previsao_x_programado_mensal_usina": {
         "dominio": "geracao_e_operacional",

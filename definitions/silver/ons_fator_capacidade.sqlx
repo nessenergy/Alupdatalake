@@ -1,0 +1,55 @@
+config {
+  type: "view",
+  schema: "silver",
+  tags: ["silver"],
+  assertions: {
+    uniqueKey: ["instante", "id_ons"],
+    nonNull: ["data_referencia", "instante", "id_ons", "submercado"],
+    rowConditions: [
+      "submercado IN ('N','NE','S','SE')"
+    ]
+  }
+}
+
+-- Silver: fator de capacidade de eólicas e solares por usina (ou conjunto) e
+-- hora, higienizada e deduplicada. Aditivo 01.
+-- Dedup por (instante, id_ons): o nome do conjunto não é único (233 nomes para
+-- 238 ids em 09/2026) e o CEG vem vazio nos conjuntos. Vence a ingestão mais
+-- recente: o ONS revisa dado publicado.
+-- Sem condição de sinal nem de teto: a origem publica geração verificada
+-- negativa (até -1,4 MWmed) e fator acima de 1 (1,05 em 09/2026; 1,82 em
+-- 09/2024). Recusar esconderia o defeito da origem.
+SELECT
+  data_referencia,
+  submercado,
+  codigo_usina,  -- CEG; NULL em conjunto de usinas
+  CAST(NULL AS STRING) AS agente_ccee,  -- o ONS não usa perfil da CCEE
+  FORMAT_DATE('%Y-%m', data_referencia) AS periodo_apuracao,
+  CAST(NULL AS STRING) AS periodo_apuracao_ccee,  -- a origem não declara período próprio
+  instante,
+  EXTRACT(HOUR FROM instante) AS hora,
+  nome_subsistema,
+  uf,
+  nome_uf,
+  codigo_ponto_conexao,
+  nome_ponto_conexao,
+  localizacao,
+  modalidade_operacao,
+  tipo_usina,
+  nome_usina_conjunto,
+  id_ons,
+  latitude_coletora,
+  longitude_coletora,
+  latitude_ponto_conexao,
+  longitude_ponto_conexao,
+  geracao_programada_mwmed,
+  geracao_verificada_mwmed,
+  capacidade_instalada_mw,
+  fator_capacidade,
+  _ingestao_id,
+  _ingestao_timestamp
+FROM ${ref("bronze", "ons_fator_capacidade")}
+QUALIFY ROW_NUMBER() OVER (
+  PARTITION BY instante, id_ons
+  ORDER BY _ingestao_timestamp DESC
+) = 1

@@ -4,7 +4,7 @@ O **componente 07** do contrato: cada fonte entrega, junto do conector e das
 views, a documentação de campos e a linhagem origem → Bronze → Silver → Gold.
 Este índice diz o que já existe, o que falta e — importante — **por que falta**.
 
-Em **02/10/2026**, o índice cobre **44 fontes em 43 dicionários de fonte**
+Em **02/10/2026**, o índice cobre **52 fontes em 51 dicionários de fonte**
 (eólico e fotovoltaico compartilham um documento), além de **2 dicionários
 técnicos**. Bases reutilizáveis não entram nessa contagem. O contrato mantém
 **13 fontes**; entidade implementada não cria uma fonte contratual nova.
@@ -54,6 +54,10 @@ técnicos**. Bases reutilizáveis não entram nessa contagem. O contrato mantém
 | ONS — disponibilidade horária por usina | [`ons_disponibilidade_usina.md`](ons_disponibilidade_usina.md) | 1 | `submercado`, `codigo_usina` | `disponibilidade_mensal_usina` |
 | ONS — constrained-off eólico | [`ons_restricao_coff.md`](ons_restricao_coff.md) | 1 | `submercado` | `restricao_coff_mensal_usina` |
 | ONS — constrained-off fotovoltaico | [`ons_restricao_coff.md`](ons_restricao_coff.md) | 1 | `submercado` | `restricao_coff_mensal_usina` |
+| ONS — dados hidrológicos por reservatório (horário) | [`ons_dados_hidrologicos.md`](ons_dados_hidrologicos.md) | Aditivo 01 | `submercado` | `operacao_hidraulica_mensal_reservatorio` |
+| ONS — energia vertida turbinável | [`ons_energia_vertida_turbinavel.md`](ons_energia_vertida_turbinavel.md) | Aditivo 01 | `submercado` | `vertimento_turbinavel_mensal_usina` |
+| ONS — geração térmica por motivo de despacho | [`ons_geracao_termica_despacho.md`](ons_geracao_termica_despacho.md) | Aditivo 01 | `submercado`, `codigo_usina` | `despacho_termico_mensal_usina` |
+| ONS — fator de capacidade de eólicas e solares | [`ons_fator_capacidade.md`](ons_fator_capacidade.md) | Aditivo 01 | `submercado`, `codigo_usina` | `fator_capacidade_mensal_usina` |
 | BCB — PTAX | [`bcb_cambio_ptax.md`](bcb_cambio_ptax.md) | 0 | — | `cambio_mensal` |
 | BCB — Selic e CDI | [`bcb_juros.md`](bcb_juros.md) | 1 | — | `juros_mensal` |
 | IBGE — IPCA | [`ibge_ipca.md`](ibge_ipca.md) | 1 | — | `inflacao_mensal` |

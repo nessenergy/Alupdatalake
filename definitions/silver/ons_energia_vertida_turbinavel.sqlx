@@ -1,0 +1,52 @@
+config {
+  type: "view",
+  schema: "silver",
+  tags: ["silver"],
+  assertions: {
+    uniqueKey: ["codigo_usina_modelo", "instante"],
+    nonNull: ["data_referencia", "instante", "codigo_usina_modelo", "submercado"],
+    rowConditions: [
+      "submercado IN ('N','NE','S','SE')"
+    ]
+  }
+}
+
+-- Silver: energia vertida turbinável por usina e hora, higienizada e
+-- deduplicada. Aditivo 01.
+-- Dedup por (codigo_usina_modelo, instante): o nome do reservatório não é a
+-- chave, e o CEG não vem na origem. Vence a ingestão mais recente: o ONS revisa
+-- dado publicado.
+-- Sem condição de sinal: não há valor negativo em 09/2026, e o que não foi
+-- visto na série não vira regra.
+SELECT
+  data_referencia,
+  submercado,
+  CAST(NULL AS STRING) AS codigo_usina,  -- `cod_usina` do ONS é código de modelo, não o CEG
+  CAST(NULL AS STRING) AS agente_ccee,  -- o ONS não usa perfil da CCEE
+  FORMAT_DATE('%Y-%m', data_referencia) AS periodo_apuracao,
+  CAST(NULL AS STRING) AS periodo_apuracao_ccee,  -- a origem não declara período próprio
+  instante,
+  EXTRACT(HOUR FROM instante) AS hora,
+  nome_subsistema,
+  bacia,
+  rio,
+  agente,
+  reservatorio,
+  codigo_usina_modelo,
+  geracao_mwmed,
+  disponibilidade_mwmed,
+  vazao_turbinada_m3s,
+  vazao_vertida_m3s,
+  vazao_vertida_nao_turbinavel_m3s,
+  produtividade_mw_por_m3s,
+  folga_geracao_mwmed,
+  energia_vertida_mwmed,
+  vazao_vertida_turbinavel_m3s,
+  energia_vertida_turbinavel_mwmed,
+  _ingestao_id,
+  _ingestao_timestamp
+FROM ${ref("bronze", "ons_energia_vertida_turbinavel")}
+QUALIFY ROW_NUMBER() OVER (
+  PARTITION BY codigo_usina_modelo, instante
+  ORDER BY _ingestao_timestamp DESC
+) = 1

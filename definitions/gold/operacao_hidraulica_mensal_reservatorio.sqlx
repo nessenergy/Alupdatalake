@@ -1,0 +1,42 @@
+config {
+  type: "table",
+  schema: "gold",
+  tags: ["gold"],
+  dependOnDependencyAssertions: true
+}
+
+-- Gold: operação hidráulica por reservatório e mês. Aditivo 01.
+--
+-- Responde "como cada reservatório operou no mês — quanto de volume útil, quanto
+-- entrou, quanto turbinou e quanto verteu, e por quantas horas verteu". É a
+-- visão horária resumida; o diário está em `armazenamento_mensal_reservatorio`
+-- e `afluencia_mensal_reservatorio`. Sem KPI (ADR 012).
+--
+-- Volume útil só entra nas estatísticas dentro de 0 a 100%. A origem publica
+-- valores fora dessa faixa (09/2026: de -1.917% a 836%, sobretudo em fio d'água,
+-- onde o volume útil não tem significado); misturá-los distorceria a média.
+-- As horas excluídas são contadas à parte, para que o mês com volume ruim não
+-- passe por mês medido. As demais colunas não têm filtro.
+SELECT
+  periodo_apuracao,
+  submercado,
+  bacia,
+  id_reservatorio,
+  ANY_VALUE(nome_reservatorio)  AS reservatorio,
+  ANY_VALUE(tipo_reservatorio)  AS tipo_reservatorio,
+  COUNT(*)                      AS horas_no_mes,
+  COUNTIF(volume_util_percentual BETWEEN 0 AND 100) AS horas_com_volume_valido,
+  COUNTIF(volume_util_percentual IS NOT NULL AND volume_util_percentual NOT BETWEEN 0 AND 100)
+                                AS horas_com_volume_fora_da_faixa,
+  AVG(IF(volume_util_percentual BETWEEN 0 AND 100, volume_util_percentual, NULL)) AS volume_util_medio_percentual,
+  MIN(IF(volume_util_percentual BETWEEN 0 AND 100, volume_util_percentual, NULL)) AS volume_util_minimo_percentual,
+  MAX(IF(volume_util_percentual BETWEEN 0 AND 100, volume_util_percentual, NULL)) AS volume_util_maximo_percentual,
+  AVG(nivel_montante_m)         AS nivel_montante_medio_m,
+  AVG(vazao_afluente_m3s)       AS vazao_afluente_media_m3s,
+  AVG(vazao_defluente_m3s)      AS vazao_defluente_media_m3s,
+  AVG(vazao_turbinada_m3s)      AS vazao_turbinada_media_m3s,
+  AVG(vazao_vertida_m3s)        AS vazao_vertida_media_m3s,
+  MAX(vazao_vertida_m3s)        AS vazao_vertida_maxima_m3s,
+  COUNTIF(vazao_vertida_m3s > 0) AS horas_vertendo
+FROM ${ref("silver", "ons_dados_hidrologicos")}
+GROUP BY periodo_apuracao, submercado, bacia, id_reservatorio

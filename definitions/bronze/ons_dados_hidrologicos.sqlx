@@ -1,0 +1,39 @@
+config {
+  type: "operations",
+  schema: "bronze",
+  hasOutput: true,
+  tags: ["bronze"]
+}
+
+-- Bronze: dados hidrológicos por reservatório, base horária (ONS, dados abertos,
+-- CSV mensal). Aditivo 01. ~122 mil linhas por mês (09/2026, 170 reservatórios).
+-- Colunas de medida anuláveis: vazio na origem é ausência, não zero.
+CREATE TABLE IF NOT EXISTS ${self()} (
+  data_referencia     DATE      NOT NULL OPTIONS(description="Dia do instante"),
+  instante            DATETIME  NOT NULL OPTIONS(description="Hora FIM: 01:00 cobre 00:00 a 00:59; o fim do dia vem como 23:59:00 (dicionário do ONS)"),
+  submercado          STRING    NOT NULL OPTIONS(description="N, NE, S, SE"),
+  nome_subsistema     STRING    NOT NULL,
+  tipo_reservatorio   STRING    NOT NULL OPTIONS(description="Ex.: Fio dagua, Reservatório com Usina; texto aparado (a origem vem em largura fixa)"),
+  bacia               STRING    NOT NULL,
+  id_reservatorio     STRING    NOT NULL OPTIONS(description="Identificador ONS do reservatório, aparado"),
+  nome_reservatorio   STRING    NOT NULL,
+  codigo_usina_modelo INT64     OPTIONS(description="Código da usina nos modelos de otimização do ONS (não é o CEG); vazio em reservatório sem usina ou fictício"),
+  nivel_montante_m                 NUMERIC OPTIONS(description="Nível a montante, m"),
+  nivel_jusante_m                  NUMERIC OPTIONS(description="Nível a jusante, m; vazio em parte dos reservatórios"),
+  volume_util_percentual           NUMERIC OPTIONS(description="Volume útil, %. Pode ser negativo e passar de 100 na origem (visto: -1.917 a 836)"),
+  vazao_afluente_m3s               NUMERIC OPTIONS(description="m3/s; pode ser negativa na origem"),
+  vazao_defluente_m3s              NUMERIC OPTIONS(description="m3/s"),
+  vazao_turbinada_m3s              NUMERIC OPTIONS(description="m3/s; vazio em reservatório sem usina"),
+  vazao_vertida_m3s                NUMERIC OPTIONS(description="m3/s"),
+  vazao_outras_estruturas_m3s      NUMERIC OPTIONS(description="m3/s; vazio na maior parte das linhas"),
+  vazao_transferida_m3s            NUMERIC OPTIONS(description="m3/s; negativa quando o reservatório recebe"),
+  vazao_vertida_nao_turbinavel_m3s NUMERIC OPTIONS(description="m3/s"),
+
+  _ingestao_id        STRING    NOT NULL,
+  _ingestao_timestamp TIMESTAMP NOT NULL,
+  _fonte              STRING    NOT NULL,
+  _schema_versao      STRING    NOT NULL
+)
+PARTITION BY DATE(_ingestao_timestamp)
+CLUSTER BY data_referencia, submercado
+OPTIONS(description="Dados hidrológicos horários por reservatório (ONS) — camada Bronze, append-only");

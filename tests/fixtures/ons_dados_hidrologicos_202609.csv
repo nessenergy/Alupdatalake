@@ -1,0 +1,11 @@
+id_subsistema;nom_subsistema;tip_reservatorio;nom_bacia;id_reservatorio;nom_reservatorio;cod_usina;din_instante;val_nivelmontante;val_niveljusante;val_volumeutil;val_vazaoafluente;val_vazaodefluente;val_vazaoturbinada;val_vazaovertida;val_vazaooutrasestruturas;val_vazaotransferida;val_vazaovertidanaoturbinavel
+N ;Norte;Reservatório com Usina                  ;AMAZONAS       ;AMUHBB;BALBINA             ;277;2026-09-01 01:00:00;50.01;27.43;76.49;220.0;1244.0;1244.0;0.0;;;0.0
+N ;Norte;Reservatório com Usina                  ;AMAZONAS       ;AMUHBB;BALBINA             ;277;2026-09-01 02:00:00;50.01;26.85;76.49;231.0;967.0;967.0;0.0;;;0.0
+N ;Norte;Reservatório com Usina                  ;AMAZONAS       ;AMUHBB;BALBINA             ;277;2026-09-01 03:00:00;50.01;26.35;76.49;238.0;587.0;587.0;0.0;;;0.0
+N ;Norte;Reservatório com Usina                  ;AMAZONAS       ;AMUHBB;BALBINA             ;277;2026-09-01 23:59:00;49.99;27.18;76.05;188.0;1095.0;1095.0;0.0;;;0.0
+N ;Norte;Reservatório com Usina                  ;AMAZONAS       ;AMUHBB;BALBINA             ;277;2026-09-02 01:00:00;49.98;26.85;75.83;0.0;977.0;977.0;0.0;;;0.0
+SE;Sudeste/Centro-Oeste;Fio dagua                               ;AMAZONAS       ;AMDA  ;DARDANELOS          ;310;2026-09-01 03:00:00;213.49;112.45;-4.58;44.0;46.0;29.0;0.0;21.0;0.0;0.0
+S ;Sul;Reservatório com Usina                  ;CAPIVARI       ;CASPSO;G. P. SOUZA         ;115;2026-09-28 17:00:00;842.69;;81.24;-4.0;53.0;21.0;32.0;;;0.0
+S ;Sul;Reservatório sem usina                  ;JACUI          ;JIBLNG;BLANG               ;;2026-09-01 01:00:00;793.57;;102.28;39.0;39.0;;29.0;11.0;;0.0
+S ;Sul;Reservatório com Usina                  ;IGUACU         ;IGSEGR;SEGREDO             ;76;2026-09-01 01:00:00;605.66;501.29;72.45;3773.0;4076.0;980.0;3096.0;;-160.0;0.0
+SE;Sudeste/Centro-Oeste;Fio dagua                               ;GRANDE         ;GRIGAR;IGARAPAVA           ;10;2026-09-10 17:00:00;511.92;495.66;29.57;;1106.0;1106.0;0.0;0.0;;0.0

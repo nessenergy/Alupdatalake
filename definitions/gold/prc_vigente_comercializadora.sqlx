@@ -1,0 +1,26 @@
+config {
+  type: "table",
+  schema: "gold",
+  tags: ["gold"],
+  dependOnDependencyAssertions: true
+}
+
+-- Gold: o PRC em vigor de cada comercializadora — a tabela publicada na data de atualização mais recente.
+-- `dias_desde_atualizacao` mostra a idade da tabela, não do carregamento: a página é lida toda semana e o PRC
+-- pode ficar meses sem mudar (a da ACE estava em 01/10/2025 quando o conector foi escrito). Sem KPI nem
+-- comparação entre comercializadoras (ADR 012).
+WITH ultima AS (
+  SELECT comercializadora, MAX(data_atualizacao) AS data_atualizacao
+  FROM ${ref("silver", "ace_prc")}
+  GROUP BY comercializadora
+)
+SELECT
+  p.comercializadora,
+  p.data_atualizacao,
+  DATE_DIFF(CURRENT_DATE(), p.data_atualizacao, DAY) AS dias_desde_atualizacao,
+  p.submercado,
+  p.tipo_energia,
+  p.prazo_meses,
+  p.preco_rs_mwh
+FROM ${ref("silver", "ace_prc")} AS p
+JOIN ultima AS u USING (comercializadora, data_atualizacao)

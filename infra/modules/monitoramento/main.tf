@@ -41,6 +41,7 @@ variable "conectores_criticos" {
     ons_cvu_termica                         = 180 # semanal + folga (Aditivo 01)
     aneel_siga                              = 180 # semanal + folga
     aneel_tarifas                           = 180 # semanal + folga
+    ace_prc                                 = 180 # semanal + folga
     ons_capacidade                          = 180 # semanal + folga
     ons_geracao_usina                       = 780 # mensal + folga
     ons_disponibilidade_usina               = 780 # mensal (dia 7) + folga

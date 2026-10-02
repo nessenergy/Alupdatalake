@@ -18,6 +18,8 @@ const limites_horas = {
   ons_geracao_exportacao: 26,
   ons_balanco_energia: 26,
   ons_cmo_semi_horario: 26,
+  ons_carga_programada: 26,
+  ons_carga_verificada: 26,
   ons_volume_espera: 26,
   ons_programacao_previsao: 26,
   ons_balanco_dessem: 26,

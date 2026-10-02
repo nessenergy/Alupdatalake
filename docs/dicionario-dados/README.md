@@ -25,6 +25,8 @@ técnicos**. Bases reutilizáveis não entram nessa contagem. O contrato mantém
 | ONS — geração para exportação | [`ons_geracao_exportacao.md`](ons_geracao_exportacao.md) | Aditivo 01 | — | `exportacao_mensal` |
 | ONS — balanço de energia | [`ons_balanco_energia.md`](ons_balanco_energia.md) | Aditivo 01 | `submercado` | `balanco_energia_mensal_subsistema` |
 | ONS — CMO semi-horário | [`ons_cmo_semi_horario.md`](ons_cmo_semi_horario.md) | Aditivo 01 | `submercado` | `cmo_mensal_submercado` |
+| ONS — carga programada (API) | [`ons_carga_programada.md`](ons_carga_programada.md) | Aditivo 01 | `submercado` (só nos 4 subsistemas) | `desvio_carga_programada_verificada_mensal` |
+| ONS — carga verificada (API) | [`ons_carga_verificada.md`](ons_carga_verificada.md) | Aditivo 01 | `submercado` (só nos 4 subsistemas) | `desvio_carga_programada_verificada_mensal` |
 | ONS — volume de espera recomendado | [`ons_volume_espera.md`](ons_volume_espera.md) | Aditivo 01 | `submercado` | `volume_espera_mensal_reservatorio` |
 | ONS — CVU das térmicas | [`ons_cvu_termica.md`](ons_cvu_termica.md) | Aditivo 01 | `submercado` | `cvu_mensal_termica` |
 | ONS — previsão versus programado (eólicas e solares) | [`ons_programacao_previsao.md`](ons_programacao_previsao.md) | Aditivo 01 | — | `previsao_x_programado_mensal_usina` |

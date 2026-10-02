@@ -102,6 +102,8 @@ DOMINIO_ANALITICO = {
     "ons_geracao_exportacao": "Mercado de Energia",
     "ons_balanco_energia": "Mercado de Energia",
     "ons_cmo_semi_horario": "Mercado de Energia",
+    "ons_carga_programada": "Mercado de Energia",
+    "ons_carga_verificada": "Mercado de Energia",
     "ons_volume_espera": "Mercado de Energia",
     "ons_cvu_termica": "Mercado de Energia",
     "ons_programacao_previsao": "Geração e Operacional",

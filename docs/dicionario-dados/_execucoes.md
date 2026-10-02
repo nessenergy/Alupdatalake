@@ -38,7 +38,7 @@ responde nesta tabela, sem abrir o orquestrador.
 | `origem_ingestao_id` | STRING | URI do raw relido | preenchido só em replay; liga o reprocessamento à execução original |
 | `janela_inicio` | DATE | parâmetro da execução | nenhum conector decide "hoje" sozinho |
 | `janela_fim` | DATE | parâmetro da execução | |
-| `status` | STRING | runner | `EM_EXECUCAO`, `SUCESSO` ou `ERRO` |
+| `status` | STRING | runner | `EM_EXECUCAO`, `SUCESSO` ou `ERRO`. A linha `EM_EXECUCAO` é gravada **ao começar** (melhor esforço); a linha final de mesmo `ingestao_id` vem ao terminar. Marca de início sem linha final há mais de 40 min é execução morta (tempo limite): `gold.saude_ingestao` a conta como erro |
 | `linhas_extraidas` | INT64 | contagem após `extrair()` | o que a fonte devolveu |
 | `linhas_invalidas` | INT64 | contagem de reprovações do schema | **é o sinal de mudança de layout na origem**; alerta dispara quando sobe |
 | `linhas_carregadas` | INT64 | retorno do load job | diferença para `extraidas` é o que foi descartado |

@@ -16,7 +16,7 @@ from typing import TYPE_CHECKING, Any
 
 from pydantic import BaseModel, ValidationError
 
-from src.core.bigquery import carregar_bronze, registrar_execucao
+from src.core.bigquery import carregar_bronze, registrar_execucao, registrar_inicio
 from src.core.config import get_settings
 from src.core.execucao import Execucao, Janela
 from src.core.linhagem import emitir as emitir_linhagem
@@ -105,6 +105,7 @@ class Conector(ABC):
     def _ingerir(self, execucao: Execucao, janela: Janela) -> Execucao:
         logger.info("[%s] ingestão %s janela=%s", self.rotulo, execucao.ingestao_id, janela)
         self._execucao = execucao
+        registrar_inicio(execucao)
 
         try:
 

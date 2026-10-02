@@ -50,6 +50,7 @@ variable "conectores_criticos" {
     ons_geracao_termica_despacho            = 780 # mensal (dia 8) + folga (Aditivo 01)
     ons_fator_capacidade                    = 780 # mensal (dia 8) + folga (Aditivo 01)
     ibge_ipca                               = 780 # mensal + folga
+    bcb_igpm                                = 780 # mensal + folga
     ccee_pld                                = 26  # diário desde 28/09 (dataset `pld_horario`)
     ccee_perfil                             = 180 # semanal + folga
     ccee_agente                             = 780 # mensal + folga

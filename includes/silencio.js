@@ -35,6 +35,7 @@ const limites_horas = {
   ons_geracao_termica_despacho: 780,
   ons_fator_capacidade: 780,
   ibge_ipca: 780,
+  bcb_igpm: 780,
   ccee_pld: 26,
   ccee_perfil: 180,
   ccee_agente: 780,

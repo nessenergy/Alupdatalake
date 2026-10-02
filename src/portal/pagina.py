@@ -22,10 +22,10 @@ BRASILIA = timezone(timedelta(hours=-3), "BRT")
 SEGUNDOS_POR_TELA = 20
 
 ROTAS = (
-    ("/", "Dado de negócio"),
     ("/indicadores", "Indicadores"),
     ("/lake", "Saúde do lake"),
     ("/custo", "Custo de nuvem"),
+    ("/dado", "Dado de negócio"),
 )
 
 FONTES = (
@@ -108,7 +108,7 @@ def pagina(
         classe = "ad-page ad-page--telao"
     else:
         refresh = ""
-        modo = f'<a class="ad-telao-link" href="{rota}?telao=1">modo telão</a>' if rota != "/" else ""
+        modo = f'<a class="ad-telao-link" href="{rota}?telao=1">modo telão</a>' if rota != "/dado" else ""
         classe = "ad-page"
     nota = f'<p class="ad-notice">{aviso}</p>' if aviso else ""
     return f"""<!doctype html>

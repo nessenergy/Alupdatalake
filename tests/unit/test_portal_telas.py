@@ -18,7 +18,7 @@ from src.portal.app import app
 from src.portal.dados import Indicador, ProvedorSimulado, SaudeConector, SerieVolumetria
 from src.portal.pagina import Telao, pagina, proxima_do_telao
 
-TELAS = ["/", "/lake", "/custo", "/indicadores"]
+TELAS = ["/dado", "/lake", "/custo", "/indicadores"]
 
 
 @pytest.fixture
@@ -200,7 +200,7 @@ def test_so_telao_igual_a_1_liga_o_modo(cliente) -> None:
 
 
 def test_dado_de_negocio_fica_fora_do_rodizio(cliente) -> None:
-    corpo = cliente.get("/?telao=1").get_data(as_text=True)
+    corpo = cliente.get("/dado?telao=1").get_data(as_text=True)
     assert "http-equiv" not in corpo
     assert "modo telão" not in corpo
 
@@ -340,7 +340,7 @@ def test_toda_tela_tem_o_cabecalho_fixo_com_a_navegacao(cliente, rota) -> None:
     assert '<nav class="ad-nav"' in cabecalho
     assert "position:sticky" in corpo
     assert cabecalho.count('aria-current="page"') == 1
-    for destino in ("/", "/indicadores", "/lake", "/custo"):
+    for destino in ("/dado", "/indicadores", "/lake", "/custo"):
         assert f'href="{destino}"' in cabecalho
 
 

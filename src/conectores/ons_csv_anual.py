@@ -69,6 +69,8 @@ class OnsCsvAnual(Conector):
     max_dias_por_requisicao = None  # o recorte é por ano de arquivo, não por dias
     caminho: ClassVar[str]
     coluna_data: ClassVar[str]
+    exige_algum_ano: ClassVar[bool] = False
+    """Se verdadeiro, a janela cujos anos todos vieram sem arquivo falha alto em vez de devolver zero linhas."""
 
     def __init__(self) -> None:
         self._sessao = criar_sessao()
@@ -84,12 +86,15 @@ class OnsCsvAnual(Conector):
         return "\n".join(decodificar(linha) for linha in resposta.content.splitlines())
 
     def extrair(self, janela: Janela) -> Iterator[dict[str, Any]]:
-        for ano in range(janela.inicio.year, janela.fim.year + 1):
+        anos = range(janela.inicio.year, janela.fim.year + 1)
+        publicados = 0
+        for ano in anos:
             logger.info("%s: baixando %d", self.rotulo, ano)
             conteudo = self._baixar_ano(ano)
             if conteudo is None:
                 logger.warning("%s: %d sem recurso publicado no catálogo, ignorado", self.rotulo, ano)
                 continue
+            publicados += 1
             for linha in csv.DictReader(StringIO(conteudo), delimiter=";"):
                 referencia = (linha.get(self.coluna_data) or "")[:10]
                 if not referencia:
@@ -97,3 +102,5 @@ class OnsCsvAnual(Conector):
                 if not (janela.inicio.isoformat() <= referencia <= janela.fim.isoformat()):
                     continue  # o arquivo é anual; a janela é o recorte pedido
                 yield linha
+        if self.exige_algum_ano and not publicados:
+            raise RuntimeError(f"{self.rotulo}: nenhum arquivo publicado para {list(anos)}")

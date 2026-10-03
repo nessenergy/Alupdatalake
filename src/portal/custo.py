@@ -109,6 +109,7 @@ DOMINIO_ANALITICO = {
     "ons_dados_hidrologicos": "Mercado de Energia",
     "ons_programacao_previsao": "Geração e Operacional",
     "ons_balanco_dessem": "Mercado de Energia",
+    "ons_demanda_maxima": "Mercado de Energia",
     "ons_ena": "Mercado de Energia",
     # Cadastro do mercado: dá nome ao que nas outras fontes é código.
     "ccee_perfil": "Mercado de Energia",
@@ -157,6 +158,7 @@ BYTES_POR_LINHA = {
     "ibge_ipca": 128,
     "bcb_igpm": 64,  # data e uma NUMERIC por mês
     "ons_carga": 184,
+    "ons_demanda_maxima": 120,  # 3 textos, 2 NUMERIC, 2 DATETIME e a data; 4 linhas por dia
     "aneel_siga": 640,
     "ace_prc": 160,  # 5 textos/datas, 1 NUMERIC; 24 linhas por execução semanal
     "aneel_tarifas": 280,  # 7 textos e 3 datas, 2 NUMERIC; ~50 mil linhas por execução semanal

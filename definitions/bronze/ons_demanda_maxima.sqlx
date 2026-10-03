@@ -1,0 +1,25 @@
+config {
+  type: "operations",
+  schema: "bronze",
+  hasOutput: true,
+  tags: ["bronze"]
+}
+
+-- Bronze: demanda máxima diária por subsistema (ONS). Seção de demanda máxima do IPDO (ADR 027).
+CREATE TABLE IF NOT EXISTS ${self()} (
+  data_referencia              DATE      NOT NULL OPTIONS(description="Dia de referência da demanda máxima"),
+  submercado                   STRING    NOT NULL OPTIONS(description="Sigla do subsistema: N, NE, S ou SE"),
+  nome_subsistema              STRING    NOT NULL,
+  demanda_integralizada_mwmed  NUMERIC   OPTIONS(description="Demanda integralizada na hora da máxima instantânea, em MWmed; nulo se a origem não trouxe"),
+  instante_integralizada       DATETIME  OPTIONS(description="Hora da medida integralizada"),
+  demanda_instantanea_mw       NUMERIC   OPTIONS(description="Demanda máxima instantânea do dia, em MW; nulo se a origem não trouxe"),
+  instante_instantanea         DATETIME  OPTIONS(description="Instante (com minuto) da demanda máxima instantânea"),
+
+  _ingestao_id        STRING    NOT NULL,
+  _ingestao_timestamp TIMESTAMP NOT NULL,
+  _fonte              STRING    NOT NULL,
+  _schema_versao      STRING    NOT NULL
+)
+PARTITION BY DATE(_ingestao_timestamp)
+CLUSTER BY data_referencia, submercado
+OPTIONS(description="Demanda máxima diária por subsistema — camada Bronze, append-only");

@@ -1,0 +1,27 @@
+config {
+  type: "table",
+  schema: "gold",
+  tags: ["gold"],
+  dependOnDependencyAssertions: true
+}
+
+-- Gold: demanda máxima por mês e subsistema — a maior demanda instantânea do
+-- mês, o dia e o instante em que ocorreu, e quantos dias do mês têm dado.
+-- Sem KPI nem comparação entre subsistemas (ADR 012). Dia sem demanda
+-- instantânea (nulo na origem) conta em `dias_com_dado`, mas não disputa a máxima.
+SELECT
+  periodo_apuracao,
+  submercado,
+  ANY_VALUE(nome_subsistema)  AS nome_subsistema,
+  COUNT(*)                    AS dias_com_dado,
+  MAX(demanda_instantanea_mw) AS demanda_instantanea_maxima_mw,
+  ARRAY_AGG(
+    IF(demanda_instantanea_mw IS NULL, NULL, data_referencia) IGNORE NULLS
+    ORDER BY demanda_instantanea_mw DESC, data_referencia LIMIT 1
+  )[SAFE_OFFSET(0)]           AS data_demanda_maxima,
+  ARRAY_AGG(
+    IF(demanda_instantanea_mw IS NULL, NULL, instante_instantanea) IGNORE NULLS
+    ORDER BY demanda_instantanea_mw DESC, data_referencia LIMIT 1
+  )[SAFE_OFFSET(0)]           AS instante_demanda_maxima
+FROM ${ref("silver", "ons_demanda_maxima")}
+GROUP BY periodo_apuracao, submercado

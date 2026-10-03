@@ -122,6 +122,12 @@ variable "conectores" {
       cron         = "55 10 * * *"
       ultimos_dias = 7
     }
+    ons_demanda_maxima = {
+      # Onda 1, seção de demanda máxima do IPDO (ADR 027). Um CSV por ano (~48 KB em 2026), o ONS publica o dia
+      # anterior; 30 dias cobrem a revisão, como no ons_carga.
+      cron         = "5 11 * * *"
+      ultimos_dias = 30
+    }
     ons_cvu_termica = {
       # O CVU muda por semana operativa (PMO): semanal, sábado. A janela de 40
       # dias cobre a semana que começa no ano anterior e a revisão atrasada.

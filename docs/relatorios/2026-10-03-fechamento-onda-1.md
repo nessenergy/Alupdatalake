@@ -151,3 +151,19 @@ e do Dataform dos dois ambientes. Os números são **iguais em dev e hml**.
 Leitura honesta: a bacia mais próxima é aproximação **sem limite de distância**; a mediana de 62 km é razoável, mas a
 máxima de 690 km mostra estações que não deveriam ser atribuídas a nenhuma bacia sem um corte. Quem usa filtra por
 `distancia_bacia_km`; o corte é decisão da Alup. A média por bacia é **regra provisória** (ADR 026).
+
+## 9. As três cargas pedidas em 02/10 (conferido em 03/10/2026, 13h41 BRT)
+
+Pedido do e-mail de 02/10: concluir os carregamentos de IGP-M, Tarifas Homologadas e PRC até 05/10. Método: `Conferir cargas`,
+runs `37137754481` (dev) e `37137767465` (hml).
+
+| Carga | dev | hml |
+|---|---|---|
+| Tarifas Homologadas (`aneel_tarifas`) | 327.763 linhas; Gold `tarifa_vigente_distribuidora` 10.366 | igual |
+| PRC (`ace_prc`) | 24 preços; Gold `prc_vigente_comercializadora` 24 | igual |
+| IGP-M (`bcb_igpm`) | **0 linhas**; Gold `igpm_mensal` 0 | 25 meses (2024-09 a 2026-09); Gold 25 |
+
+Pendente: IGP-M em `dev`. `api.bcb.gov.br` não resolve (DNS) desde 03/10 ~03:40Z; testado de novo às 13h46 BRT. O vigia
+anterior desistiu após 8 h; um novo (tentativa a cada 30 min, por até 48 h) dispara `Executar ingestão` em `dev`
+(`bcb_igpm`, de 2024-09-01 a 2026-10-02) ao primeiro HTTP 200. Plano B, só se o BCB seguir fora até 04/10 à noite:
+reprocessar em `dev` o raw do IGP-M arquivado no `hml`; depende de a conta de deploy ler o bucket do `hml`, não verificado.

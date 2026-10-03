@@ -1,4 +1,4 @@
-# ADR 028 — Acesso ao CPTEC: bloqueio na origem, fonte fora da Onda 1 até haver resposta do INPE
+# ADR 028 — Acesso ao CPTEC: 403 no webservice, fonte fora da Onda 1 até haver resposta do INPE
 
 **Status**: proposto · **Data**: 2026-10-03 · **Complementa** a
 [ADR 018](018-vias-de-acesso-a-ccee.md) (que resolveu um 403 por `User-Agent`)
@@ -38,8 +38,8 @@ onde indicado.
 ## O que se conclui, e o que não
 
 **Fato:** o host `servicos.cptec.inpe.br` recusa com 403 toda requisição, até a
-raiz, independente de `User-Agent`, e recusou também de uma segunda origem de
-rede. Não é o filtro de `User-Agent` da CCEE (ADR 018). O 500 do proxy da
+raiz, independente de `User-Agent`, e recusou também de um segundo ponto de
+vista de rede (a ferramenta de leitura web, **uma única amostra**). Não é o filtro de `User-Agent` da CCEE (ADR 018). O 500 do proxy da
 BrasilAPI, cujo erro nomeia a falha de busca de cidades e de previsões, é
 coerente com o proxy também não alcançar a origem; é inferência, não está
 provado.
@@ -52,9 +52,11 @@ token ou liberação de IP para o webservice. Quem recebe o 403 não recebe
 instrução.
 
 **Hipótese (não verificada):** bloqueio por faixa de IP ou geografia do
-cliente, ou webservice fora do ar com o 403 como sintoma. A segunda origem de
-rede reforça "bloqueio na origem" contra "IP da máquina de desenvolvimento",
-mas é uma única amostra de outra rede.
+cliente, ou webservice fora do ar com o 403 como sintoma. O segundo ponto de
+vista de rede enfraquece a hipótese de que o problema seja só o IP da máquina
+de desenvolvimento, mas é uma única amostra e não prova a causa. O Open-Meteo
+foi testado **apenas** a partir da máquina de desenvolvimento; um IP do Google
+Cloud pode se comportar de outro modo.
 
 **Não verificado:** o comportamento a partir de um IP do Google Cloud. Seria
 necessário um job descartável **declarado em `infra/`** (recurso fora de
@@ -94,8 +96,8 @@ entrega desta tarefa.
 
 > Assunto: Webservice de previsão do CPTEC — acesso retornando 403
 >
-> O coletor da Alupar (identificado em `User-Agent`) consome dados públicos para
-> o data lake corporativo. O webservice anunciado em
+> Um coletor de dados públicos (identificado em `User-Agent`) alimenta um data
+> lake corporativo. O webservice anunciado em
 > https://www.cptec.inpe.br/ (`servicos.cptec.inpe.br/XML/`) responde HTTP 403
 > a qualquer requisição, inclusive à raiz do host, a partir de duas redes
 > distintas, desde 02/10/2026. Também não localizamos o domínio
@@ -103,7 +105,7 @@ entrega desta tarefa.
 > descontinuado? (2) o acesso exige cadastro, chave ou liberação de IP, e como
 > solicitar? (3) existe endereço substituto para a previsão de 7 dias e a
 > previsão climática? Podemos informar o IP de saída do coletor, se for o caso.
-> Contato: comercializacao@alupar.com.br
+> Contato: o contato da Alup indicado pelo Ricardo Esper (preencher ao enviar).
 
 ## Consequências
 

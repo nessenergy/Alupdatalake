@@ -135,3 +135,34 @@ def test_ciclo_completo_no_runner_sem_rede(monkeypatch) -> None:
 
     assert execucao.linhas_extraidas > 0
     assert execucao.linhas_invalidas == 0
+
+
+def test_cabecalho_com_colunas_embaralhadas_falha_alto(monkeypatch) -> None:
+    """Se o INMET reordenar colunas, a coluna 3 deixa de ser chuva: temperatura passaria na faixa 0 a 500."""
+    linhas = FIXTURE.decode("latin-1").split("\r\n")
+    cabecalho = linhas[8].split(";")
+    cabecalho[2], cabecalho[7] = cabecalho[7], cabecalho[2]
+    linhas[8] = ";".join(cabecalho)
+    conector, _ = _conector(monkeypatch, {2025: _zip((NOME, "\r\n".join(linhas).encode("latin-1")))})
+
+    with pytest.raises(LayoutInesperadoError, match="PRECIPITA"):
+        list(conector.extrair(Janela.de_texto("2025-01-01", "2025-01-01")))
+
+
+@pytest.mark.parametrize("data", ["01/01/2019", "", "2025-01-01"])
+def test_data_fora_do_formato_aaaa_mm_dd_falha_alto(monkeypatch, data: str) -> None:
+    """O INMET antigo escrevia dd/mm/aaaa: sem erro, o ano inteiro viraria zero linhas como sucesso."""
+    texto = FIXTURE.decode("latin-1").replace("2025/01/01;0000 UTC", f"{data};0000 UTC")
+    conector, _ = _conector(monkeypatch, {2025: _zip((NOME, texto.encode("latin-1")))})
+
+    with pytest.raises(LayoutInesperadoError, match="data"):
+        list(conector.extrair(Janela.de_texto("2025-01-01", "2025-01-01")))
+
+
+def test_zip_com_csv_mas_janela_sem_nenhuma_hora_avisa(monkeypatch, caplog) -> None:
+    conector, _ = _conector(monkeypatch, {2025: _zip((NOME, FIXTURE))})
+
+    with caplog.at_level("WARNING"):
+        assert list(conector.extrair(Janela.de_texto("2025-06-01", "2025-06-02"))) == []
+
+    assert "nenhuma hora" in caplog.text

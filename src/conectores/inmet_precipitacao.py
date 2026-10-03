@@ -12,7 +12,9 @@ então uma janela recente pode vir com menos horas do que se espera; a Gold exp�
 from __future__ import annotations
 
 import logging
+import re
 import tempfile
+import unicodedata
 import zipfile
 from datetime import date
 from decimal import Decimal
@@ -71,6 +73,13 @@ class PrecipitacaoHoraria(BaseModel):
         return valor
 
 
+_DATA = re.compile(r"\d{4}/\d{2}/\d{2}")
+
+
+def _sem_acento(texto: str) -> str:
+    return unicodedata.normalize("NFKD", texto).encode("ascii", "ignore").decode().strip().upper()
+
+
 def _metadados(linhas: list[str]) -> dict[str, str]:
     meta = {}
     for linha in linhas[:LINHAS_DE_METADADOS]:
@@ -85,10 +94,16 @@ def _ler_estacao(conteudo: bytes) -> Iterator[dict[str, Any]]:
     for chave in ("REGIAO", "UF", "ESTACAO", "CODIGO (WMO)", "LATITUDE", "LONGITUDE"):
         if not meta.get(chave):
             raise LayoutInesperadoError(f"CSV de estação sem o metadado {chave!r}")
+    cabecalho = linhas[LINHAS_DE_METADADOS].split(";") if len(linhas) > LINHAS_DE_METADADOS else []
+    coluna = _sem_acento(cabecalho[COLUNA_PRECIPITACAO]) if len(cabecalho) > COLUNA_PRECIPITACAO else ""
+    if not coluna.startswith("PRECIPITA"):
+        raise LayoutInesperadoError(f"a coluna {COLUNA_PRECIPITACAO + 1} do CSV não é PRECIPITA...: {coluna!r}")
     for linha in linhas[LINHAS_DE_METADADOS + 1 :]:
-        campos = linha.split(";")
-        if len(campos) <= COLUNA_PRECIPITACAO or not campos[0].strip():
+        if not linha.strip():
             continue
+        campos = linha.split(";")
+        if len(campos) <= COLUNA_PRECIPITACAO or not _DATA.fullmatch(campos[0].strip()):
+            raise LayoutInesperadoError(f"linha de dado com data fora de aaaa/mm/dd: {linha[:40]!r}")
         yield {
             "estacao": meta["CODIGO (WMO)"],
             "nome_estacao": meta["ESTACAO"],
@@ -141,11 +156,15 @@ class InmetPrecipitacao(Conector):
                 csvs = [n for n in z.namelist() if n.upper().endswith(".CSV")]
                 if not csvs:
                     raise LayoutInesperadoError(f"o zip de {ano} do INMET não tem nenhum CSV")
+                recortadas = 0
                 for nome in csvs:
                     for linha in _ler_estacao(z.read(nome)):
                         dia = linha["data"].replace("/", "-")
                         if inicio <= dia <= fim:
+                            recortadas += 1
                             yield linha
+                if not recortadas:
+                    logger.warning("INMET: o zip de %d tem %d CSVs, mas nenhuma hora cai na janela", ano, len(csvs))
 
     def transformar(self, bruto: dict[str, Any]) -> dict[str, Any]:
         return {

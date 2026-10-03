@@ -7,11 +7,14 @@ não existe caminho de código que só rode em produção.
     alupdata ingerir bcb_cambio_ptax --de 2026-01-01 --ate 2026-01-31
     alupdata ingerir bcb_cambio_ptax --ultimos-dias 7 --dry-run
     alupdata testar-conexao fmb
+    alupdata sondar cptec
 """
 
 from __future__ import annotations
 
 import argparse
+import dataclasses
+import json
 import sys
 
 from src.core.banco import testar_conexao
@@ -19,6 +22,7 @@ from src.core.config import get_settings
 from src.core.execucao import Janela
 from src.core.observabilidade import configurar_logging
 from src.core.registry import listar, obter
+from src.core.sonda import SONDAS, sondar
 
 configurar_logging()
 
@@ -44,6 +48,8 @@ def _parser() -> argparse.ArgumentParser:
 
     teste = sub.add_parser("testar-conexao", help="abre conexão com a DSN da fonte e roda SELECT 1")
     teste.add_argument("fonte", help="fonte do secret alupdata-<fonte>-dsn, como fmb ou comercializacao")
+    sonda = sub.add_parser("sondar", help="chama os endereços de uma sonda fixa e imprime status e amostra")
+    sonda.add_argument("nome", choices=sorted(SONDAS), help="sonda da lista fixa em src/core/sonda.py")
     return parser
 
 
@@ -67,6 +73,11 @@ def main(argv: list[str] | None = None) -> int:
         ok, mensagem = testar_conexao(args.fonte)
         print(mensagem)
         return 0 if ok else 1
+
+    if args.comando == "sondar":
+        for resultado in sondar(args.nome):
+            print(json.dumps({"sonda": args.nome, **dataclasses.asdict(resultado)}, ensure_ascii=False))
+        return 0
 
     if args.comando == "reprocessar-raw":
         conector = obter(args.conector)

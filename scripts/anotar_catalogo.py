@@ -106,6 +106,7 @@ ANOTACOES: dict[str, dict[str, str]] = {
     },  # Aditivo 01
     # 3 · Meteorologia
     "precipitacao_diaria_estacao": {"dominio": "meteorologia", "responsavel": INTELIGENCIA},
+    "precipitacao_diaria_bacia": {"dominio": "meteorologia", "responsavel": INTELIGENCIA},
     "cobertura_boletins_tempook": {"dominio": "meteorologia", "responsavel": INTELIGENCIA},
     "cobertura_ena_prevs_tempook": {"dominio": "meteorologia", "responsavel": INTELIGENCIA},
     # 4 · Comercial e Contratos

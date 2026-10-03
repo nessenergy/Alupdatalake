@@ -1,0 +1,25 @@
+config {
+  type: "table",
+  schema: "gold",
+  tags: ["gold"],
+  dependOnDependencyAssertions: true
+}
+
+-- Gold: chuva diária por bacia, a partir da chuva por estação (cláusula 4ª: "precipitação histórica por bacia").
+-- **Regra provisória, da ness., a confirmar com a Alup (ADR 026):** média SIMPLES entre as estações da bacia,
+-- contando só o dia de estação COMPLETO (24 horas com medição). Dia com buraco não entra: somar só as horas
+-- medidas subestimaria a chuva, e 38% das horas do INMET vêm vazias. Sem ponderação por área nem por distância.
+-- `estacoes_na_bacia` conta as estações da bacia com algum dado no dia; `estacoes_validas`, as que entraram na média.
+-- Quando nenhuma estação da bacia teve o dia completo, a média é NULL (e não zero). Estação sem bacia exata não entra,
+-- e a bacia mais próxima (aproximação) também não é usada aqui.
+SELECT
+  bacia,
+  bacia_chave,
+  data_referencia,
+  COUNT(*) AS estacoes_na_bacia,
+  COUNTIF(horas_com_medicao = 24) AS estacoes_validas,
+  AVG(IF(horas_com_medicao = 24, precipitacao_mm_dia, NULL)) AS precipitacao_mm_dia_media,
+  MAX(IF(horas_com_medicao = 24, precipitacao_mm_dia, NULL)) AS precipitacao_mm_dia_maxima
+FROM ${ref("gold", "precipitacao_diaria_estacao")}
+WHERE bacia IS NOT NULL
+GROUP BY bacia, bacia_chave, data_referencia

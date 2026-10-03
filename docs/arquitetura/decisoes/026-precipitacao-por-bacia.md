@@ -100,6 +100,10 @@ coluna a mais, não um agregado que esconda estação:
 - **Agregação por bacia** (média das estações, ponderada ou não) é decisão metodológica que
   este ADR não toma. A primeira entrega fica na estação com a bacia ao lado; a média por
   bacia, se a Alup quiser, entra com a regra escrita por ela.
+  *Atualização de 03/10/2026:* a ness. entregou, **como regra provisória e descritiva**, a média simples
+  dos dias completos de estação (24 horas medidas) em `precipitacao_diaria_bacia`, para a pessoa ter um número por
+  bacia já. A Alup pode trocar a regra; a decisão metodológica segue sendo dela. A bacia mais próxima das estações
+  sem bacia exata (aproximação, com a distância em km) também foi entregue, e a média por bacia não a usa.
 - **Para a Alup**: informar por escrito que 39% das estações atuais ficam fora dos contornos
   do ONS (litoral, Nordeste e Norte sem aproveitamentos do SIN) e que 3 bacias do EAR não têm
   polígono. Pedir confirmação de que o recorte "por bacia" cobre as bacias do ONS e não todo o

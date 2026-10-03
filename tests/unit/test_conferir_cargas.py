@@ -119,7 +119,10 @@ def test_cada_silver_e_gold_citada_existe_em_definitions():
     for sql in todas_as_consultas():
         citadas.update(re.findall(r"`proj\.(bronze|silver|gold)\.(\w+)`", sql))
     assert {c for c in citadas if c[0] == "silver"} >= {("silver", "bcb_igpm"), ("silver", "ons_ear_bacia")}
-    assert {c for c in citadas if c[0] == "gold"} >= {("gold", "precipitacao_diaria_estacao")}
+    assert {c for c in citadas if c[0] == "gold"} >= {
+        ("gold", "precipitacao_diaria_estacao"),
+        ("gold", "precipitacao_diaria_bacia"),
+    }
     for camada, nome in sorted(citadas):
         assert (RAIZ / "definitions" / camada / f"{nome}.sqlx").is_file(), f"{camada}.{nome} não existe"
 

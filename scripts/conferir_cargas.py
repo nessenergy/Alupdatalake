@@ -117,8 +117,21 @@ def montar_conjuntos(projeto: str, bronze: str, silver: str, gold: str) -> list[
             _sql(
                 "SELECT COUNT(*) AS linhas, COUNT(DISTINCT estacao) AS estacoes, "
                 "COUNT(DISTINCT IF(bacia IS NOT NULL, estacao, NULL)) AS estacoes_com_bacia, "
-                "COUNT(DISTINCT bacia) AS bacias FROM $t",
+                "COUNT(DISTINCT bacia) AS bacias, "
+                "COUNT(DISTINCT IF(bacia_proxima IS NOT NULL, estacao, NULL)) AS estacoes_com_bacia_proxima, "
+                "MAX(distancia_bacia_km) AS distancia_max_km, "
+                "APPROX_QUANTILES(distancia_bacia_km, 2)[OFFSET(1)] AS distancia_mediana_km FROM $t",
                 t=tabela(gold, "precipitacao_diaria_estacao"),
+            ),
+        )
+    )
+    gold_itens.append(
+        Item(
+            "precipitacao_diaria_bacia",
+            _sql(
+                "SELECT COUNT(*) AS linhas, COUNT(DISTINCT bacia) AS bacias, MIN(data_referencia) AS data_min, "
+                "MAX(data_referencia) AS data_max, COUNTIF(estacoes_validas = 0) AS dias_sem_estacao_completa FROM $t",
+                t=tabela(gold, "precipitacao_diaria_bacia"),
             ),
         )
     )

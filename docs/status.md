@@ -1,6 +1,6 @@
 # Estado do projeto
 
-Atualizado em **2026-10-02**. Auditoria de ponta a ponta, com a conferência de cada número:
+Atualizado em **2026-10-03**. Auditoria de ponta a ponta, com a conferência de cada número:
 [`relatorios/2026-10-02-auditoria-de-ponta-a-ponta.md`](relatorios/2026-10-02-auditoria-de-ponta-a-ponta.md).
 
 ## Situação em 02/10/2026 (conferida)
@@ -41,10 +41,11 @@ Tabela completa em [`plano-execucao.md` §3.2](plano-execucao.md#32-a-lista-do-c
 Relatório de fechamento, com a matriz dos 7 componentes e a conferência por ambiente:
 [`relatorios/2026-10-03-fechamento-onda-1.md`](relatorios/2026-10-03-fechamento-onda-1.md).
 
-- **ONS Operacional:** `ons_demanda_maxima` (seção 7 do IPDO, PR #361) tem os 7 componentes no repositório; a carga não foi
-  conferida no BigQuery. IPDO e ACOMPH: decisão proposta, depende de aceite da Alup
+- **ONS Operacional:** `ons_demanda_maxima` (seção 7 do IPDO, PR #361) tem os 7 componentes no repositório; a carga rodou com
+  `success` no GitHub em `hml` e em `dev` e não foi conferida no BigQuery. O Dataform de `hml` rodou depois da carga; o de `dev`
+  ainda não. IPDO e ACOMPH: decisão proposta, depende de aceite da Alup
   ([ADR 027](arquitetura/decisoes/027-ons-operacional-ipdo-acomph.md)); não estão entregues.
-- **INMET:** `inmet_precipitacao` e `ons_bacia_contorno` com os 7 componentes no repositório. Histórico de `hml` carregado
+- **INMET:** `inmet_precipitacao` e `ons_bacia_contorno` com os 7 componentes no repositório; `ons_bacia_contorno` rodou com `success` no GitHub em `hml` e em `dev` (o Dataform de `dev` ainda não rodou depois). Histórico de `hml` carregado
   em 9 janelas (todas `success` no GitHub) e Dataform de `hml` `SUCCEEDED`; `dev` com carga em andamento. Recorte por bacia
   proposto no [ADR 026](arquitetura/decisoes/026-precipitacao-por-bacia.md), sem aceite.
 - **ANEEL:** Bronze e Silver conferidos em `dev` e `hml` (328.293 linhas de tarifas, 24 preços de PRC); Gold de tarifas com

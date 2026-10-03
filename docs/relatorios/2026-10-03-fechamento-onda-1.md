@@ -27,16 +27,16 @@ workflow terminou com sucesso, sem consulta ao BigQuery; `pendente (motivo)`.
 
 | Fonte | Conector | Bronze | Silver | Gold | Testes | Agendamento | Dicionário | Conferência `hml` | Conferência `dev` |
 |---|---|---|---|---|---|---|---|---|---|
-| `ons_ear` | presente | presente | presente | presente (`armazenamento_e_afluencia_mensal`) | presente | presente | presente | não consta neste relatório (entregue antes; ver relatório de 02/10) | idem |
-| `ons_ena` | presente | presente | presente | presente (idem) | presente | presente | presente | idem | idem |
-| `ccee_pld` | presente | presente | presente | presente (`pld_mensal_submercado`) | presente | presente | presente | idem | idem |
-| `ons_carga` | presente | presente | presente | presente (`carga_mensal_submercado`) | presente | presente | presente | idem | idem |
-| `ons_demanda_maxima` | presente | presente | presente | presente (`demanda_maxima_mensal_subsistema`) | presente | presente | presente | não conferido (execução não verificada) | não conferido (execução não verificada) |
-| `aneel_tarifas` | presente | presente | presente | presente (`tarifa_vigente_distribuidora`) | presente | presente | presente | conferido (03/10, 328.293 linhas na Bronze e na Silver; Gold 10.366) | conferido (03/10, 328.293 linhas; Gold 10.366) |
-| `ace_prc` | presente | presente | presente | presente (`prc_vigente_comercializadora`) | presente | presente | presente | Bronze e Silver conferidos (03/10, 24 preços); Gold foi atualizada depois com o Dataform rerodado, contagem **não reconferida** | conferido (03/10, 24 preços; Gold 24) |
-| `inmet_precipitacao` | presente | presente | presente | presente (`precipitacao_diaria_estacao`) | presente | presente | presente | histórico de 09/2024 a 02/10/2026 em 9 janelas de 3 meses, todas `success` no GitHub; **contagens não conferidas** (o `gcloud` pediu reautenticação) | pendente (carga em andamento) |
-| `ons_bacia_contorno` | presente | presente | presente | usada na Gold `precipitacao_diaria_estacao` (colunas `bacia` e `bacia_chave`, `ST_COVERS`) | presente | presente | presente | carregada e Dataform `SUCCEEDED` depois da carga; o cruzamento (quantas estações caem em bacia) **não conferido**. Uma execução anterior do SQL espacial, em 03/10, também `SUCCEEDED`, mas com a Bronze vazia | pendente (não consta carga conferida) |
-| `bcb_igpm` | presente | presente | presente | presente (`igpm_mensal`) | presente | presente | presente | conferido (03/10, 25 meses; Gold 25 linhas) | pendente: `api.bcb.gov.br` não resolve a partir de nenhum lugar desde 03/10 ~03:40Z (queda externa) |
+| `ons_ear` | presente | presente | presente | presente (`armazenamento_e_afluencia_mensal`) | presente | presente | presente | pendente (conferência não refeita neste relatório; evidência de 02/10 em `2026-10-02-auditoria-de-ponta-a-ponta.md`) | pendente (conferência não refeita neste relatório; evidência de 02/10 em `2026-10-02-auditoria-de-ponta-a-ponta.md`) |
+| `ons_ena` | presente | presente | presente | presente (idem) | presente | presente | presente | pendente (conferência não refeita neste relatório; evidência de 02/10 em `2026-10-02-auditoria-de-ponta-a-ponta.md`) | pendente (conferência não refeita neste relatório; evidência de 02/10 em `2026-10-02-auditoria-de-ponta-a-ponta.md`) |
+| `ccee_pld` | presente | presente | presente | presente (`pld_mensal_submercado`) | presente | presente | presente | conferido (02/10, PLD real com 24 meses, segundo a auditoria de 02/10) | conferido (02/10, PLD real com 24 meses, segundo a auditoria de 02/10) |
+| `ons_carga` | presente | presente | presente | presente (`carga_mensal_submercado`) | presente | presente | presente | pendente (conferência não refeita neste relatório; evidência de 02/10 em `2026-10-02-auditoria-de-ponta-a-ponta.md`) | pendente (conferência não refeita neste relatório; evidência de 02/10 em `2026-10-02-auditoria-de-ponta-a-ponta.md`) |
+| `ons_demanda_maxima` | presente | presente | presente | presente (`demanda_maxima_mensal_subsistema`) | presente | presente | presente | rodou no GitHub, não conferido (run `37101196781`, `success`; o Dataform de `hml` rodou depois, deploy `37101436318`, 05:58Z, `SUCCEEDED`, e cobre a carga) | rodou no GitHub, não conferido (run `37102015342`, 06:11Z, `success`; o Dataform de `dev` (`37101539114`, 06:01Z) rodou **antes** da carga e ainda não rodou depois) |
+| `aneel_tarifas` | presente | presente | presente | presente (`tarifa_vigente_distribuidora`) | presente | presente | presente | conferido (03/10, 328.293 linhas; a fonte do brief não separa Bronze e Silver). Gold: 10.366 linhas, data da conferência não registrada | conferido (03/10, 328.293 linhas; idem). Gold: 10.366 linhas, data da conferência não registrada |
+| `ace_prc` | presente | presente | presente | presente (`prc_vigente_comercializadora`) | presente | presente | presente | conferido (03/10, 24 preços) para Bronze e Silver; a Gold foi atualizada depois com o Dataform rerodado e a contagem não foi reconferida: `rodou no GitHub, não conferido` | conferido (03/10, 24 preços); Gold: 24 linhas, data da conferência não registrada |
+| `inmet_precipitacao` | presente | presente | presente | presente (`precipitacao_diaria_estacao`) | presente | presente | presente | rodou no GitHub, não conferido (9 janelas de 3 meses, de 09/2024 a 02/10/2026, todas `success`; o `gcloud` pediu reautenticação) | pendente (carga em andamento) |
+| `ons_bacia_contorno` | presente | presente | presente | usada na Gold `precipitacao_diaria_estacao` (colunas `bacia` e `bacia_chave`, `ST_COVERS`) | presente | presente | presente | rodou no GitHub, não conferido (run `37101015968`, `success`). O Dataform de `hml` `37100814775` (05:47Z) foi anterior, com a Bronze vazia; o seguinte, `37101436318` (05:58Z, `SUCCEEDED`), cobre a carga. O cruzamento (quantas estações caem em bacia) não foi conferido | rodou no GitHub, não conferido (run `37101760880`, 06:07Z, `success`; o Dataform de `dev` (`37101539114`, 06:01Z) rodou **antes** da carga e ainda não rodou depois) |
+| `bcb_igpm` | presente | presente | presente | presente (`igpm_mensal`) | presente | presente | presente | conferido (25 meses; Gold 25 linhas; data da conferência não registrada) | pendente (`api.bcb.gov.br` não resolve a partir de nenhum lugar desde 03/10 ~03:40Z, queda externa) |
 
 Onde está cada componente (caminhos no repositório):
 
@@ -51,10 +51,14 @@ Onde está cada componente (caminhos no repositório):
 PRs que introduziram as peças desta rodada: #354 (conector INMET), #358 (camadas, agendamento e dicionário do INMET),
 #360 (contornos das bacias e bacia de cada estação), #361 (demanda máxima), #362 (limpeza e teste de retry).
 Para `ons_ear`, `ons_ena`, `ccee_pld` e `ons_carga` a existência dos arquivos foi verificada hoje; **a conferência de
-carga por ambiente não foi refeita aqui** (as quatro vieram de entregas anteriores).
+carga por ambiente não foi refeita aqui** (as quatro vieram de entregas anteriores, cuja evidência está na auditoria de 02/10).
 
-Aditivo 01 (itens 12 a 19, fora da Onda 1, mesmos ambientes): carga de `dev` concluída em 03/10 e Dataform de `dev`
-`SUCCEEDED` com os dados; contagens por conector **não conferidas**.
+Aditivo 01 (itens 12 a 19, fora da Onda 1, mesmos ambientes): carga de `dev` concluída em 03/10 e Dataform de `dev` `SUCCEEDED` com os dados; contagens por conector **não conferidas**.
+
+Ordem dos eventos em 03/10 (importa para ler as células acima): em `hml`, Dataform `37100814775` (05:47Z), depois as cargas de
+`ons_bacia_contorno` e `ons_demanda_maxima`, depois Dataform `37101436318` (05:58Z, `SUCCEEDED`). Em `dev`, Dataform
+`37101539114` (06:01Z, `SUCCEEDED`), depois as cargas das duas fontes (06:07Z e 06:11Z); **o Dataform de `dev` ainda não rodou
+depois delas**. Nada disso foi conferido no BigQuery.
 
 ## 3. O que não foi entregue e por quê
 

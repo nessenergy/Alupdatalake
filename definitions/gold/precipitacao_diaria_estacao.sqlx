@@ -16,6 +16,11 @@ config {
 -- JOIN). `bacia_chave` é o mesmo nome em maiúsculas e sem acento, para cruzar com `ons_ear_bacia.nomecurto`. Estação
 -- dentro de mais de um polígono fica com o de MENOR ÁREA (ST_AREA), e o nome da bacia desempata. Vale o contorno da data de referência
 -- mais recente de cada bacia.
+--
+-- `bacia_proxima`, `bacia_proxima_chave` e `distancia_bacia_km` só vêm preenchidas para a estação SEM bacia exata: são a
+-- bacia de contorno mais próximo (menor ST_DISTANCE entre o ponto e o contorno) e a distância em km. É aproximação, sem
+-- limite de distância: quem usa filtra por `distancia_bacia_km`. Não substitui `bacia`, e a chuva por bacia
+-- (`precipitacao_diaria_bacia`) NÃO usa a bacia mais próxima.
 WITH contorno_vigente AS (
   SELECT nome_bacia, bacia_chave, contorno, ST_AREA(contorno) AS area_m2
   FROM ${ref("silver", "ons_bacia_contorno")}
@@ -45,6 +50,25 @@ estacao_bacia AS (
   FROM estacao_ponto AS e
   LEFT JOIN contorno_vigente AS c ON ST_COVERS(c.contorno, e.ponto)
   GROUP BY e.estacao
+),
+
+-- Bacia mais próxima, só para a estação sem bacia exata: roda por estação, não por dia.
+estacao_proxima AS (
+  SELECT
+    e.estacao,
+    ARRAY_AGG(
+      STRUCT(
+        c.nome_bacia AS bacia_proxima,
+        c.bacia_chave AS bacia_proxima_chave,
+        ST_DISTANCE(c.contorno, e.ponto) / 1000 AS distancia_km
+      )
+      ORDER BY ST_DISTANCE(c.contorno, e.ponto) ASC, c.nome_bacia ASC
+      LIMIT 1
+    )[SAFE_OFFSET(0)] AS proxima
+  FROM estacao_ponto AS e
+  CROSS JOIN contorno_vigente AS c
+  WHERE e.estacao NOT IN (SELECT estacao FROM estacao_bacia WHERE bacia IS NOT NULL)
+  GROUP BY e.estacao
 )
 
 SELECT
@@ -53,6 +77,9 @@ SELECT
   ANY_VALUE(p.uf) AS uf,
   b.bacia,
   b.bacia_chave,
+  x.proxima.bacia_proxima AS bacia_proxima,
+  x.proxima.bacia_proxima_chave AS bacia_proxima_chave,
+  ROUND(x.proxima.distancia_km, 1) AS distancia_bacia_km,
   p.data_referencia,
   SUM(p.precipitacao_mm) AS precipitacao_mm_dia,
   COUNTIF(p.precipitacao_mm IS NOT NULL) AS horas_com_medicao,
@@ -61,4 +88,7 @@ SELECT
     OVER (PARTITION BY p.estacao) AS ultima_hora_com_dado
 FROM ${ref("silver", "inmet_precipitacao")} AS p
 LEFT JOIN estacao_bacia AS b ON b.estacao = p.estacao
-GROUP BY p.estacao, b.bacia, b.bacia_chave, p.data_referencia
+LEFT JOIN estacao_proxima AS x ON x.estacao = p.estacao
+GROUP BY
+  p.estacao, b.bacia, b.bacia_chave, x.proxima.bacia_proxima, x.proxima.bacia_proxima_chave,
+  x.proxima.distancia_km, p.data_referencia

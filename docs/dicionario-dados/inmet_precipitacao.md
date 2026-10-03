@@ -124,8 +124,32 @@ chave (calculado localmente com os 31 nomes reais; o ADR 026 dizia 20 por contar
 - **Estação em mais de um polígono:** vale o de **menor área** (`ST_AREA`); o nome da bacia desempata. A regra é
   determinística, e um teste (`tests/unit/test_sql.py`) a fixa.
 - **Contorno vigente:** o da data de referência mais recente de cada bacia.
-- **Sem agregação por bacia.** A Gold não faz média nem soma por bacia: a regra de agregação (média das estações,
-  ponderada ou não) é decisão metodológica da Alup (ADR 026, §5). A chuva segue por estação.
+- **`precipitacao_diaria_estacao` não agrega por bacia.** A chuva segue por estação; a agregação provisória vive em
+  outra Gold (`precipitacao_diaria_bacia`, abaixo), porque a regra metodológica (média simples, ponderada ou não) é
+  decisão da Alup (ADR 026, §5).
+
+### Bacia mais próxima (aproximação, só para estação sem bacia exata)
+
+`bacia_proxima`, `bacia_proxima_chave` (STRING) e `distancia_bacia_km` (FLOAT64, 1 casa) vêm preenchidas **apenas para a
+estação sem `bacia`**: são a bacia de contorno mais próximo (menor `ST_DISTANCE` entre o ponto da estação e o contorno,
+em km) e a distância até ele. Estação com bacia exata fica com as três colunas nulas. É **aproximação, sem limite de
+distância**: quem usa filtra por `distancia_bacia_km`. Não substitui `bacia` e não entra na chuva por bacia. A conta roda
+por estação (uma vez), não por dia.
+
+### Chuva por bacia (`precipitacao_diaria_bacia`, regra provisória da ness.)
+
+| Campo | Tipo | Significado |
+|---|---|---|
+| `bacia`, `bacia_chave` | STRING | a bacia exata (ponto em polígono); estação sem bacia exata não entra |
+| `data_referencia` | DATE | dia (UTC, como a Silver) |
+| `estacoes_na_bacia` | INT64 | estações da bacia com alguma linha no dia |
+| `estacoes_validas` | INT64 | estações que entraram na média: **só dia de estação completo (24 horas medidas)** |
+| `precipitacao_mm_dia_media` | FLOAT64 | média **simples** do dia entre as estações válidas; nula se nenhuma foi válida |
+| `precipitacao_mm_dia_maxima` | FLOAT64 | a maior chuva do dia entre as estações válidas |
+
+Por que só dia completo: somar só as horas medidas subestimaria a chuva, e 38% das horas da origem vêm vazias. Sem
+ponderação por área ou distância. **A regra é descritiva e provisória: a Alup pode trocá-la (ADR 026).** Dia sem estação
+completa fica com média **nula, nunca zero**. A cobertura é a do `bacia` exato: cerca de 61% das estações.
 
 **Granularidade (o que `bacia` quer dizer).** Os contornos do ONS são faixas, não regiões aninhadas: o polígono
 "Paraná" **não contém** Grande, Paranaíba nem Paranapanema. A chuva "do Paraná" é a da faixa desse polígono, não a de
@@ -164,7 +188,8 @@ portal.inmet.gov.br → {ano}.zip (um CSV por estação)
   → gs://<bucket>-raw/inmet/precipitacao/dt=…/<ingestao_id>.json.gz
     → bronze.inmet_precipitacao   (append-only, particionado por _ingestao_timestamp)
       → silver.inmet_precipitacao (QUALIFY por estação, dia e hora, _ingestao_timestamp DESC)
-        → gold.precipitacao_diaria_estacao   (+ coluna `bacia`, por ponto em polígono)
+        → gold.precipitacao_diaria_estacao   (+ `bacia` por ponto em polígono; + bacia mais próxima, só sem bacia)
+          → gold.precipitacao_diaria_bacia   (média simples dos dias completos, provisória)
               ↑
 silver.ons_bacia_contorno  (contornos do ONS, CC-BY; ver ons_bacia_contorno.md)
 ```

@@ -31,7 +31,7 @@ ARQUIVOS = [c for camada in CAMADAS for c in sorted((DEFINICOES / camada).glob("
 GOLD_OPERACIONAL = {"saude_ingestao", "volumetria_lake", "custo_consultas"}
 # Gold que lê outras Gold. Fechado e com motivo: a agregação por usina e mês já
 # está feita na Gold de domínio, e refazê-la sobre a Silver duplicaria a regra.
-GOLD_DERIVADA = {"indicadores_mensais"}
+GOLD_DERIVADA = {"indicadores_mensais", "precipitacao_diaria_bacia"}
 
 _CONFIG = re.compile(r"^config \{.*?^\}\n", re.DOTALL | re.MULTILINE)
 _REF = re.compile(r'\$\{ref\("([a-z_]+)", "([a-z_]+)"\)\}')
@@ -443,8 +443,44 @@ def test_gold_da_chuva_liga_a_bacia_por_ponto_em_poligono_sem_agregar_por_bacia(
     assert "ST_AREA(" in corpo
     assert "LEFT JOIN contorno_vigente" in corpo  # estação fora de todo contorno continua na Gold
     assert "INNER JOIN" not in corpo
-    assert "GROUP BY p.estacao, b.bacia, b.bacia_chave, p.data_referencia" in corpo  # a chuva segue por estação e dia
+    assert re.search(r"GROUP BY\s+p\.estacao, b\.bacia, b\.bacia_chave,", corpo)  # a chuva segue por estação e dia
+    assert corpo.rstrip().endswith("p.data_referencia")
     assert not re.search(r"\b(AVG|SUM)\([^)]*bacia", corpo)  # nenhuma média nem soma por bacia
+
+
+def _gold(nome: str) -> str:
+    caminho = Path(__file__).resolve().parents[2] / "definitions" / "gold" / f"{nome}.sqlx"
+    return caminho.read_text(encoding="utf-8")
+
+
+def test_bacia_proxima_so_para_estacao_sem_bacia_exata() -> None:
+    """ADR 026: aproximação rotulada. Roda por estação, só para quem não tem `bacia`, e não substitui a exata."""
+    sql = _gold("precipitacao_diaria_estacao")
+    corpo = "\n".join(linha for linha in sql.splitlines() if not linha.lstrip().startswith("--"))
+    assert "ST_DISTANCE(" in corpo
+    assert "estacao_proxima AS (" in corpo
+    assert "WHERE e.estacao NOT IN (SELECT estacao FROM estacao_bacia WHERE bacia IS NOT NULL)" in corpo
+    assert "FROM estacao_ponto AS e" in corpo  # por estação, nunca por dia
+    assert "distancia_bacia_km" in corpo and "bacia_proxima_chave" in corpo
+    assert "ST_COVERS(" in corpo  # a bacia exata continua por ponto em polígono
+
+
+def test_chuva_por_bacia_so_media_dia_completo_de_estacao() -> None:
+    """Dia com buraco subestimaria a chuva se entrasse na média: só horas_com_medicao = 24 conta; nunca zero."""
+    sql = _gold("precipitacao_diaria_bacia")
+    assert "AVG(IF(horas_com_medicao = 24, precipitacao_mm_dia, NULL))" in sql
+    assert "COUNTIF(horas_com_medicao = 24) AS estacoes_validas" in sql
+    assert "COUNT(*) AS estacoes_na_bacia" in sql
+    assert "WHERE bacia IS NOT NULL" in sql
+    assert "GROUP BY bacia, bacia_chave, data_referencia" in sql
+    assert "COALESCE(precipitacao_mm_dia" not in sql
+
+
+def test_chuva_por_bacia_le_a_gold_da_estacao_e_nao_a_bacia_proxima() -> None:
+    sql = _gold("precipitacao_diaria_bacia")
+    corpo = "\n".join(linha for linha in sql.splitlines() if not linha.lstrip().startswith("--"))
+    assert 'ref("gold", "precipitacao_diaria_estacao")' in corpo
+    assert "bacia_proxima" not in corpo
 
 
 def test_silver_do_contorno_repara_a_geometria_e_deduplica_por_bacia_e_data() -> None:

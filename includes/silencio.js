@@ -23,6 +23,7 @@ const limites_horas = {
   ons_volume_espera: 26,
   ons_programacao_previsao: 26,
   ons_balanco_dessem: 26,
+  ons_demanda_maxima: 26,
   ons_cvu_termica: 180,
   aneel_siga: 180,
   aneel_tarifas: 180,

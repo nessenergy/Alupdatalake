@@ -4,7 +4,7 @@ O **componente 07** do contrato: cada fonte entrega, junto do conector e das
 views, a documentação de campos e a linhagem origem → Bronze → Silver → Gold.
 Este índice diz o que já existe, o que falta e — importante — **por que falta**.
 
-Em **03/10/2026**, o índice cobre **57 fontes em 56 dicionários de fonte**
+Em **03/10/2026**, o índice cobre **58 fontes em 57 dicionários de fonte**
 (eólico e fotovoltaico compartilham um documento), além de **2 dicionários
 técnicos**. Bases reutilizáveis não entram nessa contagem. O contrato mantém
 **13 fontes**; entidade implementada não cria uma fonte contratual nova.
@@ -31,6 +31,7 @@ técnicos**. Bases reutilizáveis não entram nessa contagem. O contrato mantém
 | ONS — CVU das térmicas | [`ons_cvu_termica.md`](ons_cvu_termica.md) | Aditivo 01 | `submercado` | `cvu_mensal_termica` |
 | ONS — previsão versus programado (eólicas e solares) | [`ons_programacao_previsao.md`](ons_programacao_previsao.md) | Aditivo 01 | — | `previsao_x_programado_mensal_usina` |
 | ONS — DESSEM, balanço de energia | [`ons_balanco_dessem.md`](ons_balanco_dessem.md) | Aditivo 01 | `submercado` | `balanco_dessem_mensal_subsistema` |
+| ONS — demanda máxima diária (seção 7 do IPDO) | [`ons_demanda_maxima.md`](ons_demanda_maxima.md) | 1 | `submercado` | `demanda_maxima_mensal_subsistema` |
 | CCEE — PLD | [`ccee_pld.md`](ccee_pld.md) | 1 | `submercado` | `pld_mensal_submercado` |
 | CCEE — perfis de agente | [`ccee_perfil.md`](ccee_perfil.md) | 1 | **`agente_ccee`** | `agentes_ccee` |
 | CCEE — lista mensal de agentes | [`ccee_agente.md`](ccee_agente.md) | 1 | `agente_ccee` | `agentes_por_classe_mensal` |
@@ -86,7 +87,7 @@ nova; fonte sem entidade diz por quê.
 | ANEEL | 1 | `aneel_siga`, `aneel_tarifas` |
 | ACE Comercializadora (Alup) | 1 | `ace_prc` |
 | INMET | 1 | `inmet_precipitacao` |
-| ONS | 1 | `ons_bacia_contorno`, `ons_carga`, `ons_ear`, `ons_ena`, `ons_geracao_usina`, `ons_capacidade`, `ons_disponibilidade_usina`, `ons_restricao_coff_eolica`, `ons_restricao_coff_fotovoltaica` |
+| ONS | 1 | `ons_bacia_contorno`, `ons_carga`, `ons_demanda_maxima`, `ons_ear`, `ons_ena`, `ons_geracao_usina`, `ons_capacidade`, `ons_disponibilidade_usina`, `ons_restricao_coff_eolica`, `ons_restricao_coff_fotovoltaica` |
 | CCEE InfoMercado | 1 | `ccee_pld`, `ccee_perfil`, `ccee_agente`, `ccee_exposicao_financeira`, `ccee_contabilizacao_perfil`, `ccee_geracao_usina`, `ccee_contrato_montante`, `ccee_varejista_consumidor`, `ccee_encargo_ess`, `ccee_energia_reserva`, `ccee_cvu_estrutural` |
 | CCEE agente credenciado | 2 | nenhuma — depende de credencial de agente (item 2.1) |
 | BBCE | 2 | `bbce_curva_forward` |

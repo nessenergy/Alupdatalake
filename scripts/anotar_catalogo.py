@@ -83,6 +83,7 @@ ANOTACOES: dict[str, dict[str, str]] = {
         "responsavel": INTELIGENCIA,
     },  # Aditivo 01
     "balanco_dessem_mensal_subsistema": {"dominio": "mercado_de_energia", "responsavel": INTELIGENCIA},  # Aditivo 01
+    "demanda_maxima_mensal_subsistema": {"dominio": "mercado_de_energia", "responsavel": INTELIGENCIA},  # Onda 1
     "tarifa_vigente_distribuidora": {"dominio": "mercado_de_energia", "responsavel": INTELIGENCIA},  # Onda 1
     "prc_vigente_comercializadora": {"dominio": "mercado_de_energia", "responsavel": INTELIGENCIA},  # Onda 1
     # 2 · Geração e Operacional — usinas do SIN, dado público

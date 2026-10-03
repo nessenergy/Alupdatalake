@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import io
+import tempfile
 import zipfile
 from datetime import date
 from decimal import Decimal
@@ -83,7 +84,9 @@ def test_hora_sem_medicao_vira_nulo_e_nunca_zero(monkeypatch) -> None:
     conector, _ = _conector(monkeypatch, {2025: _zip((NOME, FIXTURE))})
     registros = _linhas(conector, "2025-01-01", "2025-12-31")
 
-    assert any(r.precipitacao_mm is None for r in registros)
+    vazia = [r for r in registros if r.precipitacao_mm is None]
+    assert [(r.data_referencia, r.hora_utc) for r in vazia] == [(date(2025, 1, 23), 20)]  # a linha vazia da fixture
+    assert all(r.precipitacao_mm == Decimal("0") for r in registros if r.data_referencia == date(2025, 1, 1))
 
 
 def test_sentinela_9999_vira_nulo() -> None:
@@ -116,10 +119,99 @@ def test_janela_que_cruza_o_ano_baixa_os_dois_zips(monkeypatch) -> None:
     assert {r.data_referencia.year for r in registros} == {2025, 2026}
 
 
-def test_ano_ainda_nao_publicado_e_aviso_nao_erro(monkeypatch) -> None:
+def test_ano_ainda_nao_publicado_e_aviso_nao_erro(monkeypatch, caplog) -> None:
     conector, _ = _conector(monkeypatch, {2025: _zip((NOME, FIXTURE)), 2026: None})
 
-    assert _linhas(conector, "2025-01-01", "2026-12-31")  # o 2026 devolveu 404; o 2025 vale
+    with caplog.at_level("WARNING"):
+        registros = _linhas(conector, "2025-01-01", "2026-12-31")  # o 2026 devolveu 404; o 2025 vale
+
+    assert registros
+    assert {r.data_referencia.year for r in registros} == {2025}
+    avisos = [r for r in caplog.records if r.levelname == "WARNING" and "ainda não publicado" in r.getMessage()]
+    assert len(avisos) == 1
+    assert "2026" in avisos[0].getMessage()
+
+
+def test_sentinela_9999_no_csv_sai_nulo_e_nao_erro_nem_zero(monkeypatch) -> None:
+    texto = FIXTURE.decode("latin-1").replace("2025/01/01;0100 UTC;0;", "2025/01/01;0100 UTC;-9999;")
+    conector, _ = _conector(monkeypatch, {2025: _zip((NOME, texto.encode("latin-1")))})
+    execucao = conector.ingerir(Janela.de_texto("2025-01-01", "2025-01-01"))
+    registros = _linhas(conector, "2025-01-01", "2025-01-01")
+
+    assert execucao.linhas_invalidas == 0
+    assert {r.hora_utc: r.precipitacao_mm for r in registros}[1] is None
+    assert {r.hora_utc: r.precipitacao_mm for r in registros}[0] == Decimal("0")
+
+
+def test_limite_inferior_da_janela_deixa_o_dia_anterior_de_fora(monkeypatch, caplog) -> None:
+    """A fixture só tem horas de 2025-01-01 e uma linha vazia em 2025-01-23: a janela de 02/01 não colhe nada."""
+    conector, _ = _conector(monkeypatch, {2025: _zip((NOME, FIXTURE))})
+
+    with caplog.at_level("WARNING"):
+        assert _linhas(conector, "2025-01-02", "2025-01-02") == []
+    assert "nenhuma hora" in caplog.text
+
+
+class _RespostaQueQuebra:
+    status_code = 200
+    fechada = False
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *_):
+        _RespostaQueQuebra.fechada = True
+
+    def raise_for_status(self) -> None:
+        pass
+
+    def iter_content(self, _tamanho):
+        yield b"abc"
+        raise ConnectionError("caiu no meio do download")
+
+
+class _Resposta404:
+    status_code = 404
+    fechada = False
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *_):
+        _Resposta404.fechada = True
+
+
+def test_download_que_quebra_no_meio_fecha_o_temporario_e_propaga(monkeypatch) -> None:
+    criados = []
+    real = tempfile.TemporaryFile
+
+    def temporario():
+        arquivo = real()
+        criados.append(arquivo)
+        return arquivo
+
+    monkeypatch.setattr("src.conectores.inmet_precipitacao.tempfile.TemporaryFile", temporario)
+    monkeypatch.setattr("src.conectores.inmet_precipitacao.criar_sessao", lambda: None)
+    conector = InmetPrecipitacao()
+    conector._sessao = type("S", (), {"get": lambda self, *a, **k: _RespostaQueQuebra()})()
+    _RespostaQueQuebra.fechada = False
+
+    with pytest.raises(ConnectionError, match="caiu"):
+        conector._baixar_zip(2025)
+
+    assert len(criados) == 1
+    assert criados[0].closed
+    assert _RespostaQueQuebra.fechada
+
+
+def test_404_fecha_a_resposta(monkeypatch) -> None:
+    monkeypatch.setattr("src.conectores.inmet_precipitacao.criar_sessao", lambda: None)
+    conector = InmetPrecipitacao()
+    conector._sessao = type("S", (), {"get": lambda self, *a, **k: _Resposta404()})()
+    _Resposta404.fechada = False
+
+    assert conector._baixar_zip(2026) is None
+    assert _Resposta404.fechada
 
 
 def test_zip_sem_nenhum_csv_falha_alto(monkeypatch) -> None:

@@ -1,6 +1,6 @@
 # ADR 026 — Precipitação do INMET por bacia: ponto em polígono com os contornos do ONS
 
-**Status**: implementado (fonte `ons_bacia_contorno` e coluna `bacia` na Gold da chuva); a cobertura (39% das estações sem bacia, 3 bacias do EAR sem polígono) aguarda a manifestação da Alup · **Data**: 2026-10-03 · **Relaciona-se** com a cláusula 4ª (Onda 1,
+**Status**: implementado (fonte `ons_bacia_contorno` e coluna `bacia` na Gold da chuva), **ainda não aceito**: só vira "aceito" depois da conversa de fechamento com a Alup sobre a cobertura (39% das estações sem bacia, 3 bacias do EAR sem polígono) · **Data**: 2026-10-03 · **Relaciona-se** com a cláusula 4ª (Onda 1,
 "INMET — precipitação histórica por bacia") e com o dicionário de
 [`ons_ear_bacia`](../../dicionario-dados/ons_ear_bacia.md)
 
@@ -32,7 +32,9 @@ Fatos verificados:
   `ID` e `Nome_Bacia`. Descrito pelo próprio ONS como os contornos "das bacias hidrográficas com
   aproveitamentos no SIN".
 - **Cruzamento de nomes** com o EAR: 20 dos 23 nomes do EAR têm polígono (por nome, ignorando
-  acento e caixa; Itajaí aparece como `Itajaí-Açu`). **Sem polígono**: AMAZONAS, PARAGUAI e
+  acento e caixa; Itajaí aparece como `Itajaí-Açu`). **Correção (03/10/2026, na implementação):** pela chave
+  normalizada (maiúsculas e sem acento) são **19 de 23**, porque `ITAJAI-ACU` não é `ITAJAI`; o texto original
+  fica como foi escrito, e o Itajaí exige um de-para manual. **Sem polígono**: AMAZONAS, PARAGUAI e
   SANTA MARIA VIT. O shapefile traz 11 polígonos que não são nome de EAR (Correntes, Tapajós,
   Xingu, Madeira, Antas, Manso, Uatuamã, Curuá-Una, Itiquira, Jauru, Jari).
 - **Qualidade da geometria**: 6 dos 31 polígonos têm **autointerseção** (Iguaçu, Madeira, Paraná,
@@ -41,7 +43,8 @@ Fatos verificados:
   de área desprezível (Tapajós/Madeira 0,3 grau², Madeira/Jauru 0,01, Paraná/Paranapanema 0,08).
 - **Teste real de ponto em polígono**: `apitempo.inmet.gov.br/estacoes/T` (200) lista 672
   estações com coordenadas. Com os polígonos reparados, **408 caem em alguma bacia (61%), 264
-  ficam fora (39%)**, e 1 cai em duas. Contagem por bacia: Tocantins 53, Paraná 51, São
+  ficam fora (39%)**, e 1 cai em duas. Os percentuais são sobre as **672 estações da lista do INMET**, não
+  sobre as que têm histórico de chuva. Contagem por bacia: Tocantins 53, Paraná 51, São
   Francisco 48, Uruguai 45, Grande 25, Paranaíba 23, Tapajós 23, Parnaíba 22, Paraíba do Sul 18,
   Xingu 14, Madeira 13, Paranapanema 13, Tietê 13, Iguaçu 12, Doce 10, Jequitinhonha 6, Jacuí 5,
   Antas 4, Paraguaçu 4, Itajaí-Açu 2, e 1 cada em Manso, Curuá-Una, Araguari, Itabapoana e Mucuri.
@@ -69,6 +72,9 @@ entrega em boa parte do território.
 
 ## 4. Decisão
 
+A decisão é **híbrida**: **A** para o que cai nos contornos do ONS e **C** para o resto (estação com `bacia`
+nula, entregue por estação e UF).
+
 **Alternativa A**, com a regra de que **a chuva continua entregue por estação** e a bacia é uma
 coluna a mais, não um agregado que esconda estação:
 
@@ -77,7 +83,7 @@ coluna a mais, não um agregado que esconda estação:
 2. A Gold da chuva liga cada estação ao polígono por `ST_CONTAINS` e normaliza o nome
    (`trim`, maiúsculas, sem acento) para casar com `bacia` da `silver.ons_ear_bacia`.
 3. Estação fora de qualquer polígono sai com `bacia` nula e a UF preenchida, nunca com bacia
-   inventada. A Gold expõe também quantas estações entraram em cada bacia e quantas ficaram sem.
+   inventada (é a parte C da decisão). A Gold expõe também quantas estações entraram em cada bacia e quantas ficaram sem.
 4. Bacias do EAR sem polígono (AMAZONAS, PARAGUAI, SANTA MARIA VIT) ficam sem chuva, e isso é
    declarado na documentação. Não se soma Tapajós, Xingu etc. para fabricar AMAZONAS: o ONS não
    diz que é essa a composição.
@@ -98,5 +104,7 @@ coluna a mais, não um agregado que esconda estação:
   do ONS (litoral, Nordeste e Norte sem aproveitamentos do SIN) e que 3 bacias do EAR não têm
   polígono. Pedir confirmação de que o recorte "por bacia" cobre as bacias do ONS e não todo o
   território; se não, vale a saída C para o restante (por estação e UF).
+- **Licença e crédito**: o conjunto `bacia_contorno` é CC-BY, que exige crédito ao ONS na documentação e na
+  linhagem; o crédito já consta em [`ons_bacia_contorno`](../../dicionario-dados/ons_bacia_contorno.md).
 - **Plano**: acrescentar tarefa de implementação (fonte `ons_bacia_contorno` e junção na
   Gold). Este ADR não escreve código.

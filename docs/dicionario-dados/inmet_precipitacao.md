@@ -7,7 +7,7 @@
 | Endpoint | `portal.inmet.gov.br/uploads/dadoshistoricos/{ano}.zip` |
 | Escopo | **Onda 1**, linha "INMET — precipitação histórica por bacia" da cláusula 4ª. A Gold é **por estação, com a bacia ao lado** (coluna `bacia`, ponto em polígono com os contornos do ONS: [ADR 026](../arquitetura/decisoes/026-precipitacao-por-bacia.md) e [`ons_bacia_contorno`](ons_bacia_contorno.md)); a chuva **não** é agregada por bacia |
 | Frequência | O zip do ano é reescrito poucas vezes por mês e atrasa (ver "Defasagem") |
-| Cobertura | 2025 completo (595 CSVs de estação); o de 2026 é parcial. A cobertura carregada no BigQuery será registrada aqui depois da carga do histórico |
+| Cobertura | Lida a partir do zip de 2025 (o de 2026 é parcial); o número de CSVs e a cobertura completa do ano **não foram medidos**: só 01 e 02/03/2025 foram lidos por inteiro (564 estações). A cobertura carregada no BigQuery será registrada aqui depois da carga do histórico |
 | Volume | 60 a 90 MB por zip; 27.072 linhas e 564 estações em 01 e 02/03/2025 (medido na leitura real) |
 | Licença | a do portal do INMET (não conferida aqui) |
 | Credencial | nenhuma |
@@ -105,6 +105,7 @@ a Silver fica com uma linha por estação, dia e hora.
 `gold.precipitacao_diaria_estacao`: chuva diária por estação (`precipitacao_mm_dia`), com `horas_com_medicao`,
 `horas_sem_medicao` e `ultima_hora_com_dado` (por estação, para o zip atrasado não parecer sucesso). **Hora sem
 medição fica fora da soma, nunca vira zero**; um dia com 0 horas medidas dá `precipitacao_mm_dia` nulo.
+`ultima_hora_com_dado` é **por estação**: é a última hora com medição da estação no Silver inteiro, e se repete igual em todas as linhas de dia dela (não é a última hora do dia da linha).
 Sem KPI e sem comparação entre estações (ADR 012).
 
 ### A coluna `bacia` (ADR 026, implementado)

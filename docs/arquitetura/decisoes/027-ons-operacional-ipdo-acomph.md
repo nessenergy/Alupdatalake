@@ -85,7 +85,7 @@ lake já tem consolidado.
 distribuição é pelo SINtegre, exige cadastro e credencial, o que não é Onda 1 ("sem
 dependência de credenciais da Alup"). Pela regra 2 do contrato, o segredo, a
 declaração em `infra/` e o pedido à Alup são de Onda 2. A necessidade de analítica
-hidrológica (vazões e condições por usina) fica atendida, em parte, pelos conjuntos
+hidrológica (vazões e condições por usina) pode ser atendida, em parte, pelos conjuntos
 de EAR, ENA e dados hidrológicos da tabela acima.
 
 Em ambos os casos o escopo do item não é entregue como "IPDO e ACOMPH" literais, e
@@ -111,10 +111,15 @@ esse item, e os conjuntos operacionais do ONS seguem entregues.
 >
 > Propomos: (a) dar o IPDO por atendido pelos conjuntos já entregues, acrescentando a
 > demanda máxima; (b) deslocar o ACOMPH para a Onda 2, condicionado à
-> obtenção do cadastro no SINtegre e à guarda da credencial no Secret Manager; (c) usar as horas liberadas dentro das 580 h previstas
-> na cláusula, que admite alteração de fontes. Pedimos o aceite por escrito.
+> obtenção do cadastro no SINtegre e à guarda da credencial no Secret Manager; (c) usar as horas
+> liberadas dentro das 580 h previstas na cláusula, que admite alteração de fontes. Pedimos o aceite
+> por escrito.
 
 A decisão de enviar, e a forma, é de quem fala com o cliente.
+
+**Atualização:** a demanda máxima do IPDO (seção 7) passou a existir como fonte no lake
+(`ons_demanda_maxima`, PR #361), o que reduz a lacuna de conteúdo que esta ADR aponta; a decisão
+acima não muda.
 
 ## 6. Não verificado
 

@@ -152,6 +152,22 @@ variable "conectores" {
       cron         = "0 9 * * 1"
       ultimos_dias = 400
     }
+    inmet_precipitacao = {
+      # Onda 1, "precipitação" da cláusula 4ª. O zip anual do portal do INMET (60 a 90 MB, um CSV por estação) é
+      # reescrito poucas vezes por mês e atrasa: o de 2026 tinha Last-Modified de 02/09 em 02/10. Semanal, segunda
+      # às 6h; a janela de 62 dias cobre a virada do zip e a republicação. O job baixa o zip inteiro a cada
+      # execução, mesmo para um dia de janela.
+      #
+      # `memoria` 1Gi: o zip fica num arquivo temporário (no Cloud Run o /tmp conta na memória: 60 a 90 MB, dois
+      # zips na virada do ano, um de cada vez) e cada CSV de estação é lido inteiro (~1 MB); o resto segue o
+      # runner em fatias de 8 MiB, que no ons_geracao_usina (534 mil linhas) marcou 440 MiB. 62 dias são ~900 mil
+      # linhas (564 estações x 24 h x 62 dias, estimativa). O pico deste conector NÃO foi medido: confirmar na
+      # primeira carga em hml. `timeout` fica no padrão de 1800 s: o ons_geracao_usina leu 534 mil linhas em 84 s.
+      cron         = "0 6 * * 1"
+      ultimos_dias = 62
+      memoria      = "1Gi"
+      cpu          = "1"
+    }
     ons_capacidade = {
       # Cadastro de unidades geradoras; muda devagar, como o aneel_siga.
       # Segunda de manhã, uma hora depois do SIGA, para não disputar a mesma

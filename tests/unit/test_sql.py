@@ -420,3 +420,11 @@ def test_silver_das_tarifas_nao_reprova_valor_negativo_que_a_aneel_publica() -> 
     """2.433 linhas do arquivo real têm TUSD ou TE negativa; a asserção de piso em zero reprovou o Dataform (02/10)."""
     caminho = Path(__file__).resolve().parents[2] / "definitions" / "silver" / "aneel_tarifas.sqlx"
     assert ">= 0" not in caminho.read_text(encoding="utf-8").split("SELECT", 1)[0]
+
+
+def test_gold_da_chuva_nao_trata_hora_sem_medicao_como_zero() -> None:
+    """Hora sem medição conta em `horas_sem_medicao`; somar COALESCE(..., 0) esconderia o buraco da origem."""
+    caminho = Path(__file__).resolve().parents[2] / "definitions" / "gold" / "precipitacao_diaria_estacao.sqlx"
+    sql = caminho.read_text(encoding="utf-8")
+    assert "horas_sem_medicao" in sql
+    assert "COALESCE(precipitacao_mm" not in sql

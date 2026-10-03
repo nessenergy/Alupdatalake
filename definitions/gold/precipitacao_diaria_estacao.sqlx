@@ -1,0 +1,23 @@
+config {
+  type: "table",
+  schema: "gold",
+  tags: ["gold"],
+  dependOnDependencyAssertions: true
+}
+
+-- Gold: chuva diária por estação do INMET. `horas_sem_medicao` mostra o buraco da origem em vez de escondê-lo
+-- dentro de um zero. `ultima_hora_com_dado` é por estação: o zip do ano corrente atrasa semanas, e um dia
+-- sem linhas não quer dizer um dia sem chuva. Sem KPI nem comparação entre estações (ADR 012).
+-- Por estação, não por bacia: o ADR 026 decidiu o ponto em polígono, ainda não implementado.
+SELECT
+  estacao,
+  ANY_VALUE(nome_estacao) AS nome_estacao,
+  ANY_VALUE(uf) AS uf,
+  data_referencia,
+  SUM(precipitacao_mm) AS precipitacao_mm_dia,
+  COUNTIF(precipitacao_mm IS NOT NULL) AS horas_com_medicao,
+  COUNTIF(precipitacao_mm IS NULL) AS horas_sem_medicao,
+  MAX(MAX(IF(precipitacao_mm IS NOT NULL, TIMESTAMP_ADD(TIMESTAMP(data_referencia), INTERVAL hora_utc HOUR), NULL)))
+    OVER (PARTITION BY estacao) AS ultima_hora_com_dado
+FROM ${ref("silver", "inmet_precipitacao")}
+GROUP BY estacao, data_referencia

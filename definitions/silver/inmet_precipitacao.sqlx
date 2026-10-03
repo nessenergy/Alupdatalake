@@ -1,0 +1,31 @@
+config {
+  type: "view",
+  schema: "silver",
+  tags: ["silver"],
+  assertions: {
+    uniqueKey: ["estacao", "data_referencia", "hora_utc"],
+    nonNull: ["estacao", "data_referencia", "hora_utc"],
+    rowConditions: [
+      "hora_utc BETWEEN 0 AND 23",
+      "precipitacao_mm IS NULL OR (precipitacao_mm >= 0 AND precipitacao_mm <= 500)"
+    ]
+  }
+}
+
+-- Silver: precipitação horária do INMET deduplicada. Para cada estação, dia e hora vence a ingestão mais recente.
+-- Hora sem medição continua NULL: a Silver não inventa zero.
+SELECT
+  data_referencia,
+  CAST(NULL AS STRING) AS submercado,    -- a estação é do INMET, não do submercado (o mapeamento por bacia é do ADR 026)
+  CAST(NULL AS STRING) AS codigo_usina,
+  CAST(NULL AS STRING) AS agente_ccee,
+  FORMAT_DATE('%Y-%m', data_referencia) AS periodo_apuracao,
+  CAST(NULL AS STRING) AS periodo_apuracao_ccee,
+  estacao, nome_estacao, regiao, uf, latitude, longitude, altitude_m,
+  hora_utc, precipitacao_mm,
+  _ingestao_id, _ingestao_timestamp
+FROM ${ref("bronze", "inmet_precipitacao")}
+QUALIFY ROW_NUMBER() OVER (
+  PARTITION BY estacao, data_referencia, hora_utc
+  ORDER BY _ingestao_timestamp DESC
+) = 1

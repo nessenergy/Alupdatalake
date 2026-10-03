@@ -137,12 +137,12 @@ nomes para os mesmos conjuntos. Ver §5.1.
 
 | | |
 |---|---|
-| **Fontes hoje** | `tempook_boletins` — boletim guardado como arquivo, **acervo até 26/10/2022** ([ADR 019](decisoes/019-boletim-do-tempook-como-arquivo.md)) · **`tempook_ena_prevs`** — previsão de ENA, um `tar.gz` por dia, **em dia** |
+| **Fontes hoje** | **`inmet_precipitacao`** — chuva horária por estação, do zip anual do INMET (Onda 1; por estação, o "por bacia" é do [ADR 026](decisoes/026-precipitacao-por-bacia.md), ainda não implementado) · `tempook_boletins` — boletim guardado como arquivo, **acervo até 26/10/2022** ([ADR 019](decisoes/019-boletim-do-tempook-como-arquivo.md)) · **`tempook_ena_prevs`** — previsão de ENA, um `tar.gz` por dia, **em dia** |
 | **Fontes a conectar** | os demais caminhos do TempoOK que a Alup vai indicar; o boletim recente, se estiver em outra área do storage |
-| **Granularidade** | arquivo diário (por modelo, no ENA-PREVS) |
+| **Granularidade** | hora por estação (INMET); arquivo diário (por modelo, no ENA-PREVS) |
 | **Cadência** | diária, inclusive fim de semana |
-| **Gold hoje** | `cobertura_boletins_tempook`, `cobertura_ena_prevs_tempook` |
-| **Situação** | **arquivado e em dia — sem conteúdo extraído.** O domínio passou a ter dado da data de hoje em 21/09; a extração dos números é escopo futuro e depende de a Alup dizer quais importam |
+| **Gold hoje** | `precipitacao_diaria_estacao` (chuva diária por estação do INMET, Onda 1), `cobertura_boletins_tempook`, `cobertura_ena_prevs_tempook` |
+| **Situação** | **INMET: chuva horária por estação, com número (Onda 1).** TempoOK: **arquivado e em dia — sem conteúdo extraído.** O domínio passou a ter dado da data de hoje em 21/09; a extração dos números é escopo futuro e depende de a Alup dizer quais importam |
 
 O domínio responde "o arquivo de tal dia chegou", não "choveu quanto" nem "a ENA
 esperada é tal". A diferença é grande e está registrada. Os `tar.gz` do ENA-PREVS

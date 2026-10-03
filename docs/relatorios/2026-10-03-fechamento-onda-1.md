@@ -11,9 +11,9 @@ conferido no BigQuery** (com data e contagem). Onde a conferência não foi feit
 | # | Item da cláusula | Fontes no projeto | Estado em 03/10 |
 |---|---|---|---|
 | 1 | ONS Core (EAR, ENA, PLD horário, Carga) | `ons_ear`, `ons_ena`, `ccee_pld`, `ons_carga` | 7 componentes no repositório (matriz, §2) |
-| 2 | ONS Operacional (IPDO e ACOMPH) | `ons_demanda_maxima` (seção 7 do IPDO); IPDO em si e ACOMPH sem fonte | carga da demanda máxima conferida em `hml` e na Silver de `dev` (03/10); decisão proposta no ADR 027, depende de aceite da Alup; IPDO e ACOMPH **não entregues** |
+| 2 | ONS Operacional (IPDO e ACOMPH) | `ons_demanda_maxima` (seção 7 do IPDO); IPDO em si e ACOMPH sem fonte | carga da demanda máxima conferida em `hml` e `dev` (03/10, Gold com 116 linhas nos dois); decisão proposta no ADR 027, depende de aceite da Alup; IPDO e ACOMPH **não entregues** |
 | 3 | ANEEL (tarifas homologadas e referência, PRC) | `aneel_tarifas`, `ace_prc` | 7 componentes; Silver e Gold conferidas em `dev` e `hml` em 03/10 |
-| 4 | INMET (precipitação histórica por bacia) | `inmet_precipitacao`, `ons_bacia_contorno` | 7 componentes; carga e recorte por bacia conferidos em `hml` em 03/10 (398 de 653 estações com bacia); `dev` pendente |
+| 4 | INMET (precipitação histórica por bacia) | `inmet_precipitacao`, `ons_bacia_contorno` | 7 componentes; carga e recorte por bacia conferidos em `hml` e `dev` em 03/10 (398 de 653 estações com bacia nos dois) |
 | 5 | CPTEC (previsão de 7 dias) | nenhuma | **não entregue**: bloqueado (ADR 028) |
 | — | IGP-M (proposta de 28/05, minuta PDF de 23/07) | `bcb_igpm` | conferido em `hml` (03/10); `dev` pendente |
 
@@ -31,12 +31,12 @@ workflow terminou com sucesso, sem consulta ao BigQuery; `pendente (motivo)`.
 | `ons_ena` | presente | presente | presente | presente (idem) | presente | presente | presente | pendente (conferência não refeita neste relatório; evidência de 02/10 em `2026-10-02-auditoria-de-ponta-a-ponta.md`) | pendente (conferência não refeita neste relatório; evidência de 02/10 em `2026-10-02-auditoria-de-ponta-a-ponta.md`) |
 | `ccee_pld` | presente | presente | presente | presente (`pld_mensal_submercado`) | presente | presente | presente | conferido (02/10, PLD real com 24 meses, segundo a auditoria de 02/10) | conferido (02/10, PLD real com 24 meses, segundo a auditoria de 02/10) |
 | `ons_carga` | presente | presente | presente | presente (`carga_mensal_submercado`) | presente | presente | presente | pendente (conferência não refeita neste relatório; evidência de 02/10 em `2026-10-02-auditoria-de-ponta-a-ponta.md`) | pendente (conferência não refeita neste relatório; evidência de 02/10 em `2026-10-02-auditoria-de-ponta-a-ponta.md`) |
-| `ons_demanda_maxima` | presente | presente | presente | presente (`demanda_maxima_mensal_subsistema`) | presente | presente | presente | conferido (03/10/2026, Silver 3.480 linhas, de 2024-01-01 a 2026-05-19, run `37103149215`); Gold `demanda_maxima_mensal_subsistema`: 116 linhas | conferido (03/10/2026, Silver 3.480 linhas, mesmo intervalo, run `37103208999`); Gold: pendente (0 linhas, o Dataform de `dev` ainda não rodou depois da carga) |
+| `ons_demanda_maxima` | presente | presente | presente | presente (`demanda_maxima_mensal_subsistema`) | presente | presente | presente | conferido (03/10/2026, Silver 3.480 linhas, de 2024-01-01 a 2026-05-19, run `37103149215`); Gold `demanda_maxima_mensal_subsistema`: 116 linhas | conferido (03/10/2026, Silver 3.480 linhas, mesmo intervalo; Gold `demanda_maxima_mensal_subsistema` 116 linhas, igual a `hml`; run `37107071613`, depois do Dataform de `dev` `37106857432`) |
 | `aneel_tarifas` | presente | presente | presente | presente (`tarifa_vigente_distribuidora`) | presente | presente | presente | conferido (03/10/2026, Silver 327.763 linhas, de 2010-02-03 a 2026-09-22; Bronze extraiu 328.293; Gold 10.366 linhas; run `37103149215`) | conferido (03/10/2026, Silver 327.763 linhas, mesmo intervalo; Gold 10.366 linhas; run `37103208999`) |
 | `ace_prc` | presente | presente | presente | presente (`prc_vigente_comercializadora`) | presente | presente | presente | conferido (03/10/2026, Silver 24 linhas, Gold `prc_vigente_comercializadora` 24 linhas, run `37103149215`) | conferido (03/10/2026, Silver 24 linhas, Gold 24 linhas, run `37103208999`) |
-| `inmet_precipitacao` | presente | presente | presente | presente (`precipitacao_diaria_estacao`) | presente | presente | presente | conferido (03/10/2026, Silver 10.327.440 linhas, de 2024-09-01 a 2026-08-31; Gold `precipitacao_diaria_estacao` 430.310 linhas, 653 estações, run `37103149215`). A última execução (2026-09-01 a 2026-10-02) extraiu 0 linhas e terminou `SUCESSO`: o zip de 2026 do INMET só vai até agosto | pendente (carga em andamento: Silver com 2.328.164 linhas, de 2024-09-01 a 2025-02-28 naquele instante, run `37103208999`; Gold 0 linhas, o Dataform de `dev` ainda não rodou depois da carga) |
-| `ons_bacia_contorno` | presente | presente | presente | usada na Gold `precipitacao_diaria_estacao` (colunas `bacia` e `bacia_chave`, `ST_COVERS`) | presente | presente | presente | conferido (03/10/2026, 31 polígonos, run `37103149215`). Na Gold da chuva, 398 de 653 estações com bacia (61%) e 25 bacias distintas; 19 dos 23 `nomecurto` do EAR casam com as bacias | conferido (03/10/2026, 31 polígonos, run `37103208999`); o cruzamento por estação em `dev` está pendente (Gold da chuva com 0 linhas, o Dataform de `dev` ainda não rodou depois da carga) |
-| `bcb_igpm` | presente | presente | presente | presente (`igpm_mensal`) | presente | presente | presente | conferido (03/10/2026, Silver 25 linhas, de 2024-09-01 a 2026-09-01; Gold `igpm_mensal` 25 linhas, run `37103149215`) | pendente (0 linhas em run `37103208999`; `api.bcb.gov.br` fora do ar, 9 execuções com erro nos últimos 3 dias) |
+| `inmet_precipitacao` | presente | presente | presente | presente (`precipitacao_diaria_estacao`) | presente | presente | presente | conferido (03/10/2026, Silver 10.327.440 linhas, de 2024-09-01 a 2026-08-31; Gold `precipitacao_diaria_estacao` 430.310 linhas, 653 estações, run `37103149215`). A última execução (2026-09-01 a 2026-10-02) extraiu 0 linhas e terminou `SUCESSO`: o zip de 2026 do INMET só vai até agosto | conferido (03/10/2026, Silver 10.327.440 linhas, de 2024-09-01 a 2026-08-31; Gold `precipitacao_diaria_estacao` 430.310 linhas, 653 estações, 398 com bacia, 25 bacias; run `37107071613`). Igual a `hml` em todos os números. A última execução extraiu 0 linhas e terminou `SUCESSO`, como em `hml` |
+| `ons_bacia_contorno` | presente | presente | presente | usada na Gold `precipitacao_diaria_estacao` (colunas `bacia` e `bacia_chave`, `ST_COVERS`) | presente | presente | presente | conferido (03/10/2026, 31 polígonos, run `37103149215`). Na Gold da chuva, 398 de 653 estações com bacia (61%) e 25 bacias distintas; 19 dos 23 `nomecurto` do EAR casam com as bacias | conferido (03/10/2026, 31 polígonos, run `37107071613`). Na Gold da chuva em `dev`, 398 de 653 estações com bacia e 25 bacias distintas, igual a `hml`; 19 dos 23 `nomecurto` do EAR casam |
+| `bcb_igpm` | presente | presente | presente | presente (`igpm_mensal`) | presente | presente | presente | conferido (03/10/2026, Silver 25 linhas, de 2024-09-01 a 2026-09-01; Gold `igpm_mensal` 25 linhas, run `37103149215`) | pendente (0 linhas na Silver e na Gold, runs `37103208999` e `37107071613`; `api.bcb.gov.br` não resolve desde 03/10 ~03:40Z, a tentativa final de ingestão em `dev`, run `37106480778`, falhou; 12 execuções com erro nos últimos 3 dias) |
 
 Onde está cada componente (caminhos no repositório):
 
@@ -57,7 +57,7 @@ Aditivo 01 (itens 12 a 19, fora da Onda 1): conferido em `dev` em 03/10/2026 (ru
 
 Ordem dos eventos em 03/10 (contexto das cargas; as contagens conferidas estão na seção 7): em `hml`, Dataform `37100814775` (05:47Z), depois as cargas de
 `ons_bacia_contorno` e `ons_demanda_maxima`, depois Dataform `37101436318` (05:58Z, `SUCCEEDED`). Em `dev`, Dataform
-`37101539114` (06:01Z, `SUCCEEDED`), depois as cargas das duas fontes (06:07Z e 06:11Z); **o Dataform de `dev` ainda não rodou
+`37101539114` (06:01Z, `SUCCEEDED`), depois as cargas das duas fontes (06:07Z e 06:11Z); **o Dataform de `dev` ainda não tinha rodado
 depois delas**. As contagens foram conferidas depois, pelo workflow `Conferir cargas` (seção 7).
 
 ## 3. O que não foi entregue e por quê
@@ -67,8 +67,8 @@ depois delas**. As contagens foram conferidas depois, pelo workflow `Conferir ca
   origem pública; a hipótese de distribuição por cadastro **não foi verificada**. Proposta no ADR 027, sem aceite.
 - **CPTEC.** 403 em todo caminho do webservice e a API nova sem DNS; causa desconhecida. Fora da Onda 1 até haver resposta
   do INPE, como decisão provisória (ADR 028).
-- **Conferência no BigQuery:** feita em 03/10 (seção 7). Seguem pendentes o INMET em `dev` (carga em andamento), as Golds de INMET, bacia e demanda máxima em `dev` (o Dataform de `dev` ainda não rodou depois das cargas) e o `bcb_juros`.
-- **IGP-M em `dev`:** pendente por queda externa do BCB (0 linhas; 9 execuções com erro nos últimos 3 dias).
+- **Conferência no BigQuery:** feita em 03/10 (seção 7). A conferência final de `dev` (seção 7) fechou INMET, bacia e demanda máxima, com as Golds. Seguem pendentes o IGP-M em `dev` e o `bcb_juros`.
+- **IGP-M em `dev`:** pendente por queda externa do BCB (0 linhas; 12 execuções com erro nos últimos 3 dias; a tentativa final, run `37106480778`, falhou).
 
 ## 4. Decisões que dependem da Alup ou de outras pessoas
 
@@ -86,18 +86,18 @@ depois delas**. As contagens foram conferidas depois, pelo workflow `Conferir ca
 - **INMET, setembro:** o zip de 2026 do INMET só vai até agosto; a Silver de `hml` termina em 2026-08-31 e a janela de 01/09 a 02/10 extrai 0 linhas.
 - **Demanda máxima:** origem atrasada; o CSV de 2026 termina em 19/05/2026 (dicionário `ons_demanda_maxima.md`).
 - **INMET, memória:** o 1Gi do Cloud Run é estimativa, o pico não foi medido (comentário em `infra/modules/scheduler/main.tf`).
-- **BCB fora do ar** desde 03/10 ~03:40Z: `bcb_igpm` em `dev` pendente e os agendamentos diários de `bcb_juros` e do câmbio falham até voltar; `bcb_juros` teve 3 execuções com erro em 3 dias nos dois ambientes.
+- **BCB fora do ar** desde 03/10 ~03:40Z: `bcb_igpm` em `dev` pendente (12 execuções com erro em 3 dias) e os agendamentos diários de `bcb_juros` e do câmbio falham até voltar; `bcb_juros` teve 3 execuções com erro em 3 dias nos dois ambientes.
 
 ## 6. Próximo passo recomendado
 
-Rodar de novo o workflow `Conferir cargas` em `dev` quando a carga do INMET terminar e depois de um Dataform de `dev`
-(para ter as Golds de INMET, bacia e demanda máxima), e repetir o `bcb_igpm` em `dev` quando o BCB voltar. Só depois
-dessas conferências os marcos correspondentes do painel podem virar `feito`.
+A carga do INMET em `dev` terminou e o Dataform de `dev` rodou depois dela (seção 7, conferência final). Falta repetir o
+`bcb_igpm` em `dev` quando o BCB voltar e rodar `Conferir cargas` de novo. Os marcos do painel seguem `previsto`: dependem
+do aceite da Alup (ADRs 026 e 027) e das pendências abaixo.
 
 ## 7. Conferência de 03/10
 
 Método: workflow `Conferir cargas` (PR #364), somente leitura no BigQuery, com a conta de serviço de deploy. `hml`: run
-`37103149215`. `dev`: run `37103208999`, **com a carga do INMET em `dev` ainda em andamento**. Os dois em 03/10/2026.
+`37103149215`. `dev`: run `37103208999`, **com a carga do INMET em `dev` ainda em andamento naquele instante**; a coluna `dev` da tabela abaixo é essa primeira conferência e a final de `dev` (run `37107071613`) está na subseção seguinte. Os dois em 03/10/2026.
 Contagens da Silver, salvo onde indicado.
 
 | Fonte | `hml` | `dev` |
@@ -113,6 +113,24 @@ Contagens da Silver, salvo onde indicado.
 Saúde da ingestão: `hml` com 45 fontes `OK`, 1 `SEM_SUCESSO` e 1 `FALHA_RECENTE`; `dev` com 53 `OK`, 2 `SEM_SUCESSO`,
 1 `ATRASADA` e 1 `FALHA_RECENTE`. `bcb_juros` com erros nos dois ambientes (queda do BCB).
 
-Pendente, com o motivo: IGP-M em `dev` (BCB fora do ar); INMET em `dev` (carga em andamento); Gold de INMET, bacia e
-demanda máxima em `dev` (o Dataform de `dev` ainda não rodou depois das cargas); `bcb_juros` (queda do BCB). As fontes
+Pendente, com o motivo: IGP-M em `dev` (BCB fora do ar); `bcb_juros` (queda do BCB). As fontes
 `ons_ear`, `ons_ena` e `ons_carga` seguem com a evidência da auditoria de 02/10, sem nova conferência.
+
+### Conferência final de `dev`
+
+Depois da carga do INMET em `dev` (9 janelas `success`) e do Dataform de `dev` `SUCCEEDED` (deploy `37106857432`, 03/10
+07:38Z), o workflow `Conferir cargas` rodou de novo em `dev`: run `37107071613`. A tabela substitui, para estes itens, a
+coluna `dev` acima. `hml` é a run `37103149215`.
+
+| Item | `dev` (run `37107071613`) | `hml` (run `37103149215`) | Situação |
+|---|---|---|---|
+| `inmet_precipitacao`, Silver | 10.327.440 linhas, 2024-09-01 a 2026-08-31 | idem | conferido, igual |
+| Gold `precipitacao_diaria_estacao` | 430.310 linhas, 653 estações, 398 com bacia, 25 bacias | idem | conferido, igual |
+| `ons_bacia_contorno` | 31 polígonos; 19 dos 23 `nomecurto` do EAR casam | idem | conferido, igual |
+| Gold `demanda_maxima_mensal_subsistema` | 116 linhas | 116 linhas | conferido, igual |
+| `bcb_igpm` | 0 linhas (Silver e Gold) | 25 linhas | **pendente** (BCB fora do ar; 12 execuções com erro em 3 dias; tentativa final, run `37106480778`, falhou) |
+| `bcb_juros` | 3 execuções com erro em 3 dias | 3 | **pendente** (queda do BCB) |
+| Saúde da ingestão | 53 `OK`, 2 `SEM_SUCESSO`, 1 `ATRASADA`, 1 `FALHA_RECENTE` | 45 `OK`, 1 `SEM_SUCESSO`, 1 `FALHA_RECENTE` | sem mudança em `dev` desde a run `37103208999` |
+
+Não contadas pela conferência: as Golds dos oito itens do Aditivo 01. Segue pendente a decisão de aceite da Alup sobre os
+ADRs 026, 027 e 028. O estado da Onda 1 no painel (`entregue`) não muda.

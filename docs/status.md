@@ -43,25 +43,23 @@ Relatório de fechamento, com a matriz dos 7 componentes e a conferência por am
 
 - **ONS Operacional:** `ons_demanda_maxima` (seção 7 do IPDO, PR #361) tem os 7 componentes no repositório; a carga foi conferida
   no BigQuery em 03/10 (Silver com 3.480 linhas, de 2024-01-01 a 2026-05-19, em `hml` e `dev`; a origem está atrasada). Gold com 116
-  linhas em `hml` e 0 em `dev`, onde o Dataform ainda não rodou depois da carga. IPDO e ACOMPH: decisão proposta, depende de aceite da Alup
+  linhas em `hml` e em `dev` (conferida em `dev` na run `37107071613`, depois do Dataform). IPDO e ACOMPH: decisão proposta, depende de aceite da Alup
   ([ADR 027](arquitetura/decisoes/027-ons-operacional-ipdo-acomph.md)); não estão entregues.
 - **INMET:** `inmet_precipitacao` e `ons_bacia_contorno` com os 7 componentes no repositório; conferido em `hml` em 03/10: Silver do INMET com 10.327.440 linhas (2024-09-01 a 2026-08-31; sem dado de setembro porque o zip de 2026 do INMET
-  vai até agosto), Gold com 653 estações, **398 com bacia (61%)** e 25 bacias, 31 polígonos (19 dos 23 `nomecurto` do EAR casam). Em `dev` a carga
-  do INMET segue em andamento (2.328.164 linhas naquele instante) e as Golds ainda não rodaram. Recorte por bacia
+  vai até agosto), Gold com 653 estações, **398 com bacia (61%)** e 25 bacias, 31 polígonos (19 dos 23 `nomecurto` do EAR casam). Em `dev`, depois da carga do INMET (9 janelas `success`) e do Dataform `37106857432`, a conferência de 03/10 (run `37107071613`) deu os **mesmos números de `hml`**: Silver 10.327.440 linhas, Gold 430.310 linhas, 653 estações, 398 com bacia, 25 bacias. Recorte por bacia
   proposto no [ADR 026](arquitetura/decisoes/026-precipitacao-por-bacia.md), sem aceite.
 - **ANEEL:** conferido em `dev` e `hml` em 03/10: Silver de tarifas com 327.763 linhas (o Bronze extraiu 328.293), 24 preços de PRC; Gold de
   tarifas com 10.366 linhas e de PRC com 24, nos dois.
 - **CPTEC:** bloqueado, sem causa conhecida; fora da Onda 1 até haver resposta do INPE, como decisão provisória
   ([ADR 028](arquitetura/decisoes/028-cptec-acesso.md)). Não entregue.
-- **Conferência no BigQuery (03/10):** feita pelo workflow `Conferir cargas` (somente leitura; `hml` run `37103149215`, `dev` run `37103208999`).
+- **Conferência no BigQuery (03/10):** feita pelo workflow `Conferir cargas` (somente leitura; `hml` run `37103149215`, `dev` runs `37103208999` e `37107071613`, esta depois da carga do INMET e do Dataform de `dev`).
   Aditivo 01, itens 12 a 19: Silver em `dev` com 94.656 a 18.998.832 linhas por item, `SUCESSO` e zero inválidas, entregues em 03/10 (162h de
-  162h apontadas); em `hml` os oito têm 0 linhas. **Ainda pendentes:** IGP-M em `dev` (BCB fora do ar), INMET em `dev` (carga em andamento),
-  Golds de INMET, bacia e demanda máxima em `dev` (o Dataform de `dev` ainda não rodou depois das cargas) e `bcb_juros` (erros nos dois
-  ambientes). Marcos só viram `feito` depois disso.
+  162h apontadas); em `hml` os oito têm 0 linhas. **Ainda pendentes:** IGP-M em `dev` (BCB fora do ar) e `bcb_juros` (erros nos dois
+  ambientes). Saúde da ingestão em `dev` na run `37107071613`: 53 `OK`, 2 `SEM_SUCESSO`, 1 `ATRASADA`, 1 `FALHA_RECENTE`. Marcos só viram `feito` depois disso.
 - **ADRs 026 a 028 aguardam o aceite da Alup**, assim como a pergunta sobre transmissão (TUST/RAP) nas tarifas.
 - **Inconsistência a decidir (comercial):** o painel mantém a Onda 1 como `entregue` desde 25/09; frente aos itens 2, 4 e 5
   da cláusula 4ª, o relatório de fechamento aponta a divergência. Marco não alterado.
-- **IGP-M (`bcb_igpm`):** conferido em `hml` em 03/10 (Silver 25 linhas, Gold 25). Em `dev` pendente (0 linhas): `api.bcb.gov.br` não resolve desde 03/10
+- **IGP-M (`bcb_igpm`):** conferido em `hml` em 03/10 (Silver 25 linhas, Gold 25). Em `dev` pendente (0 linhas; 12 execuções com erro em 3 dias; a tentativa final, run de ingestão `37106480778`, falhou): `api.bcb.gov.br` não resolve desde 03/10
   ~03:40Z (externo); os agendamentos de `bcb_juros` e câmbio também falham até voltar.
 - **Pendência: confirmar qual versão do contrato foi assinada.** O .docx v3 não cita IGP-M e a minuta PDF de 23/07
   cita. A decisão cabe a quem guarda o contrato; não bloqueia a entrega.

@@ -1,0 +1,93 @@
+name: Sondar rede
+
+# Chama endereços públicos de dentro do GCP (a partir de um Cloud Run Job que já existe) e mostra status,
+# tamanho, tipo e os primeiros caracteres da resposta. Serve para separar "a origem bloqueia o IP da máquina
+# de desenvolvimento" de "a origem bloqueia qualquer um" (caso do CPTEC, ADR 028).
+#
+# Somente leitura de endereço público: a lista de endereços é constante em `src/core/sonda.py`, nada vem de
+# entrada do usuário, nada é gravado e o job devolve sempre 0, então não dispara alerta de ingestão. Só a SA de
+# deploy executa job (ADR 015). Usa o job `ingestao-bcb-cambio-ptax` só como casca de execução do mesmo contêiner.
+#
+# Entrada do usuário nunca entra num `run:` por `${{ }}`: vai por variável de ambiente e é validada.
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Ambiente'
+        required: true
+        type: choice
+        options:
+          - dev
+          - hml
+          - prod
+      sonda:
+        description: 'Sonda da lista fixa em src/core/sonda.py'
+        required: true
+        type: choice
+        options:
+          - cptec
+          - inmet_previsao
+          - open_meteo
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: sondar-rede-${{ inputs.environment }}
+  cancel-in-progress: false
+
+jobs:
+  sondar:
+    name: "Sonda ${{ inputs.sonda }} (${{ inputs.environment }})"
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    steps:
+      - name: Validar entradas
+        env:
+          SONDA: ${{ inputs.sonda }}
+        run: |
+          set -euo pipefail
+          [[ "$SONDA" =~ ^[a-z_]+$ ]] || { echo "::error::sonda inválida"; exit 1; }
+
+      - uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3.0.0
+        id: auth
+        with:
+          workload_identity_provider: ${{ vars.GCP_WIF_PROVIDER }}
+          service_account: ${{ vars.GCP_DEPLOY_SA }}
+      - uses: google-github-actions/setup-gcloud@aa5489c8933f4cc7a4f7d45035b3b1440c9c10db # v3.0.1
+
+      - name: Executar a sonda no job
+        env:
+          SONDA: ${{ inputs.sonda }}
+          AMBIENTE: ${{ inputs.environment }}
+          PROJETO: ${{ steps.auth.outputs.project_id }}
+          REGIAO: ${{ vars.GCP_REGION }}
+        run: |
+          set -euo pipefail
+          [[ "$SONDA" =~ ^[a-z_]+$ ]] || exit 1
+          JOB="ingestao-bcb-cambio-ptax"
+          {
+            echo "### Sonda \`$SONDA\` em \`$AMBIENTE\`"
+            echo ""
+            echo "- Executada de dentro do GCP, no job \`$JOB\`"
+            echo ""
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          gcloud run jobs execute "$JOB" --project "$PROJETO" --region "$REGIAO" --wait \
+            --args="sondar,$SONDA" 2>&1 | tee /tmp/execucao.log
+          execucao=$(grep -oE 'executions describe [a-zA-Z0-9-]+' /tmp/execucao.log | awk '{print $3}' | head -1)
+          [[ -n "$execucao" ]] || { echo "::error::não achei o id da execução"; exit 1; }
+
+          # O log de contêiner chega ao Cloud Logging com alguns segundos de atraso: tenta algumas vezes.
+          for tentativa in 1 2 3 4 5 6; do
+            gcloud logging read \
+              "resource.type=\"cloud_run_job\" AND resource.labels.job_name=\"$JOB\" AND labels.\"run.googleapis.com/execution_name\"=\"$execucao\" AND textPayload:\"sonda\"" \
+              --project "$PROJETO" --format="value(textPayload)" --order=asc --limit=20 > /tmp/sonda.log 2>&1 || true
+            [[ -s /tmp/sonda.log ]] && break
+            sleep 10
+          done
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+          cat /tmp/sonda.log | tee -a "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"

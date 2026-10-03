@@ -68,8 +68,9 @@ ano de idade é informação, e é o que a Gold expõe. Sem KPI nem comparação
   tipo que comece com "conve"; tipo que não seja convencional nem incentivada vira linha inválida, contada.
 - **Aviso, não erro.** Se a tabela tiver número de preços diferente de 24 (4 submercados × 2 tipos × 3 prazos), o
   conector registra um aviso: pode ser linha nova e legítima.
-- **Data defasada.** A página dizia "Atualizado em: 01/10/2025" quase um ano depois. Não sabemos se o PRC não
-  mudou ou se a data ficou sem edição; a Gold mostra a idade e a Alup deve confirmar.
+- **Data de 01/10/2025 confirmada.** A página dizia "Atualizado em: 01/10/2025" quase um ano depois. Em 02/10/2026 a
+  ness. confirmou que o PRC não mudou e que essa é a tabela oficial vigente. A Gold segue mostrando a idade da
+  tabela (`dias_desde_atualizacao`); um número alto aqui é esperado, não sinal de falha.
 - **Verificado em 02/10/2026:** a página real, com a verificação de TLS ligada, trouxe 24 preços, todos válidos
   no schema; os valores conferem com o texto da página. O repositório de certificados do Python do Windows não
   conhece a nova raiz da Let's Encrypt (falha local de verificação); com `requests` e `certifi` a página responde 200.

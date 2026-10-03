@@ -129,16 +129,21 @@ conector.
 ### 3.2 A lista do contrato (cláusula 4ª) e o que falta
 
 A cláusula 4ª lista cinco itens para a Onda 1, e a tabela acima não os reproduzia. Estado em 03/10/2026, no que
-os ADRs 026 a 028 (todos propostos, aguardando o aceite da Alup) e a conferência em `hml` e `dev` sustentam:
+os ADRs 026 a 028 (todos propostos, aguardando o aceite da Alup) e as conferências sustentam. "Conferido" significa
+consultado no BigQuery; "rodou no GitHub" não é conferência. Matriz completa dos 7 componentes e das conferências:
+[`relatorios/2026-10-03-fechamento-onda-1.md`](relatorios/2026-10-03-fechamento-onda-1.md).
 
 | Contrato | Fonte | Estado |
 |---|---|---|
-| 1 ONS Core (EAR, ENA, PLD horário, Carga) | `ons_ear`, `ons_ena`, `ccee_pld`, `ons_carga` | entregue |
-| 2 ONS Operacional (IPDO e ACOMPH) | nenhuma fonte de ingestão. IPDO: PDF preliminar de uso interno, só do dia, sem histórico; o conteúdo já está no lake, salvo a demanda máxima. ACOMPH: sem origem pública encontrada; a hipótese de distribuição por cadastro não foi verificada ([ADR 027](arquitetura/decisoes/027-ons-operacional-ipdo-acomph.md)) | decisão proposta, depende de aceite da Alup (ADR 027) |
-| 3 ANEEL (tarifas homologadas e referência, PRC) | `aneel_tarifas`, `ace_prc` | entregue e conferido em `hml` e em `dev` (328.293 linhas de tarifas, 24 preços de PRC, zero inválidas) |
-| 4 INMET (precipitação histórica por bacia) | `inmet_precipitacao`: conector incorporado ao `main` (PR #354); camadas SQL, agendamento e dicionário são a Tarefa 4 do plano de fechamento. Recorte por bacia proposto no [ADR 026](arquitetura/decisoes/026-precipitacao-por-bacia.md): ponto em polígono com `bacia_contorno` do ONS, com 61% das estações numa bacia; custo adicional de 12 a 16 h, fonte nova | em desenvolvimento |
-| 5 CPTEC (previsão de 7 dias) | nenhuma. O [ADR 028](arquitetura/decisoes/028-cptec-acesso.md) registra 403 em todo caminho do webservice e DNS inexistente na API nova; causa desconhecida; fora da Onda 1 até haver resposta do INPE (decisão provisória) | bloqueado, sem causa conhecida |
-| (proposta) BCB IGP-M | `bcb_igpm` | entregue e conferido em `hml` (25 meses). Em `dev` a carga está pendente por queda de DNS do `api.bcb.gov.br` em 03/10/2026 (não resolve a partir do GCP nem da máquina de desenvolvimento; é externo); repetir quando o BCB voltar |
+| 1 ONS Core (EAR, ENA, PLD horário, Carga) | `ons_ear`, `ons_ena`, `ccee_pld`, `ons_carga` | 7 componentes no repositório; entregues antes |
+| 2 ONS Operacional (IPDO e ACOMPH) | `ons_demanda_maxima` (seção 7 do IPDO, PR #361), com os 7 componentes no repositório; carga rodou no GitHub, não conferida no BigQuery. IPDO em si: PDF preliminar de uso interno, só do dia, conteúdo já no lake salvo a demanda máxima. ACOMPH: sem origem pública encontrada; a hipótese de cadastro não foi verificada ([ADR 027](arquitetura/decisoes/027-ons-operacional-ipdo-acomph.md)) | decisão proposta, depende de aceite da Alup; IPDO e ACOMPH não entregues |
+| 3 ANEEL (tarifas homologadas e referência, PRC) | `aneel_tarifas`, `ace_prc` | Bronze e Silver conferidos em `dev` e `hml` em 03/10 (328.293 linhas de tarifas, 24 preços de PRC). Gold: `tarifa_vigente_distribuidora` 10.366 linhas em `dev` e `hml`; `prc_vigente_comercializadora` 24 em `dev`; em `hml` foi atualizada depois e a contagem não foi reconferida |
+| 4 INMET (precipitação histórica por bacia) | `inmet_precipitacao` (PRs #354, #358, #362) e `ons_bacia_contorno` (31 polígonos, #360), com a Gold `precipitacao_diaria_estacao` e as colunas `bacia` e `bacia_chave` por `ST_COVERS` ([ADR 026](arquitetura/decisoes/026-precipitacao-por-bacia.md)) | 7 componentes no repositório. Em `hml`: histórico de 09/2024 a 02/10/2026 em 9 janelas, todas `success` no GitHub; contagens e cruzamento por bacia **não conferidos no BigQuery** (`gcloud` pediu reautenticação). `dev`: carga em andamento |
+| 5 CPTEC (previsão de 7 dias) | nenhuma. [ADR 028](arquitetura/decisoes/028-cptec-acesso.md): 403 em todo caminho do webservice e DNS inexistente na API nova; causa desconhecida; fora da Onda 1 até haver resposta do INPE (decisão provisória) | não entregue, bloqueado |
+| (proposta) BCB IGP-M | `bcb_igpm` | conferido em `hml` em 03/10 (25 meses; Gold 25 linhas). `dev` pendente: `api.bcb.gov.br` não resolve desde 03/10 ~03:40Z (queda externa); repetir quando voltar |
+
+O painel mantém a Onda 1 como `entregue` desde 25/09. Se isso continua valendo frente aos itens 2, 4 e 5 acima é decisão
+comercial, não alterada aqui.
 
 Plano de fechamento: `docs/superpowers/plans/2026-10-02-fechamento-gaps-onda-1.md`.
 

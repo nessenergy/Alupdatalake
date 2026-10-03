@@ -38,15 +38,27 @@ Atualizado em **2026-10-02**. Auditoria de ponta a ponta, com a conferência de 
 
 Tabela completa em [`plano-execucao.md` §3.2](plano-execucao.md#32-a-lista-do-contrato-cláusula-4ª-e-o-que-falta).
 
-- **ONS Operacional (IPDO e ACOMPH):** decisão proposta, depende de aceite da Alup
-  ([ADR 027](arquitetura/decisoes/027-ons-operacional-ipdo-acomph.md)). Não está entregue.
-- **INMET:** em desenvolvimento; recorte por bacia proposto no
-  [ADR 026](arquitetura/decisoes/026-precipitacao-por-bacia.md).
+Relatório de fechamento, com a matriz dos 7 componentes e a conferência por ambiente:
+[`relatorios/2026-10-03-fechamento-onda-1.md`](relatorios/2026-10-03-fechamento-onda-1.md).
+
+- **ONS Operacional:** `ons_demanda_maxima` (seção 7 do IPDO, PR #361) tem os 7 componentes no repositório; a carga rodou
+  no GitHub e não foi conferida no BigQuery. IPDO e ACOMPH: decisão proposta, depende de aceite da Alup
+  ([ADR 027](arquitetura/decisoes/027-ons-operacional-ipdo-acomph.md)); não estão entregues.
+- **INMET:** `inmet_precipitacao` e `ons_bacia_contorno` com os 7 componentes no repositório. Histórico de `hml` carregado
+  em 9 janelas (todas `success` no GitHub) e Dataform de `hml` `SUCCEEDED`; `dev` com carga em andamento. Recorte por bacia
+  proposto no [ADR 026](arquitetura/decisoes/026-precipitacao-por-bacia.md), sem aceite.
+- **ANEEL:** Bronze e Silver conferidos em `dev` e `hml` (328.293 linhas de tarifas, 24 preços de PRC); Gold de tarifas com
+  10.366 linhas nos dois; Gold de PRC com 24 em `dev`, em `hml` não reconferida.
 - **CPTEC:** bloqueado, sem causa conhecida; fora da Onda 1 até haver resposta do INPE, como decisão provisória
-  ([ADR 028](arquitetura/decisoes/028-cptec-acesso.md)).
-- **ADRs 026 a 028 aguardam o aceite da Alup.** A conversa de fechamento é a Tarefa 8 do plano de fechamento.
-- **IGP-M (`bcb_igpm`):** conferido em `hml` (25 meses). Em `dev` a carga está pendente por queda de DNS do
-  `api.bcb.gov.br` em 03/10 (externa); repetir quando o BCB voltar.
+  ([ADR 028](arquitetura/decisoes/028-cptec-acesso.md)). Não entregue.
+- **Pendência explícita: conferência no BigQuery.** Ainda não conferidos: contagens do INMET e da `ons_bacia_contorno` em
+  `hml` e `dev`, quantas estações caem em bacia, a demanda máxima, e as fontes do Aditivo 01 em `dev` (carga concluída e
+  Dataform `SUCCEEDED` em 03/10). O `gcloud` pediu reautenticação. Marcos só viram `feito` depois disso.
+- **ADRs 026 a 028 aguardam o aceite da Alup**, assim como a pergunta sobre transmissão (TUST/RAP) nas tarifas.
+- **Inconsistência a decidir (comercial):** o painel mantém a Onda 1 como `entregue` desde 25/09; frente aos itens 2, 4 e 5
+  da cláusula 4ª, o relatório de fechamento aponta a divergência. Marco não alterado.
+- **IGP-M (`bcb_igpm`):** conferido em `hml` (25 meses). Em `dev` pendente: `api.bcb.gov.br` não resolve desde 03/10
+  ~03:40Z (externo); os agendamentos de `bcb_juros` e câmbio também falham até voltar.
 - **Pendência: confirmar qual versão do contrato foi assinada.** O .docx v3 não cita IGP-M e a minuta PDF de 23/07
   cita. A decisão cabe a quem guarda o contrato; não bloqueia a entrega.
 

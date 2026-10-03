@@ -110,25 +110,33 @@ nome = "ONS — CSV mensal pesado"
 numero = 12
 titulo = "Dados Hidrológicos por Reservatório, horário"
 horas = 10
-estado = "pendente"
+estado = "entregue"
+entregue_em = 2026-10-03
+prs = [346]
 
 [[grupo.item]]
 numero = 13
 titulo = "Energia Vertida Turbinável"
 horas = 9
-estado = "pendente"
+estado = "entregue"
+entregue_em = 2026-10-03
+prs = [346]
 
 [[grupo.item]]
 numero = 14
 titulo = "Geração Térmica por Motivo de Despacho"
 horas = 10
-estado = "pendente"
+estado = "entregue"
+entregue_em = 2026-10-03
+prs = [346]
 
 [[grupo.item]]
 numero = 15
 titulo = "Fator de Capacidade Eólica e Solar"
 horas = 10
-estado = "pendente"
+estado = "entregue"
+entregue_em = 2026-10-03
+prs = [346]
 
 [[grupo]]
 codigo = "C"
@@ -138,13 +146,17 @@ nome = "ONS — arquivo diário"
 numero = 16
 titulo = "Previsão vs. Programado Eólicas/Solares"
 horas = 12
-estado = "pendente"
+estado = "entregue"
+entregue_em = 2026-10-03
+prs = [344]
 
 [[grupo.item]]
 numero = 17
 titulo = "DESSEM, Balanço de Energia Geral"
 horas = 10
-estado = "pendente"
+estado = "entregue"
+entregue_em = 2026-10-03
+prs = [344]
 
 [[grupo]]
 codigo = "D"
@@ -154,13 +166,17 @@ nome = "ONS — API"
 numero = 18
 titulo = "Carga de Energia Programada"
 horas = 12
-estado = "pendente"
+estado = "entregue"
+entregue_em = 2026-10-03
+prs = [345]
 
 [[grupo.item]]
 numero = 19
 titulo = "Carga de Energia Verificada"
 horas = 6
-estado = "pendente"
+estado = "entregue"
+entregue_em = 2026-10-03
+prs = [345]
 
 [[grupo]]
 codigo = "CCEE"

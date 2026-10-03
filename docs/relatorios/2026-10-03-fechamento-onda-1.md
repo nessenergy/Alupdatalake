@@ -14,7 +14,7 @@ conferido no BigQuery** (com data e contagem). Onde a conferência não foi feit
 | 2 | ONS Operacional (IPDO e ACOMPH) | `ons_demanda_maxima` (seção 7 do IPDO); IPDO em si e ACOMPH sem fonte | carga da demanda máxima conferida em `hml` e `dev` (03/10, Gold com 116 linhas nos dois); decisão proposta no ADR 027, depende de aceite da Alup; IPDO e ACOMPH **não entregues** |
 | 3 | ANEEL (tarifas homologadas e referência, PRC) | `aneel_tarifas`, `ace_prc` | 7 componentes; Silver e Gold conferidas em `dev` e `hml` em 03/10 |
 | 4 | INMET (precipitação histórica por bacia) | `inmet_precipitacao`, `ons_bacia_contorno` | 7 componentes; carga e recorte por bacia conferidos em `hml` e `dev` em 03/10 (398 de 653 estações com bacia nos dois) |
-| 5 | CPTEC (previsão de 7 dias) | nenhuma | **não entregue**: bloqueado (ADR 028) |
+| 5 | CPTEC (previsão de 7 dias) | nenhuma | **não entregue**: bloqueado também de dentro do GCP (ADR 028 e 029) |
 | — | IGP-M (proposta de 28/05, minuta PDF de 23/07) | `bcb_igpm` | conferido em `hml` (03/10); `dev` pendente |
 
 ## 2. Matriz dos 7 componentes por fonte
@@ -66,7 +66,9 @@ depois delas**. As contagens foram conferidas depois, pelo workflow `Conferir ca
   já está no lake, exceto a demanda máxima, que agora é a fonte `ons_demanda_maxima`. Para o ACOMPH não se encontrou
   origem pública; a hipótese de distribuição por cadastro **não foi verificada**. Proposta no ADR 027, sem aceite.
 - **CPTEC.** 403 em todo caminho do webservice e a API nova sem DNS; causa desconhecida. Fora da Onda 1 até haver resposta
-  do INPE, como decisão provisória (ADR 028).
+  do INPE, como decisão provisória (ADR 028). Em 03/10 a sonda de dentro do GCP (dev e hml) também recebeu 403, então o
+  bloqueio não é do IP da máquina de desenvolvimento. Alternativas públicas avaliadas e descartadas (ADR 029): INMET
+  previsão tem 5 dias e não traz chuva; Open-Meteo é gratuito só para uso não comercial.
 - **Conferência no BigQuery:** feita em 03/10 (seção 7). A conferência final de `dev` (seção 7) fechou INMET, bacia e demanda máxima, com as Golds. Seguem pendentes o IGP-M em `dev` e o `bcb_juros`.
 - **IGP-M em `dev`:** pendente por queda externa do BCB (0 linhas; 12 execuções com erro nos últimos 3 dias; a tentativa final, run `37106480778`, falhou).
 
@@ -134,3 +136,18 @@ coluna `dev` acima. `hml` é a run `37103149215`.
 
 Não contadas pela conferência: as Golds dos oito itens do Aditivo 01. Segue pendente a decisão de aceite da Alup sobre os
 ADRs 026, 027 e 028. O estado da Onda 1 no painel (`entregue`) não muda.
+
+## 8. Chuva por bacia e bacia mais próxima (conferido em 03/10/2026)
+
+Método: workflow `Conferir cargas` (somente leitura), runs `37123673126` (hml) e `37123677588` (dev), depois do deploy
+e do Dataform dos dois ambientes. Os números são **iguais em dev e hml**.
+
+| Gold | Resultado conferido |
+|---|---|
+| `precipitacao_diaria_estacao` | 430.310 linhas, 653 estações, 398 com bacia exata, 25 bacias |
+| bacia mais próxima (só sem bacia exata) | 255 estações (653 menos 398, como esperado); distância mediana **62,0 km**, máxima **690,6 km** |
+| `precipitacao_diaria_bacia` | 17.727 linhas (bacia e dia), 25 bacias, de 2024-09-01 a 2026-08-31; **1.216 dias de bacia sem nenhuma estação completa** (média nula) |
+
+Leitura honesta: a bacia mais próxima é aproximação **sem limite de distância**; a mediana de 62 km é razoável, mas a
+máxima de 690 km mostra estações que não deveriam ser atribuídas a nenhuma bacia sem um corte. Quem usa filtra por
+`distancia_bacia_km`; o corte é decisão da Alup. A média por bacia é **regra provisória** (ADR 026).

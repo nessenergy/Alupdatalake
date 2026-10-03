@@ -41,24 +41,27 @@ Tabela completa em [`plano-execucao.md` §3.2](plano-execucao.md#32-a-lista-do-c
 Relatório de fechamento, com a matriz dos 7 componentes e a conferência por ambiente:
 [`relatorios/2026-10-03-fechamento-onda-1.md`](relatorios/2026-10-03-fechamento-onda-1.md).
 
-- **ONS Operacional:** `ons_demanda_maxima` (seção 7 do IPDO, PR #361) tem os 7 componentes no repositório; a carga rodou com
-  `success` no GitHub em `hml` e em `dev` e não foi conferida no BigQuery. O Dataform de `hml` rodou depois da carga; o de `dev`
-  ainda não. IPDO e ACOMPH: decisão proposta, depende de aceite da Alup
+- **ONS Operacional:** `ons_demanda_maxima` (seção 7 do IPDO, PR #361) tem os 7 componentes no repositório; a carga foi conferida
+  no BigQuery em 03/10 (Silver com 3.480 linhas, de 2024-01-01 a 2026-05-19, em `hml` e `dev`; a origem está atrasada). Gold com 116
+  linhas em `hml` e 0 em `dev`, onde o Dataform ainda não rodou depois da carga. IPDO e ACOMPH: decisão proposta, depende de aceite da Alup
   ([ADR 027](arquitetura/decisoes/027-ons-operacional-ipdo-acomph.md)); não estão entregues.
-- **INMET:** `inmet_precipitacao` e `ons_bacia_contorno` com os 7 componentes no repositório; `ons_bacia_contorno` rodou com `success` no GitHub em `hml` e em `dev` (o Dataform de `dev` ainda não rodou depois). Histórico de `hml` carregado
-  em 9 janelas (todas `success` no GitHub) e Dataform de `hml` `SUCCEEDED`; `dev` com carga em andamento. Recorte por bacia
+- **INMET:** `inmet_precipitacao` e `ons_bacia_contorno` com os 7 componentes no repositório; conferido em `hml` em 03/10: Silver do INMET com 10.327.440 linhas (2024-09-01 a 2026-08-31; sem dado de setembro porque o zip de 2026 do INMET
+  vai até agosto), Gold com 653 estações, **398 com bacia (61%)** e 25 bacias, 31 polígonos (19 dos 23 `nomecurto` do EAR casam). Em `dev` a carga
+  do INMET segue em andamento (2.328.164 linhas naquele instante) e as Golds ainda não rodaram. Recorte por bacia
   proposto no [ADR 026](arquitetura/decisoes/026-precipitacao-por-bacia.md), sem aceite.
-- **ANEEL:** Bronze e Silver conferidos em `dev` e `hml` (328.293 linhas de tarifas, 24 preços de PRC); Gold de tarifas com
-  10.366 linhas nos dois; Gold de PRC com 24 em `dev`, em `hml` não reconferida.
+- **ANEEL:** conferido em `dev` e `hml` em 03/10: Silver de tarifas com 327.763 linhas (o Bronze extraiu 328.293), 24 preços de PRC; Gold de
+  tarifas com 10.366 linhas e de PRC com 24, nos dois.
 - **CPTEC:** bloqueado, sem causa conhecida; fora da Onda 1 até haver resposta do INPE, como decisão provisória
   ([ADR 028](arquitetura/decisoes/028-cptec-acesso.md)). Não entregue.
-- **Pendência explícita: conferência no BigQuery.** Ainda não conferidos: contagens do INMET e da `ons_bacia_contorno` em
-  `hml` e `dev`, quantas estações caem em bacia, a demanda máxima, e as fontes do Aditivo 01 em `dev` (carga concluída e
-  Dataform `SUCCEEDED` em 03/10). O `gcloud` pediu reautenticação. Marcos só viram `feito` depois disso.
+- **Conferência no BigQuery (03/10):** feita pelo workflow `Conferir cargas` (somente leitura; `hml` run `37103149215`, `dev` run `37103208999`).
+  Aditivo 01, itens 12 a 19: Silver em `dev` com 94.656 a 18.998.832 linhas por item, `SUCESSO` e zero inválidas, entregues em 03/10 (162h de
+  162h apontadas); em `hml` os oito têm 0 linhas. **Ainda pendentes:** IGP-M em `dev` (BCB fora do ar), INMET em `dev` (carga em andamento),
+  Golds de INMET, bacia e demanda máxima em `dev` (o Dataform de `dev` ainda não rodou depois das cargas) e `bcb_juros` (erros nos dois
+  ambientes). Marcos só viram `feito` depois disso.
 - **ADRs 026 a 028 aguardam o aceite da Alup**, assim como a pergunta sobre transmissão (TUST/RAP) nas tarifas.
 - **Inconsistência a decidir (comercial):** o painel mantém a Onda 1 como `entregue` desde 25/09; frente aos itens 2, 4 e 5
   da cláusula 4ª, o relatório de fechamento aponta a divergência. Marco não alterado.
-- **IGP-M (`bcb_igpm`):** conferido em `hml` (25 meses). Em `dev` pendente: `api.bcb.gov.br` não resolve desde 03/10
+- **IGP-M (`bcb_igpm`):** conferido em `hml` em 03/10 (Silver 25 linhas, Gold 25). Em `dev` pendente (0 linhas): `api.bcb.gov.br` não resolve desde 03/10
   ~03:40Z (externo); os agendamentos de `bcb_juros` e câmbio também falham até voltar.
 - **Pendência: confirmar qual versão do contrato foi assinada.** O .docx v3 não cita IGP-M e a minuta PDF de 23/07
   cita. A decisão cabe a quem guarda o contrato; não bloqueia a entrega.

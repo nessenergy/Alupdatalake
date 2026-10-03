@@ -177,6 +177,14 @@ componentes estão entregues e a carga roda em `dev`.
 | 9 | `ena-diario-por-bacia` | 4 | 4 | 28/09/2026 | [#297](https://github.com/nessenergy/Alupdatalake/pull/297) |
 | 10 | `ena-diario-por-reservatorio` | 5 | 5 | 28/09/2026 | [#297](https://github.com/nessenergy/Alupdatalake/pull/297) |
 | 11 | `geracao-exportacao-internacional` | 5 | 5 | 28/09/2026 | [#298](https://github.com/nessenergy/Alupdatalake/pull/298) |
+| 12 | `ons_dados_hidrologicos` | 10 | 10 | 03/10/2026 | [#346](https://github.com/nessenergy/Alupdatalake/pull/346) |
+| 13 | `ons_energia_vertida_turbinavel` | 9 | 9 | 03/10/2026 | [#346](https://github.com/nessenergy/Alupdatalake/pull/346) |
+| 14 | `ons_geracao_termica_despacho` | 10 | 10 | 03/10/2026 | [#346](https://github.com/nessenergy/Alupdatalake/pull/346) |
+| 15 | `ons_fator_capacidade` | 10 | 10 | 03/10/2026 | [#346](https://github.com/nessenergy/Alupdatalake/pull/346) |
+| 16 | `ons_programacao_previsao` | 12 | 12 | 03/10/2026 | [#344](https://github.com/nessenergy/Alupdatalake/pull/344) |
+| 17 | `ons_balanco_dessem` | 10 | 10 | 03/10/2026 | [#344](https://github.com/nessenergy/Alupdatalake/pull/344) |
+| 18 | `ons_carga_programada` | 12 | 12 | 03/10/2026 | [#345](https://github.com/nessenergy/Alupdatalake/pull/345) |
+| 19 | `ons_carga_verificada` | 6 | 6 | 03/10/2026 | [#345](https://github.com/nessenergy/Alupdatalake/pull/345) |
 | 20 | `custo_variavel_unitario_merchant` | 4 | 4 | 28/09/2026 | [#301](https://github.com/nessenergy/Alupdatalake/pull/301) |
 | 21 | `custo_variavel_unitario_conjuntural` | 4 | 4 | 28/09/2026 | [#301](https://github.com/nessenergy/Alupdatalake/pull/301) |
 | 22 | `custo_variavel_unitario_conjuntural_revisado` | 4 | 4 | 28/09/2026 | [#301](https://github.com/nessenergy/Alupdatalake/pull/301) |
@@ -184,7 +192,7 @@ componentes estão entregues e a carga roda em `dev`.
 | 24 | `energia_reserva_consumo_referencia` | 4 | 4 | 28/09/2026 | [#301](https://github.com/nessenergy/Alupdatalake/pull/301) |
 | 25 | `consumo_classe_agente` | 4 | 4 | 28/09/2026 | [#301](https://github.com/nessenergy/Alupdatalake/pull/301) |
 
-**Apontado até agora: 83h de 162h** (itens 1–25; item 26 tratado em §4.1).
+**Apontado até agora: 162h de 162h** (itens 1–25; item 26 tratado em §4.1): 83h dos itens 1–11 e 20–25, mais 79h dos itens 12–19, entregues em 03/10/2026.
 
 Evidência do item 7: carga em `dev` de 28/09, 14.976 linhas de 01/09/2024 a
 27/09/2026, 23 bacias, zero inválidas; `gold.armazenamento_mensal_bacia`
@@ -224,6 +232,46 @@ log do contêiner (#303/#304, com `roles/logging.viewer` na SA de deploy). Nos
 itens 21 e 22, o arquivo de 2025 publica o cabeçalho `CODIGO_MODELO_PREÇO`
 (com cedilha) e CNPJ sem o zero à esquerda, e o código de modelo de preço se
 repete no mês: a chave passou a ser (mês, parcela, leilão, produto) (#317).
+
+### Evidência dos itens 12 a 19 (carga em `dev`, conferida em 03/10/2026)
+
+Os oito itens têm os 7 componentes no repositório (conector, Bronze, Silver, Gold, testes, agendamento e dicionário) e a
+carga rodou em **`dev`**. A conferência foi feita em 03/10/2026 pelo workflow `Conferir cargas`, que lê o BigQuery
+somente para leitura com a conta de serviço de deploy (run `37103208999`, ambiente `dev`). Linhas na Silver:
+
+| # | Conector | Linhas | De | Até |
+|---|---|---:|---|---|
+| 12 | `ons_dados_hidrologicos` | 3.009.821 | 01/09/2024 | 02/10/2026 |
+| 13 | `ons_energia_vertida_turbinavel` | 2.774.427 | 01/09/2024 | 30/09/2026 |
+| 14 | `ons_geracao_termica_despacho` | 2.363.064 | 01/09/2024 | 30/09/2026 |
+| 15 | `ons_fator_capacidade` | 4.101.336 | 01/09/2024 | 30/09/2026 |
+| 16 | `ons_programacao_previsao` | 18.998.832 | 01/10/2024 | 02/10/2026 |
+| 17 | `ons_balanco_dessem` | 94.656 | 23/05/2025 | 02/10/2026 |
+| 18 | `ons_carga_programada` | 1.206.288 | 01/09/2024 | 02/10/2026 |
+| 19 | `ons_carga_verificada` | 1.207.008 | 01/09/2024 | 02/10/2026 |
+
+A última execução de cada um dos oito em `bronze._execucoes` é `SUCESSO`, com zero linhas inválidas. O Dataform de `dev`
+já tinha rodado `SUCCEEDED` sobre esses dados (deploys `37087604338` e `37094436585`), então as asserções das Silvers
+passaram com dado real. A conferência desta rodada contou linhas na Silver; as Golds destes itens existem no
+repositório, mas suas contagens em `dev` não foram feitas aqui.
+
+**Ressalva de ambiente:** a carga conferida é a de `dev`. Em `hml` os oito têm **0 linhas** (run `37103149215`, de
+03/10/2026): nunca foram carregados lá, e o critério do painel é a carga em `dev`.
+
+Limitações de cada origem, conforme os dicionários de dados:
+
+- **Item 16:** o ONS não publica arquivo anterior a 01/10/2024, um mês depois do início dos demais. A recarga não cabe numa
+  execução do Cloud Run e segue o runbook, em janelas de até 3 meses.
+- **Item 17:** o DESSEM só existe desde 23/05/2025; o histórico tem cerca de 16 meses, menor que os 24 do restante, por
+  limite da origem.
+- **Item 13:** o conector lê a série mensal, que começa em 2024-01, e recusa janela anterior.
+- **Item 12:** a origem publica volume útil e vazões negativos e fora de faixa; Bronze e Silver guardam o que vem, e a
+  Gold aplica a faixa de 0 a 100% ao volume útil (decisão que o dicionário deixa para o dono do domínio confirmar).
+- **Item 14:** seis colunas entraram no arquivo do ONS ao longo da série e ficam nulas (nunca zero) nos meses anteriores.
+- **Item 15:** a origem publica fator de capacidade negativo e acima de 1; o dado é guardado como publicado.
+- **Item 18:** há dias sem publicação em algumas áreas; é lacuna da origem e o conector não preenche.
+- **Item 19:** a origem publica carga negativa em algumas áreas (MMGD maior que a carga, áreas de perdas); aceita sem
+  validação por sinal.
 
 ## 6. Fora desta estimativa
 

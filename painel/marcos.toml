@@ -336,13 +336,13 @@ estado = "feito"
 
 [[marco]]
 data = 2026-10-03
-titulo = "ONS Operacional: demanda máxima (IPDO, seção 7) com os 7 componentes, carga conferida em hml em 03/10 (3.480 linhas na Silver); IPDO e ACOMPH não entregues, ADR 027 pendente de aceite da Alup"
+titulo = "ONS Operacional: demanda máxima (IPDO, seção 7) com os 7 componentes, carga conferida em hml e dev em 03/10 (3.480 linhas na Silver, Gold com 116 linhas nos dois); IPDO e ACOMPH não entregues, ADR 027 pendente de aceite da Alup"
 estado = "previsto"
 dono = "Alup"
 
 [[marco]]
 data = 2026-10-03
-titulo = "INMET, precipitação por bacia: 7 componentes no repositório, carga conferida em hml em 03/10 (398 de 653 estações com bacia), conferência em dev pendente; recorte do ADR 026 pendente de aceite da Alup"
+titulo = "INMET, precipitação por bacia: 7 componentes no repositório, carga conferida em hml e dev em 03/10 (398 de 653 estações com bacia, iguais nos dois); recorte do ADR 026 pendente de aceite da Alup"
 estado = "previsto"
 dono = "ness."
 

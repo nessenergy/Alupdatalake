@@ -31,7 +31,7 @@ workflow terminou com sucesso, sem consulta ao BigQuery; `pendente (motivo)`.
 | `ons_ena` | presente | presente | presente | presente (idem) | presente | presente | presente | idem | idem |
 | `ccee_pld` | presente | presente | presente | presente (`pld_mensal_submercado`) | presente | presente | presente | idem | idem |
 | `ons_carga` | presente | presente | presente | presente (`carga_mensal_submercado`) | presente | presente | presente | idem | idem |
-| `ons_demanda_maxima` | presente | presente | presente | presente (`demanda_maxima_mensal_subsistema`) | presente | presente | presente | rodou no GitHub, não conferido | rodou no GitHub, não conferido |
+| `ons_demanda_maxima` | presente | presente | presente | presente (`demanda_maxima_mensal_subsistema`) | presente | presente | presente | não conferido (execução não verificada) | não conferido (execução não verificada) |
 | `aneel_tarifas` | presente | presente | presente | presente (`tarifa_vigente_distribuidora`) | presente | presente | presente | conferido (03/10, 328.293 linhas na Bronze e na Silver; Gold 10.366) | conferido (03/10, 328.293 linhas; Gold 10.366) |
 | `ace_prc` | presente | presente | presente | presente (`prc_vigente_comercializadora`) | presente | presente | presente | Bronze e Silver conferidos (03/10, 24 preços); Gold foi atualizada depois com o Dataform rerodado, contagem **não reconferida** | conferido (03/10, 24 preços; Gold 24) |
 | `inmet_precipitacao` | presente | presente | presente | presente (`precipitacao_diaria_estacao`) | presente | presente | presente | histórico de 09/2024 a 02/10/2026 em 9 janelas de 3 meses, todas `success` no GitHub; **contagens não conferidas** (o `gcloud` pediu reautenticação) | pendente (carga em andamento) |

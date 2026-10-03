@@ -336,7 +336,7 @@ estado = "feito"
 
 [[marco]]
 data = 2026-10-03
-titulo = "ONS Operacional: demanda máxima (IPDO, seção 7) com os 7 componentes, carga ainda não conferida no BigQuery; IPDO e ACOMPH não entregues, ADR 027 pendente de aceite da Alup"
+titulo = "ONS Operacional: demanda máxima (IPDO, seção 7) com os 7 componentes, carga não conferida no BigQuery; IPDO e ACOMPH não entregues, ADR 027 pendente de aceite da Alup"
 estado = "previsto"
 dono = "Alup"
 

@@ -41,8 +41,8 @@ Tabela completa em [`plano-execucao.md` §3.2](plano-execucao.md#32-a-lista-do-c
 Relatório de fechamento, com a matriz dos 7 componentes e a conferência por ambiente:
 [`relatorios/2026-10-03-fechamento-onda-1.md`](relatorios/2026-10-03-fechamento-onda-1.md).
 
-- **ONS Operacional:** `ons_demanda_maxima` (seção 7 do IPDO, PR #361) tem os 7 componentes no repositório; a carga rodou
-  no GitHub e não foi conferida no BigQuery. IPDO e ACOMPH: decisão proposta, depende de aceite da Alup
+- **ONS Operacional:** `ons_demanda_maxima` (seção 7 do IPDO, PR #361) tem os 7 componentes no repositório; a carga não foi
+  conferida no BigQuery. IPDO e ACOMPH: decisão proposta, depende de aceite da Alup
   ([ADR 027](arquitetura/decisoes/027-ons-operacional-ipdo-acomph.md)); não estão entregues.
 - **INMET:** `inmet_precipitacao` e `ons_bacia_contorno` com os 7 componentes no repositório. Histórico de `hml` carregado
   em 9 janelas (todas `success` no GitHub) e Dataform de `hml` `SUCCEEDED`; `dev` com carga em andamento. Recorte por bacia

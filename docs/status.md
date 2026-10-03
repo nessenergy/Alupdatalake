@@ -34,6 +34,22 @@ Atualizado em **2026-10-02**. Auditoria de ponta a ponta, com a conferência de 
   - **Orçamento (#87):** a Alup disse "manter o recomendado": **US$ 20/mês até novembro e US$ 400/mês depois**. O Portal ainda usa US$ 120 como premissa.
   - **Exportação de faturamento ligada pela QI Network em `dev`** (01/10, 14h41): as duas tabelas de exportação já existem no dataset `faturamento`. O histórico começa em 01/10. A mensagem não cita o papel de Costs Manager para as contas de serviço (item 12).
 
+## Registro de 03/10: lacunas da Onda 1 frente à cláusula 4ª
+
+Tabela completa em [`plano-execucao.md` §3.2](plano-execucao.md#32-a-lista-do-contrato-cláusula-4ª-e-o-que-falta).
+
+- **ONS Operacional (IPDO e ACOMPH):** decisão proposta, depende de aceite da Alup
+  ([ADR 027](arquitetura/decisoes/027-ons-operacional-ipdo-acomph.md)). Não está entregue.
+- **INMET:** em desenvolvimento; recorte por bacia proposto no
+  [ADR 026](arquitetura/decisoes/026-precipitacao-por-bacia.md).
+- **CPTEC:** bloqueado, sem causa conhecida; fora da Onda 1 até haver resposta do INPE, como decisão provisória
+  ([ADR 028](arquitetura/decisoes/028-cptec-acesso.md)).
+- **ADRs 026 a 028 aguardam o aceite da Alup.** A conversa de fechamento é a Tarefa 8 do plano de fechamento.
+- **IGP-M (`bcb_igpm`):** conferido em `hml` (25 meses). Em `dev` a carga está pendente por queda de DNS do
+  `api.bcb.gov.br` em 03/10 (externa); repetir quando o BCB voltar.
+- **Pendência: confirmar qual versão do contrato foi assinada.** O .docx v3 não cita IGP-M e a minuta PDF de 23/07
+  cita. A decisão cabe a quem guarda o contrato; não bloqueia a entrega.
+
 ## Histórico até 25/09 (superado pela situação acima)
 
 **A Alup liberou o GCP nos três ambientes** —

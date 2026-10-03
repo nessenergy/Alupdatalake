@@ -335,6 +335,24 @@ titulo = "Histórico de 24 meses completo e idêntico em dev e hml: geração po
 estado = "feito"
 
 [[marco]]
+data = 2026-10-03
+titulo = "ONS Operacional (IPDO e ACOMPH): decisão proposta no ADR 027, pendente de aceite da Alup; fonte não entregue"
+estado = "previsto"
+dono = "Alup"
+
+[[marco]]
+data = 2026-10-03
+titulo = "INMET, precipitação por bacia: em desenvolvimento; recorte proposto no ADR 026, pendente de aceite da Alup"
+estado = "previsto"
+dono = "ness."
+
+[[marco]]
+data = 2026-10-03
+titulo = "CPTEC: bloqueado (403 sem causa conhecida, ADR 028); fora da Onda 1 até haver resposta do INPE"
+estado = "previsto"
+dono = "ness."
+
+[[marco]]
 data = 2026-10-12
 titulo = "Credenciais da Onda 2"
 estado = "previsto"

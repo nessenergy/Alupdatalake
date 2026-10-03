@@ -22,7 +22,7 @@ from src.core.config import get_settings
 from src.core.execucao import Janela
 from src.core.observabilidade import configurar_logging
 from src.core.registry import listar, obter
-from src.core.sonda import SONDAS, sondar
+from src.core.sonda import SONDAS, gravar_resultado, sondar
 
 configurar_logging()
 
@@ -75,8 +75,10 @@ def main(argv: list[str] | None = None) -> int:
         return 0 if ok else 1
 
     if args.comando == "sondar":
-        for resultado in sondar(args.nome):
+        resultados = sondar(args.nome)
+        for resultado in resultados:
             print(json.dumps({"sonda": args.nome, **dataclasses.asdict(resultado)}, ensure_ascii=False))
+        print(json.dumps({"sonda": args.nome, "resultado_em": gravar_resultado(args.nome, resultados)}))
         return 0
 
     if args.comando == "reprocessar-raw":

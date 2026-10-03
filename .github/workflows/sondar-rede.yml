@@ -5,8 +5,8 @@ name: Sondar rede
 # de desenvolvimento" de "a origem bloqueia qualquer um" (caso do CPTEC, ADR 028).
 #
 # Somente leitura de endereço público: a lista de endereços é constante em `src/core/sonda.py`, nada vem de
-# entrada do usuário, nada é gravado e o job devolve sempre 0, então não dispara alerta de ingestão. Só a SA de
-# deploy executa job (ADR 015). Usa o job `ingestao-bcb-cambio-ptax` só como casca de execução do mesmo contêiner.
+# entrada do usuário, o job só grava o resultado em `sondas/` no bucket raw e devolve sempre 0, então não dispara
+# alerta de ingestão. Só a SA de deploy executa job (ADR 015) e ela não lê o Cloud Logging: o resultado vem do bucket. Usa o job `ingestao-bcb-cambio-ptax` só como casca de execução do mesmo contêiner.
 #
 # Entrada do usuário nunca entra num `run:` por `${{ }}`: vai por variável de ambiente e é validada.
 
@@ -75,19 +75,16 @@ jobs:
             echo ""
           } >> "$GITHUB_STEP_SUMMARY"
 
-          gcloud run jobs execute "$JOB" --project "$PROJETO" --region "$REGIAO" --wait \
-            --args="sondar,$SONDA" 2>&1 | tee /tmp/execucao.log
-          execucao=$(grep -oE 'executions describe [a-zA-Z0-9-]+' /tmp/execucao.log | awk '{print $3}' | head -1)
-          [[ -n "$execucao" ]] || { echo "::error::não achei o id da execução"; exit 1; }
+          gcloud run jobs execute "$JOB" --project "$PROJETO" --region "$REGIAO" --wait             --args="sondar,$SONDA" 2>&1 | tee /tmp/execucao.log
 
-          # O log de contêiner chega ao Cloud Logging com alguns segundos de atraso: tenta algumas vezes.
-          for tentativa in 1 2 3 4 5 6; do
-            gcloud logging read \
-              "resource.type=\"cloud_run_job\" AND resource.labels.job_name=\"$JOB\" AND labels.\"run.googleapis.com/execution_name\"=\"$execucao\" AND textPayload:\"sonda\"" \
-              --project "$PROJETO" --format="value(textPayload)" --order=asc --limit=20 > /tmp/sonda.log 2>&1 || true
-            [[ -s /tmp/sonda.log ]] && break
-            sleep 10
-          done
-          echo '```' >> "$GITHUB_STEP_SUMMARY"
-          cat /tmp/sonda.log | tee -a "$GITHUB_STEP_SUMMARY"
+          # A SA de deploy não lê o Cloud Logging; o job grava o resultado no bucket raw (src/core/sonda.py).
+          BUCKET="gs://${PROJETO}-raw/sondas/${SONDA}"
+          ultimo=$(gcloud storage ls "$BUCKET/" --project "$PROJETO" 2>/dev/null | sort | tail -1 || true)
+          if [[ -z "$ultimo" ]]; then
+            echo "::error::não achei o resultado em $BUCKET/ (a sonda não gravou ou a SA não lê o bucket)"
+            exit 1
+          fi
+          echo "- Resultado: \`$ultimo\`" >> "$GITHUB_STEP_SUMMARY"
+          echo '```json' >> "$GITHUB_STEP_SUMMARY"
+          gcloud storage cat "$ultimo" --project "$PROJETO" | tee -a "$GITHUB_STEP_SUMMARY"
           echo '```' >> "$GITHUB_STEP_SUMMARY"

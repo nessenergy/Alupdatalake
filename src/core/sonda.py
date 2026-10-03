@@ -7,8 +7,12 @@ usuário) e a sonda não grava nada: só devolve status, tamanho, tipo e os prim
 
 from __future__ import annotations
 
+import dataclasses
+import json
 from dataclasses import dataclass
+from datetime import UTC, datetime
 
+from src.core.config import get_settings
 from src.core.http import criar_sessao
 
 PREVIEW = 160
@@ -53,3 +57,23 @@ def sondar(nome: str, sessao=None) -> list[ResultadoSonda]:
         except Exception as exc:  # noqa: BLE001 - a sonda existe para registrar a falha, não para propagá-la
             resultados.append(ResultadoSonda(url, None, 0, "", "", f"{type(exc).__name__}: {str(exc)[:200]}"))
     return resultados
+
+
+def gravar_resultado(nome: str, resultados: list[ResultadoSonda]) -> str | None:
+    """Grava o resultado em gs://<bucket raw>/sondas/<nome>/<UTC>.json e devolve o URI (ou None se falhar).
+
+    A conta de deploy não lê o Cloud Logging, mas lê o bucket: é por aqui que o workflow `Sondar rede` mostra o
+    resultado. Falha de gravação não derruba a sonda (o JSON também vai para o stdout).
+    """
+    try:
+        from google.cloud import storage  # noqa: PLC0415 - import tardio: só a sonda em produção precisa do cliente
+
+        cfg = get_settings()
+        caminho = f"sondas/{nome}/{datetime.now(UTC):%Y%m%dT%H%M%SZ}.json"
+        corpo = json.dumps([dataclasses.asdict(r) for r in resultados], ensure_ascii=False, indent=2)
+        storage.Client(project=cfg.gcp_project_id).bucket(cfg.bucket_raw).blob(caminho).upload_from_string(
+            corpo, content_type="application/json"
+        )
+        return f"gs://{cfg.bucket_raw}/{caminho}"
+    except Exception:  # noqa: BLE001
+        return None

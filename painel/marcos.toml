@@ -342,13 +342,19 @@ dono = "Alup"
 
 [[marco]]
 data = 2026-10-03
-titulo = "INMET, precipitação por bacia: 7 componentes no repositório, carga conferida em hml e dev em 03/10 (398 de 653 estações com bacia, iguais nos dois); recorte do ADR 026 pendente de aceite da Alup"
+titulo = "INMET, precipitação por bacia: 7 componentes no repositório, carga conferida em hml e dev em 03/10 (398 de 653 estações com bacia, iguais nos dois); chuva diária por bacia (17.727 linhas, 25 bacias) e bacia mais próxima das 255 estações sem bacia exata, iguais nos dois; regra da média provisória e recorte do ADR 026 pendentes de aceite da Alup"
 estado = "previsto"
 dono = "ness."
 
 [[marco]]
 data = 2026-10-03
-titulo = "CPTEC: bloqueado (403 sem causa conhecida, ADR 028); fora da Onda 1 até haver resposta do INPE"
+titulo = "Pendências de carga do e-mail de 02/10: Tarifas Homologadas (327.763 linhas) e PRC (24 preços) conferidas em dev e hml; IGP-M conferido em hml (25 meses) e pendente em dev porque o BCB está fora do ar"
+estado = "previsto"
+dono = "ness."
+
+[[marco]]
+data = 2026-10-03
+titulo = "CPTEC: bloqueado (403 sem causa conhecida, também de dentro do GCP em 03/10, ADRs 028 e 029); fora da Onda 1 até haver resposta do INPE"
 estado = "previsto"
 dono = "ness."
 

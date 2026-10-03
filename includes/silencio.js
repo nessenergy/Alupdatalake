@@ -28,6 +28,7 @@ const limites_horas = {
   aneel_tarifas: 180,
   ace_prc: 180,
   inmet_precipitacao: 180,
+  ons_bacia_contorno: 780,
   ons_capacidade: 180,
   ons_geracao_usina: 780,
   ons_disponibilidade_usina: 780,

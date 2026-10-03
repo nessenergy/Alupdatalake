@@ -428,3 +428,26 @@ def test_gold_da_chuva_nao_trata_hora_sem_medicao_como_zero() -> None:
     sql = caminho.read_text(encoding="utf-8")
     assert "horas_sem_medicao" in sql
     assert "COALESCE(precipitacao_mm" not in sql
+
+
+def test_gold_da_chuva_liga_a_bacia_por_ponto_em_poligono_sem_agregar_por_bacia() -> None:
+    """ADR 026: `bacia` é uma coluna ao lado da estação. Menor área desempata; LEFT JOIN não perde estação sem bacia."""
+    caminho = Path(__file__).resolve().parents[2] / "definitions" / "gold" / "precipitacao_diaria_estacao.sqlx"
+    sql = caminho.read_text(encoding="utf-8")
+    corpo = "\n".join(linha for linha in sql.splitlines() if not linha.lstrip().startswith("--"))
+    assert "ST_CONTAINS(" in corpo
+    assert "ORDER BY c.area_m2 ASC" in corpo  # estação em dois polígonos: vale o menor
+    assert "ST_AREA(" in corpo
+    assert "LEFT JOIN contorno_vigente" in corpo  # estação fora de todo contorno continua na Gold
+    assert "INNER JOIN" not in corpo
+    assert "GROUP BY p.estacao, b.bacia, p.data_referencia" in corpo  # a chuva segue por estação e dia
+    assert not re.search(r"\b(AVG|SUM)\([^)]*bacia", corpo)  # nenhuma média nem soma por bacia
+
+
+def test_silver_do_contorno_repara_a_geometria_e_deduplica_por_bacia_e_data() -> None:
+    """6 dos 31 polígonos têm autointerseção; sem `make_valid` o BigQuery recusa a geometria."""
+    caminho = Path(__file__).resolve().parents[2] / "definitions" / "silver" / "ons_bacia_contorno.sqlx"
+    sql = caminho.read_text(encoding="utf-8")
+    assert "ST_GEOGFROMTEXT(wkt, make_valid => TRUE)" in sql
+    assert "PARTITION BY nome_bacia, data_referencia" in sql
+    assert 'uniqueKey: ["nome_bacia", "data_referencia"]' in sql

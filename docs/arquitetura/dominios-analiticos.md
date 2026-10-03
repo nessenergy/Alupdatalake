@@ -137,7 +137,7 @@ nomes para os mesmos conjuntos. Ver §5.1.
 
 | | |
 |---|---|
-| **Fontes hoje** | **`inmet_precipitacao`** — chuva horária por estação, do zip anual do INMET (Onda 1; por estação, o "por bacia" é do [ADR 026](decisoes/026-precipitacao-por-bacia.md), ainda não implementado) · `tempook_boletins` — boletim guardado como arquivo, **acervo até 26/10/2022** ([ADR 019](decisoes/019-boletim-do-tempook-como-arquivo.md)) · **`tempook_ena_prevs`** — previsão de ENA, um `tar.gz` por dia, **em dia** |
+| **Fontes hoje** | **`inmet_precipitacao`** — chuva horária por estação, do zip anual do INMET (Onda 1; por estação, com a bacia em coluna por ponto em polígono, [ADR 026](decisoes/026-precipitacao-por-bacia.md)) · **`ons_bacia_contorno`** — contornos das bacias do SIN (ONS, CC-BY), insumo da bacia da chuva · `tempook_boletins` — boletim guardado como arquivo, **acervo até 26/10/2022** ([ADR 019](decisoes/019-boletim-do-tempook-como-arquivo.md)) · **`tempook_ena_prevs`** — previsão de ENA, um `tar.gz` por dia, **em dia** |
 | **Fontes a conectar** | os demais caminhos do TempoOK que a Alup vai indicar; o boletim recente, se estiver em outra área do storage |
 | **Granularidade** | hora por estação (INMET); arquivo diário (por modelo, no ENA-PREVS) |
 | **Cadência** | diária, inclusive fim de semana |

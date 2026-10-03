@@ -1,6 +1,6 @@
 # ADR 026 — Precipitação do INMET por bacia: ponto em polígono com os contornos do ONS
 
-**Status**: proposto · **Data**: 2026-10-03 · **Relaciona-se** com a cláusula 4ª (Onda 1,
+**Status**: implementado (fonte `ons_bacia_contorno` e coluna `bacia` na Gold da chuva); a cobertura (39% das estações sem bacia, 3 bacias do EAR sem polígono) aguarda a manifestação da Alup · **Data**: 2026-10-03 · **Relaciona-se** com a cláusula 4ª (Onda 1,
 "INMET — precipitação histórica por bacia") e com o dicionário de
 [`ons_ear_bacia`](../../dicionario-dados/ons_ear_bacia.md)
 

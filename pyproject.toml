@@ -19,6 +19,7 @@ dependencies = [
     # foi o que derrubou o primeiro apply de dev em 23/09. O servidor de
     # desenvolvimento do Flask não serve produção.
     "gunicorn>=23.0",
+    "pyshp>=3.1.6",
 ]
 
 [project.optional-dependencies]

@@ -1,7 +1,7 @@
 """Conector INMET — precipitação horária por estação (Onda 1, dado público, sem credencial).
 
 Fonte: zip anual do portal, `https://portal.inmet.gov.br/uploads/dadoshistoricos/{ano}.zip`, com um CSV por
-estação (595 em 2025). Cada CSV tem 8 linhas de metadados, o cabeçalho na linha 9, `;` como separador, vírgula
+estação. Cada CSV tem 8 linhas de metadados, o cabeçalho na linha 9, `;` como separador, vírgula
 decimal e codificação latin-1. Só a coluna de precipitação horária interessa à Onda 1.
 
 A API `apitempo.inmet.gov.br` não serve para o histórico: a lista de estações responde, o dado horário voltou
@@ -135,15 +135,19 @@ class InmetPrecipitacao(Conector):
         """Baixa o zip do ano para um arquivo temporário (são 60 a 90 MB). `None` quando o ano ainda não existe."""
         from src.core.config import get_settings
 
-        resposta = self._sessao.get(URL.format(ano=ano), timeout=get_settings().http_timeout, stream=True)
-        if resposta.status_code == 404:
-            return None
-        resposta.raise_for_status()
-        arquivo = tempfile.TemporaryFile()  # noqa: SIM115 — fechado pelo chamador
-        for pedaco in resposta.iter_content(1 << 20):
-            arquivo.write(pedaco)
-        arquivo.seek(0)
-        return arquivo
+        with self._sessao.get(URL.format(ano=ano), timeout=get_settings().http_timeout, stream=True) as resposta:
+            if resposta.status_code == 404:
+                return None
+            resposta.raise_for_status()
+            arquivo = tempfile.TemporaryFile()  # noqa: SIM115 — fechado pelo chamador
+            try:
+                for pedaco in resposta.iter_content(1 << 20):
+                    arquivo.write(pedaco)
+            except BaseException:
+                arquivo.close()
+                raise
+            arquivo.seek(0)
+            return arquivo
 
     def extrair(self, janela: Janela) -> Iterator[dict[str, Any]]:
         inicio, fim = janela.inicio.isoformat(), janela.fim.isoformat()

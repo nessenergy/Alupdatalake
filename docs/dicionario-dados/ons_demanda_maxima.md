@@ -36,7 +36,7 @@ Alup sobre a substituição proposta no ADR, e não que o IPDO foi entregue.
   instantes diferentes não dá a máxima do SIN).
 - **Nenhum campo vazio** e nenhuma chave `(subsistema, data)` repetida em 2024,
   2025 e 2026. Se vier vazio, o valor vira nulo, nunca zero; valor negativo é
-  recusado.
+  recusado pelo conector (a linha conta em `linhas_invalidas`), antes da Silver.
 - **A série tem lacuna recente.** O arquivo de 2026 terminava em 19/05/2026 na
   leitura de 03/10/2026: a origem ainda não publicara o resto. A ingestão
   diária segue; os dias aparecem quando o ONS os publicar. O limite de silêncio

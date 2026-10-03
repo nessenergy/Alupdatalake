@@ -16,6 +16,9 @@ def servidor_instavel():
 
     class Handler(BaseHTTPRequestHandler):
         def _responder(self, metodo: str) -> None:
+            # Consome o corpo do POST: fechar o socket com bytes não lidos faz o SO mandar RST, e o cliente
+            # perde a resposta (ConnectionAbortedError), retenta e a contagem vira 3 em vez de 2.
+            self.rfile.read(int(self.headers.get("Content-Length", 0)))
             chamadas[metodo] += 1
             status = 503 if chamadas[metodo] == 1 else 200
             corpo = json.dumps({"ok": status == 200}).encode()

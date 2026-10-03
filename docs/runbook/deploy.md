@@ -251,6 +251,23 @@ O workflow valida o conector (snake_case), as datas (`AAAA-MM-DD`, as duas ou
 nenhuma) e a URI antes de chamar o GCP, e espera a execução terminar. O
 resultado fica em `bronze._execucoes`.
 
+### No GCP: workflow `Conferir cargas`
+
+Para conferir as cargas sem `gcloud auth` pessoal, o workflow `Conferir cargas`
+roda, com a SA de deploy, um conjunto fixo de consultas versionadas em
+`scripts/conferir_cargas.py`: contagens e datas das Silver e Gold da Onda 1 e do
+Aditivo 01, a última execução de cada conector em `bronze._execucoes`, a saúde
+da ingestão e o cruzamento das bacias com o EAR.
+
+```bash
+gh workflow run "Conferir cargas" -f environment=hml
+```
+
+O resultado fica no resumo da execução (aba Summary do run no GitHub), com uma
+seção por conjunto; tabela inexistente no ambiente sai como `ausente`. É
+somente leitura (só `SELECT`/`WITH`, nada é escrito ou criado), e a única
+entrada é o ambiente.
+
 ## Segredos
 
 O Terraform cria o secret vazio; o valor entra fora do versionamento:

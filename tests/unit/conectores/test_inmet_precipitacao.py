@@ -139,11 +139,11 @@ def test_ciclo_completo_no_runner_sem_rede(monkeypatch) -> None:
 
 def test_cabecalho_com_colunas_embaralhadas_falha_alto(monkeypatch) -> None:
     """Se o INMET reordenar colunas, a coluna 3 deixa de ser chuva: temperatura passaria na faixa 0 a 500."""
-    linhas = FIXTURE.decode("latin-1").split("\r\n")
+    linhas = FIXTURE.decode("latin-1").splitlines()  # a quebra de linha da fixture depende da plataforma
     cabecalho = linhas[8].split(";")
     cabecalho[2], cabecalho[7] = cabecalho[7], cabecalho[2]
     linhas[8] = ";".join(cabecalho)
-    conector, _ = _conector(monkeypatch, {2025: _zip((NOME, "\r\n".join(linhas).encode("latin-1")))})
+    conector, _ = _conector(monkeypatch, {2025: _zip((NOME, "\n".join(linhas).encode("latin-1")))})
 
     with pytest.raises(LayoutInesperadoError, match="PRECIPITA"):
         list(conector.extrair(Janela.de_texto("2025-01-01", "2025-01-01")))

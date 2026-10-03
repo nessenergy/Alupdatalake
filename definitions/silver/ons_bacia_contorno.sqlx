@@ -1,0 +1,37 @@
+config {
+  type: "view",
+  schema: "silver",
+  tags: ["silver"],
+  assertions: {
+    uniqueKey: ["nome_bacia", "data_referencia"],
+    nonNull: ["nome_bacia", "data_referencia", "contorno"],
+    rowConditions: [
+      "NOT ST_ISEMPTY(contorno)"
+    ]
+  }
+}
+
+-- Silver: contornos das bacias do SIN (ONS, CC-BY), deduplicados e como GEOGRAPHY.
+-- Dedup: para cada bacia e data de referência vence a ingestão mais recente; o retrato semanal do mesmo shapefile
+-- não multiplica polígono. `data_referencia` é a data que o CKAN declara para o conjunto, não a da leitura.
+-- `make_valid => TRUE` repara as autointerseções (6 dos 31 polígonos); sem isso o BigQuery recusa a geometria.
+SELECT
+  data_referencia,
+  CAST(NULL AS STRING) AS submercado,    -- a bacia não é submercado
+  CAST(NULL AS STRING) AS codigo_usina,
+  CAST(NULL AS STRING) AS agente_ccee,
+  FORMAT_DATE('%Y-%m', data_referencia) AS periodo_apuracao,
+  CAST(NULL AS STRING) AS periodo_apuracao_ccee,
+  nome_bacia,
+  -- Chave para cruzar com `ons_ear_bacia.nomecurto` (maiúsculas, sem acento): Paraná -> PARANA.
+  -- A regex não usa barra invertida (como `\pM`) por cautela: o corpo do .sqlx passa pelo Dataform, que o lê como template JS.
+  UPPER(REGEXP_REPLACE(NORMALIZE(nome_bacia, NFD), r'[^[:ascii:]]', '')) AS bacia_chave,
+  id_bacia,
+  ST_GEOGFROMTEXT(wkt, make_valid => TRUE) AS contorno,
+  _ingestao_id,
+  _ingestao_timestamp
+FROM ${ref("bronze", "ons_bacia_contorno")}
+QUALIFY ROW_NUMBER() OVER (
+  PARTITION BY nome_bacia, data_referencia
+  ORDER BY _ingestao_timestamp DESC
+) = 1

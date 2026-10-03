@@ -1,6 +1,6 @@
 # ADR 026 — Precipitação do INMET por bacia: ponto em polígono com os contornos do ONS
 
-**Status**: proposto · **Data**: 2026-10-03 · **Relaciona-se** com a cláusula 4ª (Onda 1,
+**Status**: implementado (fonte `ons_bacia_contorno` e coluna `bacia` na Gold da chuva); a cobertura (39% das estações sem bacia, 3 bacias do EAR sem polígono) aguarda a manifestação da Alup · **Data**: 2026-10-03 · **Relaciona-se** com a cláusula 4ª (Onda 1,
 "INMET — precipitação histórica por bacia") e com o dicionário de
 [`ons_ear_bacia`](../../dicionario-dados/ons_ear_bacia.md)
 
@@ -34,7 +34,7 @@ Fatos verificados:
 - **Cruzamento de nomes** com o EAR: 20 dos 23 nomes do EAR têm polígono (por nome, ignorando
   acento e caixa; Itajaí aparece como `Itajaí-Açu`). **Sem polígono**: AMAZONAS, PARAGUAI e
   SANTA MARIA VIT. O shapefile traz 11 polígonos que não são nome de EAR (Correntes, Tapajós,
-  Xingu, Madeira, Antas, Manso, Uatumã, Curuá-Una, Itiquira, Jauru, Jari).
+  Xingu, Madeira, Antas, Manso, Uatuamã, Curuá-Una, Itiquira, Jauru, Jari).
 - **Qualidade da geometria**: 6 dos 31 polígonos têm **autointerseção** (Iguaçu, Madeira, Paraná,
   Paranaíba, São Francisco, Tocantins) e `ST_CONTAINS` ingênuo os ignora ou o BigQuery os
   recusa; reparados com `make_valid` (shapely), as sobreposições entre bacias ficam em 3 pares

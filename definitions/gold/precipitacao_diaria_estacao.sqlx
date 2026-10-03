@@ -5,19 +5,60 @@ config {
   dependOnDependencyAssertions: true
 }
 
--- Gold: chuva diária por estação do INMET. `horas_sem_medicao` mostra o buraco da origem em vez de escondê-lo
--- dentro de um zero. `ultima_hora_com_dado` é por estação: o zip do ano corrente atrasa semanas, e um dia
--- sem linhas não quer dizer um dia sem chuva. Sem KPI nem comparação entre estações (ADR 012).
--- Por estação, não por bacia: o ADR 026 decidiu o ponto em polígono, ainda não implementado.
+-- Gold: chuva diária por estação do INMET, com a bacia em que a estação cai. `horas_sem_medicao` mostra o buraco da
+-- origem em vez de escondê-lo dentro de um zero. `ultima_hora_com_dado` é por estação: o zip do ano corrente
+-- atrasa semanas, e um dia sem linhas não quer dizer um dia sem chuva. Sem KPI nem comparação entre estações (ADR 012).
+--
+-- `bacia` é o ponto em polígono do ADR 026, com os contornos do ONS (silver.ons_bacia_contorno), e é só uma coluna ao
+-- lado: a chuva continua por estação e NÃO é agregada por bacia (a regra de agregação é da Alup). `bacia` fica nula
+-- quando a estação cai fora de todo contorno (39% das estações em 03/10/2026); a estação exatamente sobre uma
+-- borda também recebe a bacia (ST_COVERS inclui a fronteira) e a linha da estação sem bacia continua na Gold (LEFT
+-- JOIN). `bacia_chave` é o mesmo nome em maiúsculas e sem acento, para cruzar com `ons_ear_bacia.nomecurto`. Estação
+-- dentro de mais de um polígono fica com o de MENOR ÁREA (ST_AREA), e o nome da bacia desempata. Vale o contorno da data de referência
+-- mais recente de cada bacia.
+WITH contorno_vigente AS (
+  SELECT nome_bacia, bacia_chave, contorno, ST_AREA(contorno) AS area_m2
+  FROM ${ref("silver", "ons_bacia_contorno")}
+  QUALIFY ROW_NUMBER() OVER (PARTITION BY nome_bacia ORDER BY data_referencia DESC) = 1
+),
+
+-- Uma linha por estação, não por dia: a junção espacial roda ~600 vezes, não ~200 mil. A coordenada é a da leitura
+-- mais recente QUE TENHA latitude e longitude: uma leitura recente sem coordenada não pode apagar a bacia que uma
+-- antiga já provou (o filtro mantém latitude e longitude da mesma linha).
+estacao_ponto AS (
+  SELECT
+    estacao,
+    ST_GEOGPOINT(
+      CAST(ARRAY_AGG(longitude ORDER BY data_referencia DESC LIMIT 1)[OFFSET(0)] AS FLOAT64),
+      CAST(ARRAY_AGG(latitude ORDER BY data_referencia DESC LIMIT 1)[OFFSET(0)] AS FLOAT64)
+    ) AS ponto
+  FROM ${ref("silver", "inmet_precipitacao")}
+  WHERE latitude IS NOT NULL AND longitude IS NOT NULL
+  GROUP BY estacao
+),
+
+estacao_bacia AS (
+  SELECT
+    e.estacao,
+    ARRAY_AGG(c.nome_bacia IGNORE NULLS ORDER BY c.area_m2 ASC, c.nome_bacia ASC LIMIT 1)[SAFE_OFFSET(0)] AS bacia,
+    ARRAY_AGG(c.bacia_chave IGNORE NULLS ORDER BY c.area_m2 ASC, c.nome_bacia ASC LIMIT 1)[SAFE_OFFSET(0)] AS bacia_chave
+  FROM estacao_ponto AS e
+  LEFT JOIN contorno_vigente AS c ON ST_COVERS(c.contorno, e.ponto)
+  GROUP BY e.estacao
+)
+
 SELECT
-  estacao,
-  ANY_VALUE(nome_estacao) AS nome_estacao,
-  ANY_VALUE(uf) AS uf,
-  data_referencia,
-  SUM(precipitacao_mm) AS precipitacao_mm_dia,
-  COUNTIF(precipitacao_mm IS NOT NULL) AS horas_com_medicao,
-  COUNTIF(precipitacao_mm IS NULL) AS horas_sem_medicao,
-  MAX(MAX(IF(precipitacao_mm IS NOT NULL, TIMESTAMP_ADD(TIMESTAMP(data_referencia), INTERVAL hora_utc HOUR), NULL)))
-    OVER (PARTITION BY estacao) AS ultima_hora_com_dado
-FROM ${ref("silver", "inmet_precipitacao")}
-GROUP BY estacao, data_referencia
+  p.estacao,
+  ANY_VALUE(p.nome_estacao) AS nome_estacao,
+  ANY_VALUE(p.uf) AS uf,
+  b.bacia,
+  b.bacia_chave,
+  p.data_referencia,
+  SUM(p.precipitacao_mm) AS precipitacao_mm_dia,
+  COUNTIF(p.precipitacao_mm IS NOT NULL) AS horas_com_medicao,
+  COUNTIF(p.precipitacao_mm IS NULL) AS horas_sem_medicao,
+  MAX(MAX(IF(p.precipitacao_mm IS NOT NULL, TIMESTAMP_ADD(TIMESTAMP(p.data_referencia), INTERVAL p.hora_utc HOUR), NULL)))
+    OVER (PARTITION BY p.estacao) AS ultima_hora_com_dado
+FROM ${ref("silver", "inmet_precipitacao")} AS p
+LEFT JOIN estacao_bacia AS b ON b.estacao = p.estacao
+GROUP BY p.estacao, b.bacia, b.bacia_chave, p.data_referencia

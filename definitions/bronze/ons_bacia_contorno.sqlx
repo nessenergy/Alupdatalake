@@ -1,0 +1,24 @@
+config {
+  type: "operations",
+  schema: "bronze",
+  hasOutput: true,
+  tags: ["bronze"]
+}
+
+-- Bronze: contornos das bacias hidrográficas do SIN (ONS, conjunto aberto `bacia_contorno`, licença CC-BY; o autor é
+-- o ONS). Append-only: cada execução grava o retrato do shapefile; a Silver deduplica por bacia e data de referência.
+-- A geometria fica como WKT, do jeito que o shapefile a traz (6 dos 31 polígonos têm autointerseção); o reparo é da Silver.
+CREATE TABLE IF NOT EXISTS ${self()} (
+  data_referencia  DATE   NOT NULL OPTIONS(description="`metadata_modified` do conjunto no CKAN do ONS, não a data da leitura"),
+  nome_bacia       STRING NOT NULL OPTIONS(description="Campo Nome_Bacia do shapefile, com acento (ex.: Paraná, Itajaí-Açu)"),
+  id_bacia         INT64  OPTIONS(description="Campo ID do shapefile (0 a 30 em 2026)"),
+  wkt              STRING NOT NULL OPTIONS(description="POLYGON ou MULTIPOLYGON em WGS84, longitude e latitude, sem reparo"),
+
+  _ingestao_id        STRING    NOT NULL OPTIONS(description="Identificador da execução de ingestão"),
+  _ingestao_timestamp TIMESTAMP NOT NULL OPTIONS(description="Quando o registro entrou no lake"),
+  _fonte              STRING    NOT NULL OPTIONS(description="Identificador da fonte"),
+  _schema_versao      STRING    NOT NULL OPTIONS(description="Versão do contrato lido na origem")
+)
+PARTITION BY DATE(_ingestao_timestamp)
+CLUSTER BY nome_bacia, data_referencia
+OPTIONS(description="Contornos das bacias do SIN (ONS, CC-BY) — camada Bronze, append-only");

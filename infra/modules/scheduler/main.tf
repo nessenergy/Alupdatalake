@@ -168,6 +168,16 @@ variable "conectores" {
       memoria      = "1Gi"
       cpu          = "1"
     }
+    ons_bacia_contorno = {
+      # Onda 1, "precipitação por bacia" (ADR 026): os contornos das bacias do SIN servem ao ponto em polígono da
+      # chuva do INMET. O conjunto `bacia_contorno` do ONS é um retrato (zip de 1,6 MB, 31 polígonos) sem janela, e o
+      # CKAN o declarava modificado em 27/05/2024: muda raramente. Mensal, dia 1 às 7h, basta; a Bronze é append-only
+      # e a Silver deduplica por bacia e data de referência. Memória e CPU como as outras (o pico não foi medido).
+      cron         = "0 7 1 * *"
+      ultimos_dias = 1 # retrato do zip; a janela não se aplica
+      memoria      = "1Gi"
+      cpu          = "1"
+    }
     ons_capacidade = {
       # Cadastro de unidades geradoras; muda devagar, como o aneel_siga.
       # Segunda de manhã, uma hora depois do SIGA, para não disputar a mesma

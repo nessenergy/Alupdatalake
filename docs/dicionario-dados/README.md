@@ -4,7 +4,7 @@ O **componente 07** do contrato: cada fonte entrega, junto do conector e das
 views, a documentação de campos e a linhagem origem → Bronze → Silver → Gold.
 Este índice diz o que já existe, o que falta e — importante — **por que falta**.
 
-Em **02/10/2026**, o índice cobre **56 fontes em 55 dicionários de fonte**
+Em **03/10/2026**, o índice cobre **57 fontes em 56 dicionários de fonte**
 (eólico e fotovoltaico compartilham um documento), além de **2 dicionários
 técnicos**. Bases reutilizáveis não entram nessa contagem. O contrato mantém
 **13 fontes**; entidade implementada não cria uma fonte contratual nova.
@@ -52,6 +52,7 @@ técnicos**. Bases reutilizáveis não entram nessa contagem. O contrato mantém
 | ACE Comercializadora — PRC | [`ace_prc.md`](ace_prc.md) | 1 | `submercado` | `prc_vigente_comercializadora` |
 | ANEEL — tarifas homologadas das distribuidoras | [`aneel_tarifas.md`](aneel_tarifas.md) | 1 | — | `tarifa_vigente_distribuidora` |
 | INMET — precipitação horária por estação | [`inmet_precipitacao.md`](inmet_precipitacao.md) | 1 | — | `precipitacao_diaria_estacao` |
+| ONS — contornos das bacias (CC-BY) | [`ons_bacia_contorno.md`](ons_bacia_contorno.md) | 1 | — | `precipitacao_diaria_estacao` (coluna `bacia`) |
 | ONS — geração horária por usina | [`ons_geracao_usina.md`](ons_geracao_usina.md) | 1 | `submercado`, `codigo_usina` | `geracao_mensal_usina_ons` |
 | ONS — capacidade instalada | [`ons_capacidade.md`](ons_capacidade.md) | 1 | `submercado`, `codigo_usina` | `capacidade_instalada_vigente_usina` |
 | ONS — disponibilidade horária por usina | [`ons_disponibilidade_usina.md`](ons_disponibilidade_usina.md) | 1 | `submercado`, `codigo_usina` | `disponibilidade_mensal_usina` |
@@ -85,7 +86,7 @@ nova; fonte sem entidade diz por quê.
 | ANEEL | 1 | `aneel_siga`, `aneel_tarifas` |
 | ACE Comercializadora (Alup) | 1 | `ace_prc` |
 | INMET | 1 | `inmet_precipitacao` |
-| ONS | 1 | `ons_carga`, `ons_ear`, `ons_ena`, `ons_geracao_usina`, `ons_capacidade`, `ons_disponibilidade_usina`, `ons_restricao_coff_eolica`, `ons_restricao_coff_fotovoltaica` |
+| ONS | 1 | `ons_bacia_contorno`, `ons_carga`, `ons_ear`, `ons_ena`, `ons_geracao_usina`, `ons_capacidade`, `ons_disponibilidade_usina`, `ons_restricao_coff_eolica`, `ons_restricao_coff_fotovoltaica` |
 | CCEE InfoMercado | 1 | `ccee_pld`, `ccee_perfil`, `ccee_agente`, `ccee_exposicao_financeira`, `ccee_contabilizacao_perfil`, `ccee_geracao_usina`, `ccee_contrato_montante`, `ccee_varejista_consumidor`, `ccee_encargo_ess`, `ccee_energia_reserva`, `ccee_cvu_estrutural` |
 | CCEE agente credenciado | 2 | nenhuma — depende de credencial de agente (item 2.1) |
 | BBCE | 2 | `bbce_curva_forward` |

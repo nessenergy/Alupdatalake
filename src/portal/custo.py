@@ -140,6 +140,7 @@ DOMINIO_ANALITICO = {
     "ons_fator_capacidade": "Geração e Operacional",
     "tempook_boletins": "Meteorologia",
     "tempook_ena_prevs": "Meteorologia",
+    "inmet_precipitacao": "Meteorologia",
     "hubspot_negocios": "Comercial e Contratos",
     "bcb_cambio_ptax": "Econômico",
     "bcb_juros": "Econômico",

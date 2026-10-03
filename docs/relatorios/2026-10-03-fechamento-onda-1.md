@@ -136,3 +136,18 @@ coluna `dev` acima. `hml` é a run `37103149215`.
 
 Não contadas pela conferência: as Golds dos oito itens do Aditivo 01. Segue pendente a decisão de aceite da Alup sobre os
 ADRs 026, 027 e 028. O estado da Onda 1 no painel (`entregue`) não muda.
+
+## 8. Chuva por bacia e bacia mais próxima (conferido em 03/10/2026)
+
+Método: workflow `Conferir cargas` (somente leitura), runs `37123673126` (hml) e `37123677588` (dev), depois do deploy
+e do Dataform dos dois ambientes. Os números são **iguais em dev e hml**.
+
+| Gold | Resultado conferido |
+|---|---|
+| `precipitacao_diaria_estacao` | 430.310 linhas, 653 estações, 398 com bacia exata, 25 bacias |
+| bacia mais próxima (só sem bacia exata) | 255 estações (653 menos 398, como esperado); distância mediana **62,0 km**, máxima **690,6 km** |
+| `precipitacao_diaria_bacia` | 17.727 linhas (bacia e dia), 25 bacias, de 2024-09-01 a 2026-08-31; **1.216 dias de bacia sem nenhuma estação completa** (média nula) |
+
+Leitura honesta: a bacia mais próxima é aproximação **sem limite de distância**; a mediana de 62 km é razoável, mas a
+máxima de 690 km mostra estações que não deveriam ser atribuídas a nenhuma bacia sem um corte. Quem usa filtra por
+`distancia_bacia_km`; o corte é decisão da Alup. A média por bacia é **regra provisória** (ADR 026).

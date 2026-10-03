@@ -1,0 +1,29 @@
+config {
+  type: "operations",
+  schema: "bronze",
+  hasOutput: true,
+  tags: ["bronze"]
+}
+
+-- Bronze: precipitação horária por estação do INMET (zip anual do portal, um CSV por estação). Append-only.
+-- Fiel à origem: `precipitacao_mm` nulo é hora sem medição (o campo vazio ou o -9999 do INMET), nunca zero.
+CREATE TABLE IF NOT EXISTS ${self()} (
+  estacao          STRING  NOT NULL OPTIONS(description="Código da estação (WMO), ex.: A701"),
+  nome_estacao     STRING  NOT NULL OPTIONS(description="Nome da estação, como no cabeçalho do CSV"),
+  regiao           STRING  NOT NULL OPTIONS(description="N, NE, CO, SE ou S"),
+  uf               STRING  NOT NULL OPTIONS(description="Sigla da UF da estação"),
+  latitude         NUMERIC NOT NULL OPTIONS(description="Graus decimais"),
+  longitude        NUMERIC NOT NULL OPTIONS(description="Graus decimais"),
+  altitude_m       NUMERIC OPTIONS(description="Altitude da estação em metros; vazia em alguns CSVs"),
+  data_referencia  DATE    NOT NULL OPTIONS(description="Dia da medição (UTC)"),
+  hora_utc         INT64   NOT NULL OPTIONS(description="Hora UTC, 0 a 23"),
+  precipitacao_mm  NUMERIC OPTIONS(description="Chuva da hora em mm; nulo é hora sem medição, nunca zero"),
+
+  _ingestao_id        STRING    NOT NULL OPTIONS(description="Identificador da execução de ingestão"),
+  _ingestao_timestamp TIMESTAMP NOT NULL OPTIONS(description="Quando o registro entrou no lake"),
+  _fonte              STRING    NOT NULL OPTIONS(description="Identificador da fonte"),
+  _schema_versao      STRING    NOT NULL OPTIONS(description="Versão do contrato lido na origem")
+)
+PARTITION BY DATE(_ingestao_timestamp)
+CLUSTER BY estacao, data_referencia
+OPTIONS(description="Precipitação horária do INMET — camada Bronze, append-only");

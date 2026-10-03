@@ -42,6 +42,7 @@ variable "conectores_criticos" {
     aneel_siga                              = 180 # semanal + folga
     aneel_tarifas                           = 180 # semanal + folga
     ace_prc                                 = 180 # semanal + folga
+    inmet_precipitacao                      = 180 # semanal + folga
     ons_capacidade                          = 180 # semanal + folga
     ons_geracao_usina                       = 780 # mensal + folga
     ons_disponibilidade_usina               = 780 # mensal (dia 7) + folga

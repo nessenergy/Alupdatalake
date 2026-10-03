@@ -159,6 +159,7 @@ BYTES_POR_LINHA = {
     "aneel_siga": 640,
     "ace_prc": 160,  # 5 textos/datas, 1 NUMERIC; 24 linhas por execução semanal
     "aneel_tarifas": 280,  # 7 textos e 3 datas, 2 NUMERIC; ~50 mil linhas por execução semanal
+    "inmet_precipitacao": 180,  # 4 textos, 4 NUMERIC, data e hora; ~900 mil linhas por semana
     "hubspot_negocios": 512,
     "ccee_geracao_usina": 420,  # 36 colunas, 25 quase sempre nulas
     "ons_geracao_usina": 220,  # 14 colunas + 4 técnicas; ver estimativa no relatório da entrega

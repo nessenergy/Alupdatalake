@@ -51,7 +51,9 @@ Relatório de fechamento, com a matriz dos 7 componentes e a conferência por am
 - **ANEEL:** conferido em `dev` e `hml` em 03/10: Silver de tarifas com 327.763 linhas (o Bronze extraiu 328.293), 24 preços de PRC; Gold de
   tarifas com 10.366 linhas e de PRC com 24, nos dois.
 - **CPTEC:** bloqueado, sem causa conhecida; fora da Onda 1 até haver resposta do INPE, como decisão provisória
-  ([ADR 028](arquitetura/decisoes/028-cptec-acesso.md)). Não entregue.
+  ([ADR 028](arquitetura/decisoes/028-cptec-acesso.md)). Não entregue. Em 03/10 a sonda de dentro do GCP (dev e hml) também
+  recebeu 403: o bloqueio não é do IP da máquina de desenvolvimento. INMET previsão (5 dias, sem chuva) e Open-Meteo
+  (licença não comercial) não servem de substitutos ([ADR 029](arquitetura/decisoes/029-previsao-do-tempo-fonte.md)).
 - **Conferência no BigQuery (03/10):** feita pelo workflow `Conferir cargas` (somente leitura; `hml` run `37103149215`, `dev` runs `37103208999` e `37107071613`, esta depois da carga do INMET e do Dataform de `dev`).
   Aditivo 01, itens 12 a 19: Silver em `dev` com 94.656 a 18.998.832 linhas por item, `SUCESSO` e zero inválidas, entregues em 03/10 (162h de
   162h apontadas); em `hml` os oito têm 0 linhas. **Ainda pendentes:** IGP-M em `dev` (BCB fora do ar) e `bcb_juros` (erros nos dois

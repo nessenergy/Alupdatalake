@@ -14,7 +14,7 @@ conferido no BigQuery** (com data e contagem). Onde a conferência não foi feit
 | 2 | ONS Operacional (IPDO e ACOMPH) | `ons_demanda_maxima` (seção 7 do IPDO); IPDO em si e ACOMPH sem fonte | carga da demanda máxima conferida em `hml` e `dev` (03/10, Gold com 116 linhas nos dois); decisão proposta no ADR 027, depende de aceite da Alup; IPDO e ACOMPH **não entregues** |
 | 3 | ANEEL (tarifas homologadas e referência, PRC) | `aneel_tarifas`, `ace_prc` | 7 componentes; Silver e Gold conferidas em `dev` e `hml` em 03/10 |
 | 4 | INMET (precipitação histórica por bacia) | `inmet_precipitacao`, `ons_bacia_contorno` | 7 componentes; carga e recorte por bacia conferidos em `hml` e `dev` em 03/10 (398 de 653 estações com bacia nos dois) |
-| 5 | CPTEC (previsão de 7 dias) | nenhuma | **não entregue**: bloqueado (ADR 028) |
+| 5 | CPTEC (previsão de 7 dias) | nenhuma | **não entregue**: bloqueado também de dentro do GCP (ADR 028 e 029) |
 | — | IGP-M (proposta de 28/05, minuta PDF de 23/07) | `bcb_igpm` | conferido em `hml` (03/10); `dev` pendente |
 
 ## 2. Matriz dos 7 componentes por fonte
@@ -66,7 +66,9 @@ depois delas**. As contagens foram conferidas depois, pelo workflow `Conferir ca
   já está no lake, exceto a demanda máxima, que agora é a fonte `ons_demanda_maxima`. Para o ACOMPH não se encontrou
   origem pública; a hipótese de distribuição por cadastro **não foi verificada**. Proposta no ADR 027, sem aceite.
 - **CPTEC.** 403 em todo caminho do webservice e a API nova sem DNS; causa desconhecida. Fora da Onda 1 até haver resposta
-  do INPE, como decisão provisória (ADR 028).
+  do INPE, como decisão provisória (ADR 028). Em 03/10 a sonda de dentro do GCP (dev e hml) também recebeu 403, então o
+  bloqueio não é do IP da máquina de desenvolvimento. Alternativas públicas avaliadas e descartadas (ADR 029): INMET
+  previsão tem 5 dias e não traz chuva; Open-Meteo é gratuito só para uso não comercial.
 - **Conferência no BigQuery:** feita em 03/10 (seção 7). A conferência final de `dev` (seção 7) fechou INMET, bacia e demanda máxima, com as Golds. Seguem pendentes o IGP-M em `dev` e o `bcb_juros`.
 - **IGP-M em `dev`:** pendente por queda externa do BCB (0 linhas; 12 execuções com erro nos últimos 3 dias; a tentativa final, run `37106480778`, falhou).
 

@@ -110,14 +110,16 @@ Sem KPI e sem comparação entre estações (ADR 012).
 ### A coluna `bacia` (ADR 026, implementado)
 
 `bacia` (STRING) é o `Nome_Bacia` do contorno do ONS (`silver.ons_bacia_contorno`) que contém a estação, escrito como
-o ONS o escreve (com acento: `Paraná`, `Itajaí-Açu`). Para cruzar com a `silver.ons_ear_bacia` (maiúsculas, sem acento)
-normalize os dois lados. A regra, escrita no SQL:
+o ONS o escreve (com acento: `Paraná`, `Itajaí-Açu`). `bacia_chave` (STRING) é o mesmo nome em maiúsculas e sem
+acento (`PARANA`, `ITAJAI-ACU`), para cruzar com `silver.ons_ear_bacia.nomecurto`: **19 dos 23 `nomecurto` casam** pela
+chave (calculado localmente com os 31 nomes reais; o ADR 026 dizia 20 por contar o Itajaí, mas `ITAJAI-ACU` não é
+`ITAJAI`: esse cruzamento precisa de um de-para manual). A regra, escrita no SQL:
 
 - **Junção espacial por estação, não por dia:** uma CTE de uma linha por estação (coordenada da leitura mais
-  recente) liga o ponto `ST_GEOGPOINT(longitude, latitude)` ao contorno por `ST_CONTAINS`; depois a Gold junta o
+  recente que tenha latitude e longitude) liga o ponto `ST_GEOGPOINT(longitude, latitude)` ao contorno por `ST_COVERS`; depois a Gold junta o
   resultado às linhas por dia.
-- **LEFT JOIN, nunca INNER:** a estação fora de todo contorno **continua na Gold, com `bacia` nula**. O mesmo vale
-  para a estação exatamente sobre uma borda (`ST_CONTAINS` não conta a fronteira). Nenhuma bacia é inventada.
+- **LEFT JOIN, nunca INNER:** a estação fora de todo contorno **continua na Gold, com `bacia` nula**. A estação
+  exatamente sobre uma borda **recebe** a bacia (`ST_COVERS` inclui a fronteira). Nenhuma bacia é inventada.
 - **Estação em mais de um polígono:** vale o de **menor área** (`ST_AREA`); o nome da bacia desempata. A regra é
   determinística, e um teste (`tests/unit/test_sql.py`) a fixa.
 - **Contorno vigente:** o da data de referência mais recente de cada bacia.
@@ -138,7 +140,7 @@ reproduzidos no BigQuery**.
   01 e 02/03/2025, 10.340 horas sem medição, 47 horas vazias em A701.
 - A fixture é pequena e de dado público.
 - As três camadas foram lidas pelo `sqlglot` (`tests/unit/test_sql.py`); um teste fixa que a Gold não usa
-  `COALESCE(precipitacao_mm, ...)`, e outro que a junção da bacia usa `ST_CONTAINS` e `ST_AREA`, é um `LEFT JOIN` e
+  `COALESCE(precipitacao_mm, ...)`, e outro que a junção da bacia usa `ST_COVERS` e `ST_AREA`, é um `LEFT JOIN` e
   não agrega por bacia.
 
 ## O que não foi verificado
@@ -150,7 +152,7 @@ reproduzidos no BigQuery**.
 - A cobertura carregada no BigQuery (estações, primeira e última data).
 - Por que parte das horas não tem medição (38% em março de 2025): a origem não explica.
 - O texto da licença do portal.
-- **A junção espacial da `bacia`:** nenhuma consulta espacial foi executada. `ST_CONTAINS` e o contorno com
+- **A junção espacial da `bacia`:** nenhuma consulta espacial foi executada. `ST_COVERS` e o contorno com
   `make_valid` só rodam no BigQuery; quantas estações caem em cada bacia na Gold, e o tempo da junção, são hipótese
   até a primeira execução em hml.
 

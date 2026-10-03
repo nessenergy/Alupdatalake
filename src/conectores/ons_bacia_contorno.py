@@ -121,13 +121,17 @@ class OnsBaciaContorno(Conector):
         timeout = get_settings().http_timeout
         resposta = self._sessao.get(URL_CKAN, params={"id": CONJUNTO}, timeout=timeout)
         resposta.raise_for_status()
-        conjunto = resposta.json()["result"]
-        urls = [r["url"] for r in conjunto["resources"] if r["url"].lower().endswith(".zip")]
+        try:
+            conjunto = resposta.json()["result"]
+            urls = [r["url"] for r in conjunto["resources"] if r["url"].lower().endswith(".zip")]
+            data_referencia = conjunto["metadata_modified"][:10]
+        except (KeyError, TypeError, ValueError) as exc:
+            raise LayoutInesperadoError(f"a resposta do CKAN para {CONJUNTO} mudou de forma: {exc!r}") from exc
         if len(urls) != 1:
             raise LayoutInesperadoError(f"o conjunto {CONJUNTO} trouxe {len(urls)} recursos zip, esperado 1")
         zip_ = self._sessao.get(urls[0], timeout=timeout)
         zip_.raise_for_status()
-        return zip_.content, conjunto["metadata_modified"][:10]
+        return zip_.content, data_referencia
 
     def extrair(self, janela: Janela) -> Iterator[dict[str, Any]]:
         del janela  # retrato: o conjunto não tem recorte de período
@@ -141,6 +145,9 @@ class OnsBaciaContorno(Conector):
             if shp is None:
                 raise LayoutInesperadoError("o zip de contornos não traz mais um arquivo .shp")
             base = shp[:-4]
+            for extensao in (".shx", ".dbf"):
+                if base + extensao not in arquivo.namelist():
+                    raise LayoutInesperadoError(f"o zip de contornos não traz mais o arquivo {extensao}")
             leitor = shapefile.Reader(
                 shp=arquivo.open(shp),
                 shx=arquivo.open(base + ".shx"),

@@ -29,13 +29,16 @@ bacia exige um polígono de bacia, e este é o conjunto do próprio ONS, o mesmo
   Grande, Iguaçu, Madeira, Paraná, Paranaíba, Paranapanema, São Francisco, Tietê, Tocantins, Uruguai, Antas, Manso,
   Uatuamã, Capivari, Araguari, Curuá-Una, Doce, Jacuí, Itabapoana, Itiquira, Jauru, Mucuri, Paraguaçu,
   Jequitinhonha, Jari, Paraíba do Sul.
-- **"Uatuamã"** é como o ONS escreve no arquivo (o ADR 026 o chamava Uatumã); o dado não é corrigido.
+- **"Uatuamã"** é como o ONS escreve no arquivo (o ADR 026 escrevia "Uatumã" antes de ler o shapefile, e foi
+  corrigido); o conector não altera o nome.
 - **6 polígonos têm autointerseção** (Iguaçu, Madeira, Paraná, Paranaíba, São Francisco e Tocantins, segundo o ADR 026,
   medido com `shapely`). O conector grava a geometria como veio; o reparo é da Silver (`make_valid`).
 - **Cobertura em relação ao EAR:** 20 dos 23 nomes da `ons_ear_bacia` têm polígono (ignorando acento e caixa; o
   Itajaí aparece como `Itajaí-Açu`). **Sem polígono:** AMAZONAS, PARAGUAI e SANTA MARIA VIT. 11 polígonos não são nome de
   EAR (Correntes, Tapajós, Xingu, Madeira, Antas, Manso, Uatuamã, Curuá-Una, Itiquira, Jauru, Jari). Os nomes do
-  EAR são em maiúsculas e sem acento: para cruzar chuva e armazenamento, normalize os dois lados.
+  EAR são em maiúsculas e sem acento: a Silver traz `bacia_chave` (ver Campos) para cruzar. Calculado localmente com os 31 nomes reais e os 23
+  `nomecurto` do ADR 026, **19 casam** pela chave; o ADR dizia 20 por contar o Itajaí, mas `ITAJAI-ACU` não é `ITAJAI`
+  (de-para manual). Sem casar: AMAZONAS, PARAGUAI, SANTA MARIA VIT e ITAJAI.
 - **O contorno é "das bacias hidrográficas com aproveitamentos no SIN"**, segundo o próprio ONS: não cobre todo o
   território (ver "Granularidade").
 
@@ -45,6 +48,7 @@ bacia exige um polígono de bacia, e este é o conjunto do próprio ONS, o mesmo
 |---|---|---|---|---|
 | `metadata_modified` (CKAN) | `data_referencia` | `data_referencia` | DATE | só a data |
 | `Nome_Bacia` | `nome_bacia` | `nome_bacia` | STRING | como veio, com acento |
+| derivado de `Nome_Bacia` | — | `bacia_chave` | STRING | `UPPER(REGEXP_REPLACE(NORMALIZE(nome_bacia, NFD), r'[^[:ascii:]]', ''))`: maiúsculas, sem acento (`Paraná` vira `PARANA`); chave para `ons_ear_bacia.nomecurto` |
 | `ID` | `id_bacia` | `id_bacia` | INT64 | 0 a 30 |
 | geometria | `wkt` | `contorno` | STRING → GEOGRAPHY | WKT em longitude e latitude; a Silver faz `ST_GEOGFROMTEXT(wkt, make_valid => TRUE)` |
 
@@ -87,7 +91,7 @@ modificação, as duas versões ficam na Silver e a Gold da chuva usa a mais rec
 ## O que não foi verificado
 
 - **Nenhuma consulta espacial foi executada.** O `ST_GEOGFROMTEXT(..., make_valid => TRUE)` da Silver e o
-  `ST_CONTAINS` da Gold só rodam no BigQuery (Dataform); os testes locais leem o SQL como texto e o `sqlglot` o
+  `ST_COVERS` da Gold só rodam no BigQuery (Dataform); os testes locais leem o SQL como texto e o `sqlglot` o
   analisa. Que o BigQuery aceite o WKT de 627 KB, o repare e devolva polígonos não vazios é hipótese até a primeira
   execução em hml.
 - A execução do job no Cloud Run e o pico de memória (esperado pequeno: 1,6 MB de zip).
@@ -100,5 +104,5 @@ dados.ons.org.br (CKAN: bacia_contorno) → Bacias_Hidrograficas_SIN.zip (shapef
   → gs://<bucket>-raw/ons/bacia_contorno/dt=…/<ingestao_id>.json.gz
     → bronze.ons_bacia_contorno   (append-only, particionada por _ingestao_timestamp)
       → silver.ons_bacia_contorno (QUALIFY por bacia e data; contorno GEOGRAPHY com make_valid)
-        → gold.precipitacao_diaria_estacao (coluna `bacia`, por ponto em polígono)
+        → gold.precipitacao_diaria_estacao (colunas `bacia` e `bacia_chave`, por ponto em polígono)
 ```

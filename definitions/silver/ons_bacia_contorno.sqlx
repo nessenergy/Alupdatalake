@@ -23,6 +23,9 @@ SELECT
   FORMAT_DATE('%Y-%m', data_referencia) AS periodo_apuracao,
   CAST(NULL AS STRING) AS periodo_apuracao_ccee,
   nome_bacia,
+  -- Chave para cruzar com `ons_ear_bacia.nomecurto` (maiúsculas, sem acento): Paraná -> PARANA.
+  -- A regex não usa barra invertida (como `\pM`) por cautela: o corpo do .sqlx passa pelo Dataform, que o lê como template JS.
+  UPPER(REGEXP_REPLACE(NORMALIZE(nome_bacia, NFD), r'[^[:ascii:]]', '')) AS bacia_chave,
   id_bacia,
   ST_GEOGFROMTEXT(wkt, make_valid => TRUE) AS contorno,
   _ingestao_id,

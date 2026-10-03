@@ -34,7 +34,7 @@ Fatos verificados:
 - **Cruzamento de nomes** com o EAR: 20 dos 23 nomes do EAR têm polígono (por nome, ignorando
   acento e caixa; Itajaí aparece como `Itajaí-Açu`). **Sem polígono**: AMAZONAS, PARAGUAI e
   SANTA MARIA VIT. O shapefile traz 11 polígonos que não são nome de EAR (Correntes, Tapajós,
-  Xingu, Madeira, Antas, Manso, Uatumã, Curuá-Una, Itiquira, Jauru, Jari).
+  Xingu, Madeira, Antas, Manso, Uatuamã, Curuá-Una, Itiquira, Jauru, Jari).
 - **Qualidade da geometria**: 6 dos 31 polígonos têm **autointerseção** (Iguaçu, Madeira, Paraná,
   Paranaíba, São Francisco, Tocantins) e `ST_CONTAINS` ingênuo os ignora ou o BigQuery os
   recusa; reparados com `make_valid` (shapely), as sobreposições entre bacias ficam em 3 pares

@@ -435,12 +435,15 @@ def test_gold_da_chuva_liga_a_bacia_por_ponto_em_poligono_sem_agregar_por_bacia(
     caminho = Path(__file__).resolve().parents[2] / "definitions" / "gold" / "precipitacao_diaria_estacao.sqlx"
     sql = caminho.read_text(encoding="utf-8")
     corpo = "\n".join(linha for linha in sql.splitlines() if not linha.lstrip().startswith("--"))
-    assert "ST_CONTAINS(" in corpo
+    assert "ST_COVERS(" in corpo  # a borda também recebe a bacia
+    assert "ST_CONTAINS(" not in corpo
+    assert "b.bacia_chave" in corpo and "bacia_chave" in corpo.split("estacao_bacia AS", 1)[1]
+    assert "WHERE latitude IS NOT NULL AND longitude IS NOT NULL" in corpo  # coordenada mais recente que não seja nula
     assert "ORDER BY c.area_m2 ASC" in corpo  # estação em dois polígonos: vale o menor
     assert "ST_AREA(" in corpo
     assert "LEFT JOIN contorno_vigente" in corpo  # estação fora de todo contorno continua na Gold
     assert "INNER JOIN" not in corpo
-    assert "GROUP BY p.estacao, b.bacia, p.data_referencia" in corpo  # a chuva segue por estação e dia
+    assert "GROUP BY p.estacao, b.bacia, b.bacia_chave, p.data_referencia" in corpo  # a chuva segue por estação e dia
     assert not re.search(r"\b(AVG|SUM)\([^)]*bacia", corpo)  # nenhuma média nem soma por bacia
 
 
@@ -449,5 +452,6 @@ def test_silver_do_contorno_repara_a_geometria_e_deduplica_por_bacia_e_data() ->
     caminho = Path(__file__).resolve().parents[2] / "definitions" / "silver" / "ons_bacia_contorno.sqlx"
     sql = caminho.read_text(encoding="utf-8")
     assert "ST_GEOGFROMTEXT(wkt, make_valid => TRUE)" in sql
+    assert "NORMALIZE(nome_bacia, NFD)" in sql and "AS bacia_chave" in sql  # chave para cruzar com ons_ear_bacia
     assert "PARTITION BY nome_bacia, data_referencia" in sql
     assert 'uniqueKey: ["nome_bacia", "data_referencia"]' in sql

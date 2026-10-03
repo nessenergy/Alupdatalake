@@ -150,6 +150,52 @@ def test_arquivo_que_nao_e_zip_falha_alto(monkeypatch: pytest.MonkeyPatch) -> No
         _brutos(conector)
 
 
+def test_zip_sem_dbf_ou_shx_falha_alto_e_nao_com_keyerror(monkeypatch: pytest.MonkeyPatch) -> None:
+    saida = io.BytesIO()
+    with zipfile.ZipFile(saida, "w") as z:
+        z.writestr("Bacias.shp", b"")
+    conector = _conector(monkeypatch, saida.getvalue())
+
+    with pytest.raises(LayoutInesperadoError, match=r"\.shx|\.dbf"):
+        _brutos(conector)
+
+
+class _Resposta:
+    def __init__(self, dados: dict[str, Any]) -> None:
+        self._dados = dados
+
+    def raise_for_status(self) -> None:
+        return None
+
+    def json(self) -> dict[str, Any]:
+        return self._dados
+
+
+class _Sessao:
+    def __init__(self, dados: dict[str, Any]) -> None:
+        self._dados = dados
+
+    def get(self, *args: Any, **kwargs: Any) -> _Resposta:
+        return _Resposta(self._dados)
+
+
+@pytest.mark.parametrize(
+    "resultado",
+    [
+        {"resources": [{"name": "sem url"}], "metadata_modified": "2024-05-27T18:02:14"},
+        {"resources": [{"url": "https://x/a.zip"}]},  # sem metadata_modified
+        {"metadata_modified": "2024-05-27T18:02:14"},  # sem recursos
+    ],
+)
+def test_resposta_do_ckan_fora_do_formato_falha_alto(
+    monkeypatch: pytest.MonkeyPatch, resultado: dict[str, Any]
+) -> None:
+    monkeypatch.setattr("src.conectores.ons_bacia_contorno.criar_sessao", lambda: _Sessao({"result": resultado}))
+
+    with pytest.raises(LayoutInesperadoError, match="CKAN"):
+        OnsBaciaContorno()._baixar()
+
+
 def test_nome_vazio_e_recusado_pelo_schema() -> None:
     with pytest.raises(ValueError, match="nome_bacia"):
         ContornoBacia(data_referencia=DATA, nome_bacia="  ", id_bacia=1, wkt="POLYGON ((0 0, 0 1, 1 1, 0 0))")

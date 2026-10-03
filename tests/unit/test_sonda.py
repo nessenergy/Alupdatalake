@@ -8,7 +8,7 @@ from pathlib import Path
 import pytest
 import yaml
 from src.cli import main
-from src.core.sonda import PREVIEW, SONDAS, ResultadoSonda, sondar
+from src.core.sonda import PREVIEW, SONDAS, ResultadoSonda, gravar_resultado, sondar
 
 WORKFLOW = Path(__file__).resolve().parents[2] / ".github" / "workflows" / "sondar-rede.yml"
 
@@ -81,12 +81,13 @@ def test_enderecos_sao_constantes_sem_marcador_de_substituicao() -> None:
 
 def test_cli_imprime_uma_linha_json_por_endereco_e_devolve_zero(monkeypatch, capsys) -> None:
     monkeypatch.setattr("src.core.sonda.criar_sessao", lambda: _todas(403))
+    monkeypatch.setattr("src.cli.gravar_resultado", lambda nome, resultados: None)
 
     codigo = main(["sondar", "cptec"])
 
     saida = [json.loads(linha) for linha in capsys.readouterr().out.splitlines() if linha.startswith("{")]
-    assert codigo == 0
-    assert [linha["status"] for linha in saida] == [403] * len(SONDAS["cptec"])
+    assert codigo == 0  # a sonda nunca falha o job: nada de alerta de ingestão por diagnóstico
+    assert [linha["status"] for linha in saida if "status" in linha] == [403] * len(SONDAS["cptec"])
     assert {linha["sonda"] for linha in saida} == {"cptec"}
 
 
@@ -103,3 +104,12 @@ def test_workflow_so_oferece_as_sondas_da_lista_e_nao_interpola_entrada_em_run()
     assert set(entradas["sonda"]["options"]) == set(SONDAS)
     for passo in fluxo["jobs"]["sondar"]["steps"]:
         assert "${{ inputs." not in passo.get("run", "")
+
+
+def test_gravar_resultado_falha_em_silencio_sem_credencial(monkeypatch) -> None:
+    def explode(*args, **kwargs):
+        raise RuntimeError("sem credencial")
+
+    monkeypatch.setattr("google.cloud.storage.Client", explode)
+
+    assert gravar_resultado("cptec", []) is None

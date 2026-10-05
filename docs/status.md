@@ -1,7 +1,34 @@
 # Estado do projeto
 
-Atualizado em **2026-10-03**. Auditoria de ponta a ponta, com a conferência de cada número:
+Atualizado em **2026-10-05**. Auditoria de ponta a ponta, com a conferência de cada número:
 [`relatorios/2026-10-02-auditoria-de-ponta-a-ponta.md`](relatorios/2026-10-02-auditoria-de-ponta-a-ponta.md).
+
+## Atualização de 05/10/2026
+
+- **Pendências do e-mail de 02/10 (Eduardo Pires): concluídas e respondidas.** IGP-M, Tarifas Homologadas e PRC estão
+  carregados e conferidos em `dev` e `hml` (IGP-M 25 meses; Tarifas 327.763 linhas, Gold 10.366; PRC 24 preços). O IGP-M em
+  `dev` foi carregado em 04/10, quando o BCB voltou; os 3 últimos meses (jul -1,16; ago -0,22; set 1,57) batem com a API do
+  BCB (runs de conferência `37307339177` e `37307344159`). A resposta com a evidência foi enviada ao Eduardo.
+- **CPTEC:** o 403 também vem de dentro do GCP (sonda em `dev` e `hml`, 03/10). INMET previsão (5 dias, sem chuva) e Open-Meteo
+  (licença não comercial) não servem de substitutos: [ADR 029](arquitetura/decisoes/029-previsao-do-tempo-fonte.md). Segue
+  não entregue.
+- **Chuva por bacia e bacia mais próxima** (`precipitacao_diaria_bacia`; colunas novas em `precipitacao_diaria_estacao`):
+  conferidos em `dev` e `hml`, iguais. A média é regra provisória (ADR 026) e a bacia mais próxima não tem corte de distância
+  (máxima de 690,6 km): as duas dependem de decisão da Alup.
+- **INMET, defeito corrigido (#378):** as "672 linhas inválidas" por execução eram a estação A772 (Amambaí), cujo metadado
+  `ALTITUDE` vem como `NULL`; o conector descartava todas as horas dela. Corrigido; histórico da estação (18/02 a 31/08)
+  recarregado em `dev` e `hml`, e as Golds regeradas: as duas ficaram iguais (Silver 10.332.120 linhas; 654 estações na Gold,
+  399 com bacia exata; chuva por bacia com as mesmas 17.727 linhas; runs de conferência `37345257545` e `37347614563`).
+- **Conferência e runner:** `Conferir cargas` mostra a causa do último erro por conector e os 3 últimos meses do IGP-M (#373,
+  #376); o runner grava `origem_indisponivel:` no erro de rede, DNS, timeout e HTTP 5xx (#377). As falhas de `aneel_tarifas`,
+  `bcb_igpm` e `inmet_precipitacao` dos últimos dias eram de origem; a de tarifas não se repetiu na reexecução.
+- **Onda 2 (começa em 19/10; credenciais até 19/10, prazo interno 12/10):** levantamento em
+  [`relatorios/2026-10-05-onda-2-levantamento.md`](relatorios/2026-10-05-onda-2-levantamento.md): BBCE, Hubspot e TempoOK têm
+  os 7 componentes e só faltam as credenciais da Alup; o item 2.1 (CCEE agente credenciado) não tem nenhum arquivo e aguarda a
+  posição da Alup (#260); o item 2.5 está sem definição de escopo. O rascunho de cobrança das credenciais está pronto no fio
+  das pendências e **não foi enviado**.
+- **Plano de débitos técnicos** ([`superpowers/plans/2026-10-05-debitos-tecnicos.md`](superpowers/plans/2026-10-05-debitos-tecnicos.md)):
+  T1, T3 e T4 feitas; T5 a T7 **não executadas**, aguardando decisão do Ricardo.
 
 ## Situação em 02/10/2026 (conferida)
 

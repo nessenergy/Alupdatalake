@@ -155,7 +155,7 @@ Marco 3 — 18,97% · R$ 28.160,00 · **Bloqueada por credencial da Alup**
 
 | # | Fonte | Est. | Credencial necessária |
 |---|---|---|---|
-| 2.1 | **CCEE agente credenciado** | 32h ⚠ | Certificado/credencial de agente. **Sem caminho definido em 27/09**: aguarda a posição da Alup sobre as 32h ([#260](https://github.com/nessenergy/Alupdatalake/issues/260)); se o item sair do escopo, a realocação das horas é decisão de coordenação |
+| 2.1 | **CCEE agente credenciado** | 32h ⚠ | Certificado/credencial de agente. **Sem caminho definido em 27/09**: aguarda a posição da Alup sobre as 32h ([#260](https://github.com/nessenergy/Alupdatalake/issues/260)); **nenhum arquivo do item existe no repositório** (levantamento de 05/10, [relatório](relatorios/2026-10-05-onda-2-levantamento.md)); se o item sair do escopo, a realocação das horas é decisão de coordenação |
 | 2.2 | **BBCE** | 28h ⚠ | Implementado no PR #131; faltam acesso e host (#23) |
 | 2.3 | **Hubspot** | 20h → **~4h restantes** | Token de API (private app). Os 7 componentes foram escritos contra documentação pública em 2026-08-26, sem acesso real; falta rodar contra a API real e ajustar |
 | 2.4 | **TempoOK** | 18h | Implementado, **dois produtos**: o boletim tem contrato verificado mas acervo só até 26/10/2022 (#129); a **previsão de ENA** (`tempook_ena_prevs`) responde para a data de hoje, verificada em 21/09 — só o caminho de exemplo é conhecido, a Alup vai indicar os demais |

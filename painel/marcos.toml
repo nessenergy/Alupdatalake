@@ -359,6 +359,18 @@ estado = "previsto"
 dono = "ness."
 
 [[marco]]
+data = 2026-10-05
+titulo = "Resposta ao Eduardo Pires com as três cargas pendentes (IGP-M, Tarifas Homologadas e PRC) concluídas e conferidas em dev e hml"
+estado = "feito"
+dono = "ness."
+
+[[marco]]
+data = 2026-10-05
+titulo = "Onda 2: levantamento por fonte. BBCE, Hubspot e TempoOK com os 7 componentes, só faltam as credenciais; CCEE agente credenciado (2.1) sem arquivo e aguardando a Alup; item 2.5 sem escopo definido"
+estado = "feito"
+dono = "ness."
+
+[[marco]]
 data = 2026-10-12
 titulo = "Credenciais da Onda 2"
 estado = "previsto"

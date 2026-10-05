@@ -135,6 +135,18 @@ def montar_conjuntos(projeto: str, bronze: str, silver: str, gold: str) -> list[
             ),
         )
     )
+    silver_itens.append(
+        Item(
+            "bcb_igpm_ultimos_3_meses",
+            _sql(
+                "SELECT STRING_AGG(CONCAT(FORMAT_DATE('%Y-%m', data_referencia), '=', "
+                "CAST(variacao_percentual_mes AS STRING)), "
+                "' | ' ORDER BY data_referencia) AS variacao_percentual_mes FROM "
+                "(SELECT data_referencia, variacao_percentual_mes FROM $t ORDER BY data_referencia DESC LIMIT 3)",
+                t=tabela(silver, "bcb_igpm"),
+            ),
+        )
+    )
     execucao_itens = [
         Item(
             "ultima_execucao",

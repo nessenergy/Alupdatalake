@@ -49,6 +49,12 @@ Medidas em 01 e 02/03/2025 e no zip de 2025:
 - **47 horas vazias na estação A701 em 2025**, uma estação em geral bem coberta. Prova de que a lacuna não é só de
   estação nova.
 - **`-9999`** aparece como sentinela de "sem dado" em outros anos; tratado igual ao campo vazio.
+- **`NULL` escrito como texto** aparece em metadado de estação: a A772 (Amambaí, MS) traz `ALTITUDE;NULL` no zip de 2026. Antes
+  de 05/10/2026 isso reprovava a validação e o conector descartava **todas as horas dessa estação** (2.976 linhas no
+  recorte de jul a ago/2026, 672 por execução na janela de 28 dias): era a causa das "672 linhas inválidas" de cada
+  execução. Agora `NULL` vale como ausente nos campos opcionais (altitude e precipitação); em latitude e longitude continua
+  sendo erro, porque sem coordenada a estação não serve. Medido localmente sobre o zip de 2026 (1.892.160 linhas no
+  recorte), com uma única estação afetada.
 - **Leitura estrita (falha alto):** cabeçalho de coluna que não começa por `PRECIPITA`, metadado de estação
   ausente, data fora de `aaaa/mm/dd` e zip sem CSV levantam `LayoutInesperadoError`. Carregar zero linhas como
   sucesso esconderia a quebra por dias (o alerta de silêncio só enxerga depois).

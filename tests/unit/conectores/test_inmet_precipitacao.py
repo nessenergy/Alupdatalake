@@ -258,3 +258,18 @@ def test_zip_com_csv_mas_janela_sem_nenhuma_hora_avisa(monkeypatch, caplog) -> N
         assert list(conector.extrair(Janela.de_texto("2025-06-01", "2025-06-02"))) == []
 
     assert "nenhuma hora" in caplog.text
+
+
+@pytest.mark.parametrize("texto", ["NULL", "null", " Null "])
+def test_altitude_escrita_como_null_vira_nulo_e_a_chuva_da_estacao_nao_e_descartada(texto: str) -> None:
+    """Medido em 05/10/2026: a estação A772 (Amambaí) traz `ALTITUDE;NULL` e perdia todas as suas horas."""
+    registro = PrecipitacaoHoraria.model_validate(_registro(altitude_m=texto, precipitacao_mm="1,2"))
+
+    assert registro.altitude_m is None
+    assert registro.precipitacao_mm == Decimal("1.2")
+
+
+def test_latitude_null_continua_sendo_erro_de_origem() -> None:
+    """`NULL` só é aceito onde o campo é opcional: sem coordenada a estação não serve."""
+    with pytest.raises(ValueError):
+        PrecipitacaoHoraria.model_validate(_registro(latitude="NULL"))

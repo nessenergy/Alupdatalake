@@ -348,8 +348,8 @@ dono = "ness."
 
 [[marco]]
 data = 2026-10-03
-titulo = "Pendências de carga do e-mail de 02/10: Tarifas Homologadas (327.763 linhas) e PRC (24 preços) conferidas em dev e hml; IGP-M conferido em hml (25 meses) e pendente em dev porque o BCB está fora do ar"
-estado = "previsto"
+titulo = "Pendências de carga do e-mail de 02/10 concluídas e conferidas em dev e hml em 05/10: IGP-M (25 meses, últimos 3 meses iguais aos do BCB), Tarifas Homologadas (327.763 linhas) e PRC (24 preços)"
+estado = "feito"
 dono = "ness."
 
 [[marco]]

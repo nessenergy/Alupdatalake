@@ -56,13 +56,13 @@ Relatório de fechamento, com a matriz dos 7 componentes e a conferência por am
   (licença não comercial) não servem de substitutos ([ADR 029](arquitetura/decisoes/029-previsao-do-tempo-fonte.md)).
 - **Conferência no BigQuery (03/10):** feita pelo workflow `Conferir cargas` (somente leitura; `hml` run `37103149215`, `dev` runs `37103208999` e `37107071613`, esta depois da carga do INMET e do Dataform de `dev`).
   Aditivo 01, itens 12 a 19: Silver em `dev` com 94.656 a 18.998.832 linhas por item, `SUCESSO` e zero inválidas, entregues em 03/10 (162h de
-  162h apontadas); em `hml` os oito têm 0 linhas. **Ainda pendentes:** IGP-M em `dev` (BCB fora do ar) e `bcb_juros` (erros nos dois
+  162h apontadas); em `hml` os oito têm 0 linhas. **Ainda pendente:** `bcb_juros` (erros nos dois
   ambientes). Saúde da ingestão em `dev` na run `37107071613`: 53 `OK`, 2 `SEM_SUCESSO`, 1 `ATRASADA`, 1 `FALHA_RECENTE`. Marcos só viram `feito` depois disso.
 - **ADRs 026 a 028 aguardam o aceite da Alup**, assim como a pergunta sobre transmissão (TUST/RAP) nas tarifas.
 - **Inconsistência a decidir (comercial):** o painel mantém a Onda 1 como `entregue` desde 25/09; frente aos itens 2, 4 e 5
   da cláusula 4ª, o relatório de fechamento aponta a divergência. Marco não alterado.
-- **IGP-M (`bcb_igpm`):** conferido em `hml` em 03/10 (Silver 25 linhas, Gold 25). Em `dev` pendente (0 linhas; 12 execuções com erro em 3 dias; a tentativa final, run de ingestão `37106480778`, falhou): `api.bcb.gov.br` não resolve desde 03/10
-  ~03:40Z (externo); os agendamentos de `bcb_juros` e câmbio também falham até voltar.
+- **IGP-M (`bcb_igpm`):** conferido em `hml` em 03/10 (Silver 25 linhas, Gold 25). Em `dev` carregado em 04/10 (o BCB, fora do ar desde 03/10 ~03:40Z, voltou; Silver 25 linhas, Gold 25 após o deploy), igual ao `hml`.
+  Valores dos 3 últimos meses conferidos contra o BCB em 05/10 (jul -1,16, ago -0,22, set 1,57).
 - **Pendência: confirmar qual versão do contrato foi assinada.** O .docx v3 não cita IGP-M e a minuta PDF de 23/07
   cita. A decisão cabe a quem guarda o contrato; não bloqueia a entrega.
 

@@ -14,6 +14,7 @@ from datetime import UTC, datetime
 from decimal import Decimal
 from typing import TYPE_CHECKING, Any
 
+import requests
 from pydantic import BaseModel, ValidationError
 
 from src.core.bigquery import carregar_bronze, registrar_execucao, registrar_inicio
@@ -26,6 +27,30 @@ from src.core.storage import abrir_raw, identificar_raw, ler_raw
 
 if TYPE_CHECKING:
     from collections.abc import Iterable, Iterator
+
+PREFIXO_ORIGEM_INDISPONIVEL = "origem_indisponivel: "
+_ERROS_DE_ORIGEM = (requests.ConnectionError, requests.Timeout, ConnectionError, TimeoutError)
+
+
+def _origem_nao_respondeu(exc: BaseException | None) -> bool:
+    """Rede, DNS, timeout ou HTTP 5xx, na própria exceção ou na que a causou."""
+    visitadas: set[int] = set()
+    while exc is not None and id(exc) not in visitadas:
+        visitadas.add(id(exc))
+        if isinstance(exc, _ERROS_DE_ORIGEM):
+            return True
+        resposta = getattr(exc, "response", None)
+        if isinstance(exc, requests.HTTPError) and resposta is not None and resposta.status_code >= 500:
+            return True
+        exc = exc.__cause__ or exc.__context__
+    return False
+
+
+def descrever_erro(exc: BaseException) -> str:
+    """Texto de `_execucoes.erro`; a origem que não respondeu ganha um prefixo, para não parecer erro nosso."""
+    texto = sanitizar(f"{type(exc).__name__}: {exc}")
+    return PREFIXO_ORIGEM_INDISPONIVEL + texto if _origem_nao_respondeu(exc) else texto
+
 
 logger = logging.getLogger(__name__)
 
@@ -125,7 +150,7 @@ class Conector(ABC):
                     self._carregar_em_lotes(execucao, records)
             execucao.encerrar()
         except Exception as exc:  # noqa: BLE001 — a execução precisa ser registrada como ERRO
-            execucao.encerrar(erro=sanitizar(f"{type(exc).__name__}: {exc}"))
+            execucao.encerrar(erro=descrever_erro(exc))
             logger.exception("[%s] ingestão falhou", self.rotulo)  # exc_info alimenta o Error Reporting
             try:
                 registrar_execucao(execucao)
@@ -232,7 +257,7 @@ class Conector(ABC):
                     self._carregar_em_lotes(execucao, counted_records())
                 execucao.encerrar()
             except Exception as exc:  # noqa: BLE001 — registra toda falha do replay
-                execucao.encerrar(erro=sanitizar(f"{type(exc).__name__}: {exc}"))
+                execucao.encerrar(erro=descrever_erro(exc))
                 logger.exception("[%s] replay falhou", self.rotulo)
                 try:
                     registrar_execucao(execucao)

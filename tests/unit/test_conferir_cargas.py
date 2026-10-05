@@ -140,3 +140,23 @@ def test_workflow_so_le_e_nao_interpola_entrada_em_run():
     for passo in job["steps"]:
         assert "${{" not in passo.get("run", ""), passo
     assert any("scripts.conferir_cargas" in passo.get("run", "") for passo in job["steps"])
+
+
+def test_conferencia_mostra_o_erro_da_ultima_execucao_com_falha():
+    """A conta de deploy não lê o Cloud Logging, mas lê `_execucoes.erro`: a causa de uma falha aparece aqui."""
+    consultas = {item.rotulo: item.sql for _, itens in conjuntos() for item in itens}
+    sql = consultas["ultimo_erro"]
+    cc.validar_sql(sql)
+    assert "erro IS NOT NULL" in sql
+    assert "INTERVAL 3 DAY" in sql
+    assert "`proj.bronze._execucoes`" in sql
+    assert "SUBSTR(erro, 1, 200)" in sql
+
+
+def test_texto_de_erro_vindo_do_bigquery_passa_pelo_sanitizador():
+    """O erro gravado pela ingestão vai para o resumo do GitHub: nada que pareça credencial pode sair."""
+    cliente = ClienteFalso(linhas=[{"conector": "x", "erro": "falhou com Bearer abc123segredo e mais texto"}])
+    secoes = cc.rodar(cliente, [("Erros", [cc.Item("ultimo_erro", "SELECT 1")])])
+    texto = str(secoes)
+    assert "abc123segredo" not in texto
+    assert "[REDACTED]" in texto

@@ -67,7 +67,7 @@ class PrecipitacaoHoraria(BaseModel):
     def _numero_da_origem(cls, valor: Any) -> Any:
         if isinstance(valor, str):
             texto = valor.strip()
-            if texto in {"", SENTINELA_SEM_MEDICAO}:
+            if texto == "" or texto == SENTINELA_SEM_MEDICAO or texto.upper() == "NULL":
                 return None
             return _decimal_br(texto)
         return valor

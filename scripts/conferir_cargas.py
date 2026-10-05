@@ -161,6 +161,19 @@ def montar_conjuntos(projeto: str, bronze: str, silver: str, gold: str) -> list[
             ),
         ),
         Item(
+            "ultimo_erro",
+            _sql(
+                "SELECT CONCAT(fonte, '_', entidade) AS conector, DATE(encerrada_em) AS data_execucao, "
+                "SUBSTR(erro, 1, 200) AS erro "
+                "FROM $e WHERE CONCAT(fonte, '_', entidade) IN ($c) AND erro IS NOT NULL "
+                "AND encerrada_em >= TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL 3 DAY) "
+                "QUALIFY ROW_NUMBER() OVER (PARTITION BY fonte, entidade ORDER BY encerrada_em DESC) = 1 "
+                "ORDER BY conector",
+                e=execucoes,
+                c=conectores,
+            ),
+        ),
+        Item(
             "erros_3_dias",
             _sql(
                 "SELECT CONCAT(fonte, '_', entidade) AS conector, COUNT(*) AS execucoes_erro FROM $e "
@@ -225,7 +238,14 @@ def rodar(cliente: Any, conjuntos: list[Conjunto]) -> list[tuple[str, list[dict[
                 continue
             if not resultado:
                 linhas.append({"item": item.rotulo, "resultado": "sem linhas"})
-            linhas.extend({"item": item.rotulo, **linha} for linha in resultado)
+            # O texto de erro gravado pela ingestão vai para o resumo do GitHub: passa pelo sanitizador.
+            linhas.extend(
+                {
+                    "item": item.rotulo,
+                    **{k: sanitizar(v, limite=200) if isinstance(v, str) else v for k, v in linha.items()},
+                }
+                for linha in resultado
+            )
         secoes.append((titulo, linhas))
     return secoes
 

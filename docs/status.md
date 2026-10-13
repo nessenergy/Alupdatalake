@@ -3,6 +3,24 @@
 Atualizado em **2026-10-05**. Auditoria de ponta a ponta, com a conferência de cada número:
 [`relatorios/2026-10-02-auditoria-de-ponta-a-ponta.md`](relatorios/2026-10-02-auditoria-de-ponta-a-ponta.md).
 
+## Atualização de 13/10/2026
+
+Balanço completo, com a avaliação de cada entrega e os prazos realinhados:
+[`relatorios/2026-10-13-balanco-completo.md`](relatorios/2026-10-13-balanco-completo.md).
+
+- **Ondas 0 e 1 aceitas por escrito em 05/10** (Eduardo Pires: "Medições aprovadas"; a ness. confirmou o faturamento dos
+  marcos 1 e 2, R$ 53.760,00). Isto **substitui** "nenhuma onda está aceita" e "aceito: 0 h", que valiam até 02/10. A aprovação
+  respondeu às três cargas citadas por ele; IPDO, ACOMPH e CPTEC (cláusula 4ª, itens 2 e 5) seguem sem entrega.
+- **Credenciais da Onda 2, teste em dev em 13/10** (janela 12 a 13/10, pelo workflow `Executar ingestão`): BBCE falhou, o
+  segredo `alupdata-bbce-credenciais` não existe ou não tem versão; Hubspot falhou com 401, o segredo tem versão mas o token é
+  recusado; TempoOK funcionou (token de 14/09). A Alup disse na reunião de 13/10 que subiu credenciais; o que e onde ainda não
+  foi confirmado. O prazo contratual é 19/10.
+- **Pedidos da reunião de 13/10:** a Alup (Leonardo) pediu acesso de leitura ao Bronze (PR #383, só em hml por ora); DECOMP e
+  NEWAVE voltaram à pauta e seguem fora da estimativa do aditivo 01 (§6).
+- **Conferência de 13/10:** dev com 55 fontes OK, 1 SEM_SUCESSO e 1 ATRASADA; hml com 54 OK e 1 SEM_SUCESSO. SCA vermelho
+  desde 12/10 (werkzeug 3.1.8, CVE-2026-102598, corrigido na 3.1.9). Produção ainda não existe; o aceite de 05/10 libera o
+  bootstrap, que é decisão do Ricardo.
+
 ## Atualização de 05/10/2026
 
 - **Pendências do e-mail de 02/10 (Eduardo Pires): concluídas e respondidas.** IGP-M, Tarifas Homologadas e PRC estão

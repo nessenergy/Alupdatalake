@@ -43,7 +43,7 @@ def test_marcos_do_repositorio_sao_validos():
 @pytest.mark.parametrize(
     ("trecho", "erro"),
     [
-        ('estado = "entregue"', 'estado = "quase"'),
+        ('estado = "aceita"', 'estado = "quase"'),
         ("janela = [2026-08-31, 2026-09-11]", "janela = [2026-09-11, 2026-08-31]"),
     ],
 )

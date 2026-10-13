@@ -142,7 +142,7 @@ consultado no BigQuery; "rodou no GitHub" não é conferência. Matriz completa 
 | 5 CPTEC (previsão de 7 dias) | nenhuma. [ADR 028](arquitetura/decisoes/028-cptec-acesso.md): 403 em todo caminho do webservice e DNS inexistente na API nova; causa desconhecida; em 03/10 a sonda de dentro do GCP (dev e hml) também recebeu 403 ([ADR 029](arquitetura/decisoes/029-previsao-do-tempo-fonte.md)); fora da Onda 1 até haver resposta do INPE (decisão provisória) | não entregue, bloqueado |
 | (proposta) BCB IGP-M | `bcb_igpm` | conferido em `hml` em 03/10 (Silver com 25 linhas, de 2024-09 a 2026-09; Gold 25 linhas). `dev` carregado em 04/10 (BCB voltou; Silver 25 linhas, Gold 25), igual ao `hml`; valores dos 3 últimos meses conferidos contra o BCB em 05/10 |
 
-O painel mantém a Onda 1 como `entregue` desde 25/09. Se isso continua valendo frente aos itens 2, 4 e 5 acima é decisão
+O painel mostra a Onda 1 como `aceita` desde 05/10 (Eduardo Pires). Os itens 2 e 5 acima seguem sem entrega, e a aprovação respondeu às três cargas citadas por ele; o que isso cobre é decisão
 comercial, não alterada aqui.
 
 Plano de fechamento: `docs/superpowers/plans/2026-10-02-fechamento-gaps-onda-1.md`.

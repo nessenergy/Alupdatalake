@@ -36,6 +36,8 @@ configuracao_login_portal = ["group:operacao-datalake@ness.com.br"]
 # Grupo da Alup informado pela Tainá em 29/09 (#261).
 portal_acesso      = ["group:operacao-datalake@ness.com.br", "group:alup.alertas@alupar.com.br"]
 grupo_consumidores = "alup.alertas@alupar.com.br"
+# Leitura só do Bronze, pedida pela Alup em 13/10 (Leonardo).
+grupo_bronze = "alup.alertas@alupar.com.br"
 #
 # grupo_operacao dá também Bronze e Silver — só se a Alup pedir explicitamente
 # mais que a Gold; não presumir.

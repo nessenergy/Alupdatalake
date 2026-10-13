@@ -83,6 +83,8 @@ locals {
   camadas_por_grupo = {
     consumidores = { grupo = var.grupo_consumidores, camadas = ["gold"] }
     operacao     = { grupo = var.grupo_operacao, camadas = ["bronze", "silver", "gold"] }
+    # Pedido da Alup em 13/10: ver o que a ingestão gravou, sem Silver.
+    bronze = { grupo = var.grupo_bronze, camadas = ["bronze"] }
   }
 
   leitura_pessoas = merge([

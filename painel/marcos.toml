@@ -19,8 +19,9 @@ horas = 90
 marco_pct = 15.52
 janela = [2026-08-31, 2026-09-11]
 trabalho_desde = 2026-08-25
-estado = "entregue"
+estado = "aceita"
 entregue_em = 2026-09-25
+# Aceita por escrito em 05/10 (Eduardo Pires).
 # A3 (ambiente GCP) venceu em 04/09 e chegou em 23/09: 19 dias corridos. Cláusula 3ª:
 # o prazo que depende do insumo é postergado; 11/09 + 19 dias = 30/09.
 prazo_postergado = 2026-09-30
@@ -85,8 +86,9 @@ horas = 120
 marco_pct = 20.69
 janela = [2026-09-14, 2026-10-16]
 trabalho_desde = 2026-08-25
-estado = "entregue"
+estado = "aceita"
 entregue_em = 2026-09-25
+# Aceita por escrito em 05/10; IPDO, ACOMPH e CPTEC seguem sem entrega.
 entidades = [
   "bcb_juros", "ibge_ipca", "aneel_siga",
   "ons_carga", "ons_ear", "ons_ena", "ons_geracao_usina", "ons_capacidade",
@@ -371,10 +373,22 @@ estado = "feito"
 dono = "ness."
 
 [[marco]]
+data = 2026-10-05
+titulo = "Ondas 0 e 1 aprovadas por escrito por Eduardo Pires (marcos 1 e 2, R$ 53.760); faturamento confirmado pela ness."
+estado = "feito"
+dono = "Alup"
+
+[[marco]]
 data = 2026-10-12
-titulo = "Credenciais da Onda 2"
+titulo = "Credenciais da Onda 2 (prazo interno): não chegaram; teste de 13/10 em dev, BBCE sem versão no segredo e Hubspot com 401"
 estado = "previsto"
 dono = "Alup"
+
+[[marco]]
+data = 2026-10-13
+titulo = "Balanço completo: avaliação de cada entrega e prazos realinhados"
+estado = "feito"
+dono = "ness."
 
 [[marco]]
 data = 2026-10-16

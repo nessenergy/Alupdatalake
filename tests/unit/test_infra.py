@@ -379,7 +379,7 @@ def test_acesso_a_dado_do_bigquery_e_do_storage_gera_log_de_auditoria() -> None:
 def test_grupos_de_pessoas_nascem_vazios() -> None:
     """R01: o e-mail do grupo é da Alup; sem ele preenchido, nada é concedido."""
     variaveis = _ler("infra/variables.tf")
-    for nome in ("grupo_consumidores", "grupo_operacao"):
+    for nome in ("grupo_consumidores", "grupo_operacao", "grupo_bronze"):
         assert _tem(rf'variable "{nome}" \{{[^}}]*default\s*=\s*""', variaveis), nome
     assert _tem(r'variable "portal_acesso" \{[^}]*default\s*=\s*\[\]', variaveis)
 
@@ -401,6 +401,16 @@ def test_consumidores_leem_so_a_gold_e_operacao_le_as_tres_camadas() -> None:
     jobs = _bloco(principal, 'resource "google_project_iam_member" "pessoas_jobs"')
     assert '"roles/bigquery.jobUser"' in jobs
     assert "for_each" in jobs
+
+
+def test_grupo_bronze_le_so_o_bronze() -> None:
+    """A Alup pediu o Bronze em 13/10: leitura só da camada bronze, sem Silver. Entra em hml; dev fica para depois."""
+    grupos = _bloco(_ler("infra/main.tf"), "locals {\n  camadas_por_grupo")
+    assert _tem(r'bronze\s*=\s*\{[^}]*var\.grupo_bronze[^}]*camadas\s*=\s*\["bronze"\]', grupos)
+    for ambiente in ("hml",):
+        tfvars = _ler(f"infra/environments/{ambiente}.tfvars")
+        assert _tem(r'(?m)^grupo_bronze\s*=\s*"alup\.alertas@alupar\.com\.br"', tfvars), ambiente
+    assert not _tem(r"(?m)^grupo_bronze\s*=", _ler("infra/environments/prod.tfvars"))
 
 
 def test_nenhum_binding_humano_existe_com_os_defaults() -> None:

@@ -102,6 +102,16 @@ variable "grupo_consumidores" {
   }
 }
 
+variable "grupo_bronze" {
+  description = "E-mail do grupo Google da Alup que lê só o Bronze; vazio não concede nada"
+  type        = string
+  default     = ""
+  validation {
+    condition     = var.grupo_bronze == "" || can(regex("^[^@:\\s]+@[^@:\\s]+$", var.grupo_bronze))
+    error_message = "Informe só o e-mail do grupo, sem o prefixo group:."
+  }
+}
+
 variable "grupo_operacao" {
   description = "E-mail do grupo Google da Alup que lê Bronze, Silver e Gold; vazio não concede nada"
   type        = string

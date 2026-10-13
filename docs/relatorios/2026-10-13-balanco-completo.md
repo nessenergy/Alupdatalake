@@ -12,7 +12,7 @@ CPS-01025/2026, 580 h, kickoff em 27/08, término previsto em 08/01/2027.
 | Próximo prazo da Alup | **19/10**: tokens e APIs da Onda 2 (CCEE, BBCE, Hubspot, TempoOK). Faltam 4 dias úteis |
 | Próximo prazo da ness. | Onda 2 (19/10 a 13/11) e fim da janela contratual da Onda 1 (16/10, já aceita) |
 | Credenciais da Onda 2 | **Nenhuma útil em dev.** Teste de 13/10: BBCE sem versão no segredo; Hubspot com segredo, mas 401; TempoOK funciona (token de 14/09) |
-| Estado técnico | 58 conectores registrados, **58 com os 7 componentes presentes** (conferido por script, abaixo). Testes do CI: 1.448 coletados, cobertura de linhas **95,59%** (5.157 de 5.395, artefato do run `38477573646`). Conferência de 13/10 em dev, depois dos testes de credencial: 55 OK, **2 SEM_SUCESSO (`bbce_curva_forward`, `hubspot_negocios`)** e **1 ATRASADA (`tempook_boletins`, último sucesso em 24/09)**. hml: 54 OK e 1 SEM_SUCESSO **ainda sem nome** (a conferência nominal depende do PR #385 na `main`) |
+| Estado técnico | 58 conectores registrados, **58 com os 7 componentes presentes** (conferido por script, abaixo). Testes do CI: 1.448 coletados, cobertura de linhas **95,59%** (5.157 de 5.395, artefato do run `38477573646`). Conferência de 13/10 em dev, depois dos testes de credencial: 55 OK, **2 SEM_SUCESSO (`bbce_curva_forward`, `hubspot_negocios`)** e **1 ATRASADA (`tempook_boletins`, último sucesso em 24/09)**. hml: 54 OK e 1 SEM_SUCESSO, **`tempook_ena_prevs`** (segredo `alupdata-tempook-api-token` sem versão em hml, ADR 020; é espera de credencial, não defeito; run `38480930596`) |
 | Alerta aberto | SCA vermelho desde 12/10 (werkzeug 3.1.8, CVE-2026-102598, corrigido na 3.1.9). Cláusula 8ª exige Alta/Crítica corrigida antes da homologação |
 | Produção | **Não existe.** O bootstrap esperava o aceite, que ocorreu em 05/10 |
 
@@ -109,7 +109,7 @@ Pela cláusula 3ª, em contagem simples e só como registro: se os tokens não c
 **Técnicos:**
 - carga parcial por tempo limite não aparece na saúde (fila 1.14);
 - 554 testes ignorados sem motivo catalogado (T5);
-- a fonte em SEM_SUCESSO de hml não foi nomeada: o item `saude_fora_do_ok` do PR #385 só roda em hml depois de entrar na `main`, porque a proteção do ambiente recusa a branch;
+- hml: a fonte em SEM_SUCESSO é `tempook_ena_prevs`, aguardando o token do TempoOK em hml (ADR 020); em dev a mesma fonte funciona;
 - SCA vermelho por werkzeug 3.1.8: correção no PR #386 (3.1.9), com CI verde.
 
 ## 5. Como foi medido
@@ -119,4 +119,4 @@ Pela cláusula 3ª, em contagem simples e só como registro: se os tokens não c
 - Conferência de dev e hml em 13/10: runs `38467092766` e `38467098953` (só contagem por situação). Fontes nomeadas em dev pela run `38477711568`, com o item `saude_fora_do_ok` do PR #385: `bbce_curva_forward` (segredo sem versão), `hubspot_negocios` (401) e `tempook_boletins` (ATRASADA, 24/09). A run de hml, `38477714404`, foi recusada pela proteção do ambiente.
 - Credenciais: ingestões de teste em dev, 13/10, janela 12 a 13/10: Hubspot `38468669196`, BBCE `38468673738`, TempoOK `38468678153`.
 - Testes e cobertura: CI do run `38477573646`, `pytest tests/ --cov=src`: 1.448 testes coletados, 95,59% de cobertura de linhas. Não contei os ignorados.
-- Não medido: o conteúdo dos segredos, os testes ignorados e a fonte em SEM_SUCESSO de hml.
+- Não medido: o conteúdo dos segredos, os testes ignorados e a distinção entre SEM_SUCESSO por defeito e por espera de credencial nas demais fontes.

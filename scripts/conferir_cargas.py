@@ -190,7 +190,15 @@ def montar_conjuntos(projeto: str, bronze: str, silver: str, gold: str) -> list[
                 "SELECT situacao, COUNT(*) AS fontes FROM $t GROUP BY situacao ORDER BY situacao",
                 t=tabela(gold, "saude_ingestao"),
             ),
-        )
+        ),
+        Item(
+            "saude_fora_do_ok",
+            _sql(
+                "SELECT conector, situacao, ultimo_sucesso, ultima_execucao, aguardando_credencial, "
+                "SUBSTR(ultimo_erro, 1, 200) AS ultimo_erro FROM $t WHERE situacao != 'OK' ORDER BY conector",
+                t=tabela(gold, "saude_ingestao"),
+            ),
+        ),
     ]
     bacia_itens = [
         Item(

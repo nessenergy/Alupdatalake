@@ -153,6 +153,16 @@ def test_conferencia_mostra_o_erro_da_ultima_execucao_com_falha():
     assert "SUBSTR(erro, 1, 200)" in sql
 
 
+def test_conferencia_nomeia_as_fontes_fora_do_ok():
+    """A contagem por situação não diz qual fonte falha: este item lista o conector."""
+    consultas = {item.rotulo: item.sql for _, itens in conjuntos() for item in itens}
+    sql = consultas["saude_fora_do_ok"]
+    cc.validar_sql(sql)
+    assert "`proj.gold.saude_ingestao`" in sql
+    assert "situacao != 'OK'" in sql
+    assert "conector" in sql
+
+
 def test_texto_de_erro_vindo_do_bigquery_passa_pelo_sanitizador():
     """O erro gravado pela ingestão vai para o resumo do GitHub: nada que pareça credencial pode sair."""
     cliente = ClienteFalso(linhas=[{"conector": "x", "erro": "falhou com Bearer abc123segredo e mais texto"}])

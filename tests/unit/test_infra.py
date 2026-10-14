@@ -404,10 +404,10 @@ def test_consumidores_leem_so_a_gold_e_operacao_le_as_tres_camadas() -> None:
 
 
 def test_grupo_bronze_le_so_o_bronze() -> None:
-    """A Alup pediu o Bronze em 13/10: leitura só da camada bronze, sem Silver. Entra em hml; dev fica para depois."""
+    """A Alup pediu o Bronze em 13/10: leitura só da camada bronze, sem Silver, em dev e hml."""
     grupos = _bloco(_ler("infra/main.tf"), "locals {\n  camadas_por_grupo")
     assert _tem(r'bronze\s*=\s*\{[^}]*var\.grupo_bronze[^}]*camadas\s*=\s*\["bronze"\]', grupos)
-    for ambiente in ("hml",):
+    for ambiente in ("dev", "hml"):
         tfvars = _ler(f"infra/environments/{ambiente}.tfvars")
         assert _tem(r'(?m)^grupo_bronze\s*=\s*"alup\.alertas@alupar\.com\.br"', tfvars), ambiente
     assert not _tem(r"(?m)^grupo_bronze\s*=", _ler("infra/environments/prod.tfvars"))

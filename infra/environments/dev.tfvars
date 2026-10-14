@@ -5,6 +5,8 @@ environment = "dev"
 # Acesso de pessoas (R01 do RIPD): grupos Google da Alup, preenchidos por ela.
 # Vazio não concede nada.
 # grupo_consumidores = "<grupo-consumidores>@<dominio-da-alup>"
+# Leitura só do Bronze, pedida pela Alup em 13/10 (Leonardo).
+grupo_bronze = "alup.alertas@alupar.com.br"
 # Em dev, a operação é da ness. (24/09): dado das três camadas e consulta, para
 # conferir a carga. Em hml e prod, o grupo é o da Alup.
 grupo_operacao = "operacao-datalake@ness.com.br"

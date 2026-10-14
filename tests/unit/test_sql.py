@@ -412,7 +412,9 @@ def test_saude_trata_execucao_sem_fim_como_erro() -> None:
     caminho = Path(__file__).resolve().parents[2] / "definitions" / "gold" / "saude_ingestao.sqlx"
     sql = caminho.read_text(encoding="utf-8")
     assert "status = 'EM_EXECUCAO'" in sql
-    assert "INTERVAL 40 MINUTE" in sql
+    # O maior tempo limite de job é 7200 s (ccee_geracao_usina): marca de início mais nova que isso
+    # é execução em andamento, não morta. 40 minutos acusava erro numa carga legítima de ~80 min.
+    assert "INTERVAL 130 MINUTE" in sql
     assert "NOT EXISTS" in sql
 
 

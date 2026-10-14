@@ -60,7 +60,7 @@ Balanço completo, com a avaliação de cada entrega e os prazos realinhados:
   incompletas (11 e 14 de 25 meses em `hml`; 22 em `dev`) porque a recarga de 29/09 usou uma janela única de 25 meses e
   estourou o limite de 1800 s do Cloud Run, deixando Bronze duplicada sem registro em `_execucoes`. Recarregadas em
   janelas de 3 meses e conferidas mês a mês: **25 de 25 em `dev` e `hml`, idênticas**; fator de capacidade com 25
-  meses nos dois. **Segue aberto o ponto cego:** carga parcial por tempo limite não aparece na saúde (fila 1.14).
+  meses nos dois. O ponto cego (carga parcial por tempo limite não aparecia na saúde) foi **fechado no mesmo dia** pelo PR #343 (fila 1.14): o job grava `EM_EXECUCAO` ao começar e a saúde trata a marca sem fim como erro. Em 14/10 o limite de espera subiu de 40 para 130 minutos, porque a carga da geração por usina da CCEE leva ~80 minutos e aparecia como erro enquanto rodava.
 - **`dev` alinhado à `main` em 02/10** (Portal na revisão 00038, Gold com `aguardando_credencial`); `hml` na
   revisão 00018, também da `main`. O `terraform apply` dos dois fechou sem nenhuma mudança.
 - **Alup, vencidas:** #258 (quem assina, prazo 29/09) e #260 (32 h do item 2.1, prazo 30/09). A #259 (confirmar a

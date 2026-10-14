@@ -503,8 +503,8 @@ Não há carga em BigQuery real registrada nem confirmação de entrega do ambie
 
 ### Documentação
 
-ADRs 001–025 · 43 dicionários para as 44 fontes registradas e 2 dicionários técnicos com [índice e linhagem](dicionario-dados/README.md) · plano de execução · runbook de deploy,
-de primeiro deploy e de acompanhamento semanal ·
+ADRs 001–029 · 57 dicionários para as 58 fontes registradas (eólica e fotovoltaica de restrição compartilham um) e 2 dicionários técnicos com [índice e linhagem](dicionario-dados/README.md) · plano de execução · runbook de deploy,
+de primeiro deploy, de acompanhamento semanal, de incidentes e de [conferência e sondas](runbook/conferencia-e-sondas.md) ·
 [`proximos-passos.md`](proximos-passos.md) como fila de execução ·
 [`acoes-humanas.md`](acoes-humanas.md) com o passo a passo do que só uma
 pessoa executa · `AGENTS.md` como contexto canônico · skills do projeto e

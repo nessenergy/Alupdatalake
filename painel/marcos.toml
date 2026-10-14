@@ -276,14 +276,14 @@ codigo = "4.5"
 titulo = "Documentação final e dicionário"
 horas = 10
 pronto = 0.3
-nota = "dicionário das 44 fontes registradas, em 43 documentos (eólica e fotovoltaica de restrição compartilham um)"
+nota = "dicionário das 58 fontes registradas, em 57 documentos (eólica e fotovoltaica de restrição compartilham um), conferido contra o registro em 14/10; as fontes das Ondas 2 e 3 ainda não implementadas não têm dicionário"
 
 [[onda.item]]
 codigo = "4.6"
 titulo = "Handoff técnico"
 horas = 10
 pronto = 0.2
-nota = "runbook de incidente escrito (docs/runbook/incidentes.md)"
+nota = "runbooks de incidente e de conferência e sondas escritos (docs/runbook/incidentes.md e conferencia-e-sondas.md)"
 
 # Marcos: o que aconteceu e o que vem, em ordem de data.
 [[marco]]

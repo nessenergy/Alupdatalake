@@ -107,7 +107,7 @@ Pela cláusula 3ª, em contagem simples e só como registro: se os tokens não c
 - rascunhos sem envio: cobrança das credenciais (05/10, perdeu a razão de ser em parte) e resposta a Jefferson (08/10).
 
 **Técnicos:**
-- carga parcial por tempo limite não aparece na saúde (fila 1.14);
+- (corrigido em 14/10) a fila 1.14, carga parcial por tempo limite, já estava fechada pelo PR #343 de 02/10; o `status.md` ainda a listava como aberta;
 - 554 testes ignorados sem motivo catalogado (T5);
 - hml: a fonte em SEM_SUCESSO é `tempook_ena_prevs`, aguardando o token do TempoOK em hml (ADR 020); em dev a mesma fonte funciona;
 - SCA vermelho por werkzeug 3.1.8: correção no PR #386 (3.1.9), com CI verde.

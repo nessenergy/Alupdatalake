@@ -222,6 +222,7 @@ PAPEL_POR_RECURSO = {
     "google_secret_manager_secret": "roles/secretmanager.admin",
     "google_cloud_run_v2_": "roles/run.admin",
     "google_cloud_scheduler_job": "roles/cloudscheduler.admin",
+    "google_cloudbuild_trigger": "roles/cloudbuild.builds.editor",
     "google_dataform_": "roles/dataform.admin",
     "google_iap_": "roles/iap.admin",
     "google_monitoring_": "roles/monitoring.editor",

@@ -270,6 +270,16 @@ module "catalogo" {
   bucket_raw          = module.storage.bucket_raw
 }
 
+# CI no Cloud Build (ADR 030, fase 1): só existe com `cicd` preenchida.
+module "cicd" {
+  count  = var.cicd == null ? 0 : 1
+  source = "./modules/cicd"
+
+  project_id       = var.project_id
+  repositorio_dono = var.cicd.repositorio_dono
+  repositorio_nome = var.cicd.repositorio_nome
+}
+
 # Onda 3 (ADR 017): a cadeia só existe quando houver fonte interna ingerida.
 # Com `cadeia_onda3` vazia — o padrão — nenhum recurso é criado.
 module "orquestracao" {

@@ -15,7 +15,8 @@ ness. acesso de escrita à rede da Alupar.
 | 25/09 | N1 em `dev` e `hml` (API `compute` pelo bootstrap) | ness. |
 | 25/09 | 0, G1 a G5 em `dev` e `hml`, pelo [`rede-onda3-alupar.sh`](rede-onda3-alupar.sh), com a conta `ness@alupar.com.br`. O papel `roles/iam.infrastructureAdmin` que o grupo `operacao-datalake@` tinha no `alupar-networking` saiu; ficou só leitura | ness., a pedido da Alupar |
 | 25/09 | N2 em `dev`: `teste-conexao-fmb` criado. Rodou dentro da sub-rede e parou na DSN ausente, o que confirma a parte GCP | ness. |
-| pendente | L1 (IP e rede do FMB), G6, L2 a L6 e a credencial do FMB (N3) | Alupar |
+| 14/10 | Jefferson (TI da ness.) informou que **o FMB está na AWS da DCIDE**, alcançada por dois túneis VPN site-to-site; o `10.18.0.145` é de aplicações internas e não é o FMB. Ver o adendo de 15/10 da ADR 024 | ness. |
+| pendente | L1 (IP privado do Oracle e faixa da VPC da DCIDE), G6, L2 a L5 **refeitos para o caminho até a DCIDE**, o aceite do lado da DCIDE (L7) e a credencial do FMB (N3), de usuário nativo do Oracle | Alupar e DCIDE |
 | depois do aceite | `prod-alupdata`: bootstrap de produção, depois o script com `prod` nas duas listas | ness. |
 
 Todos os passos da Parte G têm equivalente no script, que mostra tudo antes de
@@ -200,6 +201,8 @@ dos usuários remotos.
 ## Parte L — Rede local da Alupar (FortiGate e datacenter)
 
 ### L1. Informar o endereço do FMB
+
+> **Revisto em 15/10/2026.** O FMB está na AWS da DCIDE, e não no datacenter da Alupar. Em L1, `<IP_FMB>` é o IP **privado** do Oracle na AWS e `<REDE_FMB>` é a faixa da VPC da DCIDE. Em L3 a L5, onde se lê "datacenter do FMB", leia **DCIDE (AWS)**: a fase 2 do túnel, a rota de volta e a liberação do Oracle (rota e *security group*) precisam ser feitas também do lado da DCIDE, para `172.16.9.0/26`. O usuário do banco precisa ser nativo do Oracle, não do Active Directory. Detalhe na [ADR 024](../arquitetura/decisoes/024-rede-das-fontes-internas.md).
 
 A TI informa à ness. **`<IP_FMB>`**, o IP do servidor Oracle do FMB (o mesmo
 host recebido em 11/09, agora como IP), e **`<REDE_FMB>`**, a faixa da rede

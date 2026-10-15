@@ -73,3 +73,13 @@ Com `rede_interna = null`, nenhum job muda.
   reprocessada.
 - Se o FMB estiver numa rede já alcançável por outro caminho, o item 4 muda e
   esta ADR recebe adendo.
+
+## Adendo de 15/10/2026 — o FMB está na AWS da DCIDE
+
+Em 14/10, a TI da ness. relatou, após conversa com o Leonardo (Alup), que o FMB **não está hospedado no ambiente interno da Alupar**: está na AWS da **DCIDE**, alcançada pela Alupar por **dois túneis VPN site-to-site** (pontas da DCIDE 18.228.121.175 e 54.207.251.230), e o FMB se integra ao Active Directory da Alupar. Isso aciona a ressalva da seção 3 ("se o FMB estiver numa rede já alcançável por outro caminho, o item 4 muda").
+
+- **Item 4 revisto.** O caminho passa a ser: rota na `vpc-dr-prd` para a rede do FMB com próximo salto no lado interno do FortiGate, **túnel do FortiGate até a DCIDE** (fase 2 com o par `172.16.9.0/26` e a faixa da VPC da DCIDE), e liberação da porta do Oracle na rota e no *security group* **do lado da DCIDE**, só a partir de `172.16.9.0/26`. Continua sem NAT, e a DSN continua apontando para IP.
+- **Novo terceiro no caminho.** A DCIDE não é parte do contrato nem da ness.; o que depender dela entra na dependência da Alup (cláusula 3ª, VPN e credenciais da Onda 3, prazo 16/11).
+- **Credencial.** O conector entra com usuário e senha do banco. Se o usuário do FMB depender do Active Directory, não serve: é preciso um **usuário nativo do Oracle, só de leitura**.
+- **Os IPs não são do servidor.** 18.228.121.175 e 54.207.251.230 são pontas de túnel. Faltam o IP privado do Oracle, a faixa da VPC da DCIDE, a porta e o nome do serviço.
+- **Fora do escopo desta ADR, e sem definição.** O Leonardo também pediu acesso ao `10.18.0.145` (Airflow, site interno, Metabase e API de WhatsApp) e ao `172.16.8.30` (file server com as planilhas). Nenhum dos dois é uma das quatro fontes da Onda 3, e ler um compartilhamento SMB não é o mecanismo do motor de planilhas (depósito de CSV e XLSX em pasta). Dependem de definição de escopo e de decisão do Ricardo.

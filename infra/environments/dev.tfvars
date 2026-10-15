@@ -21,6 +21,9 @@ gravacao_segredos = ["group:operacao-datalake@ness.com.br", "group:alup.alertas@
 # Leitura do projeto inteiro, sem valor de segredo (roles/viewer).
 leitura_projeto = ["group:operacao-datalake@ness.com.br"]
 
+# Conectar o repositório ao Cloud Build e criar gatilhos (ADR 030).
+gestao_cicd = ["group:operacao-datalake@ness.com.br"]
+
 # Quem configura o login do Portal no console (cliente OAuth "Externo" e IAP):
 # a ness. confere o que entrega. Sem acesso a dado (runbook/portal.md).
 configuracao_login_portal = ["group:operacao-datalake@ness.com.br"]

@@ -136,6 +136,20 @@ variable "leitura_projeto" {
   }
 }
 
+variable "gestao_cicd" {
+  description = <<-EOT
+    Quem conecta o repositório ao Cloud Build e cria e dispara gatilhos (ADR 030):
+    `roles/cloudbuild.builds.editor` e `roles/cloudbuild.connectionAdmin`. Não dá acesso a
+    dado nem a segredo. Só group:<e-mail> ou domain:<domínio> (R01).
+  EOT
+  type        = list(string)
+  default     = []
+  validation {
+    condition     = alltrue([for m in var.gestao_cicd : can(regex("^(group|domain):[^\\s]+$", m))])
+    error_message = "Use só group:<e-mail> ou domain:<domínio>; acesso individual (user:) não entra."
+  }
+}
+
 variable "configuracao_login_portal" {
   description = <<-EOT
     Quem configura o login do Portal no console: cliente OAuth "Externo" e o

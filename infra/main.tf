@@ -125,6 +125,19 @@ resource "google_project_iam_member" "leitura_projeto" {
   member  = each.value
 }
 
+# CI, deploy e operação no Cloud Build (ADR 030): conectar o repositório do GitHub e criar
+# gatilhos exigem estes dois papéis. Nenhum dá leitura de dado nem de segredo. Só group:/domain: (R01).
+resource "google_project_iam_member" "gestao_cicd" {
+  for_each = {
+    for par in setproduct(var.gestao_cicd, ["roles/cloudbuild.builds.editor", "roles/cloudbuild.connectionAdmin"]) :
+    "${par[0]}|${par[1]}" => { member = par[0], role = par[1] }
+  }
+
+  project = var.project_id
+  role    = each.value.role
+  member  = each.value.member
+}
+
 # Login do Portal para quem entrega (runbook/portal.md, "Acesso da ness."): o
 # cliente OAuth "Externo" do IAP só se cria no console — a API foi desligada
 # pelo Google em 03/2026 — e exige estes três papéis. Nenhum deles lê dado.

@@ -639,6 +639,23 @@ def test_leitura_do_projeto_e_por_grupo_e_nao_le_segredo() -> None:
     assert "secretmanager" not in bloco and "roles/owner" not in bloco and "roles/editor" not in bloco
 
 
+def test_gestao_do_cicd_concede_so_os_dois_papeis_do_cloud_build_e_por_grupo() -> None:
+    """ADR 030: conectar o repositório e criar gatilho exigem estes dois papéis; nada de dado nem de segredo."""
+    variavel = _bloco(_ler("infra/variables.tf"), 'variable "gestao_cicd"')
+    assert "validation" in variavel and "group:" in variavel
+    assert _tem(r"default\s*=\s*\[\]", variavel)
+
+    principal = _ler("infra/main.tf")
+    bloco = _bloco(principal, 'resource "google_project_iam_member" "gestao_cicd"')
+    assert "var.gestao_cicd" in bloco
+    assert '"roles/cloudbuild.builds.editor"' in bloco
+    assert '"roles/cloudbuild.connectionAdmin"' in bloco
+    assert "secretmanager" not in bloco and "roles/owner" not in bloco and "roles/editor" not in bloco
+    assert _tem(
+        r'(?m)^gestao_cicd\s*=\s*\["group:operacao-datalake@ness\.com\.br"\]', _ler("infra/environments/dev.tfvars")
+    )
+
+
 def test_login_do_portal_so_configura_oauth_e_iap_por_grupo() -> None:
     """Quem entrega confere o que entregou (28/09): o cliente OAuth "Externo" do
     IAP é passo de console, e exige estes dois papéis — nenhum outro."""

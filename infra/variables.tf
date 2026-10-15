@@ -136,6 +136,18 @@ variable "leitura_projeto" {
   }
 }
 
+variable "cicd" {
+  description = <<-EOT
+    CI no Cloud Build (ADR 030, fase 1): dono e nome do repositório do GitHub já conectado ao
+    projeto. `null` não cria nada. A conexão é passo humano de dono da organização.
+  EOT
+  type = object({
+    repositorio_dono = string
+    repositorio_nome = string
+  })
+  default = null
+}
+
 variable "gestao_cicd" {
   description = <<-EOT
     Quem conecta o repositório ao Cloud Build e cria e dispara gatilhos (ADR 030):

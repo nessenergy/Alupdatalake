@@ -77,6 +77,7 @@ locals {
   papeis_deploy = [
     "roles/bigquery.dataOwner",                # datasets e o IAM de cada um
     "roles/bigquery.admin",                    # ALTER PROJECT do TABLE_STORAGE no deploy (bigquery.config.update)
+    "roles/cloudbuild.builds.editor",          # gatilhos do CI no Cloud Build, ADR 030
     "roles/cloudscheduler.admin",              # disparos das ingestões
     "roles/dataform.admin",                    # repositório, configs e o IAM do repositório
     "roles/iam.serviceAccountAdmin",           # SAs de ingestão, Dataform e Portal, e o IAM delas

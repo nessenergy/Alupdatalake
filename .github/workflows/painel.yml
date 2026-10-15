@@ -13,7 +13,7 @@ name: Painel
 
 on:
   schedule:
-    - cron: "7 * * * *" # de hora em hora
+    - cron: "7 */3 * * *" # de 3 em 3 horas (era de hora em hora; ADR 030). Depois de deploy e ingestão manual roda sozinho
   workflow_run:
     workflows: ["Deploy GCP", "Executar ingestão", "Testar conexão"]
     types: [completed]

@@ -9,6 +9,11 @@ on:
 permissions:
   contents: read
 
+# Um push novo no mesmo PR cancela a execução anterior (ADR 030, fase 0): menos minutos de Actions.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   lint:
     name: "Lint & Formatação"

@@ -64,3 +64,48 @@ relatorio: ## Gera o HTML de um relatorio: make relatorio ARQ=docs/relatorios/AA
 
 dataform-compile: ## Compila o projeto Dataform (definitions/) sem credencial
 	npx --yes @dataform/cli@3.0.69 compile
+
+# ---------------------------------------------------------------- CI (ADR 030)
+# Um alvo por etapa do CI. O Actions e o Cloud Build só chamam estes comandos, para o pipeline
+# não depender da plataforma. `make ci` roda tudo, na ordem; `BASE` é o ramo de comparação
+# da checagem de atribuição (padrão origin/main).
+BASE ?= origin/main
+GITLEAKS_VERSAO ?= 8.28.0
+
+.PHONY: ci ci-deps ci-lint ci-testes ci-atribuicao ci-sast ci-segredos ci-terraform ci-dataform ci-sca
+
+ci: ci-lint ci-testes ci-atribuicao ci-sast ci-segredos ci-terraform ci-dataform ci-sca
+
+ci-deps:
+	uv sync --frozen --extra dev
+
+ci-lint: ci-deps
+	uv run ruff check src/ tests/ scripts/
+	uv run ruff format --check src/ tests/ scripts/
+
+ci-testes: ci-deps
+	uv run pytest tests/ -v --tb=short --cov=src --cov-report=xml
+
+ci-atribuicao:
+	python scripts/verifica_atribuicao.py --demo
+	python scripts/verifica_atribuicao.py --intervalo "$(BASE)..HEAD"
+
+ci-sast: ci-deps
+	uv run bandit -r src/ scripts/ -ll
+
+ci-segredos:
+	curl -sSfL -o gitleaks.tar.gz "https://github.com/gitleaks/gitleaks/releases/download/v$(GITLEAKS_VERSAO)/gitleaks_$(GITLEAKS_VERSAO)_linux_x64.tar.gz"
+	tar -xzf gitleaks.tar.gz gitleaks
+	./gitleaks git --redact --no-banner --exit-code 1 .
+
+ci-terraform:
+	cd infra && terraform init -backend=false && terraform fmt -check -recursive && terraform validate
+	cd infra/bootstrap && terraform init -backend=false && terraform validate
+
+ci-dataform: ci-deps
+	npx --yes @dataform/cli@3.0.69 compile --json > dataform-graph.json
+	DATAFORM_GRAPH=dataform-graph.json uv run pytest tests/unit/test_sql.py -q -k compiled_gold
+
+ci-sca: ci-deps
+	uv export --no-emit-project --no-hashes --extra dev -o .requirements.txt -q
+	uv run pip-audit --strict --desc -r .requirements.txt

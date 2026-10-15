@@ -190,6 +190,27 @@ def test_ci_e_makefile_compilam_o_dataform_na_mesma_versao() -> None:
     assert "@dataform/cli@3.0.69 compile" in _ler("Makefile")
 
 
+def test_makefile_tem_um_alvo_por_etapa_do_ci_e_o_aggregate() -> None:
+    """ADR 030: a lógica do pipeline mora no Makefile, para o Cloud Build e o Actions chamarem o mesmo comando."""
+    makefile = _ler("Makefile")
+    etapas = (
+        "ci-lint",
+        "ci-testes",
+        "ci-atribuicao",
+        "ci-sast",
+        "ci-segredos",
+        "ci-terraform",
+        "ci-dataform",
+        "ci-sca",
+    )
+    for alvo in etapas:
+        assert _tem(rf"(?m)^{alvo}:", makefile), alvo
+    agregado = re.search(r"(?m)^ci:(.*)$", makefile)
+    assert agregado, "falta o alvo agregado `ci`"
+    for alvo in etapas:
+        assert alvo in agregado.group(1), alvo
+
+
 def test_dataform_executa_com_service_account_propria() -> None:
     """Strict act-as: o agente do Dataform personifica uma SA do projeto."""
     modulo = _ler("infra/modules/dataform/main.tf")

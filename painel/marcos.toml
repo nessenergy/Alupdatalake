@@ -412,13 +412,19 @@ dono = "ness."
 
 [[rede]]
 passo = "G6"
-titulo = "Rota até a rede do FMB"
+titulo = "Rota até a rede do FMB (agora na AWS da DCIDE, via túnel do FortiGate)"
 estado = "pendente"
 dono = "Alup"
 
 [[rede]]
 passo = "L1–L5"
-titulo = "FortiGate, datacenter e listener do Oracle"
+titulo = "FortiGate, túnel até a DCIDE e listener do Oracle"
+estado = "pendente"
+dono = "Alup"
+
+[[rede]]
+passo = "L7"
+titulo = "DCIDE: aceitar 172.16.9.0/26 na rota e no security group, na porta do Oracle"
 estado = "pendente"
 dono = "Alup"
 

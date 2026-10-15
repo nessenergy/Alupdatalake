@@ -3,6 +3,19 @@
 Atualizado em **2026-10-05**. Auditoria de ponta a ponta, com a conferência de cada número:
 [`relatorios/2026-10-02-auditoria-de-ponta-a-ponta.md`](relatorios/2026-10-02-auditoria-de-ponta-a-ponta.md).
 
+## Atualização de 15/10/2026
+
+- **Rede da Onda 3: o FMB está na AWS da DCIDE** (informação da TI da ness., de 14/10, vinda do Leonardo). A Alupar chega a ele por dois
+  túneis VPN site-to-site; o `10.18.0.145` é de aplicações internas (Airflow, site interno, Metabase e API de WhatsApp) e **não é o
+  Oracle**. O caminho muda e a DCIDE passa a ser terceiro nele: adendo de 15/10 na
+  [ADR 024](arquitetura/decisoes/024-rede-das-fontes-internas.md), aviso no [`rede-onda3.md`](runbook/rede-onda3.md) e novo passo L7 no
+  painel. Pedido das cinco informações enviado em 15/10 a Jefferson e Leonardo (IP privado e VPC do Oracle, contato na DCIDE, usuário
+  nativo do Oracle, o que ler do `10.18.0.145` e se o file server `172.16.8.30` é SMB). Os dois últimos são pedidos fora das quatro
+  fontes da Onda 3 e dependem de definição de escopo.
+- **Produção:** plano do bootstrap em [`superpowers/plans/2026-10-14-bootstrap-producao.md`](superpowers/plans/2026-10-14-bootstrap-producao.md),
+  sem aplicar nada; quatro decisões antes do primeiro apply (região, rotação do token do TempoOK, acessos, custo).
+- **Leonardo no grupo `alup.alertas`:** leitura do Bronze aplicada em dev e hml (deploys de 14/10).
+
 ## Atualização de 13/10/2026
 
 Balanço completo, com a avaliação de cada entrega e os prazos realinhados:

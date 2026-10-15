@@ -50,6 +50,7 @@ locals {
     "artifactregistry.googleapis.com",
     "bigquery.googleapis.com",
     "billingbudgets.googleapis.com", # orçamento, infra/modules/monitoramento/custo.tf
+    "cloudbuild.googleapis.com",     # CI, deploy e operação fora do GitHub Actions, ADR 030
     "cloudresourcemanager.googleapis.com",
     "cloudscheduler.googleapis.com",
     "compute.googleapis.com",     # projeto de serviço da VPC compartilhada da Alupar, ADR 024

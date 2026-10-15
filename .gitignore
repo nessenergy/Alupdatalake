@@ -63,3 +63,6 @@ node_modules/
 # Sem esta linha, um `git add -A` distraido comita a arvore inteira de um
 # worktree — que e uma copia completa do repositorio.
 .claude/worktrees/
+gitleaks
+gitleaks.tar.gz
+dataform-graph.json

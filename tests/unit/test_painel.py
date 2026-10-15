@@ -184,7 +184,7 @@ def test_importar_execucoes_vazias_nao_quebra_o_painel():
 
 def test_workflow_do_painel_le_hml_sem_deployment_e_publica_com_identidade_propria():
     texto = (RAIZ / ".github" / "workflows" / "painel.yml").read_text(encoding="utf-8")
-    assert 'cron: "7 * * * *"' in texto
+    assert 'cron: "7 */3 * * *"' in texto
     assert "name: hml\n      deployment: false" in texto, "hml sem registrar deployment a cada hora"
     assert "if: ${{ !cancelled() }}" in texto, "sem hml, o painel sai só com dev"
     assert "${{ inputs." not in texto

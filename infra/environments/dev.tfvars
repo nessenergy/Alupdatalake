@@ -24,6 +24,12 @@ leitura_projeto = ["group:operacao-datalake@ness.com.br"]
 # Conectar o repositório ao Cloud Build e criar gatilhos (ADR 030).
 gestao_cicd = ["group:operacao-datalake@ness.com.br"]
 
+# CI no Cloud Build, em paralelo ao Actions (ADR 030, fase 1). O repositório já está conectado ao projeto.
+cicd = {
+  repositorio_dono = "nessenergy"
+  repositorio_nome = "Alupdatalake"
+}
+
 # Quem configura o login do Portal no console (cliente OAuth "Externo" e IAP):
 # a ness. confere o que entrega. Sem acesso a dado (runbook/portal.md).
 configuracao_login_portal = ["group:operacao-datalake@ness.com.br"]

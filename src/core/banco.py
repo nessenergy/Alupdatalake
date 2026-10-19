@@ -47,6 +47,10 @@ logger = logging.getLogger(__name__)
 
 PORTA_PADRAO = {"oracle": 1521, "mysql": 3306, "sqlserver": 1433}
 _HOSTS_LOCAIS = {"127.0.0.1", "localhost", "::1"}
+
+# Pacote público de CAs do RDS (certs/rds-global-bundle.pem, copiado para a imagem): o RDS assina com a CA da AWS,
+# que não está no repositório de CAs do sistema. Vale quando a DSN de um host *.rds.amazonaws.com não traz ssl_ca.
+CA_RDS = "/app/certs/rds-global-bundle.pem"
 _SOMENTE_LEITURA = re.compile(r"^\s*(?:--[^\n]*\n\s*)*(SELECT|WITH)\b", re.IGNORECASE)
 
 
@@ -113,7 +117,10 @@ def _tls_mysql(host: str, consulta: dict[str, list[str]]) -> dict[str, Any]:
             # Nem host nem usuário na mensagem: a DSN inteira é segredo.
             raise ValueError("TLS só pode ser desligado (tls=0) para banco local")
         return {"ssl_disabled": True}
-    return {"ssl": ssl.create_default_context(cafile=consulta.get("ssl_ca", [None])[0])}
+    cafile = consulta.get("ssl_ca", [None])[0]
+    if cafile is None and host.endswith(".rds.amazonaws.com"):
+        cafile = CA_RDS
+    return {"ssl": ssl.create_default_context(cafile=cafile)}
 
 
 def testar_conexao(fonte: str) -> tuple[bool, str]:

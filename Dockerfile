@@ -11,6 +11,8 @@ COPY pyproject.toml uv.lock README.md ./
 RUN uv sync --frozen --no-dev --extra bancos --no-install-project
 
 COPY src/ ./src/
+# Pacote público de CAs do RDS, para o TLS verificado do MySQL (src/core/banco.py, CA_RDS).
+COPY certs/ ./certs/
 RUN uv sync --frozen --no-dev --extra bancos
 
 ENV PATH="/app/.venv/bin:$PATH" \

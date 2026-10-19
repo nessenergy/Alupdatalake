@@ -202,6 +202,39 @@ def test_mysql_usa_a_ca_indicada_na_dsn(monkeypatch: pytest.MonkeyPatch) -> None
     assert capturado["database"] == "base", "a consulta da DSN não entra no nome da base"
 
 
+def test_mysql_do_rds_usa_o_pacote_de_ca_da_aws_quando_a_dsn_nao_indica_ca(monkeypatch: pytest.MonkeyPatch) -> None:
+    """O RDS assina com a CA da AWS, que não está no repositório do sistema: sem isso o TLS verificado falha (19/10)."""
+    import ssl
+
+    recebido: dict[str, Any] = {}
+    original = ssl.create_default_context
+
+    def contexto_falso(**kwargs: Any) -> ssl.SSLContext:
+        recebido.update(kwargs)
+        return original()
+
+    monkeypatch.setattr(ssl, "create_default_context", contexto_falso)
+    _mysql_capturado(monkeypatch, "mysql://app:senha@comercializacao.abc.us-east-1.rds.amazonaws.com/base")
+
+    assert recebido == {"cafile": banco.CA_RDS}
+
+
+def test_mysql_de_host_que_nao_e_rds_nao_ganha_ca_por_conta_propria(monkeypatch: pytest.MonkeyPatch) -> None:
+    import ssl
+
+    recebido: dict[str, Any] = {}
+    original = ssl.create_default_context
+
+    def contexto_falso(**kwargs: Any) -> ssl.SSLContext:
+        recebido.update(kwargs)
+        return original()
+
+    monkeypatch.setattr(ssl, "create_default_context", contexto_falso)
+    _mysql_capturado(monkeypatch, "mysql://app:senha@banco.exemplo.com/base")
+
+    assert recebido == {"cafile": None}
+
+
 @pytest.mark.parametrize("host", ["127.0.0.1", "localhost"])
 def test_mysql_sem_tls_so_em_banco_local(monkeypatch: pytest.MonkeyPatch, host: str) -> None:
     capturado = _mysql_capturado(monkeypatch, f"mysql://root:senha@{host}:3306/base?tls=0")

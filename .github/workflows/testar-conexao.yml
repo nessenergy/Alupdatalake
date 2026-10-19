@@ -67,6 +67,15 @@ jobs:
           if gcloud run jobs execute "$JOB" --project "$PROJETO" --region "$REGIAO" --wait; then
             echo "- Resultado: **conexão aberta e SELECT 1 respondido**" >> "$GITHUB_STEP_SUMMARY"
           else
-            echo "- Resultado: **falhou**; a mensagem nos registros diz em que passo do runbook/rede-onda3.md está o problema" >> "$GITHUB_STEP_SUMMARY"
+            echo "- Resultado: **falhou**; a mensagem abaixo diz em que passo do runbook/rede-onda3.md está o problema" >> "$GITHUB_STEP_SUMMARY"
+            execucao=$(gcloud run jobs executions list --job "$JOB" --project "$PROJETO" --region "$REGIAO" --limit 1 --format="value(name)" 2>/dev/null || true)
+            if [[ -n "$execucao" ]]; then
+              echo "::group::Log do contêiner ($execucao)"
+              gcloud logging read \
+                "resource.type=\"cloud_run_job\" AND resource.labels.job_name=\"$JOB\" AND labels.\"run.googleapis.com/execution_name\"=\"$execucao\"" \
+                --project "$PROJETO" --format="value(timestamp,severity,textPayload)" --order=asc --limit=200 \
+                2>&1 | tee -a "$GITHUB_STEP_SUMMARY" || echo "(log não encontrado ou sem permissão de leitura)" | tee -a "$GITHUB_STEP_SUMMARY"
+              echo "::endgroup::"
+            fi
             exit 1
           fi

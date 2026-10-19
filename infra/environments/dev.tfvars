@@ -54,4 +54,5 @@ rede_interna = {
   rede         = "vpc-dr-prd"
   sub_rede     = "snet-vpc-dr-prd-us-central1-alupdata"
 }
-fontes_teste_conexao = ["fmb"]
+# Credenciais do DB Alup e do DB Comercialização chegaram em 19/10; os dois jobs mostram se a DSN e o acesso funcionam.
+fontes_teste_conexao = ["fmb", "portal-alup", "comercializacao"]

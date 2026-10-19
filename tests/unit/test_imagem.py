@@ -66,3 +66,12 @@ def test_o_comando_do_portal_existe_na_imagem():
 def test_o_readme_continua_escapando_da_regra_de_markdown():
     assert ignorado("CLAUDE.md"), "a regra *.md deixou de valer"
     assert not ignorado("README.md"), "sem README.md o uv sync não instala o projeto"
+
+
+def test_imagem_instala_os_drivers_de_banco() -> None:
+    """Sem `--extra bancos`, `oracledb` e `pymysql` ficam fora da imagem e todo conector de banco falha (19/10)."""
+    dockerfile = (RAIZ / "Dockerfile").read_text(encoding="utf-8")
+    instalacoes = [linha for linha in dockerfile.splitlines() if "uv sync" in linha]
+    assert instalacoes, "o Dockerfile não instala as dependências com uv sync"
+    for linha in instalacoes:
+        assert "--extra bancos" in linha, linha

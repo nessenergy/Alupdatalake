@@ -142,6 +142,7 @@ DOMINIO_ANALITICO = {
     "tempook_boletins": "Meteorologia",
     "tempook_ena_prevs": "Meteorologia",
     "inmet_precipitacao": "Meteorologia",
+    "cptec_previsao": "Meteorologia",
     "ons_bacia_contorno": "Meteorologia",
     "hubspot_negocios": "Comercial e Contratos",
     "bcb_cambio_ptax": "Econômico",
@@ -162,6 +163,7 @@ BYTES_POR_LINHA = {
     "aneel_siga": 640,
     "ace_prc": 160,  # 5 textos/datas, 1 NUMERIC; 24 linhas por execução semanal
     "aneel_tarifas": 280,  # 7 textos e 3 datas, 2 NUMERIC; ~50 mil linhas por execução semanal
+    "cptec_previsao": 120,  # data, cidade, UF, 4 números e um código; 162 linhas por dia (27 capitais x 6 dias)
     "inmet_precipitacao": 180,  # 4 textos, 4 NUMERIC, data e hora; ~900 mil linhas por semana
     "ons_bacia_contorno": 155_000,  # o WKT: 155 KB em média (máx. 627 KB) nos 31 polígonos reais; 31 linhas por mês
     "hubspot_negocios": 512,

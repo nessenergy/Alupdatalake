@@ -20,6 +20,7 @@ dependencies = [
     # desenvolvimento do Flask não serve produção.
     "gunicorn>=23.0",
     "pyshp>=3.1.6",
+    "defusedxml>=0.7.1",
 ]
 
 [project.optional-dependencies]

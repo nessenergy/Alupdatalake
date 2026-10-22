@@ -115,3 +115,10 @@ entrega desta tarefa.
 - A decisão final (esperar o INPE, trocar de provedor ou excluir o item) é da
   Alup, com esta evidência.
 - Reabrir esta ADR quando o INPE responder ou quando o teste do GCP rodar.
+
+## Adendo de 22/10/2026
+
+O webservice `servicos.cptec.inpe.br/XML` voltou a responder **200** (com `x-ratelimit-limit: 120`; um 429 transitório antes) e
+devolveu a previsão de 6 dias das 27 capitais. O 403 de 02 e 03/10 não se repete. A causa do bloqueio nunca foi confirmada; o
+conector falha alto se ele voltar. A fonte passa a (A): ver a [ADR 029](029-previsao-do-tempo-fonte.md) e o dicionário
+[`cptec_previsao`](../../dicionario-dados/cptec_previsao.md).

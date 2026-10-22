@@ -145,6 +145,7 @@ resource "google_cloudbuild_trigger" "deploy" {
     _IMAGEM_BASE           = "${var.regiao}-docker.pkg.dev/${var.project_id}/alupdata/cli"
     _TF_ESTADO             = "${var.project_id}-tfstate"
     _REGIAO                = var.regiao
+    _CONTA_DEPLOY          = element(split("/", var.deploy_service_account_id), 3)
     _DATAFORM_TOKEN_VERSAO = var.dataform_token_versao
   }
 

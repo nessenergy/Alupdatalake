@@ -1,8 +1,11 @@
 """CI no Cloud Build (ADR 030, fase 1): o arquivo do build só chama `make`, e os gatilhos são seguros."""
 
 import re
+import shutil
+import subprocess
 from pathlib import Path
 
+import pytest
 import yaml
 
 RAIZ = Path(__file__).resolve().parents[2]
@@ -112,6 +115,7 @@ def test_gatilho_de_deploy_e_manual_roda_como_a_conta_de_deploy_e_tem_as_substit
         "_TF_ESTADO",
         "_REGIAO",
         "_DATAFORM_TOKEN_VERSAO",
+        "_CONTA_DEPLOY",
     ):
         assert sub in bloco, sub
     assert '"${var.project_id}-tfstate"' in modulo
@@ -128,9 +132,20 @@ def test_deploy_yaml_so_chama_o_script_e_grava_log_no_cloud_logging() -> None:
     assert set(passos) == {"imagem", "infra"}
     assert passos["infra"]["args"] == ["cloudbuild/deploy.sh"]
     assert "cloud-sdk" in passos["infra"]["name"]
+    assert passos["imagem"]["args"] == ["cloudbuild/imagem.sh"]
+    assert "PROJECT_ID" not in " ".join(passos["infra"]["env"])
     assert passos["imagem"]["name"] == "gcr.io/cloud-builders/docker"
     env = " ".join(passos["infra"]["env"])
-    for nome in ("AMBIENTE", "MODULO", "IMAGEM_SHA", "IMAGEM_BASE", "TF_ESTADO", "REGIAO", "DATAFORM_TOKEN_VERSAO"):
+    for nome in (
+        "AMBIENTE",
+        "MODULO",
+        "IMAGEM_SHA",
+        "IMAGEM_BASE",
+        "TF_ESTADO",
+        "REGIAO",
+        "DATAFORM_TOKEN_VERSAO",
+        "CONTA_DEPLOY",
+    ):
         assert f"{nome}=${{_" in env, nome
 
 
@@ -153,3 +168,54 @@ def test_deploy_sh_valida_antes_de_agir_e_nao_usa_sintaxe_do_actions() -> None:
         "scripts.anotar_catalogo",
     ):
         assert trecho in script, trecho
+    assert "gcloud config" not in script
+
+
+_BASH = shutil.which("bash")
+_SHA = "a" * 40
+_BASE = "us-central1-docker.pkg.dev/proj/alupdata/cli"
+_OK = {
+    "AMBIENTE": "dev",
+    "MODULO": "all",
+    "COMMIT_SHA": _SHA,
+    "IMAGEM_BASE": _BASE,
+    "REGIAO": "us-central1",
+    "CONTA_DEPLOY": "deploy@proj.iam.gserviceaccount.com",
+}
+
+
+def _rodar(script: str, tmp_path: Path, **env: str) -> subprocess.CompletedProcess[str]:
+    # PATH vazio: se o script chamasse gcloud, terraform ou docker antes de validar, o comando falharia
+    # com 127 e o teste não veria o código esperado.
+    vazio = tmp_path / "vazio"
+    vazio.mkdir(exist_ok=True)
+    ambiente = {**_OK, **env, "PATH": str(vazio)}
+    return subprocess.run(  # noqa: S603
+        [_BASH, str(RAIZ / script)], env=ambiente, capture_output=True, text=True, cwd=tmp_path, check=False
+    )
+
+
+@pytest.mark.skipif(_BASH is None, reason="precisa de bash")
+@pytest.mark.parametrize("script", ["cloudbuild/deploy.sh", "cloudbuild/imagem.sh"])
+@pytest.mark.parametrize(
+    "env",
+    [{"MODULO": "foo"}, {"AMBIENTE": "x"}, {"MODULO": "all", "COMMIT_SHA": "xyz"}, {"MODULO": "all", "COMMIT_SHA": ""}],
+)
+def test_scripts_recusam_entrada_invalida_antes_de_qualquer_efeito(
+    script: str, env: dict[str, str], tmp_path: Path
+) -> None:
+    r = _rodar(script, tmp_path, **env)
+    assert r.returncode == 1, r.stderr + r.stdout
+
+
+@pytest.mark.skipif(_BASH is None, reason="precisa de bash")
+def test_modulo_connectors_nao_toca_no_terraform_e_infra_nao_constroi_imagem(tmp_path: Path) -> None:
+    assert _rodar("cloudbuild/deploy.sh", tmp_path, MODULO="connectors").returncode == 0
+    assert _rodar("cloudbuild/imagem.sh", tmp_path, MODULO="infra").returncode == 0
+    assert _rodar("cloudbuild/deploy.sh", tmp_path, MODULO="infra", IMAGEM_SHA="curto").returncode == 1
+
+
+@pytest.mark.skipif(_BASH is None, reason="precisa de bash")
+def test_deploy_exige_conta_de_deploy(tmp_path: Path) -> None:
+    r = _rodar("cloudbuild/deploy.sh", tmp_path, CONTA_DEPLOY="")
+    assert r.returncode == 1 and "CONTA_DEPLOY" in r.stdout

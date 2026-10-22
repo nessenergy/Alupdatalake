@@ -26,9 +26,9 @@ if [[ ! "$TAG" =~ ^[0-9a-f]{40}$ ]]; then
 fi
 IMAGEM="$IMAGEM_BASE:$TAG"
 
-# A conta de deploy é a conta com que o build roda.
-CONTA_DEPLOY="$(gcloud config get-value account 2>/dev/null)"
-[ -n "$CONTA_DEPLOY" ] || { echo "Não foi possível descobrir a conta de deploy do build."; exit 1; }
+# A conta de deploy vem do gatilho (_CONTA_DEPLOY), não do gcloud: é determinística.
+[[ "${CONTA_DEPLOY:-}" =~ ^[^@[:space:]]+@[^@[:space:]]+$ ]] || { echo "CONTA_DEPLOY vazia ou inválida."; exit 1; }
+[[ "${IMAGEM_BASE:-}" == "${REGIAO:-}-docker.pkg.dev/"* ]] || { echo "IMAGEM_BASE '${IMAGEM_BASE:-}' fora da região '${REGIAO:-}'."; exit 1; }
 
 # Falha antes do init/plan se a imagem não existe no ambiente escolhido.
 # `images describe` exige containeranalysis.occurrences.list, que a conta de deploy não tem

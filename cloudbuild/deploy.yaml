@@ -4,14 +4,13 @@ steps:
   - id: imagem
     name: gcr.io/cloud-builders/docker
     entrypoint: bash
-    args:
-      - -c
-      - |
-        set -euo pipefail
-        [[ "${_MODULO}" == "all" || "${_MODULO}" == "connectors" ]] || { echo "módulo ${_MODULO}: imagem não é construída"; exit 0; }
-        docker build -t "${_IMAGEM_BASE}:${COMMIT_SHA}" -t "${_IMAGEM_BASE}:latest" .
-        docker push "${_IMAGEM_BASE}:${COMMIT_SHA}"
-        docker push "${_IMAGEM_BASE}:latest"
+    args: ["cloudbuild/imagem.sh"]
+    env:
+      - "AMBIENTE=${_AMBIENTE}"
+      - "MODULO=${_MODULO}"
+      - "IMAGEM_BASE=${_IMAGEM_BASE}"
+      - "REGIAO=${_REGIAO}"
+      - "COMMIT_SHA=${COMMIT_SHA}"
   - id: infra
     name: gcr.io/google.com/cloudsdktool/cloud-sdk:stable
     entrypoint: bash
@@ -25,7 +24,7 @@ steps:
       - "REGIAO=${_REGIAO}"
       - "DATAFORM_TOKEN_VERSAO=${_DATAFORM_TOKEN_VERSAO}"
       - "COMMIT_SHA=${COMMIT_SHA}"
-      - "PROJETO=$PROJECT_ID"
+      - "CONTA_DEPLOY=${_CONTA_DEPLOY}"
 options:
   # Conta de serviço própria exige log no Cloud Logging (ou num bucket); sem isso o build é recusado.
   logging: CLOUD_LOGGING_ONLY

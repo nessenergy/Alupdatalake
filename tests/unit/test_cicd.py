@@ -460,18 +460,49 @@ def test_agendados_gatilho_manual_e_scheduler_apontam_para_o_run_certo() -> None
     assert "https://cloudbuild.googleapis.com/v1/projects/${var.project_id}/locations/global/triggers/" in sched
     assert ":run" in sched and "google_cloudbuild_trigger.agendado[each.key].name" in sched
     assert 'http_method = "POST"' in sched
-    assert "oauth_token" in sched and "google_service_account.agendador.email" in sched
+    assert "oauth_token" in sched and "google_service_account.agendador[0].email" in sched
     assert "branchName" in sched and "base64encode" in sched
     assert 'time_zone = "Etc/UTC"' in sched
 
 
+def _hcl(caminho: str) -> str:
+    return "\n".join(linha for linha in _ler(caminho).splitlines() if not linha.lstrip().startswith("#"))
+
+
 def test_agendador_so_roda_gatilho_e_age_como_a_conta_do_gatilho() -> None:
-    modulo = _ler("infra/modules/cicd/main.tf")
-    assert 'account_id   = "alupdata-agendador"' in modulo
+    modulo = _hcl("infra/modules/cicd/main.tf")
+    conta = _bloco(modulo, 'resource "google_service_account" "agendador"')
+    assert 'account_id   = "alupdata-agendador"' in conta
+    assert re.search(r"count\s*=\s*length\(local\.agendados_ligados\)\s*>\s*0\s*\?\s*1\s*:\s*0", conta)
+    assert "google_service_account.agendador.email" not in modulo, "a conta tem count: use [0]"
     papeis = re.findall(r'role\s*=\s*"(roles/[^"]+)"', modulo)
     assert "roles/cloudbuild.builds.editor" in papeis and "roles/iam.serviceAccountUser" in papeis
-    assert "roles/storage.objectAdmin" not in papeis, "o bucket é do projeto da ness., fora de infra/"
-    assert "roles/storage.objectAdmin" in modulo and "ness-painel-projetos-alupdata" in modulo, "documentado"
+    assert "roles/storage.objectAdmin" not in modulo, "o bucket é do projeto da ness., fora de infra/"
+    assert "roles/storage.objectAdmin" in _ler("infra/modules/cicd/main.tf"), "documentado no comentário"
+    age = _bloco(modulo, 'resource "google_service_account_iam_member" "agendador_age_como"')
+    assert "deploy_service_account_id" not in age
+
+
+def test_quadro_tem_conta_propria_e_o_ci_nao_le_o_segredo_do_quadro() -> None:
+    modulo = _hcl("infra/modules/cicd/main.tf")
+    conta = _bloco(modulo, 'resource "google_service_account" "quadro"')
+    assert 'account_id   = "alupdata-quadro"' in conta and "var.agendados.quadro" in conta
+    acesso = _bloco(modulo, 'resource "google_secret_manager_secret_iam_member" "quadro_le_chave_do_quadro"')
+    assert "var.quadro_secret_id" in acesso and "google_service_account.quadro[0].email" in acesso
+    for bloco in re.findall(r'resource "google_secret_manager_secret_iam_member" "\w+" \{.*?\n\}\n', modulo, re.DOTALL):
+        if "var.quadro_secret_id" in bloco:
+            assert "google_service_account.ci" not in bloco
+    assert 'conta         = "quadro"' in modulo
+    assert "ci_le_chave_do_quadro" not in modulo
+
+
+def test_quadro_so_liga_com_a_chave_gravada() -> None:
+    modulo = _hcl("infra/modules/cicd/main.tf")
+    assert re.search(r'variable "quadro_chave_gravada" \{[^}]*default\s*=\s*false', modulo, re.DOTALL)
+    gatilho = _bloco(modulo, 'resource "google_cloudbuild_trigger" "agendado"')
+    assert re.search(r'each\.key\s*!=\s*"quadro"\s*\|\|\s*var\.quadro_chave_gravada', gatilho)
+    assert "var.cicd.quadro_chave_gravada" in _ler("infra/main.tf")
+    assert "JÁ TENHA UMA VERSÃO" in _ler("cloudbuild/agendado-quadro.yaml")
 
 
 def test_atribuicao_e_painel_exigem_client_id_do_app_de_leitura() -> None:
@@ -479,15 +510,6 @@ def test_atribuicao_e_painel_exigem_client_id_do_app_de_leitura() -> None:
     assert "precondition" in gatilho
     assert re.search(r'var\.github_app_ci_client_id\s*!=\s*""', gatilho)
     assert "atribuicao" in gatilho and "painel" in gatilho
-
-
-def test_segredo_do_quadro_so_e_lido_pela_conta_do_ci_se_quadro_estiver_ligado() -> None:
-    modulo = _ler("infra/modules/cicd/main.tf")
-    bloco = _bloco(modulo, 'resource "google_secret_manager_secret_iam_member" "ci_le_chave_do_quadro"')
-    assert re.search(r"count\s*=\s*var\.agendados\.quadro\s*\?\s*1\s*:\s*0", bloco)
-    assert "roles/secretmanager.secretAccessor" in bloco and "google_service_account.ci.email" in bloco
-    assert "var.quadro_secret_id" in bloco
-    assert "module.secrets.quadro_app_key_secret_id" in _ler("infra/main.tf")
 
 
 def test_conta_do_painel_so_existe_com_painel_ligado_e_le_dev() -> None:

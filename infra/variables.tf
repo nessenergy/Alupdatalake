@@ -148,6 +148,8 @@ variable "cicd" {
     github_app_ci_client_id = optional(string, "")
     # client_id do GitHub App do quadro; vazio faz o agendado do quadro avisar e sair com sucesso.
     github_app_quadro_client_id = optional(string, "")
+    # Confirma que o segredo do quadro já tem versão (condição para ligar agendados.quadro).
+    quadro_chave_gravada = optional(bool, false)
     # Agendados no Cloud Scheduler (Tarefa 7): cada um é opt-in. Atribuição e painel exigem github_app_ci_client_id.
     agendados = optional(object({
       sca        = optional(bool, false)

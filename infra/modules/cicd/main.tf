@@ -240,6 +240,11 @@ variable "github_app_quadro_client_id" {
   type        = string
   default     = ""
 }
+variable "quadro_chave_gravada" {
+  description = "Confirma que o segredo do quadro já tem versão; sem isso o agendado do quadro não liga (o build cairia na largada)"
+  type        = bool
+  default     = false
+}
 variable "quadro_secret_id" {
   description = "Id do segredo da chave do App do quadro (módulo secrets)"
   type        = string
@@ -262,6 +267,8 @@ variable "projeto_hml" {
 }
 
 resource "google_service_account" "agendador" {
+  count = length(local.agendados_ligados) > 0 ? 1 : 0
+
   project      = var.project_id
   account_id   = "alupdata-agendador"
   display_name = "Cloud Scheduler dos agendados do AlupData"
@@ -284,7 +291,7 @@ locals {
     quadro = {
       cron          = "0 11 * * 1-5"
       arquivo       = "cloudbuild/agendado-quadro.yaml"
-      conta         = "ci"
+      conta         = "quadro"
       substitutions = tomap({ _CLIENT_ID_APP = var.github_app_quadro_client_id })
     }
     painel = {
@@ -302,32 +309,52 @@ locals {
   agendados_ligados = { for k, v in local.agendados_def : k => v if var.agendados[k] }
 }
 
-# Só roda gatilho. `builds.editor` é o menor papel predefinido com `cloudbuild.builds.create`, que o `:run` exige.
+# `roles/cloudbuild.builds.editor` é o menor papel predefinido que permite `:run` (`cloudbuild.builds.create`),
+# mas também permite criar build arbitrário. A contenção real é o `serviceAccountUser` abaixo, restrito às contas
+# dos gatilhos agendados (nunca à conta de deploy).
 resource "google_project_iam_member" "agendador_roda_gatilho" {
   count = length(local.agendados_ligados) > 0 ? 1 : 0
 
   project = var.project_id
   role    = "roles/cloudbuild.builds.editor"
-  member  = "serviceAccount:${google_service_account.agendador.email}"
+  member  = "serviceAccount:${google_service_account.agendador[0].email}"
 }
 
 # Disparar gatilho com conta própria exige agir como essa conta.
 resource "google_service_account_iam_member" "agendador_age_como" {
   for_each = toset([for k, v in local.agendados_ligados : v.conta])
 
-  service_account_id = each.value == "painel" ? google_service_account.painel[0].id : google_service_account.ci.id
+  service_account_id = each.value == "painel" ? google_service_account.painel[0].id : each.value == "quadro" ? google_service_account.quadro[0].id : google_service_account.ci.id
   role               = "roles/iam.serviceAccountUser"
-  member             = "serviceAccount:${google_service_account.agendador.email}"
+  member             = "serviceAccount:${google_service_account.agendador[0].email}"
 }
 
-# A conta do CI só lê o segredo do quadro se o agendado do quadro estiver ligado.
-resource "google_secret_manager_secret_iam_member" "ci_le_chave_do_quadro" {
+# Conta própria do quadro: a chave do App do quadro escreve em Projects e issues, então a conta `alupdata-ci`
+# (a mesma dos gatilhos de PR, que rodam o yaml de quem abre o PR) NÃO a lê. Só existe com `quadro` ligado.
+resource "google_service_account" "quadro" {
+  count = var.agendados.quadro ? 1 : 0
+
+  project      = var.project_id
+  account_id   = "alupdata-quadro"
+  display_name = "Quadro do AlupData no Cloud Build"
+}
+
+resource "google_project_iam_member" "quadro_log" {
+  count = var.agendados.quadro ? 1 : 0
+
+  project = var.project_id
+  role    = "roles/logging.logWriter"
+  member  = "serviceAccount:${google_service_account.quadro[0].email}"
+}
+
+# Único segredo que a conta do quadro lê.
+resource "google_secret_manager_secret_iam_member" "quadro_le_chave_do_quadro" {
   count = var.agendados.quadro ? 1 : 0
 
   project   = var.project_id
   secret_id = var.quadro_secret_id
   role      = "roles/secretmanager.secretAccessor"
-  member    = "serviceAccount:${google_service_account.ci.email}"
+  member    = "serviceAccount:${google_service_account.quadro[0].email}"
 }
 
 # Conta própria do painel: lê metadado de execução de dev e o segredo do App de leitura. Escrita no bucket do
@@ -372,7 +399,7 @@ resource "google_cloudbuild_trigger" "agendado" {
   project         = var.project_id
   name            = "alupdata-ag-${each.key}"
   description     = "Agendado ${each.key} (ADR 030): disparado pelo Cloud Scheduler, ou gcloud builds triggers run alupdata-ag-${each.key} --branch=main"
-  service_account = each.value.conta == "painel" ? google_service_account.painel[0].id : google_service_account.ci.id
+  service_account = each.value.conta == "painel" ? google_service_account.painel[0].id : each.value.conta == "quadro" ? google_service_account.quadro[0].id : google_service_account.ci.id
   filename        = each.value.arquivo
   substitutions   = each.value.substitutions
 
@@ -389,6 +416,10 @@ resource "google_cloudbuild_trigger" "agendado" {
   }
 
   lifecycle {
+    precondition {
+      condition     = each.key != "quadro" || var.quadro_chave_gravada
+      error_message = "O agendado quadro exige quadro_chave_gravada = true: grave antes uma versão de alupdata-github-quadro-app-key."
+    }
     # Atribuição e painel usam o token do App de leitura do CI; sem client id o build falharia todo dia.
     precondition {
       condition     = !contains(["atribuicao", "painel"], each.key) || var.github_app_ci_client_id != ""
@@ -396,7 +427,7 @@ resource "google_cloudbuild_trigger" "agendado" {
     }
   }
 
-  depends_on = [google_project_iam_member.painel]
+  depends_on = [google_project_iam_member.painel, google_project_iam_member.quadro_log]
 }
 
 resource "google_cloud_scheduler_job" "agendado" {
@@ -420,7 +451,7 @@ resource "google_cloud_scheduler_job" "agendado" {
     body        = base64encode(jsonencode({ source = { branchName = "main" } }))
 
     oauth_token {
-      service_account_email = google_service_account.agendador.email
+      service_account_email = google_service_account.agendador[0].email
     }
   }
 

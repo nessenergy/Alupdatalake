@@ -300,6 +300,7 @@ module "cicd" {
   github_app_ci_client_id     = var.cicd.github_app_ci_client_id
   github_app_quadro_client_id = var.cicd.github_app_quadro_client_id
   agendados                   = var.cicd.agendados
+  quadro_chave_gravada        = var.cicd.quadro_chave_gravada
   quadro_secret_id            = module.secrets.quadro_app_key_secret_id
   dataset_bronze              = module.bigquery.dataset_ids["bronze"]
 

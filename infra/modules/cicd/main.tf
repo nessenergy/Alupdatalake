@@ -14,13 +14,12 @@ variable "repositorio_nome" { type = string }
 variable "deploy_service_account_id" {
   description = "id completo da conta de deploy: projects/<projeto>/serviceAccounts/<e-mail>"
   type        = string
+  validation {
+    condition     = can(regex("^projects/[^/]+/serviceAccounts/.+$", var.deploy_service_account_id))
+    error_message = "Informe projects/<projeto>/serviceAccounts/<e-mail>; deploy_service_account vazio não serve."
+  }
 }
 variable "regiao" { type = string }
-# Imagem base de ingestão usada pelo cloudbuild/operar.yaml (Tarefa 6); o módulo só a recebe.
-variable "imagem_ingestao_base" {
-  type    = string
-  default = ""
-}
 
 resource "google_service_account" "ci" {
   project      = var.project_id

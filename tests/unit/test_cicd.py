@@ -70,15 +70,27 @@ def test_operacoes_sob_demanda_sao_gatilhos_manuais_da_conta_de_deploy() -> None
 
 def test_modulo_cicd_declara_as_variaveis_das_operacoes_e_o_main_as_liga() -> None:
     modulo = _ler("infra/modules/cicd/main.tf")
-    for variavel in ("deploy_service_account_id", "regiao", "imagem_ingestao_base"):
+    for variavel in ("deploy_service_account_id", "regiao"):
         assert f'variable "{variavel}"' in modulo, variavel
     principal = _ler("infra/main.tf")
     assert "projects/${var.project_id}/serviceAccounts/${var.deploy_service_account}" in principal
-    assert "cicd" in _ler("infra/environments/hml.tfvars")
+    assert "imagem_ingestao_base" not in modulo + principal
+    assert not re.search(r"^\s*cicd\s*=", _ler("infra/environments/hml.tfvars"), re.MULTILINE), (
+        "hml só liga depois de D3"
+    )
+
+
+def test_modulo_cicd_recusa_conta_de_deploy_vazia() -> None:
+    modulo = _ler("infra/modules/cicd/main.tf")
+    bloco = modulo[modulo.index('variable "deploy_service_account_id"') :]
+    assert re.search(
+        r"validation\s*\{\s*condition\s*=\s*can\(regex\(\"\^projects/\[\^/\]\+/serviceAccounts/\.\+\$\"", bloco
+    )
 
 
 def test_conta_de_deploy_escreve_log_proprio_e_operacao_age_como_ela() -> None:
-    assert '"roles/logging.logWriter"' in _ler("infra/bootstrap/main.tf")
+    lista = re.search(r"papeis_deploy\s*=\s*\[(.*?)\]", _ler("infra/bootstrap/main.tf"), re.DOTALL)
+    assert lista and "roles/logging.logWriter" in re.findall(r'"(roles/[^"]+)"', lista.group(1))
     principal = _ler("infra/main.tf")
     assert re.search(r'resource "google_service_account_iam_member" "operacao_age_como_deploy"', principal)
     assert "roles/iam.serviceAccountUser" in principal

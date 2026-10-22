@@ -23,7 +23,7 @@ resource "google_project_iam_member" "ci_log" {
   member  = "serviceAccount:${google_service_account.ci.email}"
 }
 
-# O repositório é público: PR de quem não é dono só roda depois de um comentário de aprovação.
+# PR de quem não é dono só roda depois de um comentário de aprovação (o repositório é privado, mas a regra vale se mudar).
 resource "google_cloudbuild_trigger" "pr" {
   project         = var.project_id
   name            = "alupdata-ci-pr"

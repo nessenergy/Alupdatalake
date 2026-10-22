@@ -18,14 +18,15 @@ def test_ci_yaml_so_chama_o_script_e_grava_log_no_cloud_logging() -> None:
     passos = ci["steps"]
     assert len(passos) == 1
     assert "cloudbuild/ci.sh" in " ".join(passos[0]["args"])
-    assert ci["substitutions"]["_ALVOS"] == "ci"
+    alvos = ci["substitutions"]["_ALVOS"].split()
+    assert "ci-atribuicao" not in alvos, "sem credencial para buscar a main no repositório privado"
+    assert "ci-testes" in alvos
 
 
 def test_script_de_ci_roda_make_e_nao_tem_credencial() -> None:
     script = _ler("cloudbuild/ci.sh")
     assert "set -euo pipefail" in script
     assert re.search(r"make\s+.*\$ALVOS|make\s+\$\{?ALVOS", script)
-    assert "git fetch" in script, "a checagem de atribuição e o gitleaks precisam do histórico"
     for proibido in ("gcloud auth", "GOOGLE_APPLICATION_CREDENTIALS", "secretmanager"):
         assert proibido not in script
 
@@ -35,7 +36,7 @@ def test_modulo_cicd_so_escreve_log_e_nao_roda_pr_de_fora_sem_aprovacao() -> Non
     papeis = re.findall(r'role\s*=\s*"(roles/[^"]+)"', modulo)
     assert papeis == ["roles/logging.logWriter"], papeis
     assert "COMMENTS_ENABLED_FOR_EXTERNAL_CONTRIBUTORS_ONLY" in modulo, (
-        "o repositório é público: PR de fora exige aprovação"
+        "PR de fora exige aprovação, mesmo com o repositório privado"
     )
     assert 'filename        = "cloudbuild/ci.yaml"' in modulo
     assert modulo.count("service_account") >= 2

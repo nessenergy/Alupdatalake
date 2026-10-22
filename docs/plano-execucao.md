@@ -157,8 +157,8 @@ Marco 3 — 18,97% · R$ 28.160,00 · **Bloqueada por credencial da Alup**
 |---|---|---|---|
 | 2.1 | **CCEE agente credenciado** | 32h ⚠ | Certificado/credencial de agente. **Sem caminho definido em 27/09**: aguarda a posição da Alup sobre as 32h ([#260](https://github.com/nessenergy/Alupdatalake/issues/260)); **nenhum arquivo do item existe no repositório** (levantamento de 05/10, [relatório](relatorios/2026-10-05-onda-2-levantamento.md)); se o item sair do escopo, a realocação das horas é decisão de coordenação |
 | 2.2 | **BBCE** | 28h ⚠ | Implementado no PR #131; faltam acesso e host (#23) |
-| 2.3 | **Hubspot** | 20h → **~4h restantes** | Token de API (private app). Os 7 componentes foram escritos contra documentação pública em 2026-08-26, sem acesso real; falta rodar contra a API real e ajustar |
-| 2.4 | **TempoOK** | 18h | Implementado, **dois produtos**: o boletim tem contrato verificado mas acervo só até 26/10/2022 (#129); a **previsão de ENA** (`tempook_ena_prevs`) responde para a data de hoje, verificada em 21/09 — só o caminho de exemplo é conhecido, a Alup vai indicar os demais |
+| 2.3 | **Hubspot** | 20h | **Carga real em dev e hml em 22/10** (runs `39776552963` e `39776564873`), depois de a Alupar gravar o token de aplicativo privado em 20/10. Falta conferir as linhas e fechar o dossiê |
+| 2.4 | **TempoOK** | 18h | **Retirado do escopo como fonte do lake**: o Leonardo respondeu em 20/10 (registrado pelo Gabriel no canal da equipe) que sai "integralmente do escopo". **Confirmação por escrito pendente.** Os 7 componentes dos dois produtos existem no código; a realocação das 18 h é decisão de coordenação |
 | 2.5 | Tabelas Gold de preço e posição comercial | 12h | — |
 
 **Estratégia contra o bloqueio** (decidida no brainstorm): para cada fonte
@@ -182,10 +182,10 @@ Marco 4 — 26,72% · R$ 39.680,00 · **A maior onda; bloqueada por VPN e creden
 
 | # | Fonte | Est. | Acesso necessário |
 |---|---|---|---|
-| 3.1 | **Oracle FMB** | 45h ⚠ | VPN + usuário read-only + schema documentado. **Rede, lado GCP, pronta em 25/09** ([ADR 024](arquitetura/decisoes/024-rede-das-fontes-internas.md)): faltam a rota até o FMB, o FortiGate e o datacenter, e a credencial |
-| 3.2 | **Portal Alup** (MySQL/NoSQL/Storage) | 40h ⚠ | VPN + credenciais read-only |
-| 3.3 | **MySQL RDS Comercialização** | 30h ⚠ | Usuário read-only e conectividade; C8 dispensa VPN e peering. Sai pelo IP fixo do Cloud NAT da Alupar (ADR 024), com TLS obrigatório (#249) |
-| 3.4 | **RM/TOTVS** | 25h ⚠ | Endpoints e credencial |
+| 3.1 | **Oracle FMB** | 45h ⚠ | Credencial de usuário nativo, só leitura, gravada pela Alupar (dev e hml). O FMB está na AWS da DCIDE (adendo de 15/10 da [ADR 024](arquitetura/decisoes/024-rede-das-fontes-internas.md)); o teste de conexão de 22/10 ainda expira. Falta o caminho de rede via DCIDE |
+| 3.2 | **Portal Alup** (MySQL/NoSQL/Storage) | 40h ⚠ | Credencial do DB Alup (MySQL) gravada; **a conexão funciona** (teste de 22/10). Falta o esquema das tabelas para escrever o conector |
+| 3.3 | **MySQL RDS Comercialização** | 30h ⚠ | Credencial gravada; **a conexão funciona** com TLS verificado (teste de 19/10). Falta o esquema das tabelas (#14) para escrever o conector |
+| 3.4 | **RM/TOTVS** | 25h ⚠ | Consumo só por webservice, segundo o Thiago (20/10). Faltam os endpoints e a credencial |
 | 3.5 | Orquestração em Cloud Workflows | 10h → **mecanismo entregue em 23/09** (`infra/modules/orquestracao`): fluxo que executa as ingestões da cadeia em paralelo, compila a release do Dataform e espera o estado terminal. Com `cadeia_onda3` vazia não cria recurso — a cadeia nasce com a primeira fonte interna | — |
 | 3.6 | Tabelas Gold que cruzam interno × mercado | 5h | dado interno carregado |
 

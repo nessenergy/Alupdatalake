@@ -1,7 +1,21 @@
 # Estado do projeto
 
-Atualizado em **2026-10-05**. Auditoria de ponta a ponta, com a conferência de cada número:
+Atualizado em **2026-10-22**. Visão de uma página: [`visao-consolidada.md`](visao-consolidada.md). Relatório com as evidências:
+[`relatorios/2026-10-22-situacao-consolidada.md`](relatorios/2026-10-22-situacao-consolidada.md). Guia de auditoria: [`auditoria.md`](auditoria.md).
+Última auditoria de ponta a ponta, com a conferência de cada número:
 [`relatorios/2026-10-02-auditoria-de-ponta-a-ponta.md`](relatorios/2026-10-02-auditoria-de-ponta-a-ponta.md).
+
+## Atualização de 22/10/2026
+
+- **Hubspot carrega em dev e hml.** A Alupar gravou o token de aplicativo privado em 20/10 e a ingestão de 22/10 terminou com sucesso nos dois ambientes; a fonte saiu da lista de fontes fora do OK. As linhas carregadas não foram medidas.
+- **TempoOK sai do escopo como fonte do lake** (resposta do Leonardo, 20/10, registrada pelo Gabriel no canal da equipe). Confirmação por escrito pendente. Credenciais: ONS por usuário e senha; CCEE por usuário, senha e certificado ou por token de API.
+- **Conexões da Onda 3 (testes de 19 e 22/10):** MySQL Comercialização e MySQL Alup **conectam**; o Oracle FMB ainda expira (falta o caminho via DCIDE). O RM/TOTVS é só webservice. Faltam os esquemas das duas bases MySQL.
+- **Três defeitos de imagem achados pelos testes de conexão e corrigidos:** sem os drivers de banco (#401), sem a CA do RDS (#402) e teste de conexão sem log (#400).
+- **Qualidade do código, medida em 22/10:** 2.013 testes aprovados, 558 ignorados por desenho (cerca de 96% são regras SQL que não se aplicam à camada testada) e cobertura de 96%. Corrige o "1.448 testes" citado em 14/10, que era contagem parcial.
+- **Saúde da ingestão:** dev com 56 fontes OK, 1 ATRASADA (`tempook_boletins`) e 1 SEM_SUCESSO (`bbce_curva_forward`); hml com 55 OK e 1 SEM_SUCESSO (`tempook_ena_prevs`).
+- **Responsável pelos aceites:** Eduardo Pires, o que encerra a pendência #258.
+- **Documentação para auditoria:** novo [`auditoria.md`](auditoria.md), [`visao-consolidada.md`](visao-consolidada.md), `README.md` reescrito e o script `make componentes`, que reproduz a conferência dos 7 componentes.
+- **CI fora do GitHub Actions ([ADR 030](arquitetura/decisoes/030-cicd-fora-do-github-actions.md)):** a conta de serviço do CI existe em dev; os gatilhos do Cloud Build aguardam o bootstrap, que uma pessoa precisa reaplicar em dev e hml.
 
 ## Atualização de 15/10/2026
 

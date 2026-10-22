@@ -5,58 +5,85 @@
 > Repositório centralizado de dados operacionais e de mercado do Grupo Alupar.
 > Arquitetura Medallion (Bronze → Silver → Gold) na Google Cloud Platform.
 
-## Visão Geral
+## Visão geral
 
 | Item | Detalhe |
 |------|--------|
 | **Contrato** | CPS-01025/2026 |
 | **Contratantes** | FGE, IJUI, FOZ, QUELUZ, LAVRINHAS, VERDE 08 (Grupo Alupar) |
 | **Contratada** | ness. Processos e Tecnologia |
-| **Horas** | 580h em 5 ondas (19 semanas) |
-| **Kickoff** | 27/08/2026 |
-| **Término previsto** | 08/01/2027 |
-| **Stack** | Python · BigQuery · Cloud Storage · Terraform · Dataform · Cloud Run · Cloud Workflows (Onda 3) |
+| **Prazo** | kickoff em 27/08/2026, em 5 ondas, até 08/01/2027 |
+| **Stack** | Python · BigQuery · Cloud Storage · Dataform · Cloud Run · Cloud Scheduler · Terraform |
 
-## Cronograma
+Cada fonte de dados só está entregue com os **7 componentes** da cláusula 2ª do contrato: conector Python, tabela Bronze, view Silver, view Gold,
+testes, agendamento e dicionário com linhagem.
 
-| Onda | Nome | Início | Término | Horas |
-|------|------|--------|---------|-------|
-| 0 | Fundação & Arquitetura | 31/08/2026 | 11/09/2026 | 90h |
-| 1 | Inteligência de Mercado Base | 14/09/2026 | 16/10/2026 | 120h |
-| 2 | Modelos Preditivos & APIs com Credenciais | 19/10/2026 | 13/11/2026 | 110h |
-| 3 | Sistemas Internos | 16/11/2026 | 18/12/2026 | 155h |
-| 4 | Planilhas, Governança & Handoff | 21/12/2026 | 08/01/2027 | 105h |
+## Estado atual (22/10/2026)
 
-Jornada em período comercial (seg–sex). Datas de término = data-alvo de homologação
-e de marco de faturamento. Detalhes e feriados:
-[Resumo do Contrato](docs/contrato/resumo-contrato.md#cronograma--ondas-de-desenvolvimento-cláusula-4ª).
+| Onda | Tema | Janela | Estado |
+|------|------|--------|--------|
+| 0 | Fundação e arquitetura | 31/08 a 11/09 | **Aprovada** (05/10) |
+| 1 | Inteligência de mercado: APIs públicas | 14/09 a 16/10 | **Aprovada** (05/10); IPDO, ACOMPH e CPTEC sem entrega |
+| 2 | APIs com credenciais | 19/10 a 13/11 | **Em andamento**: Hubspot carrega; BBCE sem credencial; CCEE credenciada sem código; TempoOK fora do escopo |
+| 3 | Sistemas internos | 16/11 a 18/12 | **Em andamento**: 2 de 3 bancos conectam; Oracle FMB depende de rede via terceiro |
+| 4 | Planilhas, governança e handoff | 21/12 a 08/01/2027 | **Em andamento**: motor de planilhas pronto; leitor do Google Drive a escrever |
 
-## Trabalhando neste repositório com um agente
+| Medida | Valor |
+|---|---|
+| Conectores registrados | **58**, todos com os 7 componentes presentes |
+| Testes | **2.013 aprovados** e 558 ignorados por desenho |
+| Cobertura de linhas | **96%** |
+| Ambientes | `dev` e `hml` aplicados; produção ainda não existe |
+| Saúde da ingestão | dev: 56 fontes OK; hml: 55 |
 
-O contexto completo — regras que não se negociam, como escrever um conector,
-comandos, convenções e o estado atual — está em **[`AGENTS.md`](AGENTS.md)**.
-Leia aquele arquivo antes de mudar qualquer coisa; ele vale para qualquer
-agente de código, seja qual for a ferramenta.
+Visão de uma página: [`docs/visao-consolidada.md`](docs/visao-consolidada.md). Relatório com as evidências:
+[`docs/relatorios/2026-10-22-situacao-consolidada.md`](docs/relatorios/2026-10-22-situacao-consolidada.md). Histórico e pendências:
+[`docs/status.md`](docs/status.md).
 
-Atalho: uma fonte nova começa com `make novo-conector fonte=X entidade=Y` e
-termina com os 7 componentes da cláusula 2ª. O framework em `src/core/` já faz
-raw no GCS, validação, colunas técnicas, carga no Bronze e log de execução — o
-conector implementa só `extrair()` e `transformar()`.
+## Para auditar
+
+O guia [`docs/auditoria.md`](docs/auditoria.md) lista cada controle (7 componentes, SAST, SCA, segredos, acesso, mudança, LGPD), onde está a evidência
+e o comando que a reproduz. O essencial:
+
+```bash
+uv sync --frozen --extra dev --extra bancos
+make componentes      # confere os 7 componentes de cada fonte registrada
+make ci               # lint, testes, atribuição, Bandit, Gitleaks, Terraform, Dataform e pip-audit
+uv run pytest tests/ --cov=src
+gh workflow run "Conferir cargas" -f environment=dev   # estado do dado no BigQuery, somente leitura
+```
+
+## Fontes por origem
+
+| Origem | Conectores | Tipo | Onda |
+|---|---|---|---|
+| ONS | 29 | arquivos e APIs públicas | 1 e aditivo 01 |
+| CCEE (dados abertos) | 17 | CKAN público | 1 e aditivo 01 |
+| BCB, IBGE, ANEEL, INMET, ACE | 8 | APIs e arquivos públicos | 1 |
+| Hubspot | 1 | API credenciada | 2 |
+| BBCE | 1 | API credenciada | 2 |
+| TempoOK | 2 | API credenciada (fora do escopo desde 20/10) | 2 |
+| CCEE credenciado | 0 | a definir | 2 |
+| Oracle FMB, MySQL Alup, MySQL Comercialização, RM/TOTVS | 0 | bancos e sistemas internos | 3 |
+| Planilhas (CSV e XLSX) | motor pronto | arquivos da Alupar | 4 |
+
+O contrato mantém **13 fontes**; entidade implementada não cria uma fonte contratual nova. O índice completo, com linhagem, está em
+[`docs/dicionario-dados/README.md`](docs/dicionario-dados/README.md).
 
 ## Arquitetura
 
 ```mermaid
 graph LR
     subgraph Fontes
-        A[APIs Públicas]
-        B[APIs Credenciadas]
-        C[Bancos Internos]
+        A[APIs públicas]
+        B[APIs credenciadas]
+        C[Bancos internos]
         D[Planilhas]
     end
     subgraph "Medallion (BigQuery)"
-        E["Bronze<br/>Dados brutos"]
-        F["Silver<br/>Higienizados"]
-        G["Gold<br/>Dados consolidados"]
+        E["Bronze<br/>bruto, append-only"]
+        F["Silver<br/>tipado e deduplicado"]
+        G["Gold<br/>regra de negócio"]
     end
     A --> E
     B --> E
@@ -64,118 +91,93 @@ graph LR
     D --> E
     E --> F
     F --> G
-    G --> H["BI / Portal"]
+    G --> H["Portal e painéis"]
 ```
 
-## Estrutura do Repositório
+Decisões e o porquê de cada uma: [`docs/arquitetura/decisoes/`](docs/arquitetura/decisoes/) (30 ADRs). Visão geral:
+[`docs/arquitetura/visao-geral.md`](docs/arquitetura/visao-geral.md).
+
+## Estrutura do repositório
 
 ```
 alupdatalake/
-├── src/ # Código Python (conectores + core)
-├── definitions/          # Dataform: DDL Bronze, view Silver, tabela Gold (ADR 012)
-├── dags/ # vazio; orquestração da Onda 3 em Cloud Workflows (ADR 017)
-├── infra/ # Terraform (IaC GCP)
-├── tests/ # Testes pytest
-├── docs/ # Documentação do projeto
-└── .github/ # Templates, workflows CI/CD
+├── src/             # conectores (src/conectores/) e framework de ingestão (src/core/)
+├── definitions/     # Dataform: Bronze, Silver, Gold e asserções
+├── infra/           # Terraform de tudo que existe na GCP
+├── tests/           # pytest, unitários e de integração
+├── scripts/         # conferências, painel e ferramentas de apoio
+├── painel/          # dados do painel público de acompanhamento
+├── cloudbuild/      # CI no Cloud Build (ADR 030)
+├── certs/           # pacote público de CAs do RDS, usado pelo TLS verificado
+├── docs/            # contrato, arquitetura, runbooks, relatórios e planos
+└── .github/         # templates e workflows
 ```
 
-## Quick Start
+## Primeiros passos
 
 ```bash
-# Clone
 git clone https://github.com/nessenergy/alupdatalake.git
 cd alupdatalake
-
-# Setup Python
-uv sync
+uv sync --extra dev
 pre-commit install --hook-type pre-commit --hook-type commit-msg
 
-# Testes
 make test
-
-# Lint
 make lint
 
-# Terraform
-cd infra && terraform init -backend=false
-
-# Ingestão (o mesmo comando roda local e no Cloud Run Job, chamado pelo Workflows na Onda 3)
+# ingestão: o mesmo comando roda local e no Cloud Run Job
 uv run alupdata listar
 uv run alupdata ingerir ons_carga --de 2026-01-01 --ate 2026-01-31 --dry-run
 ```
 
-### Comandos do dia a dia
-
 | Comando | O quê |
 |---|---|
-| `make all` | lint + testes + Bandit + pip-audit — antes de todo PR |
+| `make all` | lint, testes, Bandit e pip-audit, antes de todo PR |
+| `make ci` | as etapas do CI, na ordem (ADR 030) |
+| `make componentes` | os 7 componentes de cada fonte registrada |
 | `make novo-conector fonte=X entidade=Y` | esqueleto dos 7 componentes |
-| `make dataform-compile` | compila o projeto Dataform de `definitions/`, sem credencial |
-| `make sync-skills` | atualiza as skills vendorizadas do Google |
-| `alupdata reprocessar-raw ...` | revalida um raw do GCS sem chamar novamente a fonte |
+| `make dataform-compile` | compila o Dataform sem credencial |
+| `alupdata reprocessar-raw ...` | revalida um bruto do GCS sem chamar a fonte de novo |
 
-## Conectores
+## Regras do projeto
 
-| Fonte | Onda | Entrega até | Tipo | Status |
-|-------|------|-------------|------|--------|
-| Câmbio BCB (PTAX) | 1 | 16/10/2026 | API pública | **Implementado; validado em dry-run** |
-| IBGE (IPCA) | 1 | 16/10/2026 | API pública | **Implementado; validado em dry-run** |
-| ANEEL (SIGA) | 1 | 16/10/2026 | API pública | **Implementado; validado em dry-run** — fonte de `codigo_usina` |
-| ONS (carga, EAR, ENA, geração, capacidade, disponibilidade e constrained-off eólico/fotovoltaico) | 1 | 16/10/2026 | Arquivo público | **Implementado; validado em dry-run** — fonte de `submercado`; geração e capacidade também preenchem `codigo_usina` (CEG) |
-| CCEE (InfoMercado) | 1 | 16/10/2026 | API Pública | **Implementado via dados abertos** — 11 entidades; acesso destravado em 14/09 ([ADR 018](docs/arquitetura/decisoes/018-vias-de-acesso-a-ccee.md)) |
-| CCEE (Credenciado) | 2 | 13/11/2026 | API Credenciada | Escopo candidato; demanda e cobertura a definir na [#22](https://github.com/nessenergy/Alupdatalake/issues/22); distinto da via pública |
-| BBCE | 2 | 13/11/2026 | API Credenciada | **Implementado** — PR #131; aguarda acesso e host (A7) |
-| Hubspot | 2 | 13/11/2026 | API Credenciada | **Implementado, não validado na API** — aguarda token A9 |
-| TempoOK | 2 | 13/11/2026 | API Credenciada | **Implementado; contrato verificado na API** — acervo alcançável até 26/10/2022; aguarda acervo recente (#129) |
-| Oracle FMB | 3 | 18/12/2026 | Banco Interno | Backlog |
-| Portal Alup | 3 | 18/12/2026 | Banco Interno | Backlog |
-| MySQL RDS | 3 | 18/12/2026 | Banco Interno | Backlog |
-| RM/TOTVS | 3 | 18/12/2026 | Sistema Interno | Backlog |
+As seis regras que não se negociam estão em [`AGENTS.md`](AGENTS.md) (que vale para qualquer agente de código, seja qual for a ferramenta):
 
-## Progresso por Onda
-
-Em **24/09/2026**, há **27 entidades implementadas** dentro do acompanhamento das
-**13 fontes contratuais**. A Alup liberou o GCP em 23/09, e o ambiente `dev` está
-provisionado, com Dataform e Portal no ar. **A carga real começou em 24/09**
-(BCB, ONS e a previsão de ENA do TempoOK); BBCE e Hubspot aguardam credencial.
-No mesmo dia, as **23 fontes públicas da Onda 1 carregaram em `dev` com
-`SUCESSO`**, zero inválidas. Nenhuma onda homologou ainda: o novo alvo é o
-dossiê conjunto das Ondas 0 e 1 em 29–30/09, com aceite em ~01/10.
-
-Detalhes e evidências em [docs/status.md](docs/status.md) e no
-[Project 2](https://github.com/orgs/nessenergy/projects/2).
+1. toda fonte entrega os 7 componentes;
+2. credencial só pelo Secret Manager;
+3. ingestão sempre por janela de datas;
+4. Bronze append-only, particionada e clusterizada, com a deduplicação na Silver;
+5. recurso GCP que não está em `infra/` não existe;
+6. nenhuma atribuição de ferramenta automatizada em commit, PR, issue ou documento.
 
 ## Segurança
 
 | Ferramenta | Função | Cláusula |
 |-----------|--------|----------|
-| Bandit | SAST — Análise estática de segurança | 8.4 |
-| pip-audit | SCA — Vulnerabilidades em dependências | 8.4 |
-| Gitleaks | Detecção de secrets no código | 8.5 |
-| Secret Manager | Gestão segura de credenciais GCP | 8.5 |
+| Bandit | SAST, análise estática de segurança | 8.4 |
+| pip-audit | SCA, vulnerabilidades em dependências | 8.4 |
+| Gitleaks | detecção de segredos no código e no histórico | 8.5 |
+| Secret Manager | gestão de credenciais na GCP | 8.5 |
 
-Detalhes: [docs/arquitetura/seguranca.md](docs/arquitetura/seguranca.md)
+Detalhes: [`docs/arquitetura/seguranca.md`](docs/arquitetura/seguranca.md). Política de divulgação: [`SECURITY.md`](SECURITY.md).
 
 ## Documentação
 
-- [Resumo do Contrato](docs/contrato/resumo-contrato.md)
-- [Arquitetura](docs/arquitetura/visao-geral.md)
-- [Segurança](docs/arquitetura/seguranca.md)
-- [Decisões (ADRs)](docs/arquitetura/decisoes/)
-- [Dicionário de Dados](docs/dicionario-dados/)
-- [Runbook](docs/runbook/)
-- [Onboarding](docs/onboarding.md)
-- [Como contribuir](CONTRIBUTING.md)
-- [Glossário](docs/glossario.md)
-- [Estado do projeto e pendências](docs/status.md)
-- [Interlocutores do projeto](docs/interlocutores.md)
-- [Plano de execução](docs/plano-execucao.md)
-- [Runbook de deploy](docs/runbook/deploy.md)
-- [Checklist do primeiro deploy](docs/runbook/primeiro-deploy.md)
-- [Contexto para agentes](AGENTS.md)
+| Assunto | Onde |
+|---|---|
+| Visão consolidada e relatório atual | [`docs/visao-consolidada.md`](docs/visao-consolidada.md) e [`docs/relatorios/`](docs/relatorios/) |
+| Guia de auditoria | [`docs/auditoria.md`](docs/auditoria.md) |
+| Estado, plano e fila de execução | [`docs/status.md`](docs/status.md), [`docs/plano-execucao.md`](docs/plano-execucao.md), [`docs/proximos-passos.md`](docs/proximos-passos.md) |
+| Contrato resumido | [`docs/contrato/resumo-contrato.md`](docs/contrato/resumo-contrato.md) |
+| Dicionário de dados e linhagem | [`docs/dicionario-dados/`](docs/dicionario-dados/README.md) |
+| Operação | [`docs/runbook/`](docs/runbook/) (deploy, incidentes, credenciais, conferência e sondas, rede) |
+| LGPD | [`docs/lgpd/`](docs/lgpd/) |
+| Interlocutores e responsabilidades | [`docs/interlocutores.md`](docs/interlocutores.md) e [`docs/raci.md`](docs/raci.md) |
+| Como contribuir | [`CONTRIBUTING.md`](CONTRIBUTING.md) e [`docs/onboarding.md`](docs/onboarding.md) |
+| Glossário | [`docs/glossario.md`](docs/glossario.md) |
+
+O acompanhamento diário da equipe acontece no canal Alup Datalake do Teams. O painel público de acompanhamento é gerado a partir de
+[`painel/marcos.toml`](painel/marcos.toml).
 
 ## Licença
 
-Propriétario — Desenvolvido sob contrato CPS-01025/2026 para o Grupo Alupar.
-
+Proprietário. Desenvolvido sob o contrato CPS-01025/2026 para o Grupo Alupar.

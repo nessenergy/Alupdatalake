@@ -17,6 +17,20 @@ Quando um item fecha, sai da fila ativa; os registros datados abaixo são
 históricos. As ações externas da seção 2 ficam com a coordenação da ness.,
 em acompanhamento com a Alup; sua execução não é presumida por esta revisão.
 
+> **Quadro de 22/10/2026.** O que está de fato aberto hoje, em ordem. O restante desta fila é histórico e foi superado em parte; o estado
+> atual está em [`status.md`](status.md) e em [`visao-consolidada.md`](visao-consolidada.md).
+>
+> | # | Item | Dono |
+> |---|---|---|
+> | 1 | Enviar à Alupar o formato do segredo do BBCE e pedir a credencial | Ricardo |
+> | 2 | Confirmar por escrito que o TempoOK saiu do escopo | Gabriel |
+> | 3 | Formato e envio das credenciais da ONS e da CCEE | Alupar |
+> | 4 | Esquema das duas bases MySQL, para escrever os conectores da Onda 3 | Alupar |
+> | 5 | Caminho de rede até o Oracle FMB via DCIDE (IP privado, VPC, aceite da sub-rede) | Thiago, Alupar |
+> | 6 | Endpoints e credencial do RM/TOTVS | Alupar |
+> | 7 | Pasta do Drive e planilhas modelo; escrever o leitor do Drive | Alupar, ness. |
+> | 8 | Reaplicar o bootstrap em dev (Cloud Build) e hml (log do contêiner) | Ricardo |
+> | 9 | Decidir a produção, o item 2.1 (CCEE credenciado) e os decks DECOMP e NEWAVE | Ricardo |
 ---
 
 ## 1. O que está travando tudo

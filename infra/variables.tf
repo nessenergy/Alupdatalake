@@ -144,6 +144,8 @@ variable "cicd" {
   type = object({
     repositorio_dono = string
     repositorio_nome = string
+    # client_id do GitHub App de leitura do CI (decisão D1); vazio mantém o PR sem a checagem de atribuição.
+    github_app_ci_client_id = optional(string, "")
   })
   default = null
 }

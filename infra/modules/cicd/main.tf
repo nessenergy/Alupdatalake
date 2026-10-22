@@ -36,6 +36,14 @@ variable "dataform_token_versao" {
   default     = "1"
 }
 
+# Checagem de atribuição no Cloud Build: o passo busca-main lê a main do repositório privado com o token de um
+# GitHub App (decisão D1). Vazio, o gatilho de PR segue com `cloudbuild/ci.yaml`, sem a checagem e sem segredo.
+variable "github_app_ci_client_id" {
+  description = "client_id do GitHub App de leitura do CI; vazio mantém o PR sem ci-atribuicao"
+  type        = string
+  default     = ""
+}
+
 resource "google_service_account" "ci" {
   project      = var.project_id
   account_id   = "alupdata-ci"
@@ -49,13 +57,51 @@ resource "google_project_iam_member" "ci_log" {
   member  = "serviceAccount:${google_service_account.ci.email}"
 }
 
+# Chave privada do GitHub App de leitura do CI. Contêiner vazio: o valor entra fora do Terraform (regra 2):
+#   gcloud secrets versions add alupdata-github-ci-app-key --data-file=chave.pem
+# Criado sempre; só o gatilho de PR o usa, e só com github_app_ci_client_id preenchido.
+resource "google_secret_manager_secret" "ci_app_key" {
+  secret_id = "alupdata-github-ci-app-key"
+  project   = var.project_id
+
+  # Réplica só na região do ambiente (ADR 011), como os outros segredos.
+  replication {
+    user_managed {
+      replicas {
+        location = var.regiao
+      }
+    }
+  }
+
+  labels = {
+    projeto  = "alupdata"
+    ambiente = var.ambiente
+  }
+}
+
+# Único segredo que a conta do CI lê.
+resource "google_secret_manager_secret_iam_member" "ci_le_chave_do_app" {
+  project   = var.project_id
+  secret_id = google_secret_manager_secret.ci_app_key.secret_id
+  role      = "roles/secretmanager.secretAccessor"
+  member    = "serviceAccount:${google_service_account.ci.email}"
+}
+
 # PR de quem não é dono só roda depois de um comentário de aprovação (o repositório é privado, mas a regra vale se mudar).
 resource "google_cloudbuild_trigger" "pr" {
   project         = var.project_id
   name            = "alupdata-ci-pr"
   description     = "CI de todo PR para a main (ADR 030)"
-  filename        = "cloudbuild/ci.yaml"
+  filename        = var.github_app_ci_client_id == "" ? "cloudbuild/ci.yaml" : "cloudbuild/ci-com-atribuicao.yaml"
   service_account = google_service_account.ci.id
+
+  # Sem client id: os alvos de hoje, sem ci-atribuicao. Com ele: o ci completo e o passo busca-main.
+  substitutions = var.github_app_ci_client_id == "" ? {
+    _ALVOS = "ci-lint ci-testes ci-sast ci-segredos ci-terraform ci-dataform ci-sca"
+    } : {
+    _ALVOS         = "ci"
+    _CLIENT_ID_APP = var.github_app_ci_client_id
+  }
 
   github {
     owner = var.repositorio_dono

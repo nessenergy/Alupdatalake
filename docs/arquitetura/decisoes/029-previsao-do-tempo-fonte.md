@@ -46,3 +46,9 @@ Alternativas avaliadas (leitura pública, da máquina de desenvolvimento, em 03/
   comercial é da Alup e do Ricardo.
 - A sonda e o workflow `Sondar rede` ficam como ferramenta para qualquer origem pública que passe a bloquear.
 - Risco: a Open-Meteo e o INMET podem mudar formato ou licença; esta ADR vale para 03/10/2026.
+
+## Adendo de 22/10/2026
+
+O CPTEC voltou a responder 200 (ver o adendo da [ADR 028](028-cptec-acesso.md)); vale a **saída A**: o conector `cptec_previsao` foi
+construído, com os 7 componentes, para as 27 capitais. É um retrato da previsão vigente, sem janela, e não traz precipitação em mm. As
+alternativas (INMET, Open-Meteo) seguem não adotadas.

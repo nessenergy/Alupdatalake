@@ -52,6 +52,7 @@ técnicos**. Bases reutilizáveis não entram nessa contagem. O contrato mantém
 | ANEEL — SIGA | [`aneel_siga.md`](aneel_siga.md) | 1 | **`codigo_usina`** | `parque_gerador` |
 | ACE Comercializadora — PRC | [`ace_prc.md`](ace_prc.md) | 1 | `submercado` | `prc_vigente_comercializadora` |
 | ANEEL — tarifas homologadas das distribuidoras | [`aneel_tarifas.md`](aneel_tarifas.md) | 1 | — | `tarifa_vigente_distribuidora` |
+| CPTEC — previsão do tempo por capital | [`cptec_previsao.md`](cptec_previsao.md) | 1 | — | `previsao_tempo_capitais` |
 | INMET — precipitação horária por estação | [`inmet_precipitacao.md`](inmet_precipitacao.md) | 1 | — | `precipitacao_diaria_estacao` |
 | ONS — contornos das bacias (CC-BY) | [`ons_bacia_contorno.md`](ons_bacia_contorno.md) | 1 | — | `precipitacao_diaria_estacao` (coluna `bacia`) |
 | ONS — geração horária por usina | [`ons_geracao_usina.md`](ons_geracao_usina.md) | 1 | `submercado`, `codigo_usina` | `geracao_mensal_usina_ons` |
@@ -87,6 +88,7 @@ nova; fonte sem entidade diz por quê.
 | ANEEL | 1 | `aneel_siga`, `aneel_tarifas` |
 | ACE Comercializadora (Alup) | 1 | `ace_prc` |
 | INMET | 1 | `inmet_precipitacao` |
+| CPTEC | 1 | `cptec_previsao` |
 | ONS | 1 | `ons_bacia_contorno`, `ons_carga`, `ons_demanda_maxima`, `ons_ear`, `ons_ena`, `ons_geracao_usina`, `ons_capacidade`, `ons_disponibilidade_usina`, `ons_restricao_coff_eolica`, `ons_restricao_coff_fotovoltaica` |
 | CCEE InfoMercado | 1 | `ccee_pld`, `ccee_perfil`, `ccee_agente`, `ccee_exposicao_financeira`, `ccee_contabilizacao_perfil`, `ccee_geracao_usina`, `ccee_contrato_montante`, `ccee_varejista_consumidor`, `ccee_encargo_ess`, `ccee_energia_reserva`, `ccee_cvu_estrutural` |
 | CCEE agente credenciado | 2 | nenhuma — depende de credencial de agente (item 2.1) |

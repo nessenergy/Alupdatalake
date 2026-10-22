@@ -21,6 +21,8 @@ dependencies = [
     "gunicorn>=23.0",
     "pyshp>=3.1.6",
     "defusedxml>=0.7.1",
+    # Assinatura RS256 do JWT do GitHub App (scripts/github_app_token.py).
+    "cryptography>=43",
 ]
 
 [project.optional-dependencies]

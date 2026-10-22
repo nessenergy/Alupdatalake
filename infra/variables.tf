@@ -146,8 +146,31 @@ variable "cicd" {
     repositorio_nome = string
     # client_id do GitHub App de leitura do CI (decisão D1); vazio mantém o PR sem a checagem de atribuição.
     github_app_ci_client_id = optional(string, "")
+    # client_id do GitHub App do quadro; vazio faz o agendado do quadro avisar e sair com sucesso.
+    github_app_quadro_client_id = optional(string, "")
+    # Agendados no Cloud Scheduler (Tarefa 7): cada um é opt-in. Atribuição e painel exigem github_app_ci_client_id.
+    agendados = optional(object({
+      sca        = optional(bool, false)
+      atribuicao = optional(bool, false)
+      quadro     = optional(bool, false)
+      painel     = optional(bool, false)
+    }), {})
   })
   default = null
+}
+
+variable "leitores_execucoes" {
+  description = <<-EOT
+    Quem lê as execuções deste ambiente (dataset bronze: `roles/bigquery.dataViewer`; projeto:
+    `roles/bigquery.jobUser`), como a conta do painel em hml. Membros no formato
+    serviceAccount:<e-mail> ou group:<e-mail>; vazio não concede.
+  EOT
+  type        = list(string)
+  default     = []
+  validation {
+    condition     = alltrue([for m in var.leitores_execucoes : can(regex("^(serviceAccount|group):[^[:space:]]+$", m))])
+    error_message = "Use só serviceAccount:<e-mail> ou group:<e-mail>."
+  }
 }
 
 variable "gestao_cicd" {

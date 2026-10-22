@@ -101,13 +101,13 @@ def test_script_de_ci_roda_make_e_nao_tem_credencial() -> None:
 def test_modulo_cicd_so_escreve_log_e_nao_roda_pr_de_fora_sem_aprovacao() -> None:
     modulo = _ler("infra/modules/cicd/main.tf")
     papeis = re.findall(r'role\s*=\s*"(roles/[^"]+)"', modulo)
-    assert papeis == ["roles/logging.logWriter", "roles/secretmanager.secretAccessor"], papeis
+    assert papeis[:2] == ["roles/logging.logWriter", "roles/secretmanager.secretAccessor"], papeis
     assert "COMMENTS_ENABLED_FOR_EXTERNAL_CONTRIBUTORS_ONLY" in modulo, (
         "PR de fora exige aprovação, mesmo com o repositório privado"
     )
     assert 'filename        = "cloudbuild/ci.yaml"' in modulo
     assert modulo.count("service_account") >= 2
-    assert modulo.count('resource "google_cloudbuild_trigger"') == 4, "pr, main, as operações (for_each) e o deploy"
+    assert modulo.count('resource "google_cloudbuild_trigger"') == 5, "pr, main, operações, deploy e agendados"
 
 
 def test_segredo_do_app_de_ci_e_lido_so_pela_conta_do_ci_e_o_gatilho_pr_escolhe_pelo_client_id() -> None:
@@ -334,3 +334,179 @@ def test_operar_sh_recusa_operacao_fora_da_lista(tmp_path: Path, operacao: str) 
     resultado = _rodar("cloudbuild/operar.sh", tmp_path, OPERACAO=operacao, PROJETO="proj")
     assert resultado.returncode == 1, resultado.stderr
     assert "OPERACAO inv" in resultado.stdout
+
+
+# --------------------------------------------------------------------------------------------------------------
+# Agendados (Tarefa 7): cada um com yaml e flag próprios.
+
+_AGENDADOS = {
+    "sca": ("0 11 * * 1", "node:22-bookworm"),
+    "atribuicao": ("0 11 * * *", "node:22-bookworm"),
+    "quadro": ("0 11 * * 1-5", "cloud-sdk"),
+    "painel": ("7 */3 * * *", "cloud-sdk"),
+}
+
+
+@pytest.mark.parametrize("tarefa", _AGENDADOS)
+def test_agendado_yaml_so_chama_o_script_com_tarefa_fixa(tarefa: str) -> None:
+    ag = yaml.safe_load(_ler(f"cloudbuild/agendado-{tarefa}.yaml"))
+    assert ag["options"]["logging"] == "CLOUD_LOGGING_ONLY"
+    (passo,) = ag["steps"]
+    assert passo["args"] == ["cloudbuild/agendado.sh"]
+    assert _AGENDADOS[tarefa][1] in passo["name"]
+    assert f"TAREFA={tarefa}" in passo["env"], "tarefa fixa no yaml, não por substituição"
+    assert "${_" not in " ".join(passo["args"]), "substituição é textual: dentro do shell seria injeção"
+
+
+def test_agendado_sca_nao_declara_segredo() -> None:
+    assert "availableSecrets" not in yaml.safe_load(_ler("cloudbuild/agendado-sca.yaml"))
+
+
+@pytest.mark.parametrize(
+    ("tarefa", "segredo"),
+    [
+        ("atribuicao", "alupdata-github-ci-app-key"),
+        ("painel", "alupdata-github-ci-app-key"),
+        ("quadro", "alupdata-github-quadro-app-key"),
+    ],
+)
+def test_agendado_com_token_le_o_segredo_certo_por_secretenv(tarefa: str, segredo: str) -> None:
+    ag = yaml.safe_load(_ler(f"cloudbuild/agendado-{tarefa}.yaml"))
+    assert ag["steps"][0]["secretEnv"] == ["CHAVE_APP"]
+    (s,) = ag["availableSecrets"]["secretManager"]
+    assert s["versionName"] == f"projects/$PROJECT_ID/secrets/{segredo}/versions/latest"
+    assert "CLIENT_ID_APP=${_CLIENT_ID_APP}" in ag["steps"][0]["env"]
+
+
+def test_agendado_painel_recebe_bucket_e_projetos_por_env() -> None:
+    ag = yaml.safe_load(_ler("cloudbuild/agendado-painel.yaml"))
+    env = " ".join(ag["steps"][0]["env"])
+    for nome in ("PAINEL_BUCKET", "PROJETO_DEV", "PROJETO_HML"):
+        assert f"{nome}=${{_" in env, nome
+        assert ag["substitutions"][f"_{nome}"] == "", "o valor vem do módulo, não do yaml"
+
+
+def test_agendado_sh_e_lf_valida_primeiro_e_nao_vaza_token() -> None:
+    script = _ler("cloudbuild/agendado.sh")
+    assert "\r" not in script and "set -euo pipefail" in script
+    assert "${_" not in script and "GITHUB_ACTIONS" not in script
+    assert not re.search(r"set\s+-\w*x", script)
+    assert not re.search(r"(echo|printf)[^\n]*\$\{?(TOKEN|CHAVE_APP|GH_TOKEN|GITHUB_TOKEN)", script)
+    assert script.index("sca|atribuicao|quadro|painel") < script.index("astral.sh")
+    for trecho in (
+        "ci-sca",
+        "test_verifica_atribuicao.py",
+        "verifica_atribuicao.py --github nessenergy/Alupdatalake",
+        "scripts.quadro --aplicar",
+        "organization_projects=write",
+        "--so-execucoes",
+        "scripts.painel_aditivo",
+        "gcloud storage cp",
+        "--cache-control=no-store",
+    ):
+        assert trecho in script, trecho
+
+
+@pytest.mark.skipif(_BASH is None, reason="precisa de bash")
+@pytest.mark.parametrize("tarefa", ["", "deploy", "sca; id", "painel "])
+def test_agendado_sh_recusa_tarefa_fora_da_lista(tmp_path: Path, tarefa: str) -> None:
+    r = _rodar("cloudbuild/agendado.sh", tmp_path, TAREFA=tarefa)
+    assert r.returncode == 1 and "TAREFA inv" in r.stdout
+
+
+@pytest.mark.skipif(_BASH is None, reason="precisa de bash")
+def test_agendado_quadro_sem_client_id_avisa_e_sai_com_sucesso(tmp_path: Path) -> None:
+    r = _rodar("cloudbuild/agendado.sh", tmp_path, TAREFA="quadro", CLIENT_ID_APP="", CHAVE_APP="k")
+    assert r.returncode == 0 and "sincronizado" in r.stdout
+
+
+@pytest.mark.skipif(_BASH is None, reason="precisa de bash")
+@pytest.mark.parametrize("tarefa", ["atribuicao", "painel"])
+def test_agendado_atribuicao_e_painel_exigem_client_id(tmp_path: Path, tarefa: str) -> None:
+    r = _rodar("cloudbuild/agendado.sh", tmp_path, TAREFA=tarefa, CLIENT_ID_APP="", CHAVE_APP="k")
+    assert r.returncode == 1 and "CLIENT_ID_APP" in r.stdout
+
+
+def _bloco(texto: str, inicio: str) -> str:
+    return texto[texto.index(inicio) :].split("\n}\n")[0]
+
+
+def test_agendados_desligados_por_padrao_nao_criam_gatilho_nem_scheduler() -> None:
+    modulo = _ler("infra/modules/cicd/main.tf")
+    assert re.search(
+        r'variable "agendados" \{.*?default\s*=\s*\{\s*sca\s*=\s*false\s*atribuicao\s*=\s*false\s*'
+        r"quadro\s*=\s*false\s*painel\s*=\s*false\s*\}",
+        modulo,
+        re.DOTALL,
+    )
+    for recurso in ("google_cloudbuild_trigger", "google_cloud_scheduler_job"):
+        assert re.search(r"for_each\s*=\s*local\.agendados_ligados", _bloco(modulo, f'resource "{recurso}" "agendado"'))
+    assert re.search(r"agendados_ligados\s*=\s*\{[^}]*if var\.agendados\[", modulo)
+    assert "agendados" not in _ler("infra/environments/dev.tfvars"), "dev não liga nenhum"
+    assert "agendados" not in _ler("infra/environments/hml.tfvars")
+    assert re.search(r"agendados\s*=\s*optional\(", _ler("infra/variables.tf"))
+    assert "var.cicd.agendados" in _ler("infra/main.tf")
+
+
+def test_agendados_gatilho_manual_e_scheduler_apontam_para_o_run_certo() -> None:
+    modulo = _ler("infra/modules/cicd/main.tf")
+    for tarefa, (cron, _) in _AGENDADOS.items():
+        assert f"cloudbuild/agendado-{tarefa}.yaml" in modulo, tarefa
+        assert re.search(rf'cron\s*=\s*"{re.escape(cron)}"', modulo), (tarefa, cron)
+    assert 'name = "alupdata-ag-${' in modulo or "alupdata-ag-" in modulo
+    gatilho = _bloco(modulo, 'resource "google_cloudbuild_trigger" "agendado"')
+    assert "github {" not in gatilho and "git_file_source" in gatilho and "source_to_build" in gatilho
+    sched = _bloco(modulo, 'resource "google_cloud_scheduler_job" "agendado"')
+    assert "https://cloudbuild.googleapis.com/v1/projects/${var.project_id}/locations/global/triggers/" in sched
+    assert ":run" in sched and "google_cloudbuild_trigger.agendado[each.key].name" in sched
+    assert 'http_method = "POST"' in sched
+    assert "oauth_token" in sched and "google_service_account.agendador.email" in sched
+    assert "branchName" in sched and "base64encode" in sched
+    assert 'time_zone = "Etc/UTC"' in sched
+
+
+def test_agendador_so_roda_gatilho_e_age_como_a_conta_do_gatilho() -> None:
+    modulo = _ler("infra/modules/cicd/main.tf")
+    assert 'account_id   = "alupdata-agendador"' in modulo
+    papeis = re.findall(r'role\s*=\s*"(roles/[^"]+)"', modulo)
+    assert "roles/cloudbuild.builds.editor" in papeis and "roles/iam.serviceAccountUser" in papeis
+    assert "roles/storage.objectAdmin" not in papeis, "o bucket é do projeto da ness., fora de infra/"
+    assert "roles/storage.objectAdmin" in modulo and "ness-painel-projetos-alupdata" in modulo, "documentado"
+
+
+def test_atribuicao_e_painel_exigem_client_id_do_app_de_leitura() -> None:
+    gatilho = _bloco(_ler("infra/modules/cicd/main.tf"), 'resource "google_cloudbuild_trigger" "agendado"')
+    assert "precondition" in gatilho
+    assert re.search(r'var\.github_app_ci_client_id\s*!=\s*""', gatilho)
+    assert "atribuicao" in gatilho and "painel" in gatilho
+
+
+def test_segredo_do_quadro_so_e_lido_pela_conta_do_ci_se_quadro_estiver_ligado() -> None:
+    modulo = _ler("infra/modules/cicd/main.tf")
+    bloco = _bloco(modulo, 'resource "google_secret_manager_secret_iam_member" "ci_le_chave_do_quadro"')
+    assert re.search(r"count\s*=\s*var\.agendados\.quadro\s*\?\s*1\s*:\s*0", bloco)
+    assert "roles/secretmanager.secretAccessor" in bloco and "google_service_account.ci.email" in bloco
+    assert "var.quadro_secret_id" in bloco
+    assert "module.secrets.quadro_app_key_secret_id" in _ler("infra/main.tf")
+
+
+def test_conta_do_painel_so_existe_com_painel_ligado_e_le_dev() -> None:
+    modulo = _ler("infra/modules/cicd/main.tf")
+    assert 'account_id   = "alupdata-painel"' in modulo
+    conta = _bloco(modulo, 'resource "google_service_account" "painel"')
+    assert re.search(r"count\s*=\s*var\.agendados\.painel\s*\?\s*1\s*:\s*0", conta)
+    assert "roles/bigquery.jobUser" in modulo and "roles/bigquery.dataViewer" in modulo
+    assert "var.dataset_bronze" in modulo
+    assert "google_secret_manager_secret.ci_app_key.secret_id" in _bloco(
+        modulo, 'resource "google_secret_manager_secret_iam_member" "painel_le_chave_do_app"'
+    )
+
+
+def test_leitores_execucoes_dao_leitura_do_bronze_e_job_user_sem_valor_em_hml() -> None:
+    variavel = _ler("infra/variables.tf")
+    assert re.search(r'variable "leitores_execucoes" \{.*?default\s*=\s*\[\]', variavel, re.DOTALL)
+    principal = _ler("infra/main.tf")
+    i = principal.index("var.leitores_execucoes")
+    trecho = principal[i - 600 : i + 900]
+    assert "roles/bigquery.dataViewer" in trecho and "roles/bigquery.jobUser" in trecho
+    assert "leitores_execucoes" not in _ler("infra/environments/hml.tfvars"), "hml adiado"

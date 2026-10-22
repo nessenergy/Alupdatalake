@@ -207,3 +207,222 @@ resource "google_cloudbuild_trigger" "deploy" {
     repo_type = "GITHUB"
   }
 }
+
+# ---------------------------------------------------------------------------------------------- agendados
+# Agendados (ADR 030, Tarefa 7): SCA, atribuição, quadro e painel saem do GitHub Actions. Cada um tem o próprio
+# yaml (cloudbuild/agendado-<tarefa>.yaml), um gatilho manual `alupdata-ag-<tarefa>` e um job do Cloud Scheduler
+# que o dispara pela API (`triggers/<nome>:run`). Tudo é opt-in por tarefa e vem desligado: um agendado cujo
+# segredo ainda não tem versão derrubaria o build, e o Scheduler só geraria falha diária.
+#
+# Pré-requisitos humanos, por tarefa:
+#   atribuicao e painel: `github_app_ci_client_id` preenchido e versão do segredo alupdata-github-ci-app-key (D1).
+#   quadro: `github_app_quadro_client_id` e versão do segredo alupdata-github-quadro-app-key.
+#   painel: a ness. concede `roles/storage.objectAdmin` sobre o bucket ness-painel-projetos-alupdata à conta
+#     alupdata-painel (D2); o projeto da ness. está fora deste infra/. Em hml, a conta entra na variável raiz
+#     `leitores_execucoes`.
+variable "agendados" {
+  description = "Liga cada tarefa agendada (gatilho e Scheduler); tudo desligado por padrão"
+  type = object({
+    sca        = bool
+    atribuicao = bool
+    quadro     = bool
+    painel     = bool
+  })
+  default = {
+    sca        = false
+    atribuicao = false
+    quadro     = false
+    painel     = false
+  }
+}
+variable "github_app_quadro_client_id" {
+  description = "client_id do GitHub App do quadro; vazio faz o agendado do quadro avisar e sair com sucesso"
+  type        = string
+  default     = ""
+}
+variable "quadro_secret_id" {
+  description = "Id do segredo da chave do App do quadro (módulo secrets)"
+  type        = string
+  default     = "alupdata-github-quadro-app-key"
+}
+variable "dataset_bronze" {
+  description = "Dataset bronze do projeto, que a conta do painel lê"
+  type        = string
+  default     = "bronze"
+}
+variable "painel_bucket" {
+  description = "Bucket do painel, no projeto da ness."
+  type        = string
+  default     = "ness-painel-projetos-alupdata"
+}
+variable "projeto_hml" {
+  description = "Projeto de hml que o painel lê"
+  type        = string
+  default     = "alupar-hm-alupdata"
+}
+
+resource "google_service_account" "agendador" {
+  project      = var.project_id
+  account_id   = "alupdata-agendador"
+  display_name = "Cloud Scheduler dos agendados do AlupData"
+}
+
+locals {
+  agendados_def = {
+    sca = {
+      cron          = "0 11 * * 1"
+      arquivo       = "cloudbuild/agendado-sca.yaml"
+      conta         = "ci"
+      substitutions = tomap({})
+    }
+    atribuicao = {
+      cron          = "0 11 * * *"
+      arquivo       = "cloudbuild/agendado-atribuicao.yaml"
+      conta         = "ci"
+      substitutions = tomap({ _CLIENT_ID_APP = var.github_app_ci_client_id })
+    }
+    quadro = {
+      cron          = "0 11 * * 1-5"
+      arquivo       = "cloudbuild/agendado-quadro.yaml"
+      conta         = "ci"
+      substitutions = tomap({ _CLIENT_ID_APP = var.github_app_quadro_client_id })
+    }
+    painel = {
+      cron    = "7 */3 * * *"
+      arquivo = "cloudbuild/agendado-painel.yaml"
+      conta   = "painel"
+      substitutions = tomap({
+        _CLIENT_ID_APP = var.github_app_ci_client_id
+        _PAINEL_BUCKET = var.painel_bucket
+        _PROJETO_DEV   = var.project_id
+        _PROJETO_HML   = var.projeto_hml
+      })
+    }
+  }
+  agendados_ligados = { for k, v in local.agendados_def : k => v if var.agendados[k] }
+}
+
+# Só roda gatilho. `builds.editor` é o menor papel predefinido com `cloudbuild.builds.create`, que o `:run` exige.
+resource "google_project_iam_member" "agendador_roda_gatilho" {
+  count = length(local.agendados_ligados) > 0 ? 1 : 0
+
+  project = var.project_id
+  role    = "roles/cloudbuild.builds.editor"
+  member  = "serviceAccount:${google_service_account.agendador.email}"
+}
+
+# Disparar gatilho com conta própria exige agir como essa conta.
+resource "google_service_account_iam_member" "agendador_age_como" {
+  for_each = toset([for k, v in local.agendados_ligados : v.conta])
+
+  service_account_id = each.value == "painel" ? google_service_account.painel[0].id : google_service_account.ci.id
+  role               = "roles/iam.serviceAccountUser"
+  member             = "serviceAccount:${google_service_account.agendador.email}"
+}
+
+# A conta do CI só lê o segredo do quadro se o agendado do quadro estiver ligado.
+resource "google_secret_manager_secret_iam_member" "ci_le_chave_do_quadro" {
+  count = var.agendados.quadro ? 1 : 0
+
+  project   = var.project_id
+  secret_id = var.quadro_secret_id
+  role      = "roles/secretmanager.secretAccessor"
+  member    = "serviceAccount:${google_service_account.ci.email}"
+}
+
+# Conta própria do painel: lê metadado de execução de dev e o segredo do App de leitura. Escrita no bucket do
+# painel não está aqui (projeto da ness.): ver o cabeçalho desta seção.
+resource "google_service_account" "painel" {
+  count = var.agendados.painel ? 1 : 0
+
+  project      = var.project_id
+  account_id   = "alupdata-painel"
+  display_name = "Painel do AlupData no Cloud Build"
+}
+
+resource "google_project_iam_member" "painel" {
+  for_each = var.agendados.painel ? toset(["roles/logging.logWriter", "roles/bigquery.jobUser", "roles/run.viewer"]) : toset([])
+
+  project = var.project_id
+  role    = each.value
+  member  = "serviceAccount:${google_service_account.painel[0].email}"
+}
+
+resource "google_bigquery_dataset_iam_member" "painel_le_bronze" {
+  count = var.agendados.painel ? 1 : 0
+
+  project    = var.project_id
+  dataset_id = var.dataset_bronze
+  role       = "roles/bigquery.dataViewer"
+  member     = "serviceAccount:${google_service_account.painel[0].email}"
+}
+
+resource "google_secret_manager_secret_iam_member" "painel_le_chave_do_app" {
+  count = var.agendados.painel ? 1 : 0
+
+  project   = var.project_id
+  secret_id = google_secret_manager_secret.ci_app_key.secret_id
+  role      = "roles/secretmanager.secretAccessor"
+  member    = "serviceAccount:${google_service_account.painel[0].email}"
+}
+
+resource "google_cloudbuild_trigger" "agendado" {
+  for_each = local.agendados_ligados
+
+  project         = var.project_id
+  name            = "alupdata-ag-${each.key}"
+  description     = "Agendado ${each.key} (ADR 030): disparado pelo Cloud Scheduler, ou gcloud builds triggers run alupdata-ag-${each.key} --branch=main"
+  service_account = each.value.conta == "painel" ? google_service_account.painel[0].id : google_service_account.ci.id
+  filename        = each.value.arquivo
+  substitutions   = each.value.substitutions
+
+  source_to_build {
+    uri       = local.repositorio_uri
+    ref       = "refs/heads/main"
+    repo_type = "GITHUB"
+  }
+  git_file_source {
+    path      = each.value.arquivo
+    uri       = local.repositorio_uri
+    revision  = "refs/heads/main"
+    repo_type = "GITHUB"
+  }
+
+  lifecycle {
+    # Atribuição e painel usam o token do App de leitura do CI; sem client id o build falharia todo dia.
+    precondition {
+      condition     = !contains(["atribuicao", "painel"], each.key) || var.github_app_ci_client_id != ""
+      error_message = "Os agendados atribuicao e painel exigem github_app_ci_client_id preenchido (decisão D1)."
+    }
+  }
+
+  depends_on = [google_project_iam_member.painel]
+}
+
+resource "google_cloud_scheduler_job" "agendado" {
+  for_each = local.agendados_ligados
+
+  project   = var.project_id
+  region    = var.regiao
+  name      = "alupdata-ag-${each.key}"
+  schedule  = each.value.cron
+  time_zone = "Etc/UTC"
+
+  # Sem nova tentativa: um build repetido em cima de outro só duplicaria o efeito (comentário, publicação).
+  retry_config {
+    retry_count = 0
+  }
+
+  http_target {
+    http_method = "POST"
+    uri         = "https://cloudbuild.googleapis.com/v1/projects/${var.project_id}/locations/global/triggers/${google_cloudbuild_trigger.agendado[each.key].name}:run"
+    headers     = { "Content-Type" = "application/json" }
+    body        = base64encode(jsonencode({ source = { branchName = "main" } }))
+
+    oauth_token {
+      service_account_email = google_service_account.agendador.email
+    }
+  }
+
+  depends_on = [google_project_iam_member.agendador_roda_gatilho]
+}

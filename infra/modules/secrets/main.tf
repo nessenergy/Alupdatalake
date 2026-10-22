@@ -96,6 +96,11 @@ resource "google_secret_manager_secret_iam_member" "github_le_chave_quadro" {
   member    = "serviceAccount:${var.github_service_account}"
 }
 
+output "quadro_app_key_secret_id" {
+  description = "Id do segredo da chave do GitHub App do quadro"
+  value       = google_secret_manager_secret.quadro_app_key.secret_id
+}
+
 output "secret_ids" {
   description = "Ids dos secrets criados"
   value       = [for s in google_secret_manager_secret.fonte : s.secret_id]

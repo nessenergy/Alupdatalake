@@ -1,0 +1,22 @@
+# Agendado da varredura de atribuição (ADR 030, regra 6): equivale ao atribuicao.yml. Usa o token de leitura do
+# GitHub App do CI (decisão D1); só entra em uso com `github_app_ci_client_id` e uma versão do segredo gravadas,
+# porque `availableSecrets` sem versão derruba o build inteiro.
+steps:
+  - id: agendado
+    name: node:22-bookworm
+    entrypoint: bash
+    secretEnv: [CHAVE_APP]
+    args: ["cloudbuild/agendado.sh"]
+    env:
+      - "TAREFA=atribuicao"
+      - "CLIENT_ID_APP=${_CLIENT_ID_APP}"
+availableSecrets:
+  secretManager:
+    - versionName: projects/$PROJECT_ID/secrets/alupdata-github-ci-app-key/versions/latest
+      env: CHAVE_APP
+substitutions:
+  _CLIENT_ID_APP: ""
+options:
+  # Conta de serviço própria exige log no Cloud Logging (ou num bucket); sem isso o build é recusado.
+  logging: CLOUD_LOGGING_ONLY
+timeout: 1800s

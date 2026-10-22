@@ -13,6 +13,7 @@ export PATH="$HOME/.local/bin:$PATH"
 
 TOKEN="$(uv run --no-project --with cryptography --with requests \
   python -m scripts.github_app_token --dono nessenergy --permissao contents=read)"
+if [ -z "$TOKEN" ]; then echo "token do GitHub App vazio: confira o client id, a chave e a instalação do App"; exit 1; fi
 REPO="https://x-access-token:${TOKEN}@github.com/nessenergy/Alupdatalake.git"
 
 # Filtra o token de qualquer mensagem do git.

@@ -95,7 +95,8 @@ def executar_job(
             ["gcloud", "run", "jobs", "executions", "list", "--job", job, "--project", projeto]
             + ["--region", regiao, "--limit", "1", "--format=value(name)"]
         )
-        execucao = listagem.strip()
+        candidata = listagem.strip()
+        execucao = candidata if re.fullmatch(r"[a-zA-Z0-9-]+", candidata) else ""
     if execucao:
         filtro = (
             f'resource.type="cloud_run_job" AND resource.labels.job_name="{job}" '

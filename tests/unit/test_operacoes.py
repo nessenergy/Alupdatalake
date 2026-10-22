@@ -201,3 +201,16 @@ def test_main_projeto_invalido_devolve_1_sem_chamar_o_executor() -> None:
 
     assert main(argv, executor=_executor_falso(chamadas)) == 1
     assert chamadas == []
+
+
+def test_listagem_com_lixo_nao_vira_filtro_do_logging() -> None:
+    chamadas: list[list[str]] = []
+
+    def executor(cmd: list[str]) -> tuple[int, str]:
+        chamadas.append(cmd)
+        if cmd[:5] == ["gcloud", "run", "jobs", "executions", "list"]:
+            return 0, 'x" OR severity>=ERROR\n'
+        return 1, "The execution failed"
+
+    assert executar_job("teste-conexao-fmb", [], "p", "r", executor=executor, listar_execucao=True) == 1
+    assert len(chamadas) == 2, "sem nome de execução válido não consulta o logging"

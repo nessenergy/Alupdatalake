@@ -71,3 +71,12 @@ def test_troca_o_jwt_por_token_com_so_as_permissoes_pedidas(chave) -> None:
     assert url_post == "https://api.github.com/app/installations/42/access_tokens"
     assert kw_post["json"] == {"permissions": {"contents": "read"}}
     assert kw_post["headers"]["Authorization"].startswith("Bearer ")
+
+
+def test_permissao_sem_igual_da_mensagem_clara_e_sai_com_2(capsys: pytest.CaptureFixture[str]) -> None:
+    from scripts.github_app_token import main
+
+    with pytest.raises(SystemExit) as saida:
+        main(["--dono", "x", "--permissao", "contents"])
+    assert saida.value.code == 2
+    assert "nome=nivel" in capsys.readouterr().err

@@ -65,6 +65,9 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--dono", required=True)
     parser.add_argument("--permissao", action="append", required=True, help="nome=nivel, ex.: contents=read")
     args = parser.parse_args(argv)
+    invalidas = [item for item in args.permissao if "=" not in item]
+    if invalidas:
+        parser.error(f"--permissao precisa de nome=nivel (ex.: contents=read); recebi: {', '.join(invalidas)}")
     permissoes = dict(item.split("=", 1) for item in args.permissao)
     print(token_de_instalacao(os.environ["CLIENT_ID_APP"], os.environ["CHAVE_APP"].encode(), args.dono, permissoes))
     return 0

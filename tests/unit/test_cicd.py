@@ -219,3 +219,34 @@ def test_modulo_connectors_nao_toca_no_terraform_e_infra_nao_constroi_imagem(tmp
 def test_deploy_exige_conta_de_deploy(tmp_path: Path) -> None:
     r = _rodar("cloudbuild/deploy.sh", tmp_path, CONTA_DEPLOY="")
     assert r.returncode == 1 and "CONTA_DEPLOY" in r.stdout
+
+
+def test_operar_yaml_so_chama_o_script_e_passa_tudo_por_env() -> None:
+    operar = yaml.safe_load(_ler("cloudbuild/operar.yaml"))
+    assert operar["options"]["logging"] == "CLOUD_LOGGING_ONLY"
+    (passo,) = operar["steps"]
+    assert passo["args"] == ["cloudbuild/operar.sh"]
+    assert "cloud-sdk" in passo["name"]
+    assert "${_" not in " ".join(passo["args"]), "substituição é textual: dentro do shell seria injeção"
+    env = " ".join(passo["env"])
+    for nome in ("OPERACAO", "REGIAO", "CONECTOR", "DE", "ATE", "URI", "FONTE", "SONDA"):
+        assert f"{nome}=${{_" in env, nome
+    assert "PROJETO=${PROJECT_ID}" in env
+    for sub in ("_OPERACAO", "_REGIAO", "_CONECTOR", "_DE", "_ATE", "_URI", "_FONTE", "_SONDA"):
+        assert sub in operar["substitutions"], sub
+
+
+def test_operar_sh_valida_a_operacao_antes_de_instalar_qualquer_coisa() -> None:
+    script = _ler("cloudbuild/operar.sh")
+    assert "set -euo pipefail" in script
+    assert "${_" not in script and "GITHUB_" not in script
+    assert script.index("executar-ingestao|conferir-cargas|sondar-rede|testar-conexao") < script.index("astral.sh")
+    assert "scripts.operacoes" in script
+
+
+@pytest.mark.skipif(_BASH is None, reason="precisa de bash")
+@pytest.mark.parametrize("operacao", ["", "deploy", "executar-ingestao; id", "sondar-rede "])
+def test_operar_sh_recusa_operacao_fora_da_lista(tmp_path: Path, operacao: str) -> None:
+    resultado = _rodar("cloudbuild/operar.sh", tmp_path, OPERACAO=operacao, PROJETO="proj")
+    assert resultado.returncode == 1, resultado.stderr
+    assert "OPERACAO inv" in resultado.stdout

@@ -6,13 +6,22 @@ Para quem opera o lake depois do handoff. Cobre três ferramentas de **leitura**
 
 **Para quê.** Dizer, sem `gcloud auth` pessoal, o que há no BigQuery de um ambiente: contagens e datas das Silver e Gold, a última execução de cada conector, a saúde da ingestão e o último erro.
 
-**Como rodar.** Aba **Actions → Conferir cargas → Run workflow**, escolhendo o ambiente (`dev`, `hml` ou `prod`). Ou:
+**Como rodar.** Gatilho do Cloud Build `alupdata-op-conferir-cargas`; o ambiente é o do projeto (`dev`, `hml` ou `prod`):
 
 ```bash
-gh workflow run "Conferir cargas" -f environment=hml
+gcloud builds triggers run alupdata-op-conferir-cargas --project=<projeto> --branch=main
 ```
 
-O resultado sai no **Summary** da execução, uma seção por conjunto. A única entrada é o ambiente. O workflow roda com a conta de deploy e só executa `SELECT` ou `WITH`; o código recusa qualquer outro comando. Tabela que não existe no ambiente aparece como `ausente`, e o resto continua.
+Sem substituições.
+
+Quem dispara precisa estar no grupo `operacao-datalake`, que tem
+`roles/cloudbuild.builds.editor` no projeto e `roles/iam.serviceAccountUser` na conta de deploy
+(o build roda como ela). O projeto escolhe o ambiente: use o projeto do `dev`, `hml` ou `prod`.
+
+> Transição: até a Tarefa 9 desligar o GitHub Actions, o caminho antigo (`gh workflow run ...`)
+> continua valendo em paralelo. Depois dela, só o gatilho do Cloud Build.
+
+O resultado sai no log do build, uma seção por conjunto. O build roda com a conta de deploy e só executa `SELECT` ou `WITH`; o código recusa qualquer outro comando. Tabela que não existe no ambiente aparece como `ausente`, e o resto continua.
 
 **Itens e como lê-los** (definidos em `scripts/conferir_cargas.py`):
 
@@ -34,13 +43,20 @@ O resultado sai no **Summary** da execução, uma seção por conjunto. A única
 | `FALHA_RECENTE` | houve erro depois do último sucesso |
 | `SEM_SUCESSO` | a fonte nunca teve sucesso |
 
-**O que NÃO fazer.** Não use este workflow para "consertar" nada: ele não escreve. Para recarregar, use `Executar ingestão` (`incidentes.md` §4). Se o item `saude_fora_do_ok` não existir no resumo, a `main` do ambiente é anterior ao PR #385.
+**O que NÃO fazer.** Não use este gatilho para "consertar" nada: ele não escreve. Para recarregar, use o gatilho `alupdata-op-executar-ingestao` (`incidentes.md` §4). Se o item `saude_fora_do_ok` não existir no resumo, a `main` do ambiente é anterior ao PR #385.
 
 ## 2. Sondar rede
 
 **Para quê.** Saber o que uma URL pública responde **de dentro do GCP**, para separar bloqueio do IP da máquina de desenvolvimento de bloqueio da origem. Foi assim que se verificou que o CPTEC devolve 403 também de dentro do GCP (ADR 029).
 
-**Como rodar.** **Actions → Sondar rede**, com o ambiente e a sonda:
+**Como rodar.** Gatilho `alupdata-op-sondar-rede`, com a sonda em `_SONDA` (o ambiente é o do projeto):
+
+```bash
+gcloud builds triggers run alupdata-op-sondar-rede --project=<projeto> --branch=main \
+  --substitutions=_SONDA=cptec
+```
+
+Papel necessário e transição para o Actions: os mesmos do gatilho de conferência (§1). Sondas aceitas:
 
 | Sonda | O que chama |
 |---|---|
@@ -50,11 +66,11 @@ O resultado sai no **Summary** da execução, uma seção por conjunto. A única
 
 A lista é fixa em `src/core/sonda.py` (`SONDAS`). **Não aceita URL livre**, de propósito.
 
-**Como funciona.** O workflow executa o Cloud Run Job `ingestao-bcb-cambio-ptax` com o argumento `sondar <nome>`. O job grava o resultado em `gs://<projeto>-raw/sondas/<nome>/<UTC>.json`, e o workflow lê esse arquivo e o mostra no Summary. A conta de deploy **não lê o Cloud Logging**, por isso o resultado vai ao bucket.
+**Como funciona.** O build executa o Cloud Run Job `ingestao-bcb-cambio-ptax` com o argumento `sondar <nome>`. O job grava o resultado em `gs://<projeto>-raw/sondas/<nome>/<UTC>.json`, e o build lê esse arquivo e o mostra no log. A conta de deploy **não lê o Cloud Logging**, por isso o resultado vai ao bucket.
 
 **Como interpretar.** Cada URL traz o status HTTP ou o erro de rede. 200 com corpo é fonte acessível. 403 é bloqueio da origem. Erro de DNS ou de conexão é rede.
 
-**O que NÃO fazer.** Não adicione sonda de URL que carregue credencial. O job sai sempre com código 0: um resultado ruim não derruba o workflow, ele só aparece no resumo.
+**O que NÃO fazer.** Não adicione sonda de URL que carregue credencial. O job sai sempre com código 0: um resultado ruim não derruba o build, ele só aparece no log.
 
 ## 3. Ler `origem_indisponivel`
 

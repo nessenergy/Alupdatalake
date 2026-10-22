@@ -1,7 +1,31 @@
-# Alvo dos gatilhos de operação (ADR 030). Implementação real na Tarefa 6; até lá falha alto.
+# Alvo dos gatilhos de operação (ADR 030). O arquivo só chama o script; a lógica e a validação estão em
+# cloudbuild/operar.sh. Toda substituição entra por env:, nunca no texto do shell (a substituição é textual).
 steps:
-  - name: gcr.io/cloud-builders/gcloud
+  - id: operar
+    name: gcr.io/google.com/cloudsdktool/cloud-sdk:stable
     entrypoint: bash
-    args: ["-c", "echo 'operar.yaml: implementado na Tarefa 6'; exit 1"]
+    args: ["cloudbuild/operar.sh"]
+    env:
+      - "OPERACAO=${_OPERACAO}"
+      - "PROJETO=${PROJECT_ID}"
+      - "REGIAO=${_REGIAO}"
+      - "CONECTOR=${_CONECTOR}"
+      - "DE=${_DE}"
+      - "ATE=${_ATE}"
+      - "URI=${_URI}"
+      - "FONTE=${_FONTE}"
+      - "SONDA=${_SONDA}"
 options:
+  # Conta de serviço própria exige log no Cloud Logging (ou num bucket); sem isso o build é recusado.
   logging: CLOUD_LOGGING_ONLY
+timeout: 3300s
+# Defaults vazios: o gatilho de cada operação só passa o que ela usa.
+substitutions:
+  _OPERACAO: ""
+  _REGIAO: us-east1
+  _CONECTOR: ""
+  _DE: ""
+  _ATE: ""
+  _URI: ""
+  _FONTE: ""
+  _SONDA: ""

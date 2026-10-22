@@ -228,45 +228,59 @@ O replay cria uma nova execução com `modo=REPLAY` e preenche
 `origem_ingestao_id`. A janela é obrigatória porque os objetos raw gravados até
 esta versão não carregam a data final no próprio arquivo.
 
-### No GCP: workflow `Executar ingestão`
+### No GCP: gatilho `alupdata-op-executar-ingestao`
 
 Os comandos acima rodam a CLI local. No ambiente, pessoa não executa Cloud Run
-Job — só a SA de deploy tem `run.jobs.run`. O disparo à mão é pelo workflow
-`Executar ingestão`, que roda o job com a SA de deploy e deixa no GitHub quem
-disparou, qual conector e com que janela:
+Job — só a SA de deploy tem `run.jobs.run`. O disparo à mão é pelo gatilho do
+Cloud Build `alupdata-op-executar-ingestao`, que roda o job com a SA de deploy e
+deixa no histórico do Cloud Build quem disparou, qual conector e com que janela:
 
 ```bash
 # janela do agendamento
-gh workflow run "Executar ingestão" -f environment=dev -f conector=ons_carga
+gcloud builds triggers run alupdata-op-executar-ingestao --project=<projeto> --branch=main \
+  --substitutions=_CONECTOR=ons_carga
 # janela explícita
-gh workflow run "Executar ingestão" -f environment=dev -f conector=ons_carga \
-  -f de=2026-01-01 -f ate=2026-01-31
+gcloud builds triggers run alupdata-op-executar-ingestao --project=<projeto> --branch=main \
+  --substitutions=_CONECTOR=ons_carga,_DE=2026-01-01,_ATE=2026-01-31
 # replay de um raw, com a janela original
-gh workflow run "Executar ingestão" -f environment=dev -f conector=bcb_cambio_ptax \
-  -f uri=gs://<bucket>/bcb/cambio_ptax/dt=2026-01-01/<ingestao_id>.json.gz \
-  -f de=2026-01-01 -f ate=2026-01-31
+gcloud builds triggers run alupdata-op-executar-ingestao --project=<projeto> --branch=main \
+  --substitutions=_CONECTOR=bcb_cambio_ptax,_URI=gs://<bucket>/bcb/cambio_ptax/dt=2026-01-01/<ingestao_id>.json.gz,_DE=2026-01-01,_ATE=2026-01-31
 ```
 
-O workflow valida o conector (snake_case), as datas (`AAAA-MM-DD`, as duas ou
+| Substituição | Obrigatória | Valor |
+|---|---|---|
+| `_CONECTOR` | sim | rótulo em snake_case, como `ons_carga` |
+| `_DE`, `_ATE` | não | `AAAA-MM-DD`, as duas ou nenhuma; vazio usa a janela do agendamento |
+| `_URI` | não | replay: objeto `gs://` do raw; exige a janela original em `_DE` e `_ATE` |
+
+Quem dispara precisa estar no grupo `operacao-datalake`, que tem
+`roles/cloudbuild.builds.editor` no projeto e `roles/iam.serviceAccountUser` na conta de deploy
+(o build roda como ela). O projeto escolhe o ambiente: use o projeto do `dev`, `hml` ou `prod`.
+
+> Transição: até a Tarefa 9 desligar o GitHub Actions, o caminho antigo (`gh workflow run ...`)
+> continua valendo em paralelo. Depois dela, só o gatilho do Cloud Build.
+
+O gatilho valida o conector (snake_case), as datas (`AAAA-MM-DD`, as duas ou
 nenhuma) e a URI antes de chamar o GCP, e espera a execução terminar. O
 resultado fica em `bronze._execucoes`.
 
-### No GCP: workflow `Conferir cargas`
+### No GCP: gatilho `alupdata-op-conferir-cargas`
 
-Para conferir as cargas sem `gcloud auth` pessoal, o workflow `Conferir cargas`
+Para conferir as cargas sem `gcloud auth` pessoal, o gatilho `alupdata-op-conferir-cargas`
 roda, com a SA de deploy, um conjunto fixo de consultas versionadas em
 `scripts/conferir_cargas.py`: contagens e datas das Silver e Gold da Onda 1 e do
 Aditivo 01, a última execução de cada conector em `bronze._execucoes`, a saúde
 da ingestão e o cruzamento das bacias com o EAR.
 
 ```bash
-gh workflow run "Conferir cargas" -f environment=hml
+gcloud builds triggers run alupdata-op-conferir-cargas --project=<projeto> --branch=main
 ```
 
-O resultado fica no resumo da execução (aba Summary do run no GitHub), com uma
-seção por conjunto; tabela inexistente no ambiente sai como `ausente`. É
-somente leitura (só `SELECT`/`WITH`, nada é escrito ou criado), e a única
-entrada é o ambiente.
+Sem substituições: o ambiente é o do projeto escolhido. O resultado fica no log do
+build (console do Cloud Build ou `gcloud builds log <id> --project=<projeto>`), com
+uma seção por conjunto; tabela inexistente no ambiente sai como `ausente`. É
+somente leitura (só `SELECT`/`WITH`, nada é escrito ou criado). Papel necessário e
+transição para o Actions: os mesmos do gatilho `alupdata-op-executar-ingestao`, acima.
 
 ## Segredos
 

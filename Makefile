@@ -111,4 +111,5 @@ ci-dataform: ci-deps
 
 ci-sca: ci-deps
 	uv export --no-emit-project --no-hashes --extra dev -o .requirements.txt -q
-	uv run pip-audit --strict --desc -r .requirements.txt
+	# --no-deps --disable-pip: o export já fixa todas as versões; sem isso o pip-audit cria um venv com ensurepip, que quebra no Python do uv
+	uv run pip-audit --strict --desc --no-deps --disable-pip -r .requirements.txt

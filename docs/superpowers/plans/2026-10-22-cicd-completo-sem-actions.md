@@ -16,8 +16,10 @@
 |---|---|
 | Alvos `make ci-*` e `cloudbuild/ci.yaml` | feito |
 | Gatilhos de PR e de push na `main` (`infra/modules/cicd`, só em dev) | **no ar e verdes** desde o PR #408: lint, testes, SAST, segredos, Terraform, Dataform e SCA |
-| Checagem de atribuição (regra 6) no Cloud Build | **fora**: o build não tem credencial para buscar a `main` do repositório privado |
-| Deploy, operações, agendados | só no Actions |
+| Checagem de atribuição (regra 6) no Cloud Build | implementada (`ci-com-atribuicao.yaml`, `busca-main.sh`); pendente da prova com D1 |
+| Deploy, operações, agendados | implementados no Cloud Build (tarefas 0 a 7); o Actions segue ligado até a Fase 4 |
+| Tarefas 0 a 7 | implementadas |
+| Tarefas 8 e 9 | pendentes |
 | Gatilhos em hml e prod | não existem (o módulo `cicd` só está ligado em dev) |
 
 ## Fatos que mudam a ADR 030 (medidos em 22/10/2026)
@@ -39,9 +41,9 @@
 
 | # | O quê | Quem | Bloqueia |
 |---|---|---|---|
-| D1 | **Credencial de leitura do GitHub para o CI.** Recomendado: um GitHub App novo, `alupdata-ci`, só com leitura de conteúdo, issues e pull requests, instalado em `Alupdatalake`; a chave privada vai para o segredo `alupdata-github-ci-app-key`. A alternativa é reaproveitar o token do Dataform (`alupdata-dataform-git-token`), cujo escopo não foi verificado | Ricardo, com o dono da organização | Tarefas 1, 4 e 7 |
+| D1 | **Credencial de leitura do GitHub para o CI.** Recomendado: um GitHub App novo, `alupdata-ci`, só com leitura de conteúdo, issues e pull requests, instalado em `Alupdatalake`; a chave privada vai para o segredo `alupdata-github-ci-app-key`; quem grava a versão do segredo é o grupo `gravacao_segredos` (`roles/secretmanager.secretVersionAdder`, sem leitura). A alternativa é reaproveitar o token do Dataform (`alupdata-dataform-git-token`), cujo escopo não foi verificado | Ricardo, com o dono da organização | Tarefas 1, 4 e 7 |
 | D2 | Conceder `roles/storage.objectAdmin` no bucket `ness-painel-projetos-alupdata` à conta `alupdata-painel` do projeto dev (criada na Tarefa 7) | ness., no projeto `ness-painel-projetos` | Tarefa 7 |
-| D3 | Aplicar o bootstrap em hml (e em prod, quando existir) com os papéis novos das tarefas 3 e 5 | pessoa com Owner | Tarefas 5 a 7 em hml |
+| D3 | Reaplicar o bootstrap em dev (o `roles/logging.logWriter` da conta de deploy só vale depois disso) e aplicá-lo em hml (e em prod, quando existir) com os papéis novos das tarefas 3 e 5 | pessoa com Owner | Tarefas 5 a 7 em hml |
 | D4 | Desligar o CodeQL no repositório (configuração do GitHub, não é workflow versionado) | dono da organização | Tarefa 9 |
 
 ## Custo (da Alup, cláusula 5ª) — estimativa a conferir na primeira fatura
@@ -54,17 +56,17 @@ Franquia do Cloud Build: 2.500 minutos por mês (ADR 030, §4). Uso estimado: CI
 |---|---|
 | `scripts/github_app_token.py` (novo) | gera o token de instalação de um GitHub App a partir da chave no ambiente |
 | `scripts/operacoes.py` (novo) | valida as entradas e monta os comandos das quatro operações sob demanda |
-| `cloudbuild/ci.yaml` (alterar) | volta a rodar `ci-atribuicao`, com o token de leitura |
+| `cloudbuild/ci-com-atribuicao.yaml`, `cloudbuild/busca-main.sh` (novos) | o PR volta a rodar `ci-atribuicao` com o token de leitura; o Terraform escolhe entre `ci.yaml` e `ci-com-atribuicao.yaml` conforme o client id do App |
 | `cloudbuild/deploy.yaml`, `cloudbuild/deploy.sh` (novos) | imagem, Terraform, Dataform e catálogo, por ambiente |
-| `cloudbuild/operar.yaml` (novo) | as quatro operações sob demanda |
-| `cloudbuild/agendado.yaml` (novo) | Painel, Quadro, Atribuição diária e SCA semanal |
+| `cloudbuild/operar.yaml`, `cloudbuild/operar.sh`, `cloudbuild/imagem.sh` (novos) | as quatro operações sob demanda e a construção/validação da imagem |
+| `cloudbuild/agendado-{sca,atribuicao,quadro,painel}.yaml`, `cloudbuild/agendado.sh` (novos) | um yaml por tarefa agendada: Painel, Quadro, Atribuição diária e SCA semanal |
 | `infra/modules/cicd/` (estender) | gatilhos manuais e de deploy, Scheduler, contas e papéis |
-| `infra/environments/{dev,hml}.tfvars` (alterar) | liga o módulo em hml e traz os valores que hoje estão no GitHub |
+| `infra/environments/{dev,hml}.tfvars` (alterar) | `dev.tfvars` liga o módulo; hml fica para o PR de D3 |
 | `.github/workflows/*` (remover, Tarefa 9) | só depois de tudo estável |
 
 ---
 
-### Task 0: corrigir a ADR 030 e registrar as decisões
+### Task 0: corrigir a ADR 030 e registrar as decisões (implementada)
 
 **Arquivos:** alterar `docs/arquitetura/decisoes/030-cicd-fora-do-github-actions.md`.
 
@@ -73,7 +75,7 @@ Franquia do Cloud Build: 2.500 minutos por mês (ADR 030, §4). Uso estimado: CI
 - [ ] **Passo 3:** rodar `uv run pytest tests/unit/test_infra.py tests/unit/test_cicd.py -q`. Esperado: passa (nenhum teste lê a ADR).
 - [ ] **Passo 4:** commit `docs: ADR 030 corrigida (repositório privado) e custo estimado do CI/CD completo`.
 
-### Task 1: gerar o token do GitHub App (TDD)
+### Task 1: gerar o token do GitHub App (TDD) (implementada)
 
 **Arquivos:** criar `scripts/github_app_token.py` e `tests/unit/test_github_app_token.py`. Declarar `cryptography>=43` em `pyproject.toml` (já está no `uv.lock` como transitiva) e rodar `uv lock`.
 
@@ -241,7 +243,7 @@ if __name__ == "__main__":
 - [ ] **Passo 4:** `uv run pytest tests/unit/test_github_app_token.py -q`. Esperado: 2 passam. Rodar `uv run ruff check scripts tests && uv run ruff format --check scripts tests && uv run bandit -q -r scripts/github_app_token.py`.
 - [ ] **Passo 5:** commit `feat(ci): script que gera o token de instalação de um GitHub App`.
 
-### Task 2: as operações sob demanda como código testado (TDD)
+### Task 2: as operações sob demanda como código testado (TDD) (implementada)
 
 Hoje a validação e a montagem dos comandos estão dentro de YAML do Actions, sem teste. Aqui elas viram Python.
 
@@ -434,12 +436,12 @@ def executar_job(job: str, args: list[str], projeto: str, regiao: str, executor:
   Em seguida, `main(argv)` com os quatro subcomandos: `executar-ingestao` (usa `ingestao()` e `executar_job`), `testar-conexao` (usa `job_teste_conexao()` e `executar_job`), `sondar-rede` (usa `executar_job("ingestao-bcb-cambio-ptax", args_sonda(sonda), ...)` e depois `gcloud storage ls gs://<projeto>-raw/sondas/<sonda>/` e `gcloud storage cat` do último objeto) e `conferir-cargas` (`subprocess.run([sys.executable, "-m", "scripts.conferir_cargas"], env={**os.environ, "GCP_PROJECT_ID": projeto})`). Cada subcomando devolve `1` com a mensagem de `EntradaInvalida` se a validação reprovar.
 - [ ] **Passo 7:** `uv run pytest tests/unit/test_operacoes.py -q` (todos passam), ruff e bandit limpos, e commit `feat(ci): operações sob demanda como código testado, fora do YAML`.
 
-### Task 3: gatilhos manuais, contas e papéis em `infra/` (Terraform)
+### Task 3: gatilhos manuais, contas e papéis em `infra/` (Terraform) (implementada)
 
 **Arquivos:** estender `infra/modules/cicd/main.tf`; alterar `infra/main.tf` (chamada do módulo), `infra/variables.tf`, `infra/environments/dev.tfvars` e `hml.tfvars`; testes em `tests/unit/test_cicd.py`.
 
-- [ ] **Passo 1: testes que falham** em `tests/unit/test_cicd.py`, no estilo dos existentes (regex sobre o arquivo): o módulo declara os quatro gatilhos `alupdata-op-executar-ingestao`, `-conferir-cargas`, `-sondar-rede` e `-testar-conexao`; todos com `filename = "cloudbuild/operar.yaml"` e `service_account` igual à conta de deploy do ambiente; nenhum deles usa o bloco `github {` (é manual, não pode disparar no push); e o papel `roles/logging.logWriter` aparece para a conta de deploy.
-- [ ] **Passo 2:** novas variáveis do módulo: `deploy_service_account_id` (o `id` completo da conta de deploy, vindo de `var.deploy_service_account`), `regiao` e `imagem_ingestao_base`. O módulo passa a ser ligado em **dev e hml** (`cicd = { ... }` em `hml.tfvars`).
+- [ ] **Passo 1: testes que falham** em `tests/unit/test_cicd.py`, no estilo dos existentes (regex sobre o arquivo): o módulo declara os quatro gatilhos `alupdata-op-executar-ingestao`, `-conferir-cargas`, `-sondar-rede` e `-testar-conexao`; todos com `git_file_source` com `path = "cloudbuild/operar.yaml"` e sem `filename` (o provider recusa os dois juntos) e `service_account` igual à conta de deploy do ambiente; nenhum deles usa o bloco `github {` (é manual, não pode disparar no push); e o papel `roles/logging.logWriter` aparece para a conta de deploy.
+- [ ] **Passo 2:** novas variáveis do módulo: `deploy_service_account_id` (o `id` completo da conta de deploy, vindo de `var.deploy_service_account`) e `regiao`.
 - [ ] **Passo 3:** o recurso dos gatilhos manuais, com este formato (gatilho manual de repositório do GitHub conectado: `source_to_build` e `git_file_source`, sem `github {}`):
 
 ```hcl
@@ -458,7 +460,6 @@ resource "google_cloudbuild_trigger" "operacao" {
   name            = each.key
   description     = "Operação sob demanda (ADR 030): gcloud builds triggers run ${each.key} --branch=main --substitutions=..."
   service_account = var.deploy_service_account_id
-  filename        = "cloudbuild/operar.yaml"
   substitutions   = merge(each.value, { _REGIAO = var.regiao })
 
   source_to_build {
@@ -479,7 +480,7 @@ resource "google_cloudbuild_trigger" "operacao" {
 - [ ] **Passo 5:** `terraform fmt -check -recursive infra`, `uv run pytest tests/unit/test_cicd.py tests/unit/test_bootstrap.py tests/unit/test_infra.py -q`, `terraform -chdir=infra validate`. Esperado: tudo verde.
 - [ ] **Passo 6:** commit `feat(infra): gatilhos manuais das operações e papéis de log da conta de deploy`. **Aplicar em dev** (Tarefa 6 faz isso por deploy). Em hml depende de D3.
 
-### Task 4: a checagem de atribuição volta ao Cloud Build
+### Task 4: a checagem de atribuição volta ao Cloud Build (implementada)
 
 Depende de D1.
 
@@ -519,7 +520,7 @@ availableSecrets:
 - [ ] **Passo 3:** `uv run pytest tests/unit/test_cicd.py -q`, depois PR de teste (qualquer mudança de documentação) e conferir o `alupdata-ci-pr` verde **com** `ci-atribuicao`.
 - [ ] **Passo 4:** commit `feat(ci): a checagem de atribuição volta ao Cloud Build, com token de leitura do GitHub`.
 
-### Task 5: deploy no Cloud Build
+### Task 5: deploy no Cloud Build (implementada)
 
 **Arquivos:** criar `cloudbuild/deploy.yaml`, `cloudbuild/deploy.sh`; estender o módulo `cicd` com os gatilhos de deploy; teste em `tests/unit/test_cicd.py`.
 
@@ -563,7 +564,7 @@ timeout: 3000s
 - [ ] **Passo 5:** `bash -n cloudbuild/deploy.sh`, `uv run pytest tests -q`, `terraform validate`. Depois do PR mesclado, **provar em dev**: `gcloud builds triggers run alupdata-deploy --project=alupar-dev-alupdata --branch=main --substitutions=_AMBIENTE=dev,_MODULO=all`. Esperado: build verde, Dataform concluído, mesma infraestrutura do deploy do Actions (o `terraform plan` seguinte não mostra mudança).
 - [ ] **Passo 6:** commit `feat(ci): deploy no Cloud Build, por ambiente`.
 
-### Task 6: operações sob demanda no Cloud Build
+### Task 6: operações sob demanda no Cloud Build (implementada)
 
 **Arquivos:** criar `cloudbuild/operar.yaml`; documentação em `docs/runbook/`.
 
@@ -602,11 +603,11 @@ substitutions:
 - [ ] **Passo 3:** reescrever em `docs/runbook/deploy.md`, `docs/runbook/incidentes.md` e `docs/runbook/conferencia-e-sondas.md` os comandos de `gh workflow run` para `gcloud builds triggers run ...`, com a tabela de substituições de cada operação.
 - [ ] **Passo 4:** commit `feat(ci): operações sob demanda no Cloud Build e runbooks`.
 
-### Task 7: agendados (Painel, Quadro, Atribuição, SCA)
+### Task 7: agendados (Painel, Quadro, Atribuição, SCA) (implementada)
 
 Depende de D1 (Atribuição, Painel) e D2 (Painel).
 
-**Arquivos:** criar `cloudbuild/agendado.yaml`; estender o módulo `cicd` com os gatilhos agendados e o Cloud Scheduler.
+**Arquivos:** criar `cloudbuild/agendado-{sca,atribuicao,quadro,painel}.yaml` e `cloudbuild/agendado.sh`; estender o módulo `cicd` com os gatilhos agendados e o Cloud Scheduler.
 
 - [ ] **Passo 1: testes que falham** em `tests/unit/test_cicd.py`: existe um `google_cloud_scheduler_job` por agendado, com `http_target` para `cloudbuild.googleapis.com/v1/projects/.../triggers/<nome>:run`, `oauth_token` da conta `alupdata-agendador`, e a tabela de crons abaixo.
 
@@ -617,18 +618,18 @@ Depende de D1 (Atribuição, Painel) e D2 (Painel).
 | Quadro | `alupdata-ag-quadro` | `0 11 * * 1-5` | `quadro.yml` |
 | Painel | `alupdata-ag-painel` | `7 */3 * * *` | `painel.yml` |
 
-- [ ] **Passo 2:** `cloudbuild/agendado.yaml` com `_TAREFA` (`sca|atribuicao|quadro|painel`) chamando `make ci-sca`, `scripts/verifica_atribuicao.py --github nessenergy/Alupdatalake` (com o token de leitura, `GH_TOKEN`), `scripts.quadro --aplicar` (com o App do quadro, `alupdata-github-quadro-app-key`, permissões `organization_projects=write`, `issues=write`, `pull_requests=read`) e `scripts.painel` (token de leitura de issues). O Quadro mantém a guarda de hoje: sem chave gravada, avisa e sai com sucesso.
-- [ ] **Passo 3: Painel, o mais delicado.** O Painel lê dev e hml e grava no bucket do projeto da ness. Criar em `infra/` a conta `alupdata-painel` (dev). Em hml, uma variável `leitores_execucoes` concede a ela `roles/bigquery.dataViewer` no dataset `bronze` e `roles/bigquery.jobUser` no projeto. A publicação usa `gcloud storage cp dados.json dados-aditivo.json painel/index.html painel/aditivo.html gs://ness-painel-projetos-alupdata/ --cache-control=no-store`, e exige D2. O encadeamento "depois do deploy e da ingestão" (hoje `workflow_run`) vira um último passo dos builds de deploy e de `executar-ingestao` que roda `gcloud builds triggers run alupdata-ag-painel --branch=main`.
+- [ ] **Passo 2:** um yaml por tarefa (`agendado-sca.yaml`, `-atribuicao`, `-quadro`, `-painel`), todos chamando `cloudbuild/agendado.sh`. O módulo recebe o objeto `agendados = { sca, atribuicao, quadro, painel }` com uma flag por tarefa, tudo desligado por padrão, e a variável `quadro_chave_gravada` (precondição: o quadro só liga com a chave gravada). O quadro roda com a conta própria `alupdata-quadro`. As tarefas chamam `make ci-sca`, `scripts/verifica_atribuicao.py --github nessenergy/Alupdatalake` (com o token de leitura, `GH_TOKEN`), `scripts.quadro --aplicar` (com o App do quadro, `alupdata-github-quadro-app-key`, permissões `organization_projects=write`, `issues=write`, `pull_requests=read`) e `scripts.painel` (token de leitura de issues). O Quadro mantém a guarda de hoje: sem chave gravada, avisa e sai com sucesso.
+- [ ] **Passo 3: Painel, o mais delicado.** O Painel lê dev e hml e grava no bucket do projeto da ness. Criar em `infra/` a conta `alupdata-painel` (dev). Em hml, uma variável `leitores_execucoes` concede a ela `roles/bigquery.dataViewer` no dataset `bronze` e `roles/bigquery.jobUser` no projeto. A publicação usa `gcloud storage cp dados.json dados-aditivo.json painel/index.html painel/aditivo.html gs://ness-painel-projetos-alupdata/ --cache-control=no-store`, e exige D2. **PENDENTE (depende de D2):** o encadeamento "depois do deploy e da ingestão" (hoje `workflow_run`) vira um último passo dos builds de deploy e de `executar-ingestao` que roda `gcloud builds triggers run alupdata-ag-painel --branch=main`.
 - [ ] **Passo 4:** `terraform validate`, testes verdes; aplicar em dev (pelo deploy da Tarefa 5) e disparar cada agendado uma vez à mão: `gcloud builds triggers run alupdata-ag-painel ...`. Conferir `dados.json` novo no bucket e a página do painel atualizada.
 - [ ] **Passo 5:** commit `feat(ci): agendados no Cloud Scheduler e no Cloud Build`.
 
-### Task 8: operar em paralelo por uma semana
+### Task 8: operar em paralelo por uma semana (pendente)
 
 - [ ] **Passo 1:** com tudo no ar, manter o Actions ligado e **não** disparar nada novo por ele. Registrar a cada dia útil, em `docs/status.md`, se os agendados do Cloud Scheduler rodaram e comparar com o Painel.
 - [ ] **Passo 2:** critérios de saída: (a) ao menos 5 PRs com os checks do Cloud Build iguais aos do Actions; (b) um deploy completo de dev e um de hml pelo Cloud Build; (c) cada agendado rodou 3 vezes; (d) o custo de build do mês dentro da franquia (conferir no Billing); (e) as quatro operações sob demanda provadas em dev e hml.
 - [ ] **Passo 3:** só com (a) a (e) cumpridos, seguir para a Tarefa 9.
 
-### Task 9: desligar o Actions
+### Task 9: desligar o Actions (pendente)
 
 Depende de D3 (hml), D4 e da Tarefa 8.
 
@@ -647,7 +648,9 @@ Depende de D3 (hml), D4 e da Tarefa 8.
 
 - **Credencial de leitura do GitHub (D1).** É a única credencial nova do CI. Mitigação: App só de leitura, token de uma hora, segredo com acesso restrito à conta do CI, nunca em log (o Cloud Build mascara o valor de `availableSecrets`).
 - **Painel no projeto da ness. (D2).** Sem a concessão no bucket, o painel para de atualizar. Mitigação: manter o workflow `painel.yml` até a Tarefa 9 e só removê-lo depois de três publicações pelo Cloud Build.
-- **Gatilho manual com repositório de 1ª geração.** O formato `source_to_build` e `git_file_source` com `repo_type = "GITHUB"` precisa ser provado em dev no primeiro `terraform apply`; se o provedor recusar, o recurso muda para um gatilho de 2ª geração (exige criar a conexão) e o plano é ajustado.
+- **Gatilho manual com repositório de 1ª geração.** Resolvido: o provider exige só `git_file_source` (com `source_to_build`, `repo_type = "GITHUB"`); `filename` junto dele é recusado no plan. Um teste roda `terraform plan` offline para pegar isso.
+- **Grupo de operação age como a conta de deploy (I4).** Permite `gcloud builds submit --service-account=<deploy>` com código arbitrário e `triggers run --branch=<qualquer>`; a conta de deploy tem `projectIamAdmin`. Ampliação consciente em relação à ADR 015, mitigada pelo grupo ser da ness. Futuro: conta própria enxuta para operações e `approval_required = true` no gatilho de deploy de hml e prod.
+- **Gatilho de PR roda o yaml do próprio PR (M5)** como `alupdata-ci`, que lê a chave do App de leitura. Aceitável com repositório privado e colaboradores confiáveis.
 - **Conta de deploy executando build.** Precisa de `logging.logWriter` e de permissão para quem dispara agir como ela. Está na Tarefa 3.
 - **Perda do formulário do GitHub.** Quem opera usa `gcloud builds triggers run`. Mitigação: runbooks da Tarefa 6 e o papel por grupo.
 - **Custo.** Estimado dentro da franquia, mas não medido. A Tarefa 8 confere.

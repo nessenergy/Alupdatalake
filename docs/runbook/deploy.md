@@ -256,8 +256,9 @@ gcloud builds triggers run alupdata-op-executar-ingestao --project=<projeto> --b
 Quem dispara precisa estar no grupo `operacao-datalake`, que tem
 `roles/cloudbuild.builds.editor` no projeto e `roles/iam.serviceAccountUser` na conta de deploy
 (o build roda como ela). O projeto escolhe o ambiente: use o projeto do `dev`, `hml` ou `prod`.
+Hoje os gatilhos e os papéis do grupo só existem em `dev` (`hml` e `prod` entram com D3).
 
-> Transição: até a Tarefa 9 desligar o GitHub Actions, o caminho antigo (`gh workflow run ...`)
+> Transição: até a Fase 4 da ADR 030 desligar o GitHub Actions, o caminho antigo (`gh workflow run ...`)
 > continua valendo em paralelo. Depois dela, só o gatilho do Cloud Build.
 
 O gatilho valida o conector (snake_case), as datas (`AAAA-MM-DD`, as duas ou

@@ -72,6 +72,14 @@ O repositório foi tornado privado e isso muda três pontos desta seção:
   (seção Custo do plano). Esse é o cenário do CI/CD completo. Os cerca de 800 minutos por mês de Actions, citados acima, são o
   cenário atual. São cenários diferentes, não uma contradição. É estimativa, não medição. A primeira fatura confirma. O Painel é o maior consumidor; se apertar, volta
   para a cadência de 6 em 6 horas.
+- **(I3, ordem dos passos humanos)** O `roles/logging.logWriter` da conta de deploy só vale depois de reaplicar o bootstrap em `dev` (como Owner).
+  Reaplicar o bootstrap em `dev` é, portanto, passo humano **antes** de provar o deploy e as operações; sem ele o build dessas contas não grava log.
+- **(I4, ampliação consciente em relação à ADR 015)** O grupo de operação passa a poder agir como a conta de deploy (`roles/iam.serviceAccountUser`
+  e `roles/cloudbuild.builds.editor`). Isso permite `gcloud builds submit --service-account=<deploy>` com código arbitrário e
+  `gcloud builds triggers run ... --branch=<qualquer>`, e a conta de deploy tem `roles/resourcemanager.projectIamAdmin`. Fica aceito porque o grupo
+  é da ness. Recomendação futura: conta própria e enxuta para as operações e `approval_required = true` no gatilho de deploy de `hml` e `prod`.
+- **(M5, risco)** O gatilho de PR roda o yaml do próprio PR como `alupdata-ci`, que lê a chave do App de leitura. É aceitável com o repositório
+  privado e colaboradores de confiança.
 
 ## 5. Fases
 

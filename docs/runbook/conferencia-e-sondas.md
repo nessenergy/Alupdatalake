@@ -17,8 +17,9 @@ Sem substituições.
 Quem dispara precisa estar no grupo `operacao-datalake`, que tem
 `roles/cloudbuild.builds.editor` no projeto e `roles/iam.serviceAccountUser` na conta de deploy
 (o build roda como ela). O projeto escolhe o ambiente: use o projeto do `dev`, `hml` ou `prod`.
+Hoje os gatilhos e os papéis do grupo só existem em `dev` (`hml` e `prod` entram com D3).
 
-> Transição: até a Tarefa 9 desligar o GitHub Actions, o caminho antigo (`gh workflow run ...`)
+> Transição: até a Fase 4 da ADR 030 desligar o GitHub Actions, o caminho antigo (`gh workflow run ...`)
 > continua valendo em paralelo. Depois dela, só o gatilho do Cloud Build.
 
 O resultado sai no log do build, uma seção por conjunto. O build roda com a conta de deploy e só executa `SELECT` ou `WITH`; o código recusa qualquer outro comando. Tabela que não existe no ambiente aparece como `ausente`, e o resto continua.

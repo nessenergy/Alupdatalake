@@ -325,7 +325,7 @@ gcloud builds triggers run alupdata-op-testar-conexao --project=<projeto-dev> --
 
 `_FONTE` é a fonte a testar. Papel necessário (grupo `operacao-datalake`) e transição
 para o Actions: como em [`conferencia-e-sondas.md`](conferencia-e-sondas.md) §1; até a
-Tarefa 9, `gh workflow run "Testar conexão"` continua valendo. Pessoa não executa job
+Fase 4 da ADR 030, `gh workflow run "Testar conexão"` continua valendo. Pessoa não executa job
 direto (ADR 015): o build roda pela conta de deploy e registra quem testou. O log do build diz se passou e
 leva ao job no console, onde a mensagem do teste está em **Registros**:
 
@@ -339,5 +339,6 @@ leva ao job no console, onde a mensagem do teste está em **Registros**:
 | `ORA-01017` | chegou ao banco, com usuário ou senha errados | N3 |
 | `ORA-12537` ou conexão encerrada logo após abrir | verificação de nó do Oracle | L5, item 4 |
 
+Hoje os gatilhos e os papéis do grupo só existem em `dev` (`hml` e `prod` entram com D3).
 Com `dev` verde, repetir N2 e N4 em `hml` e em `prod` (mesma sub-rede; o G4 já
 cobriu os três projetos).

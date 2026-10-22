@@ -24,6 +24,13 @@ gravacao_segredos = ["group:operacao-datalake@ness.com.br"]
 # sem ela a operação não confere versão de secret nem configuração do Dataform.
 leitura_projeto = ["group:operacao-datalake@ness.com.br"]
 
+# Gestão do CI e das operações no Cloud Build (ADR 030). Depende de o repositório estar conectado ao projeto.
+gestao_cicd = ["group:operacao-datalake@ness.com.br"]
+cicd = {
+  repositorio_dono = "nessenergy"
+  repositorio_nome = "Alupdatalake"
+}
+
 # Quem configura o login do Portal no console (cliente OAuth "Externo" e IAP):
 # a ness. confere o que entrega. Sem acesso a dado (runbook/portal.md).
 configuracao_login_portal = ["group:operacao-datalake@ness.com.br"]

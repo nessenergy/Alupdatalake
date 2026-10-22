@@ -40,7 +40,7 @@ def test_modulo_cicd_so_escreve_log_e_nao_roda_pr_de_fora_sem_aprovacao() -> Non
     )
     assert 'filename        = "cloudbuild/ci.yaml"' in modulo
     assert modulo.count("service_account") >= 2
-    assert modulo.count('resource "google_cloudbuild_trigger"') == 2
+    assert modulo.count('resource "google_cloudbuild_trigger"') == 3, "pr, main e as operações (for_each)"
 
 
 def test_modulo_cicd_so_existe_quando_a_variavel_for_preenchida() -> None:
@@ -54,3 +54,31 @@ def test_modulo_cicd_so_existe_quando_a_variavel_for_preenchida() -> None:
 def test_conta_de_deploy_pode_criar_gatilho() -> None:
     bootstrap = _ler("infra/bootstrap/main.tf")
     assert '"roles/cloudbuild.builds.editor"' in bootstrap
+
+
+def test_operacoes_sob_demanda_sao_gatilhos_manuais_da_conta_de_deploy() -> None:
+    modulo = _ler("infra/modules/cicd/main.tf")
+    for nome in ("executar-ingestao", "conferir-cargas", "sondar-rede", "testar-conexao"):
+        assert f'"alupdata-op-{nome}"' in modulo, nome
+    bloco = modulo[modulo.index('resource "google_cloudbuild_trigger" "operacao"') :]
+    assert 'filename        = "cloudbuild/operar.yaml"' in bloco
+    assert "service_account = var.deploy_service_account_id" in bloco
+    assert "github {" not in bloco, "é manual: não pode disparar no push"
+    assert "git_file_source" in bloco
+    assert (RAIZ / "cloudbuild/operar.yaml").exists()
+
+
+def test_modulo_cicd_declara_as_variaveis_das_operacoes_e_o_main_as_liga() -> None:
+    modulo = _ler("infra/modules/cicd/main.tf")
+    for variavel in ("deploy_service_account_id", "regiao", "imagem_ingestao_base"):
+        assert f'variable "{variavel}"' in modulo, variavel
+    principal = _ler("infra/main.tf")
+    assert "projects/${var.project_id}/serviceAccounts/${var.deploy_service_account}" in principal
+    assert "cicd" in _ler("infra/environments/hml.tfvars")
+
+
+def test_conta_de_deploy_escreve_log_proprio_e_operacao_age_como_ela() -> None:
+    assert '"roles/logging.logWriter"' in _ler("infra/bootstrap/main.tf")
+    principal = _ler("infra/main.tf")
+    assert re.search(r'resource "google_service_account_iam_member" "operacao_age_como_deploy"', principal)
+    assert "roles/iam.serviceAccountUser" in principal

@@ -278,6 +278,20 @@ module "cicd" {
   project_id       = var.project_id
   repositorio_dono = var.cicd.repositorio_dono
   repositorio_nome = var.cicd.repositorio_nome
+
+  # O gatilho exige o id completo da conta; deriva-se do e-mail já passado por -var no deploy.
+  deploy_service_account_id = "projects/${var.project_id}/serviceAccounts/${var.deploy_service_account}"
+  regiao                    = var.region
+  imagem_ingestao_base      = var.imagem_ingestao
+}
+
+# Disparar gatilho com conta própria exige agir como a conta de deploy (ADR 030).
+resource "google_service_account_iam_member" "operacao_age_como_deploy" {
+  for_each = var.cicd == null || var.deploy_service_account == "" ? toset([]) : toset(var.gestao_cicd)
+
+  service_account_id = "projects/${var.project_id}/serviceAccounts/${var.deploy_service_account}"
+  role               = "roles/iam.serviceAccountUser"
+  member             = each.value
 }
 
 # Onda 3 (ADR 017): a cadeia só existe quando houver fonte interna ingerida.

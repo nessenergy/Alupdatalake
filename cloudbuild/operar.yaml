@@ -1,0 +1,7 @@
+# Alvo dos gatilhos de operação (ADR 030). Implementação real na Tarefa 6; até lá falha alto.
+steps:
+  - name: gcr.io/cloud-builders/gcloud
+    entrypoint: bash
+    args: ["-c", "echo 'operar.yaml: implementado na Tarefa 6'; exit 1"]
+options:
+  logging: CLOUD_LOGGING_ONLY

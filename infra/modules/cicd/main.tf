@@ -10,6 +10,18 @@ variable "project_id" { type = string }
 variable "repositorio_dono" { type = string }
 variable "repositorio_nome" { type = string }
 
+# Operações sob demanda (ADR 030): gatilhos manuais que rodam como a conta de deploy.
+variable "deploy_service_account_id" {
+  description = "id completo da conta de deploy: projects/<projeto>/serviceAccounts/<e-mail>"
+  type        = string
+}
+variable "regiao" { type = string }
+# Imagem base de ingestão usada pelo cloudbuild/operar.yaml (Tarefa 6); o módulo só a recebe.
+variable "imagem_ingestao_base" {
+  type    = string
+  default = ""
+}
+
 resource "google_service_account" "ci" {
   project      = var.project_id
   account_id   = "alupdata-ci"
@@ -66,4 +78,39 @@ resource "google_cloudbuild_trigger" "main" {
   }
 
   depends_on = [google_project_iam_member.ci_log]
+}
+
+# Operações sob demanda: gatilhos manuais (sem bloco github{}, não disparam no push), rodados com
+# `gcloud builds triggers run <nome> --branch=main --substitutions=...`. O repositório é o do
+# GitHub conectado pelo aplicativo do Cloud Build (1ª geração).
+locals {
+  repositorio_uri = "https://github.com/${var.repositorio_dono}/${var.repositorio_nome}"
+  operacoes = {
+    "alupdata-op-executar-ingestao" = { _OPERACAO = "executar-ingestao", _CONECTOR = "", _DE = "", _ATE = "", _URI = "" }
+    "alupdata-op-conferir-cargas"   = { _OPERACAO = "conferir-cargas" }
+    "alupdata-op-sondar-rede"       = { _OPERACAO = "sondar-rede", _SONDA = "cptec" }
+    "alupdata-op-testar-conexao"    = { _OPERACAO = "testar-conexao", _FONTE = "" }
+  }
+}
+
+resource "google_cloudbuild_trigger" "operacao" {
+  for_each        = local.operacoes
+  project         = var.project_id
+  name            = each.key
+  description     = "Operação sob demanda (ADR 030): gcloud builds triggers run ${each.key} --branch=main --substitutions=..."
+  service_account = var.deploy_service_account_id
+  filename        = "cloudbuild/operar.yaml"
+  substitutions   = merge(each.value, { _REGIAO = var.regiao })
+
+  source_to_build {
+    uri       = local.repositorio_uri
+    ref       = "refs/heads/main"
+    repo_type = "GITHUB"
+  }
+  git_file_source {
+    path      = "cloudbuild/operar.yaml"
+    uri       = local.repositorio_uri
+    revision  = "refs/heads/main"
+    repo_type = "GITHUB"
+  }
 }

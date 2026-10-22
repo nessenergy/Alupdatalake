@@ -7,8 +7,11 @@ UV_VERSAO="0.5.11"
 TERRAFORM_VERSAO="1.15.8"
 
 # A checagem de atribuição e o gitleaks precisam do histórico e da referência da main.
-git fetch --unshallow --quiet 2>/dev/null || true
-git fetch --quiet origin main:refs/remotes/origin/main 2>/dev/null || true
+# O Cloud Build baixa o código como FETCH_HEAD e não cria o remoto `origin`; o repositório é público, então a URL basta.
+git remote get-url origin >/dev/null 2>&1 || git remote add origin "https://github.com/nessenergy/Alupdatalake.git"
+git fetch --unshallow --quiet origin 2>/dev/null || true
+# Sem `|| true`: se a main não vier, a checagem de atribuição não tem com o que comparar e o build deve dizer isso.
+git fetch --quiet origin main:refs/remotes/origin/main
 
 curl -LsSf "https://astral.sh/uv/${UV_VERSAO}/install.sh" | sh
 export PATH="$HOME/.local/bin:$PATH"

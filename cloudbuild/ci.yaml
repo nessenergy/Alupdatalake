@@ -4,6 +4,19 @@
 # `_ALVOS` é o que o `make` executa: `ci` roda tudo (gatilho de PR); o gatilho de push na main
 # passa só as etapas que não dependem do intervalo do PR (a checagem de atribuição fica de fora).
 steps:
+  # O repositório é privado. A imagem `git` do Cloud Build traz o auxiliar de credencial que o gatilho configura; a
+  # imagem do passo seguinte não traz, e nela `git fetch` pede usuário. Por isso a main e o histórico vêm daqui.
+  - id: busca-main
+    name: gcr.io/cloud-builders/git
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        set -euo pipefail
+        URL="https://github.com/nessenergy/Alupdatalake.git"
+        git fetch --unshallow --quiet "$$URL" || true
+        git fetch --quiet "$$URL" main:refs/remotes/origin/main
+
   - id: ci
     name: node:22-bookworm
     entrypoint: bash

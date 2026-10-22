@@ -17,8 +17,7 @@ _DATA = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 _URI = re.compile(r"^gs://[a-z0-9._-]+/[a-z0-9_=./-]+$")
 _FONTE = re.compile(r"^[a-z0-9-]+$")
 _SONDA = re.compile(r"^[a-z_]+$")
-_PROJETO = re.compile(r"^[a-z0-9][a-z0-9-]*$")
-_REGIAO = re.compile(r"^[a-z0-9][a-z0-9-]*$")
+_NOME_GCP = re.compile(r"^[a-z0-9][a-z0-9-]*$")  # projeto e região
 
 # O job que serve de casca de execução para a sonda (mesmo contêiner dos demais).
 _JOB_SONDA = "ingestao-bcb-cambio-ptax"
@@ -72,17 +71,35 @@ def _rodar(cmd: list[str]) -> tuple[int, str]:
     return resultado.returncode, saida
 
 
-def executar_job(job: str, args: list[str], projeto: str, regiao: str, executor: Executor = _rodar) -> int:
-    """Executa o Cloud Run Job e espera. Se falhar, imprime o log do contêiner, que o `--wait` não mostra."""
+def executar_job(
+    job: str,
+    args: list[str],
+    projeto: str,
+    regiao: str,
+    executor: Executor = _rodar,
+    limite_log: int = 500,
+    listar_execucao: bool = False,
+) -> int:
+    """Executa o Cloud Run Job e espera. Se falhar, imprime o log do contêiner, que o `--wait` não mostra.
+
+    A execução é achada na saída do `--wait`; sem ela, e com `listar_execucao`, pela última da listagem do job.
+    """
     comando = ["gcloud", "run", "jobs", "execute", job, "--project", projeto, "--region", regiao, "--wait", *args]
     status, saida = executor(comando)
     if status == 0:
         return 0
     achada = re.search(r"executions describe ([a-zA-Z0-9-]+)", saida)
-    if achada:
+    execucao = achada.group(1) if achada else ""
+    if not execucao and listar_execucao:
+        _, listagem = executor(
+            ["gcloud", "run", "jobs", "executions", "list", "--job", job, "--project", projeto]
+            + ["--region", regiao, "--limit", "1", "--format=value(name)"]
+        )
+        execucao = listagem.strip()
+    if execucao:
         filtro = (
             f'resource.type="cloud_run_job" AND resource.labels.job_name="{job}" '
-            f'AND labels."run.googleapis.com/execution_name"="{achada.group(1)}"'
+            f'AND labels."run.googleapis.com/execution_name"="{execucao}"'
         )
         executor(
             [
@@ -93,7 +110,7 @@ def executar_job(job: str, args: list[str], projeto: str, regiao: str, executor:
                 "--project",
                 projeto,
                 "--order=asc",
-                "--limit=500",
+                f"--limit={limite_log}",
                 "--format=value(timestamp,severity,textPayload)",
             ]
         )
@@ -103,20 +120,23 @@ def executar_job(job: str, args: list[str], projeto: str, regiao: str, executor:
 def _sondar(sonda: str, projeto: str, regiao: str, executor: Executor) -> int:
     """Roda a sonda no job e lê o resultado no bucket raw (a SA de deploy não lê o Cloud Logging)."""
     args = args_sonda(sonda)
-    executar_job(_JOB_SONDA, args, projeto, regiao, executor)
+    if executar_job(_JOB_SONDA, args, projeto, regiao, executor) != 0:
+        return 1
     bucket = f"gs://{projeto}-raw/sondas/{sonda}/"
     _, listagem = executor(["gcloud", "storage", "ls", bucket, "--project", projeto])
     objetos = sorted(linha.strip() for linha in listagem.splitlines() if linha.strip().startswith("gs://"))
     if not objetos:
         print(f"não achei o resultado em {bucket} (a sonda não gravou ou a SA não lê o bucket)")
         return 1
+    print(f"Resultado: {objetos[-1]}")
     status, _ = executor(["gcloud", "storage", "cat", objetos[-1], "--project", projeto])
     return status
 
 
 def _conferir_cargas(projeto: str) -> int:
     ambiente = {**os.environ, "GCP_PROJECT_ID": projeto}
-    return subprocess.run([sys.executable, "-m", "scripts.conferir_cargas"], env=ambiente, check=False).returncode  # noqa: S603  # nosec B603
+    comando = [sys.executable, "-m", "scripts.conferir_cargas"]
+    return subprocess.run(comando, env=ambiente, check=False).returncode  # noqa: S603  # nosec B603
 
 
 def _exigir(valor: str | None, formato: re.Pattern[str], nome: str) -> str:
@@ -127,7 +147,7 @@ def _exigir(valor: str | None, formato: re.Pattern[str], nome: str) -> str:
 
 def main(argv: Sequence[str] | None = None, executor: Executor = _rodar) -> int:
     """Linha de comando usada pelos gatilhos do Cloud Build. Flag vazia vale como ausente."""
-    parser = argparse.ArgumentParser(prog="python -m scripts.operacoes")
+    parser = argparse.ArgumentParser(prog="python -m scripts.operacoes", allow_abbrev=False)
     parser.add_argument("operacao", choices=["executar-ingestao", "conferir-cargas", "sondar-rede", "testar-conexao"])
     parser.add_argument("--projeto", default="")
     parser.add_argument("--regiao", default="")
@@ -135,16 +155,18 @@ def main(argv: Sequence[str] | None = None, executor: Executor = _rodar) -> int:
         parser.add_argument(f"--{flag}", default="")
     p = parser.parse_args(argv)
     try:
-        projeto = _exigir(p.projeto, _PROJETO, "projeto")
+        projeto = _exigir(p.projeto, _NOME_GCP, "projeto")
         if p.operacao == "conferir-cargas":
             return _conferir_cargas(projeto)
-        regiao = _exigir(p.regiao, _REGIAO, "regiao")
+        regiao = _exigir(p.regiao, _NOME_GCP, "regiao")
         if p.operacao == "executar-ingestao":
             job, args, janela = ingestao(p.conector, p.de, p.ate, p.uri)
             print(f"Job: {job}\nJanela: {janela}")
             return executar_job(job, args, projeto, regiao, executor)
         if p.operacao == "testar-conexao":
-            return executar_job(job_teste_conexao(p.fonte), [], projeto, regiao, executor)
+            return executar_job(
+                job_teste_conexao(p.fonte), [], projeto, regiao, executor, limite_log=200, listar_execucao=True
+            )
         return _sondar(p.sonda, projeto, regiao, executor)
     except EntradaInvalida as erro:
         print(erro)

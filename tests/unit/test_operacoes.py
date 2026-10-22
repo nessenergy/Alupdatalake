@@ -2,8 +2,11 @@
 
 from __future__ import annotations
 
+import subprocess
+from types import SimpleNamespace
+
 import pytest
-from scripts.operacoes import EntradaInvalida, args_sonda, executar_job, ingestao, job_teste_conexao, main
+from scripts.operacoes import EntradaInvalida, Executor, args_sonda, executar_job, ingestao, job_teste_conexao, main
 
 
 def test_ingestao_sem_janela_usa_a_do_agendamento() -> None:
@@ -76,7 +79,7 @@ def test_job_que_passa_nao_le_log() -> None:
     assert len(chamadas) == 1
 
 
-def _executor_falso(chamadas: list[list[str]], saida: str = "") -> object:
+def _executor_falso(chamadas: list[list[str]], saida: str = "") -> Executor:
     def executor(cmd: list[str]) -> tuple[int, str]:
         chamadas.append(cmd)
         return 0, saida
@@ -131,3 +134,70 @@ def test_main_sondar_rede_le_o_ultimo_resultado_do_bucket() -> None:
     assert chamadas[0][4] == "ingestao-bcb-cambio-ptax"
     assert chamadas[1][:4] == ["gcloud", "storage", "ls", "gs://p-raw/sondas/cptec/"]
     assert chamadas[2][:4] == ["gcloud", "storage", "cat", "gs://p-raw/sondas/cptec/b.json"]
+
+
+def test_main_sondar_rede_com_job_falho_nao_lista_o_bucket() -> None:
+    chamadas: list[list[str]] = []
+
+    def executor(cmd: list[str]) -> tuple[int, str]:
+        chamadas.append(cmd)
+        return 1, ""
+
+    argv = ["sondar-rede", "--projeto", "p", "--regiao", "r", "--sonda", "cptec"]
+
+    assert main(argv, executor=executor) == 1
+    assert not any(c[:3] == ["gcloud", "storage", "ls"] for c in chamadas)
+
+
+def test_testar_conexao_sem_linha_describe_acha_a_execucao_pela_listagem() -> None:
+    chamadas: list[list[str]] = []
+
+    def executor(cmd: list[str]) -> tuple[int, str]:
+        chamadas.append(cmd)
+        if cmd[:4] == ["gcloud", "run", "jobs", "execute"]:
+            return 1, "The execution failed"
+        if cmd[:5] == ["gcloud", "run", "jobs", "executions", "list"]:
+            return 0, "teste-conexao-fmb-xyz99\n"
+        return 0, "log"
+
+    argv = ["testar-conexao", "--projeto", "p", "--regiao", "r", "--fonte", "fmb"]
+
+    assert main(argv, executor=executor) == 1
+    assert chamadas[1][:5] == ["gcloud", "run", "jobs", "executions", "list"]
+    assert chamadas[1][5:8] == ["--job", "teste-conexao-fmb", "--project"]
+    assert chamadas[2][:3] == ["gcloud", "logging", "read"]
+    assert "teste-conexao-fmb-xyz99" in chamadas[2][3]
+    assert "--limit=200" in chamadas[2]
+
+
+def test_ingestao_sem_linha_describe_nao_lista_execucoes() -> None:
+    chamadas: list[list[str]] = []
+
+    def executor(cmd: list[str]) -> tuple[int, str]:
+        chamadas.append(cmd)
+        return 1, "The execution failed"
+
+    assert executar_job("ingestao-ons-carga", [], "p", "r", executor=executor) == 1
+    assert len(chamadas) == 1
+
+
+def test_main_conferir_cargas_passa_o_projeto_no_env_e_propaga_o_status(monkeypatch: pytest.MonkeyPatch) -> None:
+    capturado: dict = {}
+
+    def falso(cmd: list[str], **kw: object) -> SimpleNamespace:
+        capturado.update(cmd=cmd, env=kw["env"])
+        return SimpleNamespace(returncode=3)
+
+    monkeypatch.setattr(subprocess, "run", falso)
+
+    assert main(["conferir-cargas", "--projeto", "meu-proj", "--regiao", ""]) == 3
+    assert capturado["cmd"][1:] == ["-m", "scripts.conferir_cargas"]
+    assert capturado["env"]["GCP_PROJECT_ID"] == "meu-proj"
+
+
+def test_main_projeto_invalido_devolve_1_sem_chamar_o_executor() -> None:
+    chamadas: list[list[str]] = []
+    argv = ["testar-conexao", "--projeto", "--wait; x", "--regiao", "r", "--fonte", "fmb"]
+
+    assert main(argv, executor=_executor_falso(chamadas)) == 1
+    assert chamadas == []

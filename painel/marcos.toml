@@ -409,6 +409,12 @@ estado = "feito"
 dono = "ness."
 
 [[marco]]
+data = 2026-10-22
+titulo = "CPTEC: webservice voltou a responder; conector das 27 capitais carregado em dev e hml (162 linhas)"
+estado = "feito"
+dono = "ness."
+
+[[marco]]
 data = 2026-10-16
 titulo = "Fim da janela contratual da Onda 1 (marco 2, R$ 30.720)"
 estado = "previsto"

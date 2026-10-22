@@ -7,6 +7,8 @@ Atualizado em **2026-10-22**. Visão de uma página: [`visao-consolidada.md`](vi
 
 ## Atualização de 22/10/2026
 
+- **CPTEC entregue em dev e hml.** O webservice voltou a responder 200 em 22/10 (403 em 02 e 03/10, ADR 028 e 029). Conector `cptec_previsao` (27 capitais, retrato da previsão vigente, sem janela), com os 7 componentes: 162 linhas na Bronze, na Silver e na Gold `previsao_tempo_capitais`, nos dois ambientes (PR #405). Não traz precipitação em mm. IPDO segue na saída C da ADR 027 (aguarda aceite da Alupar) e ACOMPH depende da credencial e do contrato da API do SINtegre; ver [spec](superpowers/specs/2026-10-22-onda1-ipdo-acomph-cptec-design.md).
+- **Dataform reprova no Hubspot.** A asserção `silver_hubspot_negocios_assertions_rowConditions` falha com o dado real (valor negativo ou fechamento anterior à criação) em dev e hml, o que deixa o passo do Dataform do `Deploy GCP` vermelho. Os gatilhos do Cloud Build em dev foram criados em 22/10 (apply verde). Decisão pendente: investigar o dado e corrigir na origem ou rever a regra.
 - **Hubspot carrega em dev e hml.** A Alupar gravou o token de aplicativo privado em 20/10 e a ingestão de 22/10 terminou com sucesso nos dois ambientes; a fonte saiu da lista de fontes fora do OK. As linhas carregadas não foram medidas.
 - **TempoOK sai do escopo como fonte do lake** (resposta do Leonardo, 20/10, registrada pelo Gabriel no canal da equipe). Confirmação por escrito pendente. Credenciais: ONS por usuário e senha; CCEE por usuário, senha e certificado ou por token de API.
 - **Conexões da Onda 3 (testes de 19 e 22/10):** MySQL Comercialização e MySQL Alup **conectam**; o Oracle FMB ainda expira (falta o caminho via DCIDE). O RM/TOTVS é só webservice. Faltam os esquemas das duas bases MySQL.

@@ -90,8 +90,8 @@ ci-testes: ci-deps
 	uv run pytest tests/ -v --tb=short --cov=src --cov-report=xml
 
 ci-atribuicao:
-	python scripts/verifica_atribuicao.py --demo
-	python scripts/verifica_atribuicao.py --intervalo "$(BASE)..HEAD"
+	uv run python scripts/verifica_atribuicao.py --demo
+	uv run python scripts/verifica_atribuicao.py --intervalo "$(BASE)..HEAD"
 
 ci-sast: ci-deps
 	uv run bandit -r src/ scripts/ -ll

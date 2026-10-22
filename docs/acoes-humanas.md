@@ -24,6 +24,11 @@ destrava. Os comandos foram executados ou conferidos em 23/09, no ambiente
 
 ---
 
+> **Atualização de 22/10/2026.** Ações que só uma pessoa executa, hoje:
+>
+> 1. **Reaplicar o bootstrap em dev e hml** (`infra/bootstrap`, com `environments/dev.tfvars` e `environments/hml.tfvars`). Em dev, concede à conta de deploy o papel que cria os gatilhos do Cloud Build; em hml, o papel que lê o log do contêiner. Sem isso, o deploy de dev termina vermelho no passo dos gatilhos.
+> 2. **Enviar à Alupar o e-mail** com o formato do BBCE e as perguntas pendentes (está em rascunho no Outlook).
+> 3. **Instalar o aplicativo do Cloud Build no GitHub** e conectar o repositório: feito em 19/10.
 ## 0. ~~Reativar o GitHub Actions~~ — resolvido em 24/09
 
 Parou por cota às 03h e voltou no fim da manhã, com a cobrança regularizada.

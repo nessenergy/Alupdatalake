@@ -169,14 +169,14 @@ codigo = "2.3"
 titulo = "Hubspot"
 horas = 20
 pronto = 0.8
-nota = "implementado; faltam token, carga e dossiê"
+nota = "carga real em dev e hml em 22/10, com o token de aplicativo privado; faltam conferir as linhas e o dossiê"
 
 [[onda.item]]
 codigo = "2.4"
 titulo = "TempoOK"
 horas = 18
 pronto = 0.8
-nota = "previsão de ENA carregando em dev; em hml o segredo está vazio (ADR 020); boletins dependem do acervo"
+nota = "retirada do escopo como fonte do lake, comunicada em 20/10; confirmação por escrito pendente"
 
 [[onda.item]]
 codigo = "2.5"
@@ -387,6 +387,24 @@ dono = "Alup"
 [[marco]]
 data = 2026-10-13
 titulo = "Balanço completo: avaliação de cada entrega e prazos realinhados"
+estado = "feito"
+dono = "ness."
+
+[[marco]]
+data = 2026-10-19
+titulo = "Teste de conexão dos bancos da Onda 3: MySQL Comercialização conecta; correção da imagem (drivers de banco e CA do RDS)"
+estado = "feito"
+dono = "ness."
+
+[[marco]]
+data = 2026-10-20
+titulo = "Retorno da Alupar: TempoOK fora do escopo; ONS por usuário e senha; CCEE por usuário, senha e certificado ou token; Hubspot com token de aplicativo privado"
+estado = "feito"
+dono = "Alup"
+
+[[marco]]
+data = 2026-10-22
+titulo = "Hubspot carrega em dev e hml; MySQL Alup conecta; relatório consolidado e guia de auditoria publicados"
 estado = "feito"
 dono = "ness."
 

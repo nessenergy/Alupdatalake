@@ -14,14 +14,14 @@ pago do GitHub, cobrado **por assento**, e a cota de minutos é **compartilhada*
 
 Fatos medidos em 15/10/2026, que delimitam a decisão:
 
-- O repositório `nessenergy/Alupdatalake` é **público** e a organização está no plano Free (`gh api`). Por isso o custo líquido de
-  Actions é zero hoje: setembro teve 1.508 minutos na organização (585 no AlupData, o resto sobretudo no `sitealupar`) e
-  US$ 9,05 de custo bruto, todos descontados.
+- Em 15/10/2026 o repositório `nessenergy/Alupdatalake` era **público** e a organização estava no plano Free (`gh api`). Por isso o
+  custo líquido de Actions era zero: setembro teve 1.508 minutos na organização (585 no AlupData, o resto sobretudo no
+  `sitealupar`) e US$ 9,05 de custo bruto, todos descontados.
 - O consumo do AlupData em 7 dias foi de 444 minutos: CI de PR 43%, CodeQL a cada push 10%, Painel (de hora em hora) 18%.
 - O CI é pesado porque cada PR roda tudo, inclusive PR só de documentação.
-- **Repositório público expõe detalhes do cliente**: faixas de rede, nome do FortiGate, IDs de projeto e e-mails de contas de
-  serviço. Tornar o repositório privado é decisão do Ricardo e, no plano Free, **desliga os ambientes do GitHub** (que são
-  recurso de plano pago em repositório privado), o que quebra o deploy atual.
+- **Histórico:** o repositório público expunha detalhes do cliente (faixas de rede, nome do FortiGate, IDs de projeto e e-mails de
+  contas de serviço). No plano Free, tornar o repositório privado **desligaria os ambientes do GitHub** (recurso de plano pago em
+  repositório privado) e quebraria o deploy atual. Esse ponto foi resolvido pela migração para o Cloud Build (§2 e §5).
 
 ## 2. Decisão
 
@@ -59,6 +59,18 @@ O GitHub fica só como **repositório, PRs, issues, Projects e Dependabot**. Nen
 - **A ADR 010** (`main` sem proteção) segue valendo: a proteção de branch continua indisponível no plano Free.
 - **Sobre tornar o repositório privado:** fora desta ADR. Esta decisão **permite** fazê-lo sem pagar assento, porque tira do GitHub o
   que dependia do plano pago.
+
+### Adendo de 22/10/2026 (repositório já privado)
+
+O repositório foi tornado privado e isso muda três pontos desta seção:
+
+- **(a)** O build do Cloud Build não tem credencial do GitHub nas etapas. A `main` e as APIs do GitHub exigem um token de leitura
+  vindo do Secret Manager (decisão D1 do plano de CI/CD completo, `docs/superpowers/plans/2026-10-22-cicd-completo-sem-actions.md`).
+- **(b)** O CI deixa de ser "só escreve log" e passa a ler **um** segredo: o do App de leitura do GitHub. Nenhum outro segredo
+  entra no pipeline, e o segredo nunca aparece em código, log ou fixture (regra 2).
+- **(c)** Custo estimado do CI/CD completo no Cloud Build: cerca de 1.260 minutos por mês, abaixo da franquia de 2.500 minutos
+  (seção Custo do plano). É estimativa, não medição. A primeira fatura confirma. O Painel é o maior consumidor; se apertar, volta
+  para a cadência de 6 em 6 horas.
 
 ## 5. Fases
 

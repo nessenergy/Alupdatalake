@@ -282,6 +282,7 @@ module "cicd" {
   # O gatilho exige o id completo da conta; deriva-se do e-mail já passado por -var no deploy.
   deploy_service_account_id = "projects/${var.project_id}/serviceAccounts/${var.deploy_service_account}"
   regiao                    = var.region
+  ambiente                  = var.environment
 }
 
 # Disparar gatilho com conta própria exige agir como a conta de deploy (ADR 030).

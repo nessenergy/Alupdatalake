@@ -21,6 +21,21 @@ variable "deploy_service_account_id" {
 }
 variable "regiao" { type = string }
 
+# Deploy no Cloud Build (ADR 030): um gatilho por ambiente, criado pela chamada do módulo em cada projeto.
+variable "ambiente" {
+  description = "Ambiente do deploy: dev, hml ou prod"
+  type        = string
+  validation {
+    condition     = contains(["dev", "hml", "prod"], var.ambiente)
+    error_message = "Ambiente deve ser 'dev', 'hml' ou 'prod'."
+  }
+}
+variable "dataform_token_versao" {
+  description = "Versão do secret do token do Dataform (alupdata-dataform-git-token)"
+  type        = string
+  default     = "1"
+}
+
 resource "google_service_account" "ci" {
   project      = var.project_id
   account_id   = "alupdata-ci"
@@ -108,6 +123,38 @@ resource "google_cloudbuild_trigger" "operacao" {
   }
   git_file_source {
     path      = "cloudbuild/operar.yaml"
+    uri       = local.repositorio_uri
+    revision  = "refs/heads/main"
+    repo_type = "GITHUB"
+  }
+}
+
+# Deploy (ADR 030): gatilho manual, como a conta de deploy, com o comportamento do workflow deploy.yml.
+# `_MODULO=infra` exige `_IMAGEM_SHA` (SHA completo de uma imagem já publicada).
+resource "google_cloudbuild_trigger" "deploy" {
+  project         = var.project_id
+  name            = "alupdata-deploy"
+  description     = "Deploy de ${var.ambiente} (ADR 030): gcloud builds triggers run alupdata-deploy --branch=main --substitutions=_MODULO=all"
+  service_account = var.deploy_service_account_id
+  filename        = "cloudbuild/deploy.yaml"
+
+  substitutions = {
+    _AMBIENTE              = var.ambiente
+    _MODULO                = "all"
+    _IMAGEM_SHA            = ""
+    _IMAGEM_BASE           = "${var.regiao}-docker.pkg.dev/${var.project_id}/alupdata/cli"
+    _TF_ESTADO             = "${var.project_id}-tfstate"
+    _REGIAO                = var.regiao
+    _DATAFORM_TOKEN_VERSAO = var.dataform_token_versao
+  }
+
+  source_to_build {
+    uri       = local.repositorio_uri
+    ref       = "refs/heads/main"
+    repo_type = "GITHUB"
+  }
+  git_file_source {
+    path      = "cloudbuild/deploy.yaml"
     uri       = local.repositorio_uri
     revision  = "refs/heads/main"
     repo_type = "GITHUB"

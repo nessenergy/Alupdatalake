@@ -1,0 +1,32 @@
+# Deploy no Cloud Build (ADR 030). Tradução do workflow deploy.yml: o arquivo só chama o script; a lógica está
+# em cloudbuild/deploy.sh. Gatilho manual, como a conta de deploy (alupdata-deploy).
+steps:
+  - id: imagem
+    name: gcr.io/cloud-builders/docker
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        set -euo pipefail
+        [[ "${_MODULO}" == "all" || "${_MODULO}" == "connectors" ]] || { echo "módulo ${_MODULO}: imagem não é construída"; exit 0; }
+        docker build -t "${_IMAGEM_BASE}:${COMMIT_SHA}" -t "${_IMAGEM_BASE}:latest" .
+        docker push "${_IMAGEM_BASE}:${COMMIT_SHA}"
+        docker push "${_IMAGEM_BASE}:latest"
+  - id: infra
+    name: gcr.io/google.com/cloudsdktool/cloud-sdk:stable
+    entrypoint: bash
+    args: ["cloudbuild/deploy.sh"]
+    env:
+      - "AMBIENTE=${_AMBIENTE}"
+      - "MODULO=${_MODULO}"
+      - "IMAGEM_SHA=${_IMAGEM_SHA}"
+      - "IMAGEM_BASE=${_IMAGEM_BASE}"
+      - "TF_ESTADO=${_TF_ESTADO}"
+      - "REGIAO=${_REGIAO}"
+      - "DATAFORM_TOKEN_VERSAO=${_DATAFORM_TOKEN_VERSAO}"
+      - "COMMIT_SHA=${COMMIT_SHA}"
+      - "PROJETO=$PROJECT_ID"
+options:
+  # Conta de serviço própria exige log no Cloud Logging (ou num bucket); sem isso o build é recusado.
+  logging: CLOUD_LOGGING_ONLY
+timeout: 3000s

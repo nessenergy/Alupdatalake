@@ -1,29 +1,18 @@
 # CI no Cloud Build (ADR 030, fase 1). O arquivo só chama o script; a lógica está no Makefile
 # (`make ci`), para o Actions e o Cloud Build rodarem exatamente os mesmos comandos.
 #
-# `_ALVOS` é o que o `make` executa: `ci` roda tudo (gatilho de PR); o gatilho de push na main
-# passa só as etapas que não dependem do intervalo do PR (a checagem de atribuição fica de fora).
+# `_ALVOS` é o que o `make` executa. Os dois gatilhos rodam as etapas que não dependem do intervalo do PR: a checagem
+# de atribuição (`ci-atribuicao`) fica de fora porque compara com a main, e o build do Cloud Build não tem credencial para
+# buscá-la no repositório privado (o fetch pede usuário, mesmo na imagem `git` do Cloud Build). Essa checagem segue no
+# job "Commits sem atribuição" do GitHub Actions; trazê-la para cá exige guardar um token no Secret Manager, decisão aberta.
 steps:
-  # O repositório é privado. A imagem `git` do Cloud Build traz o auxiliar de credencial que o gatilho configura; a
-  # imagem do passo seguinte não traz, e nela `git fetch` pede usuário. Por isso a main e o histórico vêm daqui.
-  - id: busca-main
-    name: gcr.io/cloud-builders/git
-    entrypoint: bash
-    args:
-      - -c
-      - |
-        set -euo pipefail
-        URL="https://github.com/nessenergy/Alupdatalake.git"
-        git fetch --unshallow --quiet "$$URL" || true
-        git fetch --quiet "$$URL" main:refs/remotes/origin/main
-
   - id: ci
     name: node:22-bookworm
     entrypoint: bash
     args: ["cloudbuild/ci.sh", "${_ALVOS}"]
 
 substitutions:
-  _ALVOS: "ci"
+  _ALVOS: "ci-lint ci-testes ci-sast ci-segredos ci-terraform ci-dataform ci-sca"
 
 options:
   # Conta de serviço própria exige log no Cloud Logging (ou num bucket); sem isso o build é recusado.

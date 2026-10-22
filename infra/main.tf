@@ -308,6 +308,9 @@ module "cicd" {
   deploy_service_account_id = "projects/${var.project_id}/serviceAccounts/${var.deploy_service_account}"
   regiao                    = var.region
   ambiente                  = var.environment
+  gravacao_segredos         = var.gravacao_segredos
+  # Vazio na raiz (Dataform desligado) cai no "1" do módulo: o deploy.sh devolve este valor à raiz por -var.
+  dataform_token_versao = var.dataform_git_token_versao != "" ? var.dataform_git_token_versao : "1"
 }
 
 # Disparar gatilho com conta própria exige agir como a conta de deploy (ADR 030).

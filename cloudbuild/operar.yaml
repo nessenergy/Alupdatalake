@@ -22,7 +22,7 @@ timeout: 3300s
 # Defaults vazios: o gatilho de cada operação só passa o que ela usa.
 substitutions:
   _OPERACAO: ""
-  _REGIAO: us-east1
+  _REGIAO: ""
   _CONECTOR: ""
   _DE: ""
   _ATE: ""

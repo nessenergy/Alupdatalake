@@ -87,6 +87,22 @@ resource "google_secret_manager_secret_iam_member" "ci_le_chave_do_app" {
   member    = "serviceAccount:${google_service_account.ci.email}"
 }
 
+# Quem grava a versão da chave é o grupo de gravação de segredos (sem leitura), como nos segredos de fonte.
+variable "gravacao_segredos" {
+  description = "Membros group:/domain: que acrescentam versão aos segredos do CI e do quadro, sem leitura"
+  type        = list(string)
+  default     = []
+}
+
+resource "google_secret_manager_secret_iam_member" "grava_chave_do_app" {
+  for_each = toset(var.gravacao_segredos)
+
+  project   = var.project_id
+  secret_id = google_secret_manager_secret.ci_app_key.secret_id
+  role      = "roles/secretmanager.secretVersionAdder"
+  member    = each.value
+}
+
 # PR de quem não é dono só roda depois de um comentário de aprovação (o repositório é privado, mas a regra vale se mudar).
 resource "google_cloudbuild_trigger" "pr" {
   project         = var.project_id
@@ -159,7 +175,6 @@ resource "google_cloudbuild_trigger" "operacao" {
   name            = each.key
   description     = "Operação sob demanda (ADR 030): gcloud builds triggers run ${each.key} --branch=main --substitutions=..."
   service_account = var.deploy_service_account_id
-  filename        = "cloudbuild/operar.yaml"
   substitutions   = merge(each.value, { _REGIAO = var.regiao })
 
   source_to_build {
@@ -182,7 +197,6 @@ resource "google_cloudbuild_trigger" "deploy" {
   name            = "alupdata-deploy"
   description     = "Deploy de ${var.ambiente} (ADR 030): gcloud builds triggers run alupdata-deploy --branch=main --substitutions=_MODULO=all"
   service_account = var.deploy_service_account_id
-  filename        = "cloudbuild/deploy.yaml"
 
   substitutions = {
     _AMBIENTE              = var.ambiente
@@ -347,6 +361,15 @@ resource "google_project_iam_member" "quadro_log" {
   member  = "serviceAccount:${google_service_account.quadro[0].email}"
 }
 
+resource "google_secret_manager_secret_iam_member" "grava_chave_do_quadro" {
+  for_each = var.agendados.quadro ? toset(var.gravacao_segredos) : toset([])
+
+  project   = var.project_id
+  secret_id = var.quadro_secret_id
+  role      = "roles/secretmanager.secretVersionAdder"
+  member    = each.value
+}
+
 # Único segredo que a conta do quadro lê.
 resource "google_secret_manager_secret_iam_member" "quadro_le_chave_do_quadro" {
   count = var.agendados.quadro ? 1 : 0
@@ -400,7 +423,6 @@ resource "google_cloudbuild_trigger" "agendado" {
   name            = "alupdata-ag-${each.key}"
   description     = "Agendado ${each.key} (ADR 030): disparado pelo Cloud Scheduler, ou gcloud builds triggers run alupdata-ag-${each.key} --branch=main"
   service_account = each.value.conta == "painel" ? google_service_account.painel[0].id : each.value.conta == "quadro" ? google_service_account.quadro[0].id : google_service_account.ci.id
-  filename        = each.value.arquivo
   substitutions   = each.value.substitutions
 
   source_to_build {

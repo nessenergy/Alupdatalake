@@ -1,5 +1,6 @@
 """CI no Cloud Build (ADR 030, fase 1): o arquivo do build só chama `make`, e os gatilhos são seguros."""
 
+import os
 import re
 import shutil
 import subprocess
@@ -149,7 +150,8 @@ def test_operacoes_sob_demanda_sao_gatilhos_manuais_da_conta_de_deploy() -> None
     for nome in ("executar-ingestao", "conferir-cargas", "sondar-rede", "testar-conexao"):
         assert f'"alupdata-op-{nome}"' in modulo, nome
     bloco = modulo[modulo.index('resource "google_cloudbuild_trigger" "operacao"') :]
-    assert 'filename        = "cloudbuild/operar.yaml"' in bloco
+    assert 'path      = "cloudbuild/operar.yaml"' in bloco
+    assert "filename" not in _bloco(bloco, ""), "o provider recusa filename junto de git_file_source"
     assert "service_account = var.deploy_service_account_id" in bloco
     assert "github {" not in bloco, "é manual: não pode disparar no push"
     assert "git_file_source" in bloco
@@ -188,7 +190,8 @@ def test_gatilho_de_deploy_e_manual_roda_como_a_conta_de_deploy_e_tem_as_substit
     modulo = _ler("infra/modules/cicd/main.tf")
     bloco = modulo[modulo.index('resource "google_cloudbuild_trigger" "deploy"') :]
     assert 'name            = "alupdata-deploy"' in bloco
-    assert 'filename        = "cloudbuild/deploy.yaml"' in bloco
+    assert 'path      = "cloudbuild/deploy.yaml"' in bloco
+    assert "filename" not in _bloco(bloco, ""), "o provider recusa filename junto de git_file_source"
     assert "service_account = var.deploy_service_account_id" in bloco
     assert "github {" not in bloco, "é manual: não pode disparar no push"
     assert "git_file_source" in bloco
@@ -206,6 +209,7 @@ def test_gatilho_de_deploy_e_manual_roda_como_a_conta_de_deploy_e_tem_as_substit
     assert '"${var.project_id}-tfstate"' in modulo
     assert "${var.regiao}-docker.pkg.dev/${var.project_id}/alupdata/cli" in modulo
     assert re.search(r'variable "dataform_token_versao" \{[^}]*default\s*=\s*"1"', modulo, re.DOTALL)
+    assert re.search(r"dataform_token_versao\s*=\s*var\.dataform_git_token_versao\s*!=\s*\"\"", _ler("infra/main.tf"))
     assert re.search(r'variable "ambiente"', modulo) and '["dev", "hml", "prod"]' in modulo
     assert re.search(r"ambiente\s*=\s*var\.environment", _ler("infra/main.tf"))
 
@@ -456,6 +460,7 @@ def test_agendados_gatilho_manual_e_scheduler_apontam_para_o_run_certo() -> None
     assert 'name = "alupdata-ag-${' in modulo or "alupdata-ag-" in modulo
     gatilho = _bloco(modulo, 'resource "google_cloudbuild_trigger" "agendado"')
     assert "github {" not in gatilho and "git_file_source" in gatilho and "source_to_build" in gatilho
+    assert "filename" not in _bloco(gatilho, ""), "o provider recusa filename junto de git_file_source"
     sched = _bloco(modulo, 'resource "google_cloud_scheduler_job" "agendado"')
     assert "https://cloudbuild.googleapis.com/v1/projects/${var.project_id}/locations/global/triggers/" in sched
     assert ":run" in sched and "google_cloudbuild_trigger.agendado[each.key].name" in sched
@@ -532,3 +537,85 @@ def test_leitores_execucoes_dao_leitura_do_bronze_e_job_user_sem_valor_em_hml() 
     trecho = principal[i - 600 : i + 900]
     assert "roles/bigquery.dataViewer" in trecho and "roles/bigquery.jobUser" in trecho
     assert "leitores_execucoes" not in _ler("infra/environments/hml.tfvars"), "hml adiado"
+
+
+def _sem_comentarios(hcl: str) -> str:
+    return re.sub(r"(?m)^\s*#.*$", "", hcl)
+
+
+def test_grupo_de_gravacao_acrescenta_versao_aos_segredos_do_ci_e_do_quadro() -> None:
+    modulo = _sem_comentarios(_ler("infra/modules/cicd/main.tf"))
+    assert 'variable "gravacao_segredos"' in modulo
+    ci = _bloco(modulo, 'resource "google_secret_manager_secret_iam_member" "grava_chave_do_app"')
+    assert "google_secret_manager_secret.ci_app_key.secret_id" in ci
+    assert '"roles/secretmanager.secretVersionAdder"' in ci and "var.gravacao_segredos" in ci
+    quadro = _bloco(modulo, 'resource "google_secret_manager_secret_iam_member" "grava_chave_do_quadro"')
+    assert "var.quadro_secret_id" in quadro and '"roles/secretmanager.secretVersionAdder"' in quadro
+    assert re.search(r"gravacao_segredos\s*=\s*var\.gravacao_segredos", _sem_comentarios(_ler("infra/main.tf")))
+
+
+def test_busca_main_recusa_token_vazio() -> None:
+    script = _ler("cloudbuild/busca-main.sh")
+    assert '[ -z "$TOKEN" ]' in script
+    assert script.index('[ -z "$TOKEN" ]') < script.index("REPO=")
+
+
+def test_operar_yaml_nao_assume_regiao() -> None:
+    assert yaml.safe_load(_ler("cloudbuild/operar.yaml"))["substitutions"]["_REGIAO"] == ""
+
+
+# O validate não enxerga conflitos de schema do provider (filename x git_file_source); o plan sim.
+_ROTEIRO_PLAN = """
+terraform {
+  required_providers {
+    google = { source = "hashicorp/google", version = "~> 6.0" }
+  }
+}
+provider "google" {
+  project = "projeto-ficticio"
+  region  = "us-central1"
+}
+module "cicd" {
+  source                      = "./modulo"
+  project_id                  = "projeto-ficticio"
+  repositorio_dono            = "dono"
+  repositorio_nome            = "repo"
+  deploy_service_account_id   = "projects/projeto-ficticio/serviceAccounts/deploy@p.iam.gserviceaccount.com"
+  regiao                      = "us-central1"
+  ambiente                    = "dev"
+  github_app_ci_client_id     = "Iv1.ficticio"
+  github_app_quadro_client_id = "Iv1.quadro"
+  quadro_chave_gravada        = true
+  quadro_secret_id            = "alupdata-github-quadro-app-key"
+  dataset_bronze              = "bronze"
+  painel_bucket               = "bucket-ficticio"
+  projeto_hml                 = "hml-ficticio"
+  gravacao_segredos           = ["group:operacao@exemplo.com"]
+  agendados                   = { sca = true, atribuicao = true, quadro = true, painel = true }
+}
+"""
+
+
+@pytest.mark.skipif(shutil.which("terraform") is None, reason="precisa do terraform")
+def test_plan_offline_do_modulo_cicd_sem_erro_de_schema(tmp_path: Path) -> None:
+    terraform = shutil.which("terraform") or "terraform"
+    shutil.copytree(RAIZ / "infra/modules/cicd", tmp_path / "modulo")
+    (tmp_path / "main.tf").write_text(_ROTEIRO_PLAN, encoding="utf-8")
+    env = {
+        **os.environ,
+        "GOOGLE_OAUTH_ACCESS_TOKEN": "falso",  # dispensa a credencial padrão; -refresh=false não chama a API
+        "TF_IN_AUTOMATION": "1",
+        "TF_PLUGIN_CACHE_DIR": "",
+    }
+
+    def tf(*args: str) -> subprocess.CompletedProcess[str]:
+        return subprocess.run(  # noqa: S603
+            [terraform, *args], cwd=tmp_path, env=env, capture_output=True, text=True, check=False, timeout=600
+        )
+
+    iniciar = tf("init", "-backend=false", "-input=false", "-no-color")
+    if iniciar.returncode != 0:
+        pytest.skip(f"terraform init indisponível (provider não baixado, provavelmente rede): {iniciar.stderr[-300:]}")
+    plano = tf("plan", "-refresh=false", "-input=false", "-no-color")
+    assert plano.returncode == 0, plano.stdout[-2000:] + plano.stderr[-2000:]
+    assert "only one of" not in plano.stderr

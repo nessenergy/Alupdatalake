@@ -23,7 +23,7 @@ em acompanhamento com a Alup; sua execução não é presumida por esta revisão
 > | # | Item | Dono |
 > |---|---|---|
 > | 1 | Enviar à Alupar o formato do segredo do BBCE e pedir a credencial | Ricardo |
-> | 2 | Confirmar por escrito que o TempoOK saiu do escopo | Gabriel |
+> | 2 | ~~Confirmar por escrito que o TempoOK saiu do escopo~~: dispensado, a saída está validada (23/10/2026) | Gabriel |
 > | 3 | Formato e envio das credenciais da ONS e da CCEE | Alupar |
 > | 4 | Esquema das duas bases MySQL, para escrever os conectores da Onda 3 | Alupar |
 > | 5 | Caminho de rede até o Oracle FMB via DCIDE (IP privado, VPC, aceite da sub-rede) | Thiago, Alupar |

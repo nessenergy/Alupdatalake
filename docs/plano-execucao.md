@@ -158,7 +158,7 @@ Marco 3 — 18,97% · R$ 28.160,00 · **Bloqueada por credencial da Alup**
 | 2.1 | **CCEE agente credenciado** | 32h ⚠ | Certificado/credencial de agente. **Sem caminho definido em 27/09**: aguarda a posição da Alup sobre as 32h ([#260](https://github.com/nessenergy/Alupdatalake/issues/260)); **nenhum arquivo do item existe no repositório** (levantamento de 05/10, [relatório](relatorios/2026-10-05-onda-2-levantamento.md)); se o item sair do escopo, a realocação das horas é decisão de coordenação |
 | 2.2 | **BBCE** | 28h ⚠ | Implementado no PR #131; faltam acesso e host (#23) |
 | 2.3 | **Hubspot** | 20h | **Carga real em dev e hml em 22/10** (runs `39776552963` e `39776564873`), depois de a Alupar gravar o token de aplicativo privado em 20/10. Falta conferir as linhas e fechar o dossiê |
-| 2.4 | **TempoOK** | 18h | **Retirado do escopo como fonte do lake**: o Leonardo respondeu em 20/10 (registrado pelo Gabriel no canal da equipe) que sai "integralmente do escopo". **Confirmação por escrito pendente.** Os 7 componentes dos dois produtos existem no código; a realocação das 18 h é decisão de coordenação |
+| 2.4 | **TempoOK** | 18h | **Retirado do escopo como fonte do lake**: o Leonardo respondeu em 20/10 (registrado pelo Gabriel no canal da equipe) que sai "integralmente do escopo". **Saída validada em 23/10/2026, sem necessidade de confirmação por escrito.** Os 7 componentes dos dois produtos existem no código; a realocação das 18 h é decisão de coordenação |
 | 2.5 | Tabelas Gold de preço e posição comercial | 12h | — |
 
 **Estratégia contra o bloqueio** (decidida no brainstorm): para cada fonte

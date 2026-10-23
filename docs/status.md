@@ -1,9 +1,20 @@
 # Estado do projeto
 
-Atualizado em **2026-10-22**. Visão de uma página: [`visao-consolidada.md`](visao-consolidada.md). Relatório com as evidências:
+Atualizado em **2026-10-23**. Visão de uma página: [`visao-consolidada.md`](visao-consolidada.md). Relatório com as evidências:
 [`relatorios/2026-10-22-situacao-consolidada.md`](relatorios/2026-10-22-situacao-consolidada.md). Guia de auditoria: [`auditoria.md`](auditoria.md).
 Última auditoria de ponta a ponta, com a conferência de cada número:
 [`relatorios/2026-10-02-auditoria-de-ponta-a-ponta.md`](relatorios/2026-10-02-auditoria-de-ponta-a-ponta.md).
+
+## Atualização de 23/10/2026
+
+Dia 53 de 130 do contrato (41%). Onda 2 no dia 5 de 26 (termina em 13/11); a Onda 3 começa em 24 dias (16/11); restam 77 dias.
+
+- **CI e CD no Cloud Build, sem GitHub Actions (PR #409, plano de 22/10).** Tarefas 0 a 7 implementadas e revisadas: deploy por ambiente (`cloudbuild/deploy.yaml`), as quatro operações sob demanda como gatilhos manuais (`alupdata-op-*`, código em `scripts/operacoes.py`), segredo vazio e token de leitura do GitHub App, e os agendados (SCA, atribuição, quadro, painel), todos desligados por padrão. O `terraform apply` de dev passou (10 criados, 64 alterados) e os gatilhos de PR e de push no Cloud Build estão verdes. O Actions segue ligado e é o que vale até a Fase 4 da [ADR 030](arquitetura/decisoes/030-cicd-fora-do-github-actions.md). O repositório é privado (a ADR dizia público; corrigida).
+- **Ainda sem prova real:** as quatro operações pelo Cloud Build em dev (falta o papel de gravar log na conta de deploy de dev), a checagem de atribuição no Cloud Build (depende do GitHub App de leitura, D1), o painel e os agendados (D1 e D2) e tudo em hml (D3). Roteiro pelo console em [`acoes-humanas.md`](acoes-humanas.md), seção de 23/10.
+- **Tarefas 8 e 9 do plano (semana em paralelo e desligamento do Actions) não executadas.** Dependem de D1 a D4 e do tempo.
+- **Pendências que seguem de terceiros:** FMB (rota de rede via DCIDE); BBCE (credencial e envio do formato, o e-mail está em rascunho); ONS e CCEE (formato); esquemas dos MySQL; RM/TOTVS; pasta e planilhas modelo do Drive; confirmação por escrito do TempoOK; aceite do IPDO (ADR 027); credencial e contrato da API do SINtegre para o ACOMPH.
+- **Dataform termina vermelho** em dev e hml pela asserção de qualidade do Hubspot (valor negativo ou fechamento anterior à criação). Decisão pendente.
+- **Produção** não existe; as quatro decisões do plano de 14/10 seguem abertas.
 
 ## Atualização de 22/10/2026
 

@@ -415,6 +415,12 @@ estado = "feito"
 dono = "ness."
 
 [[marco]]
+data = 2026-10-23
+titulo = "CI e CD no Cloud Build mesclados e aplicados em dev (Actions segue ligado); provas e hml dependem de passos humanos"
+estado = "feito"
+dono = "ness."
+
+[[marco]]
 data = 2026-10-16
 titulo = "Fim da janela contratual da Onda 1 (marco 2, R$ 30.720)"
 estado = "previsto"

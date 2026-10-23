@@ -41,7 +41,6 @@ SILVER_ADITIVO = (
 )
 SILVER_ONDA_1 = (
     "inmet_precipitacao",
-    "cptec_previsao",
     "ons_bacia_contorno",
     "ons_demanda_maxima",
     "aneel_tarifas",
@@ -54,7 +53,6 @@ GOLD = (
     "tarifa_vigente_distribuidora",
     "prc_vigente_comercializadora",
     "demanda_maxima_mensal_subsistema",
-    "previsao_tempo_capitais",
 )
 
 _PROIBIDAS = re.compile(

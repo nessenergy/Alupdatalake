@@ -14,7 +14,7 @@ Cada fonte só está entregue com os **7 componentes** da cláusula 2ª: conecto
 | Onda | Tema | Janela | Estado |
 |---|---|---|---|
 | 0 | Fundação e arquitetura | 31/08 a 11/09 | **Aprovada** (05/10) |
-| 1 | Mercado: APIs públicas | 14/09 a 16/10 | **Aprovada** (05/10), com IPDO, ACOMPH e CPTEC sem entrega |
+| 1 | Mercado: APIs públicas | 14/09 a 16/10 | **Aprovada** (05/10), com IPDO e ACOMPH sem entrega |
 | 2 | APIs com credenciais | 19/10 a 13/11 | **Em andamento**: Hubspot carrega; BBCE sem credencial; CCEE credenciada sem código; TempoOK fora do escopo |
 | 3 | Sistemas internos | 16/11 a 18/12 | **Em andamento**: 2 de 3 bancos conectam; FMB depende da DCIDE; faltam esquemas |
 | 4 | Planilhas, governança e handoff | 21/12 a 08/01/2027 | **Em andamento**: motor pronto; Drive aceito; faltam modelos de planilha |

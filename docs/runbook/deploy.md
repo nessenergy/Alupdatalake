@@ -189,6 +189,51 @@ Não há sincronização de DAGs nem dependência de Composer. Cloud Workflows �
 destino de orquestração da Onda 3 (ADR 017), ainda sem implantação comprovada.
 A validação local dessas guardas não comprova deploy nem homologação no GCP.
 
+## Deploy e agendados no Cloud Build
+
+Além do workflow acima, o deploy tem um caminho no **Cloud Build** ([ADR 030](../arquitetura/decisoes/030-cicd-fora-do-github-actions.md)).
+O Actions segue ligado e é o que vale até a Fase 4 da ADR; hoje os gatilhos existem **só em `dev`** (hml e prod entram quando o repositório
+for conectado ao projeto, D3 em [`acoes-humanas.md`](../acoes-humanas.md)). Tudo isso está declarado em `infra/modules/cicd/`.
+
+### Gatilho `alupdata-deploy`
+
+Manual, roda como a conta de deploy do ambiente. Dispara-se no console (Cloud Build → Gatilhos → Executar, ramificação `main`) ou por
+`gcloud builds triggers run alupdata-deploy --project=<projeto> --branch=main --substitutions=_MODULO=all`.
+
+| Substituição | Valor | Quem define |
+|---|---|---|
+| `_MODULO` | `all`, `infra` ou `connectors`, como no workflow | quem dispara |
+| `_IMAGEM_SHA` | SHA completo (40 hexadecimais) de uma imagem já publicada; obrigatório em `_MODULO=infra`, ignorado em `all` | quem dispara |
+| `_AMBIENTE` | `dev`, `hml` ou `prod` | Terraform |
+| `_IMAGEM_BASE` | `<região>-docker.pkg.dev/<projeto>/alupdata/cli` | Terraform |
+| `_TF_ESTADO` | `<projeto>-tfstate` | Terraform |
+| `_REGIAO` | região do ambiente | Terraform |
+| `_CONTA_DEPLOY` | e-mail da conta de deploy, derivado de `deploy_service_account_id` | Terraform |
+| `_DATAFORM_TOKEN_VERSAO` | versão do segredo `alupdata-dataform-git-token` | Terraform |
+
+As guardas são as do workflow (SHA válido, imagem existente, Terraform sem `latest`) e rodam antes de qualquer efeito: `cloudbuild/imagem.sh`
+e `cloudbuild/deploy.sh`. Um erro do Terraform ou do Dataform derruba o build.
+
+### Operações sob demanda
+
+Os quatro gatilhos `alupdata-op-*` (executar ingestão, conferir cargas, sondar rede, testar conexão) estão descritos em
+[`conferencia-e-sondas.md`](conferencia-e-sondas.md) e em [`incidentes.md`](incidentes.md).
+
+### Agendados (todos desligados por padrão)
+
+Cada um é um gatilho manual `alupdata-ag-<tarefa>` chamado por um Cloud Scheduler, ligado por uma flag própria no objeto `agendados` da variável
+`cicd` do ambiente (`infra/environments/<ambiente>.tfvars`). Nenhum liga sem o que depende dele:
+
+| Tarefa | Gatilho | Cron (UTC) | Para ligar |
+|---|---|---|---|
+| SCA | `alupdata-ag-sca` | `0 11 * * 1` | só a flag `sca = true` |
+| Atribuição | `alupdata-ag-atribuicao` | `0 11 * * *` | `github_app_ci_client_id` preenchido **e** uma versão no segredo `alupdata-github-ci-app-key` (D1) |
+| Quadro | `alupdata-ag-quadro` | `0 11 * * 1-5` | `github_app_quadro_client_id`, uma versão no segredo `alupdata-github-quadro-app-key` e `quadro_chave_gravada = true` |
+| Painel | `alupdata-ag-painel` | `7 */3 * * *` | `github_app_ci_client_id` e a concessão no bucket do painel, no projeto da ness. (D2) |
+
+A atribuição e o painel recusam ligar sem o client id (uma `precondition` no módulo). O passo a passo humano de cada pré-requisito está na seção
+de 23/10/2026 de [`acoes-humanas.md`](../acoes-humanas.md). Enquanto uma flag estiver desligada, o agendado equivalente do GitHub Actions continua valendo.
+
 ## SQL das camadas (Dataform)
 
 O SQL de `definitions/` é compilado pelo Dataform a partir da `main` (ADR 012):

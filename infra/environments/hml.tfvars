@@ -24,6 +24,9 @@ gravacao_segredos = ["group:operacao-datalake@ness.com.br"]
 # sem ela a operação não confere versão de secret nem configuração do Dataform.
 leitura_projeto = ["group:operacao-datalake@ness.com.br"]
 
+# O módulo cicd (CI e operações no Cloud Build, ADR 030) só liga em hml depois de D3, com o
+# repositório conectado ao projeto; antes disso o gatilho falha com 403 no deploy. Nada ligado aqui.
+
 # Quem configura o login do Portal no console (cliente OAuth "Externo" e IAP):
 # a ness. confere o que entrega. Sem acesso a dado (runbook/portal.md).
 configuracao_login_portal = ["group:operacao-datalake@ness.com.br"]

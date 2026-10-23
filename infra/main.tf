@@ -270,6 +270,24 @@ module "catalogo" {
   bucket_raw          = module.storage.bucket_raw
 }
 
+# Quem lê as execuções deste ambiente (a conta do painel, em hml): jobUser não dá acesso a dado.
+resource "google_bigquery_dataset_iam_member" "leitores_execucoes" {
+  for_each = toset(var.leitores_execucoes)
+
+  project    = var.project_id
+  dataset_id = module.bigquery.dataset_ids["bronze"]
+  role       = "roles/bigquery.dataViewer"
+  member     = each.value
+}
+
+resource "google_project_iam_member" "leitores_execucoes_jobs" {
+  for_each = toset(var.leitores_execucoes)
+
+  project = var.project_id
+  role    = "roles/bigquery.jobUser"
+  member  = each.value
+}
+
 # CI no Cloud Build (ADR 030, fase 1): só existe com `cicd` preenchida.
 module "cicd" {
   count  = var.cicd == null ? 0 : 1
@@ -278,6 +296,30 @@ module "cicd" {
   project_id       = var.project_id
   repositorio_dono = var.cicd.repositorio_dono
   repositorio_nome = var.cicd.repositorio_nome
+
+  github_app_ci_client_id     = var.cicd.github_app_ci_client_id
+  github_app_quadro_client_id = var.cicd.github_app_quadro_client_id
+  agendados                   = var.cicd.agendados
+  quadro_chave_gravada        = var.cicd.quadro_chave_gravada
+  quadro_secret_id            = module.secrets.quadro_app_key_secret_id
+  dataset_bronze              = module.bigquery.dataset_ids["bronze"]
+
+  # O gatilho exige o id completo da conta; deriva-se do e-mail já passado por -var no deploy.
+  deploy_service_account_id = "projects/${var.project_id}/serviceAccounts/${var.deploy_service_account}"
+  regiao                    = var.region
+  ambiente                  = var.environment
+  gravacao_segredos         = var.gravacao_segredos
+  # Vazio na raiz (Dataform desligado) cai no "1" do módulo: o deploy.sh devolve este valor à raiz por -var.
+  dataform_token_versao = var.dataform_git_token_versao != "" ? var.dataform_git_token_versao : "1"
+}
+
+# Disparar gatilho com conta própria exige agir como a conta de deploy (ADR 030).
+resource "google_service_account_iam_member" "operacao_age_como_deploy" {
+  for_each = var.cicd == null || var.deploy_service_account == "" ? toset([]) : toset(var.gestao_cicd)
+
+  service_account_id = "projects/${var.project_id}/serviceAccounts/${var.deploy_service_account}"
+  role               = "roles/iam.serviceAccountUser"
+  member             = each.value
 }
 
 # Onda 3 (ADR 017): a cadeia só existe quando houver fonte interna ingerida.

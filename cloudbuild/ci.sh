@@ -3,6 +3,16 @@
 set -euo pipefail
 
 ALVOS="${1:-ci}"
+
+# A checagem de atribuição compara com a main; quem a busca é o passo busca-main (ci-com-atribuicao.yaml).
+case " $ALVOS " in *" ci "* | *" ci-atribuicao "*)
+  git rev-parse --verify --quiet origin/main >/dev/null || {
+    echo "ci-atribuicao exige origin/main, e o passo busca-main não a trouxe (use cloudbuild/ci-com-atribuicao.yaml)"
+    exit 1
+  }
+  ;;
+esac
+
 UV_VERSAO="0.5.11"
 TERRAFORM_VERSAO="1.15.8"
 

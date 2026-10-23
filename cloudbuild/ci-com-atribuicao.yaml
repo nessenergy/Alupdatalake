@@ -1,0 +1,30 @@
+# CI no Cloud Build com a checagem de atribuição (ADR 030). Igual ao ci.yaml, mais o passo `busca-main`, que
+# traz a main do repositório privado com um token de leitura do GitHub App (decisão D1). O gatilho de PR só usa
+# este arquivo quando `github_app_ci_client_id` está preenchido e o segredo alupdata-github-ci-app-key tem versão;
+# `availableSecrets` sem versão derruba o build inteiro, por isso o ci.yaml segue valendo até lá.
+steps:
+  - id: busca-main
+    name: node:22-bookworm
+    entrypoint: bash
+    secretEnv: [CHAVE_APP]
+    env: ["CLIENT_ID_APP=${_CLIENT_ID_APP}"]
+    args: ["cloudbuild/busca-main.sh"]
+  - id: ci
+    name: node:22-bookworm
+    entrypoint: bash
+    args: ["cloudbuild/ci.sh", "${_ALVOS}"]
+
+availableSecrets:
+  secretManager:
+    - versionName: projects/$PROJECT_ID/secrets/alupdata-github-ci-app-key/versions/latest
+      env: CHAVE_APP
+
+substitutions:
+  _ALVOS: "ci"
+  _CLIENT_ID_APP: ""
+
+options:
+  # Conta de serviço própria exige log no Cloud Logging (ou num bucket); sem isso o build é recusado.
+  logging: CLOUD_LOGGING_ONLY
+
+timeout: 1800s

@@ -110,14 +110,32 @@ filtro por data resolva isso.
 
 ## 4. Reprocessar
 
-Pessoa não executa job direto (ADR 015). O disparo manual é pelo workflow
-**Executar ingestão** do GitHub, que registra quem disparou, qual conector e
-com que janela.
+Pessoa não executa job direto (ADR 015). O disparo manual é pelo gatilho do
+Cloud Build `alupdata-op-executar-ingestao`, que registra quem disparou, qual
+conector e com que janela. Os comandos completos e a tabela de substituições
+estão em [`deploy.md`](deploy.md) (seção "No GCP: gatilho `alupdata-op-executar-ingestao`").
+
+Quem dispara precisa estar no grupo `operacao-datalake`, que tem
+`roles/cloudbuild.builds.editor` no projeto e `roles/iam.serviceAccountUser` na conta de deploy
+(o build roda como ela). O projeto escolhe o ambiente: use o projeto do `dev`, `hml` ou `prod`.
+Hoje os gatilhos e os papéis do grupo só existem em `dev` (`hml` e `prod` entram com D3).
+
+> Transição: até a Fase 4 da ADR 030 desligar o GitHub Actions, o caminho antigo (`gh workflow run ...`)
+> continua valendo em paralelo. Depois dela, só o gatilho do Cloud Build.
 
 ### 4.1 Uma janela, direto da origem
 
-Workflow **Executar ingestão**, com `environment`, `conector` (como
-`ons_carga`; a lista sai de `alupdata listar`), `de` e `ate`.
+```bash
+gcloud builds triggers run alupdata-op-executar-ingestao --project=<projeto> --branch=main \
+  --substitutions=_CONECTOR=ons_carga,_DE=2026-01-01,_ATE=2026-01-31
+```
+
+| Substituição | Valor |
+|---|---|
+| `_CONECTOR` | rótulo como `ons_carga`; a lista sai de `alupdata listar` |
+| `_DE`, `_ATE` | início e fim da janela, `AAAA-MM-DD` |
+
+O ambiente é o do `--project`.
 
 **Recarga longa: janelas de até 3 meses.** O job do Cloud Run tem limite de 1800 s por execução
 (com 2 novas tentativas). Uma fonte pesada, como as usinas do ONS, leva de 9 a 16 minutos por
@@ -129,8 +147,8 @@ dispare uma execução por trecho de até 3 meses, **uma de cada vez**, e confir
 
 ### 4.2 Replay de um raw já arquivado
 
-Mesmo workflow, com `uri` apontando para o objeto `gs://` do raw e a **janela
-original** em `de` e `ate`. A execução fica com `modo = REPLAY` em
+Mesmo gatilho, com `_URI` apontando para o objeto `gs://` do raw e a **janela
+original** em `_DE` e `_ATE`. A execução fica com `modo = REPLAY` em
 `bronze._execucoes`. É o caminho depois de uma correção de schema (§3.2).
 
 ### 4.3 Conferir

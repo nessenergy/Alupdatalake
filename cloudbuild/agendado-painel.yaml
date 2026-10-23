@@ -1,0 +1,28 @@
+# Agendado do Painel (ADR 030): equivale ao painel.yml. Lê dev (conta alupdata-painel) e hml, lê as issues com o
+# token de leitura do App do CI e publica no bucket do projeto da ness. (exige D2). Bucket e projetos vêm do
+# gatilho (módulo cicd), nunca de literal aqui.
+steps:
+  - id: agendado
+    name: gcr.io/google.com/cloudsdktool/cloud-sdk:stable
+    entrypoint: bash
+    secretEnv: [CHAVE_APP]
+    args: ["cloudbuild/agendado.sh"]
+    env:
+      - "TAREFA=painel"
+      - "CLIENT_ID_APP=${_CLIENT_ID_APP}"
+      - "PAINEL_BUCKET=${_PAINEL_BUCKET}"
+      - "PROJETO_DEV=${_PROJETO_DEV}"
+      - "PROJETO_HML=${_PROJETO_HML}"
+availableSecrets:
+  secretManager:
+    - versionName: projects/$PROJECT_ID/secrets/alupdata-github-ci-app-key/versions/latest
+      env: CHAVE_APP
+substitutions:
+  _CLIENT_ID_APP: ""
+  _PAINEL_BUCKET: ""
+  _PROJETO_DEV: ""
+  _PROJETO_HML: ""
+options:
+  # Conta de serviço própria exige log no Cloud Logging (ou num bucket); sem isso o build é recusado.
+  logging: CLOUD_LOGGING_ONLY
+timeout: 1800s

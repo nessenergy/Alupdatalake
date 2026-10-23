@@ -1,0 +1,31 @@
+# Deploy no Cloud Build (ADR 030). Tradução do workflow deploy.yml: o arquivo só chama o script; a lógica está
+# em cloudbuild/deploy.sh. Gatilho manual, como a conta de deploy (alupdata-deploy).
+steps:
+  - id: imagem
+    name: gcr.io/cloud-builders/docker
+    entrypoint: bash
+    args: ["cloudbuild/imagem.sh"]
+    env:
+      - "AMBIENTE=${_AMBIENTE}"
+      - "MODULO=${_MODULO}"
+      - "IMAGEM_BASE=${_IMAGEM_BASE}"
+      - "REGIAO=${_REGIAO}"
+      - "COMMIT_SHA=${COMMIT_SHA}"
+  - id: infra
+    name: gcr.io/google.com/cloudsdktool/cloud-sdk:stable
+    entrypoint: bash
+    args: ["cloudbuild/deploy.sh"]
+    env:
+      - "AMBIENTE=${_AMBIENTE}"
+      - "MODULO=${_MODULO}"
+      - "IMAGEM_SHA=${_IMAGEM_SHA}"
+      - "IMAGEM_BASE=${_IMAGEM_BASE}"
+      - "TF_ESTADO=${_TF_ESTADO}"
+      - "REGIAO=${_REGIAO}"
+      - "DATAFORM_TOKEN_VERSAO=${_DATAFORM_TOKEN_VERSAO}"
+      - "COMMIT_SHA=${COMMIT_SHA}"
+      - "CONTA_DEPLOY=${_CONTA_DEPLOY}"
+options:
+  # Conta de serviço própria exige log no Cloud Logging (ou num bucket); sem isso o build é recusado.
+  logging: CLOUD_LOGGING_ONLY
+timeout: 3000s

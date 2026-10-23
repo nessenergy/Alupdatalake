@@ -1,0 +1,24 @@
+# Agendado do Quadro (ADR 030): equivale ao quadro.yml. Usa o App do quadro (segredo alupdata-github-quadro-app-key).
+# Sem client id o agendado.sh avisa e sai com sucesso; `availableSecrets` sem versão derruba o build, por isso o
+# gatilho só é ligado depois que a chave do App foi gravada (runbook acompanhamento-semanal).
+# ATENÇÃO: `agendados.quadro = true` exige que o segredo do quadro JÁ TENHA UMA VERSÃO, senão o build cai na largada;
+# o módulo recusa ligar sem `quadro_chave_gravada = true`. Roda como a conta própria alupdata-quadro.
+steps:
+  - id: agendado
+    name: gcr.io/google.com/cloudsdktool/cloud-sdk:stable
+    entrypoint: bash
+    secretEnv: [CHAVE_APP]
+    args: ["cloudbuild/agendado.sh"]
+    env:
+      - "TAREFA=quadro"
+      - "CLIENT_ID_APP=${_CLIENT_ID_APP}"
+availableSecrets:
+  secretManager:
+    - versionName: projects/$PROJECT_ID/secrets/alupdata-github-quadro-app-key/versions/latest
+      env: CHAVE_APP
+substitutions:
+  _CLIENT_ID_APP: ""
+options:
+  # Conta de serviço própria exige log no Cloud Logging (ou num bucket); sem isso o build é recusado.
+  logging: CLOUD_LOGGING_ONLY
+timeout: 1800s

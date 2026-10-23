@@ -1,0 +1,11 @@
+# Agendado SCA semanal (ADR 030): equivale ao cron do sca.yml. Sem token e sem segredo; a lógica está em agendado.sh.
+steps:
+  - id: agendado
+    name: node:22-bookworm
+    entrypoint: bash
+    args: ["cloudbuild/agendado.sh"]
+    env: ["TAREFA=sca"]
+options:
+  # Conta de serviço própria exige log no Cloud Logging (ou num bucket); sem isso o build é recusado.
+  logging: CLOUD_LOGGING_ONLY
+timeout: 1800s

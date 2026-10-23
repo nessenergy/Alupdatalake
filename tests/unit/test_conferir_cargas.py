@@ -184,3 +184,64 @@ def test_conferencia_mostra_os_negocios_do_hubspot_fora_da_regra_sem_vazar_valor
     colunas_escolhidas = lista.split(" FROM ")[0]
     for dado_do_cliente in ("valor,", "nome", "email", "proprietario"):
         assert dado_do_cliente not in colunas_escolhidas
+
+
+# Silvers que a conferência por contagem de linhas não cobre. Elas são acompanhadas pela `gold.saude_ingestao`
+# (frescor e erro por fonte), e o teste abaixo obriga a decidir sobre toda Silver nova: entra em `SILVER` ou entra aqui.
+EXCECOES_DA_CONFERENCIA = frozenset(
+    {
+        "aneel_siga",
+        "bbce_curva_forward",
+        "bcb_cambio_ptax",
+        "bcb_juros",
+        "ccee_agente",
+        "ccee_consumo_classe_agente",
+        "ccee_contabilizacao_perfil",
+        "ccee_contabilizacao_perfil_historico",
+        "ccee_contrato_montante",
+        "ccee_cvu_conjuntural",
+        "ccee_cvu_conjuntural_revisado",
+        "ccee_cvu_estrutural",
+        "ccee_cvu_merchant",
+        "ccee_encargo_ess",
+        "ccee_energia_reserva",
+        "ccee_energia_reserva_consumo_referencia",
+        "ccee_exposicao_financeira",
+        "ccee_geracao_usina",
+        "ccee_perfil",
+        "ccee_pld",
+        "ccee_reserva_encargo",
+        "ccee_varejista_consumidor",
+        "hubspot_negocios",
+        "ibge_ipca",
+        "ons_balanco_energia",
+        "ons_capacidade",
+        "ons_carga",
+        "ons_cmo_semi_horario",
+        "ons_cvu_termica",
+        "ons_disponibilidade_usina",
+        "ons_ear",
+        "ons_ear_bacia",
+        "ons_ear_reservatorio",
+        "ons_ena",
+        "ons_ena_bacia",
+        "ons_ena_reservatorio",
+        "ons_geracao_exportacao",
+        "ons_geracao_usina",
+        "ons_intercambio_internacional",
+        "ons_intercambio_nacional",
+        "ons_restricao_coff_eolica",
+        "ons_restricao_coff_fotovoltaica",
+        "ons_volume_espera",
+        "tempook_boletins",
+        "tempook_ena_prevs",
+    }
+)
+
+
+def test_toda_silver_esta_na_conferencia_ou_na_lista_de_excecoes():
+    """Fonte nova sem entrada na conferência passaria despercebida; a exceção tem de ser escrita."""
+    silvers = {p.stem for p in (RAIZ / "definitions" / "silver").glob("*.sqlx")}
+    assert silvers - set(cc.SILVER) - EXCECOES_DA_CONFERENCIA == set()
+    assert not EXCECOES_DA_CONFERENCIA & set(cc.SILVER), "fonte na lista e na exceção ao mesmo tempo"
+    assert silvers >= EXCECOES_DA_CONFERENCIA, "exceção de Silver que não existe mais"

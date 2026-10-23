@@ -44,7 +44,7 @@ Cada fonte só está entregue com os **7 componentes** da cláusula 2ª: conecto
 
 | De | O quê |
 |---|---|
-| Alupar | credencial do BBCE; formato e envio da ONS e da CCEE; esquema das bases MySQL; RM/TOTVS; chamado com a DCIDE; pasta do Drive e planilhas modelo; confirmação por escrito do TempoOK |
+| Alupar | credencial do BBCE; formato e envio da ONS e da CCEE; esquema das bases MySQL; RM/TOTVS; chamado com a DCIDE; pasta do Drive e planilhas modelo |
 | ness. | enviar o formato do BBCE; reaplicar o bootstrap em dev e hml; decidir a produção; decidir sobre DECOMP e NEWAVE |
 
 ## Para auditar

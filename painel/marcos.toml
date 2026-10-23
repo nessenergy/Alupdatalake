@@ -176,7 +176,7 @@ codigo = "2.4"
 titulo = "TempoOK"
 horas = 18
 pronto = 0.8
-nota = "retirada do escopo como fonte do lake, comunicada em 20/10; confirmação por escrito pendente"
+nota = "retirada do escopo como fonte do lake, comunicada em 20/10 e validada em 23/10"
 
 [[onda.item]]
 codigo = "2.5"

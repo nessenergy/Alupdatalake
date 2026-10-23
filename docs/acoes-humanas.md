@@ -29,6 +29,73 @@ destrava. Os comandos foram executados ou conferidos em 23/09, no ambiente
 > 1. **Reaplicar o bootstrap em dev e hml** (`infra/bootstrap`, com `environments/dev.tfvars` e `environments/hml.tfvars`). Em dev, concede à conta de deploy o papel que cria os gatilhos do Cloud Build; em hml, o papel que lê o log do contêiner. Sem isso, o deploy de dev termina vermelho no passo dos gatilhos.
 > 2. **Enviar à Alupar o e-mail** com o formato do BBCE e as perguntas pendentes (está em rascunho no Outlook).
 > 3. **Instalar o aplicativo do Cloud Build no GitHub** e conectar o repositório: feito em 19/10.
+
+---
+
+## Atualização de 23/10/2026 — passos humanos do CI e CD no Cloud Build
+
+Contexto: os gatilhos de PR e de push já rodam no Cloud Build (verdes), e o Terraform de deploy e de operações foi aplicado em dev em 22/10. O que segue depende de uma pessoa. Está na ordem em que deve ser feito. Plano completo em [`superpowers/plans/2026-10-22-cicd-completo-sem-actions.md`](superpowers/plans/2026-10-22-cicd-completo-sem-actions.md).
+
+Estado do bootstrap, conferido pela lista de IAM em 22/10: em **dev** a conta de deploy já tem "Editor do Cloud Build"; em **hml** a conta de deploy já tem "Editor do Cloud Build" e "Visualizador de registros". Falta, em **dev**, o papel de gravar log (passo 1).
+
+### 1. Dev: dar à conta de deploy o papel de gravar log (quem tem Owner, 1 minuto)
+
+Sem ele, os builds de deploy e de operação rodam sem log.
+
+1. Abra https://console.cloud.google.com/iam-admin/iam?project=alupar-dev-alupdata
+2. **Permitir acesso**. Em **Novos membros**: `alupdata-deploy@alupar-dev-alupdata.iam.gserviceaccount.com`.
+3. Papel: **Gravador de registros** (`roles/logging.logWriter`). **Salvar**.
+
+É o mesmo papel que o bootstrap concede (`infra/bootstrap`); dar pelo console agora e reaplicar o bootstrap depois não conflita, porque a concessão é idempotente.
+
+### 2. Dev: provar as quatro operações pelo console
+
+Depende do passo 1. Com uma conta da ness. que tenha o papel do grupo `operacao-datalake`:
+
+1. Abra https://console.cloud.google.com/cloud-build/triggers?project=alupar-dev-alupdata
+2. Nos gatilhos `alupdata-op-*`, clique em **Executar** (ramificação `main`) e, onde houver, preencha as substituições:
+
+| Gatilho | Substituições | O que esperar |
+|---|---|---|
+| `alupdata-op-conferir-cargas` | nenhuma | tabela com as contagens; `cptec_previsao` com 162 linhas |
+| `alupdata-op-executar-ingestao` | `_CONECTOR` = `cptec_previsao` | build verde, execução concluída |
+| `alupdata-op-sondar-rede` | `_SONDA` = `cptec` | o JSON da sonda no log |
+| `alupdata-op-testar-conexao` | `_FONTE` = `comercializacao` | "conexão aberta e SELECT 1 respondido" |
+
+3. Abra o histórico do build e veja o log da etapa `operar`. Se algum falhar, copie o fim do log (as primeiras 10 linhas depois de `ERROR: build step`) e mande: o erro mostra o que ajustar.
+
+### 3. D1: o aplicativo de leitura do GitHub (dono da organização `nessenergy`)
+
+Devolve a checagem de atribuição (regra 6) ao Cloud Build e permite o painel e a varredura diária. O repositório é privado, e o build não tem credencial do GitHub.
+
+1. No GitHub: **organização `nessenergy` → Settings → Developer settings → GitHub Apps → New GitHub App**.
+2. Nome `alupdata-ci`; **Homepage URL** qualquer (a do repositório); **Webhook**: desmarque *Active*.
+3. **Repository permissions**, todas em **Read-only**: *Contents*, *Issues*, *Pull requests*. (*Metadata* já vem.) Nada de escrita.
+4. **Where can this GitHub App be installed?** *Only on this account*. **Create GitHub App**.
+5. Na página do app, anote o **Client ID** (começa com `Iv`). Em **Private keys → Generate a private key**, guarde o arquivo `.pem` baixado.
+6. **Install App** → organização `nessenergy` → **Only select repositories** → `Alupdatalake`.
+7. Grave a chave no Secret Manager: https://console.cloud.google.com/security/secret-manager?project=alupar-dev-alupdata → segredo `alupdata-github-ci-app-key` → **Nova versão** → **Fazer upload do arquivo** com o `.pem` (quem estiver no grupo de gravação de segredos). Depois **apague o `.pem` do computador**.
+8. Me passe o **Client ID** (não é segredo). Eu o coloco em `infra/environments/dev.tfvars` (`github_app_ci_client_id`), e o gatilho de PR passa a rodar a variante com a checagem de atribuição.
+
+### 4. D2: o painel no projeto da ness. (quem administra `ness-painel-projetos`)
+
+Só depois do D1 e da conta `alupdata-painel` existir (liga com `agendados.painel` no Terraform). No projeto `ness-painel-projetos`, no bucket `ness-painel-projetos-alupdata` (https://console.cloud.google.com/storage/browser/ness-painel-projetos-alupdata?project=ness-painel-projetos → **Permissões → Conceder acesso**): conceder **Administrador de objetos do Storage** (`roles/storage.objectAdmin`) à conta `alupdata-painel@alupar-dev-alupdata.iam.gserviceaccount.com`. Até lá, o painel continua pelo Actions.
+
+### 5. D3: hml (quem tem Owner)
+
+1. Conectar o repositório ao projeto de hml: https://console.cloud.google.com/cloud-build/repositories/1st-gen?project=alupar-hm-alupdata → **Conectar repositório** → GitHub (aplicativo do Cloud Build) → `nessenergy/Alupdatalake`.
+2. Em hml a conta de deploy já tem os papéis do Cloud Build e de log. Depois dos dois itens, me avise: eu abro o PR que liga o módulo `cicd` em `hml.tfvars`.
+
+### 6. D4: desligar o CodeQL (dono da organização)
+
+No repositório: **Settings → Code security → Code scanning → CodeQL analysis → Disable CodeQL**. O SAST contratual continua com Bandit, a SCA com `pip-audit` e os segredos com Gitleaks.
+
+### O que isto destrava
+
+Passos 1 e 2: o CD e as operações no Cloud Build provados em dev. Passo 3: a checagem de atribuição no Cloud Build. Passos 4 e 5: painel e hml. Passo 6 e a semana de operação em paralelo: o desligamento do GitHub Actions (Fase 4 da [ADR 030](arquitetura/decisoes/030-cicd-fora-do-github-actions.md)).
+
+---
+
 ## 0. ~~Reativar o GitHub Actions~~ — resolvido em 24/09
 
 Parou por cota às 03h e voltou no fim da manhã, com a cobrança regularizada.

@@ -504,6 +504,11 @@ resource "google_cloud_run_v2_job" "ingestao" {
   project  = var.project_id
   location = var.region
 
+  # O job é configuração versionada, não dado. Com a proteção ligada (padrão do provider), retirar uma fonte do mapa
+  # `conectores` falha o apply ("cannot destroy job without setting deletion_protection=false"), como aconteceu
+  # com o CPTEC em 23/10/2026, e deixa todo deploy seguinte vermelho.
+  deletion_protection = false
+
   template {
     template {
       service_account = var.service_account_email

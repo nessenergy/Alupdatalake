@@ -170,3 +170,17 @@ def test_texto_de_erro_vindo_do_bigquery_passa_pelo_sanitizador():
     texto = str(secoes)
     assert "abc123segredo" not in texto
     assert "[REDACTED]" in texto
+
+
+def test_conferencia_mostra_os_negocios_do_hubspot_fora_da_regra_sem_vazar_valor():
+    itens = {item.rotulo: item.sql for _, lista in conjuntos() for item in lista}
+
+    contagem = itens["hubspot_negocios_fora_da_regra"]
+    assert "valor < 0" in contagem
+    assert "data_fechamento < DATE(criado_em)" in contagem
+
+    lista = itens["hubspot_negocios_reprovados"]
+    assert "negocio_id" in lista and "LIMIT 50" in lista
+    colunas_escolhidas = lista.split(" FROM ")[0]
+    for dado_do_cliente in ("valor,", "nome", "email", "proprietario"):
+        assert dado_do_cliente not in colunas_escolhidas

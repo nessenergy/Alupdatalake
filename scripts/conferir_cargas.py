@@ -147,6 +147,30 @@ def montar_conjuntos(projeto: str, bronze: str, silver: str, gold: str) -> list[
             ),
         )
     )
+    # As duas regras são as `rowConditions` de definitions/silver/hubspot_negocios.sqlx. Só sai o id do negócio:
+    # valor, nome, e-mail e proprietário são dado do cliente e não vão para o resumo da execução.
+    silver_itens.append(
+        Item(
+            "hubspot_negocios_fora_da_regra",
+            _sql(
+                "SELECT COUNT(*) AS negocios, COUNTIF(valor < 0) AS valor_negativo, "
+                "COUNTIF(data_fechamento IS NOT NULL AND data_fechamento < DATE(criado_em)) "
+                "AS fechamento_antes_da_criacao FROM $t",
+                t=tabela(silver, "hubspot_negocios"),
+            ),
+        )
+    )
+    silver_itens.append(
+        Item(
+            "hubspot_negocios_reprovados",
+            _sql(
+                "SELECT negocio_id, IF(valor < 0, 'valor_negativo', 'fechamento_antes_da_criacao') AS regra "
+                "FROM $t WHERE valor < 0 OR (data_fechamento IS NOT NULL AND data_fechamento < DATE(criado_em)) "
+                "ORDER BY regra, negocio_id LIMIT 50",
+                t=tabela(silver, "hubspot_negocios"),
+            ),
+        )
+    )
     execucao_itens = [
         Item(
             "ultima_execucao",

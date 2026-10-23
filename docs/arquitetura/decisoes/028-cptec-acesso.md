@@ -122,3 +122,7 @@ O webservice `servicos.cptec.inpe.br/XML` voltou a responder **200** (com `x-rat
 devolveu a previsão de 6 dias das 27 capitais. O 403 de 02 e 03/10 não se repete. A causa do bloqueio nunca foi confirmada; o
 conector falha alto se ele voltar. A fonte passa a (A): ver a [ADR 029](029-previsao-do-tempo-fonte.md) e o dicionário
 [`cptec_previsao`](../../dicionario-dados/cptec_previsao.md).
+
+## Adendo de 23/10/2026
+
+O CPTEC **saiu do escopo** (decisão informada pelo Ricardo em 23/10/2026). O conector `cptec_previsao` e seus componentes foram retirados do repositório; o histórico das investigações desta ADR e o adendo de 22/10 ficam como registro. A sonda `cptec` (`alupdata sondar cptec`) continua disponível como ferramenta de diagnóstico de rede.

@@ -23,7 +23,7 @@ testes, agendamento e dicionário com linhagem.
 | Onda | Tema | Janela | Estado |
 |------|------|--------|--------|
 | 0 | Fundação e arquitetura | 31/08 a 11/09 | **Aprovada** (05/10) |
-| 1 | Inteligência de mercado: APIs públicas | 14/09 a 16/10 | **Aprovada** (05/10); IPDO, ACOMPH e CPTEC sem entrega |
+| 1 | Inteligência de mercado: APIs públicas | 14/09 a 16/10 | **Aprovada** (05/10); IPDO e ACOMPH sem entrega |
 | 2 | APIs com credenciais | 19/10 a 13/11 | **Em andamento**: Hubspot carrega; BBCE sem credencial; CCEE credenciada sem código; TempoOK fora do escopo |
 | 3 | Sistemas internos | 16/11 a 18/12 | **Em andamento**: 2 de 3 bancos conectam; Oracle FMB depende de rede via terceiro |
 | 4 | Planilhas, governança e handoff | 21/12 a 08/01/2027 | **Em andamento**: motor de planilhas pronto; leitor do Google Drive a escrever |

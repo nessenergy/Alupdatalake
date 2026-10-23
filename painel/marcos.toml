@@ -421,6 +421,12 @@ estado = "feito"
 dono = "ness."
 
 [[marco]]
+data = 2026-10-23
+titulo = "CPTEC sai do escopo; conector e agendamento retirados"
+estado = "feito"
+dono = "ness."
+
+[[marco]]
 data = 2026-10-16
 titulo = "Fim da janela contratual da Onda 1 (marco 2, R$ 30.720)"
 estado = "previsto"

@@ -145,14 +145,6 @@ variable "conectores" {
       cron         = "0 11 * * 1"
       ultimos_dias = 1 # retrato da página; a janela não se aplica
     }
-    cptec_previsao = {
-      # Onda 1, "previsão do tempo" da cláusula 4ª. O webservice do CPTEC voltou a responder em 22/10/2026 (403 em
-      # 02 e 03/10, ADR 028 e 029), com limite de 120 requisições por janela: 27 capitais, uma requisição cada.
-      # Retrato da previsão vigente, sem janela (os dias previstos são de hoje em diante, e a janela da CLI termina
-      # ontem). Diário às 11h; o Bronze é append-only e cada emissão fica como uma foto da previsão.
-      cron         = "0 11 * * *"
-      ultimos_dias = 1 # retrato; a janela não se aplica
-    }
     aneel_tarifas = {
       # Onda 1, "ANEEL tarifas regulatórias". O CSV (89 MB, 328 mil linhas) é
       # reescrito inteiro; o conector lê tudo em stream e fica com as linhas cujo

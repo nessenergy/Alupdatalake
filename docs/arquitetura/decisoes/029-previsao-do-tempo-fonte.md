@@ -52,3 +52,7 @@ Alternativas avaliadas (leitura pública, da máquina de desenvolvimento, em 03/
 O CPTEC voltou a responder 200 (ver o adendo da [ADR 028](028-cptec-acesso.md)); vale a **saída A**: o conector `cptec_previsao` foi
 construído, com os 7 componentes, para as 27 capitais. É um retrato da previsão vigente, sem janela, e não traz precipitação em mm. As
 alternativas (INMET, Open-Meteo) seguem não adotadas.
+
+## Adendo de 23/10/2026
+
+O CPTEC **saiu do escopo** (decisão informada pelo Ricardo em 23/10/2026). O conector `cptec_previsao` e seus componentes foram retirados do repositório; o histórico das investigações desta ADR e o adendo de 22/10 ficam como registro. A sonda `cptec` (`alupdata sondar cptec`) continua disponível como ferramenta de diagnóstico de rede.

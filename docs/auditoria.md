@@ -66,7 +66,7 @@ Registradas para que a auditoria as encontre aqui e não por descoberta:
 |---|---|
 | **Produção não existe** | só `dev` e `hml` estão aplicados; o plano do bootstrap está em [`superpowers/plans/2026-10-14-bootstrap-producao.md`](superpowers/plans/2026-10-14-bootstrap-producao.md) |
 | **`main` sem proteção de branch** | decisão consciente, [ADR 010](arquitetura/decisoes/010-aceite-risco-main-sem-protecao.md); a revisão é por PR e CI |
-| **Alguns itens da Onda 1 sem entrega** | IPDO, ACOMPH e CPTEC, com as decisões em [ADR 027](arquitetura/decisoes/027-ons-operacional-ipdo-acomph.md), [028](arquitetura/decisoes/028-cptec-acesso.md) e [029](arquitetura/decisoes/029-previsao-do-tempo-fonte.md) |
+| **Alguns itens da Onda 1 sem entrega** | IPDO e ACOMPH, com as decisões em [ADR 027](arquitetura/decisoes/027-ons-operacional-ipdo-acomph.md). O CPTEC saiu do escopo em 23/10/2026 ([ADR 028](arquitetura/decisoes/028-cptec-acesso.md) e [029](arquitetura/decisoes/029-previsao-do-tempo-fonte.md)) |
 | **Fontes da Onda 3 dependem de rede e de esquema** | FMB (Oracle) depende de caminho de rede via terceiro; os bancos MySQL conectam, mas faltam os esquemas |
 | **558 testes ignorados** | cerca de 96% são regras SQL parametrizadas que não se aplicam à camada testada, por desenho; o resto exige contêiner de banco ou chamada real opt-in |
 | **Eliminação de dados de teste** (cláusula 8.3) | a executar na homologação final de cada etapa |

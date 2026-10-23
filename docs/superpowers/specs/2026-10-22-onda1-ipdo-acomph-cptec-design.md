@@ -4,6 +4,8 @@ Data: 22/10/2026. Origem: o pedido de fechar os três itens da Onda 1 que seguia
 Base: ADR [027](../../arquitetura/decisoes/027-ons-operacional-ipdo-acomph.md), [028](../../arquitetura/decisoes/028-cptec-acesso.md) e
 [029](../../arquitetura/decisoes/029-previsao-do-tempo-fonte.md).
 
+> **Atualização de 23/10/2026:** o CPTEC saiu do escopo; a seção 2.1 fica como registro do que foi construído e retirado.
+
 ## 1. O que mudou desde as ADRs, medido em 22/10/2026
 
 | Fonte | Em 03/10 | Em 22/10 | Efeito |

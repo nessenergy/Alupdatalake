@@ -57,9 +57,9 @@ Depende do passo 1. Com uma conta da ness. que tenha o papel do grupo `operacao-
 
 | Gatilho | Substituições | O que esperar |
 |---|---|---|
-| `alupdata-op-conferir-cargas` | nenhuma | tabela com as contagens; `cptec_previsao` com 162 linhas |
-| `alupdata-op-executar-ingestao` | `_CONECTOR` = `cptec_previsao` | build verde, execução concluída |
-| `alupdata-op-sondar-rede` | `_SONDA` = `cptec` | o JSON da sonda no log |
+| `alupdata-op-conferir-cargas` | nenhuma | tabela com as contagens por fonte |
+| `alupdata-op-executar-ingestao` | `_CONECTOR` = `bcb_cambio_ptax` | build verde, execução concluída |
+| `alupdata-op-sondar-rede` | `_SONDA` = `inmet_previsao` | o JSON da sonda no log |
 | `alupdata-op-testar-conexao` | `_FONTE` = `comercializacao` | "conexão aberta e SELECT 1 respondido" |
 
 3. Abra o histórico do build e veja o log da etapa `operar`. Se algum falhar, copie o fim do log (as primeiras 10 linhas depois de `ERROR: build step`) e mande: o erro mostra o que ajustar.

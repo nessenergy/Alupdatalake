@@ -36,7 +36,8 @@ COMERCIALIZADORA = "ACE Comercializadora"
 PRECOS_ESPERADOS = 24  # 4 submercados × 2 tipos de energia × 3 prazos
 
 # O PRC da página usa "SE/CO"; a dimensão comum do projeto é a sigla do submercado.
-SUBMERCADOS = {"SE/CO": "SE", "S": "S", "NE": "NE", "N": "N"}
+# A página rotulou o Norte como "N" e, desde 27/10/2026, como "NO"; ambos viram a sigla N.
+SUBMERCADOS = {"SE/CO": "SE", "S": "S", "NE": "NE", "N": "N", "NO": "N"}
 
 logger = logging.getLogger(__name__)
 

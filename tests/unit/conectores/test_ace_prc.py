@@ -36,6 +36,17 @@ def _registros(conector: AcePrc) -> list[PrecoReferencia]:
     return [PrecoReferencia.model_validate(conector.transformar(b)) for b in conector.extrair(JANELA)]
 
 
+def test_norte_publicado_como_no_vira_a_sigla_n(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Em 27/10/2026 a página passou a rotular o Norte como "NO"; a dimensão comum segue "N"."""
+    html = HTML.replace("<strong>N</strong>", "<strong>NO</strong>")
+    assert html != HTML
+
+    registros = _registros(_conector(monkeypatch, html))
+
+    assert len(registros) == 24
+    assert {r.submercado for r in registros} == {"SE", "S", "NE", "N"}
+
+
 def test_a_tabela_inteira_vira_24_precos(monkeypatch: pytest.MonkeyPatch) -> None:
     """4 submercados × 2 tipos de energia × 3 prazos."""
     registros = _registros(_conector(monkeypatch))

@@ -342,3 +342,14 @@ leva ao job no console, onde a mensagem do teste está em **Registros**:
 Hoje os gatilhos e os papéis do grupo só existem em `dev` (`hml` e `prod` entram com D3).
 Com `dev` verde, repetir N2 e N4 em `hml` e em `prod` (mesma sub-rede; o G4 já
 cobriu os três projetos).
+
+## Esquema das tabelas de um MySQL (27/10/2026)
+
+Para levantar as colunas das tabelas que a Alupar quer ingerir, sem esperar que ela as mande: o workflow
+**Testar conexão** aceita a entrada opcional `tabelas` (nomes separados por vírgula). Com ela, o job roda
+`alupdata esquema <fonte> --tabelas=...` no lugar do `SELECT 1` e o resumo da execução traz uma linha JSON por coluna
+(tabela, coluna, posição, tipo, aceita nulo, chave) e a lista das tabelas que não existem na base da DSN.
+
+- Só MySQL, só `information_schema`: nenhuma linha de dado do cliente é lida.
+- O nome da tabela é validado (letras, números e sublinhado) antes de ir ao `gcloud` e entra na consulta só como parâmetro.
+- Exemplo (dev): fonte `portal-alup`, tabelas `uc,client,invoice,medicao_cinco_minutos_api,medicao_cinco_minutos_xml,faturas_processadas,bandeira`.

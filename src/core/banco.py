@@ -34,6 +34,7 @@ import logging
 import re
 import ssl
 from contextlib import contextmanager
+from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any
 from urllib.parse import parse_qs, unquote, urlparse
 
@@ -51,6 +52,7 @@ _HOSTS_LOCAIS = {"127.0.0.1", "localhost", "::1"}
 # Pacote público de CAs do RDS (certs/rds-global-bundle.pem, copiado para a imagem): o RDS assina com a CA da AWS,
 # que não está no repositório de CAs do sistema. Vale quando a DSN de um host *.rds.amazonaws.com não traz ssl_ca.
 CA_RDS = "/app/certs/rds-global-bundle.pem"
+_NOME_TABELA = re.compile(r"[A-Za-z0-9_]{1,64}")
 _SOMENTE_LEITURA = re.compile(r"^\s*(?:--[^\n]*\n\s*)*(SELECT|WITH)\b", re.IGNORECASE)
 
 
@@ -141,12 +143,68 @@ def testar_conexao(fonte: str) -> tuple[bool, str]:
         finally:
             conexao.close()
     except Exception as erro:  # noqa: BLE001 — qualquer falha do driver é o diagnóstico
-        mensagem = str(erro)
-        for segredo in (url.password, url.username):
-            if segredo:
-                mensagem = mensagem.replace(unquote(segredo), "***").replace(segredo, "***")
-        return False, f"{fonte}: {type(erro).__name__}: {mensagem}"
+        return False, f"{fonte}: {type(erro).__name__}: {_sem_credencial(str(erro), url)}"
     return True, f"{fonte}: conexão aberta e SELECT 1 respondido"
+
+
+def _sem_credencial(mensagem: str, url: Any) -> str:
+    """Tira usuário e senha da DSN de uma mensagem do driver; o host fica, é ele que diz até onde a rede foi."""
+    for segredo in (url.password, url.username):
+        if segredo:
+            mensagem = mensagem.replace(unquote(segredo), "***").replace(segredo, "***")
+    return mensagem
+
+
+@dataclass(frozen=True)
+class Esquema:
+    colunas: list[dict[str, Any]]
+    tabelas_ausentes: list[str]
+
+
+def esquema(fonte: str, tabelas: list[str]) -> Esquema:
+    """Colunas das `tabelas` de um MySQL, lidas só do `information_schema` (nenhuma linha de dado do cliente).
+
+    Os nomes de tabela vêm de quem dispara o workflow: são validados antes de abrir a conexão e entram na consulta só
+    como parâmetro. A base é a da DSN (`DATABASE()`), então outra base do mesmo servidor não aparece. Falha do driver
+    sai sem usuário e senha da DSN.
+    """
+    if not tabelas or not all(_NOME_TABELA.fullmatch(t) for t in tabelas):
+        raise ValueError("nome de tabela inválido: use letras, números e sublinhado (até 64 caracteres)")
+    dsn = ler_secret(fonte, "dsn")
+    url = urlparse(dsn)
+    if url.scheme != "mysql":
+        raise ValueError("esquema: só MySQL; as outras fontes têm outro catálogo")
+    parametros = {f"t{i}": nome for i, nome in enumerate(tabelas)}
+    marcas = ", ".join(f"%({chave})s" for chave in parametros)
+    try:
+        conexao = conectar(dsn)
+        try:
+            linhas = list(
+                consultar(
+                    conexao,
+                    "SELECT table_name, column_name, ordinal_position, column_type, is_nullable, column_key "  # noqa: S608 # nosec B608
+                    "FROM information_schema.columns WHERE table_schema = DATABASE() "
+                    f"AND table_name IN ({marcas}) ORDER BY table_name, ordinal_position",
+                    parametros,
+                )
+            )
+        finally:
+            conexao.close()
+    except Exception as erro:  # noqa: BLE001 - qualquer falha do driver é o diagnóstico, sem a DSN
+        raise RuntimeError(f"{type(erro).__name__}: {_sem_credencial(str(erro), url)}") from None
+    colunas = [
+        {
+            "tabela": linha["table_name"],
+            "coluna": linha["column_name"],
+            "posicao": int(linha["ordinal_position"]),
+            "tipo": linha["column_type"],
+            "aceita_nulo": linha["is_nullable"] == "YES",
+            "chave": linha["column_key"] or "",
+        }
+        for linha in linhas
+    ]
+    achadas = {c["tabela"] for c in colunas}
+    return Esquema(colunas, [t for t in tabelas if t not in achadas])
 
 
 def criar_conexao(fonte: str, campo: str = "dsn") -> Any:

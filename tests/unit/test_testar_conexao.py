@@ -49,4 +49,21 @@ def test_executa_so_o_job_de_teste_e_espera():
     assert 'JOB="teste-conexao-$FONTE"' in script
     assert "gcloud run jobs execute" in script
     assert "--wait" in script
-    assert "--args" not in script, "o job já sabe o que testar; nada de argumento vindo de fora"
+    # O job já sabe o que testar. O único argumento de fora é a lista de tabelas do `esquema`, em formato fixo.
+    assert script.count("--args") == 1
+    assert '--args="^|^esquema|$FONTE|--tabelas=$TABELAS"' in script
+
+
+def test_lista_de_tabelas_e_validada_antes_de_ir_ao_gcloud_e_nao_vem_direto_do_shell():
+    texto = _texto()
+    assert re.search(r"^\s{6}tabelas:", texto, re.MULTILINE)
+    assert "TABELAS: ${{ inputs.tabelas }}" in texto
+    script = "\n".join(_blocos_run(texto))
+    assert "^[A-Za-z0-9_,]+$" in script
+    assert script.index("^[A-Za-z0-9_,]+$") < script.index("gcloud run jobs execute")
+
+
+def test_colunas_aparecem_no_resumo_mesmo_quando_o_job_passa():
+    script = "\n".join(_blocos_run(_texto()))
+    sucesso = script.split("--wait")[1].split("else")[0]
+    assert "gcloud logging read" in sucesso, "no sucesso o log também é lido, senão as colunas não chegam a ninguém"

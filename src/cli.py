@@ -17,7 +17,7 @@ import dataclasses
 import json
 import sys
 
-from src.core.banco import testar_conexao
+from src.core.banco import esquema, testar_conexao
 from src.core.config import get_settings
 from src.core.execucao import Janela
 from src.core.observabilidade import configurar_logging
@@ -48,6 +48,9 @@ def _parser() -> argparse.ArgumentParser:
 
     teste = sub.add_parser("testar-conexao", help="abre conexão com a DSN da fonte e roda SELECT 1")
     teste.add_argument("fonte", help="fonte do secret alupdata-<fonte>-dsn, como fmb ou comercializacao")
+    esquema_cmd = sub.add_parser("esquema", help="lista as colunas das tabelas de um MySQL (só information_schema)")
+    esquema_cmd.add_argument("fonte", help="fonte do secret alupdata-<fonte>-dsn, como portal-alup")
+    esquema_cmd.add_argument("--tabelas", required=True, help="nomes das tabelas, separados por vírgula")
     sonda = sub.add_parser("sondar", help="chama os endereços de uma sonda fixa e imprime status e amostra")
     sonda.add_argument("nome", choices=sorted(SONDAS), help="sonda da lista fixa em src/core/sonda.py")
     return parser
@@ -73,6 +76,17 @@ def main(argv: list[str] | None = None) -> int:
         ok, mensagem = testar_conexao(args.fonte)
         print(mensagem)
         return 0 if ok else 1
+
+    if args.comando == "esquema":
+        try:
+            resultado = esquema(args.fonte, [t.strip() for t in args.tabelas.split(",")])
+        except (ValueError, RuntimeError) as erro:  # a mensagem já vem sem a DSN
+            print(f"{args.fonte}: {erro}")
+            return 1
+        for coluna in resultado.colunas:
+            print(json.dumps(coluna, ensure_ascii=False))
+        print(json.dumps({"tabelas_ausentes": resultado.tabelas_ausentes}))
+        return 0
 
     if args.comando == "sondar":
         resultados = sondar(args.nome)

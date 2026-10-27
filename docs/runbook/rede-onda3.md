@@ -347,8 +347,9 @@ cobriu os três projetos).
 
 Para levantar as colunas das tabelas que a Alupar quer ingerir, sem esperar que ela as mande: o workflow
 **Testar conexão** aceita a entrada opcional `tabelas` (nomes separados por vírgula). Com ela, o job roda
-`alupdata esquema <fonte> --tabelas=...` no lugar do `SELECT 1` e o resumo da execução traz uma linha JSON por coluna
-(tabela, coluna, posição, tipo, aceita nulo, chave) e a lista das tabelas que não existem na base da DSN.
+`alupdata esquema <fonte> --tabelas=...` no lugar do `SELECT 1` e o resumo da execução traz uma linha de texto por coluna
+(`tabela.coluna | tipo | NULL ou NOT NULL | chave`) e a lista das tabelas que não existem na base da DSN. É texto, e não JSON,
+porque o Cloud Run trata linha que começa com `{` como log estruturado e o workflow não a lê.
 
 - Só MySQL, só `information_schema`: nenhuma linha de dado do cliente é lida.
 - O nome da tabela é validado (letras, números e sublinhado) antes de ir ao `gcloud` e entra na consulta só como parâmetro.

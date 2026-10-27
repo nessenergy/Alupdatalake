@@ -83,9 +83,11 @@ def main(argv: list[str] | None = None) -> int:
         except (ValueError, RuntimeError) as erro:  # a mensagem já vem sem a DSN
             print(f"{args.fonte}: {erro}")
             return 1
-        for coluna in resultado.colunas:
-            print(json.dumps(coluna, ensure_ascii=False))
-        print(json.dumps({"tabelas_ausentes": resultado.tabelas_ausentes}))
+        # Texto, e não JSON: linha que começa com `{` vira log estruturado no Cloud Run e o workflow não a lê.
+        for c in resultado.colunas:
+            nulo = "NULL" if c["aceita_nulo"] else "NOT NULL"
+            print(f"{c['tabela']}.{c['coluna']} | {c['tipo']} | {nulo} | {c['chave']}")
+        print(f"tabelas ausentes: {', '.join(resultado.tabelas_ausentes) or 'nenhuma'}")
         return 0
 
     if args.comando == "sondar":

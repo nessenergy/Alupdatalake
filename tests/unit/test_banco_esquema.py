@@ -11,7 +11,6 @@ Este comando as levanta de dentro do job, que é de onde a rede chega ao banco. 
 
 from __future__ import annotations
 
-import json
 from typing import Any
 
 import pytest
@@ -121,17 +120,21 @@ def test_so_mysql(monkeypatch: pytest.MonkeyPatch) -> None:
         banco.esquema("fmb", ["uc"])
 
 
-def test_cli_imprime_uma_linha_json_por_coluna(registro: dict[str, Any], capsys: pytest.CaptureFixture[str]) -> None:
+def test_cli_imprime_texto_e_nao_json_uma_linha_por_coluna(
+    registro: dict[str, Any], capsys: pytest.CaptureFixture[str]
+) -> None:
+    """Linha que começa com `{` vira log estruturado no Cloud Run e some do texto lido pelo workflow."""
     codigo = cli.main(["esquema", "portal-alup", "--tabelas", "uc,client,bandeira"])
 
-    linhas = [json.loads(linha) for linha in capsys.readouterr().out.splitlines()]
+    linhas = capsys.readouterr().out.splitlines()
     assert codigo == 0
-    assert [(linha["tabela"], linha["coluna"]) for linha in linhas if "coluna" in linha] == [
-        ("uc", "id"),
-        ("uc", "nome"),
-        ("client", "id"),
+    assert linhas == [
+        "uc.id | bigint | NOT NULL | PRI",
+        "uc.nome | varchar(120) | NULL | ",
+        "client.id | bigint | NOT NULL | PRI",
+        "tabelas ausentes: bandeira",
     ]
-    assert {"tabelas_ausentes": ["bandeira"]} in linhas
+    assert not any(linha.startswith("{") for linha in linhas)
 
 
 def test_cli_erro_do_driver_sai_sem_usuario_nem_senha(

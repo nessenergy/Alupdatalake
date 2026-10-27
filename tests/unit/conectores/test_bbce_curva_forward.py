@@ -253,15 +253,18 @@ def test_erro_5xx_registra_o_corpo_truncado_e_sem_segredo(conector, caplog):
 
     conector._sessao = SessaoFalsa()
 
-    with caplog.at_level("ERROR"), pytest.raises(AssertionError):
+    with caplog.at_level("ERROR"), pytest.raises(AssertionError) as erro:
         conector._curva_do_dia(date(2026, 1, 2))
 
-    registro = "\n".join(caplog.messages)
+    # O log do runner de ingestão mostra só o traceback: o corpo vai também na exceção.
+    notas = "\n".join(getattr(erro.value, "__notes__", []))
+    assert "conta sem acesso ao produto" in notas
+    registro = "\n".join([*caplog.messages, notas])
     assert "conta sem acesso ao produto" in registro
     assert "HTTP 500" in registro
     assert SENHA_DE_TESTE not in registro
     assert "chave-de-teste" not in registro
-    assert len(registro) < 1000
+    assert len(notas) < 600
 
 
 # ------------------------------------------------------- host não documentado

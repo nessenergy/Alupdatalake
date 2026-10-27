@@ -157,7 +157,14 @@ class BbceCurvaForward(Conector):
             credenciais = self._credenciais()
             for segredo in (credenciais["password"], credenciais["api_key"]):
                 corpo = corpo.replace(str(segredo), "***")
-            logger.error("BBCE: HTTP %s em %s: %s", resposta.status_code, rota, corpo[:500])
+            detalhe = f"BBCE: HTTP {resposta.status_code} em {rota}: {corpo[:500]}"
+            logger.error(detalhe)
+            try:
+                resposta.raise_for_status()
+            except Exception as exc:
+                # O runner de ingestão só exibe o traceback; a nota viaja nele.
+                exc.add_note(detalhe)
+                raise
         resposta.raise_for_status()
 
     def _token(self) -> str:

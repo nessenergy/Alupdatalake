@@ -94,6 +94,18 @@ terraform() { echo "terraform $*" >> calls; }
         assert not (tmp_path / "infra/calls").exists()
 
 
+def test_dataform_do_deploy_e_opcional_e_roda_por_padrao():
+    # Cada execução do Dataform varre as tabelas (assertions e Gold): deploy só de conector não precisa pagar isso.
+    config = workflow()
+    entrada = config[True]["workflow_dispatch"]["inputs"]["executar_dataform"]
+    assert entrada["type"] == "boolean"
+    assert entrada["default"] is True
+    steps = config["jobs"]["terraform"]["steps"]
+    passo = next(s for s in steps if "scripts.executar_dataform" in s.get("run", ""))
+    assert passo["if"] == "inputs.executar_dataform"
+    assert "${{" not in passo["run"]
+
+
 def test_table_storage_step():
     steps = workflow()["jobs"]["terraform"]["steps"]
     step = next(s for s in steps if s.get("name") == "Ligar o TABLE_STORAGE do projeto")

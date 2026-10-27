@@ -23,6 +23,11 @@ on:
         description: 'SHA completo da imagem já publicada; obrigatório para infra'
         required: false
         type: string
+      executar_dataform:
+        description: 'Executar o Dataform no fim (desmarque em deploy que só mexe em conector ou infra)'
+        required: false
+        type: boolean
+        default: true
 
 permissions:
   contents: read
@@ -132,7 +137,9 @@ jobs:
       # Bronze, Silver e Gold vêm do Dataform (ADR 012). Roda logo após o apply:
       # a carga nunca cria tabela Bronze. Projeto e região saem do state, e não
       # do padrão da configuração, para que um deploy de prod não caia em dev.
-      - run: |
+      - name: Executar o Dataform
+        if: inputs.executar_dataform
+        run: |
           cd infra
           export GCP_PROJECT_ID="$(terraform output -raw project_id)"
           export GCP_REGION="$(terraform output -raw region)"

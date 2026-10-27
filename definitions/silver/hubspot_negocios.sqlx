@@ -16,6 +16,10 @@ config {
 -- Dedup por `negocio_id`: o mesmo negócio é reingerido a cada mudança de estágio.
 -- Faixas (issue #110): negócio sem valor é comum no início do funil, então
 -- nulo passa. Data de fechamento anterior à criação é erro de origem.
+-- O negócio que viola a faixa não entra aqui: vai para `hubspot_negocios_quarentena`,
+-- com a regra violada, e a conferência o lista. O filtro vem depois da deduplicação:
+-- se a versão mais recente é inválida, uma versão antiga válida não ressuscita.
+WITH ultima_versao AS (
 SELECT
   DATE(modificado_em)  AS data_referencia,
   CAST(NULL AS STRING) AS submercado,    -- CRM não tem recorte de submercado
@@ -38,3 +42,8 @@ QUALIFY ROW_NUMBER() OVER (
   PARTITION BY negocio_id
   ORDER BY modificado_em DESC, _ingestao_timestamp DESC
 ) = 1
+)
+SELECT *
+FROM ultima_versao
+WHERE (valor IS NULL OR valor >= 0)
+  AND (data_fechamento IS NULL OR data_fechamento >= DATE(criado_em))

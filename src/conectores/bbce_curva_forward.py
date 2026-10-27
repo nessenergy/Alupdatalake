@@ -39,6 +39,7 @@ from datetime import date, datetime, timedelta, timezone
 from decimal import Decimal
 from typing import TYPE_CHECKING, Any
 
+import requests
 from pydantic import BaseModel, Field, model_validator
 
 from src.core.conector import Conector
@@ -147,10 +148,11 @@ class BbceCurvaForward(Conector):
         return self._cache_credenciais
 
     def _checar(self, resposta: Any, rota: str) -> None:
-        """`raise_for_status` que antes registra o corpo do erro.
+        """Levanta `HTTPError` com o corpo da resposta, no lugar do `raise_for_status`.
 
-        O status sozinho (500) não diz a causa; o corpo da BBCE costuma dizer.
-        Truncado, e sem os segredos caso a origem os ecoe.
+        O status sozinho (500) não diz a causa; o corpo da BBCE diz. Truncado, e sem
+        os segredos caso a origem os ecoe. A mensagem padrão do `requests` traria a
+        URL, e a consulta leva o JWT na query: por isso o erro é nosso, sem a URL.
         """
         if resposta.status_code >= 400:
             corpo = str(getattr(resposta, "text", ""))
@@ -159,13 +161,8 @@ class BbceCurvaForward(Conector):
                 corpo = corpo.replace(str(segredo), "***")
             detalhe = f"BBCE: HTTP {resposta.status_code} em {rota}: {corpo[:500]}"
             logger.error(detalhe)
-            try:
-                resposta.raise_for_status()
-            except Exception as exc:
-                # O runner de ingestão só exibe o traceback; a nota viaja nele.
-                exc.add_note(detalhe)
-                raise
-        resposta.raise_for_status()
+            # O runner de ingestão só exibe o traceback: o corpo vai na mensagem.
+            raise requests.HTTPError(detalhe, response=resposta)
 
     def _token(self) -> str:
         """JWT da sessão, obtido uma vez e reaproveitado na janela."""
@@ -209,12 +206,11 @@ class BbceCurvaForward(Conector):
                 headers={
                     "apiKey": credenciais["api_key"],
                     "Authorization": token,
-                    # A API respondeu 500 "accessToken parameter is required" só com Authorization
-                    # (27/10/2026). Cabeçalho, e não query, para o JWT não ir parar no log de acesso.
-                    "accessToken": token,
                     "Accept": "application/json",
                 },
-                params={"referenceDate": dia.isoformat()},
+                # A API respondeu 500 "accessToken parameter is required" com o JWT só em
+                # Authorization e em cabeçalho `accessToken` (27/10/2026): ela o quer na query.
+                params={"referenceDate": dia.isoformat(), "accessToken": token},
                 timeout=get_settings().http_timeout,
             )
             if resposta.status_code == 401 and tentativa == 1:

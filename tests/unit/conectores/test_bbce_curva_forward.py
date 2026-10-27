@@ -17,6 +17,7 @@ O que estes testes fixam, e que a documentação não deixa óbvio:
 from datetime import date
 
 import pytest
+import requests
 from src.conectores.bbce_curva_forward import (
     BbceCurvaForward,
     VerticeCurva,
@@ -180,8 +181,8 @@ def test_login_manda_a_api_key_no_cabecalho_e_a_senha_so_no_corpo(conector):
     assert visto["timeout"] is not None
 
 
-def test_consulta_manda_o_token_tambem_no_cabecalho_accesstoken(conector):
-    """Em 27/10/2026 a API respondeu 500 `accessToken parameter is required` só com `Authorization`."""
+def test_consulta_manda_o_token_como_parametro_accesstoken(conector):
+    """A API respondeu 500 `accessToken parameter is required` com o JWT em Authorization e em cabeçalho."""
     visto = {}
 
     class SessaoFalsa:
@@ -195,9 +196,9 @@ def test_consulta_manda_o_token_tambem_no_cabecalho_accesstoken(conector):
     conector._sessao = SessaoFalsa()
     conector._curva_do_dia(date(2026, 1, 2))
 
-    assert visto["headers"]["accessToken"] == "jwt-de-teste"
+    assert visto["params"]["accessToken"] == "jwt-de-teste"
+    assert visto["params"]["referenceDate"] == "2026-01-02"
     assert visto["headers"]["Authorization"] == "jwt-de-teste"
-    assert "accessToken" not in visto["params"]  # o JWT não vai para a URL
 
 
 def test_o_token_e_reaproveitado_entre_dias_da_janela(conector):
@@ -250,7 +251,7 @@ def test_401_persistente_falha_em_vez_de_devolver_vazio(conector):
 
     conector._sessao = SessaoFalsa()
 
-    with pytest.raises(AssertionError):
+    with pytest.raises(requests.HTTPError):
         conector._curva_do_dia(date(2026, 1, 2))
 
 
@@ -273,17 +274,18 @@ def test_erro_5xx_registra_o_corpo_truncado_e_sem_segredo(conector, caplog):
 
     conector._sessao = SessaoFalsa()
 
-    with caplog.at_level("ERROR"), pytest.raises(AssertionError) as erro:
+    with caplog.at_level("ERROR"), pytest.raises(requests.HTTPError) as erro:
         conector._curva_do_dia(date(2026, 1, 2))
 
-    # O log do runner de ingestão mostra só o traceback: o corpo vai também na exceção.
-    notas = "\n".join(getattr(erro.value, "__notes__", []))
+    # O log do runner de ingestão mostra só o traceback: o corpo vai também na mensagem da exceção.
+    notas = str(erro.value)
     assert "conta sem acesso ao produto" in notas
     registro = "\n".join([*caplog.messages, notas])
     assert "conta sem acesso ao produto" in registro
     assert "HTTP 500" in registro
     assert SENHA_DE_TESTE not in registro
     assert "chave-de-teste" not in registro
+    assert "jwt" not in registro  # o token vai na query: a URL não pode aparecer na mensagem
     assert len(notas) < 600
 
 

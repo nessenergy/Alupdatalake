@@ -264,7 +264,7 @@ def test_erro_5xx_registra_o_corpo_truncado_e_sem_segredo(conector, caplog):
     assert "HTTP 500" in registro
     assert SENHA_DE_TESTE not in registro
     assert "chave-de-teste" not in registro
-    assert len(registro) < 1000
+    assert len(notas) < 600
 
 
 # ------------------------------------------------------- host não documentado

@@ -172,18 +172,32 @@ def test_texto_de_erro_vindo_do_bigquery_passa_pelo_sanitizador():
     assert "[REDACTED]" in texto
 
 
-def test_conferencia_mostra_os_negocios_do_hubspot_fora_da_regra_sem_vazar_valor():
+def test_conferencia_mostra_os_negocios_do_hubspot_em_quarentena_sem_vazar_valor():
     itens = {item.rotulo: item.sql for _, lista in conjuntos() for item in lista}
 
     contagem = itens["hubspot_negocios_fora_da_regra"]
-    assert "valor < 0" in contagem
-    assert "data_fechamento < DATE(criado_em)" in contagem
+    assert "hubspot_negocios_quarentena" in contagem
+    assert "valor_negativo" in contagem
+    assert "fechamento_antes_da_criacao" in contagem
 
     lista = itens["hubspot_negocios_reprovados"]
+    assert "hubspot_negocios_quarentena" in lista
     assert "negocio_id" in lista and "LIMIT 50" in lista
     colunas_escolhidas = lista.split(" FROM ")[0]
     for dado_do_cliente in ("valor,", "nome", "email", "proprietario"):
         assert dado_do_cliente not in colunas_escolhidas
+
+
+def test_silver_e_quarentena_do_hubspot_dividem_a_mesma_regra():
+    """O que a Silver recusa tem de ser exatamente o que a quarentena mostra, senão negócio some sem rastro."""
+    silver = (RAIZ / "definitions" / "silver" / "hubspot_negocios.sqlx").read_text(encoding="utf-8")
+    quarentena = (RAIZ / "definitions" / "qualidade" / "hubspot_negocios_quarentena.sqlx").read_text(encoding="utf-8")
+
+    for regra in ("valor IS NULL OR valor >= 0", "data_fechamento IS NULL OR data_fechamento >= DATE(criado_em)"):
+        assert silver.count(regra) == 2, "a regra vale na asserção e no filtro da Silver"
+        assert regra in quarentena
+    assert "valor_negativo" in quarentena and "fechamento_antes_da_criacao" in quarentena
+    assert "uniqueKey" not in quarentena, "a quarentena espera ter linhas; só a Silver carrega asserções"
 
 
 # Silvers que a conferência por contagem de linhas não cobre. Elas são acompanhadas pela `gold.saude_ingestao`

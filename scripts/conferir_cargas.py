@@ -28,6 +28,9 @@ from src.core.seguranca import sanitizar
 configurar_logging()
 logger = logging.getLogger("conferir-cargas")
 
+# Dataset das asserções do Dataform (`defaultAssertionDataset`); a quarentena do Hubspot mora nele.
+DATASET_QUALIDADE = "qualidade"
+
 # Aditivo 01 (itens 12 a 19) e Onda 1: as Silver conferidas, com o nome da view e o rótulo do conector.
 SILVER_ADITIVO = (
     "ons_dados_hidrologicos",
@@ -147,16 +150,15 @@ def montar_conjuntos(projeto: str, bronze: str, silver: str, gold: str) -> list[
             ),
         )
     )
-    # As duas regras são as `rowConditions` de definitions/silver/hubspot_negocios.sqlx. Só sai o id do negócio:
-    # valor, nome, e-mail e proprietário são dado do cliente e não vão para o resumo da execução.
+    # O que a Silver recusa (as `rowConditions` de silver/hubspot_negocios.sqlx) está na quarentena. Só sai o id do
+    # negócio: valor, nome, e-mail e proprietário são dado do cliente e não vão para o resumo da execução.
     silver_itens.append(
         Item(
             "hubspot_negocios_fora_da_regra",
             _sql(
-                "SELECT COUNT(*) AS negocios, COUNTIF(valor < 0) AS valor_negativo, "
-                "COUNTIF(data_fechamento IS NOT NULL AND data_fechamento < DATE(criado_em)) "
-                "AS fechamento_antes_da_criacao FROM $t",
-                t=tabela(silver, "hubspot_negocios"),
+                "SELECT COUNT(*) AS negocios, COUNTIF(regra = 'valor_negativo') AS valor_negativo, "
+                "COUNTIF(regra = 'fechamento_antes_da_criacao') AS fechamento_antes_da_criacao FROM $t",
+                t=tabela(DATASET_QUALIDADE, "hubspot_negocios_quarentena"),
             ),
         )
     )
@@ -164,10 +166,8 @@ def montar_conjuntos(projeto: str, bronze: str, silver: str, gold: str) -> list[
         Item(
             "hubspot_negocios_reprovados",
             _sql(
-                "SELECT negocio_id, IF(valor < 0, 'valor_negativo', 'fechamento_antes_da_criacao') AS regra "
-                "FROM $t WHERE valor < 0 OR (data_fechamento IS NOT NULL AND data_fechamento < DATE(criado_em)) "
-                "ORDER BY regra, negocio_id LIMIT 50",
-                t=tabela(silver, "hubspot_negocios"),
+                "SELECT negocio_id, regra FROM $t ORDER BY regra, negocio_id LIMIT 50",
+                t=tabela(DATASET_QUALIDADE, "hubspot_negocios_quarentena"),
             ),
         )
     )

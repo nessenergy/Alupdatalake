@@ -1,0 +1,35 @@
+config {
+  type: "view",
+  schema: "qualidade",
+  tags: ["qualidade"]
+}
+
+-- Quarentena (dataset `qualidade`, junto das asserções): negócios do CRM cuja versão mais recente viola a faixa da Silver
+-- (`hubspot_negocios`). É erro de origem, para a Alupar corrigir no Hubspot; enquanto
+-- isso o negócio fica fora da Silver e da Gold, e a conferência o lista pelo id.
+-- Esta view espera ter linhas, por isso não leva asserção. Só id, datas e a regra:
+-- valor e nome do negócio são dado do cliente e não saem daqui.
+WITH ultima_versao AS (
+  SELECT
+    negocio_id,
+    valor,
+    data_fechamento,
+    criado_em,
+    modificado_em,
+    _ingestao_timestamp
+  FROM ${ref("bronze", "hubspot_negocios")}
+  QUALIFY ROW_NUMBER() OVER (
+    PARTITION BY negocio_id
+    ORDER BY modificado_em DESC, _ingestao_timestamp DESC
+  ) = 1
+)
+SELECT
+  negocio_id,
+  IF(valor < 0, 'valor_negativo', 'fechamento_antes_da_criacao') AS regra,
+  data_fechamento,
+  criado_em,
+  modificado_em,
+  _ingestao_timestamp
+FROM ultima_versao
+WHERE NOT (valor IS NULL OR valor >= 0)
+   OR NOT (data_fechamento IS NULL OR data_fechamento >= DATE(criado_em))

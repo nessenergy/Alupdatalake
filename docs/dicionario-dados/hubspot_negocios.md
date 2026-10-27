@@ -77,6 +77,7 @@ deixa de ser nulo e esta fonte cruza com CCEE e BBCE. Hoje não cruza.
 Hubspot CRM (deals/search)
   → bronze.hubspot_negocios     append-only, 1 linha por leitura
   → silver.hubspot_negocios     1 linha por negocio_id, versão mais recente
+                                (fora da faixa: vai para qualidade.hubspot_negocios_quarentena)
   → gold.funil_comercial        negócios, valor e idade por pipeline × estágio
 ```
 
@@ -84,6 +85,10 @@ Hubspot CRM (deals/search)
 
 - **Registro inválido**: estágio ou pipeline vazios — descartado com log e
   contado em `linhas_invalidas`.
+- **Quarentena (27/10/2026)**: o negócio cuja versão mais recente tem valor negativo ou fechamento anterior à criação não
+  entra na Silver nem na Gold. Fica em `qualidade.hubspot_negocios_quarentena` (id, regra e datas, sem valor nem nome) e a
+  conferência de cargas o lista. A correção é na origem, no Hubspot, pela Alupar; quando corrigido, o negócio volta
+  sozinho na carga seguinte.
 - **Reprocessamento**: seguro. Bronze duplica por desenho; a Silver deduplica
   por `negocio_id` ordenando por `modificado_em DESC`.
 - **Limite da API**: 100 registros por página; sem limite documentado de

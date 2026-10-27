@@ -179,6 +179,12 @@ operacional e nunca entra no Terraform. `connectors` apenas publica: para usar a
 imagem publicada, execute depois `infra` com seu `image_sha`. Em `all`, a entrada
 `image_sha` é ignorada.
 
+O fim do `all` e do `infra` roda o Dataform, e cada execução varre as tabelas
+(assertions e recarga das Gold): é a maior parcela do custo de BigQuery dos
+ambientes de teste. A entrada `executar_dataform` (padrão: marcada) permite
+desmarcar em deploy que só mexe em conector ou infraestrutura; marque quando
+algo em `definitions/` mudou ou no primeiro deploy do ambiente.
+
 O workflow rejeita SHA ausente, abreviado ou inválido antes da autenticação de
 infraestrutura. Depois, confirma a existência da imagem no Artifact Registry do
 ambiente antes de `terraform init/plan/apply`; falta de imagem ou acesso interrompe

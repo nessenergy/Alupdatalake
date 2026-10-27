@@ -44,10 +44,10 @@ def ingestao(conector: str, de: str = "", ate: str = "", uri: str = "") -> tuple
         raise EntradaInvalida("replay exige a janela original em de/ate")
     job = f"ingestao-{conector.replace('_', '-')}"
     if uri:
-        args = [f"--args=reprocessar-raw,{conector},--uri,{uri},--de,{de},--ate,{ate}"]
+        args = [f"--args=reprocessar-raw,{conector},--uri,{uri},--de={de},--ate={ate}"]
         return job, args, f"replay de {uri} ({de} a {ate})"
     if de:
-        return job, [f"--args=ingerir,{conector},--de,{de},--ate,{ate}"], f"{de} a {ate}"
+        return job, [f"--args=ingerir,{conector},--de={de},--ate={ate}"], f"{de} a {ate}"
     return job, [], "a do agendamento"
 
 

@@ -92,10 +92,10 @@ jobs:
           JOB="ingestao-${CONECTOR//_/-}"
           ARGS=()
           if [[ -n "$URI" ]]; then
-            ARGS=(--args="reprocessar-raw,$CONECTOR,--uri,$URI,--de,$DE,--ate,$ATE")
+            ARGS=(--args="reprocessar-raw,$CONECTOR,--uri,$URI,--de=$DE,--ate=$ATE")
             JANELA="replay de $URI ($DE a $ATE)"
           elif [[ -n "$DE" ]]; then
-            ARGS=(--args="ingerir,$CONECTOR,--de,$DE,--ate,$ATE")
+            ARGS=(--args="ingerir,$CONECTOR,--de=$DE,--ate=$ATE")
             JANELA="$DE a $ATE"
           else
             JANELA="a do agendamento"

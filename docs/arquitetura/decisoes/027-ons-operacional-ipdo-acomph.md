@@ -137,3 +137,16 @@ acima não muda.
   componentes, em tarefa própria.
 - Se a Alup recusar, o IPDO volta a ser avaliado como carga de PDF, com a fixture real
   e a ressalva de que não há histórico.
+
+## 8. Adendo de 27/10/2026: a Alupar precisa dos dois
+
+A Alupar respondeu em 27/10/2026 que **precisa do IPDO editável e do ACOMPH**, e que ambos ficam na
+seção da ONS que exige credenciais (usuário e senha). Isso muda a decisão da seção 4:
+
+- **IPDO:** a saída (C) deixa de valer. A necessidade é o arquivo editável, que está na área autenticada, e não o PDF
+  público de uso interno analisado em 03/10. Ainda não verificado: formato, periodicidade e se há histórico.
+- **ACOMPH:** a hipótese da seção 2 se confirma em parte: está na área autenticada. Falta saber o canal exato
+  (SINtegre ou outro) e o contrato da API.
+- **Próximo passo:** o segredo `alupdata-ons-credenciais` (JSON `usuario` e `senha`) já existe em dev e hml. Depois que a
+  Alupar o gravar e informar o contrato de acesso, escreve-se a spec e o plano dos dois conectores, com os 7 componentes.
+  Nada é construído antes disso.

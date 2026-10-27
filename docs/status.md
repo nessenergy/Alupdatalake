@@ -5,6 +5,20 @@ Atualizado em **2026-10-23**. Visão de uma página: [`visao-consolidada.md`](vi
 Última auditoria de ponta a ponta, com a conferência de cada número:
 [`relatorios/2026-10-02-auditoria-de-ponta-a-ponta.md`](relatorios/2026-10-02-auditoria-de-ponta-a-ponta.md).
 
+## Atualização de 27/10/2026
+
+Dia 57 de 130 do contrato. Resposta do Leonardo (Alupar) de 27/10 aos 12 pedidos do e-mail de 23/10:
+
+- **BBCE (1):** credencial gravada em dev e hml. O login funciona; a consulta de curvas (`/v1/curve/bbce-fwd`) responde 500 `accessToken parameter is required`, mesmo com o token em `Authorization`, em cabeçalho `accessToken` e na query. Falta um exemplo de chamada completa da BBCE, a pedir ao Leonardo.
+- **ONS e ACOMPH (2 e 4):** a Alupar precisa do **IPDO editável** e do **ACOMPH**, ambos na área autenticada da ONS (usuário e senha). Isso muda a saída C da ADR 027 (adendo de 27/10). Spec e plano saem quando houver a credencial e o contrato da API do SINtegre. Segredo `alupdata-ons-credenciais` criado em dev e hml (JSON `usuario` e `senha`).
+- **CCEE (3):** o primeiro acesso é por API SOAP, com usuário, senha, certificado e senha do certificado. Segredos `alupdata-ccee-credenciais` (JSON) e `alupdata-ccee-certificado` (arquivo) criados em dev e hml; falta a Alupar gravar os valores e informar o formato do certificado.
+- **MySQL Alup (5):** sete tabelas: `uc`, `client`, `invoice`, `medicao_cinco_minutos_api` (será renomeada para `medicao_cinco_minutos_rest`), `medicao_cinco_minutos_xml` (será renomeada para `medicao_horaria_soap`), `faturas_processadas` e `bandeira`. Faltam as colunas de cada uma.
+- **RM/TOTVS (6):** a Alupar não tem os endpoints. Precisa dos dados de faturamento dos clientes varejistas e atacadistas (status do faturamento, impostos, valores de fatura). Perguntar à DCIDE.
+- **Decks da CCEE (7):** a Alupar está elencando os arquivos de cada deck. **FMB (8):** e-mail enviado ao Danilo (DCIDE), aguardando. **Drive (9):** a pasta sai quando as planilhas estiverem prontas. **Produção (12):** aguardando a definição do grupo.
+- **TempoOK e CPTEC (10):** remoção do escopo confirmada pela Alupar.
+- **Permissões (11):** o grupo `alup.alertas@alupar.com.br` passou a gravar segredos em hml (PR #420, aplicado).
+- **Correções do dia:** `ace_prc` (a página passou a rotular o Norte como `NO`; PR #421); ingestão manual aceita janela de um dia (PR #426); `msgpack` 1.2.4 (CVE-2026-114613, PR #424). Dataform segue vermelho pela asserção do Hubspot.
+
 ## Atualização de 23/10/2026
 
 Dia 53 de 130 do contrato (41%). Onda 2 no dia 5 de 26 (termina em 13/11); a Onda 3 começa em 24 dias (16/11); restam 77 dias.

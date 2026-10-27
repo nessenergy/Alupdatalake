@@ -203,11 +203,15 @@ class BbceCurvaForward(Conector):
         url = f"{credenciais['base_url'].rstrip('/')}{ROTA_CURVA}"
 
         for tentativa in (1, 2):
+            token = self._token()
             resposta = self._sessao.get(
                 url,
                 headers={
                     "apiKey": credenciais["api_key"],
-                    "Authorization": self._token(),
+                    "Authorization": token,
+                    # A API respondeu 500 "accessToken parameter is required" só com Authorization
+                    # (27/10/2026). Cabeçalho, e não query, para o JWT não ir parar no log de acesso.
+                    "accessToken": token,
                     "Accept": "application/json",
                 },
                 params={"referenceDate": dia.isoformat()},

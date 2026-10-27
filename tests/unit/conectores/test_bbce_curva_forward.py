@@ -180,6 +180,26 @@ def test_login_manda_a_api_key_no_cabecalho_e_a_senha_so_no_corpo(conector):
     assert visto["timeout"] is not None
 
 
+def test_consulta_manda_o_token_tambem_no_cabecalho_accesstoken(conector):
+    """Em 27/10/2026 a API respondeu 500 `accessToken parameter is required` só com `Authorization`."""
+    visto = {}
+
+    class SessaoFalsa:
+        def post(self, *a, **k):
+            return _Resposta({"accessToken": "jwt-de-teste", "expiresIn": 14400})
+
+        def get(self, url, headers=None, params=None, timeout=None):
+            visto.update(headers=headers, params=params)
+            return _Resposta(RESPOSTA)
+
+    conector._sessao = SessaoFalsa()
+    conector._curva_do_dia(date(2026, 1, 2))
+
+    assert visto["headers"]["accessToken"] == "jwt-de-teste"
+    assert visto["headers"]["Authorization"] == "jwt-de-teste"
+    assert "accessToken" not in visto["params"]  # o JWT não vai para a URL
+
+
 def test_o_token_e_reaproveitado_entre_dias_da_janela(conector):
     """Login por dia gastaria uma autenticação por requisição de dado."""
     logins = {"n": 0}

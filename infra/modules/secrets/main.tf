@@ -12,6 +12,14 @@ variable "segredos" {
   type        = list(string)
   default = [
     "alupdata-ccee-api-token",
+    # ONS (IPDO e ACOMPH, área autenticada): usuário e senha num JSON só, {"usuario": "...", "senha": "..."}.
+    "alupdata-ons-credenciais",
+    # CCEE credenciada: o primeiro acesso é por API SOAP com usuário, senha, certificado e senha do certificado
+    # (resposta da Alupar em 27/10/2026). Texto e arquivo ficam em dois segredos: o JSON
+    # {"usuario": "...", "senha": "...", "senha_certificado": "..."} e o arquivo do certificado, gravado como arquivo
+    # (no console: Nova versão, Fazer upload do arquivo). O alupdata-ccee-api-token acima segue declarado e sem uso.
+    "alupdata-ccee-credenciais",
+    "alupdata-ccee-certificado",
     # O BBCE autentica por sessão (login devolve JWT de 4h) e exige quatro
     # credenciais mais o host, que não consta da documentação pública. Vão
     # num JSON só, como as DSN da Onda 3: a Alup preenche uma coisa e não

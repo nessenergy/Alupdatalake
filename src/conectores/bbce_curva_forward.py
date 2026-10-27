@@ -146,6 +146,20 @@ class BbceCurvaForward(Conector):
             self._cache_credenciais = credenciais
         return self._cache_credenciais
 
+    def _checar(self, resposta: Any, rota: str) -> None:
+        """`raise_for_status` que antes registra o corpo do erro.
+
+        O status sozinho (500) não diz a causa; o corpo da BBCE costuma dizer.
+        Truncado, e sem os segredos caso a origem os ecoe.
+        """
+        if resposta.status_code >= 400:
+            corpo = str(getattr(resposta, "text", ""))
+            credenciais = self._credenciais()
+            for segredo in (credenciais["password"], credenciais["api_key"]):
+                corpo = corpo.replace(str(segredo), "***")
+            logger.error("BBCE: HTTP %s em %s: %s", resposta.status_code, rota, corpo[:500])
+        resposta.raise_for_status()
+
     def _token(self) -> str:
         """JWT da sessão, obtido uma vez e reaproveitado na janela."""
         if self._cache_token is None:
@@ -163,7 +177,7 @@ class BbceCurvaForward(Conector):
                 params=None,
                 timeout=get_settings().http_timeout,
             )
-            resposta.raise_for_status()
+            self._checar(resposta, ROTA_LOGIN)
             self._cache_token = str(resposta.json()["accessToken"])
             logger.info("BBCE: sessão autenticada")
         return self._cache_token
@@ -196,7 +210,7 @@ class BbceCurvaForward(Conector):
                 logger.info("BBCE: sessão expirada, reautenticando")
                 self._cache_token = None
                 continue
-            resposta.raise_for_status()
+            self._checar(resposta, ROTA_CURVA)
             return list(resposta.json() or [])
         return []
 

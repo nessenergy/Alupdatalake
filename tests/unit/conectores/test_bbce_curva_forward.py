@@ -234,6 +234,36 @@ def test_401_persistente_falha_em_vez_de_devolver_vazio(conector):
         conector._curva_do_dia(date(2026, 1, 2))
 
 
+# ------------------------------------------------- corpo da resposta de erro
+
+
+def test_erro_5xx_registra_o_corpo_truncado_e_sem_segredo(conector, caplog):
+    """O 500 sozinho não diz a causa; o corpo da BBCE diz. Segredo ecoado não vaza."""
+    corpo = f"conta sem acesso ao produto; senha={SENHA_DE_TESTE} chave=chave-de-teste " + "x" * 2000
+
+    class RespostaComCorpo(_Resposta):
+        text = corpo
+
+    class SessaoFalsa:
+        def post(self, *a, **k):
+            return _Resposta({"accessToken": "jwt", "expiresIn": 14400})
+
+        def get(self, *a, **k):
+            return RespostaComCorpo(status=500)
+
+    conector._sessao = SessaoFalsa()
+
+    with caplog.at_level("ERROR"), pytest.raises(AssertionError):
+        conector._curva_do_dia(date(2026, 1, 2))
+
+    registro = "\n".join(caplog.messages)
+    assert "conta sem acesso ao produto" in registro
+    assert "HTTP 500" in registro
+    assert SENHA_DE_TESTE not in registro
+    assert "chave-de-teste" not in registro
+    assert len(registro) < 1000
+
+
 # ------------------------------------------------------- host não documentado
 
 

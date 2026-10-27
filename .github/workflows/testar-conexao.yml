@@ -23,6 +23,10 @@ on:
         description: 'Fonte, como no secret alupdata-<fonte>-dsn: fmb, portal-alup, comercializacao ou rm'
         required: true
         type: string
+      tabelas:
+        description: 'Opcional, só MySQL: tabelas separadas por vírgula. Em vez do SELECT 1, lista as colunas delas (information_schema, sem dado)'
+        required: false
+        type: string
 
 permissions:
   contents: read
@@ -50,6 +54,7 @@ jobs:
       - name: Executar o teste
         env:
           FONTE: ${{ inputs.fonte }}
+          TABELAS: ${{ inputs.tabelas }}
           AMBIENTE: ${{ inputs.environment }}
           PROJETO: ${{ steps.auth.outputs.project_id }}
           REGIAO: ${{ vars.GCP_REGION }}
@@ -57,6 +62,12 @@ jobs:
           set -euo pipefail
           [[ "$FONTE" =~ ^[a-z0-9-]+$ ]] || exit 1
           JOB="teste-conexao-$FONTE"
+          ARGS=()
+          if [[ -n "$TABELAS" ]]; then
+            [[ "$TABELAS" =~ ^[A-Za-z0-9_,]+$ ]] || { echo "::error::tabelas inválidas: use letras, números, sublinhado e vírgula"; exit 1; }
+            # A vírgula separa argumentos no gcloud; o delimitador ^|^ deixa a lista de tabelas inteira num argumento só.
+            ARGS=(--args="^|^esquema|$FONTE|--tabelas=$TABELAS")
+          fi
           URL="https://console.cloud.google.com/run/jobs/details/$REGIAO/$JOB/executions?project=$PROJETO"
           {
             echo "### Teste de conexão \`$FONTE\` em \`$AMBIENTE\`"
@@ -64,8 +75,17 @@ jobs:
             echo "- Job: \`$JOB\`"
             echo "- Mensagem do teste: nos registros da execução, em [$JOB]($URL)"
           } >> "$GITHUB_STEP_SUMMARY"
-          if gcloud run jobs execute "$JOB" --project "$PROJETO" --region "$REGIAO" --wait; then
+          if gcloud run jobs execute "$JOB" --project "$PROJETO" --region "$REGIAO" --wait "${ARGS[@]}"; then
             echo "- Resultado: **conexão aberta e SELECT 1 respondido**" >> "$GITHUB_STEP_SUMMARY"
+            if [[ -n "$TABELAS" ]]; then
+              execucao=$(gcloud run jobs executions list --job "$JOB" --project "$PROJETO" --region "$REGIAO" --limit 1 --format="value(name)" 2>/dev/null || true)
+              echo "::group::Colunas ($execucao)"
+              gcloud logging read \
+                "resource.type=\"cloud_run_job\" AND resource.labels.job_name=\"$JOB\" AND labels.\"run.googleapis.com/execution_name\"=\"$execucao\"" \
+                --project "$PROJETO" --format="value(timestamp,severity,textPayload)" --order=asc --limit=500 \
+                2>&1 | tee -a "$GITHUB_STEP_SUMMARY" || echo "(log não encontrado ou sem permissão de leitura)" | tee -a "$GITHUB_STEP_SUMMARY"
+              echo "::endgroup::"
+            fi
           else
             echo "- Resultado: **falhou**; a mensagem abaixo diz em que passo do runbook/rede-onda3.md está o problema" >> "$GITHUB_STEP_SUMMARY"
             execucao=$(gcloud run jobs executions list --job "$JOB" --project "$PROJETO" --region "$REGIAO" --limit 1 --format="value(name)" 2>/dev/null || true)

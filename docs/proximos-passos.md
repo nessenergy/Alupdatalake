@@ -22,12 +22,12 @@ em acompanhamento com a Alup; sua execução não é presumida por esta revisão
 >
 > | # | Item | Dono |
 > |---|---|---|
-> | 1 | Enviar à Alupar o formato do segredo do BBCE e pedir a credencial | Ricardo |
+> | 1 | BBCE: credencial gravada em 27/10 e login ok; pedir à Alupar um exemplo de chamada da consulta de curvas (500 `accessToken parameter is required`) | Ricardo, Gabriel |
 > | 2 | ~~Confirmar por escrito que o TempoOK saiu do escopo~~: dispensado, a saída está validada (23/10/2026) | Gabriel |
-> | 3 | Formato e envio das credenciais da ONS e da CCEE | Alupar |
-> | 4 | Esquema das duas bases MySQL, para escrever os conectores da Onda 3 | Alupar |
+> | 3 | Gravar as credenciais da ONS (IPDO editável e ACOMPH, área autenticada) e da CCEE (SOAP com certificado); os segredos existem desde 27/10 | Alupar |
+> | 4 | Colunas das 7 tabelas do MySQL Alup (duas serão renomeadas) e do outro banco, para os conectores da Onda 3 | Alupar |
 > | 5 | Caminho de rede até o Oracle FMB via DCIDE (IP privado, VPC, aceite da sub-rede) | Thiago, Alupar |
-> | 6 | Endpoints e credencial do RM/TOTVS | Alupar |
+> | 6 | RM/TOTVS: a Alupar não tem endpoints e precisa dos dados de faturamento de varejistas e atacadistas; perguntar à DCIDE | Ricardo |
 > | 7 | Pasta do Drive e planilhas modelo; escrever o leitor do Drive | Alupar, ness. |
 > | 8 | Reaplicar o bootstrap em dev (Cloud Build) e hml (log do contêiner) | Ricardo |
 > | 9 | Decidir a produção, o item 2.1 (CCEE credenciado) e os decks DECOMP e NEWAVE | Ricardo |

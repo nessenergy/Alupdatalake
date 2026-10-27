@@ -102,3 +102,16 @@ planilha fora do template: faltam ['Valor (R$)']; sobram ['Valor R$', 'Obs']
 Linha individual inválida continua no fluxo do runner: descartada, logada e
 contada em `linhas_invalidas` — o arquivo inteiro não cai por causa de uma
 linha, mas nenhuma linha some em silêncio.
+
+## Canal de entrada: pasta do Drive (27/10/2026)
+
+A Alupar vai compartilhar uma pasta do Google Drive com a conta de serviço do job, assim que as planilhas
+estiverem prontas (resposta de 27/10/2026). `src/core/drive.py` lista e baixa o que há nela:
+
+- **só leitura**, escopo `drive.readonly`, com a identidade do próprio job (credenciais padrão do ambiente); não há
+  credencial guardada;
+- o id da pasta é validado antes de entrar na consulta, e o nome do arquivo nunca escapa do diretório de destino;
+- Google Sheets nativo é exportado para xlsx, que é o que `ler_tabela()` lê.
+
+O leitor ainda não está ligado a nenhum conector: falta a pasta, o id dela (configuração, não segredo) e as planilhas
+modelo para fixar os templates. O teste de integração contra a pasta real fica para quando ela existir.

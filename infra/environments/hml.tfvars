@@ -18,7 +18,11 @@ conectores_sem_agendamento = ["hubspot_negocios", "bbce_curva_forward", "tempook
 
 # Quem grava versão de secret sem poder ler (ADR 015): o token do Dataform em
 # hml é da ness., gravado pelo grupo de operação da ness. Nunca pessoa (R01).
-gravacao_segredos = ["group:operacao-datalake@ness.com.br"]
+gravacao_segredos = [
+  "group:operacao-datalake@ness.com.br",
+  # Pedido do Leonardo (Alupar) em 27/10/2026: gravar as credenciais em hml.
+  "group:alup.alertas@alupar.com.br",
+]
 
 # Leitura do projeto inteiro, sem valor de segredo (roles/viewer), como em dev:
 # sem ela a operação não confere versão de secret nem configuração do Dataform.

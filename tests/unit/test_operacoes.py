@@ -17,14 +17,24 @@ def test_ingestao_com_janela() -> None:
     job, args, janela = ingestao("cptec_previsao", "2026-10-01", "2026-10-21")
 
     assert job == "ingestao-cptec-previsao"
-    assert args == ["--args=ingerir,cptec_previsao,--de,2026-10-01,--ate,2026-10-21"]
+    assert args == ["--args=ingerir,cptec_previsao,--de=2026-10-01,--ate=2026-10-21"]
     assert janela == "2026-10-01 a 2026-10-21"
+
+
+def test_janela_de_um_dia_nao_repete_valor_na_lista_do_gcloud() -> None:
+    """O gcloud recusa --args com valores repetidos; de == ate repetia a data."""
+    _, args, _ = ingestao("ons_carga", "2026-10-20", "2026-10-20")
+
+    itens = args[0].removeprefix("--args=").split(",")
+    assert len(itens) == len(set(itens))
+    assert "--de=2026-10-20" in itens
+    assert "--ate=2026-10-20" in itens
 
 
 def test_replay_exige_a_janela_original() -> None:
     uri = "gs://alupar-dev-alupdata-raw/ons/carga/dt=2026-10-01/abc.json.gz"
     _, args, _ = ingestao("ons_carga", "2026-10-01", "2026-10-01", uri)
-    assert args == [f"--args=reprocessar-raw,ons_carga,--uri,{uri},--de,2026-10-01,--ate,2026-10-01"]
+    assert args == [f"--args=reprocessar-raw,ons_carga,--uri,{uri},--de=2026-10-01,--ate=2026-10-01"]
     with pytest.raises(EntradaInvalida, match="janela"):
         ingestao("ons_carga", uri=uri)
 
@@ -105,7 +115,7 @@ def test_main_executar_ingestao_com_replay() -> None:
     argv += ["--de", "2026-10-01", "--ate", "2026-10-01", "--uri", uri]
 
     assert main(argv, executor=_executor_falso(chamadas)) == 0
-    assert chamadas[0][-1] == f"--args=reprocessar-raw,ons_carga,--uri,{uri},--de,2026-10-01,--ate,2026-10-01"
+    assert chamadas[0][-1] == f"--args=reprocessar-raw,ons_carga,--uri,{uri},--de=2026-10-01,--ate=2026-10-01"
 
 
 def test_main_entrada_invalida_devolve_1_sem_chamar_o_executor(capsys: pytest.CaptureFixture[str]) -> None:

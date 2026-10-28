@@ -181,13 +181,13 @@ def test_login_manda_a_api_key_no_cabecalho_e_a_senha_so_no_corpo(conector):
     assert visto["timeout"] is not None
 
 
-def test_consulta_manda_o_token_como_parametro_accesstoken(conector):
-    """A API respondeu 500 `accessToken parameter is required` com o JWT em Authorization e em cabeçalho."""
+def test_consulta_manda_accesstoken_na_query_e_idtoken_como_bearer(conector):
+    """500 `accessToken parameter is required`: o cliente funcional da mesa usa `Bearer <idToken>` em Authorization."""
     visto = {}
 
     class SessaoFalsa:
         def post(self, *a, **k):
-            return _Resposta({"accessToken": "jwt-de-teste", "expiresIn": 14400})
+            return _Resposta({"accessToken": "jwt-de-teste", "idToken": "id-de-teste", "expiresIn": 14400})
 
         def get(self, url, headers=None, params=None, timeout=None):
             visto.update(headers=headers, params=params)
@@ -198,7 +198,7 @@ def test_consulta_manda_o_token_como_parametro_accesstoken(conector):
 
     assert visto["params"]["accessToken"] == "jwt-de-teste"
     assert visto["params"]["referenceDate"] == "2026-01-02"
-    assert visto["headers"]["Authorization"] == "jwt-de-teste"
+    assert visto["headers"]["Authorization"] == "Bearer id-de-teste"
 
 
 def test_o_token_e_reaproveitado_entre_dias_da_janela(conector):

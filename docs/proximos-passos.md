@@ -22,7 +22,7 @@ em acompanhamento com a Alup; sua execução não é presumida por esta revisão
 >
 > | # | Item | Dono |
 > |---|---|---|
-> | 1 | BBCE: credencial gravada em 27/10 e login ok; pedir à Alupar um exemplo de chamada da consulta de curvas (500 `accessToken parameter is required`) | Ricardo, Gabriel |
+> | 1 | ~~BBCE: exemplo de chamada da consulta de curvas~~ resolvido em 28/10 (`Bearer <idToken>`, #434); resta conferir a Silver e a Gold | Ricardo |
 > | 2 | ~~Confirmar por escrito que o TempoOK saiu do escopo~~: dispensado, a saída está validada (23/10/2026) | Gabriel |
 > | 3 | Gravar as credenciais da ONS (IPDO editável e ACOMPH, área autenticada) e da CCEE (SOAP com certificado); os segredos existem desde 27/10 | Alupar |
 > | 4 | Colunas das 7 tabelas do MySQL Alup (duas serão renomeadas) e do outro banco, para os conectores da Onda 3 | Alupar |

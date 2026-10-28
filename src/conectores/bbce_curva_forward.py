@@ -132,6 +132,7 @@ class BbceCurvaForward(Conector):
         self._sessao = criar_sessao(retry_post=True)
         self._cache_credenciais: dict[str, Any] | None = None
         self._cache_token: str | None = None
+        self._cache_id_token: str | None = None
 
     # ----------------------------------------------------------- credenciais
 
@@ -182,7 +183,10 @@ class BbceCurvaForward(Conector):
                 timeout=get_settings().http_timeout,
             )
             self._checar(resposta, ROTA_LOGIN)
-            self._cache_token = str(resposta.json()["accessToken"])
+            corpo = resposta.json()
+            self._cache_token = str(corpo["accessToken"])
+            # O cliente da mesa (all-deals) usa o `idToken` em `Authorization: Bearer`; sem ele, cai no accessToken.
+            self._cache_id_token = str(corpo.get("idToken") or corpo["accessToken"])
             logger.info("BBCE: sessão autenticada")
         return self._cache_token
 
@@ -205,17 +209,18 @@ class BbceCurvaForward(Conector):
                 url,
                 headers={
                     "apiKey": credenciais["api_key"],
-                    "Authorization": token,
+                    "Authorization": f"Bearer {self._cache_id_token}",
                     "Accept": "application/json",
                 },
-                # A API respondeu 500 "accessToken parameter is required" com o JWT só em
-                # Authorization e em cabeçalho `accessToken` (27/10/2026): ela o quer na query.
+                # A API respondeu 500 "accessToken parameter is required" com o accessToken só em
+                # Authorization e em cabeçalho (27/10/2026): ela o quer na query, e o Authorization é o
+                # `Bearer <idToken>` que o cliente funcional da mesa usa.
                 params={"referenceDate": dia.isoformat(), "accessToken": token},
                 timeout=get_settings().http_timeout,
             )
             if resposta.status_code == 401 and tentativa == 1:
                 logger.info("BBCE: sessão expirada, reautenticando")
-                self._cache_token = None
+                self._cache_token = self._cache_id_token = None
                 continue
             self._checar(resposta, ROTA_CURVA)
             return list(resposta.json() or [])

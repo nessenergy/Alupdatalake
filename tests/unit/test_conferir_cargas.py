@@ -259,3 +259,9 @@ def test_toda_silver_esta_na_conferencia_ou_na_lista_de_excecoes():
     assert silvers - set(cc.SILVER) - EXCECOES_DA_CONFERENCIA == set()
     assert not EXCECOES_DA_CONFERENCIA & set(cc.SILVER), "fonte na lista e na exceção ao mesmo tempo"
     assert silvers >= EXCECOES_DA_CONFERENCIA, "exceção de Silver que não existe mais"
+
+
+def test_bbce_entra_so_no_log_de_execucoes():
+    sql = " ".join(i.sql for _, itens in cc.montar_conjuntos("p", "bronze", "silver", "gold") for i in itens)
+    assert "'bbce_curva_forward'" in sql
+    assert "silver.bbce" not in sql

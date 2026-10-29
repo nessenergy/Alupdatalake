@@ -205,7 +205,6 @@ def test_silver_e_quarentena_do_hubspot_dividem_a_mesma_regra():
 EXCECOES_DA_CONFERENCIA = frozenset(
     {
         "aneel_siga",
-        "bbce_curva_forward",
         "bcb_cambio_ptax",
         "bcb_juros",
         "ccee_agente",
@@ -261,7 +260,8 @@ def test_toda_silver_esta_na_conferencia_ou_na_lista_de_excecoes():
     assert silvers >= EXCECOES_DA_CONFERENCIA, "exceção de Silver que não existe mais"
 
 
-def test_bbce_entra_so_no_log_de_execucoes():
+def test_bbce_entra_com_silver_gold_e_log_de_execucoes():
     sql = " ".join(i.sql for _, itens in cc.montar_conjuntos("p", "bronze", "silver", "gold") for i in itens)
+    assert "`p.silver.bbce_curva_forward`" in sql
+    assert "`p.gold.curva_forward_vigente`" in sql
     assert "'bbce_curva_forward'" in sql
-    assert "silver.bbce" not in sql

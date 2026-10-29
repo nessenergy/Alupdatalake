@@ -50,10 +50,10 @@ SILVER_ONDA_1 = (
     "ace_prc",
     "bcb_igpm",
 )
-SILVER = SILVER_ADITIVO + SILVER_ONDA_1
-# Sem Silver ainda: entram só a última execução (linhas extraídas e carregadas) e o último erro.
-SO_EXECUCAO = ("bbce_curva_forward",)
+SILVER_ONDA_2 = ("bbce_curva_forward",)
+SILVER = SILVER_ADITIVO + SILVER_ONDA_1 + SILVER_ONDA_2
 GOLD = (
+    "curva_forward_vigente",
     "igpm_mensal",
     "tarifa_vigente_distribuidora",
     "prc_vigente_comercializadora",
@@ -103,7 +103,7 @@ def montar_conjuntos(projeto: str, bronze: str, silver: str, gold: str) -> list[
         return f"`{projeto}.{dataset}.{nome}`"
 
     execucoes = tabela(bronze, "_execucoes")
-    conectores = ", ".join(f"'{nome}'" for nome in SILVER + SO_EXECUCAO)
+    conectores = ", ".join(f"'{nome}'" for nome in SILVER)
 
     silver_itens = [
         Item(

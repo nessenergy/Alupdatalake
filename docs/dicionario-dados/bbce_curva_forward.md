@@ -27,6 +27,7 @@ vértices. É o que permite comparar a expectativa do mercado com o realizado.
   JWT de 4h. Elas vão num **único secret estruturado em JSON**, como as DSN dos
   bancos da Onda 3: a Alup preenche uma coisa só e não há estado
   meio-configurado.
+- **O token da consulta é o `idToken` do login**, em `Authorization: Bearer <idToken>`, e o `accessToken` vai também na query (`accessToken=`). Só com o `accessToken` em `Authorization` a API responde 500 `accessToken parameter is required` (27/10/2026); o `idToken` é o que o cliente de all-deals da mesa usa (corrigido em 28/10, PR #434).
 - **A senha vai no corpo do POST, nunca em query string** — em query ela
   apareceria no log de acesso da BBCE e em qualquer proxy no caminho.
 - **O JWT é reaproveitado** dentro da janela; um login por dia gastaria uma

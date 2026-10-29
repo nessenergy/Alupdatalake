@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AlupData — Sprint semanal de 29/10/2026</title>
+<meta name="theme-color" content="#00ade8">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Ccircle cx='256' cy='256' r='220' fill='%2300ade8'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --cyan:#00ade8;--cyan-dark:#006b91;--ink:#0b1326;--graphite:#172338;
+  --gray:#475569;--gray-2:#64748b;--line:#dce4ec;--mist:#f4f7fa;
+  --pad:clamp(24px,6vw,96px);--ease:cubic-bezier(.2,0,0,1);
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{font-family:Inter,Arial,sans-serif;color:var(--graphite);background:#fff;-webkit-font-smoothing:antialiased}
+h1,h2,h3,.wordmark{font-family:Montserrat,Arial,sans-serif;margin:0;text-wrap:balance}
+a{color:var(--cyan-dark);text-underline-offset:4px;transition:background 180ms var(--ease),color 180ms var(--ease)}
+a:hover{color:var(--ink)}
+:focus-visible{outline:3px solid var(--cyan);outline-offset:5px}
+.deck{height:100dvh;overflow-y:auto;scroll-snap-type:y proximity;scroll-behavior:smooth}
+.slide{position:relative;min-height:100dvh;scroll-snap-align:start;display:flex;flex-direction:column;justify-content:center;padding:112px var(--pad) 80px;border-bottom:1px solid var(--line)}
+.inner{width:100%;max-width:1184px;margin:0 auto}
+.dark{background:var(--ink);color:#e6edf5;border-color:#26344b}
+.mist{background:var(--mist)}
+.wordmark{position:absolute;top:32px;left:var(--pad);font-weight:500;font-style:normal;font-size:28px;color:#000;text-transform:none;letter-spacing:-.01em}
+.wordmark i{font-style:normal;color:#00ade8}
+.dark .wordmark{color:#fff}
+.tag{position:absolute;top:40px;right:var(--pad);font-size:11px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--gray-2)}
+.dark .tag,.dark .pagenum{color:#a0b0c4}
+.pagenum{position:absolute;bottom:32px;right:var(--pad);font:12px 'JetBrains Mono',monospace;color:var(--gray-2);letter-spacing:.12em}
+.eyebrow{font-size:12px;line-height:1.5;letter-spacing:.16em;text-transform:uppercase;color:var(--cyan-dark);margin:0 0 16px;font-weight:600}
+.dark .eyebrow{color:#63d4ff}
+h1{font-size:clamp(40px,5.4vw,76px);font-weight:600;line-height:1.06;letter-spacing:-.04em}
+h2{font-size:clamp(28px,3.1vw,44px);font-weight:600;line-height:1.16;letter-spacing:-.03em;}
+h3{font-size:22px;font-weight:500;letter-spacing:-.02em}
+.lead{font-size:clamp(16px,1.4vw,20px);line-height:1.65;color:var(--gray);max-width:76ch;margin:32px 0 0;text-wrap:pretty}
+.lead b{color:var(--graphite);font-weight:600}
+.dark .lead{color:#b7c5d6}.dark .lead b{color:#fff}
+.note{font-size:14px;line-height:1.6;color:var(--gray);margin:24px 0 0;max-width:100ch}
+code,.mono{font-family:'JetBrains Mono',monospace;font-size:.86em}
+.cover{justify-content:center;border-top:4px solid var(--cyan)}
+.cover .inner{padding-top:32px}
+.cover .lead{max-width:58ch}
+.cover-meta{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:32px;margin:48px 0 0;border-top:1px solid #304056;padding-top:24px}
+.cover-meta dt{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#a0b0c4}
+.cover-meta dd{margin:8px 0 0;font:500 clamp(14px,1.2vw,18px) 'JetBrains Mono',monospace;color:#fff}
+.meeting-link{margin:24px 0 0}
+.meeting-link a{display:inline-flex;align-items:center;min-height:48px;padding:8px 24px;border:1px solid #4d728d;border-radius:8px;font-size:14px;text-decoration:none;color:#e1f6ff;background:#162d43}
+.meeting-link a:hover{background:#21445f;color:#fff}
+.section-links{display:flex;flex-wrap:wrap;gap:8px 24px;margin-top:24px}
+.section-links a{display:inline-flex;align-items:center;min-height:44px;color:#b7c5d6;font-size:13px;text-decoration:none;border-bottom:1px solid #3c526b}
+.section-links a:hover{color:#fff;border-color:var(--cyan)}
+.nums{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));margin-top:40px;border:1px solid var(--line);border-radius:16px;overflow:hidden;background:var(--mist)}
+.nums>div{display:flex;flex-direction:column;gap:16px;padding:24px;border-right:1px solid var(--line)}
+.nums>div:last-child{border-right:0}
+.nums .v{font:600 clamp(36px,4vw,56px)/1 Montserrat,sans-serif;letter-spacing:-.04em;font-variant-numeric:tabular-nums}
+.nums .cy{color:var(--cyan-dark)}
+.nums .k{font-size:14px;line-height:1.5;color:var(--gray)}
+.versus{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:40px}
+.versus>div{display:flex;flex-direction:column;gap:16px;padding:32px;border:1px solid #304056;border-radius:16px;background:#111f34}
+.versus .rot{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#b7c5d6}
+.versus .big{font:600 clamp(32px,4vw,56px)/1.1 Montserrat,sans-serif;letter-spacing:-.04em}
+.versus .a .big{color:#63d4ff}.versus .b .big{color:#ffd18a}
+.versus p{margin:0;font-size:16px;line-height:1.6;color:#b7c5d6;max-width:44ch}
+.camadas{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px;margin-top:40px}
+.camada{display:flex;flex-direction:column;gap:16px;padding:32px;background:#fff;border:1px solid var(--line);border-top:4px solid var(--m);border-radius:12px;box-shadow:0 8px 24px rgb(15 23 42 / 4%)}
+.camada .v{font:600 48px/1 Montserrat,sans-serif;letter-spacing:-.03em;color:var(--m)}
+.camada .t{font-size:18px;font-weight:600}.camada .d{font-size:15px;line-height:1.65;color:var(--gray)}
+.tw{margin-top:32px;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th{text-align:left;font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--gray);padding:16px;background:#eaf0f5}
+td{padding:16px;border-top:1px solid var(--line);vertical-align:top;line-height:1.5}
+td:first-child{font-weight:500}tbody tr:nth-child(even){background:#f8fafc}
+td.r{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap;font-family:'JetBrains Mono',monospace}
+.trava{margin-top:32px}
+.trava .i{display:grid;grid-template-columns:72px 1fr 144px;gap:24px;padding:16px 0;border-bottom:1px solid #304056;align-items:start}
+.trava .i:last-child{border-bottom:0}
+.trava .c{font:500 14px/1.5 'JetBrains Mono',monospace;color:#63d4ff}
+.trava .t{font-size:16px;line-height:1.5;color:#e6edf5}.trava .t b{font-weight:600}
+.trava .t span{display:block;color:#aabbd0;font-size:14px;margin-top:8px}
+.trava .q{font:12px/1.6 'JetBrains Mono',monospace;color:#d2dfed;text-align:right;border:1px solid #3b4a60;border-radius:8px;padding:8px}
+.entregas{margin-top:32px;display:flex;flex-direction:column}
+.entregas .e{display:grid;grid-template-columns:64px 1fr;gap:24px;padding:20px 0;border-bottom:1px solid var(--line);align-items:baseline}
+.entregas .e:last-child{border-bottom:0}
+.entregas .d{font:500 13px 'JetBrains Mono',monospace;color:var(--cyan-dark)}
+.entregas .x{font-size:16px;line-height:1.6}.entregas .x b{font-weight:600}.entregas .x span{color:var(--gray)}
+.passo{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:40px}
+.passo>div{padding:32px;border:1px solid var(--line);border-radius:12px;background:#fff}
+.passo h3{margin-bottom:24px}.passo .cy{color:var(--cyan-dark)}
+.passo ul{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:16px}
+.passo li{font-size:16px;line-height:1.6;color:var(--gray)}.passo li b{color:var(--graphite);font-weight:600}
+.progress{position:fixed;top:0;left:0;height:3px;background:var(--cyan);width:0;z-index:9}
+@media(max-width:1000px){.nums>div{padding:24px 16px}.camada{padding:24px}.cover-meta{gap:24px}}
+@media(max-width:700px){
+  .deck{scroll-snap-type:none}.slide{padding:104px 24px 64px;min-height:100svh}
+  .wordmark{top:24px}.tag{top:32px;left:auto;right:24px;max-width:60%;text-align:right;font-size:10px}.pagenum{bottom:24px}
+  .cover .inner{padding-top:24px}.cover-meta{grid-template-columns:repeat(2,minmax(0,1fr));gap:24px 16px;margin-top:32px}
+  h1{font-size:clamp(36px,9vw,56px)}h2{font-size:28px}.lead{font-size:16px;margin-top:24px}
+  .versus,.camadas,.passo{grid-template-columns:1fr;margin-top:32px}.versus>div,.passo>div{padding:24px}
+  .nums{grid-template-columns:repeat(2,minmax(0,1fr));margin-top:32px}.nums>div{padding:24px;border-bottom:1px solid var(--line)}
+  .nums>div:nth-child(even){border-right:0}.nums>div:last-child{grid-column:1/-1;border-bottom:0}
+  .trava .i{grid-template-columns:1fr auto;gap:8px 16px;padding:24px 0}.trava .t{grid-column:1/-1;grid-row:2}.trava .q{grid-column:2;grid-row:1;text-align:right;padding:0;border:0}
+  .entregas .e{grid-template-columns:1fr;gap:8px;padding:24px 0}
+  .tw{border:0;border-radius:0;background:transparent}.tw thead{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
+  table,tbody{display:block}tr{display:block;background:#fff!important;border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:16px}
+  td{display:block;border:0;padding:8px 0;font-size:16px}td:first-child{font-weight:600}td.r{text-align:left;white-space:normal}
+  td::before{content:attr(data-label);display:block;font:500 11px/1.5 Inter,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:var(--gray);margin-bottom:8px}
+  .note{font-size:14px}.note a{display:inline-block;padding:8px 0}.section-links{gap:8px 16px}
+}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation:none!important;transition:none!important}}
+@media print{
+  @page{size:A4 landscape;margin:12mm}
+  html,body,.deck{height:auto;overflow:visible}.slide{min-height:0;display:block;break-after:page;padding:48px 0 32px;border:0}
+  .slide:last-child{break-after:auto}.slide,.dark,.mist{background:#fff;color:#172338}
+  .wordmark{top:0;left:0}.dark .wordmark{color:#000}.tag{top:8px;right:0}.pagenum{bottom:0;right:0}
+  .dark .tag,.dark .pagenum,.dark .lead,.dark .lead b,.dark .eyebrow,.versus .rot,.versus p,.trava .t,.trava .t span,.trava .q,.cover-meta dt,.cover-meta dd{color:#172338}
+  h1{font-size:40px}h2{font-size:28px}.lead{font-size:14px;margin-top:16px}.note{font-size:11px}
+  .cover .inner{padding-top:24px}.cover-meta{margin-top:24px}.cover-meta,.trava .i{border-color:#dce4ec}
+  .versus>div,.camada,.passo>div{background:#fff;box-shadow:none;padding:16px}.versus .big{font-size:36px}.versus .b .big{color:#825500}.versus .a .big{color:#006b91}
+  .nums,.versus,.camadas,.passo{margin-top:24px}.camada .d,.passo li,.entregas .x,.trava .t{font-size:12px}.trava .t span{font-size:11px}
+  .trava .i,.entregas .e{padding:8px 0}td,th{padding:8px;font-size:11px}.tw{margin-top:16px}
+  .progress,.section-links,.meeting-link{display:none}tr,.camada,.entregas .e,.trava .i{break-inside:avoid}
+}
+</style>
+</head>
+<body>
+
+<div class="progress" id="progress"></div>
+
+<main class="deck" id="deck" aria-label="Sprint semanal do AlupData" tabindex="0">
+<section class="slide dark cover" id="resumo"><span class="wordmark" role="img" aria-label="ness."><span aria-hidden="true">ness<i>.</i></span></span><span class="tag">AlupData · Sprint · 29/10/2026</span><div class="inner">
+<p class="eyebrow">Onda 2 · dia 11 de 26</p>
+<h1>Sprint semanal</h1>
+<p class="lead"><b>O BBCE passou a carregar e o Hubspot deixou de travar o processamento.</b> A Onda 2 depende agora de credenciais da ONS e da CCEE.</p>
+<div class="versus">
+<div class="a"><span class="rot">Entregue na semana</span><span class="big">BBCE e Hubspot</span><p>BBCE com 254 linhas carregadas em dev e hml; Hubspot sem erro no Dataform.</p></div>
+<div class="b"><span class="rot">Depende da Alupar</span><span class="big">ONS e CCEE</span><p>Gravar os valores nos segredos já criados e informar o formato do certificado.</p></div>
+</div>
+<p class="note" style="color:#b7c5d6">Dia 59 de 130 do contrato. Onda 2 termina em 13/11; a Onda 3 começa em 16/11.</p>
+</div><span class="pagenum">01 / 06</span></section>
+<section class="slide " id="entregas"><span class="wordmark" role="img" aria-label="ness."><span aria-hidden="true">ness<i>.</i></span></span><span class="tag">Entregas da semana</span><div class="inner">
+<p class="eyebrow">22 a 29/10</p><h2>O que ficou pronto</h2>
+<div class="entregas">
+<div class="e"><span class="d">28/10</span><span class="x"><b>BBCE carregando em dev e hml.</b> <span>Autenticação da curva corrigida. 255 linhas lidas, 254 carregadas; Silver e Gold em dev conferidas.</span></span></div>
+<div class="e"><span class="d">27/10</span><span class="x"><b>Hubspot sem travar o Dataform.</b> <span>Negócio fora da regra vai para uma quarentena e sai da Silver. A correção na origem fica com a Alupar.</span></span></div>
+<div class="e"><span class="d">27/10</span><span class="x"><b>MySQL Alup mapeado.</b> <span>Colunas das 7 tabelas levantadas; só metadado, nenhuma linha de dado.</span></span></div>
+<div class="e"><span class="d">27/10</span><span class="x"><b>Segredos da ONS e da CCEE criados</b> em dev e hml; leitor de pastas do Drive pronto para a Onda 4.</span></div>
+<div class="e"><span class="d">22/10</span><span class="x"><b>CI e CD no Cloud Build</b> implementados; CPTEC e TempoOK retirados do escopo.</span></div>
+</div>
+</div><span class="pagenum">02 / 06</span></section>
+<section class="slide mist" id="numeros"><span class="wordmark" role="img" aria-label="ness."><span aria-hidden="true">ness<i>.</i></span></span><span class="tag">Em números</span><div class="inner">
+<p class="eyebrow">Posição em 29/10</p><h2>Onde estamos</h2>
+<div class="nums">
+<div><span class="v cy">59</span><span class="k">dias de 130 do contrato</span></div>
+<div><span class="v">71</span><span class="k">dias restantes</span></div>
+<div><span class="v cy">58</span><span class="k">conectores com os 7 componentes</span></div>
+<div><span class="v">2.138</span><span class="k">testes aprovados</span></div>
+<div><span class="v cy">254</span><span class="k">linhas do BBCE na Silver</span></div>
+</div>
+<p class="note">Ondas 0 e 1 aceitas em 05/10. Ondas 2, 3 e 4 em andamento. Produção ainda não existe: depende de decisão sobre o grupo e os acessos.</p>
+</div><span class="pagenum">03 / 06</span></section>
+<section class="slide " id="custo"><span class="wordmark" role="img" aria-label="ness."><span aria-hidden="true">ness<i>.</i></span></span><span class="tag">Custo no GCP</span><div class="inner">
+<p class="eyebrow">Alerta de custo de 27/10</p><h2>O aumento veio de testes, não de nova fase</h2>
+<div class="tw"><table><thead><tr><th>Projeto</th><th>Dia comum</th><th>27/10</th></tr></thead><tbody>
+<tr><td data-label="Projeto">dev</td><td data-label="Dia comum" class="r">0,021 TiB · US$ 0,13</td><td data-label="27/10" class="r">0,195 TiB · US$ 1,22</td></tr>
+<tr><td data-label="Projeto">hml</td><td data-label="Dia comum" class="r">0,018 TiB · US$ 0,11</td><td data-label="27/10" class="r">0,074 TiB · US$ 0,46</td></tr>
+</tbody></table></div>
+<p class="note"><b>Causa:</b> execuções repetidas do Dataform nos deploys de teste. <b>Ação:</b> o deploy agora permite pular o Dataform quando só um conector muda. <b>Limites:</b> valores em dólar são estimativa pelo preço sob demanda; não medimos produção nem serviços fora do BigQuery. A Onda 3 traz bancos internos e mais volume: avisaremos antes de antecipar qualquer carga grande.</p>
+</div><span class="pagenum">04 / 06</span></section>
+<section class="slide dark" id="pendencias"><span class="wordmark" role="img" aria-label="ness."><span aria-hidden="true">ness<i>.</i></span></span><span class="tag">Pendências</span><div class="inner">
+<p class="eyebrow">O que destrava a próxima etapa</p><h2>O que precisamos da Alupar</h2>
+<div class="trava">
+<div class="i"><span class="c">ONS</span><span class="t"><b>Gravar usuário e senha</b><span>Para IPDO editável e ACOMPH. Segredo criado em dev e hml.</span></span><span class="q">Onda 2</span></div>
+<div class="i"><span class="c">CCEE</span><span class="t"><b>Gravar credenciais e certificado; informar o formato do certificado</b><span>Acesso por API SOAP.</span></span><span class="q">Onda 2</span></div>
+<div class="i"><span class="c">MySQL</span><span class="t"><b>Tabelas do Comercialização e datas das renomeações das tabelas de medição</b></span><span class="q">Onda 3</span></div>
+<div class="i"><span class="c">Hubspot</span><span class="t"><b>Corrigir o negócio com valor ou data inválidos</b><span>Volta sozinho na carga seguinte.</span></span><span class="q">Onda 2</span></div>
+<div class="i"><span class="c">RM e FMB</span><span class="t"><b>Dados de faturamento do RM/TOTVS; caminho de rede do FMB com a DCIDE</b></span><span class="q">Onda 3</span></div>
+</div>
+<p class="note" style="color:#b7c5d6">Decks da CCEE, pasta do Drive e o grupo da produção também aguardam a Alupar.</p>
+</div><span class="pagenum">05 / 06</span></section>
+<section class="slide mist" id="proximos"><span class="wordmark" role="img" aria-label="ness."><span aria-hidden="true">ness<i>.</i></span></span><span class="tag">Próximos passos</span><div class="inner">
+<p class="eyebrow">Para a semana que vem</p><h2>Quem faz o quê</h2>
+<div class="passo">
+<div><h3 class="cy">Alupar · confirmar</h3><ul>
+<li><b>Datas</b> para gravar os valores da ONS e da CCEE.</li>
+<li><b>Tabelas</b> do MySQL Comercialização e datas das renomeações.</li>
+<li><b>Grupo</b> da produção e pasta do Drive.</li>
+</ul></div>
+<div><h3>ness. · seguir</h3><ul>
+<li><b>Fechar o BBCE:</b> Gold em hml e conferência do dossiê.</li>
+<li><b>Onda 2:</b> ONS e CCEE assim que os valores chegarem.</li>
+<li><b>Onda 3:</b> ingestão do MySQL Alup com as tabelas já mapeadas.</li>
+</ul></div>
+</div>
+<p class="note">Detalhamento: <a href="https://github.com/orgs/nessenergy/projects/2">planejamento no GitHub</a> · <a href="../status.md">estado do projeto</a> · painel de acompanhamento em <a href="https://painel.alupdata.ness.com.br">painel.alupdata.ness.com.br</a>.</p>
+</div><span class="pagenum">06 / 06</span></section>
+</main>
+
+<script>
+  (function () {
+    var deck = document.getElementById('deck');
+    var bar = document.getElementById('progress');
+    function atualiza() {
+      var max = deck.scrollHeight - deck.clientHeight;
+      bar.style.width = (max > 0 ? (deck.scrollTop / max) * 100 : 0) + '%';
+    }
+    deck.addEventListener('scroll', atualiza, { passive: true });
+    atualiza();
+  })();
+</script>
+
+</body>
+</html>

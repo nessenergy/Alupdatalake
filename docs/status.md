@@ -1,9 +1,22 @@
 # Estado do projeto
 
-Atualizado em **2026-10-23**. Visão de uma página: [`visao-consolidada.md`](visao-consolidada.md). Relatório com as evidências:
+Atualizado em **2026-10-29**. Visão de uma página: [`visao-consolidada.md`](visao-consolidada.md). Relatório com as evidências:
 [`relatorios/2026-10-22-situacao-consolidada.md`](relatorios/2026-10-22-situacao-consolidada.md). Guia de auditoria: [`auditoria.md`](auditoria.md).
 Última auditoria de ponta a ponta, com a conferência de cada número:
 [`relatorios/2026-10-02-auditoria-de-ponta-a-ponta.md`](relatorios/2026-10-02-auditoria-de-ponta-a-ponta.md).
+
+## Atualização de 29/10/2026
+
+Dia 59 de 130 do contrato. Onda 2 no dia 11 de 26 (termina em 13/11); a Onda 3 começa em 18 dias (16/11); restam 71 dias.
+
+- **BBCE entregue em dev e carregando em hml, sem depender da Alupar.** A consulta de curvas respondia 500; passou a funcionar com `Authorization: Bearer <idToken>` e o `accessToken` na query, como no cliente de all-deals da mesa (PR #434). Execução de 28/10: 255 linhas extraídas, 1 inválida (motivo não verificado) e 254 carregadas, em dev e hml. Dev: Silver com 254 linhas e Gold `curva_forward_vigente` com 254. Hml: Silver com 254; a Gold está vazia até o Dataform rodar (o deploy de hml de 28/10 foi sem Dataform; o agendado de 11h o executa). Conferência de cargas passou a cobrir a Silver e a Gold do BBCE (#435 e #437).
+- **Hubspot:** o Dataform não fica mais vermelho. O negócio fora da regra sai da Silver e vai para `qualidade.hubspot_negocios_quarentena` (#428). Falta a Alupar corrigir o negócio na origem; a carga seguinte o traz de volta.
+- **Custo (alerta da Taina, 27/10):** o pico veio do BigQuery em dev e hml, de execuções repetidas do Dataform nos deploys de teste. Medido pelo Cloud Monitoring: dev 0,195 TiB em 27/10 contra ~0,021 TiB num dia comum (cerca de US$ 1,22 contra US$ 0,13 a US$ 6,25 por TiB, estimativa); hml 0,074 contra ~0,018 TiB. O consumo de base é o workflow diário do Dataform às 11h (`infra/modules/dataform`, `agendamentos_ativos`). O Deploy GCP ganhou a entrada `executar_dataform` (#433): desmarcar em deploy só de conector. Não medido: custo de produção e de serviços fora do BigQuery.
+- **Onda 3:** colunas das sete tabelas do MySQL Alup levantadas ([`dicionario-dados/mysql_alup_esquema.md`](dicionario-dados/mysql_alup_esquema.md)); o teste de conexão lista as colunas de um MySQL (#430). Faltam a lista de tabelas do MySQL Comercialização e a data das renomeações de `medicao_cinco_minutos_api` e `_xml`. FMB segue com a DCIDE.
+- **Onda 4:** leitor de pasta do Drive pronto (#429), à espera da pasta e das planilhas.
+- **Segredos:** ONS (usuário e senha) e CCEE (credenciais e certificado) criados em dev e hml; falta a Alupar gravar os valores e informar o formato do certificado. O grupo `alup.alertas@alupar.com.br` grava segredos em hml (#420).
+- **Fora do escopo:** TempoOK e CPTEC (confirmado pela Alupar em 27/10).
+- **Pendências que seguem de terceiros:** valores da ONS e da CCEE; tabelas do MySQL Comercialização; renomeação das tabelas de medição; negócio do Hubspot; dados do RM/TOTVS; decks da CCEE; FMB (DCIDE); pasta do Drive; grupo da produção. Do lado da ness.: D1 a D4 do CI/CD, papel de log em dev e a decisão sobre a produção.
 
 ## Atualização de 27/10/2026
 

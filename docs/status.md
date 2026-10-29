@@ -16,6 +16,7 @@ Dia 59 de 130 do contrato. Onda 2 no dia 11 de 26 (termina em 13/11); a Onda 3 c
 - **Onda 4:** leitor de pasta do Drive pronto (#429), à espera da pasta e das planilhas.
 - **Segredos:** ONS (usuário e senha) e CCEE (credenciais e certificado) criados em dev e hml; falta a Alupar gravar os valores e informar o formato do certificado. O grupo `alup.alertas@alupar.com.br` grava segredos em hml (#420).
 - **Fora do escopo:** TempoOK e CPTEC (confirmado pela Alupar em 27/10).
+- **Aceite: não há pendência.** As Ondas 0 e 1 foram aprovadas por escrito em 05/10 e os marcos 1 e 2 (R$ 53.760,00) estão faturados. O painel ainda mostrava como atrasadas as issues #258 (quem assina), #260 e #262, e como previstos marcos já vencidos; os marcos foram corrigidos em `painel/marcos.toml`. As issues resolvidas (#258, #262, #174, #129 e #87) saem da lista quando forem encerradas no GitHub, porque a lista de pendências do painel é a das issues abertas com a etiqueta `tipo/dependencia`.
 - **Pendências que seguem de terceiros:** valores da ONS e da CCEE; tabelas do MySQL Comercialização; renomeação das tabelas de medição; negócio do Hubspot; dados do RM/TOTVS; decks da CCEE; FMB (DCIDE); pasta do Drive; grupo da produção. Do lado da ness.: D1 a D4 do CI/CD, papel de log em dev e a decisão sobre a produção.
 
 ## Atualização de 27/10/2026

@@ -1,7 +1,7 @@
 # Próximos passos — fila de execução
 
 Documento **vivo**: é para riscar linha, não para arquivar. Atualizado em
-**2026-10-02** (seção 1 revisada na auditoria de 02/10).
+**2026-10-29** (BBCE resolvido, custo medido e Dataform opcional no deploy).
 
 Ele existe para responder uma pergunta que os outros três não respondem em uma
 tela: **qual é a próxima ação, de quem é, e qual comando a executa.**

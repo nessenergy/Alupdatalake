@@ -161,8 +161,8 @@ nota = "depende da credencial de agente (#260)"
 codigo = "2.2"
 titulo = "BBCE"
 horas = 28
-pronto = 0.8
-nota = "implementado; faltam acesso, carga e dossiê"
+pronto = 0.9
+nota = "carga em dev e hml em 28/10 (254 linhas), Silver e Gold em dev; faltam a Gold em hml e o dossiê"
 
 [[onda.item]]
 codigo = "2.3"
@@ -460,7 +460,7 @@ dono = "Alup"
 
 [[marco]]
 data = 2026-10-27
-titulo = "Resposta da Alupar aos 12 pedidos: BBCE com credencial (consulta de curvas aguarda exemplo de chamada), ONS autenticada (IPDO e ACOMPH), CCEE por SOAP, MySQL com 7 tabelas; TempoOK e CPTEC fora do escopo"
+titulo = "Resposta da Alupar aos 12 pedidos: BBCE com credencial (consulta de curvas resolvida em 28/10), ONS autenticada (IPDO e ACOMPH), CCEE por SOAP, MySQL com 7 tabelas; TempoOK e CPTEC fora do escopo"
 estado = "feito"
 
 [[rede]]
@@ -474,3 +474,13 @@ passo = "N3"
 titulo = "Credencial do FMB no Secret Manager"
 estado = "pendente"
 dono = "Alup"
+
+[[marco]]
+data = 2026-10-28
+titulo = "BBCE carregando em dev e hml sem depender da Alupar: autenticação da curva corrigida (Bearer idToken), 254 linhas na Silver"
+estado = "feito"
+
+[[marco]]
+data = 2026-10-27
+titulo = "Hubspot: negócio fora da regra vai para a quarentena e o Dataform deixa de ficar vermelho em dev e hml"
+estado = "feito"

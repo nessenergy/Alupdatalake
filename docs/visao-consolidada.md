@@ -1,6 +1,6 @@
 # Visão consolidada do AlupData
 
-Posição em **22/10/2026**. Uma página para quem chega ao projeto agora. O detalhe e as evidências estão em
+Posição em **29/10/2026**. Uma página para quem chega ao projeto agora. O detalhe e as evidências estão em
 [`relatorios/2026-10-22-situacao-consolidada.md`](relatorios/2026-10-22-situacao-consolidada.md).
 
 ## O que é
@@ -15,7 +15,7 @@ Cada fonte só está entregue com os **7 componentes** da cláusula 2ª: conecto
 |---|---|---|---|
 | 0 | Fundação e arquitetura | 31/08 a 11/09 | **Aprovada** (05/10) |
 | 1 | Mercado: APIs públicas | 14/09 a 16/10 | **Aprovada** (05/10), com IPDO e ACOMPH sem entrega |
-| 2 | APIs com credenciais | 19/10 a 13/11 | **Em andamento**: Hubspot carrega; BBCE sem credencial; CCEE credenciada sem código; TempoOK fora do escopo |
+| 2 | APIs com credenciais | 19/10 a 13/11 | **Em andamento**: Hubspot e BBCE carregam em dev e hml; CCEE aguarda a Alupar; TempoOK fora do escopo |
 | 3 | Sistemas internos | 16/11 a 18/12 | **Em andamento**: 2 de 3 bancos conectam; FMB depende da DCIDE; faltam esquemas |
 | 4 | Planilhas, governança e handoff | 21/12 a 08/01/2027 | **Em andamento**: motor pronto; Drive aceito; faltam modelos de planilha |
 
@@ -24,7 +24,7 @@ Cada fonte só está entregue com os **7 componentes** da cláusula 2ª: conecto
 | | |
 |---|---|
 | Conectores | **58**, todos com os 7 componentes presentes |
-| Testes | **2.013 aprovados**, 558 ignorados por desenho; cobertura **96%** |
+| Testes | **2.138 aprovados**, 537 ignorados por desenho (medido em 29/10); cobertura **96%** (medida em 22/10) |
 | Ambientes | `dev` e `hml` aplicados; **produção ainda não existe** |
 | Saúde da ingestão | dev: 56 OK; hml: 55 OK |
 | Documentação | 30 ADRs, 60 dicionários, 9 runbooks |
@@ -44,8 +44,8 @@ Cada fonte só está entregue com os **7 componentes** da cláusula 2ª: conecto
 
 | De | O quê |
 |---|---|
-| Alupar | credencial do BBCE; formato e envio da ONS e da CCEE; esquema das bases MySQL; RM/TOTVS; chamado com a DCIDE; pasta do Drive e planilhas modelo |
-| ness. | enviar o formato do BBCE; reaplicar o bootstrap em dev e hml; decidir a produção; decidir sobre DECOMP e NEWAVE |
+| Alupar | gravar os valores da ONS e da CCEE e informar o formato do certificado; tabelas do MySQL Comercialização e datas das renomeações; negócio do Hubspot; RM/TOTVS; chamado com a DCIDE; pasta do Drive e planilhas modelo |
+| ness. | reaplicar o bootstrap em dev e hml; decidir a produção; decidir sobre DECOMP e NEWAVE |
 
 ## Para auditar
 

@@ -35,15 +35,17 @@ em acompanhamento com a Alup; sua execução não é presumida por esta revisão
 
 ## 1. O que está travando tudo
 
-**Em 25/09, o que trava é externo e está pedido:** quem assina o aceite e os
-grupos do Portal (aceite das Ondas 0 e 1, reunião proposta para 01/10), as
-credenciais da Onda 2, e a rede local e a credencial do FMB (Onda 3). O
-dossiê das Ondas 0 e 1 foi emitido e enviado em 25/09.
+**Em 29/10, o que trava é externo e está pedido:** os valores da ONS e da CCEE
+(Onda 2), as tabelas do MySQL Comercialização, os dados de faturamento do
+RM/TOTVS, a rede e a credencial do FMB (Onda 3) e a pasta do Drive (Onda 4).
+O aceite das Ondas 0 e 1 não trava mais nada: foi assinado por escrito em 05/10
+e faturado (marcos 1 e 2, R$ 53.760,00). A lista de 25/09 que estava aqui
+(quem assina o aceite, credenciais do Hubspot e do BBCE) foi resolvida.
 
 | # | Ação | Dono | Situação |
 |---|---|---|---|
 | 1.8 | **Rede da Onda 3** ([ADR 024](arquitetura/decisoes/024-rede-das-fontes-internas.md)) | Alupar | lado GCP **pronto em 25/09** em `dev` e `hml` (sub-rede, vínculo, permissões, exceção de política, firewall) e `teste-conexao-fmb` rodando dentro da sub-rede. Faltam, da Alupar: IP e rede do FMB (G6), FortiGate e datacenter (L2 a L6) e a credencial do FMB (N3), pedidos por e-mail em 25/09 — [`runbook/rede-onda3.md`](runbook/rede-onda3.md) |
-| 1.9 | **Bootstrap de `prod`** | ness. | depois do aceite das Ondas 0 e 1; em seguida, `prod` entra no script da rede |
+| 1.9 | **Bootstrap de `prod`** | ness. | o aceite das Ondas 0 e 1 (05/10) já liberou; falta a decisão do Ricardo sobre região, acessos e custo ([plano de 14/10](superpowers/plans/2026-10-14-bootstrap-producao.md)). Em seguida, `prod` entra no script da rede |
 | 1.10 | **Aditivo 01 — padrões B, C e D** (itens 12–19, 79h) | ness. | 17 de 25 itens entregues em 28/09 (83h de 162h). Seguem os ONS mensais pesados (B), os arquivos diários (C) e a API (D). Cada entrega atualiza juntos o [documento](contrato/aditivo-01-conjuntos-publicos.md) §5, a #294 e `painel/aditivo.toml` |
 | 1.11 | **Aditivo 01 — item 26** (`consumo_horario_perfil_agente`) | ness. | dimensionar antes de estimar: histórico de 24 meses tem ~185 GB. Decidir a janela carregada em `dev` e o custo de BigQuery (§4.1) |
 | 1.12 | ~~**Aditivo 01 — contagem de linhas por conector**~~ | ness. | **feito em 29/09**: linhas por conector na §5 do documento |

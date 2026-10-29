@@ -338,26 +338,20 @@ estado = "feito"
 
 [[marco]]
 data = 2026-10-03
-titulo = "ONS Operacional: demanda máxima (IPDO, seção 7) com os 7 componentes, carga conferida em hml e dev em 03/10 (3.480 linhas na Silver, Gold com 116 linhas nos dois); IPDO e ACOMPH não entregues, ADR 027 pendente de aceite da Alup"
-estado = "previsto"
-dono = "Alup"
+titulo = "ONS Operacional: demanda máxima (IPDO, seção 7) com os 7 componentes, carga conferida em hml e dev em 03/10 (3.480 linhas na Silver, Gold com 116 linhas nos dois). IPDO editável e ACOMPH dependem da credencial da ONS (marco de 13/11)"
+estado = "feito"
+dono = "ness."
 
 [[marco]]
 data = 2026-10-03
-titulo = "INMET, precipitação por bacia: 7 componentes no repositório, carga conferida em hml e dev em 03/10 (398 de 653 estações com bacia, iguais nos dois); chuva diária por bacia (17.727 linhas, 25 bacias) e bacia mais próxima das 255 estações sem bacia exata, iguais nos dois; regra da média provisória e recorte do ADR 026 pendentes de aceite da Alup"
-estado = "previsto"
+titulo = "INMET, precipitação por bacia: 7 componentes, carga conferida em hml e dev em 03/10 (398 de 653 estações com bacia, iguais nos dois); chuva diária por bacia (17.727 linhas, 25 bacias) e bacia mais próxima das 255 estações sem bacia exata, iguais nos dois. A regra da média e o recorte do ADR 026 seguem provisórios, à espera da Alup"
+estado = "feito"
 dono = "ness."
 
 [[marco]]
 data = 2026-10-03
 titulo = "Pendências de carga do e-mail de 02/10 concluídas e conferidas em dev e hml em 05/10: IGP-M (25 meses, últimos 3 meses iguais aos do BCB), Tarifas Homologadas (327.763 linhas) e PRC (24 preços)"
 estado = "feito"
-dono = "ness."
-
-[[marco]]
-data = 2026-10-03
-titulo = "CPTEC: bloqueado (403 sem causa conhecida, também de dentro do GCP em 03/10, ADRs 028 e 029); fora da Onda 1 até haver resposta do INPE"
-estado = "previsto"
 dono = "ness."
 
 [[marco]]
@@ -376,12 +370,6 @@ dono = "ness."
 data = 2026-10-05
 titulo = "Ondas 0 e 1 aprovadas por escrito por Eduardo Pires (marcos 1 e 2, R$ 53.760); faturamento confirmado pela ness."
 estado = "feito"
-dono = "Alup"
-
-[[marco]]
-data = 2026-10-12
-titulo = "Credenciais da Onda 2 (prazo interno): não chegaram; teste de 13/10 em dev, BBCE sem versão no segredo e Hubspot com 401"
-estado = "previsto"
 dono = "Alup"
 
 [[marco]]
@@ -428,13 +416,19 @@ dono = "ness."
 
 [[marco]]
 data = 2026-10-16
-titulo = "Fim da janela contratual da Onda 1 (marco 2, R$ 30.720)"
-estado = "previsto"
+titulo = "Marco 2 (Onda 1, R$ 30.720) aprovado por escrito em 05/10 e faturado, junto com o marco 1 (R$ 53.760 no total)"
+estado = "feito"
 dono = "Alup"
 
 [[marco]]
 data = 2026-10-19
-titulo = "Prazo contratual dos tokens da Onda 2: CCEE, BBCE, Hubspot e TempoOK (cláusula 3ª)"
+titulo = "Prazo contratual dos tokens da Onda 2 (cláusula 3ª): Hubspot gravado em 20/10 e BBCE em uso em 28/10; ONS e CCEE aguardam os valores; TempoOK fora do escopo"
+estado = "previsto"
+dono = "Alup"
+
+[[marco]]
+data = 2026-11-13
+titulo = "Fim da janela da Onda 2: valores da ONS e da CCEE gravados nos segredos (IPDO editável, ACOMPH e CCEE credenciado)"
 estado = "previsto"
 dono = "Alup"
 
@@ -484,3 +478,9 @@ estado = "feito"
 data = 2026-10-27
 titulo = "Hubspot: negócio fora da regra vai para a quarentena e o Dataform deixa de ficar vermelho em dev e hml"
 estado = "feito"
+
+[[marco]]
+data = 2026-10-29
+titulo = "Painel e pendências conferidos: aceite das Ondas 0 e 1 assinado e faturado; pendências resolvidas (aceite, credenciais Hubspot e BBCE, TempoOK, orçamento) saem da lista"
+estado = "feito"
+dono = "ness."

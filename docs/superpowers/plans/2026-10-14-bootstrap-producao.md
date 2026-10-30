@@ -70,3 +70,21 @@ Cada passo diz quem executa e o que prova que terminou.
 3. O orçamento de US$ 20 e US$ 400 entra no Terraform agora? Quem concede o papel na conta de faturamento?
 4. Quando a Alup grava o valor novo do token do TempoOK em prod, e quem avisa a ness.?
 5. Quer a janela de aceite de prod com agendamento completo ou só as fontes públicas?
+
+## 7. Estado verificado em 30/10/2026 e o que ficou pronto
+
+Lido com `gcloud` e `gh` (somente leitura):
+
+| Item | Resultado |
+|---|---|
+| Projeto `prod-alupdata` | ativo (`alupar-prd-alupdata`) |
+| Seis papéis de bootstrap da conta nominal da ness. | presentes (`artifactregistry.admin`, `iam.serviceAccountAdmin`, `iam.workloadIdentityPoolAdmin`, `resourcemanager.projectIamAdmin`, `serviceusage.serviceUsageAdmin`, `storage.admin`) |
+| API do Cloud Run | **desabilitada** (BigQuery, Dataform, Dataplex, Storage e Logging habilitadas) |
+| Bootstrap aplicado | **não**: sem pool de identidade, sem bucket e sem estado em `infra/bootstrap/terraform.tfstate.d` (só `dev` e `hml`) |
+| Ambiente `prod` do GitHub | existe, **sem nenhuma variável** (hml tem as seis) |
+
+Mudanças deste PR: `infra/environments/prod.tfvars` ganhou `agendamentos_ativos = false`, os e-mails de alerta e a lista de conectores sem agendamento. Nenhum grupo de acesso foi preenchido.
+
+Decisão 2.2 (rotação do token do TempoOK) **perdeu o objeto**: o TempoOK saiu do escopo em 20/10 e a ADR 020 deixa de se aplicar a `prod`.
+
+Continuam abertas as decisões 2.1 (região), 2.3 (grupos da Alup) e 2.4 (orçamento no Terraform). O próximo passo executável é o passo 3 (`terraform apply` de `infra/bootstrap/` com `environments/prod.tfvars`), que depende de 2.1.

@@ -85,6 +85,8 @@ Lido com `gcloud` e `gh` (somente leitura):
 
 Mudanças deste PR: `infra/environments/prod.tfvars` ganhou os e-mails de alerta e a lista de conectores sem agendamento. Nenhum grupo de acesso foi preenchido.
 
+Decisão 30/10: região mantida em `us-central1`, grupos iguais aos de hml (sem `grupo_bronze`), orçamento ainda não.
+
 Decisão 2.2 (rotação do token do TempoOK) **perdeu o objeto**: o TempoOK saiu do escopo em 20/10 e a ADR 020 deixa de se aplicar a `prod`.
 
 Continuam abertas as decisões 2.1 (região), 2.3 (grupos da Alup) e 2.4 (orçamento no Terraform). O próximo passo executável é o passo 3 (`terraform apply` de `infra/bootstrap/` com `environments/prod.tfvars`), que depende de 2.1.

@@ -83,7 +83,8 @@ def _rotulo(execucao: dict[str, Any]) -> str:
 def resumir_cargas(execucoes: list[dict[str, Any]], ondas: list[dict[str, Any]]) -> list[dict[str, Any]]:
     """Última execução de cada entidade, por ambiente, agrupada por onda."""
     ultima: dict[tuple[str, str], dict[str, Any]] = {}
-    for e in sorted(execucoes, key=lambda e: e["iniciada_em"]):
+    # Empate no horário: o job grava EM_EXECUCAO e o estado final com o mesmo iniciada_em; o final vale.
+    for e in sorted(execucoes, key=lambda e: (e["iniciada_em"], e["status"] != "EM_EXECUCAO")):
         ultima[(_rotulo(e), e["ambiente"])] = e
 
     def estado(entidade: str, ambiente: str) -> dict[str, Any] | None:
@@ -299,7 +300,7 @@ def montar(
 _SQL = """
 SELECT fonte, entidade, status, linhas_carregadas, iniciada_em
 FROM `{projeto}.bronze._execucoes`
-WHERE modo = 'FONTE' AND iniciada_em >= TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL 14 DAY)
+WHERE modo = 'FONTE' AND iniciada_em >= TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL 45 DAY)
 """
 
 

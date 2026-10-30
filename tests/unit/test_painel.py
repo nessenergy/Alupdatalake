@@ -79,6 +79,17 @@ def test_cargas_por_onda_usam_a_ultima_execucao_de_cada_ambiente():
     assert onda1["ok"] == {"dev": 0, "hml": 0, "total": 1}
 
 
+def test_empate_no_horario_vale_o_estado_final_e_nao_o_em_execucao():
+    # o job grava EM_EXECUCAO e SUCESSO com o mesmo iniciada_em; a ordem de chegada é arbitrária
+    ondas = [{"numero": 1, "entidades": ["ccee_cvu_merchant"]}]
+    execucoes = [_exec("ccee_cvu_merchant", "SUCESSO", 25), _exec("ccee_cvu_merchant", "EM_EXECUCAO", 25)]
+
+    cargas = painel.resumir_cargas(execucoes, ondas)
+
+    assert cargas[0]["entidades"][0]["dev"]["status"] == "SUCESSO"
+    assert cargas[0]["ok"]["dev"] == 1
+
+
 def test_dias_seguidos_contam_ate_hoje_ou_ate_ontem_se_hoje_ainda_nao_rodou():
     execucoes = [_exec("bcb_cambio_ptax", "SUCESSO", d) for d in (23, 24, 25)] + [_exec("bcb_cambio_ptax", "ERRO", 22)]
     assert painel.dias_seguidos(execucoes, "bcb_cambio_ptax", HOJE) == 3  # 26/09 ainda não rodou

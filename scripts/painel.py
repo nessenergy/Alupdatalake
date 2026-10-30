@@ -299,8 +299,13 @@ def montar(
 
 _SQL = """
 SELECT fonte, entidade, status, linhas_carregadas, iniciada_em
-FROM `{projeto}.bronze._execucoes`
-WHERE modo = 'FONTE' AND iniciada_em >= TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL 45 DAY)
+FROM (
+  SELECT fonte, entidade, status, linhas_carregadas, iniciada_em,
+         ROW_NUMBER() OVER (PARTITION BY fonte, entidade ORDER BY iniciada_em DESC, status = 'EM_EXECUCAO') AS ordem
+  FROM `{projeto}.bronze._execucoes`
+  WHERE modo = 'FONTE'
+)
+WHERE ordem = 1 OR iniciada_em >= TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL 14 DAY)
 """
 
 

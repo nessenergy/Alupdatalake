@@ -83,7 +83,7 @@ Lido com `gcloud` e `gh` (somente leitura):
 | Bootstrap aplicado | **não**: sem pool de identidade, sem bucket e sem estado em `infra/bootstrap/terraform.tfstate.d` (só `dev` e `hml`) |
 | Ambiente `prod` do GitHub | existe, **sem nenhuma variável** (hml tem as seis) |
 
-Mudanças deste PR: `infra/environments/prod.tfvars` ganhou `agendamentos_ativos = false`, os e-mails de alerta e a lista de conectores sem agendamento. Nenhum grupo de acesso foi preenchido.
+Mudanças deste PR: `infra/environments/prod.tfvars` ganhou os e-mails de alerta e a lista de conectores sem agendamento. Nenhum grupo de acesso foi preenchido.
 
 Decisão 2.2 (rotação do token do TempoOK) **perdeu o objeto**: o TempoOK saiu do escopo em 20/10 e a ADR 020 deixa de se aplicar a `prod`.
 

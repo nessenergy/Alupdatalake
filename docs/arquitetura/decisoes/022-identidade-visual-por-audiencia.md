@@ -61,3 +61,11 @@ concentrada num lugar só (item 4) para ser trocada de uma vez.
   design system ser concluído e validado pela Alup.
 - A regra entra em `AGENTS.md`, para que qualquer pessoa ou agente que trabalhe no
   repositório a encontre antes de desenhar uma tela.
+
+## Adendo de 30/10/2026 — assinatura discreta no rodapé do Portal
+
+Por decisão do Ricardo, o rodapé do Portal passa a trazer, em tamanho pequeno e
+sem cor da ness., a menção "powered by ness.". É a única exceção: nome, cor e
+fonte da ness. continuam fora do restante do produto. Quem ler isto como
+mudança de propriedade intelectual (cláusula 7ª) deve levar ao contratante antes
+de a menção ir ao ar na produção.

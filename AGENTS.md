@@ -137,7 +137,8 @@ define todos em uma página.
 - **Identidade visual segue quem fala** ([ADR 022](docs/arquitetura/decisoes/022-identidade-visual-por-audiencia.md)):
   o que a ness. emite (relatório, proposta, apresentação) leva a marca da ness.;
   **o produto é da Alup** — Portal, painéis de BI, alertas — e leva a identidade
-  da Alup, sem cor, fonte, nome ou crédito da ness. O tema do Portal vive só nos
+  da Alup, sem cor, fonte ou nome da ness. — a única exceção é a assinatura
+  discreta "powered by ness." no rodapé do Portal (adendo de 30/10 à ADR 022). O tema do Portal vive só nos
   tokens `:root` de `ESTILO` em `src/portal/app.py`. Documentação técnica do
   repositório fica neutra. A regra de marca da ness. **não** se aplica ao produto.
 

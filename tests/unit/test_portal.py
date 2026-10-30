@@ -376,6 +376,8 @@ def test_o_produto_nao_carrega_a_marca_da_ness(cliente, rota) -> None:
     """O Portal é da Alup (cláusula 7ª): a identidade da ness. vale para o que a
     ness. emite, não para o que ela entrega. Nem a cor, nem o nome."""
     corpo = cliente.get(rota).get_data(as_text=True).lower()
+    # Única exceção (adendo de 30/10/2026 à ADR 022): a assinatura discreta do rodapé.
+    corpo = corpo.replace("powered by <b>ness</b><i>.</i>", "")
 
     assert "#00ade8" not in corpo
     assert "ness." not in corpo

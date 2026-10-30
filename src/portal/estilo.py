@@ -235,6 +235,7 @@ ESTILO = """<style>
 .ad-notice{display:flex;gap:12px;align-items:flex-start;margin:0;padding:10px 14px;border-radius:8px;background:var(--warn-soft);color:var(--warn-ink);font:500 16px/1.4 var(--font-text)}
 .ad-notice .ad-ico{margin-top:1px}
 .ad-foot{margin:0;font:400 13px/1.5 var(--font-text);color:var(--muted-foreground)}
+.ad-powered{text-align:right;font-size:12px;opacity:.7}.ad-powered b{font-weight:500}.ad-powered i{font-style:normal}
 
 /* ---------- 11. Modo telão (?telao=1) ---------- */
 .ad-telao{display:none}

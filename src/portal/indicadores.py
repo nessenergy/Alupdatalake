@@ -14,6 +14,7 @@ from src.portal.grafico import tendencia_mensal
 from src.portal.pagina import BRASILIA
 
 if TYPE_CHECKING:
+    from datetime import date
     from decimal import Decimal
 
     from src.portal.dados import Indicador, SaudeConector
@@ -163,9 +164,15 @@ def cartoes(linhas: list[Indicador], saude: list[SaudeConector] | None = None) -
     return prontos
 
 
-def referencia(linhas: list[Indicador]) -> str:
-    """Último mês calculado entre todos os indicadores."""
-    return mes(max(ind.periodo_apuracao for ind in linhas)) if linhas else "—"
+def referencia(linhas: list[Indicador], hoje: date | None = None) -> str:
+    """Último mês calculado entre todos os indicadores; avisa se ele ainda não fechou."""
+    if not linhas:
+        return "—"
+    periodo = max(ind.periodo_apuracao for ind in linhas)
+    texto = mes(periodo)
+    if hoje is not None and periodo == f"{hoje.year}-{hoje.month:02d}":
+        texto += " · mês em andamento"
+    return texto
 
 
 def banda(total: int, referencia_texto: str) -> str:

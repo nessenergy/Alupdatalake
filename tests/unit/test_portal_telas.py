@@ -232,6 +232,15 @@ def _indicadores(recortes: int) -> list[Indicador]:
     return linhas
 
 
+def test_referencia_avisa_quando_o_mes_ainda_esta_em_andamento() -> None:
+    from src.portal import indicadores as tela
+
+    linhas = _indicadores(1)  # último período: 2026-08
+    assert tela.referencia(linhas) == "ago/2026"
+    assert tela.referencia(linhas, date(2026, 9, 3)) == "ago/2026"
+    assert tela.referencia(linhas, date(2026, 8, 30)) == "ago/2026 · mês em andamento"
+
+
 def test_indicadores_no_telao_vem_em_paginas_de_12(cliente, monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr("src.portal.app.obter_provedor", lambda: _provedor(indicadores=_indicadores(26)))
     p1 = cliente.get("/indicadores?telao=1").get_data(as_text=True)

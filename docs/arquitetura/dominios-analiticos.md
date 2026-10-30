@@ -138,10 +138,10 @@ nomes para os mesmos conjuntos. Ver §5.1.
 | | |
 |---|---|
 | **Fontes hoje** | **`inmet_precipitacao`** — chuva horária por estação, do zip anual do INMET (Onda 1; por estação, com a bacia em coluna por ponto em polígono, [ADR 026](decisoes/026-precipitacao-por-bacia.md)) · **`ons_bacia_contorno`** — contornos das bacias do SIN (ONS, CC-BY), insumo da bacia da chuva · `tempook_boletins` — boletim guardado como arquivo, **acervo até 26/10/2022** ([ADR 019](decisoes/019-boletim-do-tempook-como-arquivo.md)) · **`tempook_ena_prevs`** — previsão de ENA, um `tar.gz` por dia, **em dia** |
-| **Fontes a conectar** | os demais caminhos do TempoOK que a Alup vai indicar; o boletim recente, se estiver em outra área do storage |
+| **Fontes a conectar** | nenhuma: o TempoOK saiu do escopo em 20/10/2026 e o conector foi retirado em 30/10 |
 | **Granularidade** | hora por estação (INMET); arquivo diário (por modelo, no ENA-PREVS) |
 | **Cadência** | diária, inclusive fim de semana |
-| **Gold hoje** | `precipitacao_diaria_estacao` (chuva diária por estação do INMET, Onda 1), `precipitacao_diaria_bacia` (média provisória por bacia), `cobertura_boletins_tempook`, `cobertura_ena_prevs_tempook` |
+| **Gold hoje** | `precipitacao_diaria_estacao` (chuva diária por estação do INMET, Onda 1), `precipitacao_diaria_bacia` (média provisória por bacia) |
 | **Situação** | **INMET: chuva horária por estação, com número (Onda 1).** TempoOK: **arquivado e em dia — sem conteúdo extraído.** O domínio passou a ter dado da data de hoje em 21/09; a extração dos números é escopo futuro e depende de a Alup dizer quais importam |
 
 O domínio responde "o arquivo de tal dia chegou", não "choveu quanto" nem "a ENA

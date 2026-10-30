@@ -246,8 +246,6 @@ EXCECOES_DA_CONFERENCIA = frozenset(
         "ons_restricao_coff_eolica",
         "ons_restricao_coff_fotovoltaica",
         "ons_volume_espera",
-        "tempook_boletins",
-        "tempook_ena_prevs",
     }
 )
 

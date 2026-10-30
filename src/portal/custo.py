@@ -139,8 +139,6 @@ DOMINIO_ANALITICO = {
     "ons_energia_vertida_turbinavel": "Geração e Operacional",
     "ons_geracao_termica_despacho": "Geração e Operacional",
     "ons_fator_capacidade": "Geração e Operacional",
-    "tempook_boletins": "Meteorologia",
-    "tempook_ena_prevs": "Meteorologia",
     "inmet_precipitacao": "Meteorologia",
     "ons_bacia_contorno": "Meteorologia",
     "hubspot_negocios": "Comercial e Contratos",

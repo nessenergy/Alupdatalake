@@ -73,8 +73,6 @@ variable "conectores_criticos" {
     ccee_reserva_encargo                    = 780 # mensal + folga (Aditivo 01)
     ccee_energia_reserva_consumo_referencia = 780 # mensal + folga (Aditivo 01)
     ccee_consumo_classe_agente              = 780 # mensal + folga (Aditivo 01)
-    # tempook_boletins fica fora enquanto não houver token (A7): alerta de
-    # fonte que nunca rodou dispara todo dia e ensina a equipe a ignorá-lo.
   }
 }
 

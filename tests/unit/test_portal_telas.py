@@ -119,7 +119,6 @@ def test_lake_escapa_o_nome_do_conector(cliente, monkeypatch: pytest.MonkeyPatch
 
 def test_grupo_vem_do_prefixo_e_outras_vai_por_ultimo() -> None:
     assert tela_saude.grupo_de("ons_ear_bacia") == "ONS"
-    assert tela_saude.grupo_de("tempook_ena_prevs") == "TempoOK"
     assert tela_saude.grupo_de("hubspot_negocios") == "Outras"
     fontes = tela_saude.montar([_conector("hubspot_negocios"), _conector("ccee_pld"), _conector("ons_carga")], [])
     assert [g for g, _ in tela_saude._grupos(fontes)] == ["ONS", "CCEE", "Outras"]
@@ -422,7 +421,7 @@ def test_saude_do_bigquery_traz_execucoes_e_credencial(monkeypatch: pytest.Monke
     from src.portal.dados import ProvedorBigQuery
 
     linha = SimpleNamespace(
-        conector="tempook_ena_prevs",
+        conector="bbce_curva_forward",
         situacao="SEM_SUCESSO",
         ultimo_sucesso=None,
         minutos_desde_sucesso=None,

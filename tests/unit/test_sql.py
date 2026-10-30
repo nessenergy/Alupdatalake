@@ -402,7 +402,7 @@ def test_toda_fonte_agendada_tem_limite_de_silencio_ou_motivo() -> None:
     com_limite = set(re.findall(r"^\s+([a-z0-9_]+):\s*\d+,", js, re.M))
     # Onda 2: dependem de token ou de entrada da Alup (ADR 020, A9) e ainda não executam
     # com sucesso. Quando uma delas passar a rodar, sai desta lista e ganha limite.
-    sem_sucesso_possivel = {"bbce_curva_forward", "hubspot_negocios", "tempook_boletins", "tempook_ena_prevs"}
+    sem_sucesso_possivel = {"bbce_curva_forward", "hubspot_negocios"}
     assert agendadas, "a regex não achou nenhuma fonte agendada"
     assert not (agendadas - com_limite - sem_sucesso_possivel)
 

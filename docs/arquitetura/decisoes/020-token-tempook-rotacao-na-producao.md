@@ -161,3 +161,4 @@ de A3.
 pedida já com destino: o valor novo gravado direto no Secret Manager, sem e-mail
 (seção 3). O momento natural é o dia em que A3 chegar.
 
+> **30/10/2026 — fora do escopo.** O TempoOK saiu do escopo (Alupar, 20/10, confirmado em 27/10). O conector, as tabelas Bronze, Silver e Gold, o agendamento e o dicionário foram retirados; as horas já executadas no item 2.4 continuam contabilizadas no painel. O segredo `alupdata-tempook-api-token` segue no Terraform até alguém decidir descartá-lo.

@@ -148,7 +148,7 @@ marco_pct = 18.97
 janela = [2026-10-19, 2026-11-13]
 trabalho_desde = 2026-08-26
 estado = "aguarda_alup"
-entidades = ["hubspot_negocios", "bbce_curva_forward", "tempook_boletins", "tempook_ena_prevs"]
+entidades = ["hubspot_negocios", "bbce_curva_forward"]
 
 [[onda.item]]
 codigo = "2.1"

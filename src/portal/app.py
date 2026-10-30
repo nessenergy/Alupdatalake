@@ -31,7 +31,7 @@ from src.core.seguranca import sanitizar
 from src.portal import custo_tela, saude
 from src.portal import indicadores as indicadores_tela
 from src.portal.dados import Painel, obter_provedor
-from src.portal.pagina import Telao, pagina, proxima_do_telao
+from src.portal.pagina import BRASILIA, Telao, pagina, proxima_do_telao
 
 if TYPE_CHECKING:
     from src.core.config import Settings
@@ -219,12 +219,13 @@ def indicadores() -> Response:
         if _simulado(cfg)
         else ""
     )
+    referencia = indicadores_tela.referencia(linhas, datetime.now(BRASILIA).date())
     return _responder(
         pagina(
             titulo="Indicadores",
             rota="/indicadores",
             usuario=_usuario(request.headers.get(CABECALHO_IDENTIDADE)),
-            banda=indicadores_tela.banda(len(prontos), indicadores_tela.referencia(linhas)),
+            banda=indicadores_tela.banda(len(prontos), referencia),
             corpo=indicadores_tela.corpo(prontos, pagina=numero if telao else None),
             aviso=aviso,
             telao=telao,

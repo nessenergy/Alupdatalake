@@ -126,5 +126,6 @@ def pagina(
 {_navegacao(rota)}</header>
 {banda}
 <main class="ad-main">{nota}{corpo}
-<p class="ad-foot ad-quem">Conectado como {html.escape(usuario)}</p></main>
+<p class="ad-foot ad-quem">Conectado como {html.escape(usuario)}</p>
+<p class="ad-foot ad-powered">powered by <b>ness</b><i>.</i></p></main>
 </body></html>"""

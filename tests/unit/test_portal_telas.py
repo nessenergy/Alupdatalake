@@ -363,6 +363,14 @@ def test_carimbo_e_hora_de_brasilia_e_diz_que_e_da_consulta() -> None:
     assert ">14:32</time> (Brasília)" in doc
 
 
+def test_rodape_leva_a_assinatura_discreta_da_ness_inclusive_no_telao() -> None:
+    for telao in (None, Telao("Telão", "/custo?telao=1")):
+        doc = pagina(titulo="Teste", rota="/lake", usuario="x@alupar.com.br", banda="", corpo="", telao=telao)
+        assert 'class="ad-foot ad-powered"' in doc
+        assert "powered by <b>ness</b><i>.</i>" in doc
+        assert "#00ade8" not in doc.lower()  # a cor da ness. continua fora do produto (ADR 022)
+
+
 def test_pagina_escapa_o_usuario_e_o_rotulo_do_telao() -> None:
     doc = pagina(
         titulo="Teste",

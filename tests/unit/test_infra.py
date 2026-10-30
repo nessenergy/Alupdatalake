@@ -699,7 +699,7 @@ def test_fonte_sem_credencial_fica_fora_do_agendamento_mas_o_job_existe() -> Non
     assert _tem(r"for_each\s*=\s*var\.conectores\b", job)
 
     dev = _ler("infra/environments/dev.tfvars")
-    for conector in ("hubspot_negocios", "bbce_curva_forward", "tempook_boletins"):
+    for conector in ("hubspot_negocios", "bbce_curva_forward"):
         assert f'"{conector}"' in dev, conector
         assert re.search(rf"^\s+{conector} = \{{", scheduler, re.MULTILINE), conector
 

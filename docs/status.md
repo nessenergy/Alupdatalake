@@ -802,3 +802,5 @@ automática ainda não tem execução efetiva comprovada. O resultado da
 reconciliação está no [relatório de 18/09](relatorios/2026-09-18-reconciliacao-acompanhamento.md).
 
 - **TempoOK: horas mantidas (decisão do Ricardo, 29/10).** O TempoOK saiu do escopo, mas as horas já executadas no item 2.4 (80% de 18 h, 14,4 h) continuam contabilizadas no progresso das 580 h. Issues #174 e #129 encerradas. Em 29/10 também foram encerradas a #150 (Comitê definido na prática; ponto do Google sem efeito) e a #57 (consolidação de 18/09 superada); a #141 aguarda a conferência do `usinas.csv` pela ness.
+
+- **TempoOK retirado do repositório (30/10).** Conector, tabelas Bronze, Silver e Gold, agendamento, dicionário e card do portal saíram, como no CPTEC (#412). As tabelas já criadas no BigQuery de dev e hml não são apagadas pelo deploy. O segredo `alupdata-tempook-api-token` segue no Terraform.

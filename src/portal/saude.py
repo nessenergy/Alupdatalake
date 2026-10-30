@@ -27,7 +27,6 @@ ORIGENS = {
     "aneel": "ANEEL",
     "bcb": "BCB",
     "ibge": "IBGE",
-    "tempook": "TempoOK",
 }
 OUTRAS = "Outras"
 

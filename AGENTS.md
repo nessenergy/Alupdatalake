@@ -184,8 +184,8 @@ dizem como *este contrato* usa o produto.
 | 016 | Recontabilização CCEE: versão da publicação no CKAN, Silver vigente e histórico |
 | 017 | Cloud Workflows na Onda 3, sem Composer |
 | 018 | CCEE via dados abertos; acesso credenciado é escopo candidato |
-| 019 | TempoOK como arquivo PDF e catálogo; acervo recente ainda pendente |
-| 020 | Rotação do token TempoOK na entrada em produção ou mudança do alcance |
+| 019 | TempoOK como arquivo PDF e catálogo (fonte retirada do escopo em 30/10) |
+| 020 | Rotação do token TempoOK na entrada em produção (superada: fonte fora do escopo) |
 | 021 | Seleção dos conjuntos CCEE por demanda dos domínios analíticos |
 | 022 | Identidade visual por audiência: ness. no que a ness. emite, Alup no produto, neutra na documentação técnica |
 | 023 | Região do ambiente: `us-central1`, a única que a política da Alupar admite; irreversível depois do primeiro apply; transferência internacional documentada (DPA, RoPA, RIPD) |

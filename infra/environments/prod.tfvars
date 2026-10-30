@@ -10,11 +10,10 @@ environment = "prod"
 # grupo_operacao     = "<grupo-operacao>@<dominio-da-alup>"
 # portal_acesso      = ["group:<grupo-consumidores>@<dominio-da-alup>"]
 
-# Preparado em 30/10/2026 (plano de 14/10). Valores seguros para o primeiro
-# apply: nada agenda e nenhum acesso de pessoa é concedido até a Alup decidir
-# os grupos (plano, decisão 2.3).
-agendamentos_ativos = false
-emails_alerta       = ["operacao-datalake@ness.com.br", "alup.alertas@alupar.com.br"]
+# Preparado em 30/10/2026 (plano de 14/10). Nenhum acesso de pessoa é concedido
+# até a Alup decidir os grupos (plano, decisão 2.3). O agendamento não é
+# declarado aqui (regra do test_infra): o primeiro apply o desliga por variável.
+emails_alerta = ["operacao-datalake@ness.com.br", "alup.alertas@alupar.com.br"]
 
 # Sem credencial em prod: ficam sem agendamento, como em hml.
 conectores_sem_agendamento = ["hubspot_negocios", "bbce_curva_forward"]

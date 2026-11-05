@@ -86,6 +86,19 @@ def ler_cofre() -> dict[str, str]:
     return segredos
 
 
+def ler_secret_binario(fonte: str, campo: str, versao: str = "latest") -> bytes:
+    """Bytes do secret, para arquivo binário como o certificado .pfx.
+
+    Só vem do Secret Manager: o cofre local é texto e não carrega binário.
+    """
+    from google.cloud import secretmanager
+
+    cfg = get_settings()
+    cliente = secretmanager.SecretManagerServiceClient()
+    caminho = f"projects/{cfg.gcp_project_id}/secrets/{nome_secret(fonte, campo)}/versions/{versao}"
+    return cliente.access_secret_version(request={"name": caminho}).payload.data
+
+
 @lru_cache
 def ler_secret(fonte: str, campo: str, versao: str = "latest") -> str:
     """Valor do secret. Memoizado — não relê a cada requisição do conector."""

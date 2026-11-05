@@ -484,3 +484,19 @@ data = 2026-10-29
 titulo = "Painel e pendências conferidos: aceite das Ondas 0 e 1 assinado e faturado; pendências resolvidas (aceite, credenciais Hubspot e BBCE, TempoOK, orçamento) saem da lista"
 estado = "feito"
 dono = "ness."
+
+[[marco]]
+data = 2026-11-03
+titulo = "CCEE (item 2.1): spec e plano da Plataforma de Integração mesclados; certificado e credenciais criados em hml e dev"
+estado = "feito"
+
+[[marco]]
+data = 2026-11-05
+titulo = "CCEE: sessão SOAP mesclada (certificado na conexão, usuário no envelope); primeira chamada em hml chega à CCEE e é recusada por falta do usuário dedicado"
+estado = "feito"
+
+[[marco]]
+data = 2026-11-06
+titulo = "Reunião com a Alupar: usuário dedicado e perfil de agente por ponto para a CCEE"
+estado = "previsto"
+dono = "Alup"

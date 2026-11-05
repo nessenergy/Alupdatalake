@@ -1,9 +1,19 @@
 # Estado do projeto
 
-Atualizado em **2026-10-29**. Visão de uma página: [`visao-consolidada.md`](visao-consolidada.md). Relatório com as evidências:
+Atualizado em **2026-11-05**. Visão de uma página: [`visao-consolidada.md`](visao-consolidada.md). Relatório com as evidências:
 [`relatorios/2026-10-22-situacao-consolidada.md`](relatorios/2026-10-22-situacao-consolidada.md). Guia de auditoria: [`auditoria.md`](auditoria.md).
 Última auditoria de ponta a ponta, com a conferência de cada número:
 [`relatorios/2026-10-02-auditoria-de-ponta-a-ponta.md`](relatorios/2026-10-02-auditoria-de-ponta-a-ponta.md).
+
+## Atualização de 05/11/2026
+
+Dia 66 de 130 do contrato. Onda 2 no dia 18 de 26 (termina em 13/11); a Onda 3 começa em 11 dias (16/11); restam 64 dias.
+
+- **CCEE (item 2.1, #22 e #260): a conexão chega à CCEE, falta o usuário de acesso dedicado.** Spec e plano mesclados (#448); sessão SOAP mesclada (#450), com o certificado na conexão HTTPS e usuário, senha e perfil de agente no envelope. A Alupar confirmou em 04/11, com o código que usa em produção, que o acesso é assim e que o usuário em uso é pessoal de um colaborador, não genérico. Recebemos o modelo de XML do endpoint `ListarMedidaBSv1` (medição); cada endpoint terá um XML próprio, pedido quando chegarmos nele. Primeira chamada de leitura em hml: a CCEE leu o envelope e respondeu `Server.2001: Acesso Negado`, o que indica certificado aceito e falha de autorização. A causa não foi isolada (senha, perfil de agente ou permissão sobre o ponto). Nenhuma nova tentativa até a Alupar passar o usuário dedicado, previsto para a reunião de 06/11. Comando de teste: `python -m src.cli testar-ccee`.
+- **Segredos da CCEE:** o certificado ganhou versão nova em hml e dev, porque a versão 2, destruída, quebrava a leitura de `latest`. As credenciais reais ainda precisam ser gravadas nos dois projetos.
+- **Dependências:** `pyasn1` 0.6.5 (#449) e `virtualenv` 21.15.5 (#451); o alerta alto do Dependabot está fechado. O bump das ações de CI (#398) espera a aprovação do Cloud Build.
+- **Repositório:** 19 branches remotas, 16 delas de PR já mesclado e à espera de exclusão; `.claude/settings.json` e `.impeccable/` deixam de aparecer como arquivos soltos e o mapa do quadro passa a atribuir #258 a #262 à Alupar (#452).
+- **Testes:** 2.095 aprovados e 534 ignorados por desenho, medidos em 05/11 na `main`.
 
 ## Atualização de 29/10/2026
 

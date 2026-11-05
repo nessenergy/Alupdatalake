@@ -51,7 +51,7 @@ def test_envelope_leva_usuario_perfil_e_corpo_com_escape(sessao):
     envelope = sessao.envelope("<corpo/>")
 
     assert USUARIO in envelope
-    assert "6166" in envelope
+    assert "<v1:codigoPerfilAgente>6166</v1:codigoPerfilAgente>" in envelope
     assert "<corpo/>" in envelope
     # a senha tem & e <: sem escape o XML quebra (ou, pior, injeta)
     assert "s&amp;nh&lt;a&gt;teste" in envelope
@@ -118,3 +118,53 @@ def test_abrir_sessao_com_campo_faltando_nomeia_o_campo_e_nao_o_valor(monkeypatc
 
     assert "senha" in str(erro.value)
     assert "s-pfx" not in str(erro.value)
+
+
+def test_corpo_de_listar_medida_segue_o_modelo_da_alupar():
+    corpo = ccee.corpo_listar_medida("PONTO&1", "2026-11-01", "2026-11-01")
+
+    assert "<v12:codigo>PONTO&amp;1</v12:codigo>" in corpo
+    assert "<v11:tipoMedida>FINAL</v11:tipoMedida>" in corpo
+    assert "<v12:inicio>2026-11-01T00:00:00</v12:inicio>" in corpo
+    assert "<v12:fim>2026-11-01T23:00:00</v12:fim>" in corpo
+
+
+def test_listar_medidas_devolve_as_medidas_da_resposta(sessao, chamadas):
+    chamadas.resposta = SimpleNamespace(
+        status_code=200,
+        text=(
+            '<s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/"'
+            ' xmlns:b="http://xmlns.energia.org.br/BM/v1"><s:Body><b:listarMedidaResponse>'
+            "<b:medida/><b:medida/><b:medida/></b:listarMedidaResponse></s:Body></s:Envelope>"
+        ),
+    )
+
+    assert len(ccee.listar_medidas(sessao, "P1", "2026-11-01", "2026-11-01")) == 3
+    assert chamadas.kwargs["headers"]["SOAPAction"] == "listarMedida"
+
+
+def test_testar_ccee_ok_informa_so_a_quantidade(monkeypatch):
+    monkeypatch.setattr(ccee, "abrir_sessao", lambda: object())
+    monkeypatch.setattr(ccee, "listar_medidas", lambda *a, **k: [1, 2])
+
+    assert ccee.testar_ccee("P1", "2026-11-01") == (True, "ccee: ok, 2 medidas")
+
+
+def test_testar_ccee_devolve_o_erro_da_ccee_sem_segredo(monkeypatch):
+    def falha(*a, **k):
+        raise CceeError("Fault s:Client: Acesso negado")
+
+    monkeypatch.setattr(ccee, "abrir_sessao", lambda: object())
+    monkeypatch.setattr(ccee, "listar_medidas", falha)
+
+    assert ccee.testar_ccee("P1", "2026-11-01") == (False, "ccee: Fault s:Client: Acesso negado")
+
+
+def test_testar_ccee_erro_inesperado_mostra_so_o_tipo(monkeypatch):
+    def falha(*a, **k):
+        raise ConnectionError("detalhe interno com C:/caminho/do/pfx e senha")
+
+    monkeypatch.setattr(ccee, "abrir_sessao", lambda: object())
+    monkeypatch.setattr(ccee, "listar_medidas", falha)
+
+    assert ccee.testar_ccee("P1", "2026-11-01") == (False, "ccee: falha ConnectionError")

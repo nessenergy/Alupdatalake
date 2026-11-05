@@ -8,9 +8,9 @@ a senha vão dentro do envelope SOAP. São duas credenciais distintas: a senha d
 O .pfx vem do Secret Manager como bytes e fica em memória; nada é gravado em
 disco. Usuário, senha e perfil vêm do JSON `alupdata-ccee-credenciais`.
 
-ponytail: o cabeçalho de segurança segue a documentação (WS-Security
-UsernameToken); se o template de produção da Alupar (`geracao_xml.xml`) for
-diferente, é só `Sessao.envelope` que muda.
+O envelope segue o modelo de produção da Alupar (`geracao_xml.xml`, de
+04/11/2026), igual ao exemplo da coleção Postman da CCEE. Cada endpoint tem o
+seu corpo; aqui só existe o de `listarMedida` (`ListarMedidaBSv1`).
 """
 
 from __future__ import annotations
@@ -32,21 +32,27 @@ URL_BASE = "https://servicos.ccee.org.br:443"
 _INTERVALO_S = 0.2
 
 _NS_SOAP = "http://schemas.xmlsoap.org/soap/envelope/"
-_NS_WSSE = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd"
+_NS_BM = "http://xmlns.energia.org.br/BM/v1"
 
 _ENVELOPE = (
     '<?xml version="1.0" encoding="UTF-8"?>'
-    f'<soapenv:Envelope xmlns:soapenv="{_NS_SOAP}" xmlns:wsse="{_NS_WSSE}">'
+    f'<soapenv:Envelope xmlns:soapenv="{_NS_SOAP}"'
+    ' xmlns:oas="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd"'
+    ' xmlns:v1="http://xmlns.energia.org.br/MH/v1"'
+    f' xmlns:v11="{_NS_BM}"'
+    ' xmlns:v12="http://xmlns.energia.org.br/BO/v1">'
     "<soapenv:Header>"
-    "<wsse:Security><wsse:UsernameToken>"
-    "<wsse:Username>{usuario}</wsse:Username>"
-    "<wsse:Password>{senha}</wsse:Password>"
-    "</wsse:UsernameToken></wsse:Security>"
-    "<codigoPerfilAgente>{perfil}</codigoPerfilAgente>"
+    "<v1:messageHeader><v1:codigoPerfilAgente>{perfil}</v1:codigoPerfilAgente></v1:messageHeader>"
+    "<oas:Security><oas:UsernameToken>"
+    "<oas:Username>{usuario}</oas:Username>"
+    "<oas:Password>{senha}</oas:Password>"
+    "</oas:UsernameToken></oas:Security>"
     "</soapenv:Header>"
     "<soapenv:Body>{corpo}</soapenv:Body>"
     "</soapenv:Envelope>"
 )
+
+CAMINHO_MEDIDA = "/ws/medc/ListarMedidaBSv1"
 
 
 class CceeError(RuntimeError):
@@ -117,3 +123,38 @@ def abrir_sessao() -> Sessao:
         senha=credenciais["senha"],
         perfil=str(credenciais["codigo_perfil_agente"]),
     )
+
+
+def corpo_listar_medida(ponto: str, inicio: str, fim: str, tipo: str = "FINAL") -> str:
+    """Corpo de `listarMedida`. Datas em YYYY-MM-DD; o fim vai até 23:00 do dia."""
+    return (
+        "<v11:listarMedida>"
+        f"<v11:pontoMedicao><v12:codigo>{escape(ponto)}</v12:codigo></v11:pontoMedicao>"
+        f"<v11:tipoMedida>{escape(tipo)}</v11:tipoMedida>"
+        f"<v11:periodo><v12:inicio>{escape(inicio)}T00:00:00</v12:inicio>"
+        f"<v12:fim>{escape(fim)}T23:00:00</v12:fim></v11:periodo>"
+        "</v11:listarMedida>"
+    )
+
+
+def listar_medidas(sessao: Sessao, ponto: str, inicio: str, fim: str, tipo: str = "FINAL") -> list:
+    """Elementos `medida` devolvidos pela CCEE para o ponto e o período."""
+    raiz = sessao.chamar(CAMINHO_MEDIDA, "listarMedida", corpo_listar_medida(ponto, inicio, fim, tipo))
+    return raiz.findall(f".//{{{_NS_BM}}}medida")
+
+
+def testar_ccee(ponto: str, dia: str) -> tuple[bool, str]:
+    """Uma única chamada de leitura, para provar credencial e certificado.
+
+    Devolve só o resultado: a quantidade de medidas ou o motivo da CCEE. Erro
+    inesperado mostra apenas o tipo, porque a mensagem de biblioteca de TLS
+    pode trazer caminho e detalhe do certificado. Sem retry: errar a senha de
+    um usuário pessoal repetidas vezes pode bloqueá-lo.
+    """
+    try:
+        medidas = listar_medidas(abrir_sessao(), ponto, dia, dia)
+    except CceeError as erro:
+        return False, f"ccee: {erro}"
+    except Exception as erro:  # noqa: BLE001 — a mensagem pode carregar segredo
+        return False, f"ccee: falha {type(erro).__name__}"
+    return True, f"ccee: ok, {len(medidas)} medidas"

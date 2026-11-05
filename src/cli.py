@@ -7,6 +7,7 @@ não existe caminho de código que só rode em produção.
     alupdata ingerir bcb_cambio_ptax --de 2026-01-01 --ate 2026-01-31
     alupdata ingerir bcb_cambio_ptax --ultimos-dias 7 --dry-run
     alupdata testar-conexao fmb
+    alupdata testar-ccee --dia 2026-11-01
     alupdata sondar cptec
 """
 
@@ -17,6 +18,7 @@ import dataclasses
 import json
 import sys
 
+from src.conectores.ccee_pi_sessao import testar_ccee
 from src.core.banco import esquema, testar_conexao
 from src.core.config import get_settings
 from src.core.execucao import Janela
@@ -48,6 +50,11 @@ def _parser() -> argparse.ArgumentParser:
 
     teste = sub.add_parser("testar-conexao", help="abre conexão com a DSN da fonte e roda SELECT 1")
     teste.add_argument("fonte", help="fonte do secret alupdata-<fonte>-dsn, como fmb ou comercializacao")
+    ccee = sub.add_parser(
+        "testar-ccee", help="uma chamada de leitura à CCEE (listarMedida) para provar credencial e certificado"
+    )
+    ccee.add_argument("--ponto", default="CEPITBUFPI211", help="código do ponto de medição")
+    ccee.add_argument("--dia", required=True, help="dia consultado (YYYY-MM-DD)")
     esquema_cmd = sub.add_parser("esquema", help="lista as colunas das tabelas de um MySQL (só information_schema)")
     esquema_cmd.add_argument("fonte", help="fonte do secret alupdata-<fonte>-dsn, como portal-alup")
     esquema_cmd.add_argument("--tabelas", required=True, help="nomes das tabelas, separados por vírgula")
@@ -74,6 +81,11 @@ def main(argv: list[str] | None = None) -> int:
 
     if args.comando == "testar-conexao":
         ok, mensagem = testar_conexao(args.fonte)
+        print(mensagem)
+        return 0 if ok else 1
+
+    if args.comando == "testar-ccee":
+        ok, mensagem = testar_ccee(args.ponto, args.dia)
         print(mensagem)
         return 0 if ok else 1
 

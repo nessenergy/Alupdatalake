@@ -99,3 +99,11 @@ def test_testar_conexao_devolve_o_codigo_e_imprime(monkeypatch, capsys, resultad
 
     assert main(["testar-conexao", "fmb"]) == codigo
     assert resultado[1] in capsys.readouterr().out
+
+
+@pytest.mark.parametrize(("resultado", "codigo"), [((True, "ccee: ok, 3 medidas"), 0), ((False, "ccee: falha X"), 1)])
+def test_testar_ccee_devolve_o_codigo_e_imprime(monkeypatch, capsys, resultado, codigo):
+    monkeypatch.setattr("src.cli.testar_ccee", lambda ponto, dia: resultado)
+
+    assert main(["testar-ccee", "--dia", "2026-11-01"]) == codigo
+    assert resultado[1] in capsys.readouterr().out

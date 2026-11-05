@@ -1,7 +1,7 @@
 # Próximos passos — fila de execução
 
 Documento **vivo**: é para riscar linha, não para arquivar. Atualizado em
-**2026-10-29** (BBCE resolvido, custo medido e Dataform opcional no deploy).
+**2026-11-05** (CCEE: conexão validada, falta o usuário dedicado; dependências em dia).
 
 Ele existe para responder uma pergunta que os outros três não respondem em uma
 tela: **qual é a próxima ação, de quem é, e qual comando a executa.**
@@ -24,7 +24,7 @@ em acompanhamento com a Alup; sua execução não é presumida por esta revisão
 > |---|---|---|
 > | 1 | ~~BBCE: exemplo de chamada da consulta de curvas~~ resolvido em 28/10 (`Bearer <idToken>`, #434); resta conferir a Silver e a Gold | Ricardo |
 > | 2 | ~~Confirmar por escrito que o TempoOK saiu do escopo~~: dispensado, a saída está validada (23/10/2026) | Gabriel |
-> | 3 | Gravar as credenciais da ONS (IPDO editável e ACOMPH, área autenticada) e da CCEE (SOAP com certificado); os segredos existem desde 27/10 | Alupar |
+> | 3 | ONS: gravar as credenciais (IPDO editável e ACOMPH, área autenticada). CCEE: receber na reunião de 06/11 o usuário dedicado e o perfil de agente por ponto, gravar a versão nova do segredo e fazer uma tentativa única em hml (#260) | Alupar, Ricardo |
 > | 4 | Colunas das 7 tabelas do MySQL Alup (duas serão renomeadas) e do outro banco, para os conectores da Onda 3 | Alupar |
 > | 5 | Caminho de rede até o Oracle FMB via DCIDE (IP privado, VPC, aceite da sub-rede) | Thiago, Alupar |
 > | 6 | RM/TOTVS: a Alupar não tem endpoints e precisa dos dados de faturamento de varejistas e atacadistas; perguntar à DCIDE | Ricardo |
@@ -35,8 +35,8 @@ em acompanhamento com a Alup; sua execução não é presumida por esta revisão
 
 ## 1. O que está travando tudo
 
-**Em 29/10, o que trava é externo e está pedido:** os valores da ONS e da CCEE
-(Onda 2), as tabelas do MySQL Comercialização, os dados de faturamento do
+**Em 05/11, o que trava é externo e está pedido:** os valores da ONS e o usuário
+dedicado da CCEE (Onda 2), as tabelas do MySQL Comercialização, os dados de faturamento do
 RM/TOTVS, a rede e a credencial do FMB (Onda 3) e a pasta do Drive (Onda 4).
 O aceite das Ondas 0 e 1 não trava mais nada: foi assinado por escrito em 05/10
 e faturado (marcos 1 e 2, R$ 53.760,00). A lista de 25/09 que estava aqui

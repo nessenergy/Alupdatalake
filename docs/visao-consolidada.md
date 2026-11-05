@@ -1,6 +1,6 @@
 # Visão consolidada do AlupData
 
-Posição em **29/10/2026**. Uma página para quem chega ao projeto agora. O detalhe e as evidências estão em
+Posição em **05/11/2026**. Uma página para quem chega ao projeto agora. O detalhe e as evidências estão em
 [`relatorios/2026-10-22-situacao-consolidada.md`](relatorios/2026-10-22-situacao-consolidada.md).
 
 ## O que é
@@ -24,7 +24,7 @@ Cada fonte só está entregue com os **7 componentes** da cláusula 2ª: conecto
 | | |
 |---|---|
 | Conectores | **58**, todos com os 7 componentes presentes |
-| Testes | **2.138 aprovados**, 537 ignorados por desenho (medido em 29/10); cobertura **96%** (medida em 22/10) |
+| Testes | **2.095 aprovados**, 534 ignorados por desenho (medido em 05/11); cobertura **96%** (medida em 22/10) |
 | Ambientes | `dev` e `hml` aplicados; **produção ainda não existe** |
 | Saúde da ingestão | dev: 56 OK; hml: 55 OK |
 | Documentação | 30 ADRs, 60 dicionários, 9 runbooks |

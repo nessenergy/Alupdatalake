@@ -131,6 +131,6 @@ Confirmado com o código que a Alupar usa em produção para a medição:
 - o **certificado .pfx vai na conexão HTTPS** (mTLS), em toda chamada, com a senha do próprio certificado;
 - **usuário e senha vão dentro do envelope SOAP**, junto do código do perfil de agente (`messageHeader/codigoPerfilAgente`). São credenciais diferentes da senha do certificado;
 - o usuário em uso é **pessoal de um colaborador**, não genérico. A ness. pediu um usuário dedicado ao projeto;
-- cada endpoint tem o seu XML. O de `listarMedida` (`/ws/medc/ListarMedidaBSv1`) está implementado em `src/conectores/ccee_pi_sessao.py`; os demais serão pedidos quando forem necessários.
+- cada endpoint tem o seu XML. O de `listarMedida` (`/ws/medc/ListarMedidaBSv1`) está implementado em `src/conectores/ccee_pi_sessao.py`; os demais não precisam ser pedidos: a coleção pública traz o XML de todas as operações (ver o [catálogo](../../dicionario-dados/ccee_plataforma_integracao.md), de 06/11).
 
 Primeira chamada de leitura em hml, em 05/11: a CCEE aceitou a conexão e respondeu `Server.2001: Acesso Negado`. A causa (senha, perfil de agente ou permissão sobre o ponto) fica para a próxima tentativa, com o usuário dedicado. A primeira entidade do conector de medição fica a confirmar com a Alupar em 06/11.

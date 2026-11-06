@@ -5,7 +5,7 @@ Base: ADR [018](../../arquitetura/decisoes/018-vias-de-acesso-a-ccee.md), que re
 
 ## 1. O que está verificado
 
-Fonte: coleção Postman pública da Plataforma de Integração, lida em 03/11 pela API do próprio documenter. **Leitura parcial**: cerca de 500 mil dos 774 mil caracteres não foram lidos, e os corpos de resposta de modelagem, parcelas, contratos e montantes ficaram de fora.
+Fonte: coleção Postman pública da Plataforma de Integração, lida em 03/11 pela API do próprio documenter. A leitura de 03/11 foi parcial (cerca de 500 mil dos 774 mil caracteres ficaram de fora). **Em 06/11 a coleção foi lida por inteiro** e o resultado está em [`ccee_plataforma_integracao.md`](../../dicionario-dados/ccee_plataforma_integracao.md): 57 operações, 51 de leitura, com o XML de requisição de todas e 66 respostas de exemplo. A tabela abaixo continua valendo; o catálogo a complementa.
 
 | Fato | Valor |
 |---|---|
@@ -43,6 +43,14 @@ Três perguntas à Alupar fecham isso (Fabrizio e Leonardo):
 - **Falha alto:** resposta com `Fault`, erro 2003 ou corpo vazio derruba a execução; a mensagem de erro nunca inclui senha, usuário ou conteúdo do certificado.
 - **Ambiente:** dev e hml usam o **piloto** se a Alupar liberar o acesso; senão, a produção da CCEE em somente leitura, com a decisão registrada.
 - **Segredos:** `alupdata-ccee-certificado` (.pfx, já na v1 em dev e hml) e `alupdata-ccee-credenciais` (JSON, hoje só `senha_certificado`). Campos novos entram como **nova versão** do mesmo segredo, sem mudar `infra/`.
+
+### Adendo de 06/11/2026: o que a leitura completa muda
+
+- **Não é preciso pedir o XML de cada endpoint à Alupar.** A coleção já traz o corpo de todas as 57 operações. O pedido só vale para os campos que a coleção não esclarece.
+- **O ponto de exemplo pode vir da própria CCEE.** `Listar pontos de medição por agente relacionado`, `Listar perfis` e `Listar participantes` são cadastros, que têm exceção à regra de só consultar o que é do agente. Depende de a autorização funcionar, então o usuário dedicado continua sendo o gargalo.
+- **Hipótese a verificar, não afirmada:** uma leitura de cadastro separaria as causas do `Server.2001`. Se ela também for negada, o problema é usuário ou perfil; se só a medição for, é permissão sobre o ponto. Vale uma tentativa única, depois do usuário dedicado.
+- **Perfil:** a documentação diz que o perfil diferencia o tratamento de usinas e cargas do mesmo agente. A pergunta à Alupar passa a ser "qual perfil para cada tipo de ativo", e não "para cada ponto".
+- **Piloto:** `https://piloto-servicos.ccee.org.br` consta na coleção para vários serviços. A pergunta 3 (acesso ao piloto) segue em aberto.
 
 ## 4. Fora do escopo
 

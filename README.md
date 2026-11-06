@@ -30,7 +30,7 @@ testes, agendamento e dicionário com linhagem.
 
 | Medida | Valor |
 |---|---|
-| Conectores registrados | **58**, todos com os 7 componentes presentes |
+| Conectores registrados | **56**, todos com os 7 componentes presentes |
 | Testes | **2.013 aprovados** e 558 ignorados por desenho |
 | Cobertura de linhas | **96%** |
 | Ambientes | `dev` e `hml` aplicados; produção ainda não existe |

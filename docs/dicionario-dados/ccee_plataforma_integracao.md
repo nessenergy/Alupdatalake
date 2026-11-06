@@ -92,6 +92,18 @@ Escrita não entra no escopo do AlupData: o conector só lê. `Paginada` indica 
 
 Não estão na tabela os endpoints de recebimento de notificações (webhook) e de retorno de situação da coleta: ficam do lado do agente, não da CCEE.
 
+## Erros
+
+Fonte: seção 4 do *Manual do Usuário – Informar Coleta Medição* (v1.0, 19/10/2020), que descreve o formato de erro comum a todos os serviços SOAP da Plataforma.
+
+- Todo erro volta como **SOAP Fault**. O `faultcode` é sempre `Server.<errorCode>`.
+- O `detail` traz `errorCode`, `message` (explicação detalhada), `uri` e **`transactionId`**, o identificador que a CCEE pede para rastrear a chamada.
+- Códigos listados no manual: `1001`, `2001`, `2002`, `3001`, `3002`, `3006`, `3007`, `4001` e `9999`. A tabela do PDF sai embaralhada na extração de texto, então **só o `2001` está confirmado**: `faultstring` "Acesso Negado", detalhe `securityFault`, descrito como "o cliente não tem permissão para acessar o serviço".
+- O exemplo do manual para **erro de autenticação** é exatamente `Server.2001` / `Acesso Negado`, com a mensagem `Usuario ou senha invalidos`. Ou seja, o `2001` é falha de autenticação ou de permissão no serviço; **perfil não autorizado tem erro próprio** (`Rejected: Usuário não está autorizado a usar o codigoPerfilAgente`, segundo o guia de primeiros passos).
+- O `2003` (limite de 400 chamadas por minuto) vem da descrição da coleção.
+
+**O que o nosso código descarta.** `src/conectores/ccee_pi_sessao.py` lê só `faultcode` e `faultstring`. O `message` e o `transactionId` do `detail` se perdem. Na tentativa de 05/11 isso impediu saber se a mensagem era "Usuario ou senha invalidos".
+
 ## Pontos que orientam o conector
 
 - **Cadastros primeiro.** `Listar perfis`, `Listar participantes` e `Listar pontos de medição por agente relacionado` permitem descobrir perfil e pontos sem que a Alupar os informe um a um.

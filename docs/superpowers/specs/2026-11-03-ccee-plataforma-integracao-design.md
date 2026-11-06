@@ -49,8 +49,11 @@ Três perguntas à Alupar fecham isso (Fabrizio e Leonardo):
 - **Não é preciso pedir o XML de cada endpoint à Alupar.** A coleção já traz o corpo de todas as 57 operações. O pedido só vale para os campos que a coleção não esclarece.
 - **O ponto de exemplo pode vir da própria CCEE.** `Listar pontos de medição por agente relacionado`, `Listar perfis` e `Listar participantes` são cadastros, que têm exceção à regra de só consultar o que é do agente. Depende de a autorização funcionar, então o usuário dedicado continua sendo o gargalo.
 - **Hipótese a verificar, não afirmada:** uma leitura de cadastro separaria as causas do `Server.2001`. Se ela também for negada, o problema é usuário ou perfil; se só a medição for, é permissão sobre o ponto. Vale uma tentativa única, depois do usuário dedicado.
-- **Perfil:** a documentação diz que o perfil diferencia o tratamento de usinas e cargas do mesmo agente. A pergunta à Alupar passa a ser "qual perfil para cada tipo de ativo", e não "para cada ponto".
-- **Piloto:** `https://piloto-servicos.ccee.org.br` consta na coleção para vários serviços. A pergunta 3 (acesso ao piloto) segue em aberto.
+- **Perfil:** para consultas de medição, o guia da CCEE manda usar o perfil do **agente principal do ponto**, devolvido por `Listar pontos de medição`. A pergunta "o 6166 vale para todos os pontos?" continua certa. O perfil também diferencia usina e carga do mesmo agente.
+- **Piloto (pergunta 3):** os guias da CCEE dizem que o piloto usa os **mesmos usuários, senhas e certificados** da produção, com dados defasados em um mês. Não depende de liberação da Alupar; a decisão de ambiente da seção 3 pode apontar para o piloto.
+- **Hipóteses da seção 2:** os guias oficiais indicam SSL mútuo com o certificado aderido (H2) **e** usuário e senha sistêmicos no envelope, criados na adesão (parte de H1). Não há indício de assinatura do envelope (H3). Segue pendente saber quem na Alupar detém o usuário sistêmico.
+- **O erro:** perfil não autorizado tem mensagem própria (`Rejected: Usuário não está autorizado a usar o codigoPerfilAgente`), diferente do `Server.2001` recebido. É indício, não prova, de que a causa não é o perfil; o código está no Manual de Alertas e Exceções, ainda não lido.
+- **Certificado:** validade menor que 395 dias. Renovação anual, com dono e data.
 
 ## 4. Fora do escopo
 

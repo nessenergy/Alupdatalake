@@ -13,10 +13,15 @@ Só documentação: nenhuma chamada à CCEE foi feita para montar este catálogo
 | XML de requisição | **a coleção traz o XML de todas as operações**; não é preciso pedi-los à Alupar |
 | Respostas de exemplo | 66 na coleção (valores fictícios) |
 | Produção | `https://servicos.ccee.org.br:443` |
-| Piloto | `https://piloto-servicos.ccee.org.br`, com WSDL na porta 442 (`?wsdl`) |
+| Portas | 442 (WSDL) e 443, tanto em produção quanto no piloto |
+| Piloto | `https://piloto-servicos.ccee.org.br`. **Mesmos usuários, senhas e certificados da produção.** Tem todos os serviços, menos a DRI. Dados defasados em um mês, atualizados no primeiro sábado do mês; não funciona 24/7 |
+| Duas verificações | (1) **autenticação**: usuário e senha *sistêmicos* e certificado; (2) **autorização**: `codigoPerfilAgente` no cabeçalho. Perfil não autorizado devolve `Rejected: Usuário não está autorizado a usar o codigoPerfilAgente` |
+| Conexão | **SSL mútuo**: a chave privada do certificado previamente aderido (`.pfx`, `.p12`, `.jks`) acompanha toda chamada a `*.ccee.org.br` |
+| Certificado | servidor web SSL, ICP-Brasil, RSA 2048, SHA-2, validade **menor que 395 dias** (renovação anual) e *subject* único por certificado |
+| Usuário | o *usuário sistêmico* nasce da adesão à Plataforma, feita no SGP junto com o cadastro do certificado |
 | Autenticação no envelope | WS-Security `UsernameToken` (`Username`, `Password`) |
 | Perfil | `messageHeader/codigoPerfilAgente`, **obrigatório em toda requisição**. Não confundir com o código do agente; consulta pelo serviço de perfis ou pela planilha pública Infomercado Dados Individuais |
-| Perfil e tipo de ativo | o perfil diferencia o tratamento de usinas e cargas do mesmo agente; um agente pode ter mais de um |
+| Perfil na medição | o guia de medições manda usar o perfil do **agente principal do ponto** (Conectante ou Medição), que `Listar pontos de medição` devolve no retorno. Pode ser diferente do perfil do solicitante. O perfil também diferencia usinas e cargas do mesmo agente |
 | Limite | 400 chamadas por minuto por usuário sistêmico e por serviço (erro `2003`); `SituacaoColetaMedicao` tem 60 por hora |
 | Paginação | `paginacao/numero` e `paginacao/quantidadeItens` (menor que 100; 500 em `MedidaCincoMinutosBSv2`) |
 | Restrição de acesso | o agente só consulta o que é seu ou de quem representa; **cadastros** (ativos, parcelas, agentes, perfis) têm exceção |
@@ -92,4 +97,14 @@ Não estão na tabela os endpoints de recebimento de notificações (webhook) e 
 - **Cadastros primeiro.** `Listar perfis`, `Listar participantes` e `Listar pontos de medição por agente relacionado` permitem descobrir perfil e pontos sem que a Alupar os informe um a um.
 - **Medição** tem três variantes em `ListarMedidaBSv1` (consolidadas, faltantes, finais), todas com a `SOAPAction` `listarMedida`. A resposta é horária e traz ponto, subtipo, status e quatro grandezas (geração e consumo, ativo e reativo).
 - **Medição de 5 minutos** é um serviço à parte (`MedidaCincoMinutosBSv2`, por medidor).
-- **Quanto à autorização:** a coleção descreve usuário, senha e perfil no envelope. O certificado na conexão (mTLS) vem do que a Alupar confirmou em 04/11 (ADR 018, adendo), não da coleção.
+- **Descobrir o perfil do ponto:** chamar `Listar pontos de medição por agente relacionado` com o perfil que já temos e usar o perfil devolvido em cada ponto nas consultas de medição.
+- **Piloto antes da produção.** Usa as mesmas credenciais, então a primeira tentativa de leitura pode ser no piloto. Atenção à defasagem de um mês dos dados.
+- **Certificado vence em menos de um ano.** A renovação precisa de dono e de data, e entra como nova versão do segredo `alupdata-ccee-certificado`.
+
+## Fontes
+
+- Coleção Postman atual (documenter `12351215/UzJJucpF`), lida por inteiro.
+- Repositório [`devccee/postman-collections`](https://github.com/devccee/postman-collections): a mesma coleção em versão anterior (julho de 2022, menor que a do documenter) e o passo a passo de SSL mútuo no Postman.
+- Guias [`devccee/guia-primeiros-passos`](https://github.com/devccee/guia-primeiros-passos) e [`devccee/guia-medicoes`](https://github.com/devccee/guia-medicoes), lidos em 06/11/2026.
+- **Ainda não lidos**, só citados nos guias: Manual de Autenticação, Manual de Alertas e Exceções (onde o `Server.2001` deve estar descrito), manual de adesão e atualização de certificado no SGP e o manual de `ListarMedida`. Estão em `https://www.ccee.org.br/documentos/plataforma-de-integracao`, que respondeu 403 ao acesso automatizado de 06/11.
+- Atendimento da CCEE: `atendimento@ccee.org.br` (assunto "Erro no Ambiente piloto" para o piloto).

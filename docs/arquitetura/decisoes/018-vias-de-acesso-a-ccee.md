@@ -142,5 +142,5 @@ Com o usuário `ace` (o que a Alupar usa na produção dela), a senha do certifi
 - O `Server.2001` de 05/11 foi quase certamente o usuário pessoal usado então. O manual da CCEE trata esse erro como falha de autenticação. Não é prova, porque aquela resposta não guardou `message` nem `transactionId`.
 - O erro do conector passou a incluir `errorCode`, `message` e `transactionId` (nunca o envelope). O comando `testar-ccee` aceita `--piloto`.
 - O piloto não respondeu da rede da ness. (portas 442 e 443), então a validação foi na produção, só com leitura.
-- Em aberto: a Alupar confirmar que o AlupData pode usar o `ace`; a cota de 400 chamadas por minuto vale por usuário e por serviço e é dividida com os sistemas dela; verificar se o `6166` vale para todos os pontos pelo cadastro de pontos.
+- Confirmado em 09/11 pelo Gabriel, que fala com a Alupar: o `ace` é o usuário a usar, e o usuário pessoal de 05/11 estava errado. Em aberto: a cota de 400 chamadas por minuto vale por usuário e por serviço e é dividida com os sistemas dela; verificar se o `6166` vale para todos os pontos pelo cadastro de pontos.
 - O certificado vence em 22/07/2027; a renovação precisa de dono e data.

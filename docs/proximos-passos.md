@@ -24,7 +24,7 @@ em acompanhamento com a Alup; sua execução não é presumida por esta revisão
 > |---|---|---|
 > | 1 | ~~BBCE: exemplo de chamada da consulta de curvas~~ resolvido em 28/10 (`Bearer <idToken>`, #434); resta conferir a Silver e a Gold | Ricardo |
 > | 2 | ~~Confirmar por escrito que o TempoOK saiu do escopo~~: dispensado, a saída está validada (23/10/2026) | Gabriel |
-> | 3 | ONS: gravar as credenciais (IPDO editável e ACOMPH, área autenticada). ~~CCEE: credenciais gravadas e primeira leitura feita em 09/11 (24 medidas, usuário `ace`)~~; resta confirmar com a Alupar o uso do `ace` e se o perfil `6166` vale para todos os pontos (#260) | Alupar, Ricardo |
+> | 3 | ONS: gravar as credenciais (IPDO editável e ACOMPH, área autenticada). ~~CCEE: credenciais gravadas e primeira leitura feita em 09/11 (24 medidas, usuário `ace`)~~; uso do `ace` confirmado pelo Gabriel em 09/11; resta saber se o perfil `6166` vale para todos os pontos e quem renova o certificado (#462) | Alupar, Ricardo |
 > | 4 | Colunas das 7 tabelas do MySQL Alup (duas serão renomeadas) e do outro banco, para os conectores da Onda 3 | Alupar |
 > | 5 | Caminho de rede até o Oracle FMB via DCIDE (IP privado, VPC, aceite da sub-rede) | Thiago, Alupar |
 > | 6 | RM/TOTVS: a Alupar não tem endpoints e precisa dos dados de faturamento de varejistas e atacadistas; perguntar à DCIDE | Ricardo |

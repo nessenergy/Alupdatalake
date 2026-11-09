@@ -210,6 +210,39 @@ def pontos_medicao(sessao: Sessao):
         numero += 1
 
 
+def obter_ponto(sessao: Sessao, codigo: str):
+    """Elemento `pontoMedicao` do cadastro, pelo código (None se a CCEE não devolver)."""
+    corpo = (
+        "<bm:obterPontoMedicaoRequest><bm:pontoMedicao>"
+        f"<bo:codigo>{escape(codigo)}</bo:codigo>"
+        "</bm:pontoMedicao></bm:obterPontoMedicaoRequest>"
+    )
+    raiz = sessao.chamar(CAMINHO_PONTO, "obterPontoMedicao", corpo, pagina=(1, 2))
+    return raiz.find(f".//{{{NS_BO2}}}pontoMedicao")
+
+
+def testar_cadastro(ponto: str, piloto: bool = False) -> tuple[bool, str]:
+    """Mostra quais perfis a CCEE relaciona ao ponto (tipo de relação e código do perfil, sem nomes).
+
+    Serve para descobrir com qual perfil o cadastro de pontos responde. Uma chamada, só leitura.
+    """
+    try:
+        elemento = obter_ponto(abrir_sessao(piloto), ponto)
+    except CceeError as erro:
+        return False, f"ccee: {erro}"
+    except Exception as erro:  # noqa: BLE001 — a mensagem pode carregar segredo
+        return False, f"ccee: falha {type(erro).__name__}"
+    if elemento is None:
+        return False, "ccee: a resposta não trouxe o ponto"
+    caminho = f"{{{NS_BO2}}}agentesRelacionados/{{{NS_BO2}}}participanteMercadoRelacionado"
+    relacoes = []
+    for a in elemento.findall(caminho):
+        tipo = a.findtext(f"{{{NS_BO2}}}tipoRelacao/{{{NS_BO2}}}nome")
+        perfil = a.findtext(f"{{{NS_BO2}}}perfis/{{{NS_BO2}}}perfil/{{{NS_BO2}}}codigo")
+        relacoes.append(f"{tipo} perfil={perfil}")
+    return True, f"ccee: ponto encontrado, {len(relacoes)} agentes: " + "; ".join(relacoes)
+
+
 def testar_ccee(ponto: str, dia: str, piloto: bool = False) -> tuple[bool, str]:
     """Uma única chamada de leitura, para provar credencial e certificado.
 

@@ -82,3 +82,16 @@ def test_sem_nenhum_ponto_falha_alto(chamadas, monkeypatch):
 
     with pytest.raises(RuntimeError, match="nenhum ponto"):
         list(CceePiMedida().extrair(JANELA))
+
+
+def test_lista_de_pontos_da_credencial_dispensa_o_cadastro(chamadas, monkeypatch):
+    monkeypatch.setattr(modulo, "abrir_sessao", lambda: Sessao(pfx=b"", perfil="6166", pontos=("P7", "P8")))
+
+    def sem_cadastro():
+        raise AssertionError("o cadastro não deve ser lido quando a credencial traz os pontos")
+
+    monkeypatch.setattr(modulo, "_pontos_com_perfil", sem_cadastro)
+
+    list(CceePiMedida().extrair(JANELA))
+
+    assert [(p["ponto"], p["perfil"]) for p in chamadas] == [("P7", "6166"), ("P8", "6166")]

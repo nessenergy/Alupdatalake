@@ -303,3 +303,17 @@ def test_testar_cadastro_sem_ponto_na_resposta(monkeypatch):
     monkeypatch.setattr(ccee, "obter_ponto", lambda s, c: None)
 
     assert ccee.testar_cadastro("P1") == (False, "ccee: a resposta não trouxe o ponto")
+
+
+@pytest.mark.parametrize(
+    ("valor", "esperado"),
+    [(None, ()), ("", ()), (" P1, P2 ,,P3 ", ("P1", "P2", "P3"))],
+)
+def test_abrir_sessao_le_a_lista_opcional_de_pontos(monkeypatch, valor, esperado):
+    credenciais = {"senha_certificado": "s-pfx", "usuario": USUARIO, "senha": SENHA, "codigo_perfil_agente": "6166"}
+    if valor is not None:
+        credenciais["pontos"] = valor
+    monkeypatch.setattr(ccee, "ler_secret", lambda fonte, campo: json.dumps(credenciais))
+    monkeypatch.setattr(ccee, "ler_secret_binario", lambda fonte, campo: PFX)
+
+    assert ccee.abrir_sessao().pontos == esperado

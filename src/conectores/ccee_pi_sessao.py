@@ -54,7 +54,32 @@ _ENVELOPE = (
     "</soapenv:Envelope>"
 )
 
+# Os serviços v2 (cadastros) usam outros namespaces e levam a paginação no cabeçalho.
+NS_MH2 = "http://xmlns.energia.org.br/MH/v2"
+NS_BO2 = "http://xmlns.energia.org.br/BO/v2"
+
+_ENVELOPE_V2 = (
+    '<?xml version="1.0" encoding="UTF-8"?>'
+    f'<soapenv:Envelope xmlns:soapenv="{_NS_SOAP}"'
+    ' xmlns:oas="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd"'
+    f' xmlns:mh="{NS_MH2}"'
+    ' xmlns:bm="http://xmlns.energia.org.br/BM/v2"'
+    f' xmlns:bo="{NS_BO2}">'
+    "<soapenv:Header>"
+    "<mh:messageHeader><mh:codigoPerfilAgente>{perfil}</mh:codigoPerfilAgente></mh:messageHeader>"
+    "<oas:Security><oas:UsernameToken>"
+    "<oas:Username>{usuario}</oas:Username>"
+    "<oas:Password>{senha}</oas:Password>"
+    "</oas:UsernameToken></oas:Security>"
+    "<mh:paginacao><mh:numero>{pagina}</mh:numero><mh:quantidadeItens>{itens}</mh:quantidadeItens></mh:paginacao>"
+    "</soapenv:Header>"
+    "<soapenv:Body>{corpo}</soapenv:Body>"
+    "</soapenv:Envelope>"
+)
+
 CAMINHO_MEDIDA = "/ws/medc/ListarMedidaBSv1"
+CAMINHO_PONTO = "/ws/v2/PontoMedicaoBSv2"
+ITENS_POR_PAGINA = 50
 
 
 class CceeError(RuntimeError):
@@ -78,19 +103,29 @@ class Sessao:
             usuario=escape(self.usuario), senha=escape(self.senha), perfil=escape(self.perfil), corpo=corpo
         )
 
+    def envelope_v2(self, corpo: str, pagina: int, itens: int) -> str:
+        return _ENVELOPE_V2.format(
+            usuario=escape(self.usuario),
+            senha=escape(self.senha),
+            perfil=escape(self.perfil),
+            pagina=pagina,
+            itens=itens,
+            corpo=corpo,
+        )
+
     def _sem_segredo(self, texto: str) -> str:
         for segredo in (self.senha, self.senha_pfx, self.usuario):
             if segredo:
                 texto = texto.replace(segredo, "***")
         return texto
 
-    def chamar(self, caminho: str, acao: str, corpo: str):
-        """Uma chamada SOAP; devolve a raiz do XML de resposta."""
+    def chamar(self, caminho: str, acao: str, corpo: str, pagina: tuple[int, int] | None = None):
+        """Uma chamada SOAP; devolve a raiz do XML de resposta. `pagina` = (número, itens) nos serviços v2."""
         time.sleep(_INTERVALO_S)
         resposta = post(
             self.base + caminho,
             headers={"Content-Type": "text/xml; charset=utf-8", "SOAPAction": acao},
-            data=self.envelope(corpo).encode("utf-8"),
+            data=(self.envelope_v2(corpo, *pagina) if pagina else self.envelope(corpo)).encode("utf-8"),
             pkcs12_data=self.pfx,
             pkcs12_password=self.senha_pfx,
             timeout=get_settings().http_timeout,
@@ -153,6 +188,24 @@ def listar_medidas(sessao: Sessao, ponto: str, inicio: str, fim: str, tipo: str 
     """Elementos `medida` devolvidos pela CCEE para o ponto e o período."""
     raiz = sessao.chamar(CAMINHO_MEDIDA, "listarMedida", corpo_listar_medida(ponto, inicio, fim, tipo))
     return raiz.findall(f".//{{{_NS_BM}}}medida")
+
+
+_TIPOS_RELACAO = ("AGENTE_CONECTADO", "AGENTE_CONECTANTE", "AGENTE_MEDICAO", "AGENTE_USO_FIO")
+_CORPO_PONTOS = (
+    "<bm:listarPontoMedicaoRequest><bm:tiposRelacoes>"
+    + "".join(f"<bo:tipo><bo:nome>{tipo}</bo:nome></bo:tipo>" for tipo in _TIPOS_RELACAO)
+    + "</bm:tiposRelacoes></bm:listarPontoMedicaoRequest>"
+)
+
+
+def pontos_medicao(sessao: Sessao):
+    """Elementos `pontoMedicao` do cadastro, de todas as páginas, com os agentes relacionados."""
+    numero, total = 1, 1
+    while numero <= total:
+        raiz = sessao.chamar(CAMINHO_PONTO, "listarPontoMedicao", _CORPO_PONTOS, pagina=(numero, ITENS_POR_PAGINA))
+        total = int(raiz.findtext(f".//{{{NS_MH2}}}totalPaginas") or 1)
+        yield from raiz.findall(f".//{{{NS_BO2}}}pontoMedicao")
+        numero += 1
 
 
 def testar_ccee(ponto: str, dia: str, piloto: bool = False) -> tuple[bool, str]:

@@ -138,6 +138,14 @@ variable "conectores" {
       cron         = "0 7 * * 1" # cadastro muda devagar: semanal, segunda
       ultimos_dias = 1           # cadastro completo; a janela não se aplica
     }
+    ccee_pi_ponto_medicao = {
+      # Item 2.1, Plataforma de Integração da CCEE. Cadastro de pontos de medição e dos perfis de agente de cada um:
+      # muda devagar e o retrato é pequeno. Mensal, dia 2 às 6h (o piloto da CCEE só atualiza no 1º sábado). Cada
+      # execução faz poucas chamadas SOAP de 50 itens, longe das 400 por minuto da cota, que é dividida com os
+      # sistemas da Alupar.
+      cron         = "0 6 2 * *"
+      ultimos_dias = 1 # retrato do cadastro; a janela não se aplica
+    }
     ace_prc = {
       # Onda 1, "referência (PRC)" da cláusula 4ª. A ACE Comercializadora (Alup) divulga o PRC numa tabela HTML em
       # alup.io/valores-de-energia; a página é um retrato sem janela e muda raramente (a data era 01/10/2025). Lê

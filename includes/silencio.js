@@ -43,6 +43,7 @@ const limites_horas = {
   bcb_igpm: 780,
   ccee_pld: 26,
   ccee_perfil: 180,
+  ccee_pi_ponto_medicao: 780, // mensal (dia 2) + folga
   ccee_agente: 780,
   ccee_exposicao_financeira: 780,
   ccee_contabilizacao_perfil: 780,

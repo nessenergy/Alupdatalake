@@ -2,6 +2,7 @@
 senha no envelope. Nada aqui toca a rede nem lê segredo de verdade."""
 
 import json
+from pathlib import Path
 from types import SimpleNamespace
 from xml.sax.saxutils import escape
 
@@ -230,3 +231,46 @@ def test_testar_ccee_erro_inesperado_mostra_so_o_tipo(monkeypatch):
     monkeypatch.setattr(ccee, "listar_medidas", falha)
 
     assert ccee.testar_ccee("P1", "2026-11-01") == (False, "ccee: falha ConnectionError")
+
+
+# ── cadastro de pontos de medição (PontoMedicaoBSv2, envelope v2 paginado) ─────
+
+PAGINA_1 = (Path(__file__).parent.parent / "fixtures" / "ccee_pi" / "ponto_medicao_pagina1.xml").read_text(
+    encoding="utf-8"
+)
+# A página 2 é a 1 renumerada, com outros códigos de ponto.
+PAGINA_2 = (
+    PAGINA_1.replace("<mh:numero>1</mh:numero>", "<mh:numero>2</mh:numero>")
+    .replace("ABCDEFGH01-01", "ABCDEFGH03-03")
+    .replace("ABCDEFGH02-02", "ABCDEFGH04-04")
+)
+
+
+def test_envelope_v2_leva_paginacao_perfil_e_namespaces_v2(sessao):
+    envelope = sessao.envelope_v2("<corpo/>", pagina=2, itens=50)
+
+    assert "http://xmlns.energia.org.br/MH/v2" in envelope
+    assert "<mh:numero>2</mh:numero><mh:quantidadeItens>50</mh:quantidadeItens>" in envelope
+    assert "<mh:codigoPerfilAgente>6166</mh:codigoPerfilAgente>" in envelope
+    assert "s&amp;nh&lt;a&gt;teste" in envelope
+    assert "<corpo/>" in envelope
+
+
+def test_pontos_medicao_percorre_todas_as_paginas(sessao, chamadas, monkeypatch):
+    paginas = iter([PAGINA_1, PAGINA_2])
+    visto = []
+
+    def post_paginado(url, **kwargs):
+        visto.append((url, kwargs["headers"]["SOAPAction"], kwargs["data"].decode("utf-8")))
+        return SimpleNamespace(status_code=200, text=next(paginas))
+
+    monkeypatch.setattr(ccee, "post", post_paginado)
+
+    codigos = [ponto.findtext(f"{{{ccee.NS_BO2}}}codigo") for ponto in ccee.pontos_medicao(sessao)]
+
+    assert codigos == ["ABCDEFGH01-01", "ABCDEFGH02-02", "ABCDEFGH03-03", "ABCDEFGH04-04"]
+    assert [v[0] for v in visto] == ["https://servicos.ccee.org.br:443/ws/v2/PontoMedicaoBSv2"] * 2
+    assert {v[1] for v in visto} == {"listarPontoMedicao"}
+    assert "<mh:numero>1</mh:numero>" in visto[0][2]
+    assert "<mh:numero>2</mh:numero>" in visto[1][2]
+    assert "<bo:nome>AGENTE_USO_FIO</bo:nome>" in visto[0][2]

@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<soapenv:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:mh="http://xmlns.energia.org.br/MH/v2">
+	<soapenv:Header>
+		<mh:messageHeader>
+			<mh:transactionId>12345678-1234-1234-1234-123456789012</mh:transactionId>
+			<mh:versao xsi:nil="true"/>
+		</mh:messageHeader>
+		<mh:paginacao>
+			<mh:numero>1</mh:numero>
+			<mh:quantidadeItens>2</mh:quantidadeItens>
+			<mh:totalPaginas>2</mh:totalPaginas>
+			<mh:quantidadeTotalItens>3</mh:quantidadeTotalItens>
+		</mh:paginacao>
+	</soapenv:Header>
+	<soapenv:Body>
+		<bm:listarPontoMedicaoResponse xmlns:bm="http://xmlns.energia.org.br/BM/v2" xmlns:bo="http://xmlns.energia.org.br/BO/v2">
+			<bm:pontosMedicao>
+				<bo:pontoMedicao>
+					<bo:codigo>ABCDEFGH01-01</bo:codigo>
+					<bo:nome>PONTO DE MEDICAO 001</bo:nome>
+					<bo:agentesRelacionados>
+						<bo:participanteMercadoRelacionado>
+							<bo:parte>
+								<bo:pessoaJuridica>
+									<bo:nomeEmpresarial>EMPRESA A</bo:nomeEmpresarial>
+								</bo:pessoaJuridica>
+							</bo:parte>
+							<bo:perfis>
+								<bo:perfil>
+									<bo:codigo>999</bo:codigo>
+								</bo:perfil>
+							</bo:perfis>
+							<bo:tipoRelacao>
+								<bo:nome>AGENTE_CONECTADO</bo:nome>
+							</bo:tipoRelacao>
+						</bo:participanteMercadoRelacionado>
+						<bo:participanteMercadoRelacionado>
+							<bo:parte>
+								<bo:pessoaJuridica>
+									<bo:nomeEmpresarial>EMPRESA B</bo:nomeEmpresarial>
+								</bo:pessoaJuridica>
+							</bo:parte>
+							<bo:perfis>
+								<bo:perfil>
+									<bo:codigo>888</bo:codigo>
+								</bo:perfil>
+							</bo:perfis>
+							<bo:tipoRelacao>
+								<bo:nome>AGENTE_MEDICAO</bo:nome>
+							</bo:tipoRelacao>
+						</bo:participanteMercadoRelacionado>
+						<bo:participanteMercadoRelacionado>
+							<bo:parte>
+								<bo:pessoaJuridica>
+									<bo:nomeEmpresarial>EMPRESA B</bo:nomeEmpresarial>
+								</bo:pessoaJuridica>
+							</bo:parte>
+							<bo:perfis>
+								<bo:perfil>
+									<bo:codigo>888</bo:codigo>
+								</bo:perfil>
+							</bo:perfis>
+							<bo:tipoRelacao>
+								<bo:nome>AGENTE_CONECTANTE</bo:nome>
+							</bo:tipoRelacao>
+						</bo:participanteMercadoRelacionado>
+					</bo:agentesRelacionados>
+					<bo:tipoColeta>
+						<bo:codigo>DIRETA</bo:codigo>
+					</bo:tipoColeta>
+				</bo:pontoMedicao>
+				<bo:pontoMedicao>
+					<bo:codigo>ABCDEFGH02-02</bo:codigo>
+					<bo:nome>PONTO DE MEDICAO 002</bo:nome>
+					<bo:agentesRelacionados>
+						<bo:participanteMercadoRelacionado>
+							<bo:parte>
+								<bo:pessoaJuridica>
+									<bo:nomeEmpresarial>EMPRESA A</bo:nomeEmpresarial>
+								</bo:pessoaJuridica>
+							</bo:parte>
+							<bo:perfis>
+								<bo:perfil>
+									<bo:codigo>999</bo:codigo>
+								</bo:perfil>
+							</bo:perfis>
+							<bo:tipoRelacao>
+								<bo:nome>AGENTE_CONECTADO</bo:nome>
+							</bo:tipoRelacao>
+						</bo:participanteMercadoRelacionado>
+						<bo:participanteMercadoRelacionado>
+							<bo:parte>
+								<bo:pessoaJuridica>
+									<bo:nomeEmpresarial>EMPRESA B</bo:nomeEmpresarial>
+								</bo:pessoaJuridica>
+							</bo:parte>
+							<bo:perfis>
+								<bo:perfil>
+									<bo:codigo>888</bo:codigo>
+								</bo:perfil>
+							</bo:perfis>
+							<bo:tipoRelacao>
+								<bo:nome>AGENTE_MEDICAO</bo:nome>
+							</bo:tipoRelacao>
+						</bo:participanteMercadoRelacionado>
+						<bo:participanteMercadoRelacionado>
+							<bo:parte>
+								<bo:pessoaJuridica>
+									<bo:nomeEmpresarial>EMPRESA B</bo:nomeEmpresarial>
+								</bo:pessoaJuridica>
+							</bo:parte>
+							<bo:perfis>
+								<bo:perfil>
+									<bo:codigo>888</bo:codigo>
+								</bo:perfil>
+							</bo:perfis>
+							<bo:tipoRelacao>
+								<bo:nome>AGENTE_CONECTANTE</bo:nome>
+							</bo:tipoRelacao>
+						</bo:participanteMercadoRelacionado>
+					</bo:agentesRelacionados>
+					<bo:tipoColeta>
+						<bo:codigo>DIRETA</bo:codigo>
+					</bo:tipoColeta>
+				</bo:pontoMedicao>
+			</bm:pontosMedicao>
+		</bm:listarPontoMedicaoResponse>
+	</soapenv:Body>
+</soapenv:Envelope>

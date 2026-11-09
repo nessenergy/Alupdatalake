@@ -1,0 +1,26 @@
+config {
+  type: "operations",
+  schema: "bronze",
+  hasOutput: true,
+  tags: ["bronze"]
+}
+
+-- Bronze: cadastro de pontos de medição da Plataforma de Integração da CCEE (`listarPontoMedicao`).
+-- Append-only: cada execução grava o retrato do cadastro, uma linha por ponto e agente relacionado; a Silver deduplica.
+CREATE TABLE IF NOT EXISTS ${self()} (
+  data_referencia     DATE      NOT NULL OPTIONS(description="Data do retrato (fim da janela da execução)"),
+  ponto_codigo        STRING    NOT NULL OPTIONS(description="Código do ponto de medição na CCEE"),
+  ponto_nome          STRING    OPTIONS(description="Nome do ponto"),
+  tipo_coleta         STRING    OPTIONS(description="Tipo de coleta do ponto, como DIRETA"),
+  tipo_relacao        STRING    OPTIONS(description="Relação do agente com o ponto: AGENTE_CONECTADO, AGENTE_CONECTANTE, AGENTE_MEDICAO ou AGENTE_USO_FIO; nulo se o ponto não traz agente"),
+  perfil_codigo       STRING    OPTIONS(description="Código do perfil de agente nessa relação; é o que o listarMedida pede no cabeçalho"),
+  agente_nome         STRING    OPTIONS(description="Nome empresarial do agente"),
+
+  _ingestao_id        STRING    NOT NULL OPTIONS(description="Identificador da execução de ingestão"),
+  _ingestao_timestamp TIMESTAMP NOT NULL OPTIONS(description="Quando o registro entrou no lake"),
+  _fonte              STRING    NOT NULL OPTIONS(description="Identificador da fonte"),
+  _schema_versao      STRING    NOT NULL OPTIONS(description="Versão do contrato lido na origem")
+)
+PARTITION BY DATE(_ingestao_timestamp)
+CLUSTER BY ponto_codigo, data_referencia
+OPTIONS(description="Cadastro de pontos de medição da CCEE (Plataforma de Integração) — camada Bronze, append-only");

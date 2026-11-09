@@ -25,7 +25,7 @@ from src.core.registry import registrar
 
 if TYPE_CHECKING:
     from collections.abc import Iterator
-    from xml.etree.ElementTree import Element
+    from xml.etree.ElementTree import Element  # nosec B405 - só tipo; o XML é lido com defusedxml
 
     from src.core.execucao import Janela
 

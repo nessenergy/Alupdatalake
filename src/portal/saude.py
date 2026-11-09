@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import html
 from dataclasses import dataclass
+from datetime import date
 from typing import TYPE_CHECKING
 
 from src.portal.formato import duracao, milhar, pct
@@ -34,6 +35,13 @@ OUTRAS = "Outras"
 # pedem atenção; fonte que nunca carregou (e não espera credencial) é crítica.
 ESTADO_DA_SITUACAO = {"OK": "ok", "ATRASADA": "warn", "FALHA_RECENTE": "warn", "SEM_SUCESSO": "crit"}
 ROTULO_DO_ESTADO = {"ok": "em dia", "warn": "pede atenção", "crit": "crítica", "idle": "aguardando credencial"}
+
+# Vencimento dos certificados que o lake usa para falar com uma origem. É a data do
+# arquivo .pfx guardado no Secret Manager; ao renovar, troca-se a data aqui.
+# ponytail: data escrita à mão; ler do próprio .pfx exigiria dar ao Portal acesso ao segredo.
+CERTIFICADOS = {"CCEE": date(2027, 7, 22)}
+AVISO_CERTIFICADO_DIAS = 90  # a partir daqui a tela avisa; em 30 dias ou menos, vira crítico
+CRITICO_CERTIFICADO_DIAS = 30
 
 # Gravidade para o grupo: o pior estado de uma fonte vira o do grupo.
 _GRAVIDADE = {"ok": 0, "warn": 1, "crit": 2}
@@ -156,6 +164,35 @@ def veredito(fontes: list[Fonte]) -> str:
         f'<div class="ad-lamps" aria-hidden="true">{_lampadas()}</div>'
         f'<div><h2 class="ad-verdict__title">{titulo}</h2><p class="ad-verdict__sub">{apoio}</p></div></div>'
     )
+
+
+def aviso_certificados(hoje: date) -> str:
+    """Faixa de aviso para cada certificado a 90 dias do vencimento ou menos; vazio se nenhum."""
+    faixas = ""
+    for origem, vence in CERTIFICADOS.items():
+        dias = (vence - hoje).days
+        if dias > AVISO_CERTIFICADO_DIAS:
+            continue
+        estado = "crit" if dias <= CRITICO_CERTIFICADO_DIAS else "warn"
+        dia = vence.strftime("%d/%m/%Y")
+        if dias < 0:
+            titulo, apoio = (
+                f"Certificado da {origem} venceu em {dia}",
+                "A conexão com a origem deixa de funcionar até a renovação.",
+            )
+        elif dias == 0:
+            titulo, apoio = f"Certificado da {origem} vence hoje ({dia})", "Renovar hoje, para a conexão não parar."
+        else:
+            titulo = f"Certificado da {origem} vence em {dia}"
+            apoio = f"{_plural(dias, 'dia', 'dias')} para renovar, para a conexão não parar."
+        faixas += (
+            f'<section class="ad-band" aria-label="Certificado da {html.escape(origem)}">'
+            f'<div class="ad-verdict ad-verdict--{estado}" role="status">'
+            f'<div class="ad-lamps" aria-hidden="true">{_lampadas()}</div>'
+            f'<div><h2 class="ad-verdict__title">{html.escape(titulo)}</h2>'
+            f'<p class="ad-verdict__sub">{html.escape(apoio)}</p></div></div></section>'
+        )
+    return faixas
 
 
 def _pilula(estado: str, texto: str) -> str:

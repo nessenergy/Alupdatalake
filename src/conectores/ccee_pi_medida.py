@@ -3,7 +3,10 @@
 Fonte: serviço SOAP `ListarMedidaBSv1`, operação `listarMedida` com `tipoMedida` FINAL, uma medida por hora e por
 ponto (geração e consumo, ativos e reativos). Catálogo: `docs/dicionario-dados/ccee_plataforma_integracao.md`.
 
-Os pontos e o perfil de cada um vêm do cadastro (`ccee_pi_ponto_medicao`), pela Gold `perfil_vigente_ponto_medicao`:
+Se a credencial traz o campo opcional `pontos` (códigos separados por vírgula), são eles, com o perfil da
+sessão (#462).
+Sem o campo, os pontos e o perfil de cada um vêm do cadastro (`ccee_pi_ponto_medicao`), pela Gold
+`perfil_vigente_ponto_medicao`:
 o guia da CCEE manda usar o perfil do agente principal do ponto, e o cadastro o devolve. Ponto sem perfil é pulado
 e contado no log (o código do ponto é dado de cliente e não vai ao log). Sem nenhum ponto o conector falha alto: seria o
 cadastro ainda não carregado, e não um dia sem medição.
@@ -79,10 +82,11 @@ class CceePiMedida(Conector):
     max_dias_por_requisicao = 31
 
     def extrair(self, janela: Janela) -> Iterator[dict[str, Any]]:
-        pontos = _pontos_com_perfil()
-        if not pontos:
-            raise RuntimeError("nenhum ponto no cadastro da CCEE (ccee_pi_ponto_medicao ainda não carregou?)")
         sessao = abrir_sessao()
+        # a lista da credencial vale enquanto o cadastro não responde ao perfil (#462); o perfil é o da própria sessão
+        pontos = [(p, sessao.perfil) for p in sessao.pontos] or _pontos_com_perfil()
+        if not pontos:
+            raise RuntimeError("nenhum ponto: sem lista na credencial e o cadastro da CCEE ainda não carregou")
         sem_perfil = 0
         for ponto, perfil in pontos:
             if not perfil:

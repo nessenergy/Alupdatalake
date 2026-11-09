@@ -95,6 +95,7 @@ class Sessao:
     usuario: str = ""
     senha: str = ""
     perfil: str = ""
+    pontos: tuple[str, ...] = ()  # opcional, vem da credencial: pontos a medir sem depender do cadastro
     base: str = URL_BASE
 
     def __repr__(self) -> str:  # o dataclass padrão imprimiria as senhas
@@ -170,6 +171,7 @@ def abrir_sessao(piloto: bool = False) -> Sessao:
         usuario=credenciais["usuario"],
         senha=credenciais["senha"],
         perfil=str(credenciais["codigo_perfil_agente"]),
+        pontos=tuple(p.strip() for p in str(credenciais.get("pontos") or "").split(",") if p.strip()),
         base=URL_PILOTO if piloto else URL_BASE,
     )
 

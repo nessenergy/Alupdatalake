@@ -87,6 +87,7 @@ ANOTACOES: dict[str, dict[str, str]] = {
     "tarifa_vigente_distribuidora": {"dominio": "mercado_de_energia", "responsavel": INTELIGENCIA},  # Onda 1
     "prc_vigente_comercializadora": {"dominio": "mercado_de_energia", "responsavel": INTELIGENCIA},  # Onda 1
     "perfil_vigente_ponto_medicao": {"dominio": "mercado_de_energia", "responsavel": INTELIGENCIA},  # item 2.1
+    "medicao_diaria_ponto": {"dominio": "mercado_de_energia", "responsavel": INTELIGENCIA},  # item 2.1
     # 2 · Geração e Operacional — usinas do SIN, dado público
     "parque_gerador": {"dominio": "geracao_e_operacional", "responsavel": INTELIGENCIA},
     "geracao_mensal_usina": {"dominio": "geracao_e_operacional", "responsavel": INTELIGENCIA},

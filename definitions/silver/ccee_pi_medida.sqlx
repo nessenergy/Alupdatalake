@@ -1,0 +1,41 @@
+config {
+  type: "view",
+  schema: "silver",
+  tags: ["silver"],
+  assertions: {
+    uniqueKey: ["ponto_codigo", "tipo_medida", "fim_periodo"],
+    nonNull: ["data_referencia", "ponto_codigo", "tipo_medida", "fim_periodo"],
+    rowConditions: [
+      "tipo_medida = 'FINAL'",
+      "(geracao_ativa IS NULL OR geracao_ativa >= 0) AND (consumo_ativo IS NULL OR consumo_ativo >= 0)",
+      "(geracao_reativa IS NULL OR geracao_reativa >= 0) AND (consumo_reativo IS NULL OR consumo_reativo >= 0)"
+    ]
+  }
+}
+
+-- Silver: medição horária final por ponto, deduplicada.
+-- Dedup: para cada ponto, tipo de medida e fim de período, vence a ingestão mais recente: a CCEE revisa a medida final
+-- e a janela diária reler os últimos dias traz a versão nova.
+SELECT
+  data_referencia,
+  CAST(NULL AS STRING) AS submercado,    -- a medição não traz submercado
+  CAST(NULL AS STRING) AS codigo_usina,  -- o ponto não é a usina; o de-para é da #141
+  CAST(NULL AS STRING) AS agente_ccee,   -- a origem traz o ponto, não o código do agente
+  FORMAT_DATE('%Y-%m', data_referencia) AS periodo_apuracao,
+  CAST(NULL AS STRING) AS periodo_apuracao_ccee,  -- a medida não declara período de contabilização
+  ponto_codigo,
+  tipo_medida,
+  fim_periodo,
+  sub_tipo,
+  status,
+  geracao_ativa,
+  geracao_reativa,
+  consumo_ativo,
+  consumo_reativo,
+  _ingestao_id,
+  _ingestao_timestamp
+FROM ${ref("bronze", "ccee_pi_medida")}
+QUALIFY ROW_NUMBER() OVER (
+  PARTITION BY ponto_codigo, tipo_medida, fim_periodo
+  ORDER BY _ingestao_timestamp DESC
+) = 1

@@ -1,0 +1,21 @@
+config {
+  type: "table",
+  schema: "gold",
+  tags: ["gold"],
+  dependOnDependencyAssertions: true
+}
+
+-- Gold: quanto cada ponto de medição gerou e consumiu por dia, e se o dia está completo.
+-- Soma as horas da medição final. `horas_com_dado` diz quantas horas entraram; um dia de 24 horas (23 ou 25 na troca
+-- de horário) está completo, e abaixo disso a soma subestima o dia. A unidade é a da origem; não há conversão aqui.
+SELECT
+  data_referencia,
+  ponto_codigo,
+  SUM(geracao_ativa) AS geracao_ativa,
+  SUM(geracao_reativa) AS geracao_reativa,
+  SUM(consumo_ativo) AS consumo_ativo,
+  SUM(consumo_reativo) AS consumo_reativo,
+  COUNT(*) AS horas_com_dado,
+  COUNT(*) >= 23 AS dia_completo
+FROM ${ref("silver", "ccee_pi_medida")}
+GROUP BY data_referencia, ponto_codigo

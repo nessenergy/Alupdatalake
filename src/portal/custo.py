@@ -114,6 +114,7 @@ DOMINIO_ANALITICO = {
     # Cadastro do mercado: dá nome ao que nas outras fontes é código.
     "ccee_perfil": "Mercado de Energia",
     "ccee_pi_ponto_medicao": "Mercado de Energia",
+    "ccee_pi_medida": "Mercado de Energia",
     "ccee_agente": "Mercado de Energia",
     "ccee_exposicao_financeira": "Risco e Compliance",
     "ccee_contabilizacao_perfil": "Risco e Compliance",

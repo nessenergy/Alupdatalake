@@ -23,10 +23,10 @@ Cada fonte só está entregue com os **7 componentes** da cláusula 2ª: conecto
 
 | | |
 |---|---|
-| Conectores | **56**, todos com os 7 componentes presentes |
+| Conectores | **58**, todos com os 7 componentes presentes |
 | Testes | **2.095 aprovados**, 534 ignorados por desenho (medido em 05/11); cobertura **96%** (medida em 22/10) |
 | Ambientes | `dev` e `hml` aplicados; **produção ainda não existe** |
-| Saúde da ingestão | dev: 56 OK; hml: 55 OK |
+| Saúde da ingestão | dev: 56 OK; hml: 55 OK (CCEE PI: 2 entidades novas sem deploy) |
 | Documentação | 30 ADRs, 60 dicionários, 9 runbooks |
 
 ## Como o projeto é organizado

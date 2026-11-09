@@ -27,6 +27,8 @@ from src.core.config import get_settings
 from src.core.secrets import ler_secret, ler_secret_binario
 
 URL_BASE = "https://servicos.ccee.org.br:443"
+# Piloto: mesmas credenciais da produção, dados com um mês de defasagem.
+URL_PILOTO = "https://piloto-servicos.ccee.org.br:443"
 
 # A CCEE aceita 400 chamadas por minuto (erro 2003); 0,2 s de intervalo dá 300.
 _INTERVALO_S = 0.2
@@ -66,9 +68,10 @@ class Sessao:
     usuario: str = ""
     senha: str = ""
     perfil: str = ""
+    base: str = URL_BASE
 
     def __repr__(self) -> str:  # o dataclass padrão imprimiria as senhas
-        return f"Sessao(usuario={self.usuario!r}, perfil={self.perfil!r})"
+        return f"Sessao(usuario={self.usuario!r}, perfil={self.perfil!r}, base={self.base!r})"
 
     def envelope(self, corpo: str) -> str:
         return _ENVELOPE.format(
@@ -85,7 +88,7 @@ class Sessao:
         """Uma chamada SOAP; devolve a raiz do XML de resposta."""
         time.sleep(_INTERVALO_S)
         resposta = post(
-            URL_BASE + caminho,
+            self.base + caminho,
             headers={"Content-Type": "text/xml; charset=utf-8", "SOAPAction": acao},
             data=self.envelope(corpo).encode("utf-8"),
             pkcs12_data=self.pfx,
@@ -102,7 +105,15 @@ class Sessao:
             if falha is not None:
                 codigo = (falha.findtext("faultcode") or "?").strip()
                 motivo = (falha.findtext("faultstring") or "").strip()
-                raise CceeError(f"Fault {codigo}: {self._sem_segredo(motivo)}")
+                # `detail` traz errorCode, message e transactionId (o que a CCEE pede
+                # para rastrear). Só esses três campos; nunca o envelope enviado.
+                detalhe = {
+                    elemento.tag.rsplit("}", 1)[-1]: (elemento.text or "").strip()
+                    for elemento in falha.iter()
+                    if elemento.tag.rsplit("}", 1)[-1] in ("errorCode", "message", "transactionId")
+                }
+                extra = "".join(f" [{k}={self._sem_segredo(v)}]" for k, v in detalhe.items() if v)
+                raise CceeError(f"Fault {codigo}: {self._sem_segredo(motivo)}{extra}")
         if resposta.status_code >= 400:
             raise CceeError(f"HTTP {resposta.status_code} em {caminho}")
         if raiz is None:
@@ -110,7 +121,7 @@ class Sessao:
         return raiz
 
 
-def abrir_sessao() -> Sessao:
+def abrir_sessao(piloto: bool = False) -> Sessao:
     """Monta a sessão a partir dos dois segredos. Falta de campo nomeia o campo, não o valor."""
     credenciais = json.loads(ler_secret("ccee", "credenciais"))
     faltam = [c for c in ("senha_certificado", "usuario", "senha", "codigo_perfil_agente") if not credenciais.get(c)]
@@ -122,6 +133,7 @@ def abrir_sessao() -> Sessao:
         usuario=credenciais["usuario"],
         senha=credenciais["senha"],
         perfil=str(credenciais["codigo_perfil_agente"]),
+        base=URL_PILOTO if piloto else URL_BASE,
     )
 
 
@@ -143,7 +155,7 @@ def listar_medidas(sessao: Sessao, ponto: str, inicio: str, fim: str, tipo: str 
     return raiz.findall(f".//{{{_NS_BM}}}medida")
 
 
-def testar_ccee(ponto: str, dia: str) -> tuple[bool, str]:
+def testar_ccee(ponto: str, dia: str, piloto: bool = False) -> tuple[bool, str]:
     """Uma única chamada de leitura, para provar credencial e certificado.
 
     Devolve só o resultado: a quantidade de medidas ou o motivo da CCEE. Erro
@@ -152,7 +164,7 @@ def testar_ccee(ponto: str, dia: str) -> tuple[bool, str]:
     um usuário pessoal repetidas vezes pode bloqueá-lo.
     """
     try:
-        medidas = listar_medidas(abrir_sessao(), ponto, dia, dia)
+        medidas = listar_medidas(abrir_sessao(piloto), ponto, dia, dia)
     except CceeError as erro:
         return False, f"ccee: {erro}"
     except Exception as erro:  # noqa: BLE001 — a mensagem pode carregar segredo

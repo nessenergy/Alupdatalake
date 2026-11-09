@@ -1,0 +1,36 @@
+config {
+  type: "view",
+  schema: "silver",
+  tags: ["silver"],
+  assertions: {
+    uniqueKey: ["data_referencia", "ponto_codigo", "tipo_relacao", "perfil_codigo", "agente_nome"],
+    nonNull: ["data_referencia", "ponto_codigo"],
+    rowConditions: [
+      "tipo_relacao IS NULL OR tipo_relacao IN ('AGENTE_CONECTADO', 'AGENTE_CONECTANTE', 'AGENTE_MEDICAO', 'AGENTE_USO_FIO')"
+    ]
+  }
+}
+
+-- Silver: cadastro de pontos de medição da CCEE higienizado e deduplicado.
+-- Dedup: para cada retrato, ponto, relação, perfil e agente, vence a ingestão mais recente. Retratos de datas diferentes
+-- ficam todos aqui (é o histórico do cadastro); a Gold escolhe o mais recente.
+SELECT
+  data_referencia,
+  CAST(NULL AS STRING) AS submercado,    -- o cadastro de pontos não traz submercado
+  CAST(NULL AS STRING) AS codigo_usina,  -- o ponto não é a usina; o de-para é da #141
+  CAST(NULL AS STRING) AS agente_ccee,   -- a origem traz o nome empresarial e o perfil, não o código do agente
+  FORMAT_DATE('%Y-%m', data_referencia) AS periodo_apuracao,
+  CAST(NULL AS STRING) AS periodo_apuracao_ccee,  -- o cadastro não declara período de contabilização
+  ponto_codigo,
+  ponto_nome,
+  tipo_coleta,
+  tipo_relacao,
+  perfil_codigo,
+  agente_nome,
+  _ingestao_id,
+  _ingestao_timestamp
+FROM ${ref("bronze", "ccee_pi_ponto_medicao")}
+QUALIFY ROW_NUMBER() OVER (
+  PARTITION BY data_referencia, ponto_codigo, tipo_relacao, perfil_codigo, agente_nome
+  ORDER BY _ingestao_timestamp DESC
+) = 1

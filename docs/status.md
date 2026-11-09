@@ -1,9 +1,17 @@
 # Estado do projeto
 
-Atualizado em **2026-11-05**. Visão de uma página: [`visao-consolidada.md`](visao-consolidada.md). Relatório com as evidências:
+Atualizado em **2026-11-09**. Visão de uma página: [`visao-consolidada.md`](visao-consolidada.md). Relatório com as evidências:
 [`relatorios/2026-10-22-situacao-consolidada.md`](relatorios/2026-10-22-situacao-consolidada.md). Guia de auditoria: [`auditoria.md`](auditoria.md).
 Última auditoria de ponta a ponta, com a conferência de cada número:
 [`relatorios/2026-10-02-auditoria-de-ponta-a-ponta.md`](relatorios/2026-10-02-auditoria-de-ponta-a-ponta.md).
+
+## Atualização de 09/11/2026
+
+Dia 70 de 130 do contrato. Onda 2 no dia 22 de 26 (termina em 13/11); a Onda 3 começa em 7 dias (16/11); restam 60 dias.
+
+- **CCEE (item 2.1, #22 e #260): primeira leitura real com sucesso.** Em 09/11, com o usuário `ace`, o certificado que vence em 22/07/2027 e o perfil `6166`, a produção da CCEE devolveu 24 medidas horárias do ponto `CEPITBUFPI211` em 01/11 (`ListarMedidaBSv1`, uma única tentativa). As credenciais reais estão gravadas em dev e hml (versão 3, quatro campos). O `Server.2001` de 05/11 foi quase certamente do usuário pessoal usado então; não é prova, porque o erro daquele dia não guardou a mensagem. O erro do conector agora traz `errorCode`, `message` e `transactionId`.
+- **O que segue em aberto na CCEE:** confirmar com a Alupar que o AlupData pode usar o `ace` e quem o guarda; a cota de 400 chamadas por minuto vale por usuário e por serviço, e é dividida com os sistemas da própria Alupar; o `6166` vale para todos os pontos ou só para este, a conferir pelo cadastro de pontos. O piloto (`piloto-servicos.ccee.org.br`) não responde da rede da ness. nas portas 442 e 443, e deixou de ser necessário.
+- **Renovação:** o certificado vence em 22/07/2027; renovar antes, com dono e data.
 
 ## Atualização de 05/11/2026
 

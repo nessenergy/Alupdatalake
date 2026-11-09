@@ -56,6 +56,10 @@ Três perguntas à Alupar fecham isso (Fabrizio e Leonardo):
 - **Pequena mudança de código a propor:** incluir `errorCode`, `message` e `transactionId` (nunca o conteúdo do envelope) no erro do `ccee_pi_sessao`. O `transactionId` também é o que a CCEE pede ao abrir chamado.
 - **Certificado:** validade menor que 395 dias. Renovação anual, com dono e data.
 
+### Adendo de 09/11/2026: resultado da primeira leitura
+
+Hipótese H1 e H2 confirmadas juntas: o `.pfx` na conexão (mTLS) e usuário e senha no envelope. Com o usuário `ace`, o certificado de 2027 e o perfil `6166`, `listarMedida` devolveu 24 medidas do ponto `CEPITBUFPI211` em 01/11 na produção. A causa provável do `Server.2001` de 05/11 foi o usuário pessoal. O piloto não respondeu da rede da ness., e a validação foi na produção. Ver a ADR 018 (adendo de 09/11).
+
 ## 4. Fora do escopo
 
 Contratos, montantes de energia, topologia, importação de arquivo e parcelas. Entram uma entidade por vez, depois da primeira passar.

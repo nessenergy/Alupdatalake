@@ -500,3 +500,9 @@ data = 2026-11-06
 titulo = "Reunião com a Alupar: usuário dedicado e perfil de agente por ponto para a CCEE"
 estado = "previsto"
 dono = "Alup"
+
+[[marco]]
+data = 2026-11-09
+titulo = "CCEE: credenciais gravadas e primeira leitura real com sucesso (24 medidas de um ponto, produção da CCEE)"
+estado = "feito"
+dono = "ness."

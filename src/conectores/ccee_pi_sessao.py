@@ -35,6 +35,8 @@ _INTERVALO_S = 0.2
 
 _NS_SOAP = "http://schemas.xmlsoap.org/soap/envelope/"
 _NS_BM = "http://xmlns.energia.org.br/BM/v1"
+NS_BM1 = _NS_BM
+NS_BO1 = "http://xmlns.energia.org.br/BO/v1"
 
 _ENVELOPE = (
     '<?xml version="1.0" encoding="UTF-8"?>'

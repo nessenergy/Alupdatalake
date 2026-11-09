@@ -274,3 +274,32 @@ def test_pontos_medicao_percorre_todas_as_paginas(sessao, chamadas, monkeypatch)
     assert "<mh:numero>1</mh:numero>" in visto[0][2]
     assert "<mh:numero>2</mh:numero>" in visto[1][2]
     assert "<bo:nome>AGENTE_USO_FIO</bo:nome>" in visto[0][2]
+
+
+def test_testar_cadastro_lista_tipo_e_perfil_sem_nomes(monkeypatch):
+    xml = (
+        '<e xmlns:bo="http://xmlns.energia.org.br/BO/v2"><bo:pontoMedicao><bo:agentesRelacionados>'
+        "<bo:participanteMercadoRelacionado><bo:parte><bo:pessoaJuridica><bo:nomeEmpresarial>SIGILO</bo:nomeEmpresarial>"
+        "</bo:pessoaJuridica></bo:parte><bo:perfis><bo:perfil><bo:codigo>999</bo:codigo></bo:perfil></bo:perfis>"
+        "<bo:tipoRelacao><bo:nome>AGENTE_CONECTANTE</bo:nome></bo:tipoRelacao></bo:participanteMercadoRelacionado>"
+        "</bo:agentesRelacionados></bo:pontoMedicao></e>"
+    )
+    from defusedxml import ElementTree
+
+    monkeypatch.setattr(ccee, "abrir_sessao", lambda piloto=False: object())
+    monkeypatch.setattr(
+        ccee, "obter_ponto", lambda s, c: ElementTree.fromstring(xml).find(f"{{{ccee.NS_BO2}}}pontoMedicao")
+    )
+
+    ok, texto = ccee.testar_cadastro("P1")
+
+    assert ok
+    assert "AGENTE_CONECTANTE perfil=999" in texto
+    assert "SIGILO" not in texto
+
+
+def test_testar_cadastro_sem_ponto_na_resposta(monkeypatch):
+    monkeypatch.setattr(ccee, "abrir_sessao", lambda piloto=False: object())
+    monkeypatch.setattr(ccee, "obter_ponto", lambda s, c: None)
+
+    assert ccee.testar_cadastro("P1") == (False, "ccee: a resposta não trouxe o ponto")

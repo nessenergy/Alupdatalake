@@ -18,7 +18,7 @@ import dataclasses
 import json
 import sys
 
-from src.conectores.ccee_pi_sessao import testar_ccee
+from src.conectores.ccee_pi_sessao import testar_cadastro, testar_ccee
 from src.core.banco import esquema, testar_conexao
 from src.core.config import get_settings
 from src.core.execucao import Janela
@@ -54,7 +54,10 @@ def _parser() -> argparse.ArgumentParser:
         "testar-ccee", help="uma chamada de leitura à CCEE (listarMedida) para provar credencial e certificado"
     )
     ccee.add_argument("--ponto", default="CEPITBUFPI211", help="código do ponto de medição")
-    ccee.add_argument("--dia", required=True, help="dia consultado (YYYY-MM-DD)")
+    ccee.add_argument("--dia", help="dia consultado (YYYY-MM-DD); obrigatório sem --cadastro")
+    ccee.add_argument(
+        "--cadastro", action="store_true", help="consulta o ponto no cadastro e mostra os perfis relacionados"
+    )
     ccee.add_argument("--piloto", action="store_true", help="usa o ambiente piloto da CCEE (mesmas credenciais)")
     esquema_cmd = sub.add_parser("esquema", help="lista as colunas das tabelas de um MySQL (só information_schema)")
     esquema_cmd.add_argument("fonte", help="fonte do secret alupdata-<fonte>-dsn, como portal-alup")
@@ -85,7 +88,14 @@ def main(argv: list[str] | None = None) -> int:
         print(mensagem)
         return 0 if ok else 1
 
+    if args.comando == "testar-ccee" and args.cadastro:
+        ok, mensagem = testar_cadastro(args.ponto, piloto=args.piloto)
+        print(mensagem)
+        return 0 if ok else 1
+
     if args.comando == "testar-ccee":
+        if not args.dia:
+            raise SystemExit("informe --dia (ou use --cadastro)")
         ok, mensagem = testar_ccee(args.ponto, args.dia, piloto=args.piloto)
         print(mensagem)
         return 0 if ok else 1

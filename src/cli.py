@@ -55,6 +55,7 @@ def _parser() -> argparse.ArgumentParser:
     )
     ccee.add_argument("--ponto", default="CEPITBUFPI211", help="código do ponto de medição")
     ccee.add_argument("--dia", required=True, help="dia consultado (YYYY-MM-DD)")
+    ccee.add_argument("--piloto", action="store_true", help="usa o ambiente piloto da CCEE (mesmas credenciais)")
     esquema_cmd = sub.add_parser("esquema", help="lista as colunas das tabelas de um MySQL (só information_schema)")
     esquema_cmd.add_argument("fonte", help="fonte do secret alupdata-<fonte>-dsn, como portal-alup")
     esquema_cmd.add_argument("--tabelas", required=True, help="nomes das tabelas, separados por vírgula")
@@ -85,7 +86,7 @@ def main(argv: list[str] | None = None) -> int:
         return 0 if ok else 1
 
     if args.comando == "testar-ccee":
-        ok, mensagem = testar_ccee(args.ponto, args.dia)
+        ok, mensagem = testar_ccee(args.ponto, args.dia, piloto=args.piloto)
         print(mensagem)
         return 0 if ok else 1
 

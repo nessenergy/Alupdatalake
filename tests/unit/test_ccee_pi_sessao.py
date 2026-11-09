@@ -81,6 +81,68 @@ def test_fault_vira_erro_sem_vazar_usuario_nem_senha(sessao, chamadas):
     assert SENHA not in texto
 
 
+FALHA_COM_DETALHE = (
+    '<s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/"><s:Body><s:Fault>'
+    "<faultcode>Server.2001</faultcode><faultstring>Acesso Negado</faultstring>"
+    '<detail><ns2:securityFault xmlns:ns2="http://xmlns.energia.org.br/FH/v1">'
+    "<ns2:errorCode>2001</ns2:errorCode>"
+    f"<ns2:message>Usuario ou senha invalidos para {USUARIO}</ns2:message>"
+    "<ns2:uri>/ws/medc/ListarMedidaBSv1</ns2:uri>"
+    "<ns2:transactionId>tx-abc-123</ns2:transactionId>"
+    "</ns2:securityFault></detail></s:Fault></s:Body></s:Envelope>"
+)
+
+
+def test_fault_traz_errorcode_message_e_transactionid_do_detail(sessao, chamadas):
+    chamadas.resposta = SimpleNamespace(status_code=500, text=FALHA_COM_DETALHE)
+
+    with pytest.raises(CceeError) as erro:
+        sessao.chamar("/ws/x", "acao", "<corpo/>")
+
+    texto = str(erro.value)
+    assert "Server.2001" in texto
+    assert "errorCode=2001" in texto
+    assert "Usuario ou senha invalidos" in texto
+    assert "transactionId=tx-abc-123" in texto
+    assert USUARIO not in texto  # o message da CCEE pode ecoar o usuário
+
+
+def test_fault_sem_detail_continua_so_com_codigo_e_motivo(sessao, chamadas):
+    chamadas.resposta = SimpleNamespace(status_code=500, text=FALHA)
+
+    with pytest.raises(CceeError) as erro:
+        sessao.chamar("/ws/x", "acao", "<corpo/>")
+
+    assert "transactionId" not in str(erro.value)
+
+
+def test_sessao_do_piloto_chama_o_endereco_do_piloto(chamadas):
+    piloto = Sessao(pfx=PFX, senha_pfx="x", usuario=USUARIO, senha=SENHA, perfil="6166", base=ccee.URL_PILOTO)
+
+    piloto.chamar("/ws/medc/ListarMedidaBSv1", "listarMedida", "<corpo/>")
+
+    assert chamadas.args == "https://piloto-servicos.ccee.org.br:443/ws/medc/ListarMedidaBSv1"
+
+
+def test_abrir_sessao_piloto_aponta_para_o_piloto(monkeypatch):
+    credenciais = {"senha_certificado": "s-pfx", "usuario": USUARIO, "senha": SENHA, "codigo_perfil_agente": "6166"}
+    monkeypatch.setattr(ccee, "ler_secret", lambda fonte, campo: json.dumps(credenciais))
+    monkeypatch.setattr(ccee, "ler_secret_binario", lambda fonte, campo: PFX)
+
+    assert ccee.abrir_sessao(piloto=True).base == ccee.URL_PILOTO
+    assert ccee.abrir_sessao().base == ccee.URL_BASE
+
+
+def test_testar_ccee_com_piloto_abre_a_sessao_do_piloto(monkeypatch):
+    pedido = {}
+    monkeypatch.setattr(ccee, "abrir_sessao", lambda piloto=False: pedido.setdefault("piloto", piloto))
+    monkeypatch.setattr(ccee, "listar_medidas", lambda *a, **k: [])
+
+    ccee.testar_ccee("P1", "2026-11-01", piloto=True)
+
+    assert pedido["piloto"] is True
+
+
 def test_erro_http_sem_fault_informa_so_o_status(sessao, chamadas):
     chamadas.resposta = SimpleNamespace(status_code=503, text="<html>indisponível</html>")
 
@@ -144,7 +206,7 @@ def test_listar_medidas_devolve_as_medidas_da_resposta(sessao, chamadas):
 
 
 def test_testar_ccee_ok_informa_so_a_quantidade(monkeypatch):
-    monkeypatch.setattr(ccee, "abrir_sessao", lambda: object())
+    monkeypatch.setattr(ccee, "abrir_sessao", lambda piloto=False: object())
     monkeypatch.setattr(ccee, "listar_medidas", lambda *a, **k: [1, 2])
 
     assert ccee.testar_ccee("P1", "2026-11-01") == (True, "ccee: ok, 2 medidas")
@@ -154,7 +216,7 @@ def test_testar_ccee_devolve_o_erro_da_ccee_sem_segredo(monkeypatch):
     def falha(*a, **k):
         raise CceeError("Fault s:Client: Acesso negado")
 
-    monkeypatch.setattr(ccee, "abrir_sessao", lambda: object())
+    monkeypatch.setattr(ccee, "abrir_sessao", lambda piloto=False: object())
     monkeypatch.setattr(ccee, "listar_medidas", falha)
 
     assert ccee.testar_ccee("P1", "2026-11-01") == (False, "ccee: Fault s:Client: Acesso negado")
@@ -164,7 +226,7 @@ def test_testar_ccee_erro_inesperado_mostra_so_o_tipo(monkeypatch):
     def falha(*a, **k):
         raise ConnectionError("detalhe interno com C:/caminho/do/pfx e senha")
 
-    monkeypatch.setattr(ccee, "abrir_sessao", lambda: object())
+    monkeypatch.setattr(ccee, "abrir_sessao", lambda piloto=False: object())
     monkeypatch.setattr(ccee, "listar_medidas", falha)
 
     assert ccee.testar_ccee("P1", "2026-11-01") == (False, "ccee: falha ConnectionError")

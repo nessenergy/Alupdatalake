@@ -158,7 +158,7 @@ def lake() -> Response:
             titulo="Saúde do lake",
             rota="/lake",
             usuario=_usuario(request.headers.get(CABECALHO_IDENTIDADE)),
-            banda=saude.banda(fontes),
+            banda=saude.banda(fontes) + saude.aviso_certificados(datetime.now(BRASILIA).date()),
             corpo=saude.corpo(fontes, telao=telao is not None),
             aviso=aviso,
             telao=telao,

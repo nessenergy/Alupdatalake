@@ -60,7 +60,7 @@ A Gold nunca expõe CNPJ. O RIPD e o RoPA da Onda 4 devem listar `cnpj` como ide
 
 ## Silver e Gold
 
-Silver: `QUALIFY ROW_NUMBER() OVER (PARTITION BY id ORDER BY ...) = 1`, `uniqueKey` e `nonNull` em `id`, mais `rowConditions` de faixa só onde o dicionário garante (valores não negativos em `invoice`).
+Silver: `QUALIFY ROW_NUMBER() OVER (PARTITION BY id ORDER BY ...) = 1`, `uniqueKey` e `nonNull` em `id`, mais `rowConditions` conservadoras (o teste de infra exige uma por Silver): `id > 0`, demanda contratada não negativa e `state` com 2 letras em `uc`, `valor >= 0` em `bandeira`, parcelas não negativas em `faturas_processadas`. Faixa de consumo e valor em `invoice` fica de fora: crédito e estorno podem ser negativos e uma asserção falsa barra a Gold.
 
 Gold, todas tabelas (ADR 012):
 

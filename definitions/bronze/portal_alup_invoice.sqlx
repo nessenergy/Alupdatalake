@@ -1,0 +1,30 @@
+config {
+  type: "operations",
+  schema: "bronze",
+  hasOutput: true,
+  tags: ["bronze"]
+}
+
+-- Bronze: MySQL Alup, tabela invoice (incremental pela janela de updated_at / created_at).
+-- Append-only: a deduplicação vive na Silver. Contrato: docs/dicionario-dados/mysql_alup_esquema.md.
+CREATE TABLE IF NOT EXISTS ${self()} (
+  id                              INT64 NOT NULL,
+  client_id                       INT64,
+  uc_id                           STRING,
+  month                           STRING,
+  consumption                     NUMERIC,
+  value                           NUMERIC,
+  tax                             NUMERIC,
+  status                          INT64,
+  due_date                        DATE,
+  updated_at                      DATETIME,
+  created_at                      DATETIME,
+
+  _ingestao_id                    STRING    NOT NULL,
+  _ingestao_timestamp             TIMESTAMP NOT NULL,
+  _fonte                          STRING    NOT NULL,
+  _schema_versao                  STRING    NOT NULL
+)
+PARTITION BY DATE(_ingestao_timestamp)
+CLUSTER BY client_id, month
+OPTIONS(description="MySQL Alup invoice — camada Bronze, append-only");

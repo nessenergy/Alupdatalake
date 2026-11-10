@@ -1,0 +1,65 @@
+config {
+  type: "operations",
+  schema: "bronze",
+  hasOutput: true,
+  tags: ["bronze"]
+}
+
+-- Bronze: MySQL Alup, tabela uc (retrato completo a cada execução).
+-- Append-only: a deduplicação vive na Silver. Contrato: docs/dicionario-dados/mysql_alup_esquema.md.
+CREATE TABLE IF NOT EXISTS ${self()} (
+  data_referencia                 DATE NOT NULL,
+  id                              STRING NOT NULL,
+  client_id                       INT64,
+  contrato                        STRING,
+  cnpj                            STRING OPTIONS(description="Identificador de pessoa jurídica; não sobe para a Gold"),
+  state                           STRING,
+  contract_start_date             DATE,
+  submarket                       STRING,
+  supplier                        STRING,
+  subgroup                        STRING,
+  modality                        STRING,
+  contracted_demand_peak          NUMERIC,
+  contracted_demand_off_peak      NUMERIC,
+  scde_code                       STRING,
+  contractual_modality            STRING,
+  supply_start_date               DATE,
+  supply_end_date                 DATE,
+  guaranteed_discount_percentage  NUMERIC,
+  base_price                      NUMERIC,
+  base_date                       DATE,
+  adjustment_date                 DATE,
+  adjustment_index                STRING,
+  losses                          NUMERIC,
+  proinfa                         NUMERIC,
+  included_charges                STRING,
+  icms                            NUMERIC,
+  migration                       STRING,
+  cod_agente                      INT64,
+  due_day                         INT64,
+  supply_duration                 NUMERIC,
+  total_energy_volume             NUMERIC,
+  codigo_ativo                    STRING,
+  adjusted_price                  NUMERIC,
+  ccee_last_date                  DATETIME,
+  api_ccee                        INT64,
+  condicao_pagamento              STRING,
+  id_contrato                     INT64,
+  reforma_tributaria              STRING,
+  id_migracao_ccee                STRING,
+  cod_agente_concessionaria       STRING,
+  status_do_contrato              STRING,
+  id_new                          STRING,
+  status_faturamento              STRING,
+  interesse_em_renovar            STRING,
+  meses_renovacao                 INT64,
+  renovacao_distrato              STRING,
+
+  _ingestao_id                    STRING    NOT NULL,
+  _ingestao_timestamp             TIMESTAMP NOT NULL,
+  _fonte                          STRING    NOT NULL,
+  _schema_versao                  STRING    NOT NULL
+)
+PARTITION BY DATE(_ingestao_timestamp)
+CLUSTER BY client_id, id
+OPTIONS(description="MySQL Alup uc — camada Bronze, append-only");

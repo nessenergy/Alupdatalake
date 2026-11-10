@@ -204,6 +204,11 @@ def test_silver_e_quarentena_do_hubspot_dividem_a_mesma_regra():
 # (frescor e erro por fonte), e o teste abaixo obriga a decidir sobre toda Silver nova: entra em `SILVER` ou entra aqui.
 EXCECOES_DA_CONFERENCIA = frozenset(
     {
+        "portal_alup_bandeira",  # MySQL Alup (Onda 3): sem execução real ainda; entra na conferência na primeira carga
+        "portal_alup_client",
+        "portal_alup_faturas_processadas",
+        "portal_alup_invoice",
+        "portal_alup_uc",
         "aneel_siga",
         "bcb_cambio_ptax",
         "bcb_juros",

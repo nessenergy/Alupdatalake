@@ -1,0 +1,33 @@
+config {
+  type: "view",
+  schema: "silver",
+  tags: ["silver"],
+  assertions: {
+    uniqueKey: ["id"],
+    nonNull: ["id"],
+    rowConditions: ["valor >= 0"]
+  }
+}
+
+-- Silver: bandeira tarifária por mês, uma linha por id.
+-- `data_referencia` é o 1º dia de `mes` lido como YYYY-MM; se o formato for outro, fica nulo, sem erro (pergunta 4 da spec).
+-- A data do retrato fica em `data_retrato`.
+SELECT
+  SAFE.PARSE_DATE('%Y-%m', mes) AS data_referencia,
+  CAST(NULL AS STRING) AS submercado,
+  CAST(NULL AS STRING) AS codigo_usina,   -- fonte comercial, não tem usina
+  CAST(NULL AS STRING) AS agente_ccee,  -- fonte não traz o agente CCEE
+  FORMAT_DATE('%Y-%m', SAFE.PARSE_DATE('%Y-%m', mes)) AS periodo_apuracao,
+  CAST(NULL AS STRING) AS periodo_apuracao_ccee,  -- a origem não declara período CCEE
+  id,
+  mes,
+  bandeira,
+  valor,
+  data_referencia AS data_retrato,
+  _ingestao_id,
+  _ingestao_timestamp
+FROM ${ref("bronze", "portal_alup_bandeira")}
+QUALIFY ROW_NUMBER() OVER (
+  PARTITION BY id
+  ORDER BY _ingestao_timestamp DESC
+) = 1

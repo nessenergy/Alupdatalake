@@ -42,6 +42,7 @@ const limites_horas = {
   ibge_ipca: 780,
   bcb_igpm: 780,
   ccee_pld: 26,
+  bbce_curva_forward: 80, // dias úteis às 20h: da sexta à segunda são 72 h, mais folga
   ccee_perfil: 180,
   ccee_pi_ponto_medicao: 780, // mensal (dia 2) + folga
   ccee_pi_medida: 26,

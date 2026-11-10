@@ -7,8 +7,9 @@
 | Onda | 2 — exige credencial |
 | Autenticação | `POST {base_url}/v2/login` → JWT com validade de **4h** |
 | Endpoint | `GET {base_url}/v1/curve/bbce-fwd?referenceDate=AAAA-MM-DD` |
-| Frequência | Por pregão (dia útil) |
-| Credencial | secret `alupdata-bbce-credenciais` (pendência A7, [#23](https://github.com/nessenergy/Alupdatalake/issues/23)) |
+| Frequência | Por pregão (dia útil): `cron 0 20 * * 1-5`, janela de 7 dias (`infra/modules/scheduler`). Agendada em dev e hml desde 10/11/2026 (fora de `conectores_sem_agendamento`); em prod segue sem agendamento, por falta de credencial. Limite de silêncio de 80 h (sexta a segunda são 72 h), sem alerta de e-mail (o alerta de silêncio só cobre janelas de até 26 h; a `gold.saude_ingestao` marca `ATRASADA`) |
+| Credencial | secret `alupdata-bbce-credenciais` (JSON: `base_url`, `api_key`, `company_external_code`, `email` e `password`); gravada em dev e hml (pendência A7, [#23](https://github.com/nessenergy/Alupdatalake/issues/23)) |
+| Bronze | `bronze.bbce_curva_forward`, append-only, particionada por `DATE(_ingestao_timestamp)` e clusterizada por `data_referencia, curva, vertice_em` |
 
 ## Por que esta fonte entra
 
@@ -78,8 +79,22 @@ existe.
 
 ## Gold
 
-`gold.curva_forward_vigente` — a curva do último pregão, por vértice. Responde
+`gold.curva_forward_vigente` — a curva do último pregão de cada curva, por vértice. Responde
 "quanto o mercado está pedindo hoje para entrega em cada período futuro".
+
+| Coluna | Tipo | Origem |
+|---|---|---|
+| `curva` | STRING | Silver |
+| `data_referencia` | DATE | Silver (o último pregão da curva) |
+| `vertice_em` | DATE | Silver |
+| `vertice_periodo` | STRING | Silver (`AAAA-MM` do vértice) |
+| `horizonte_dias` | INT64 | Silver |
+| `preco_reais_mwh` | NUMERIC | Silver |
+| `atualizado_em` | TIMESTAMP | Silver |
+
+Asserções do Dataform (ADR 012): na Silver, `uniqueKey` (`data_referencia`, `curva`, `vertice_em`), `nonNull` e faixas (preço
+maior ou igual a zero, vértice não anterior à referência, horizonte não negativo); na Gold, `uniqueKey` (`curva`, `vertice_em`)
+e `nonNull`, para que duplicata ou nulo não cheguem a quem consome.
 
 O histórico de curvas fica na Silver: estudar como a expectativa se moveu ao
 longo do tempo é análise de outra natureza e merece tabela própria quando for
@@ -97,21 +112,17 @@ BBCE Connect (POST /v2/login → JWT)
           → gold.curva_forward_vigente
 ```
 
-## O que não foi possível verificar sem credencial
+## O que foi verificado e o que falta
 
-O conector **nunca falou com a API**, como o `hubspot_negocios` antes do token.
-O teste de integração está `skipif` e é ele que responde:
+Verificado em 28/10/2026, com a credencial real, em dev e hml (PR #434):
 
-1. **Qual é o host?** É o item que impede qualquer verificação — sem ele o
-   conector nem tenta.
-2. **O `Authorization` espera o JWT cru ou prefixado com `Bearer`?** A coleção
-   usa a variável `{{jwt}}`, que não revela o formato. O conector envia cru; se
-   a API exigir prefixo, é uma linha.
-3. **Dia sem pregão devolve lista vazia, 404 ou erro?** O conector trata vazio
-   como ausência e 404 não é tratado à parte — a suposição é que a API devolve
-   200 com lista vazia.
-4. **Há mais de um produto na curva?** O exemplo só mostra `name: "PLD"`. Se
-   houver outros, eles entram sem mudança — a chave já inclui `curva`.
-5. **Quantos vértices por pregão**, e portanto o volume real da janela.
+1. **Host:** vem do `base_url` da credencial, como previsto.
+2. **`Authorization`:** é `Bearer <idToken>`, e o `accessToken` também vai na query (ver Particularidades).
+3. **Volume da execução de 28/10:** 255 linhas extraídas, 1 inválida e 254 carregadas, em dev e hml.
 
-A pendência real, porém, não é técnica: é o acesso ([#23](https://github.com/nessenergy/Alupdatalake/issues/23)).
+Sem verificação:
+
+- **Motivo da linha inválida** de 28/10 (preço negativo, vértice anterior à referência ou outro): conferir no log da ingestão.
+- **Dia sem pregão:** o conector trata lista vazia como ausência e não trata 404 à parte; a suposição é 200 com lista vazia.
+- **Mais de um produto na curva:** o exemplo só mostra `name: "PLD"`; outros entrariam sem mudança, porque a chave já inclui `curva`.
+- **Contagem em hml da Silver e da Gold depois do Dataform** (254 na Silver em 28/10; a Gold estava vazia até o Dataform rodar): só se confere no ambiente.

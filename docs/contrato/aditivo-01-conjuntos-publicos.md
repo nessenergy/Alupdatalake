@@ -167,7 +167,7 @@ e não previam esse volume. O dimensionamento de 10/11/2026
 - **carga mensal com `timeout` de 28.800 s, 2 vCPU e 1 GiB**; ~5,4 horas por
   mês de Bronze, vazão a confirmar na carga de prova.
 
-O item está **implementado** em [PR_ITEM26](https://github.com/nessenergy/Alupdatalake/pull/PR_ITEM26)
+O item está **implementado** em [#473](https://github.com/nessenergy/Alupdatalake/pull/473)
 (7 componentes). Falta a **carga de prova de 1 mês em `dev`**, que mede tamanho
 real, vazão e unicidade da chave. As horas do item seguem **fora do subtotal**:
 o valor novo é decisão da coordenação com a Alup, e o item só entra na §5 quando

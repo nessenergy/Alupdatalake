@@ -66,3 +66,7 @@ node_modules/
 gitleaks
 gitleaks.tar.gz
 dataform-graph.json
+
+# Contexto local de ferramenta e permissoes da maquina de cada pessoa
+.claude/settings.json
+.impeccable/

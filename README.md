@@ -34,7 +34,7 @@ testes, agendamento e dicionário com linhagem.
 | Testes | **2.013 aprovados** e 558 ignorados por desenho |
 | Cobertura de linhas | **96%** |
 | Ambientes | `dev` e `hml` aplicados; produção ainda não existe |
-| Saúde da ingestão | dev: 56 fontes OK; hml: 55 |
+| Saúde da ingestão | dev: 56 fontes OK; hml: 55 (as duas entidades novas da CCEE ainda sem deploy) |
 
 Visão de uma página: [`docs/visao-consolidada.md`](docs/visao-consolidada.md). Relatório com as evidências:
 [`docs/relatorios/2026-10-22-situacao-consolidada.md`](docs/relatorios/2026-10-22-situacao-consolidada.md). Histórico e pendências:

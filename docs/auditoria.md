@@ -32,7 +32,7 @@ rodam no GitHub e mostram o resultado no resumo da execução.
 
 A cláusula 2ª exige, por fonte: **(1)** conector Python, **(2)** tabela Bronze, **(3)** view Silver, **(4)** view Gold, **(5)** testes,
 **(6)** agendamento e **(7)** dicionário com linhagem. O `make componentes` percorre o registro de conectores (`src/core/registry.py`) e
-confere a existência de cada artefato. Em 22/10/2026: **58 fontes, 58 com todos os componentes de arquivo**.
+confere a existência de cada artefato. Em 09/11/2026: **58 fontes, 58 com todos os componentes de arquivo** (eram 58 em 22/10; o TempoOK saiu do registro em 30/10, #444).
 
 Duas ressalvas, ditas de frente:
 

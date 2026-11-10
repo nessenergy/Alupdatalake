@@ -1,0 +1,29 @@
+config {
+  type: "table",
+  schema: "gold",
+  tags: ["gold"],
+  dependOnDependencyAssertions: true
+}
+
+-- Gold: qual perfil de agente usar para consultar a medição de cada ponto, no retrato mais recente do cadastro.
+-- O guia da CCEE manda usar o perfil do agente principal do ponto (conectante ou medição); aqui cada relação vira uma
+-- coluna, e `perfil_para_medicao` fica com o do conectante e, na falta dele, o da medição.
+WITH ultimo AS (
+  SELECT * FROM ${ref("silver", "ccee_pi_ponto_medicao")}
+  WHERE data_referencia = (SELECT MAX(data_referencia) FROM ${ref("silver", "ccee_pi_ponto_medicao")})
+)
+SELECT
+  ponto_codigo,
+  ANY_VALUE(ponto_nome) AS ponto_nome,
+  ANY_VALUE(tipo_coleta) AS tipo_coleta,
+  MAX(IF(tipo_relacao = 'AGENTE_CONECTANTE', perfil_codigo, NULL)) AS perfil_conectante,
+  MAX(IF(tipo_relacao = 'AGENTE_MEDICAO', perfil_codigo, NULL)) AS perfil_medicao,
+  MAX(IF(tipo_relacao = 'AGENTE_CONECTADO', perfil_codigo, NULL)) AS perfil_conectado,
+  MAX(IF(tipo_relacao = 'AGENTE_USO_FIO', perfil_codigo, NULL)) AS perfil_uso_fio,
+  COALESCE(
+    MAX(IF(tipo_relacao = 'AGENTE_CONECTANTE', perfil_codigo, NULL)),
+    MAX(IF(tipo_relacao = 'AGENTE_MEDICAO', perfil_codigo, NULL))
+  ) AS perfil_para_medicao,
+  MAX(data_referencia) AS data_referencia
+FROM ultimo
+GROUP BY ponto_codigo

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?><io2:Envelope xmlns:io2="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:io="http://xmlns.energia.org.br/MH/v1">
+  <io2:Header>
+    <mh:messageHeader xmlns:mh="http://xmlns.energia.org.br/MH/v1">
+      <mh:codigoPerfilAgente>12345</mh:codigoPerfilAgente>
+      <mh:transactionId>15389aee-f896-4eb4-8c4d-6b30c86a777a</mh:transactionId>
+    </mh:messageHeader>
+  </io2:Header>
+  <io2:Body>
+    <out:listarMedidaResponse xmlns:out2="http://xmlns.energia.org.br/BO/v1" xmlns:out="http://xmlns.energia.org.br/BM/v1">
+      <out:medidas>
+        <out:medida>
+          <out2:periodo>
+            <out2:fim>2023-03-01T00:00:00-03:00</out2:fim>
+          </out2:periodo>
+          <out2:pontoMedicao>
+            <out2:codigo>ABSCDEFGH101</out2:codigo>
+          </out2:pontoMedicao>
+          <out2:subTipo>L</out2:subTipo>
+          <out2:status>HCC</out2:status>
+          <out2:geracaoAtiva>0.0</out2:geracaoAtiva>
+          <out2:geracaoReativo>0.0</out2:geracaoReativo>
+          <out2:consumoAtivo>57.133</out2:consumoAtivo>
+          <out2:consumoReativo>23.642</out2:consumoReativo>
+        </out:medida>
+        <out:medida>
+          <out2:periodo>
+            <out2:fim>2023-03-01T01:00:00-03:00</out2:fim>
+          </out2:periodo>
+          <out2:pontoMedicao>
+            <out2:codigo>ABSCDEFGH101</out2:codigo>
+          </out2:pontoMedicao>
+          <out2:subTipo>L</out2:subTipo>
+          <out2:status>HCC</out2:status>
+          <out2:geracaoAtiva>0.0</out2:geracaoAtiva>
+          <out2:geracaoReativo>0.0</out2:geracaoReativo>
+          <out2:consumoAtivo>218.599</out2:consumoAtivo>
+          <out2:consumoReativo>102.497</out2:consumoReativo>
+        </out:medida>
+      </out:medidas>
+    </out:listarMedidaResponse>
+  </io2:Body>
+</io2:Envelope>

@@ -608,3 +608,38 @@ def test_bloco_da_diretoria_se_chama_resumo(cliente) -> None:
     corpo = cliente.get("/custo").get_data(as_text=True)
     assert '<h2 class="ad-block__title" id="dir">Resumo</h2>' in corpo
     assert "Numa olhada" not in corpo
+
+
+# ── aviso de vencimento do certificado (Plataforma de Integração da CCEE) ──────
+
+_VENCE = date(2027, 7, 22)
+
+
+def test_certificado_longe_do_vencimento_nao_aparece() -> None:
+    assert tela_saude.aviso_certificados(_VENCE - timedelta(days=91)) == ""
+
+
+@pytest.mark.parametrize(("dias", "classe"), [(90, "warn"), (31, "warn"), (30, "crit"), (0, "crit")])
+def test_certificado_perto_do_vencimento_avisa_com_a_data(dias: int, classe: str) -> None:
+    html = tela_saude.aviso_certificados(_VENCE - timedelta(days=dias))
+
+    assert f"ad-verdict--{classe}" in html
+    assert "22/07/2027" in html
+    assert "CCEE" in html
+
+
+def test_certificado_vencido_diz_que_venceu() -> None:
+    html = tela_saude.aviso_certificados(_VENCE + timedelta(days=3))
+
+    assert "venceu" in html
+    assert "ad-verdict--crit" in html
+
+
+def test_tela_do_lake_mostra_o_aviso_quando_o_certificado_esta_perto(cliente, monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr("src.portal.app.obter_provedor", lambda: _provedor(saude=[_conector("ons_carga")]))
+    hoje = datetime.now(UTC).date()
+    monkeypatch.setattr(tela_saude, "CERTIFICADOS", {"CCEE": hoje + timedelta(days=10)})
+
+    corpo = cliente.get("/lake").get_data(as_text=True)
+
+    assert "Certificado da CCEE" in corpo

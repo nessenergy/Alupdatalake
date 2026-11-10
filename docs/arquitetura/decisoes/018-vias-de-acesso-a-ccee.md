@@ -123,3 +123,24 @@ mesma via — é a próxima entidade natural, não um bloqueio.
   contratos da CCEE, é escopo novo, com credencial pedida em A7 — e ADR própria.
 - O filtro é da CCEE e pode mudar. Se o 403 voltar com o cabeçalho, a
   investigação começa pelo que a origem passou a exigir, não pelo conector.
+
+## Adendo de 05/11/2026: como a Alupar acessa a Plataforma de Integração
+
+Confirmado com o código que a Alupar usa em produção para a medição:
+
+- o **certificado .pfx vai na conexão HTTPS** (mTLS), em toda chamada, com a senha do próprio certificado;
+- **usuário e senha vão dentro do envelope SOAP**, junto do código do perfil de agente (`messageHeader/codigoPerfilAgente`). São credenciais diferentes da senha do certificado;
+- o usuário em uso é **pessoal de um colaborador**, não genérico. A ness. pediu um usuário dedicado ao projeto;
+- cada endpoint tem o seu XML. O de `listarMedida` (`/ws/medc/ListarMedidaBSv1`) está implementado em `src/conectores/ccee_pi_sessao.py`; os demais não precisam ser pedidos: a coleção pública traz o XML de todas as operações (ver o [catálogo](../../dicionario-dados/ccee_plataforma_integracao.md), de 06/11).
+
+Primeira chamada de leitura em hml, em 05/11: a CCEE aceitou a conexão e respondeu `Server.2001: Acesso Negado`. A causa (senha, perfil de agente ou permissão sobre o ponto) fica para a próxima tentativa, com o usuário dedicado. A primeira entidade do conector de medição fica a confirmar com a Alupar em 06/11.
+
+## Adendo de 09/11/2026: primeira leitura real
+
+Com o usuário `ace` (o que a Alupar usa na produção dela), a senha do certificado que vence em 22/07/2027 e o perfil `6166`, a chamada `listarMedida` na produção da CCEE devolveu 24 medidas horárias do ponto `CEPITBUFPI211` em 01/11. Foi uma única tentativa.
+
+- O `Server.2001` de 05/11 foi quase certamente o usuário pessoal usado então. O manual da CCEE trata esse erro como falha de autenticação. Não é prova, porque aquela resposta não guardou `message` nem `transactionId`.
+- O erro do conector passou a incluir `errorCode`, `message` e `transactionId` (nunca o envelope). O comando `testar-ccee` aceita `--piloto`.
+- O piloto não respondeu da rede da ness. (portas 442 e 443), então a validação foi na produção, só com leitura.
+- Confirmado em 09/11 pelo Gabriel, que fala com a Alupar: o `ace` é o usuário a usar, e o usuário pessoal de 05/11 estava errado. Em aberto: a cota de 400 chamadas por minuto vale por usuário e por serviço e é dividida com os sistemas dela; verificar se o `6166` vale para todos os pontos pelo cadastro de pontos.
+- O certificado vence em 22/07/2027; a renovação é da Alupar e está fora do escopo do projeto.

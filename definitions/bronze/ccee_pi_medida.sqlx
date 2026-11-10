@@ -1,0 +1,30 @@
+config {
+  type: "operations",
+  schema: "bronze",
+  hasOutput: true,
+  tags: ["bronze"]
+}
+
+-- Bronze: medição horária final por ponto, da Plataforma de Integração da CCEE (`listarMedida`, tipo FINAL).
+-- Append-only: cada execução grava o que a CCEE devolveu para a janela; a Silver fica com a ingestão mais recente,
+-- porque a medida final pode ser revisada depois.
+CREATE TABLE IF NOT EXISTS ${self()} (
+  data_referencia     DATE      NOT NULL OPTIONS(description="Dia da hora medida (uma hora antes do fim do período)"),
+  ponto_codigo        STRING    NOT NULL OPTIONS(description="Código do ponto de medição na CCEE"),
+  tipo_medida         STRING    NOT NULL OPTIONS(description="Tipo pedido à CCEE: FINAL"),
+  fim_periodo         TIMESTAMP NOT NULL OPTIONS(description="Fim da hora medida, com o fuso -03:00 da origem"),
+  sub_tipo            STRING    OPTIONS(description="Subtipo da medida na CCEE, como L"),
+  status              STRING    OPTIONS(description="Status da medida na CCEE, como HCC"),
+  geracao_ativa       NUMERIC   OPTIONS(description="Geração de energia ativa na hora, na unidade da origem"),
+  geracao_reativa     NUMERIC   OPTIONS(description="Geração de energia reativa na hora, na unidade da origem"),
+  consumo_ativo       NUMERIC   OPTIONS(description="Consumo de energia ativa na hora, na unidade da origem"),
+  consumo_reativo     NUMERIC   OPTIONS(description="Consumo de energia reativa na hora, na unidade da origem"),
+
+  _ingestao_id        STRING    NOT NULL OPTIONS(description="Identificador da execução de ingestão"),
+  _ingestao_timestamp TIMESTAMP NOT NULL OPTIONS(description="Quando o registro entrou no lake"),
+  _fonte              STRING    NOT NULL OPTIONS(description="Identificador da fonte"),
+  _schema_versao      STRING    NOT NULL OPTIONS(description="Versão do contrato lido na origem")
+)
+PARTITION BY DATE(_ingestao_timestamp)
+CLUSTER BY ponto_codigo, data_referencia
+OPTIONS(description="Medição horária final por ponto da CCEE (Plataforma de Integração) — camada Bronze, append-only");

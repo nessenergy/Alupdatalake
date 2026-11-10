@@ -222,6 +222,8 @@ EXCECOES_DA_CONFERENCIA = frozenset(
         "ccee_exposicao_financeira",
         "ccee_geracao_usina",
         "ccee_perfil",
+        "ccee_pi_medida",
+        "ccee_pi_ponto_medicao",
         "ccee_pld",
         "ccee_reserva_encargo",
         "ccee_varejista_consumidor",

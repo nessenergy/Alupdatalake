@@ -27,12 +27,16 @@ from src.core.config import get_settings
 from src.core.secrets import ler_secret, ler_secret_binario
 
 URL_BASE = "https://servicos.ccee.org.br:443"
+# Piloto: mesmas credenciais da produção, dados com um mês de defasagem.
+URL_PILOTO = "https://piloto-servicos.ccee.org.br:443"
 
 # A CCEE aceita 400 chamadas por minuto (erro 2003); 0,2 s de intervalo dá 300.
 _INTERVALO_S = 0.2
 
 _NS_SOAP = "http://schemas.xmlsoap.org/soap/envelope/"
 _NS_BM = "http://xmlns.energia.org.br/BM/v1"
+NS_BM1 = _NS_BM
+NS_BO1 = "http://xmlns.energia.org.br/BO/v1"
 
 _ENVELOPE = (
     '<?xml version="1.0" encoding="UTF-8"?>'
@@ -52,7 +56,32 @@ _ENVELOPE = (
     "</soapenv:Envelope>"
 )
 
+# Os serviços v2 (cadastros) usam outros namespaces e levam a paginação no cabeçalho.
+NS_MH2 = "http://xmlns.energia.org.br/MH/v2"
+NS_BO2 = "http://xmlns.energia.org.br/BO/v2"
+
+_ENVELOPE_V2 = (
+    '<?xml version="1.0" encoding="UTF-8"?>'
+    f'<soapenv:Envelope xmlns:soapenv="{_NS_SOAP}"'
+    ' xmlns:oas="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd"'
+    f' xmlns:mh="{NS_MH2}"'
+    ' xmlns:bm="http://xmlns.energia.org.br/BM/v2"'
+    f' xmlns:bo="{NS_BO2}">'
+    "<soapenv:Header>"
+    "<mh:messageHeader><mh:codigoPerfilAgente>{perfil}</mh:codigoPerfilAgente></mh:messageHeader>"
+    "<oas:Security><oas:UsernameToken>"
+    "<oas:Username>{usuario}</oas:Username>"
+    "<oas:Password>{senha}</oas:Password>"
+    "</oas:UsernameToken></oas:Security>"
+    "<mh:paginacao><mh:numero>{pagina}</mh:numero><mh:quantidadeItens>{itens}</mh:quantidadeItens></mh:paginacao>"
+    "</soapenv:Header>"
+    "<soapenv:Body>{corpo}</soapenv:Body>"
+    "</soapenv:Envelope>"
+)
+
 CAMINHO_MEDIDA = "/ws/medc/ListarMedidaBSv1"
+CAMINHO_PONTO = "/ws/v2/PontoMedicaoBSv2"
+ITENS_POR_PAGINA = 50
 
 
 class CceeError(RuntimeError):
@@ -66,13 +95,25 @@ class Sessao:
     usuario: str = ""
     senha: str = ""
     perfil: str = ""
+    pontos: tuple[str, ...] = ()  # opcional, vem da credencial: pontos a medir sem depender do cadastro
+    base: str = URL_BASE
 
     def __repr__(self) -> str:  # o dataclass padrão imprimiria as senhas
-        return f"Sessao(usuario={self.usuario!r}, perfil={self.perfil!r})"
+        return f"Sessao(usuario={self.usuario!r}, perfil={self.perfil!r}, base={self.base!r})"
 
     def envelope(self, corpo: str) -> str:
         return _ENVELOPE.format(
             usuario=escape(self.usuario), senha=escape(self.senha), perfil=escape(self.perfil), corpo=corpo
+        )
+
+    def envelope_v2(self, corpo: str, pagina: int, itens: int) -> str:
+        return _ENVELOPE_V2.format(
+            usuario=escape(self.usuario),
+            senha=escape(self.senha),
+            perfil=escape(self.perfil),
+            pagina=pagina,
+            itens=itens,
+            corpo=corpo,
         )
 
     def _sem_segredo(self, texto: str) -> str:
@@ -81,13 +122,13 @@ class Sessao:
                 texto = texto.replace(segredo, "***")
         return texto
 
-    def chamar(self, caminho: str, acao: str, corpo: str):
-        """Uma chamada SOAP; devolve a raiz do XML de resposta."""
+    def chamar(self, caminho: str, acao: str, corpo: str, pagina: tuple[int, int] | None = None):
+        """Uma chamada SOAP; devolve a raiz do XML de resposta. `pagina` = (número, itens) nos serviços v2."""
         time.sleep(_INTERVALO_S)
         resposta = post(
-            URL_BASE + caminho,
+            self.base + caminho,
             headers={"Content-Type": "text/xml; charset=utf-8", "SOAPAction": acao},
-            data=self.envelope(corpo).encode("utf-8"),
+            data=(self.envelope_v2(corpo, *pagina) if pagina else self.envelope(corpo)).encode("utf-8"),
             pkcs12_data=self.pfx,
             pkcs12_password=self.senha_pfx,
             timeout=get_settings().http_timeout,
@@ -102,7 +143,15 @@ class Sessao:
             if falha is not None:
                 codigo = (falha.findtext("faultcode") or "?").strip()
                 motivo = (falha.findtext("faultstring") or "").strip()
-                raise CceeError(f"Fault {codigo}: {self._sem_segredo(motivo)}")
+                # `detail` traz errorCode, message e transactionId (o que a CCEE pede
+                # para rastrear). Só esses três campos; nunca o envelope enviado.
+                detalhe = {
+                    elemento.tag.rsplit("}", 1)[-1]: (elemento.text or "").strip()
+                    for elemento in falha.iter()
+                    if elemento.tag.rsplit("}", 1)[-1] in ("errorCode", "message", "transactionId")
+                }
+                extra = "".join(f" [{k}={self._sem_segredo(v)}]" for k, v in detalhe.items() if v)
+                raise CceeError(f"Fault {codigo}: {self._sem_segredo(motivo)}{extra}")
         if resposta.status_code >= 400:
             raise CceeError(f"HTTP {resposta.status_code} em {caminho}")
         if raiz is None:
@@ -110,7 +159,7 @@ class Sessao:
         return raiz
 
 
-def abrir_sessao() -> Sessao:
+def abrir_sessao(piloto: bool = False) -> Sessao:
     """Monta a sessão a partir dos dois segredos. Falta de campo nomeia o campo, não o valor."""
     credenciais = json.loads(ler_secret("ccee", "credenciais"))
     faltam = [c for c in ("senha_certificado", "usuario", "senha", "codigo_perfil_agente") if not credenciais.get(c)]
@@ -122,6 +171,8 @@ def abrir_sessao() -> Sessao:
         usuario=credenciais["usuario"],
         senha=credenciais["senha"],
         perfil=str(credenciais["codigo_perfil_agente"]),
+        pontos=tuple(p.strip() for p in str(credenciais.get("pontos") or "").split(",") if p.strip()),
+        base=URL_PILOTO if piloto else URL_BASE,
     )
 
 
@@ -143,7 +194,58 @@ def listar_medidas(sessao: Sessao, ponto: str, inicio: str, fim: str, tipo: str 
     return raiz.findall(f".//{{{_NS_BM}}}medida")
 
 
-def testar_ccee(ponto: str, dia: str) -> tuple[bool, str]:
+_TIPOS_RELACAO = ("AGENTE_CONECTADO", "AGENTE_CONECTANTE", "AGENTE_MEDICAO", "AGENTE_USO_FIO")
+_CORPO_PONTOS = (
+    "<bm:listarPontoMedicaoRequest><bm:tiposRelacoes>"
+    + "".join(f"<bo:tipo><bo:nome>{tipo}</bo:nome></bo:tipo>" for tipo in _TIPOS_RELACAO)
+    + "</bm:tiposRelacoes></bm:listarPontoMedicaoRequest>"
+)
+
+
+def pontos_medicao(sessao: Sessao):
+    """Elementos `pontoMedicao` do cadastro, de todas as páginas, com os agentes relacionados."""
+    numero, total = 1, 1
+    while numero <= total:
+        raiz = sessao.chamar(CAMINHO_PONTO, "listarPontoMedicao", _CORPO_PONTOS, pagina=(numero, ITENS_POR_PAGINA))
+        total = int(raiz.findtext(f".//{{{NS_MH2}}}totalPaginas") or 1)
+        yield from raiz.findall(f".//{{{NS_BO2}}}pontoMedicao")
+        numero += 1
+
+
+def obter_ponto(sessao: Sessao, codigo: str):
+    """Elemento `pontoMedicao` do cadastro, pelo código (None se a CCEE não devolver)."""
+    corpo = (
+        "<bm:obterPontoMedicaoRequest><bm:pontoMedicao>"
+        f"<bo:codigo>{escape(codigo)}</bo:codigo>"
+        "</bm:pontoMedicao></bm:obterPontoMedicaoRequest>"
+    )
+    raiz = sessao.chamar(CAMINHO_PONTO, "obterPontoMedicao", corpo, pagina=(1, 2))
+    return raiz.find(f".//{{{NS_BO2}}}pontoMedicao")
+
+
+def testar_cadastro(ponto: str, piloto: bool = False) -> tuple[bool, str]:
+    """Mostra quais perfis a CCEE relaciona ao ponto (tipo de relação e código do perfil, sem nomes).
+
+    Serve para descobrir com qual perfil o cadastro de pontos responde. Uma chamada, só leitura.
+    """
+    try:
+        elemento = obter_ponto(abrir_sessao(piloto), ponto)
+    except CceeError as erro:
+        return False, f"ccee: {erro}"
+    except Exception as erro:  # noqa: BLE001 — a mensagem pode carregar segredo
+        return False, f"ccee: falha {type(erro).__name__}"
+    if elemento is None:
+        return False, "ccee: a resposta não trouxe o ponto"
+    caminho = f"{{{NS_BO2}}}agentesRelacionados/{{{NS_BO2}}}participanteMercadoRelacionado"
+    relacoes = []
+    for a in elemento.findall(caminho):
+        tipo = a.findtext(f"{{{NS_BO2}}}tipoRelacao/{{{NS_BO2}}}nome")
+        perfil = a.findtext(f"{{{NS_BO2}}}perfis/{{{NS_BO2}}}perfil/{{{NS_BO2}}}codigo")
+        relacoes.append(f"{tipo} perfil={perfil}")
+    return True, f"ccee: ponto encontrado, {len(relacoes)} agentes: " + "; ".join(relacoes)
+
+
+def testar_ccee(ponto: str, dia: str, piloto: bool = False) -> tuple[bool, str]:
     """Uma única chamada de leitura, para provar credencial e certificado.
 
     Devolve só o resultado: a quantidade de medidas ou o motivo da CCEE. Erro
@@ -152,7 +254,7 @@ def testar_ccee(ponto: str, dia: str) -> tuple[bool, str]:
     um usuário pessoal repetidas vezes pode bloqueá-lo.
     """
     try:
-        medidas = listar_medidas(abrir_sessao(), ponto, dia, dia)
+        medidas = listar_medidas(abrir_sessao(piloto), ponto, dia, dia)
     except CceeError as erro:
         return False, f"ccee: {erro}"
     except Exception as erro:  # noqa: BLE001 — a mensagem pode carregar segredo

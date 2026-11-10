@@ -1,7 +1,7 @@
 # Próximos passos — fila de execução
 
 Documento **vivo**: é para riscar linha, não para arquivar. Atualizado em
-**2026-11-09** (CCEE: primeira leitura real com sucesso, 24 medidas; dependências em dia).
+**2026-11-10** (CCEE: medição carregada em hml e dev, 24 linhas; unidade e regra da hora aguardam a Alupar, #462).
 
 Ele existe para responder uma pergunta que os outros três não respondem em uma
 tela: **qual é a próxima ação, de quem é, e qual comando a executa.**

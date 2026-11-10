@@ -130,6 +130,7 @@ DOMINIO_ANALITICO = {
     "ccee_reserva_encargo": "Mercado de Energia",
     "ccee_energia_reserva_consumo_referencia": "Mercado de Energia",
     "ccee_consumo_classe_agente": "Mercado de Energia",
+    "ccee_consumo_horario_perfil_agente": "Mercado de Energia",
     "aneel_siga": "Geração e Operacional",
     "aneel_tarifas": "Mercado de Energia",
     "ace_prc": "Mercado de Energia",

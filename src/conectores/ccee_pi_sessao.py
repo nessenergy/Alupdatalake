@@ -85,7 +85,11 @@ ITENS_POR_PAGINA = 50
 
 
 class CceeError(RuntimeError):
-    """Falha da CCEE. A mensagem nunca carrega usuário, senha nem o envelope."""
+    """Falha da CCEE. A mensagem nunca carrega usuário, senha nem o envelope. `codigo` é o `errorCode` do detalhe."""
+
+    def __init__(self, mensagem: str, codigo: str | None = None) -> None:
+        super().__init__(mensagem)
+        self.codigo = codigo
 
 
 @dataclass(frozen=True)
@@ -151,7 +155,9 @@ class Sessao:
                     if elemento.tag.rsplit("}", 1)[-1] in ("errorCode", "message", "transactionId")
                 }
                 extra = "".join(f" [{k}={self._sem_segredo(v)}]" for k, v in detalhe.items() if v)
-                raise CceeError(f"Fault {codigo}: {self._sem_segredo(motivo)}{extra}")
+                raise CceeError(
+                    f"Fault {codigo}: {self._sem_segredo(motivo)}{extra}", codigo=detalhe.get("errorCode") or None
+                )
         if resposta.status_code >= 400:
             raise CceeError(f"HTTP {resposta.status_code} em {caminho}")
         if raiz is None:

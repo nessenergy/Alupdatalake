@@ -7,6 +7,8 @@ import pytest
 from defusedxml import ElementTree
 from src.conectores import ccee_pi_ponto_medicao as modulo
 from src.conectores.ccee_pi_ponto_medicao import CceePiPontoMedicao, CceePiPontoMedicaoRegistro
+from src.conectores.ccee_pi_sessao import CceeError
+from src.core.conector import SemPermissaoError
 from src.core.execucao import Janela
 
 PAGINA = (Path(__file__).parent.parent.parent / "fixtures" / "ccee_pi" / "ponto_medicao_pagina1.xml").read_text(
@@ -69,4 +71,27 @@ def test_cadastro_vazio_falha_alto(monkeypatch):
     monkeypatch.setattr(modulo, "pontos_medicao", lambda sessao: iter([]))
 
     with pytest.raises(RuntimeError, match="nenhum ponto"):
+        list(CceePiPontoMedicao().extrair(JANELA))
+
+
+def _cadastro_nega(monkeypatch, codigo):
+    def pontos(_sessao):
+        raise CceeError(f"Fault Server.{codigo}: Acesso negado [errorCode={codigo}]", codigo=codigo)
+        yield  # pragma: no cover
+
+    monkeypatch.setattr(modulo, "abrir_sessao", lambda: object())
+    monkeypatch.setattr(modulo, "pontos_medicao", pontos)
+
+
+def test_4001_do_cadastro_vira_sem_permissao_com_o_texto_da_ccee(monkeypatch):
+    _cadastro_nega(monkeypatch, "4001")
+
+    with pytest.raises(SemPermissaoError, match="errorCode=4001"):
+        list(CceePiPontoMedicao().extrair(JANELA))
+
+
+def test_outro_codigo_do_cadastro_continua_erro(monkeypatch):
+    _cadastro_nega(monkeypatch, "2001")
+
+    with pytest.raises(CceeError):
         list(CceePiPontoMedicao().extrair(JANELA))

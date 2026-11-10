@@ -414,7 +414,9 @@ def test_saude_trata_execucao_sem_fim_como_erro() -> None:
     assert "status = 'EM_EXECUCAO'" in sql
     # O maior tempo limite de job é 7200 s (ccee_geracao_usina): marca de início mais nova que isso
     # é execução em andamento, não morta. 40 minutos acusava erro numa carga legítima de ~80 min.
-    assert "INTERVAL 130 MINUTE" in sql
+    assert "520, 130) MINUTE" in sql
+    # O consumo horário por perfil (item 26) tem tempo limite de 28.800 s: 130 minutos o acusaria enquanto roda.
+    assert "i.entidade = 'consumo_horario_perfil_agente', 520" in sql
     assert "NOT EXISTS" in sql
 
 

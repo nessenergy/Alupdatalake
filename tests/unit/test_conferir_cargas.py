@@ -209,6 +209,7 @@ EXCECOES_DA_CONFERENCIA = frozenset(
         "bcb_juros",
         "ccee_agente",
         "ccee_consumo_classe_agente",
+        "ccee_consumo_horario_perfil_agente",
         "ccee_contabilizacao_perfil",
         "ccee_contabilizacao_perfil_historico",
         "ccee_contrato_montante",

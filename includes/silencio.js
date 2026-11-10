@@ -60,6 +60,7 @@ const limites_horas = {
   ccee_reserva_encargo: 780,
   ccee_energia_reserva_consumo_referencia: 780,
   ccee_consumo_classe_agente: 780,
+  ccee_consumo_horario_perfil_agente: 780,
 };
 
 // Linhas para UNNEST no SQL: STRUCT(conector, limite_h).

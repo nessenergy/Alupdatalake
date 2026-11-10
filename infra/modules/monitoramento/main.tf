@@ -75,6 +75,7 @@ variable "conectores_criticos" {
     ccee_reserva_encargo                    = 780 # mensal + folga (Aditivo 01)
     ccee_energia_reserva_consumo_referencia = 780 # mensal + folga (Aditivo 01)
     ccee_consumo_classe_agente              = 780 # mensal + folga (Aditivo 01)
+    ccee_consumo_horario_perfil_agente      = 780 # mensal + folga (Aditivo 01, item 26)
   }
 }
 

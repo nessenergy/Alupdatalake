@@ -27,6 +27,8 @@ variable "conectores" {
     memoria = optional(string, "512Mi")
     cpu     = optional(string, "1")
     timeout = optional(string, "1800s")
+    # Retentativa recarrega o mês inteiro numa Bronze append-only: o conector de carga longa pede 0.
+    max_retries = optional(number, 2)
   }))
   default = {
     bcb_cambio_ptax = {
@@ -438,6 +440,28 @@ variable "conectores" {
       cron         = "0 10 6 * *"
       ultimos_dias = 120
     }
+    ccee_consumo_horario_perfil_agente = {
+      # Aditivo 01, item 26. Um recurso gzip por mês, ~34,9 milhões de linhas (uma por carga e
+      # hora), ~11 GiB na Bronze. Dimensionamento: docs/superpowers/specs/2026-11-10-item26-consumo-horario-design.md.
+      #
+      # A CCEE publica o mês M por volta de 22 dias úteis depois do início de M+1, ou seja, no
+      # começo de M+2. Dia 10 com 45 dias de janela: o início da janela cai entre os dias 24 e 27
+      # de M (conferido para dez, jan, fev e mar), então a execução alcança o mês recém-publicado.
+      # A janela é curta de propósito: mês já carregado não é relido (guarda do conector), mas uma
+      # janela que alcançasse dois meses novos de uma vez passaria do `timeout`. Mês perdido por
+      # atraso de publicação se recupera à mão, com janela explícita (`--de` e `--ate`).
+      #
+      # Vazão extrapolada do ccee_geracao_usina (~1.800 linhas/s): ~5,4 h por mês, a confirmar na
+      # carga de prova em dev. `timeout` de 28.800 s (8 h), 2 vCPU e 1 GiB, por decisão de
+      # 10/11/2026. Sem retentativa: ela recarregaria o mês inteiro na Bronze append-only.
+      # Depois de rodar, a `saude_ingestao` espera 520 minutos antes de acusar execução morta.
+      cron         = "0 3 10 * *"
+      ultimos_dias = 45
+      memoria      = "1Gi"
+      cpu          = "2"
+      timeout      = "28800s"
+      max_retries  = 0
+    }
     bbce_curva_forward = {
       # A curva sai por pregão, em dia útil. Janela curta porque cada dia é uma
       # requisição própria; 7 dias cobrem feriado prolongado e execução perdida.
@@ -509,7 +533,7 @@ resource "google_cloud_run_v2_job" "ingestao" {
   template {
     template {
       service_account = var.service_account_email
-      max_retries     = 2
+      max_retries     = each.value.max_retries
       timeout         = each.value.timeout
 
       # Todo o tráfego pela VPC, não só o privado: é o que faz a saída para o

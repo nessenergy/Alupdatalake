@@ -33,7 +33,11 @@ interrompidas AS (
            ' sem registro de fim: provável tempo limite; pode ter carga parcial na Bronze') AS erro
   FROM ${ref("bronze", "_execucoes")} AS i
   WHERE i.status = 'EM_EXECUCAO'
-    AND i.iniciada_em < TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL 130 MINUTE)
+    -- O consumo horário por perfil (item 26) roda até 28.800 s: espera 520 minutos, não 130.
+    AND i.iniciada_em < TIMESTAMP_SUB(
+      CURRENT_TIMESTAMP(),
+      INTERVAL IF(i.fonte = 'ccee' AND i.entidade = 'consumo_horario_perfil_agente', 520, 130) MINUTE
+    )
     AND NOT EXISTS (
       SELECT 1 FROM ${ref("bronze", "_execucoes")} AS f
       WHERE f.ingestao_id = i.ingestao_id AND f.encerrada_em IS NOT NULL

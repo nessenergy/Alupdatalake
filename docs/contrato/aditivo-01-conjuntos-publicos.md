@@ -153,10 +153,25 @@ centenas de linhas por mês cada). Vinte e quatro meses de histórico são cerca
 de **185 GB** de texto de origem.
 
 As 6h estimadas seguiam o padrão dos outros conjuntos CKAN da CCEE (4-6h cada)
-e não previam esse volume. Fica **fora desta entrega**, com dimensionamento
-próprio a fazer antes de estimar — inclusive quanto histórico carregar em
-`dev` e o custo de BigQuery esperado (regra 4 do contrato: o custo de
-varredura é da Alup). Não bloqueia os itens 1–25.
+e não previam esse volume. O dimensionamento de 10/11/2026
+([#467](https://github.com/nessenergy/Alupdatalake/pull/467), spec em
+`docs/superpowers/specs/2026-11-10-item26-consumo-horario-design.md`) fixou:
+
+- **histórico em `dev`: janela recorrente de 3 meses**, com a carga de prova
+  entrando por 1 mês (jul/2026); **`hml` carrega 1 mês**. Não carregar 12 ou 24
+  meses: só se a Alup tiver uso concreto da granularidade horária além de 3
+  meses, e então com ADR própria do caminho de carga por arquivo (GCS + load
+  job), que não está no escopo agora;
+- **medidas em `NUMERIC`**; Bronze particionada pelo dia do consumo, com
+  filtro de partição obrigatório, e consumo pela Gold (que é pequena);
+- **carga mensal com `timeout` de 28.800 s, 2 vCPU e 1 GiB**; ~5,4 horas por
+  mês de Bronze, vazão a confirmar na carga de prova.
+
+O item está **implementado** em [PR_ITEM26](https://github.com/nessenergy/Alupdatalake/pull/PR_ITEM26)
+(7 componentes). Falta a **carga de prova de 1 mês em `dev`**, que mede tamanho
+real, vazão e unicidade da chave. As horas do item seguem **fora do subtotal**:
+o valor novo é decisão da coordenação com a Alup, e o item só entra na §5 quando
+a carga de prova rodar.
 
 ## 5. Controle de horas
 

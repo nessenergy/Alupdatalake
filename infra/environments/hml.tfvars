@@ -10,8 +10,8 @@ environment = "hml"
 # Dataform consulta o BigQuery todo dia. Cloud Run Jobs, Portal e o Dataform
 # disparado pelo deploy continuam disponíveis. Janela aberta desde 25/09 para
 # a homologação das Ondas 0 e 1; fecha (volta para false) depois do aceite.
-agendamentos_ativos        = true # janela de homologação das Ondas 0 e 1, 25/09
-emails_alerta              = ["operacao-datalake@ness.com.br", "alup.alertas@alupar.com.br"]
+agendamentos_ativos = true # janela de homologação das Ondas 0 e 1, 25/09
+emails_alerta       = ["operacao-datalake@ness.com.br", "alup.alertas@alupar.com.br"]
 # A BBCE saiu da lista em 10/11: a credencial está gravada e a carga de 28/10 funcionou (#434).
 conectores_sem_agendamento = ["hubspot_negocios"]
 

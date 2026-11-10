@@ -60,6 +60,11 @@ const limites_horas = {
   ccee_reserva_encargo: 780,
   ccee_energia_reserva_consumo_referencia: 780,
   ccee_consumo_classe_agente: 780,
+  portal_alup_client: 26,
+  portal_alup_uc: 26,
+  portal_alup_bandeira: 180,
+  portal_alup_invoice: 26,
+  portal_alup_faturas_processadas: 26,
 };
 
 // Linhas para UNNEST no SQL: STRUCT(conector, limite_h).

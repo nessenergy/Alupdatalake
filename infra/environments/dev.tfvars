@@ -53,5 +53,13 @@ rede_interna = {
   rede         = "vpc-dr-prd"
   sub_rede     = "snet-vpc-dr-prd-us-central1-alupdata"
 }
+# Conectores do MySQL Alup (Onda 3) saem pela rede interna: o IP de saída é o do Cloud NAT da vpc-dr-prd (ADR 024).
+conectores_rede_interna = [
+  "portal_alup_client",
+  "portal_alup_uc",
+  "portal_alup_bandeira",
+  "portal_alup_invoice",
+  "portal_alup_faturas_processadas",
+]
 # Credenciais do DB Alup e do DB Comercialização chegaram em 19/10; os dois jobs mostram se a DSN e o acesso funcionam.
 fontes_teste_conexao = ["fmb", "portal-alup", "comercializacao"]

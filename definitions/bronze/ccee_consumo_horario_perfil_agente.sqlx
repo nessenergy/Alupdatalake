@@ -1,0 +1,51 @@
+config {
+  type: "operations",
+  schema: "bronze",
+  hasOutput: true,
+  tags: ["bronze"]
+}
+
+-- Bronze: consumo horário por carga e perfil de agente (CCEE, dados abertos, gzip mensal).
+-- Aditivo 01, item 26. ~34,9 milhões de linhas por mês (uma por carga por hora), ~11 GiB.
+--
+-- Particionada pelo DIA DO CONSUMO (`data_referencia`), e não por `DATE(_ingestao_timestamp)`
+-- como as outras Bronzes: aqui a consulta filtra o dia do consumo, e uma carga mensal numa só
+-- partição de ingestão não pouparia varredura nenhuma. `require_partition_filter` impede o
+-- `SELECT *` esquecido de varrer tudo: o custo de BigQuery é da Alup (regra 4). Quem consulta
+-- a Bronze, a Silver ou a carga de prova precisa filtrar `data_referencia`.
+CREATE TABLE IF NOT EXISTS ${self()} (
+  data_referencia                      DATE      NOT NULL OPTIONS(description="Dia da hora, derivado do período de comercialização"),
+  data_hora                            DATETIME  NOT NULL OPTIONS(description="Hora cheia, horário de Brasília, sem fuso"),
+  periodo_comercializacao              INT64     NOT NULL OPTIONS(description="Índice da hora no mês, 1..744, como a CCEE publica"),
+  periodo_apuracao_ccee                STRING    NOT NULL OPTIONS(description="AAAA-MM, como a CCEE declara"),
+  versao_publicacao                    DATE      NOT NULL OPTIONS(description="last_modified do recurso no CKAN (ADR 016); a data da carga quando o CKAN não informa"),
+  codigo_carga                         INT64     NOT NULL,
+  nome_carga                           STRING,
+  data_migracao                        DATE      OPTIONS(description="Data de migração da carga para o mercado livre"),
+  codigo_perfil_agente                 INT64     NOT NULL,
+  sigla_perfil_agente                  STRING,
+  classe_perfil_agente                 STRING    NOT NULL,
+  nome_empresarial                     STRING,
+  cnpj_carga                           STRING,
+  cidade_carga                         STRING,
+  estado_carga                         STRING,
+  submercado                           STRING    NOT NULL OPTIONS(description="N, NE, S, SE"),
+  codigo_perfil_agente_distribuidora   INT64,
+  sigla_perfil_agente_distribuidora    STRING,
+  capacidade_carga                     NUMERIC   OPTIONS(description="MW"),
+  consumo_carga_acl                    NUMERIC   OPTIONS(description="MWh"),
+  consumo_carga_ajustado_acl           NUMERIC   OPTIONS(description="MWh"),
+  consumo_carga_ajustado               NUMERIC   OPTIONS(description="MWh"),
+  consumo_carga_ponto_conexao          NUMERIC   OPTIONS(description="MWh"),
+
+  _ingestao_id                         STRING    NOT NULL,
+  _ingestao_timestamp                  TIMESTAMP NOT NULL,
+  _fonte                               STRING    NOT NULL,
+  _schema_versao                       STRING    NOT NULL
+)
+PARTITION BY data_referencia
+CLUSTER BY codigo_carga, submercado, classe_perfil_agente
+OPTIONS(
+  require_partition_filter = TRUE,
+  description = "Consumo horário por carga e perfil de agente — camada Bronze, append-only, particionada pelo dia do consumo"
+);

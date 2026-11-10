@@ -1,0 +1,27 @@
+config {
+  type: "table",
+  schema: "gold",
+  tags: ["gold"],
+  dependOnDependencyAssertions: true
+}
+
+-- Gold: o consumo de cada hora, por submercado e classe de perfil de agente, somando as
+-- cargas. É a leitura que o painel e a Alup usam do item 26: ~744 horas × 4 submercados ×
+-- poucas classes ≈ 18 mil linhas por mês, KB de custo de consulta, no lugar das 34,9 milhões
+-- de linhas por carga da Silver. Soma e contagem, sem KPI (ADR 012). Unidade das medidas:
+-- MWh, como a CCEE publica no catálogo.
+SELECT
+  data_referencia,
+  data_hora,
+  periodo_apuracao,
+  submercado,
+  classe_perfil_agente,
+  COUNT(*)                          AS cargas,
+  SUM(capacidade_carga)             AS capacidade_carga_total,
+  SUM(consumo_carga_acl)            AS consumo_carga_acl_total,
+  SUM(consumo_carga_ajustado_acl)   AS consumo_carga_ajustado_acl_total,
+  SUM(consumo_carga_ajustado)       AS consumo_carga_ajustado_total,
+  SUM(consumo_carga_ponto_conexao)  AS consumo_carga_ponto_conexao_total,
+  MAX(versao_publicacao)            AS versao_publicacao
+FROM ${ref("silver", "ccee_consumo_horario_perfil_agente")}
+GROUP BY data_referencia, data_hora, periodo_apuracao, submercado, classe_perfil_agente

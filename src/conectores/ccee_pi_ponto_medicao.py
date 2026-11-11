@@ -19,8 +19,8 @@ from typing import TYPE_CHECKING, Any
 
 from pydantic import BaseModel
 
-from src.conectores.ccee_pi_sessao import NS_BO2, abrir_sessao, pontos_medicao
-from src.core.conector import Conector
+from src.conectores.ccee_pi_sessao import NS_BO2, CceeError, abrir_sessao, pontos_medicao
+from src.core.conector import Conector, SemPermissaoError
 from src.core.registry import registrar
 
 if TYPE_CHECKING:
@@ -31,12 +31,24 @@ if TYPE_CHECKING:
 
 logger = logging.getLogger(__name__)
 
+CODIGO_SEM_PERMISSAO = "4001"  # a CCEE nega o cadastro ao perfil (#462)
+
 
 def _t(elemento: Element, caminho: str) -> str | None:
     """Texto do primeiro descendente `bo:<caminho>`, com `/` entre níveis; None se não existir."""
     achado = elemento.find("/".join(f"{{{NS_BO2}}}{parte}" for parte in caminho.split("/")))
     texto = (achado.text or "").strip() if achado is not None else ""
     return texto or None
+
+
+def _pontos_do_cadastro() -> Iterator[Element]:
+    """Pontos do cadastro; o `4001` (perfil sem acesso) sobe como falta de permissão, com o texto da CCEE."""
+    try:
+        yield from pontos_medicao(abrir_sessao())
+    except CceeError as erro:
+        if erro.codigo == CODIGO_SEM_PERMISSAO:
+            raise SemPermissaoError(str(erro)) from erro
+        raise
 
 
 class CceePiPontoMedicaoRegistro(BaseModel):
@@ -61,7 +73,7 @@ class CceePiPontoMedicao(Conector):
 
     def extrair(self, janela: Janela) -> Iterator[dict[str, Any]]:
         total = 0
-        for ponto in pontos_medicao(abrir_sessao()):
+        for ponto in _pontos_do_cadastro():
             total += 1
             base = {
                 "data_referencia": janela.fim.isoformat(),

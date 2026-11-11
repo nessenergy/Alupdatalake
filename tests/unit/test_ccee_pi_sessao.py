@@ -317,3 +317,21 @@ def test_abrir_sessao_le_a_lista_opcional_de_pontos(monkeypatch, valor, esperado
     monkeypatch.setattr(ccee, "ler_secret_binario", lambda fonte, campo: PFX)
 
     assert ccee.abrir_sessao().pontos == esperado
+
+
+def test_cceeerror_guarda_o_errorcode_da_ccee(sessao, chamadas):
+    chamadas.resposta = SimpleNamespace(status_code=500, text=FALHA_COM_DETALHE)
+
+    with pytest.raises(CceeError) as erro:
+        sessao.chamar("/ws/x", "acao", "<corpo/>")
+
+    assert erro.value.codigo == "2001"
+
+
+def test_cceeerror_sem_detail_nao_tem_codigo(sessao, chamadas):
+    chamadas.resposta = SimpleNamespace(status_code=500, text=FALHA)
+
+    with pytest.raises(CceeError) as erro:
+        sessao.chamar("/ws/x", "acao", "<corpo/>")
+
+    assert erro.value.codigo is None

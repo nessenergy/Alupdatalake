@@ -86,9 +86,9 @@ agregado AS (
     APPROX_QUANTILES(duracao_segundos, 100)[OFFSET(50)] AS duracao_p50_seg,
     APPROX_QUANTILES(duracao_segundos, 100)[OFFSET(95)] AS duracao_p95_seg,
     -- O erro mais recente por data, não por ordem alfabética do texto.
-    ARRAY_AGG(IF(status = 'ERRO', erro, NULL) IGNORE NULLS ORDER BY encerrada_em DESC LIMIT 1)[SAFE_OFFSET(0)]
+    ARRAY_AGG(IF(status IN ('ERRO', 'SEM_PERMISSAO'), erro, NULL) IGNORE NULLS ORDER BY encerrada_em DESC LIMIT 1)[SAFE_OFFSET(0)]
       AS erro_mais_recente,
-    MAX(IF(status = 'ERRO', encerrada_em, NULL))    AS ultimo_erro_em
+    MAX(IF(status IN ('ERRO', 'SEM_PERMISSAO'), encerrada_em, NULL)) AS ultimo_erro_em
   FROM execucoes
   GROUP BY conector
 )
@@ -108,10 +108,11 @@ SELECT
   IF(a.ultimo_erro_em > COALESCE(a.ultimo_sucesso, TIMESTAMP '1970-01-01'), a.erro_mais_recente, NULL)
     AS ultimo_erro,
   -- Espera da Alup, não quebra: nunca houve sucesso e o erro é falta de segredo
-  -- (Secret Manager sem versão ou sem permissão, ou cofre local). O Portal mostra
+  -- (Secret Manager sem versão ou sem permissão, ou cofre local) ou a origem negou
+  -- o acesso (status SEM_PERMISSAO, ex.: cadastro da CCEE). O Portal mostra
   -- "aguardando credencial" em vez de pintar a fonte de vermelho.
   (a.ultimo_sucesso IS NULL
-    AND REGEXP_CONTAINS(COALESCE(a.erro_mais_recente, ''), r'(?i)secret|cofre local')) AS aguardando_credencial,
+    AND REGEXP_CONTAINS(COALESCE(a.erro_mais_recente, ''), r'(?i)secret|cofre local|SemPermissaoError')) AS aguardando_credencial,
   -- Semáforo. Atraso: o limite de silêncio do alerta; fora do mapa, o dobro do
   -- intervalo típico observado, e sem histórico, 26h.
   CASE

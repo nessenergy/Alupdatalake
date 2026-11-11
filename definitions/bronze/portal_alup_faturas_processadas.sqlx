@@ -1,0 +1,46 @@
+config {
+  type: "operations",
+  schema: "bronze",
+  hasOutput: true,
+  tags: ["bronze"]
+}
+
+-- Bronze: MySQL Alup, tabela faturas_processadas (incremental pela janela de updatedAt / createdAt).
+-- Append-only: a deduplicação vive na Silver. Contrato: docs/dicionario-dados/mysql_alup_esquema.md.
+CREATE TABLE IF NOT EXISTS ${self()} (
+  id                              INT64 NOT NULL,
+  id_uc                           STRING,
+  id_transacao_fmb                STRING,
+  id_pre_fatura_fmb               STRING,
+  codigo_contrato                 STRING,
+  id_erp_empresa_origem           STRING,
+  cnpj_empresa_destino            STRING,
+  mes_suprimento                  STRING,
+  quantidade                      NUMERIC,
+  preco                           NUMERIC,
+  valor_total                     NUMERIC,
+  condicao_pagamento_erp          STRING,
+  natureza_contrato               STRING,
+  consumidor_final                BOOL,
+  numero_parcelas                 INT64,
+  tags                            STRING,
+  parcelas                        STRING,
+  data_vencimento                 DATE,
+  status_processamento            STRING,
+  created_at                      DATETIME,
+  updated_at                      DATETIME,
+  erros                           STRING,
+  id_contrato                     STRING,
+  ordem_cadastrada                STRING,
+  estado                          STRING,
+  desconto                        NUMERIC,
+  submercado                      STRING,
+
+  _ingestao_id                    STRING    NOT NULL,
+  _ingestao_timestamp             TIMESTAMP NOT NULL,
+  _fonte                          STRING    NOT NULL,
+  _schema_versao                  STRING    NOT NULL
+)
+PARTITION BY DATE(_ingestao_timestamp)
+CLUSTER BY mes_suprimento, id_uc
+OPTIONS(description="MySQL Alup faturas_processadas — camada Bronze, append-only");

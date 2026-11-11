@@ -76,6 +76,11 @@ variable "conectores_criticos" {
     ccee_reserva_encargo                    = 780 # mensal + folga (Aditivo 01)
     ccee_energia_reserva_consumo_referencia = 780 # mensal + folga (Aditivo 01)
     ccee_consumo_classe_agente              = 780 # mensal + folga (Aditivo 01)
+    portal_alup_client                      = 26  # diário (Onda 3, MySQL Alup)
+    portal_alup_uc                          = 26  # diário (Onda 3)
+    portal_alup_bandeira                    = 180 # semanal + folga (Onda 3)
+    portal_alup_invoice                     = 26  # diário (Onda 3)
+    portal_alup_faturas_processadas         = 26  # diário (Onda 3)
   }
 }
 

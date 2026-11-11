@@ -1,0 +1,77 @@
+config {
+  type: "view",
+  schema: "silver",
+  tags: ["silver"],
+  assertions: {
+    uniqueKey: ["id"],
+    nonNull: ["id", "data_referencia"],
+    rowConditions: [
+      "COALESCE(contracted_demand_peak, 0) >= 0 AND COALESCE(contracted_demand_off_peak, 0) >= 0",
+      "state IS NULL OR LENGTH(state) = 2"
+    ]
+  }
+}
+
+-- Silver: unidades consumidoras vigentes, uma linha por id. Retrato diário: vence a ingestão mais recente.
+-- `submercado` é submarket como a origem escreve (sem mapa para N/NE/S/SE: pergunta 6 da spec).
+-- `agente_ccee` fica nulo: cod_agente, cod_agente_concessionaria e codigo_ativo não têm significado confirmado (pergunta 5).
+-- Sem address e vendedor: não são lidos (dado pessoal sem finalidade).
+SELECT
+  data_referencia AS data_referencia,
+  submarket AS submercado,
+  CAST(NULL AS STRING) AS codigo_usina,   -- fonte comercial, não tem usina
+  CAST(NULL AS STRING) AS agente_ccee,  -- fonte não traz o agente CCEE
+  FORMAT_DATE('%Y-%m', data_referencia) AS periodo_apuracao,
+  CAST(NULL AS STRING) AS periodo_apuracao_ccee,  -- a origem não declara período CCEE
+  id,
+  client_id,
+  contrato,
+  cnpj,
+  state,
+  contract_start_date,
+  supplier,
+  subgroup,
+  modality,
+  contracted_demand_peak,
+  contracted_demand_off_peak,
+  scde_code,
+  contractual_modality,
+  supply_start_date,
+  supply_end_date,
+  guaranteed_discount_percentage,
+  base_price,
+  base_date,
+  adjustment_date,
+  adjustment_index,
+  losses,
+  proinfa,
+  included_charges,
+  icms,
+  migration,
+  cod_agente,
+  due_day,
+  supply_duration,
+  total_energy_volume,
+  codigo_ativo,
+  adjusted_price,
+  ccee_last_date,
+  api_ccee,
+  condicao_pagamento,
+  id_contrato,
+  reforma_tributaria,
+  id_migracao_ccee,
+  cod_agente_concessionaria,
+  status_do_contrato,
+  id_new,
+  status_faturamento,
+  interesse_em_renovar,
+  meses_renovacao,
+  renovacao_distrato,
+  submarket,
+  _ingestao_id,
+  _ingestao_timestamp
+FROM ${ref("bronze", "portal_alup_uc")}
+QUALIFY ROW_NUMBER() OVER (
+  PARTITION BY id
+  ORDER BY _ingestao_timestamp DESC
+) = 1

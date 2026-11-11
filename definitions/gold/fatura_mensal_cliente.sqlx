@@ -1,0 +1,48 @@
+config {
+  type: "table",
+  schema: "gold",
+  tags: ["gold"],
+  dependOnDependencyAssertions: true
+}
+
+-- Gold: faturas por cliente e mês — consumo, valor, imposto e número de faturas, com a bandeira tarifária do mês.
+-- A bandeira entra por `periodo_apuracao` das duas Silver (mês lido como YYYY-MM). Se `mes` da bandeira tiver outro
+-- formato, a coluna fica nula: não casa errado (pergunta 4 da spec). Sem CNPJ.
+-- Fonte: MySQL Alup (portal_alup_invoice, portal_alup_client e portal_alup_bandeira).
+WITH fatura AS (
+  SELECT
+    client_id,
+    periodo_apuracao,
+    COUNT(*)         AS faturas,
+    SUM(consumption) AS consumo,
+    SUM(value)       AS valor,
+    SUM(tax)         AS imposto
+  FROM ${ref("silver", "portal_alup_invoice")}
+  GROUP BY client_id, periodo_apuracao
+),
+
+bandeira AS (
+  SELECT
+    periodo_apuracao,
+    ANY_VALUE(bandeira) AS bandeira,
+    ANY_VALUE(valor)    AS valor_bandeira
+  FROM ${ref("silver", "portal_alup_bandeira")}
+  WHERE periodo_apuracao IS NOT NULL
+  GROUP BY periodo_apuracao
+)
+
+SELECT
+  fatura.periodo_apuracao,
+  fatura.client_id,
+  cliente.nickname AS cliente,
+  fatura.faturas,
+  fatura.consumo,
+  fatura.valor,
+  fatura.imposto,
+  bandeira.bandeira,
+  bandeira.valor_bandeira
+FROM fatura
+LEFT JOIN ${ref("silver", "portal_alup_client")} AS cliente
+  ON cliente.id = fatura.client_id
+LEFT JOIN bandeira
+  ON bandeira.periodo_apuracao = fatura.periodo_apuracao

@@ -1,0 +1,41 @@
+config {
+  type: "view",
+  schema: "silver",
+  tags: ["silver"],
+  assertions: {
+    uniqueKey: ["id"],
+    nonNull: ["id"],
+    rowConditions: ["id > 0"]
+  }
+}
+
+-- Silver: faturas vigentes por UC e mês, uma linha por id.
+-- A ordem é pela modificação na origem antes da ingestão: reprocessar uma janela antiga reinsere a versão velha na
+-- Bronze com _ingestao_timestamp novo, e ela não pode vencer a versão que já estava lá.
+-- `data_referencia` é o 1º dia de `month` lido como YYYY-MM; formato diferente deixa nulo, sem erro.
+-- Sem nfe, jsonInfo, barcode e s3_key*: não são lidos (spec, "Dado pessoal e sensível").
+SELECT
+  SAFE.PARSE_DATE('%Y-%m', month) AS data_referencia,
+  CAST(NULL AS STRING) AS submercado,   -- a fatura não traz submercado
+  CAST(NULL AS STRING) AS codigo_usina, -- fonte comercial, não tem usina
+  CAST(NULL AS STRING) AS agente_ccee,  -- a fatura não traz o agente CCEE
+  FORMAT_DATE('%Y-%m', SAFE.PARSE_DATE('%Y-%m', month)) AS periodo_apuracao,
+  CAST(NULL AS STRING) AS periodo_apuracao_ccee,  -- a origem não declara período CCEE
+  id,
+  client_id,
+  uc_id,
+  month,
+  consumption,
+  value,
+  tax,
+  status,
+  due_date,
+  updated_at,
+  created_at,
+  _ingestao_id,
+  _ingestao_timestamp
+FROM ${ref("bronze", "portal_alup_invoice")}
+QUALIFY ROW_NUMBER() OVER (
+  PARTITION BY id
+  ORDER BY COALESCE(updated_at, created_at) DESC, _ingestao_timestamp DESC
+) = 1

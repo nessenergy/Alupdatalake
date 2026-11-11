@@ -1,0 +1,24 @@
+config {
+  type: "operations",
+  schema: "bronze",
+  hasOutput: true,
+  tags: ["bronze"]
+}
+
+-- Bronze: MySQL Alup, tabela client (retrato completo a cada execução).
+-- Append-only: a deduplicação vive na Silver. Contrato: docs/dicionario-dados/mysql_alup_esquema.md.
+CREATE TABLE IF NOT EXISTS ${self()} (
+  data_referencia                 DATE NOT NULL,
+  id                              INT64 NOT NULL,
+  nickname                        STRING,
+  corporate_name                  STRING,
+  cnpj                            STRING OPTIONS(description="Identificador de pessoa jurídica; não sobe para a Gold"),
+
+  _ingestao_id                    STRING    NOT NULL,
+  _ingestao_timestamp             TIMESTAMP NOT NULL,
+  _fonte                          STRING    NOT NULL,
+  _schema_versao                  STRING    NOT NULL
+)
+PARTITION BY DATE(_ingestao_timestamp)
+CLUSTER BY id
+OPTIONS(description="MySQL Alup client — camada Bronze, append-only");

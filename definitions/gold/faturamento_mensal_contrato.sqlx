@@ -1,0 +1,23 @@
+config {
+  type: "table",
+  schema: "gold",
+  tags: ["gold"],
+  dependOnDependencyAssertions: true
+}
+
+-- Gold: faturamento do ERP por mês de suprimento, natureza do contrato, submercado e status de processamento —
+-- faturas, quantidade, valor total e desconto. Sem CNPJ do destino.
+-- Os valores possíveis de `status_processamento` não estão confirmados, então a Gold não decide qual é "sucesso":
+-- entrega a contagem por status, como a origem declara.
+-- Fonte: MySQL Alup (portal_alup_faturas_processadas).
+SELECT
+  periodo_apuracao,
+  natureza_contrato,
+  submercado,
+  status_processamento,
+  COUNT(*)         AS faturas,
+  SUM(quantidade)  AS quantidade,
+  SUM(valor_total) AS valor_total,
+  SUM(desconto)    AS desconto
+FROM ${ref("silver", "portal_alup_faturas_processadas")}
+GROUP BY periodo_apuracao, natureza_contrato, submercado, status_processamento

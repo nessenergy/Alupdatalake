@@ -438,6 +438,32 @@ variable "conectores" {
       cron         = "0 10 6 * *"
       ultimos_dias = 120
     }
+    portal_alup_client = {
+      # Onda 3, MySQL Alup (docs/superpowers/specs/2026-11-10-mysql-alup-onda3-design.md). Cadastro sem coluna de
+      # modificação: retrato completo por execução, a janela não se aplica. De madrugada (02h em Brasília), fora do
+      # expediente do banco da Alup; os cinco jobs saem pela rede interna (conectores_rede_interna).
+      cron         = "0 5 * * *"
+      ultimos_dias = 1 # retrato; a janela só define data_referencia
+    }
+    portal_alup_uc = {
+      cron         = "10 5 * * *"
+      ultimos_dias = 1 # retrato; a janela só define data_referencia
+    }
+    portal_alup_bandeira = {
+      # Uma linha por mês: semanal basta.
+      cron         = "20 5 * * 1"
+      ultimos_dias = 1 # retrato; a janela só define data_referencia
+    }
+    portal_alup_invoice = {
+      # Lida por COALESCE(updated_at, created_at). 7 dias reabrem o que mudou e cobrem execução perdida; a Silver
+      # ordena pela modificação na origem, então reprocessar janela antiga não reverte linha. Volume não medido.
+      cron         = "30 5 * * *"
+      ultimos_dias = 7
+    }
+    portal_alup_faturas_processadas = {
+      cron         = "40 5 * * *"
+      ultimos_dias = 7 # idem invoice, por COALESCE(updatedAt, createdAt)
+    }
     bbce_curva_forward = {
       # A curva sai por pregão, em dia útil. Janela curta porque cada dia é uma
       # requisição própria; 7 dias cobrem feriado prolongado e execução perdida.

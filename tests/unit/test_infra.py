@@ -699,8 +699,9 @@ def test_fonte_sem_credencial_fica_fora_do_agendamento_mas_o_job_existe() -> Non
     assert _tem(r"for_each\s*=\s*var\.conectores\b", job)
 
     dev = _ler("infra/environments/dev.tfvars")
+    # BBCE saiu da lista em 10/11 (credencial gravada, carga de 28/10): o disparo existe e não está desligado.
+    assert 'conectores_sem_agendamento = ["hubspot_negocios"]' in dev
     for conector in ("hubspot_negocios", "bbce_curva_forward"):
-        assert f'"{conector}"' in dev, conector
         assert re.search(rf"^\s+{conector} = \{{", scheduler, re.MULTILINE), conector
 
 

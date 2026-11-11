@@ -2,7 +2,12 @@ config {
   type: "table",
   schema: "gold",
   tags: ["gold"],
-  dependOnDependencyAssertions: true
+  dependOnDependencyAssertions: true,
+  assertions: {
+    // Um vértice por curva: o último pregão de cada curva não repete data de entrega.
+    uniqueKey: ["curva", "vertice_em"],
+    nonNull: ["curva", "data_referencia", "vertice_em", "preco_reais_mwh"]
+  }
 }
 
 -- Gold: a curva forward vigente — o último pregão publicado, por vértice.

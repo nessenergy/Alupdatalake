@@ -1,0 +1,31 @@
+config {
+  type: "table",
+  schema: "gold",
+  tags: ["gold"],
+  dependOnDependencyAssertions: true
+}
+
+-- Gold: o consumo de cada carga no mês — total, maior hora e horas com consumo. ~47 mil
+-- linhas por mês, na granularidade de carga que a Alup pediu no item 26. O pico é a maior
+-- hora do mês (MWh numa hora, o mesmo número em MW médio). Sem KPI (ADR 012).
+SELECT
+  periodo_apuracao,
+  codigo_carga,
+  nome_carga,
+  codigo_perfil_agente,
+  sigla_perfil_agente,
+  classe_perfil_agente,
+  submercado,
+  estado_carga,
+  COUNT(*)                                       AS horas,
+  COUNTIF(consumo_carga_ponto_conexao > 0)       AS horas_com_consumo,
+  SUM(consumo_carga_acl)                         AS consumo_carga_acl_total,
+  SUM(consumo_carga_ajustado)                    AS consumo_carga_ajustado_total,
+  SUM(consumo_carga_ponto_conexao)               AS consumo_carga_ponto_conexao_total,
+  MAX(consumo_carga_ponto_conexao)               AS pico_horario_ponto_conexao,
+  MAX(capacidade_carga)                          AS capacidade_carga,
+  MAX(versao_publicacao)                         AS versao_publicacao
+FROM ${ref("silver", "ccee_consumo_horario_perfil_agente")}
+GROUP BY
+  periodo_apuracao, codigo_carga, nome_carga, codigo_perfil_agente, sigla_perfil_agente,
+  classe_perfil_agente, submercado, estado_carga

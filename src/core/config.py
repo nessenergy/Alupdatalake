@@ -38,6 +38,12 @@ class Settings(BaseSettings):
 
     dry_run: bool = Field(default=False, description="Extrai e valida sem gravar em GCS/BigQuery")
 
+    reler_meses_carregados: bool = Field(
+        default=False,
+        description="Só o consumo horário por perfil (item 26): relê o mês mesmo que a Bronze já o tenha, "
+        "para reprocessar de propósito. A Bronze é append-only, então duplica ~11 GiB por mês relido",
+    )
+
     portal_provedor: str = Field(default="simulado", description="'simulado' ou 'bigquery' (ver ADR 005)")
     portal_view: str = Field(default="cambio_mensal", description="View Gold exibida pelo Portal MVP")
     portal_limite_linhas: int = Field(default=200, description="Teto de linhas lidas por request")

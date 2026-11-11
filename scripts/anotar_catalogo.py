@@ -63,6 +63,8 @@ ANOTACOES: dict[str, dict[str, str]] = {
         "responsavel": INTELIGENCIA,
     },  # Aditivo 01
     "consumo_classe_agente_mensal": {"dominio": "mercado_de_energia", "responsavel": INTELIGENCIA},  # Aditivo 01
+    "consumo_horario_submercado_classe": {"dominio": "mercado_de_energia", "responsavel": INTELIGENCIA},  # Aditivo 01
+    "consumo_mensal_carga": {"dominio": "mercado_de_energia", "responsavel": INTELIGENCIA},  # Aditivo 01
     "armazenamento_mensal_bacia": {"dominio": "mercado_de_energia", "responsavel": INTELIGENCIA},  # Aditivo 01
     "afluencia_mensal_bacia": {"dominio": "mercado_de_energia", "responsavel": INTELIGENCIA},  # Aditivo 01
     "armazenamento_mensal_reservatorio": {"dominio": "mercado_de_energia", "responsavel": INTELIGENCIA},  # Aditivo 01

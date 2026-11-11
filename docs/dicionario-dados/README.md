@@ -49,6 +49,7 @@ técnicos**. Bases reutilizáveis não entram nessa contagem. O contrato mantém
 | CCEE — encargo de reserva (CONER) | [`ccee_reserva_encargo.md`](ccee_reserva_encargo.md) | Aditivo 01 | — | `reserva_encargo_mensal` |
 | CCEE — TRC de segurança energética | [`ccee_energia_reserva_consumo_referencia.md`](ccee_energia_reserva_consumo_referencia.md) | Aditivo 01 | — | `consumo_referencia_energia_reserva_mensal` |
 | CCEE — consumo por classe de agente | [`ccee_consumo_classe_agente.md`](ccee_consumo_classe_agente.md) | Aditivo 01 | — | `consumo_classe_agente_mensal` |
+| CCEE — consumo horário por perfil de agente | [`ccee_consumo_horario_perfil_agente.md`](ccee_consumo_horario_perfil_agente.md) | Aditivo 01 | `submercado` | `consumo_horario_submercado_classe`, `consumo_mensal_carga` |
 | ANEEL — SIGA | [`aneel_siga.md`](aneel_siga.md) | 1 | **`codigo_usina`** | `parque_gerador` |
 | MySQL Alup — cadastro e faturamento (5 tabelas) | [`portal_alup.md`](portal_alup.md) | 3 | — | `cadastro_uc_cliente`, `fatura_mensal_cliente`, `faturamento_mensal_contrato` |
 | ACE Comercializadora — PRC | [`ace_prc.md`](ace_prc.md) | 1 | `submercado` | `prc_vigente_comercializadora` |

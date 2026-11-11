@@ -1,0 +1,66 @@
+config {
+  type: "view",
+  schema: "silver",
+  tags: ["silver"],
+  assertions: {
+    uniqueKey: ["data_referencia", "data_hora", "codigo_carga"],
+    nonNull: ["data_referencia", "data_hora", "codigo_carga", "codigo_perfil_agente", "classe_perfil_agente", "submercado", "versao_publicacao"],
+    rowConditions: [
+      "submercado IN ('N','NE','S','SE')",
+      "periodo_apuracao = periodo_apuracao_ccee",
+      "consumo_carga_acl >= 0",
+      "consumo_carga_ajustado_acl >= 0",
+      "consumo_carga_ajustado >= 0",
+      "consumo_carga_ponto_conexao >= 0"
+    ]
+  }
+}
+
+-- Silver: uma linha por carga e hora, pela publicação mais recente (ADR 016).
+--
+-- `data_referencia` entra no PARTITION BY da janela para o filtro de partição descer pela
+-- análise: quem filtra o dia lê só as partições pedidas. O limite `>= 2024-03-01` é o primeiro
+-- mês do catálogo da CCEE (`_202403`) e existe por um motivo só: a Bronze exige filtro de
+-- partição, e as asserções da Silver e a Gold leem a view inteira. Ele NÃO protege consulta
+-- avulsa — quem consultar sem filtrar o dia varre tudo o que está carregado. Consumidor lê a
+-- Gold; consulta exploratória filtra `data_referencia`.
+--
+-- A chave (data_hora, codigo_carga) apoia-se na conta de uma linha por carga por hora
+-- (46.890 × 744 = 34,88 milhões em jul/2026); a asserção `uniqueKey` confirma na 1ª carga.
+-- `codigo_usina` e `agente_ccee` ficam nulos: a origem fala de carga e de perfil de agente
+-- (código de perfil, não o código de agente da CCEE).
+SELECT
+  data_referencia,
+  submercado,
+  CAST(NULL AS STRING) AS codigo_usina,  -- a origem é de carga, não de usina
+  CAST(NULL AS STRING) AS agente_ccee,   -- a origem traz o código do perfil, não o do agente
+  FORMAT_DATE('%Y-%m', data_referencia) AS periodo_apuracao,
+  periodo_apuracao_ccee,
+  versao_publicacao,
+  data_hora,
+  periodo_comercializacao,
+  codigo_carga,
+  nome_carga,
+  data_migracao,
+  codigo_perfil_agente,
+  sigla_perfil_agente,
+  classe_perfil_agente,
+  nome_empresarial,
+  cnpj_carga,
+  cidade_carga,
+  estado_carga,
+  codigo_perfil_agente_distribuidora,
+  sigla_perfil_agente_distribuidora,
+  capacidade_carga,
+  consumo_carga_acl,
+  consumo_carga_ajustado_acl,
+  consumo_carga_ajustado,
+  consumo_carga_ponto_conexao,
+  _ingestao_id,
+  _ingestao_timestamp
+FROM ${ref("bronze", "ccee_consumo_horario_perfil_agente")}
+WHERE data_referencia >= DATE '2024-03-01'
+QUALIFY ROW_NUMBER() OVER (
+  PARTITION BY data_referencia, data_hora, codigo_carga
+  ORDER BY versao_publicacao DESC, _ingestao_timestamp DESC
+) = 1

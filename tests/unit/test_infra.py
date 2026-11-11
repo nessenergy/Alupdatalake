@@ -97,8 +97,9 @@ def test_hml_nasce_sem_agendamento() -> None:
     assert _tem(r"agendamentos_ativos\s*=\s*false", hml) or _tem(
         r"agendamentos_ativos\s*=\s*true\s*#\s*janela de homologação.*\d{2}/\d{2}", hml
     ), "hml só agenda na janela de homologação, declarada com a data"
-    for ambiente in ("dev", "prod"):
-        assert "agendamentos_ativos" not in _ler(f"infra/environments/{ambiente}.tfvars")
+    assert "agendamentos_ativos" not in _ler("infra/environments/dev.tfvars")
+    # prod nasce desligado (plano de 14/10, passo 11): ligar é decisão registrada.
+    assert _tem(r"(?m)^agendamentos_ativos\s*=\s*false", _ler("infra/environments/prod.tfvars"))
 
     variavel = _bloco(_ler("infra/variables.tf"), 'variable "agendamentos_ativos"')
     assert _tem(r"type\s*=\s*bool", variavel)

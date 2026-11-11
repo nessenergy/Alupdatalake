@@ -69,12 +69,15 @@ class Execucao:
     linhas_carregadas: int = 0
     encerrada_em: datetime | None = None
     erro: str | None = None
+    sem_permissao: bool = False  # a origem negou o acesso: erro de terceiro, não do conector
 
     @property
     def status(self) -> str:
         if self.encerrada_em is None:
             return "EM_EXECUCAO"
-        return "ERRO" if self.erro else "SUCESSO"
+        if self.erro:
+            return "SEM_PERMISSAO" if self.sem_permissao else "ERRO"
+        return "SUCESSO"
 
     @property
     def duracao_segundos(self) -> float | None:
@@ -82,9 +85,10 @@ class Execucao:
             return None
         return (self.encerrada_em - self.iniciada_em).total_seconds()
 
-    def encerrar(self, erro: str | None = None) -> None:
+    def encerrar(self, erro: str | None = None, sem_permissao: bool = False) -> None:
         self.encerrada_em = datetime.now(UTC)
         self.erro = erro
+        self.sem_permissao = sem_permissao and bool(erro)
 
     def to_row(self) -> dict:
         """Linha para `bronze._execucoes` — o log operacional da ingestão."""

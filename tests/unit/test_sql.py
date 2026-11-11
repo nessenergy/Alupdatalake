@@ -402,9 +402,22 @@ def test_toda_fonte_agendada_tem_limite_de_silencio_ou_motivo() -> None:
     com_limite = set(re.findall(r"^\s+([a-z0-9_]+):\s*\d+,", js, re.M))
     # Onda 2: dependem de token ou de entrada da Alup (ADR 020, A9) e ainda não executam
     # com sucesso. Quando uma delas passar a rodar, sai desta lista e ganha limite.
-    sem_sucesso_possivel = {"bbce_curva_forward", "hubspot_negocios"}
+    sem_sucesso_possivel = {"hubspot_negocios"}
     assert agendadas, "a regex não achou nenhuma fonte agendada"
     assert not (agendadas - com_limite - sem_sucesso_possivel)
+
+
+def test_bbce_gold_e_silver_tem_chave_unica_e_limite_de_dias_uteis() -> None:
+    """BBCE (#434): os 7 componentes inteiros. A Gold sem asserção deixava duplicata passar até o consumidor."""
+    silver = (RAIZ / "definitions/silver/bbce_curva_forward.sqlx").read_text(encoding="utf-8")
+    gold = (RAIZ / "definitions/gold/curva_forward_vigente.sqlx").read_text(encoding="utf-8")
+    assert 'uniqueKey: ["data_referencia", "curva", "vertice_em"]' in silver
+    assert 'uniqueKey: ["curva", "vertice_em"]' in gold
+    assert "nonNull:" in gold.split("WITH", 1)[0]
+    # A curva sai em dia útil (cron 1-5, 20h): da sexta à segunda são 72 h, e o limite precisa passar disso.
+    js = (RAIZ / "includes/silencio.js").read_text(encoding="utf-8")
+    limite = re.search(r"^\s+bbce_curva_forward:\s*(\d+),", js, re.M)
+    assert limite and int(limite.group(1)) > 72
 
 
 def test_saude_trata_execucao_sem_fim_como_erro() -> None:

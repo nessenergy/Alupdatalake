@@ -57,6 +57,7 @@ variable "conectores_criticos" {
     ibge_ipca                               = 780 # mensal + folga
     bcb_igpm                                = 780 # mensal + folga
     ccee_pld                                = 26  # diário desde 28/09 (dataset `pld_horario`)
+    bbce_curva_forward                      = 80  # dias úteis às 20h (sexta a segunda: 72 h) + folga; sem alerta de silêncio (>26 h)
     ccee_perfil                             = 180 # semanal + folga
     ccee_pi_ponto_medicao                   = 780 # mensal (dia 2) + folga
     ccee_pi_medida                          = 26  # diário (item 2.1)
@@ -76,6 +77,11 @@ variable "conectores_criticos" {
     ccee_energia_reserva_consumo_referencia = 780 # mensal + folga (Aditivo 01)
     ccee_consumo_classe_agente              = 780 # mensal + folga (Aditivo 01)
     ccee_consumo_horario_perfil_agente      = 780 # mensal + folga (Aditivo 01, item 26)
+    portal_alup_client                      = 26  # diário (Onda 3, MySQL Alup)
+    portal_alup_uc                          = 26  # diário (Onda 3)
+    portal_alup_bandeira                    = 180 # semanal + folga (Onda 3)
+    portal_alup_invoice                     = 26  # diário (Onda 3)
+    portal_alup_faturas_processadas         = 26  # diário (Onda 3)
   }
 }
 

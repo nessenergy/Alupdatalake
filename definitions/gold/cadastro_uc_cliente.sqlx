@@ -1,0 +1,34 @@
+config {
+  type: "table",
+  schema: "gold",
+  tags: ["gold"],
+  dependOnDependencyAssertions: true
+}
+
+-- Gold: uma linha por unidade consumidora, com o cliente e o contrato vigente — quem consome, em que submercado,
+-- com que demanda contratada, preço-base e vigência de suprimento. Sem CNPJ: a Gold não o expõe.
+-- Fonte: MySQL Alup (portal_alup_uc e portal_alup_client).
+SELECT
+  uc.id                                 AS uc_id,
+  uc.client_id,
+  cliente.nickname                      AS cliente,
+  uc.state                              AS uf,
+  uc.submercado,
+  uc.supplier                           AS fornecedor,
+  uc.subgroup                           AS subgrupo,
+  uc.modality                           AS modalidade,
+  uc.contractual_modality               AS modalidade_contratual,
+  uc.contracted_demand_peak             AS demanda_contratada_ponta,
+  uc.contracted_demand_off_peak         AS demanda_contratada_fora_ponta,
+  uc.contract_start_date                AS inicio_contrato,
+  uc.supply_start_date                  AS inicio_suprimento,
+  uc.supply_end_date                    AS fim_suprimento,
+  uc.base_price                         AS preco_base,
+  uc.adjusted_price                     AS preco_reajustado,
+  uc.adjustment_index                   AS indice_reajuste,
+  uc.status_do_contrato,
+  uc.status_faturamento,
+  uc.data_referencia                    AS data_do_retrato
+FROM ${ref("silver", "portal_alup_uc")} AS uc
+LEFT JOIN ${ref("silver", "portal_alup_client")} AS cliente
+  ON cliente.id = uc.client_id

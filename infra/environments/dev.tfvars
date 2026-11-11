@@ -42,9 +42,10 @@ portal_acesso = ["group:operacao-datalake@ness.com.br"]
 # fontes sem credencial sair do agendamento.
 emails_alerta = ["operacao-datalake@ness.com.br"]
 
-# Sem credencial ainda, o disparo só gera erro: Hubspot (A9) e BBCE (A7). Os jobs
-# continuam existindo; tire da lista quando a credencial chegar.
-conectores_sem_agendamento = ["hubspot_negocios", "bbce_curva_forward"]
+# Sem credencial ainda, o disparo só gera erro: Hubspot (A9). O job continua
+# existindo; tire da lista quando a credencial chegar. A BBCE saiu da lista em
+# 10/11: a credencial está gravada e a carga de 28/10 funcionou (#434).
+conectores_sem_agendamento = ["hubspot_negocios"]
 
 # Fontes internas saem pela VPC compartilhada da Alupar (ADR 024). A parte
 # GCP da Alupar foi aplicada em 25/09 (runbook/rede-onda3.md, G1 a G5).
@@ -53,5 +54,13 @@ rede_interna = {
   rede         = "vpc-dr-prd"
   sub_rede     = "snet-vpc-dr-prd-us-central1-alupdata"
 }
+# Conectores do MySQL Alup (Onda 3) saem pela rede interna: o IP de saída é o do Cloud NAT da vpc-dr-prd (ADR 024).
+conectores_rede_interna = [
+  "portal_alup_client",
+  "portal_alup_uc",
+  "portal_alup_bandeira",
+  "portal_alup_invoice",
+  "portal_alup_faturas_processadas",
+]
 # Credenciais do DB Alup e do DB Comercialização chegaram em 19/10; os dois jobs mostram se a DSN e o acesso funcionam.
 fontes_teste_conexao = ["fmb", "portal-alup", "comercializacao"]

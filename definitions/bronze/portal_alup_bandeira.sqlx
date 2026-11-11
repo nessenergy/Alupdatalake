@@ -1,0 +1,24 @@
+config {
+  type: "operations",
+  schema: "bronze",
+  hasOutput: true,
+  tags: ["bronze"]
+}
+
+-- Bronze: MySQL Alup, tabela bandeira (retrato completo a cada execução).
+-- Append-only: a deduplicação vive na Silver. Contrato: docs/dicionario-dados/mysql_alup_esquema.md.
+CREATE TABLE IF NOT EXISTS ${self()} (
+  data_referencia                 DATE NOT NULL,
+  id                              INT64 NOT NULL,
+  mes                             STRING,
+  bandeira                        STRING NOT NULL,
+  valor                           NUMERIC NOT NULL,
+
+  _ingestao_id                    STRING    NOT NULL,
+  _ingestao_timestamp             TIMESTAMP NOT NULL,
+  _fonte                          STRING    NOT NULL,
+  _schema_versao                  STRING    NOT NULL
+)
+PARTITION BY DATE(_ingestao_timestamp)
+CLUSTER BY mes
+OPTIONS(description="MySQL Alup bandeira — camada Bronze, append-only");

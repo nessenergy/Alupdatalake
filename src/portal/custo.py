@@ -145,6 +145,12 @@ DOMINIO_ANALITICO = {
     "inmet_precipitacao": "Meteorologia",
     "ons_bacia_contorno": "Meteorologia",
     "hubspot_negocios": "Comercial e Contratos",
+    # MySQL Alup (Onda 3): cadastro de unidades consumidoras e faturamento do varejo.
+    "portal_alup_client": "Comercial e Contratos",
+    "portal_alup_uc": "Comercial e Contratos",
+    "portal_alup_bandeira": "Comercial e Contratos",
+    "portal_alup_invoice": "Comercial e Contratos",
+    "portal_alup_faturas_processadas": "Comercial e Contratos",
     "bcb_cambio_ptax": "Econômico",
     "bcb_juros": "Econômico",
     "ibge_ipca": "Econômico",

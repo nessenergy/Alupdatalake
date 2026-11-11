@@ -29,6 +29,12 @@ if TYPE_CHECKING:
     from collections.abc import Iterable, Iterator
 
 PREFIXO_ORIGEM_INDISPONIVEL = "origem_indisponivel: "
+
+
+class SemPermissaoError(RuntimeError):
+    """A origem negou o acesso por permissão da credencial. A execução fecha como SEM_PERMISSAO, sem derrubar o job."""
+
+
 _ERROS_DE_ORIGEM = (requests.ConnectionError, requests.Timeout, ConnectionError, TimeoutError)
 
 
@@ -150,7 +156,13 @@ class Conector(ABC):
                     self._carregar_em_lotes(execucao, records)
             execucao.encerrar()
         except Exception as exc:  # noqa: BLE001 — a execução precisa ser registrada como ERRO
-            execucao.encerrar(erro=descrever_erro(exc))
+            sem_permissao = isinstance(exc, SemPermissaoError)
+            execucao.encerrar(erro=descrever_erro(exc), sem_permissao=sem_permissao)
+            if sem_permissao:
+                # WARNING, não ERROR: o defeito não é nosso e o job sai com 0; o texto da origem fica no log
+                logger.warning("[%s] sem permissão na origem: %s", self.rotulo, execucao.erro)
+                registrar_execucao(execucao)
+                return execucao
             logger.exception("[%s] ingestão falhou", self.rotulo)  # exc_info alimenta o Error Reporting
             try:
                 registrar_execucao(execucao)

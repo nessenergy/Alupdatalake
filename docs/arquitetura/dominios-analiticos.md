@@ -160,7 +160,7 @@ subsistema e semana — o que os torna a contraparte prospectiva do `ons_ena`, m
 | **Fontes a conectar** | **MySQL RDS de Comercialização** · **Portal Alup** — contratos de varejo (ambos Onda 3) |
 | **Granularidade** | contrato e perfil de agente |
 | **Cadência** | diária, na janela das 22h às 6h (C9); mensal para os conjuntos públicos da CCEE |
-| **Gold hoje** | `funil_comercial`, `posicao_contratual_mensal_perfil`, `consumo_varejista_mensal_uf` |
+| **Gold hoje** | `funil_comercial`, `posicao_contratual_mensal_perfil`, `consumo_varejista_mensal_uf`, `cadastro_uc_cliente`, `fatura_mensal_cliente`, `faturamento_mensal_contrato` |
 | **Situação** | **parcial pela via pública** — o book interno segue em A7 |
 
 É o domínio de maior valor e o menos pronto. É ele que a prioridade 1 de A2

@@ -1,0 +1,55 @@
+config {
+  type: "view",
+  schema: "silver",
+  tags: ["silver"],
+  assertions: {
+    uniqueKey: ["id"],
+    nonNull: ["id"],
+    rowConditions: ["id > 0", "numero_parcelas IS NULL OR numero_parcelas >= 0"]
+  }
+}
+
+-- Silver: faturas processadas pelo ERP, uma linha por id.
+-- Mesma ordem da fatura: modificação na origem antes da ingestão, para o reprocesso de janela antiga não reverter linha.
+-- `data_referencia` é o 1º dia de `mes_suprimento` lido como YYYY-MM; formato diferente deixa nulo, sem erro.
+-- `parcelas` segue como texto JSON: a estrutura não foi confirmada, então não é tipada. Sem `nome` (não é lido).
+SELECT
+  SAFE.PARSE_DATE('%Y-%m', mes_suprimento) AS data_referencia,
+  submercado,
+  CAST(NULL AS STRING) AS codigo_usina, -- fonte comercial, não tem usina
+  CAST(NULL AS STRING) AS agente_ccee,  -- a origem traz o CNPJ do destino, não o agente CCEE
+  FORMAT_DATE('%Y-%m', SAFE.PARSE_DATE('%Y-%m', mes_suprimento)) AS periodo_apuracao,
+  CAST(NULL AS STRING) AS periodo_apuracao_ccee,  -- a origem não declara período CCEE
+  id,
+  id_uc,
+  id_transacao_fmb,
+  id_pre_fatura_fmb,
+  codigo_contrato,
+  id_erp_empresa_origem,
+  cnpj_empresa_destino,
+  mes_suprimento,
+  quantidade,
+  preco,
+  valor_total,
+  condicao_pagamento_erp,
+  natureza_contrato,
+  consumidor_final,
+  numero_parcelas,
+  tags,
+  parcelas,
+  data_vencimento,
+  status_processamento,
+  created_at,
+  updated_at,
+  erros,
+  id_contrato,
+  ordem_cadastrada,
+  estado,
+  desconto,
+  _ingestao_id,
+  _ingestao_timestamp
+FROM ${ref("bronze", "portal_alup_faturas_processadas")}
+QUALIFY ROW_NUMBER() OVER (
+  PARTITION BY id
+  ORDER BY COALESCE(updated_at, created_at) DESC, _ingestao_timestamp DESC
+) = 1

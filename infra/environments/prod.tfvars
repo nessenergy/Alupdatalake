@@ -4,11 +4,17 @@ project_id  = "prod-alupdata"
 region      = "us-central1"
 environment = "prod"
 
-# Preparado em 30/10/2026 (plano de 14/10). Região mantida em us-central1 e grupos
-# iguais aos de hml, por decisão do Ricardo em 30/10. O orçamento ainda não entra
-# (decisão 2.4). O agendamento não é
-# declarado aqui (regra do test_infra): o primeiro apply o desliga por variável.
-emails_alerta = ["operacao-datalake@ness.com.br", "alup.alertas@alupar.com.br"]
+# Bootstrap de produção (plano de 14/10, runbook/bootstrap-producao.md). Região
+# mantida em us-central1 (ADR 023: a política da organização não admite us-east1)
+# e grupos iguais aos de hml, por decisão do Ricardo em 30/10. O orçamento ainda
+# não entra: billing_account vazio até a Alup fechar valor e papel (pergunta no PR).
+#
+# Agendamento DESLIGADO até a decisão de ligar (runbook/bootstrap-producao.md, passo 10): o Scheduler cobra
+# por job existente e o workflow diário do Dataform consulta o BigQuery todo dia.
+# Cloud Run Jobs seguem disponíveis para execução manual. Ligar = trocar para true
+# com a data da janela de aceite no comentário.
+agendamentos_ativos = false
+emails_alerta       = ["operacao-datalake@ness.com.br", "alup.alertas@alupar.com.br"]
 
 # Sem credencial em prod: ficam sem agendamento, como em hml.
 conectores_sem_agendamento = ["hubspot_negocios", "bbce_curva_forward"]

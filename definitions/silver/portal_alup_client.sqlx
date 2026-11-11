@@ -1,0 +1,31 @@
+config {
+  type: "view",
+  schema: "silver",
+  tags: ["silver"],
+  assertions: {
+    uniqueKey: ["id"],
+    nonNull: ["id", "data_referencia"],
+    rowConditions: ["id > 0"]
+  }
+}
+
+-- Silver: cadastro vigente de clientes do Portal Alup, uma linha por id.
+-- Retrato diário: vence a ingestão mais recente. CNPJ fica aqui (chave de cruzamento) e não sobe para a Gold.
+SELECT
+  data_referencia AS data_referencia,
+  CAST(NULL AS STRING) AS submercado,
+  CAST(NULL AS STRING) AS codigo_usina,   -- fonte comercial, não tem usina
+  CAST(NULL AS STRING) AS agente_ccee,  -- fonte não traz o agente CCEE
+  FORMAT_DATE('%Y-%m', data_referencia) AS periodo_apuracao,
+  CAST(NULL AS STRING) AS periodo_apuracao_ccee,  -- a origem não declara período CCEE
+  id,
+  nickname,
+  corporate_name,
+  cnpj,
+  _ingestao_id,
+  _ingestao_timestamp
+FROM ${ref("bronze", "portal_alup_client")}
+QUALIFY ROW_NUMBER() OVER (
+  PARTITION BY id
+  ORDER BY _ingestao_timestamp DESC
+) = 1

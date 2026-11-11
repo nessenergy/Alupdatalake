@@ -42,6 +42,7 @@ const limites_horas = {
   ibge_ipca: 780,
   bcb_igpm: 780,
   ccee_pld: 26,
+  bbce_curva_forward: 80, // dias úteis às 20h: da sexta à segunda são 72 h, mais folga
   ccee_perfil: 180,
   ccee_pi_ponto_medicao: 780, // mensal (dia 2) + folga
   ccee_pi_medida: 26,
@@ -61,6 +62,11 @@ const limites_horas = {
   ccee_energia_reserva_consumo_referencia: 780,
   ccee_consumo_classe_agente: 780,
   ccee_consumo_horario_perfil_agente: 780,
+  portal_alup_client: 26,
+  portal_alup_uc: 26,
+  portal_alup_bandeira: 180,
+  portal_alup_invoice: 26,
+  portal_alup_faturas_processadas: 26,
 };
 
 // Linhas para UNNEST no SQL: STRUCT(conector, limite_h).

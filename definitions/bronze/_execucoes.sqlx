@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS ${self()} (
   origem_ingestao_id STRING  OPTIONS(description="Execução cujo raw originou o replay"),
   janela_inicio    DATE      NOT NULL,
   janela_fim       DATE      NOT NULL,
-  status           STRING    NOT NULL OPTIONS(description="SUCESSO | ERRO | EM_EXECUCAO"),
+  status           STRING    NOT NULL OPTIONS(description="SUCESSO | ERRO | SEM_PERMISSAO | EM_EXECUCAO"),
   linhas_extraidas INT64,
   linhas_invalidas INT64,
   linhas_carregadas INT64,

@@ -130,7 +130,8 @@ def main(argv: list[str] | None = None) -> int:
 
     conector = obter(args.conector)
     execucao = conector.ingerir(_janela(args))
-    return 0 if execucao.status == "SUCESSO" else 1
+    # SEM_PERMISSAO sai com 0 de propósito: o erro fica em `_execucoes` e no log, sem o alerta de job falho
+    return 0 if execucao.status in ("SUCESSO", "SEM_PERMISSAO") else 1
 
 
 if __name__ == "__main__":

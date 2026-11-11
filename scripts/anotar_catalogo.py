@@ -114,6 +114,10 @@ ANOTACOES: dict[str, dict[str, str]] = {
     # 4 · Comercial e Contratos
     "posicao_contratual_mensal_perfil": {"dominio": "comercial_e_contratos", "responsavel": PORTFOLIO},
     "consumo_varejista_mensal_uf": {"dominio": "comercial_e_contratos", "responsavel": COMERCIAL},  # varejo
+    # MySQL Alup (Onda 3). Responsável provisório: o mesmo do varejo; a Alupar confirma.
+    "cadastro_uc_cliente": {"dominio": "comercial_e_contratos", "responsavel": COMERCIAL},
+    "fatura_mensal_cliente": {"dominio": "comercial_e_contratos", "responsavel": COMERCIAL},
+    "faturamento_mensal_contrato": {"dominio": "comercial_e_contratos", "responsavel": COMERCIAL},
     # 5 · CRM e Marketing — o documento lista o funil também em Comercial; o
     # aspect aceita um domínio só, e funil de negócio é CRM. O dono é o mesmo.
     "funil_comercial": {"dominio": "crm_e_marketing", "responsavel": COMERCIAL},

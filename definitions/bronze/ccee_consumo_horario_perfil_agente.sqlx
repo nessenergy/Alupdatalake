@@ -16,7 +16,7 @@ config {
 CREATE TABLE IF NOT EXISTS ${self()} (
   data_referencia                      DATE      NOT NULL OPTIONS(description="Dia da hora, derivado do período de comercialização"),
   data_hora                            DATETIME  NOT NULL OPTIONS(description="Hora cheia, horário de Brasília, sem fuso"),
-  periodo_comercializacao              INT64     NOT NULL OPTIONS(description="Índice da hora no mês, 1..744, como a CCEE publica"),
+  periodo_comercializacao              INT64     NOT NULL OPTIONS(description="Hora do dia, 0..23, como a CCEE publica; o dia vem de data_referencia"),
   periodo_apuracao_ccee                STRING    NOT NULL OPTIONS(description="AAAA-MM, como a CCEE declara"),
   versao_publicacao                    DATE      NOT NULL OPTIONS(description="last_modified do recurso no CKAN (ADR 016); a data da carga quando o CKAN não informa"),
   codigo_carga                         INT64     NOT NULL,

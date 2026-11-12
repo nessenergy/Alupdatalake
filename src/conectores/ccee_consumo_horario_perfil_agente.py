@@ -7,9 +7,10 @@ A maior fonte do lake: ~34,9 milhões de linhas por mês (46.890 cargas × 744
 horas), uma linha por carga e por hora, ~11 GiB por mês na Bronze. Dimensionamento
 e custo: `docs/superpowers/specs/2026-11-10-item26-consumo-horario-design.md`.
 
-Mesmo molde do `ccee_geracao_usina` (recurso gzip por mês, `PERIODO_COMERCIALIZACAO`
-1..744 como índice da hora no mês). `transformar()` só repassa texto; quem converte
-e rejeita é o schema, porque só `ValidationError` é capturado por linha pelo runner.
+Mesmo molde do `ccee_geracao_usina` (recurso gzip por mês), mas aqui a coluna `DATA`
+traz o dia e `PERIODO_COMERCIALIZACAO` é a hora do dia (0 a 23), e não o índice no mês.
+`transformar()` só repassa texto; quem converte e rejeita é o schema, porque só
+`ValidationError` é capturado por linha pelo runner.
 
 **Guarda de recarga.** A Bronze é append-only e cada mês pesa ~11 GiB: reler o mês
 a cada execução mensal triplicaria o armazenamento. Antes de baixar, o conector
@@ -31,7 +32,7 @@ from typing import TYPE_CHECKING, Any
 from pydantic import BaseModel, Field, field_validator, model_validator
 
 from src.conectores.ccee_ckan import CceeCsvCkan, limpar, numero_ou_nulo, periodo_ccee
-from src.conectores.ccee_pld import SIGLA_SUBMERCADO, SUBMERCADOS, _data_e_hora
+from src.conectores.ccee_pld import SIGLA_SUBMERCADO, SUBMERCADOS
 from src.core.bigquery import TABELA_EXECUCOES, cliente, rotulos
 from src.core.config import get_settings
 from src.core.registry import registrar
@@ -62,15 +63,15 @@ def _texto_ou_nulo(valor: str | None) -> str | None:
 class ConsumoHorarioPerfilAgente(BaseModel):
     """O consumo de uma carga em uma hora do mês de apuração.
 
-    `data_referencia` e `data_hora` não vêm prontos: são derivados de
-    `mes_referencia` + `periodo_comercializacao` pelo `model_validator`, com a
-    mesma aritmética de `ccee_pld._data_e_hora`. Medidas vazias são nulas.
+    Neste dataset `PERIODO_COMERCIALIZACAO` é a hora do dia (0 a 23) e a coluna
+    `DATA` traz o dia; `data_referencia` e `data_hora` saem dos dois, no
+    `model_validator`. Medidas vazias são nulas.
     """
 
-    mes_referencia: str = Field(exclude=True)  # AAAAMM cru: só deriva data/hora; não é coluna do lake
+    data: date = Field(exclude=True)  # coluna DATA (dd/mm/aaaa): o dia da medida; não é coluna do lake
     data_referencia: date | None = None  # preenchido por `_deriva_data_e_hora`
     data_hora: datetime | None = None  # hora local de Brasília, sem fuso; idem
-    periodo_comercializacao: int = Field(ge=1, le=744)
+    periodo_comercializacao: int = Field(ge=0, le=23, description="Hora do dia (0 a 23), como a CCEE publica")
     periodo_apuracao_ccee: str
     versao_publicacao: date
     codigo_carga: int
@@ -91,6 +92,14 @@ class ConsumoHorarioPerfilAgente(BaseModel):
     consumo_carga_ajustado_acl: Decimal | None = None
     consumo_carga_ajustado: Decimal | None = None
     consumo_carga_ponto_conexao: Decimal | None = None
+
+    @field_validator("data", mode="before")
+    @classmethod
+    def _parseia_data(cls, valor: Any) -> Any:
+        """`dd/mm/aaaa` ou ISO; outro formato vira `ValidationError` (linha inválida)."""
+        if isinstance(valor, str) and "/" in valor:
+            return datetime.strptime(valor.strip(), "%d/%m/%Y").date()
+        return valor
 
     @field_validator("data_migracao", mode="before")
     @classmethod
@@ -114,10 +123,8 @@ class ConsumoHorarioPerfilAgente(BaseModel):
 
     @model_validator(mode="after")
     def _deriva_data_e_hora(self) -> ConsumoHorarioPerfilAgente:
-        """Período fora do mês vira `ValueError` e, dentro do validador, `ValidationError`: linha inválida, contada."""
-        dia, hora = _data_e_hora(self.mes_referencia, self.periodo_comercializacao)
-        self.data_referencia = dia
-        self.data_hora = datetime(dia.year, dia.month, dia.day, hora)
+        self.data_referencia = self.data
+        self.data_hora = datetime(self.data.year, self.data.month, self.data.day, self.periodo_comercializacao)
         return self
 
 
@@ -199,7 +206,7 @@ class CceeConsumoHorarioPerfilAgente(CceeCsvCkan):
         nome = limpar(bruto.get("SUBMERCADO")).upper()
 
         registro: dict[str, Any] = {
-            "mes_referencia": mes,
+            "data": limpar(bruto.get("DATA")),
             "periodo_comercializacao": limpar(bruto.get("PERIODO_COMERCIALIZACAO")),
             "periodo_apuracao_ccee": periodo_ccee(mes),
             "versao_publicacao": bruto["_versao_publicacao"],

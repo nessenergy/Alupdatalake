@@ -3,7 +3,7 @@
 O que estes testes protegem:
 
 - o recurso é mensal (`_AAAAMM`) e gzip, e a janela escolhe quantos meses baixar;
-- `PERIODO_COMERCIALIZACAO` (1..744) vira `data_referencia` e `data_hora`, e período
+- `PERIODO_COMERCIALIZACAO` (0..23, hora do dia) e `DATA` viram `data_referencia` e `data_hora`, e hora
   fora do mês é linha inválida (contada), nunca queda da execução;
 - medida vazia é nula, não zero;
 - a guarda de recarga: a Bronze é append-only e cada mês pesa ~11 GiB, então mês
@@ -72,7 +72,7 @@ def _validos(conector, de="2026-07-01", ate="2026-07-31"):
     return [
         ConsumoHorarioPerfilAgente.model_validate(conector.transformar(b))
         for b in conector.extrair(Janela.de_texto(de, ate))
-        if b["PERIODO_COMERCIALIZACAO"] != "745"
+        if b["PERIODO_COMERCIALIZACAO"] != "24"
     ]
 
 
@@ -94,13 +94,13 @@ def test_extrai_so_o_mes_da_janela(conector):
     assert conector.abertos == ["202607"]
 
 
-def test_transformar_deriva_data_hora_do_periodo(conector):
+def test_transformar_deriva_data_hora_de_data_e_hora(conector):
     primeiro, segundo, *_ = _validos(conector)
 
     assert primeiro.data_referencia == date(2026, 7, 1)
     assert primeiro.data_hora == datetime(2026, 7, 1, 0, 0)
-    assert segundo.periodo_comercializacao == 25
-    assert segundo.data_referencia == date(2026, 7, 2)  # período 25 = hora 0 do dia 2
+    assert segundo.periodo_comercializacao == 0
+    assert segundo.data_referencia == date(2026, 7, 2)  # DATA manda no dia; o período é só a hora
     assert segundo.data_hora == datetime(2026, 7, 2, 0, 0)
 
 
@@ -132,11 +132,11 @@ def test_medida_vazia_e_nula_e_zero_continua_zero(conector):
     assert beta.data_migracao is None
 
 
-def test_periodo_fora_do_mes_e_linha_invalida_sem_derrubar_a_execucao(conector):
+def test_hora_fora_de_0_a_23_e_linha_invalida_sem_derrubar_a_execucao(conector):
     execucao = conector.ingerir(Janela.de_texto("2026-07-01", "2026-07-31"))
 
     assert execucao.linhas_extraidas == 4
-    assert execucao.linhas_invalidas == 1  # período 745; julho tem 744 horas
+    assert execucao.linhas_invalidas == 1  # hora 24: o dia tem horas 0 a 23
     assert execucao.status == "SUCESSO"
 
 

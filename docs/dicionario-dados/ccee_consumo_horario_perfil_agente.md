@@ -26,7 +26,7 @@ O custo de BigQuery é da Alup (regra 4). Por isso:
 
 ## Particularidades
 
-- **`PERIODO_COMERCIALIZACAO` é o índice da hora no mês (1..744)**, como no PLD e no `ccee_geracao_usina`: o 1 é a hora 0 do dia 1, o 25 é a hora 0 do dia 2. `data_referencia` (o dia) e `data_hora` (a hora cheia) são derivadas. Período fora de 1..`dias × 24` do mês é linha inválida, contada em `linhas_invalidas`.
+- **`PERIODO_COMERCIALIZACAO` é a hora do dia (0..23)** e a coluna `DATA` (dd/mm/aaaa) traz o dia, diferente do PLD e do `ccee_geracao_usina`. Constatado na carga de prova de 12/11/2026 (a primeira leitura, que tratava o período como índice 1..744 do mês, colapsou o mês inteiro no dia 1). `data_referencia` é a `DATA` e `data_hora` é a `DATA` mais a hora. Hora fora de 0..23 é linha inválida, contada em `linhas_invalidas`.
 - **`data_hora` é `DATETIME`**: horário de Brasília, sem fuso, como a CCEE publica. Não é conversão para UTC.
 - **Medida vazia é nula, não zero.** Zero continua zero.
 - **Partição pelo dia do consumo**, e não por data de ingestão como nas outras Bronzes: a carga de um mês cai em ~31 partições diárias, e a consulta típica filtra o dia. Cluster por `codigo_carga`, `submercado`, `classe_perfil_agente`.
@@ -42,7 +42,8 @@ O custo de BigQuery é da Alup (regra 4). Por isso:
 |---|---|---|
 | `MES_REFERENCIA` + `PERIODO_COMERCIALIZACAO` | `data_referencia` | DATE, o dia da hora |
 | `MES_REFERENCIA` + `PERIODO_COMERCIALIZACAO` | `data_hora` | DATETIME, hora cheia de Brasília |
-| `PERIODO_COMERCIALIZACAO` | `periodo_comercializacao` | INT64, 1..744 |
+| `DATA` | `data_referencia`, `data_hora` | DATE `dd/mm/aaaa`; o dia da medida |
+| `PERIODO_COMERCIALIZACAO` | `periodo_comercializacao`, `data_hora` | INT64, 0..23 (hora do dia) |
 | `MES_REFERENCIA` | `periodo_apuracao_ccee` | STRING, AAAA-MM |
 | `last_modified` do recurso (CKAN) | `versao_publicacao` | DATE |
 | `CODIGO_CARGA` | `codigo_carga` | INT64 |

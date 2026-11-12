@@ -1,9 +1,22 @@
 # Estado do projeto
 
-Atualizado em **2026-11-10**. Visão de uma página: [`visao-consolidada.md`](visao-consolidada.md). Relatório com as evidências:
+Atualizado em **2026-11-12**. Visão de uma página: [`visao-consolidada.md`](visao-consolidada.md). Relatório com as evidências:
 [`relatorios/2026-10-22-situacao-consolidada.md`](relatorios/2026-10-22-situacao-consolidada.md). Guia de auditoria: [`auditoria.md`](auditoria.md).
 Última auditoria de ponta a ponta, com a conferência de cada número:
 [`relatorios/2026-10-02-auditoria-de-ponta-a-ponta.md`](relatorios/2026-10-02-auditoria-de-ponta-a-ponta.md).
+
+## Atualização de 12/11/2026
+
+Dia 73 de 130 do contrato. Onda 2 termina em 13/11; a Onda 3 começa em 16/11.
+
+- **Sete PRs mesclados em 11/11 (#467 a #473)** e a correção #474 em 12/11. Dev está no deploy da `main`; hml foi implantado em 12/11 com Dataform.
+- **Item 26 (`consumo_horario_perfil_agente`): primeira carga real em dev, com erro de parser achado e corrigido (#474).** A carga de julho/2026 levou 3h06 e gravou 33,4 milhões de linhas, 11,7 GB na Bronze; `MES_REFERENCIA` existe. No dataset, `PERIODO_COMERCIALIZACAO` é a hora do dia (0 a 23) e a coluna `DATA` traz o dia; o conector tratava o período como índice do mês e jogava tudo no dia 1. Corrigido e coberto por teste. A repetição da carga (replay do raw arquivado) e a conferência de unicidade da chave e custo são o que fecha o item; o item segue em `revisao` no painel até lá. A Bronze de dev guarda as linhas erradas de 01/07 (o usuário de leitura não tem permissão de apagar); a Silver as ignora porque a carga nova é mais recente para as mesmas chaves.
+- **CCEE:** o cadastro sem permissão (`4001`) passa a fechar como `SEM_PERMISSAO`, sem derrubar o agendamento (#468); dicionário da medição (#469).
+- **BBCE:** Gold `curva_forward_vigente` com chave única e limite de silêncio de 80h; agendamento ligado em dev e hml (#470).
+- **Onda 3, MySQL Alup (#471):** base `mysql_alup` e cinco conectores `portal_alup_*` com Silver, Gold e dicionário. O teste de integração só roda com a variável de ambiente e a rede da Alupar; a primeira carga real ainda não foi feita. As tabelas `medicao_cinco_minutos_*` ficam de fora até a renomeação.
+- **Produção (#472):** `prod.tfvars` (agendamentos desligados), testes de infra e o [runbook de bootstrap](runbook/bootstrap-producao.md) em 10 passos. A ness. **mantém o acesso de operação e manutenção em prod** depois do handoff (decisão do Ricardo, 11/11). Seguem abertos o orçamento por ambiente em reais e quem concede o papel de faturamento, e a janela de aceite de prod (agenda completa ou só as fontes públicas). Os passos 1 a 9 do runbook são do Ricardo, na conta nominal da ness.
+- **Aditivo 01:** 25 de 25 itens entregues (162h); só o item 26 está fora da contagem, em validação.
+- **Aguardando a Alupar:** unidade (MWh ou kWh), regra da hora e cobertura do perfil `6166` (#462); oito perguntas do MySQL Alup e a granularidade do item 26.
 
 ## Atualização de 09/11/2026
 

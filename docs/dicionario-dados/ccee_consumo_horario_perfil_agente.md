@@ -110,4 +110,6 @@ dadosabertos.ccee.org.br (CKAN) → consumo_horario_perfil_agente_<AAAAMM> (gzip
 
 ## Volume e custo
 
-Estimativa do dimensionamento (a carga de prova mede o real em `INFORMATION_SCHEMA.TABLE_STORAGE`, e o resultado entra aqui): ~340 bytes por linha, ~11 GiB por mês de Bronze, ~US$ 0,26 por mês de armazenamento por mês carregado, ~5,4 horas de carga por mês (extrapolado de 1.800 linhas/s do `ccee_geracao_usina`). Medido na carga de prova: _pendente_.
+Estimativa do dimensionamento (a carga de prova mede o real em `INFORMATION_SCHEMA.TABLE_STORAGE`, e o resultado entra aqui): ~340 bytes por linha, ~11 GiB por mês de Bronze, ~US$ 0,26 por mês de armazenamento por mês carregado, ~5,4 horas de carga por mês (extrapolado de 1.800 linhas/s do `ccee_geracao_usina`). Medido em dev (jul/2026): primeira carga em 3h06, 33,4 milhões de linhas; replay do raw arquivado em 2h54; Bronze com ~11,7 GB; Silver com 34.886.160 linhas (46.890 cargas × 744 horas). O custo de bytes faturados da Silver e das Golds ainda não foi medido.
+
+**Cota de partições.** A Bronze é particionada pelo dia do consumo e cada lote de carga toca os 31 dias do mês. O BigQuery limita as modificações de partição por tabela em janela móvel de 24 horas; a carga de junho em dev, feita no dia seguinte a uma carga e a um replay do mesmo mês, esgotou a cota depois de ~1h38 (`partition_modifications_per_column_partitioned_table`). Regra de operação: um mês por execução e no máximo uma carga ou replay por tabela a cada 24 horas; a reexecução depois da janela é segura, porque a Silver deduplica.

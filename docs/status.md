@@ -5,6 +5,12 @@ Atualizado em **2026-11-12**. Visão de uma página: [`visao-consolidada.md`](vi
 Última auditoria de ponta a ponta, com a conferência de cada número:
 [`relatorios/2026-10-02-auditoria-de-ponta-a-ponta.md`](relatorios/2026-10-02-auditoria-de-ponta-a-ponta.md).
 
+## Atualização de 12/11/2026 (noite)
+
+- **Item 26 em dev:** o Dataform rodou depois do replay e populou as duas Golds (12.648 e 46.890 linhas). A asserção da Silver aceitava só valores não negativos e reprovou 33 linhas de resíduo de medição negativo da CCEE (de 34,9 milhões); a condição foi relaxada em `consumo_carga_acl` e `consumo_carga_ajustado` (#476) e documentada no dicionário.
+- **Carga de junho em dev falhou por cota do BigQuery**, não por defeito do conector: a Bronze é particionada por dia de consumo e a tabela esgotou as modificações de partição das últimas 24 horas (carga e replay de julho no dia anterior). Reexecutar depois da janela; a Silver deduplica. O dicionário registra a regra: um mês por execução, uma carga por tabela a cada 24 horas.
+- **Carga de julho em hml** em andamento (projeto separado, cota própria). Até ela fechar e junho/maio entrarem em dev, o item 26 segue em `revisao`.
+
 ## Atualização de 12/11/2026
 
 Dia 73 de 130 do contrato. Onda 2 termina em 13/11; a Onda 3 começa em 16/11.

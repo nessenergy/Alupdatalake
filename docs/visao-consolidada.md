@@ -1,6 +1,6 @@
 # Visão consolidada do AlupData
 
-Posição em **05/11/2026**. Uma página para quem chega ao projeto agora. O detalhe e as evidências estão em
+Posição em **12/11/2026**. Uma página para quem chega ao projeto agora. O detalhe e as evidências estão em
 [`relatorios/2026-10-22-situacao-consolidada.md`](relatorios/2026-10-22-situacao-consolidada.md).
 
 ## O que é
@@ -15,19 +15,18 @@ Cada fonte só está entregue com os **7 componentes** da cláusula 2ª: conecto
 |---|---|---|---|
 | 0 | Fundação e arquitetura | 31/08 a 11/09 | **Aprovada** (05/10) |
 | 1 | Mercado: APIs públicas | 14/09 a 16/10 | **Aprovada** (05/10), com IPDO e ACOMPH sem entrega |
-| 2 | APIs com credenciais | 19/10 a 13/11 | **Em andamento**: Hubspot e BBCE carregam em dev e hml; CCEE aguarda a Alupar; TempoOK fora do escopo |
-| 3 | Sistemas internos | 16/11 a 18/12 | **Em andamento**: 2 de 3 bancos conectam; FMB depende da DCIDE; faltam esquemas |
+| 2 | APIs com credenciais | 19/10 a 13/11 | **Em andamento**: Hubspot, BBCE e a medição da CCEE carregam em dev e hml; resta a ONS autenticada (IPDO e ACOMPH); TempoOK fora do escopo |
+| 3 | Sistemas internos | 16/11 a 18/12 | **Em andamento**: MySQL Alup com código pronto e sem carga real; FMB depende da DCIDE; faltam esquemas |
 | 4 | Planilhas, governança e handoff | 21/12 a 08/01/2027 | **Em andamento**: motor pronto; Drive aceito; faltam modelos de planilha |
 
 ## Em números
 
 | | |
 |---|---|
-| Conectores | **58**, todos com os 7 componentes presentes |
-| Testes | **2.095 aprovados**, 534 ignorados por desenho (medido em 05/11); cobertura **96%** (medida em 22/10) |
-| Ambientes | `dev` e `hml` aplicados; **produção ainda não existe** |
-| Saúde da ingestão | dev: 56 OK; hml: 55 OK (CCEE PI: 2 entidades novas sem deploy) |
-| Documentação | 30 ADRs, 60 dicionários, 9 runbooks |
+| Conectores | **64** registrados, todos com os 7 componentes presentes; Aditivo 01 com 25 de 25 itens entregues e o 26 em validação |
+| Testes | **2.292 aprovados**, 607 ignorados por desenho (medido em 12/11); cobertura **96%** (medida em 22/10) |
+| Ambientes | `dev` e `hml` aplicados; **produção ainda não existe**, com `prod.tfvars` e runbook de bootstrap prontos (agendamentos desligados) |
+| Documentação | 30 ADRs, 64 dicionários, 11 runbooks |
 
 ## Como o projeto é organizado
 
@@ -44,8 +43,8 @@ Cada fonte só está entregue com os **7 componentes** da cláusula 2ª: conecto
 
 | De | O quê |
 |---|---|
-| Alupar | gravar os valores da ONS e da CCEE e informar o formato do certificado; tabelas do MySQL Comercialização e datas das renomeações; negócio do Hubspot; RM/TOTVS; chamado com a DCIDE; pasta do Drive e planilhas modelo |
-| ness. | reaplicar o bootstrap em dev e hml; decidir a produção; decidir sobre DECOMP e NEWAVE |
+| Alupar | valores da ONS; cadastro de pontos da CCEE (perfil negado) e a unidade e a regra da hora da medição; tabelas do MySQL Comercialização e datas das renomeações; negócio do Hubspot; RM/TOTVS; chamado com a DCIDE; pasta do Drive e planilhas modelo |
+| ness. | bootstrap de produção (passos 1 a 9 do runbook, na conta da ness.); orçamento por ambiente; janela de aceite de prod; decidir sobre DECOMP e NEWAVE |
 
 ## Para auditar
 

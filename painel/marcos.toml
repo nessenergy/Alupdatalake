@@ -56,8 +56,8 @@ pronto = 1.0
 codigo = "0.12"
 titulo = "Matriz RACI e data owners"
 horas = 4
-pronto = 0.75
-nota = "RACI recebida; dois pontos abertos (#150)"
+pronto = 1.0
+nota = "RACI recebida; a #150 foi encerrada em 29/10 (comitê definido na prática)"
 
 [[onda.item]]
 codigo = "0.13"
@@ -148,21 +148,21 @@ marco_pct = 18.97
 janela = [2026-10-19, 2026-11-13]
 trabalho_desde = 2026-08-26
 estado = "aguarda_alup"
-entidades = ["hubspot_negocios", "bbce_curva_forward"]
+entidades = ["hubspot_negocios", "bbce_curva_forward", "ccee_pi_ponto_medicao", "ccee_pi_medida"]
 
 [[onda.item]]
 codigo = "2.1"
 titulo = "CCEE agente credenciado"
 horas = 32
-pronto = 0.0
-nota = "depende da credencial de agente (#260)"
+pronto = 0.7
+nota = "leitura real com o usuário ace em 09/11; medição carregada em dev e hml; o cadastro de pontos segue negado ao perfil 6166 (#462)"
 
 [[onda.item]]
 codigo = "2.2"
 titulo = "BBCE"
 horas = 28
 pronto = 0.9
-nota = "carga em dev e hml em 28/10 (254 linhas), Silver e Gold em dev; faltam a Gold em hml e o dossiê"
+nota = "carga em dev e hml em 28/10 (254 linhas); Gold com chave única e agendamento ligado em dev e hml; falta o dossiê"
 
 [[onda.item]]
 codigo = "2.3"
@@ -183,7 +183,7 @@ codigo = "2.5"
 titulo = "Tabelas Gold de preço e posição comercial"
 horas = 12
 pronto = 0.7
-nota = "tabelas escritas; vazias até as credenciais"
+nota = "tabelas escritas; a Gold da BBCE tem 254 linhas; o escopo do que falta depende das demais fontes"
 
 [[onda]]
 numero = 3
@@ -206,7 +206,8 @@ nota = "rede do lado GCP pronta; faltam rede local, credencial e conectores"
 codigo = "3.2"
 titulo = "Portal Alup"
 horas = 40
-pronto = 0.0
+pronto = 0.5
+nota = "base mysql_alup e cinco conectores portal_alup_* com Silver, Gold e dicionário (#471); sem carga real, faltam rede e credencial"
 
 [[onda.item]]
 codigo = "3.3"
@@ -422,13 +423,13 @@ dono = "Alup"
 
 [[marco]]
 data = 2026-10-19
-titulo = "Prazo contratual dos tokens da Onda 2 (cláusula 3ª): Hubspot gravado em 20/10 e BBCE em uso em 28/10; ONS e CCEE aguardam os valores; TempoOK fora do escopo"
-estado = "previsto"
+titulo = "Prazo contratual dos tokens da Onda 2 (cláusula 3ª): Hubspot gravado em 20/10, BBCE em uso em 28/10 e CCEE em 09/11; resta a ONS; TempoOK fora do escopo"
+estado = "feito"
 dono = "Alup"
 
 [[marco]]
 data = 2026-11-13
-titulo = "Fim da janela da Onda 2: valores da ONS e da CCEE gravados nos segredos (IPDO editável, ACOMPH e CCEE credenciado)"
+titulo = "Fim da janela da Onda 2: valores da ONS gravados no segredo (IPDO editável e ACOMPH); a CCEE foi gravada em 09/11"
 estado = "previsto"
 dono = "Alup"
 
@@ -498,11 +499,29 @@ estado = "feito"
 [[marco]]
 data = 2026-11-06
 titulo = "Reunião com a Alupar: usuário dedicado e perfil de agente por ponto para a CCEE"
-estado = "previsto"
+estado = "feito"
 dono = "Alup"
 
 [[marco]]
 data = 2026-11-09
 titulo = "CCEE: credenciais gravadas e primeira leitura real com sucesso (24 medidas de um ponto, produção da CCEE)"
+estado = "feito"
+dono = "ness."
+
+[[marco]]
+data = 2026-11-11
+titulo = "Sete PRs mesclados: MySQL Alup (base e cinco conectores portal_alup_*), Gold da BBCE com chave única, preparo da produção (prod.tfvars e runbook de 10 passos) e item 26 do Aditivo 01"
+estado = "feito"
+dono = "ness."
+
+[[marco]]
+data = 2026-11-12
+titulo = "Item 26 do Aditivo 01: primeira carga real em dev achou e corrigiu o parser; Silver de jul/2026 com 34.886.160 linhas, chave única; as duas Golds populadas"
+estado = "feito"
+dono = "ness."
+
+[[marco]]
+data = 2026-11-12
+titulo = "Decisão: a ness. mantém o acesso de operação e manutenção em produção depois do handoff"
 estado = "feito"
 dono = "ness."

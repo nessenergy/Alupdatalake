@@ -84,7 +84,7 @@ Chave natural: (`data_referencia`, `data_hora`, `codigo_carga`) — uma linha po
 
 ## Silver — asserções
 
-`uniqueKey` na chave acima, `nonNull` nas chaves e no perfil, submercado em N/NE/S/SE, `periodo_apuracao = periodo_apuracao_ccee` e medidas `>= 0`. A Gold só roda se elas passarem.
+`uniqueKey` na chave acima, `nonNull` nas chaves e no perfil, submercado em N/NE/S/SE, `periodo_apuracao = periodo_apuracao_ccee` e `consumo_carga_ajustado_acl` e `consumo_carga_ponto_conexao` `>= 0`. `consumo_carga_acl` e `consumo_carga_ajustado` não têm essa condição: a carga de jul/2026 trouxe 33 linhas (8 cargas, 3 dias) com resíduo de medição negativo, entre -0,057 e -0,000007 MWh, que é dado da CCEE e fica como veio. A Gold só roda se elas passarem.
 
 ## Gold
 

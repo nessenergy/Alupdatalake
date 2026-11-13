@@ -8,9 +8,7 @@ config {
     rowConditions: [
       "submercado IN ('N','NE','S','SE')",
       "periodo_apuracao = periodo_apuracao_ccee",
-      "consumo_carga_acl >= 0",
       "consumo_carga_ajustado_acl >= 0",
-      "consumo_carga_ajustado >= 0",
       "consumo_carga_ponto_conexao >= 0"
     ]
   }

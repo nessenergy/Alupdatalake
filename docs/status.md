@@ -1,9 +1,26 @@
 # Estado do projeto
 
-Atualizado em **2026-11-18**. Visão de uma página: [`visao-consolidada.md`](visao-consolidada.md). Relatório com as evidências:
+Atualizado em **2026-11-19**. Visão de uma página: [`visao-consolidada.md`](visao-consolidada.md). Relatório com as evidências:
 [`relatorios/2026-10-22-situacao-consolidada.md`](relatorios/2026-10-22-situacao-consolidada.md). Guia de auditoria: [`auditoria.md`](auditoria.md).
 Última auditoria de ponta a ponta, com a conferência de cada número:
 [`relatorios/2026-10-02-auditoria-de-ponta-a-ponta.md`](relatorios/2026-10-02-auditoria-de-ponta-a-ponta.md).
+
+## Atualização de 19/11/2026
+
+Dia 80 de 130 do contrato; restam 50 dias.
+
+- **Item 26 em hml: replay do raw concluído, verificação pendente.** O `reprocessar-raw` de julho (run 44501287628, 3h03) terminou com sucesso em 19/11. O Dataform de hml e a conferência de cargas não rodaram: o GitHub Actions da organização recusa iniciar jobs ("recent account payments have failed or your spending limit needs to be increased", runs 44529719746 e 44530043393). Até o Actions voltar, a Silver de hml não foi conferida; o esperado é 34.886.160 linhas em julho (46.890 cargas × 744 h) e `consumo_mensal_carga` com 46.890. Item segue em `revisao`.
+- **Ondas e faturamento (valores e datas do contrato; efeitos da cláusula 3ª ficam como fato, sem decisão):**
+
+| Marco | Onda | Data-alvo | Valor | Situação registrada |
+|---|---|---|---|---|
+| 1 | 0, Fundação | 11/09 | R$ 23.040,00 | Aceita por escrito em 05/10 (Eduardo Pires) e faturada |
+| 2 | 1, Mercado | 16/10 | R$ 30.720,00 | Aceita por escrito em 05/10 e faturada (marcos 1 e 2 somam R$ 53.760,00) |
+| 3 | 2, Credenciais | 13/11 | R$ 28.160,00 | Janela encerrada em 13/11. Sem registro de pedido de aceite no repositório. Credenciais: Hubspot 20/10, BBCE 28/10, CCEE 09/11; ONS sem registro de entrega no painel; TempoOK fora do escopo |
+| 4 | 3, Sistemas internos | 18/12 | R$ 39.680,00 | Janela iniciada em 16/11. MySQL Alup e MySQL Comercialização conectam; Oracle FMB depende da rota da DCIDE (passos G6, L1 a L7, N3 com a Alup); RM/TOTVS sem acesso registrado |
+| 5 | 4 + Handoff | 08/01/2027 | R$ 26.880,00 | Motor S2 pronto; faltam as planilhas e os templates (Alup) |
+
+  Total faturado: R$ 53.760,00 de R$ 148.480,00 (36,2%). Os R$ 94.720,00 restantes estão nos marcos 3 a 5.
 
 ## Atualização de 18/11/2026
 

@@ -37,7 +37,7 @@ As credenciais da ONS (IPDO editável e ACOMPH) pertencem à Onda 1 e seguem reg
 |---|---|---|---|
 | 2.1 | CCEE agente credenciado | **entregue**: leitura real em 09/11 e medição carregada em dev e hml. Ressalva: cadastro de pontos aguarda a permissão da Alupar | §3.1 |
 | 2.2 | BBCE | **entregue**: carga real e agendamento em dev e hml | §3.2 |
-| 2.3 | Hubspot | **entregue**: carga real em 22/10 nos dois ambientes; agendamento em PR (#482) | §3.3 |
+| 2.3 | Hubspot | **entregue**: carga real em 22/10 nos dois ambientes; agendamento criado em 19/11 (#482) | §3.3 |
 | 2.4 | TempoOK | **fora do escopo**, com horas contabilizadas | — |
 | 2.5 | Gold de preço e posição comercial | **entregue** para BBCE e Hubspot | §3.2, §3.3 |
 
@@ -63,8 +63,8 @@ Fica registrado como dependência da Alupar, sem prejuízo da entrega da mediç�
 
 Carga real em 22/10 nos dois ambientes. A Silver recusa negócio fora da regra e o envia à quarentena: hoje há 1
 (fechamento anterior à criação), à espera de correção na origem. O agendamento estava fora por um registro antigo
-("sem credencial") e foi corrigido no PR #482; a primeira execução agendada confirma o componente.
-〔a conferir: linhas da Silver e da Gold `funil_comercial` em cada ambiente〕
+("sem credencial") e foi corrigido no #482, aplicado em dev e hml em 19/11; a primeira execução agendada confirma o componente.
+Conferido em 19/11 nos dois ambientes: Silver `hubspot_negocios` com 208 negócios (criados de 20 a 21/10), Gold `funil_comercial` com 7 linhas e 1 negócio em quarentena.
 
 ## 4. O que fecha depois da emissão
 

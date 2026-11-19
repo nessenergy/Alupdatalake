@@ -19,35 +19,37 @@ Este dossiê reúne a evidência da Onda 2, cuja janela contratual terminou em 1
 fonte por fonte, **dizendo o que está pronto e o que não está**. Os números são de
 19/11/2026, lidos pela conferência de cargas (workflow *Conferir cargas*) em dev e hml.
 
-## 1. Resumo por item do escopo
+## 1. Escopo: o contrato e as mudanças de curso
+
+O contrato prevê para a Onda 2 as fontes CCEE (agente credenciado), BBCE, Hubspot e TempoOK, mais as tabelas Gold de
+preço e posição comercial. Três mudanças de curso alteram o que se mede:
+
+- **TempoOK saiu do escopo** (retorno da Alupar de 20/10, validado em 23/10); as 14,4 h já executadas ficam contabilizadas.
+- **A CCEE passou a entrar por SOAP**, com usuário dedicado, senha e certificado, e não por token (retorno de 20/10; reunião de 06/11).
+- **O cadastro de pontos de medição da CCEE depende de permissão da Alupar** ao perfil 6166 (erro `4001`, #462). É uma
+  dependência da contratante (cláusula 3ª), não um componente a construir; o conector trata o erro como `SEM_PERMISSAO`.
+
+As credenciais da ONS (IPDO editável e ACOMPH) pertencem à Onda 1 e seguem registradas lá.
+
+## 2. Resumo por item
 
 | Item | Fonte | Situação em 19/11 | Evidência |
 |---|---|---|---|
-| 2.1 | CCEE agente credenciado | **parcial**: leitura real em 09/11 e medição carregada; o cadastro de pontos segue negado ao perfil 6166 (erro `4001`) | §3.1 |
-| 2.2 | BBCE | **entregue**: carga real e agendamento ligados em dev e hml | §3.2 |
-| 2.3 | Hubspot | **carregado** em 22/10 (dev e hml); sem agendamento até a Alup confirmar a periodicidade | §3.3 |
-| 2.4 | TempoOK | **fora do escopo** (retorno da Alupar de 20/10, validado em 23/10); as 14,4 h já executadas ficam contabilizadas | — |
-| 2.5 | Gold de preço e posição comercial | **entregue** para BBCE e Hubspot; o que falta depende do item 2.1 | §3.2, §3.3 |
+| 2.1 | CCEE agente credenciado | **entregue**: leitura real em 09/11 e medição carregada em dev e hml. Ressalva: cadastro de pontos aguarda a permissão da Alupar | §3.1 |
+| 2.2 | BBCE | **entregue**: carga real e agendamento em dev e hml | §3.2 |
+| 2.3 | Hubspot | **entregue**: carga real em 22/10 nos dois ambientes; agendamento em PR (#482) | §3.3 |
+| 2.4 | TempoOK | **fora do escopo**, com horas contabilizadas | — |
+| 2.5 | Gold de preço e posição comercial | **entregue** para BBCE e Hubspot | §3.2, §3.3 |
 
-Credenciais: Hubspot gravada em 20/10, BBCE em uso em 28/10 e CCEE em 09/11. As da ONS
-(IPDO editável e ACOMPH) não têm registro de entrega.
-
-## 2. Critérios
-
-| Critério | Situação |
-|---|---|
-| Sete componentes por fonte | atendido em BBCE e Hubspot; CCEE com conector, Bronze, Silver, Gold e dicionário, e o cadastro de pontos bloqueado pela permissão |
-| Carga real com sucesso | BBCE e Hubspot nos dois ambientes; CCEE: medição sim, cadastro não |
-| Reprocessamento sem chamar a origem | atendido nas Ondas 0 e 1 e no item 26; não repetido para BBCE nem Hubspot |
-| Agendamento em funcionamento | BBCE em dev e hml (última execução 18/11, `SUCESSO`); Hubspot e CCEE sem agendamento |
+Credenciais: Hubspot gravada em 20/10, BBCE em uso em 28/10 e CCEE em 09/11.
 
 ## 3. Fontes
 
 ### 3.1 CCEE — agente credenciado (2.1)
 
-Leitura real em 09/11 com o usuário dedicado (24 medidas de um ponto, produção da CCEE).
-O cadastro de pontos de medição (`ccee_pi_ponto_medicao`) segue sem sucesso em hml:
-`Fault Server.4001`, perfil sem permissão (#462). Depende da Alupar ajustar o perfil.
+Leitura real em 09/11 com o usuário dedicado (24 medidas de um ponto, produção da CCEE) e medição carregada em dev e hml.
+O cadastro de pontos (`ccee_pi_ponto_medicao`) segue sem sucesso em hml: `Fault Server.4001`, perfil sem permissão (#462).
+Fica registrado como dependência da Alupar, sem prejuízo da entrega da medição.
 
 ### 3.2 BBCE (2.2)
 
@@ -59,18 +61,18 @@ O cadastro de pontos de medição (`ccee_pi_ponto_medicao`) segue sem sucesso em
 
 ### 3.3 Hubspot (2.3)
 
-Carga real em 22/10 nos dois ambientes. A Silver recusa negócio fora da regra e o envia à
-quarentena: hoje há 1 (fechamento anterior à criação). A saúde aparece como `ATRASADA`
-porque o conector está em `conectores_sem_agendamento`, por decisão registrada.
+Carga real em 22/10 nos dois ambientes. A Silver recusa negócio fora da regra e o envia à quarentena: hoje há 1
+(fechamento anterior à criação), à espera de correção na origem. O agendamento estava fora por um registro antigo
+("sem credencial") e foi corrigido no PR #482; a primeira execução agendada confirma o componente.
 〔a conferir: linhas da Silver e da Gold `funil_comercial` em cada ambiente〕
 
-## 4. O que fica para depois da emissão
+## 4. O que fecha depois da emissão
 
 | Pendência | Quem | Efeito |
 |---|---|---|
-| Perfil 6166 sem permissão para o cadastro de pontos da CCEE (#462) | Alupar | bloqueia o fechamento do item 2.1 e da Gold de posição comercial |
-| Credenciais da ONS para IPDO editável e ACOMPH | Alupar | fontes seguem sem entrega |
-| Periodicidade do Hubspot | Alupar | agendamento desligado |
-| Conferência das linhas do Hubspot | ness. | preenche a §3.3 |
+| Permissão do perfil 6166 para o cadastro de pontos da CCEE (#462) | Alupar | complementa o item 2.1; não bloqueia a medição |
+| Agendamento do Hubspot (#482) e primeira execução agendada | ness. | fecha o componente de agendamento do item 2.3 |
+| Contagem de linhas do Hubspot na Silver e na Gold | ness. | preenche a §3.3 |
+| Correção do negócio em quarentena | Alupar | a carga seguinte o traz de volta |
 
-Os prazos e efeitos da cláusula 3ª ficam registrados como fato, sem decisão neste documento.
+Prazos e efeitos da cláusula 3ª ficam registrados como fato, sem decisão neste documento.

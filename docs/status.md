@@ -9,7 +9,7 @@ Atualizado em **2026-11-19**. Visão de uma página: [`visao-consolidada.md`](vi
 
 Dia 80 de 130 do contrato; restam 50 dias.
 
-- **Item 26 em hml: replay do raw concluído, verificação pendente.** O `reprocessar-raw` de julho (run 44501287628, 3h03) terminou com sucesso em 19/11. O Dataform de hml e a conferência de cargas não rodaram: o GitHub Actions da organização recusa iniciar jobs ("recent account payments have failed or your spending limit needs to be increased", runs 44529719746 e 44530043393). Até o Actions voltar, a Silver de hml não foi conferida; o esperado é 34.886.160 linhas em julho (46.890 cargas × 744 h) e `consumo_mensal_carga` com 46.890. Item segue em `revisao`.
+- **Item 26 em hml: carga válida e conferida.** O `reprocessar-raw` de julho (run 44501287628, 3h03) terminou em 19/11; o GitHub Actions ficou bloqueado por cobrança por algumas horas (runs 44529719746, 44530043393, 44530408428 e 44536829900) e, ao voltar, o Dataform de hml rodou com sucesso (run 44537428378) e a conferência confirmou: Silver com 34.886.160 linhas (01 a 31/07, 46.890 cargas × 744 h), `consumo_mensal_carga` com 46.890 e `consumo_horario_submercado_classe` com 12.648, iguais às de dev. O item 26 tem agora três meses válidos em dev e um em hml; segue em `revisao` no painel só pela granularidade (11,7 GB/mês), que aguarda a Alupar.
 - **Ondas e faturamento (valores e datas do contrato; efeitos da cláusula 3ª ficam como fato, sem decisão):**
 
 | Marco | Onda | Data-alvo | Valor | Situação registrada |

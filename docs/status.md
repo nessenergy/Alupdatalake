@@ -8,7 +8,7 @@ Atualizado em **2026-11-18**. Visão de uma página: [`visao-consolidada.md`](vi
 ## Atualização de 18/11/2026
 
 - **Item 26 com a janela de validação cumprida:** junho (17/11, 3h08) e maio (18/11, 3h27) entraram em dev depois da janela de 24 horas da cota de partições, ambos com `SUCESSO`; com julho, são três meses em dev. Julho em hml fechou em 13/11 (3h20) e o Dataform rodou em hml e em dev (18/11) em `SUCCEEDED`, com as asserções do item dentro da execução. O item segue em `revisao` no painel: a granularidade (11,7 GB/mês) aguarda a Alupar.
-- **Não verificado:** as contagens das Golds em hml e em dev depois da recarga. O usuário de leitura do MCP não tem permissão nos projetos e o relatório de "Conferir cargas" ainda não traz linhas do item 26.
+- **Contagens em dev (conferidas em 19/11):** Silver com 102.883.104 linhas de 01/05 a 31/07; maio 34.332.624 (46.146 cargas × 744 h), junho 33.664.320 (46.756 × 720 h) e julho 34.886.160 (46.890 × 744 h), sem duplicata nem lacuna. `consumo_mensal_carga` tem 139.792 linhas e `consumo_horario_submercado_classe`, 37.536. **Em hml a contagem segue pendente:** o ambiente só aceita execução da `main`, então depende de mesclar a conferência do item 26 (#480).
 - **Segurança de dependências:** `opentelemetry-api` 1.45.2 (CVE-2026-126360) mesclado em #478; a auditoria da `main` voltou a passar.
 
 ## Atualização de 12/11/2026 (noite)

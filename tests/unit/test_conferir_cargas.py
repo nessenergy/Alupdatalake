@@ -232,7 +232,6 @@ EXCECOES_DA_CONFERENCIA = frozenset(
         "ccee_pld",
         "ccee_reserva_encargo",
         "ccee_varejista_consumidor",
-        "hubspot_negocios",
         "ibge_ipca",
         "ons_balanco_energia",
         "ons_capacidade",
@@ -263,6 +262,12 @@ def test_toda_silver_esta_na_conferencia_ou_na_lista_de_excecoes():
     assert silvers - set(cc.SILVER) - EXCECOES_DA_CONFERENCIA == set()
     assert not EXCECOES_DA_CONFERENCIA & set(cc.SILVER), "fonte na lista e na exceção ao mesmo tempo"
     assert silvers >= EXCECOES_DA_CONFERENCIA, "exceção de Silver que não existe mais"
+
+
+def test_hubspot_entra_com_silver_e_gold_na_conferencia():
+    sql = " ".join(i.sql for _, itens in cc.montar_conjuntos("p", "bronze", "silver", "gold") for i in itens)
+    assert "`p.silver.hubspot_negocios`" in sql
+    assert "`p.gold.funil_comercial`" in sql
 
 
 def test_bbce_entra_com_silver_gold_e_log_de_execucoes():

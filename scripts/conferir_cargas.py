@@ -50,7 +50,7 @@ SILVER_ONDA_1 = (
     "ace_prc",
     "bcb_igpm",
 )
-SILVER_ONDA_2 = ("bbce_curva_forward",)
+SILVER_ONDA_2 = ("bbce_curva_forward", "ccee_consumo_horario_perfil_agente")
 SILVER = SILVER_ADITIVO + SILVER_ONDA_1 + SILVER_ONDA_2
 GOLD = (
     "curva_forward_vigente",
@@ -58,6 +58,8 @@ GOLD = (
     "tarifa_vigente_distribuidora",
     "prc_vigente_comercializadora",
     "demanda_maxima_mensal_subsistema",
+    "consumo_mensal_carga",
+    "consumo_horario_submercado_classe",
 )
 
 _PROIBIDAS = re.compile(
@@ -137,6 +139,17 @@ def montar_conjuntos(projeto: str, bronze: str, silver: str, gold: str) -> list[
                 "SELECT COUNT(*) AS linhas, COUNT(DISTINCT bacia) AS bacias, MIN(data_referencia) AS data_min, "
                 "MAX(data_referencia) AS data_max, COUNTIF(estacoes_validas = 0) AS dias_sem_estacao_completa FROM $t",
                 t=tabela(gold, "precipitacao_diaria_bacia"),
+            ),
+        )
+    )
+    # Item 26 (35 milhões de linhas por mês): a contagem por mês mostra se a janela de 3 meses entrou inteira.
+    silver_itens.append(
+        Item(
+            "ccee_consumo_horario_perfil_agente_por_mes",
+            _sql(
+                "SELECT FORMAT_DATE('%Y-%m', data_referencia) AS mes, COUNT(*) AS linhas, "
+                "COUNT(DISTINCT codigo_carga) AS cargas FROM $t GROUP BY mes ORDER BY mes",
+                t=tabela(silver, "ccee_consumo_horario_perfil_agente"),
             ),
         )
     )

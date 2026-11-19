@@ -50,10 +50,11 @@ SILVER_ONDA_1 = (
     "ace_prc",
     "bcb_igpm",
 )
-SILVER_ONDA_2 = ("bbce_curva_forward", "ccee_consumo_horario_perfil_agente")
+SILVER_ONDA_2 = ("bbce_curva_forward", "hubspot_negocios", "ccee_consumo_horario_perfil_agente")
 SILVER = SILVER_ADITIVO + SILVER_ONDA_1 + SILVER_ONDA_2
 GOLD = (
     "curva_forward_vigente",
+    "funil_comercial",
     "igpm_mensal",
     "tarifa_vigente_distribuidora",
     "prc_vigente_comercializadora",

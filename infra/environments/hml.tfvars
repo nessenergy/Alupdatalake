@@ -12,8 +12,8 @@ environment = "hml"
 # a homologação das Ondas 0 e 1; fecha (volta para false) depois do aceite.
 agendamentos_ativos = true # janela de homologação das Ondas 0 e 1, 25/09
 emails_alerta       = ["operacao-datalake@ness.com.br", "alup.alertas@alupar.com.br"]
-# A BBCE saiu da lista em 10/11: a credencial está gravada e a carga de 28/10 funcionou (#434).
-conectores_sem_agendamento = ["hubspot_negocios"]
+# A BBCE saiu da lista em 10/11 (#434) e o Hubspot em 19/11 (token gravado em 20/10, carga real em 22/10).
+conectores_sem_agendamento = []
 
 # Quem grava versão de secret sem poder ler (ADR 015): o token do Dataform em
 # hml é da ness., gravado pelo grupo de operação da ness. Nunca pessoa (R01).

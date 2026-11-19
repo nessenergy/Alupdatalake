@@ -1,9 +1,32 @@
 # Estado do projeto
 
-Atualizado em **2026-11-12**. Visão de uma página: [`visao-consolidada.md`](visao-consolidada.md). Relatório com as evidências:
+Atualizado em **2026-11-19**. Visão de uma página: [`visao-consolidada.md`](visao-consolidada.md). Relatório com as evidências:
 [`relatorios/2026-10-22-situacao-consolidada.md`](relatorios/2026-10-22-situacao-consolidada.md). Guia de auditoria: [`auditoria.md`](auditoria.md).
 Última auditoria de ponta a ponta, com a conferência de cada número:
 [`relatorios/2026-10-02-auditoria-de-ponta-a-ponta.md`](relatorios/2026-10-02-auditoria-de-ponta-a-ponta.md).
+
+## Atualização de 19/11/2026
+
+Dia 80 de 130 do contrato; restam 50 dias.
+
+- **Item 26 em hml: carga válida e conferida.** O `reprocessar-raw` de julho (run 44501287628, 3h03) terminou em 19/11; o GitHub Actions ficou bloqueado por cobrança por algumas horas (runs 44529719746, 44530043393, 44530408428 e 44536829900) e, ao voltar, o Dataform de hml rodou com sucesso (run 44537428378) e a conferência confirmou: Silver com 34.886.160 linhas (01 a 31/07, 46.890 cargas × 744 h), `consumo_mensal_carga` com 46.890 e `consumo_horario_submercado_classe` com 12.648, iguais às de dev. O item 26 tem agora três meses válidos em dev e um em hml; segue em `revisao` no painel só pela granularidade (11,7 GB/mês), que aguarda a Alupar.
+- **Ondas e faturamento (valores e datas do contrato; efeitos da cláusula 3ª ficam como fato, sem decisão):**
+
+| Marco | Onda | Data-alvo | Valor | Situação registrada |
+|---|---|---|---|---|
+| 1 | 0, Fundação | 11/09 | R$ 23.040,00 | Aceita por escrito em 05/10 (Eduardo Pires) e faturada |
+| 2 | 1, Mercado | 16/10 | R$ 30.720,00 | Aceita por escrito em 05/10 e faturada (marcos 1 e 2 somam R$ 53.760,00) |
+| 3 | 2, Credenciais | 13/11 | R$ 28.160,00 | Janela encerrada em 13/11. Sem registro de pedido de aceite no repositório. Credenciais: Hubspot 20/10, BBCE 28/10, CCEE 09/11; ONS sem registro de entrega no painel; TempoOK fora do escopo |
+| 4 | 3, Sistemas internos | 18/12 | R$ 39.680,00 | Janela iniciada em 16/11. MySQL Alup e MySQL Comercialização conectam; Oracle FMB depende da rota da DCIDE (passos G6, L1 a L7, N3 com a Alup); RM/TOTVS sem acesso registrado |
+| 5 | 4 + Handoff | 08/01/2027 | R$ 26.880,00 | Motor S2 pronto; faltam as planilhas e os templates (Alup) |
+
+  Total faturado: R$ 53.760,00 de R$ 148.480,00 (36,2%). Os R$ 94.720,00 restantes estão nos marcos 3 a 5.
+
+## Atualização de 18/11/2026
+
+- **Item 26 com a janela de validação cumprida:** junho (17/11, 3h08) e maio (18/11, 3h27) entraram em dev depois da janela de 24 horas da cota de partições, ambos com `SUCESSO`; com julho, são três meses em dev. **Julho em hml não está válido:** a carga de 13/11 (3h20) rodou com a imagem anterior à correção do parser (#474, mesclado depois do deploy de 12/11 18:23); a Silver de hml tem 1.078.470 linhas, todas em 01/07, e a carga registrou 1.453.621 linhas inválidas. Nova tentativa em 19/11 extraiu 0 linhas, porque o conector não relê um mês que a Bronze já tem concluído; o caminho é o replay do raw arquivado de hml (`reprocessar-raw`, como em dev), que precisa do URI com o `ingestao_id`. O Dataform em dev rodou em `SUCCEEDED` (18/11). O item segue em `revisao` no painel: falta o hml válido, e a granularidade (11,7 GB/mês) aguarda a Alupar.
+- **Contagens em dev (conferidas em 19/11):** Silver com 102.883.104 linhas de 01/05 a 31/07; maio 34.332.624 (46.146 cargas × 744 h), junho 33.664.320 (46.756 × 720 h) e julho 34.886.160 (46.890 × 744 h), sem duplicata nem lacuna. `consumo_mensal_carga` tem 139.792 linhas e `consumo_horario_submercado_classe`, 37.536. **Em hml (conferido pela `main` após o #480):** Silver com 1.078.470 linhas em 01/07, `consumo_mensal_carga` com 46.890 e `consumo_horario_submercado_classe` com 391, o que confirma o parser antigo.
+- **Segurança de dependências:** `opentelemetry-api` 1.45.2 (CVE-2026-126360) mesclado em #478; a auditoria da `main` voltou a passar.
 
 ## Atualização de 12/11/2026 (noite)
 

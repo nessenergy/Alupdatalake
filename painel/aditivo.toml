@@ -236,4 +236,4 @@ titulo = "Consumo Horário por Perfil de Agente"
 horas = 6
 estado = "revisao"
 prs = [473, 474, 476]
-nota = "Implementado (7 componentes). Carga real de jul/2026 em dev (Silver com 34.886.160 linhas, chave única, 744 horas) e as duas Golds populadas; falta estender a 3 meses em dev e dar 1 mês em hml. Janela de 3 meses em dev, 1 mês em hml; ~34,9 milhões de linhas/mês. Horas revistas, fora do subtotal (ver §4.1 do documento)."
+nota = "Implementado (7 componentes). Carga real de jul/2026 em dev (Silver com 34.886.160 linhas, chave única, 744 horas) e as duas Golds populadas; maio, junho e julho carregados e conferidos em dev; em hml, julho foi carregado com o parser antigo e falta o replay; fica em revisão até a Alupar responder sobre a granularidade. Janela de 3 meses em dev, 1 mês em hml; ~34,9 milhões de linhas/mês. Horas revistas, fora do subtotal (ver §4.1 do documento)."

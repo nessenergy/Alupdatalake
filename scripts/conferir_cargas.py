@@ -199,6 +199,17 @@ def montar_conjuntos(projeto: str, bronze: str, silver: str, gold: str) -> list[
                 c=conectores,
             ),
         ),
+        # Item 26: o replay do raw (`reprocessar-raw`) precisa do `ingestao_id` da carga original.
+        Item(
+            "ccee_consumo_horario_perfil_agente_execucoes",
+            _sql(
+                "SELECT ingestao_id, status, linhas_extraidas, linhas_invalidas, linhas_carregadas, "
+                "DATE(encerrada_em) AS data_execucao FROM $e "
+                "WHERE fonte = 'ccee' AND entidade = 'consumo_horario_perfil_agente' AND encerrada_em IS NOT NULL "
+                "ORDER BY encerrada_em DESC LIMIT 10",
+                e=execucoes,
+            ),
+        ),
         Item(
             "ultimo_erro",
             _sql(

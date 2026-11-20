@@ -1,9 +1,19 @@
 # Estado do projeto
 
-Atualizado em **2026-11-19**. Visão de uma página: [`visao-consolidada.md`](visao-consolidada.md). Relatório com as evidências:
+Atualizado em **2026-11-20**. Visão de uma página: [`visao-consolidada.md`](visao-consolidada.md). Relatório com as evidências:
 [`relatorios/2026-10-22-situacao-consolidada.md`](relatorios/2026-10-22-situacao-consolidada.md). Guia de auditoria: [`auditoria.md`](auditoria.md).
 Última auditoria de ponta a ponta, com a conferência de cada número:
 [`relatorios/2026-10-02-auditoria-de-ponta-a-ponta.md`](relatorios/2026-10-02-auditoria-de-ponta-a-ponta.md).
+
+## Atualização de 20/11/2026
+
+Dia 81 de 130 do contrato.
+
+- **Onda 2 entregue no painel.** `painel/marcos.toml` passou de `aguarda_alup` para `entregue`, com as notas de cada item conferidas contra o ambiente: BBCE com Silver de 3.548 linhas em dev e 3.040 em hml e Gold com 253; Hubspot com 208 negócios na Silver e 7 linhas na Gold `funil_comercial` nos dois ambientes (conferido em 19/11), 1 negócio em quarentena; CCEE entregue com a ressalva do cadastro de pontos (erro 4001 para o perfil 6166, #462, depende da Alupar). TempoOK segue fora do escopo.
+- **Hubspot agendado em dev e hml (#482).** O job estava de fora por um registro antigo de "sem credencial" em `conectores_sem_agendamento`; o Terraform criou o job em hml e o deploy de dev concluiu. Falta a primeira execução agendada. A conferência de cargas passou a ler a Silver e a Gold do Hubspot (#483).
+- **Dossiê da Onda 2** em rascunho no PR #484. O pedido de aceite do marco 3 não está escrito e a Onda 2 entra na pauta da reunião semanal.
+- **Higiene:** testes (2.293 passam, 607 ignorados), Ruff, Bandit e a conferência dos 7 componentes das 64 fontes passam; `pip-audit` sem vulnerabilidade conhecida. Branches locais já mescladas foram removidas; restam 7 branches remotas já mescladas, a apagar com o aval do Ricardo. O workflow Painel falhou uma vez na `main` em 20/11 de manhã e passou na execução seguinte.
+- **Em aberto sem mudança:** valores da ONS no segredo (#11), cadastro de pontos da CCEE (#462), rota do Oracle FMB (DCIDE), tabelas do MySQL Comercialização e endpoints do RM/TOTVS.
 
 ## Atualização de 19/11/2026
 

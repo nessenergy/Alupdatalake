@@ -147,29 +147,29 @@ horas = 110
 marco_pct = 18.97
 janela = [2026-10-19, 2026-11-13]
 trabalho_desde = 2026-08-26
-estado = "aguarda_alup"
+estado = "entregue"
 entidades = ["hubspot_negocios", "bbce_curva_forward", "ccee_pi_ponto_medicao", "ccee_pi_medida"]
 
 [[onda.item]]
 codigo = "2.1"
 titulo = "CCEE agente credenciado"
 horas = 32
-pronto = 0.7
-nota = "leitura real com o usuário ace em 09/11; medição carregada em dev e hml; o cadastro de pontos segue negado ao perfil 6166 (#462)"
+pronto = 1.0
+nota = "entregue com ressalva: medição carregada em dev e hml com o usuário ace desde 09/11; o cadastro de pontos segue negado ao perfil 6166 (erro 4001, #462, depende da Alupar)"
 
 [[onda.item]]
 codigo = "2.2"
 titulo = "BBCE"
 horas = 28
-pronto = 0.9
-nota = "carga em dev e hml em 28/10 (254 linhas); Gold com chave única e agendamento ligado em dev e hml; falta o dossiê"
+pronto = 1.0
+nota = "Silver com 3.548 linhas em dev e 3.040 em hml, Gold curva_forward_vigente com 253 nos dois; agendamento ligado; última execução em 18/11 com sucesso"
 
 [[onda.item]]
 codigo = "2.3"
 titulo = "Hubspot"
 horas = 20
-pronto = 0.8
-nota = "carga real em dev e hml em 22/10, com o token de aplicativo privado; faltam conferir as linhas e o dossiê"
+pronto = 1.0
+nota = "Silver com 208 negócios e Gold funil_comercial com 7 linhas nos dois ambientes (conferido em 19/11), 1 negócio em quarentena; agendamento criado em 19/11 (#482), falta a primeira execução agendada"
 
 [[onda.item]]
 codigo = "2.4"
@@ -182,8 +182,8 @@ nota = "saiu do escopo (20/10, validado em 23/10); as 14,4 h já executadas (80%
 codigo = "2.5"
 titulo = "Tabelas Gold de preço e posição comercial"
 horas = 12
-pronto = 0.7
-nota = "tabelas escritas; a Gold da BBCE tem 254 linhas; o escopo do que falta depende das demais fontes"
+pronto = 1.0
+nota = "Gold curva_forward_vigente (253 linhas) e funil_comercial (7 linhas) populadas em dev e hml"
 
 [[onda]]
 numero = 3
@@ -523,5 +523,17 @@ dono = "ness."
 [[marco]]
 data = 2026-11-12
 titulo = "Decisão: a ness. mantém o acesso de operação e manutenção em produção depois do handoff"
+estado = "feito"
+dono = "ness."
+
+[[marco]]
+data = 2026-11-17
+titulo = "opentelemetry-api 1.45.2 (CVE-2026-126360) mesclado; a auditoria de dependências da main voltou a passar"
+estado = "feito"
+dono = "ness."
+
+[[marco]]
+data = 2026-11-19
+titulo = "Item 26 conferido em hml (Silver de julho com 34.886.160 linhas); Hubspot agendado em dev e hml; GitHub Actions bloqueado por cobrança durante horas e liberado do lado da conta; dossiê da Onda 2 em rascunho"
 estado = "feito"
 dono = "ness."

@@ -1,7 +1,7 @@
 # Próximos passos — fila de execução
 
 Documento **vivo**: é para riscar linha, não para arquivar. Atualizado em
-**2026-11-18** (PRs #467 a #478 mesclados; item 26 com 3 meses em dev e 1 em hml; prod pronta para o bootstrap).
+**2026-11-25** (Onda 2 entregue; Painel corrigido; item 26 com 3 meses em dev e 1 em hml; prod pronta para o bootstrap).
 
 Ele existe para responder uma pergunta que os outros três não respondem em uma
 tela: **qual é a próxima ação, de quem é, e qual comando a executa.**

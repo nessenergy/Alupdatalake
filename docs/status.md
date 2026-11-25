@@ -1,9 +1,20 @@
 # Estado do projeto
 
-Atualizado em **2026-11-20**. Visão de uma página: [`visao-consolidada.md`](visao-consolidada.md). Relatório com as evidências:
+Atualizado em **2026-11-25**. Visão de uma página: [`visao-consolidada.md`](visao-consolidada.md). Relatório com as evidências:
 [`relatorios/2026-10-22-situacao-consolidada.md`](relatorios/2026-10-22-situacao-consolidada.md). Guia de auditoria: [`auditoria.md`](auditoria.md).
 Última auditoria de ponta a ponta, com a conferência de cada número:
 [`relatorios/2026-10-02-auditoria-de-ponta-a-ponta.md`](relatorios/2026-10-02-auditoria-de-ponta-a-ponta.md).
+
+## Atualização de 25/11/2026
+
+Dia 86 de 130 do contrato.
+
+- **Painel de volta:** o workflow Painel falhava desde 21/11 com "Argument list too long", porque o histórico de execuções de hml (924 execuções) passava por variável de ambiente. Passou a ir por artefato (#487); execução manual concluída com sucesso. O estado da Onda 2 no painel foi atualizado (#485).
+- **Hubspot:** a primeira execução agendada foi observada em 24/11, o que fecha o componente de agendamento da #482. O texto do dossiê (#484) ainda diz que ela estava pendente.
+- **Fontes públicas:** `ibge_ipca` reexecutado com sucesso em dev e hml. As séries da ANEEL (`aneel_siga`, `aneel_tarifas`) seguem sem carga desde 09/11: a origem encerra a conexão (connection reset), também a partir de uma rede fora do GCP; a causa está no servidor da ANEEL, não na infraestrutura.
+- **Onda 3:** e-mail à Alupar com a posição por fonte e o que falta (rota do Oracle FMB, tabelas do MySQL Comercialização, endpoints do RM/TOTVS, credenciais do Portal Alup) está em rascunho, ainda não enviado.
+- **Higiene:** README, `AGENTS.md` (tabela de ADRs até a 030) e visão consolidada atualizados com 64 conectores, 2.293 testes aprovados (607 ignorados) e 96% de cobertura. Removidos 9 branches remotos já mesclados, 2 branches locais e 1 stash cujo conteúdo já estava na `main`.
+- **Em aberto:** #484 (dossiê) e #486 (atualização de ações do Dependabot, com o check do Cloud Build pendente de aprovação); aceite da Onda 2; #462 (cadastro de pontos da CCEE); valores da ONS (#11).
 
 ## Atualização de 20/11/2026
 

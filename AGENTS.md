@@ -190,32 +190,22 @@ dizem como *este contrato* usa o produto.
 | 021 | Seleção dos conjuntos CCEE por demanda dos domínios analíticos |
 | 022 | Identidade visual por audiência: ness. no que a ness. emite, Alup no produto, neutra na documentação técnica |
 | 023 | Região do ambiente: `us-central1`, a única que a política da Alupar admite; irreversível depois do primeiro apply; transferência internacional documentada (DPA, RoPA, RIPD) |
+| 024 | Rede das fontes internas: VPC compartilhada da Alupar |
+| 025 | Portal redesenhado para o telão, com modo de rodízio |
+| 026 | Precipitação do INMET por bacia, ponto em polígono com os contornos do ONS (implementado, ainda não aceito) |
+| 027 | ONS Operacional: IPDO e ACOMPH (proposto) |
+| 028 | Acesso ao CPTEC: 403 no webservice, fonte fora da Onda 1 até haver resposta do INPE (proposto) |
+| 029 | Previsão do tempo de 7 dias: nenhuma alternativa pública serve (proposto) |
+| 030 | CI, deploy e operação fora do GitHub Actions; substitui em parte a 015 |
 
 Se você for propor algo que contraria um ADR, escreva um ADR novo — não um
 remendo. Em particular: o framework em `src/core/` é mais estrutura do que 13
 scripts soltos **de propósito** (ADR 003, 13 fontes / 19 semanas / handoff).
 
-## Estado atual (2026-09-23)
+## Estado atual
 
-Referência conferida: `main` em `2d0f7c6` (16/09). O estado detalhado,
-evidências, responsáveis e prazos vivem em [`docs/status.md`](docs/status.md).
-
-Há **26 entidades implementadas**, sem alterar as **13 fontes contratuais**:
-23 verificadas com dados reais em dry-run; TempoOK com contrato da API
-verificado, mas acervo alcançável somente até 26/10/2022; BBCE (PR #131) e
-Hubspot aguardam credenciais, incluindo o host do BBCE. Framework, Dataform,
-Terraform, motor de planilha e caminho de banco estão implementados; isso não
-comprova execução no GCP nem homologação.
-
-G1 encerrou com a revisão de 10/09. **Em 23/09 a Alup entregou os três
-projetos** (`alupar-dev-alupdata`, `alupar-hm-alupdata`, `prod-alupdata`),
-com faturamento vinculado e os papéis da ADR 015 concedidos; a ness. executa
-o bootstrap em `infra/bootstrap/`. A região vigente é `us-central1`
-(**ADR 023**, que substituiu a 011 porque a política da Alupar não admite
-`us-east1`). O prazo original de A3 era 04/09: 12 dias úteis de atraso.
-Seguem sem confirmação os exemplos de planilha (#142).
-
-Próximo passo técnico: após A3, bootstrap e primeiro deploy, carga ponta a
-ponta, replay do raw e evidências de homologação. Templates dependem de G3/#142;
-fontes internas dependem dos acessos e contratos reais. Nenhuma onda tem
-homologação registrada; código pronto e cartões concluídos não são aceite.
+O estado vivo está em [`docs/status.md`](docs/status.md) (atualização mais recente no topo) e a fila de execução em
+[`docs/proximos-passos.md`](docs/proximos-passos.md). Em 25/11/2026: 64 conectores
+registrados com os 7 componentes, Ondas 0 e 1 aprovadas e faturadas, Onda 2 entregue em dev e hml com o dossiê em revisão, Onda 3 em andamento
+dependendo de rede, tabelas e endpoints da Alupar, produção ainda sem bootstrap. A região vigente é `us-central1` (**ADR 023**). Código pronto e
+cartão concluído não são aceite: a homologação de cada onda é registrada por escrito.

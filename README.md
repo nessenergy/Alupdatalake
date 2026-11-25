@@ -18,23 +18,23 @@
 Cada fonte de dados só está entregue com os **7 componentes** da cláusula 2ª do contrato: conector Python, tabela Bronze, view Silver, view Gold,
 testes, agendamento e dicionário com linhagem.
 
-## Estado atual (22/10/2026)
+## Estado atual (25/11/2026)
 
 | Onda | Tema | Janela | Estado |
 |------|------|--------|--------|
-| 0 | Fundação e arquitetura | 31/08 a 11/09 | **Aprovada** (05/10) |
-| 1 | Inteligência de mercado: APIs públicas | 14/09 a 16/10 | **Aprovada** (05/10); IPDO e ACOMPH sem entrega |
-| 2 | APIs com credenciais | 19/10 a 13/11 | **Em andamento**: Hubspot carrega; BBCE sem credencial; CCEE credenciada sem código; TempoOK fora do escopo |
-| 3 | Sistemas internos | 16/11 a 18/12 | **Em andamento**: 2 de 3 bancos conectam; Oracle FMB depende de rede via terceiro |
+| 0 | Fundação e arquitetura | 31/08 a 11/09 | **Aprovada** (05/10) e faturada |
+| 1 | Inteligência de mercado: APIs públicas | 14/09 a 16/10 | **Aprovada** (05/10) e faturada |
+| 2 | APIs com credenciais | 19/10 a 13/11 | **Entregue** em dev e hml; dossiê em revisão; BBCE, Hubspot e Gold de preço e posição entregues, CCEE com a ressalva do cadastro de pontos (#462); TempoOK fora do escopo |
+| 3 | Sistemas internos | 16/11 a 18/12 | **Em andamento**: MySQL Alup e Portal Alup conectam; Oracle FMB depende da rota de rede (DCIDE); MySQL Comercialização e RM/TOTVS dependem da Alupar |
 | 4 | Planilhas, governança e handoff | 21/12 a 08/01/2027 | **Em andamento**: motor de planilhas pronto; leitor do Google Drive a escrever |
 
 | Medida | Valor |
 |---|---|
-| Conectores registrados | **58**, todos com os 7 componentes presentes |
-| Testes | **2.013 aprovados** e 558 ignorados por desenho |
+| Conectores registrados | **64**, todos com os 7 componentes presentes |
+| Testes | **2.293 aprovados** e 607 ignorados por desenho |
 | Cobertura de linhas | **96%** |
-| Ambientes | `dev` e `hml` aplicados; produção ainda não existe |
-| Saúde da ingestão | dev: 56 fontes OK; hml: 55 (as duas entidades novas da CCEE ainda sem deploy) |
+| Ambientes | `dev` e `hml` aplicados; produção ainda não existe (bootstrap preparado, #472) |
+| Faturamento | R$ 53.760,00 de R$ 148.480,00 (36,2%): marcos 1 e 2 |
 
 Visão de uma página: [`docs/visao-consolidada.md`](docs/visao-consolidada.md). Relatório com as evidências:
 [`docs/relatorios/2026-10-22-situacao-consolidada.md`](docs/relatorios/2026-10-22-situacao-consolidada.md). Histórico e pendências:
@@ -58,13 +58,14 @@ gh workflow run "Conferir cargas" -f environment=dev   # estado do dado no BigQu
 | Origem | Conectores | Tipo | Onda |
 |---|---|---|---|
 | ONS | 29 | arquivos e APIs públicas | 1 e aditivo 01 |
-| CCEE (dados abertos) | 17 | CKAN público | 1 e aditivo 01 |
+| CCEE (dados abertos) | 18 | CKAN público | 1 e aditivo 01 |
 | BCB, IBGE, ANEEL, INMET, ACE | 8 | APIs e arquivos públicos | 1 |
 | Hubspot | 1 | API credenciada | 2 |
 | BBCE | 1 | API credenciada | 2 |
-| TempoOK | 2 | API credenciada (fora do escopo desde 20/10) | 2 |
-| CCEE credenciado | 0 | a definir | 2 |
-| Oracle FMB, MySQL Alup, MySQL Comercialização, RM/TOTVS | 0 | bancos e sistemas internos | 3 |
+| TempoOK | 0 | fora do escopo desde 20/10 | 2 |
+| CCEE credenciado | 2 | SOAP com credencial da Alupar (`ccee_pi_*`) | 2 |
+| Portal Alup | 5 | banco interno | 3 |
+| MySQL Alup, Oracle FMB, MySQL Comercialização, RM/TOTVS | fora dos 64 | dependem de rede, tabelas e endpoints da Alupar (situação em `docs/status.md`) | 3 |
 | Planilhas (CSV e XLSX) | motor pronto | arquivos da Alupar | 4 |
 
 O contrato mantém **13 fontes**; entidade implementada não cria uma fonte contratual nova. O índice completo, com linhagem, está em

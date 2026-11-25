@@ -63,7 +63,7 @@ Fica registrado como dependência da Alupar, sem prejuízo da entrega da mediç�
 
 Carga real em 22/10 nos dois ambientes. A Silver recusa negócio fora da regra e o envia à quarentena: hoje há 1
 (fechamento anterior à criação), à espera de correção na origem. O agendamento estava fora por um registro antigo
-("sem credencial") e foi corrigido no #482, aplicado em dev e hml em 19/11; a primeira execução agendada confirma o componente.
+("sem credencial") e foi corrigido no #482, aplicado em dev e hml em 19/11; a primeira execução agendada foi observada em 24/11 e confirma o componente.
 Conferido em 19/11 nos dois ambientes: Silver `hubspot_negocios` com 208 negócios (criados de 20 a 21/10), Gold `funil_comercial` com 7 linhas e 1 negócio em quarentena.
 
 ## 4. O que fecha depois da emissão
@@ -71,8 +71,6 @@ Conferido em 19/11 nos dois ambientes: Silver `hubspot_negocios` com 208 negóci
 | Pendência | Quem | Efeito |
 |---|---|---|
 | Permissão do perfil 6166 para o cadastro de pontos da CCEE (#462) | Alupar | complementa o item 2.1; não bloqueia a medição |
-| Agendamento do Hubspot (#482) e primeira execução agendada | ness. | fecha o componente de agendamento do item 2.3 |
-| Contagem de linhas do Hubspot na Silver e na Gold | ness. | preenche a §3.3 |
 | Correção do negócio em quarentena | Alupar | a carga seguinte o traz de volta |
 
 Prazos e efeitos da cláusula 3ª ficam registrados como fato, sem decisão neste documento.

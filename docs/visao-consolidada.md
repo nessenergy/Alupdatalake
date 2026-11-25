@@ -24,7 +24,7 @@ Cada fonte só está entregue com os **7 componentes** da cláusula 2ª: conecto
 | | |
 |---|---|
 | Conectores | **64** registrados, todos com os 7 componentes presentes; Aditivo 01 com 25 de 25 itens entregues e o 26 em validação |
-| Testes | **2.292 aprovados**, 607 ignorados por desenho (medido em 12/11); cobertura **96%** (medida em 22/10) |
+| Testes | **2.293 aprovados**, 607 ignorados por desenho (medido em 25/11); cobertura **96%** (medida em 25/11) |
 | Ambientes | `dev` e `hml` aplicados; **produção ainda não existe**, com `prod.tfvars` e runbook de bootstrap prontos (agendamentos desligados) |
 | Documentação | 30 ADRs, 64 dicionários, 11 runbooks |
 

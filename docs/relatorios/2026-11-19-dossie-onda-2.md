@@ -19,6 +19,17 @@ Este dossiê reúne a evidência da Onda 2, cuja janela contratual terminou em 1
 fonte por fonte, **dizendo o que está pronto e o que não está**. Os números são de
 19/11/2026, lidos pela conferência de cargas (workflow *Conferir cargas*) em dev e hml.
 
+## Resumo
+
+| | |
+|---|---|
+| **Onda** | 2, APIs com credenciais (janela de 19/10 a 13/11) |
+| **Marco** | 3, R$ 28.160,00 |
+| **Entregue** | 2.1 CCEE agente credenciado, 2.2 BBCE, 2.3 Hubspot e 2.5 Gold de preço e posição, em dev e hml |
+| **Fora do escopo** | 2.4 TempoOK, por retorno da Alupar de 20/10, validado em 23/10 |
+| **Ressalva** | cadastro de pontos da CCEE negado ao perfil 6166 (erro `4001`, #462); a medição não é afetada |
+| **Verificação** | 64 fontes registradas, todas com os 7 componentes de arquivo; 2.293 testes aprovados; cobertura de 96% |
+
 ## 1. Escopo: o contrato e as mudanças de curso
 
 O contrato prevê para a Onda 2 as fontes CCEE (agente credenciado), BBCE, Hubspot e TempoOK, mais as tabelas Gold de

@@ -1,0 +1,531 @@
+<!doctype html><html lang='pt-BR'><head><meta charset='utf-8'><meta name='viewport' content='width=device-width, initial-scale=1'><title>Dossiê de homologação — Onda 2 — 19/11/2026 (rascunho)</title><link rel='preconnect' href='https://fonts.googleapis.com'><link rel='preconnect' href='https://fonts.gstatic.com' crossorigin><link href='https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap' rel='stylesheet'><style>
+@page { size: A4; margin: 16mm 14mm 16mm 14mm; }
+
+/* O documento existe para virar A4. Declarar o esquema claro impede o
+   navegador de escurecer por conta própria e descolar tela de papel. */
+:root { color-scheme: light; }
+
+/* Imprimir do navegador (Ctrl+P → Salvar como PDF) vem com "gráficos de plano
+   de fundo" DESLIGADO por padrão. Sem isto, a faixa alternada das tabelas, o
+   fundo do `code` e o bloco de alerta somem no papel — e a etiqueta vermelha
+   do questionário vira texto branco sobre branco, isto é, invisível.
+   Forçar aqui garante que tela, --print-to-pdf e impressão manual coincidam. */
+html {
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+:root {
+  --tinta: #0f172a;
+  --suave: #475569;
+  --tenue: #94a3b8;
+  --linha: #e2e8f0;
+  --linha-fina: #eef2f6;
+  --zebra: #f8fafc;
+  --ness: #00ade8;
+  --link: #007aa3;
+  --alerta: #b3261e;
+  --fundo-alerta: #fdf3f2;
+  /* Corpo em Inter, títulos e marca em Montserrat, dado técnico em mono. */
+  --texto: Inter, "Segoe UI", system-ui, sans-serif;
+  --titulo: Montserrat, "Segoe UI", system-ui, sans-serif;
+  --mono: "JetBrains Mono", "Cascadia Mono", Consolas, monospace;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: var(--texto);
+  font-size: 9.4pt;
+  line-height: 1.55;
+  color: var(--tinta);
+  margin: 0;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ---------------------------------------------------------------- cabeçalho */
+
+.marca {
+  font-family: var(--titulo);
+  font-weight: 500;
+  font-size: 15pt;
+  letter-spacing: -0.01em;
+  margin: 0 0 2mm;
+}
+/* O ponto da marca é sempre BlueDot, em qualquer fundo. */
+.marca span { color: var(--ness); }
+
+h1 {
+  font-family: var(--titulo);
+  font-size: 17pt;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+  margin: 0 0 1mm;
+  padding-bottom: 3mm;
+  border-bottom: 2px solid var(--ness);
+}
+
+/* A primeira linha depois do h1 é a tarja de identificação do documento —
+   emissão, contrato, marco. Ela se lê como etiqueta, não como parágrafo. */
+h1 + p {
+  font-size: 8.4pt;
+  color: var(--suave);
+  margin-bottom: 5mm;
+}
+
+/* ------------------------------------------------- identificação do documento */
+
+/* Ficha do documento: quem emite, para quem, sob qual contrato, em que data.
+   Fica logo abaixo do título e não se parte entre páginas — um documento
+   contratual precisa ser identificável pela primeira folha, isolada. */
+.identificacao {
+  display: grid;
+  /* Largura suficiente para "RESPONSÁVEL TÉCNICO" caber em uma linha. */
+  grid-template-columns: 37mm 1fr;
+  gap: 1.2mm 4mm;
+  margin: 4mm 0 6mm;
+  padding: 3.5mm 4mm;
+  background: var(--zebra);
+  border-left: 2px solid var(--ness);
+  font-size: 8.4pt;
+  break-inside: avoid;
+}
+.id-rotulo {
+  font-family: var(--titulo);
+  font-size: 7.2pt;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--suave);
+  padding-top: 0.4mm;
+}
+.id-valor { color: var(--tinta); }
+
+/* ------------------------------------------------------------- fecho assinado */
+
+.assinatura {
+  margin-top: 12mm;
+  break-inside: avoid;
+}
+.assinatura .local-data {
+  font-size: 8.6pt;
+  color: var(--suave);
+  margin-bottom: 12mm;
+}
+.linha-assinatura {
+  width: 68mm;
+  border-top: 1px solid var(--tinta);
+  margin-bottom: 1.6mm;
+}
+.assina-nome {
+  font-family: var(--titulo);
+  font-weight: 500;
+  font-size: 9.4pt;
+  margin: 0;
+}
+.assina-org {
+  font-size: 8pt;
+  color: var(--suave);
+  margin: 0.4mm 0 0;
+}
+
+h2 {
+  font-family: var(--titulo);
+  font-size: 11.5pt;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  margin: 8mm 0 2.5mm;
+  padding-top: 3mm;
+  border-top: 1px solid var(--linha);
+  /* Um bloco não deve abrir no rodapé e continuar na página seguinte. */
+  break-after: avoid;
+}
+
+/* Marcador BlueDot antes do título de seção: assinatura discreta, custo zero
+   de espaço, e dá ao olho um ponto de entrada por seção. */
+h2::before {
+  content: "";
+  display: inline-block;
+  width: 1.4mm;
+  height: 1.4mm;
+  border-radius: 50%;
+  background: var(--ness);
+  margin-right: 1.8mm;
+  vertical-align: 0.4mm;
+}
+
+h3 {
+  font-family: var(--titulo);
+  font-size: 10pt;
+  font-weight: 500;
+  margin: 5mm 0 2mm;
+  break-after: avoid;
+}
+
+p { margin: 0 0 2.5mm; }
+strong { font-weight: 600; }
+code {
+  font-family: var(--mono);
+  font-size: 8.3pt;
+  background: var(--zebra);
+  border: 0.2mm solid var(--linha-fina);
+  padding: 0.3mm 1mm;
+  border-radius: 2px;
+}
+
+/* Bloco de comando ou de exemplo: é o que o leitor copia. Uma linha longa rola
+   dentro do bloco em tela e quebra na impressão, sem emendar no texto. */
+pre {
+  margin: 1.5mm 0 3mm;
+  padding: 2mm 3mm;
+  background: var(--zebra);
+  border: 0.2mm solid var(--linha-fina);
+  border-radius: 2px;
+  overflow-x: auto;
+  break-inside: avoid;
+}
+pre code {
+  background: none;
+  border: 0;
+  padding: 0;
+  white-space: pre;
+}
+@media print {
+  pre code { white-space: pre-wrap; overflow-wrap: anywhere; }
+}
+
+/* -------------------------------------------------------------------- tabela */
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0 0 4mm;
+  font-size: 8.8pt;
+  /* Número em coluna alinha por dígito, não por forma da letra. */
+  font-variant-numeric: tabular-nums;
+}
+th {
+  text-align: left;
+  font-family: var(--titulo);
+  font-weight: 600;
+  font-size: 7.6pt;
+  text-transform: uppercase;
+  /* Tracking discreto: em coluna estreita, cada 0,01em a mais é uma quebra
+     de linha a mais no cabeçalho. */
+  letter-spacing: 0.04em;
+  color: var(--suave);
+  border-bottom: 1.5px solid var(--tinta);
+  padding: 1.6mm 2mm;
+  /* Cabeçalho de coluna se lê como rótulo: melhor uma linha que duas. */
+  text-wrap: balance;
+}
+td {
+  border-bottom: 1px solid var(--linha-fina);
+  padding: 2.4mm 2mm;
+  vertical-align: top;
+}
+/* Faixa alternada: em tabela densa, o olho perde a linha sem ela. Tom baixo
+   o bastante para não competir com o texto nem pesar na impressão. */
+tbody tr:nth-child(even) td { background: var(--zebra); }
+/* A primeira coluna costuma ser a chave da linha — onda, item, código. */
+tbody td:first-child { font-weight: 500; }
+/* Uma pergunta não se parte entre páginas. */
+tr { break-inside: avoid; }
+thead { display: table-header-group; }
+
+/* Diagrama em SVG embutido: ocupa a largura do texto e não se parte entre
+   páginas; a legenda fica colada nele. */
+figure.diagrama {
+  margin: 14px 0 18px;
+  padding: 10px 10px 6px;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  break-inside: avoid;
+}
+figure.diagrama svg { display: block; width: 100%; height: auto; }
+figure.diagrama figcaption {
+  margin-top: 6px;
+  font-size: 9pt;
+  color: #475569;
+}
+
+/* Larguras de coluna do formulário: código estreito, "Resposta" com espaço de
+   escrita. Valem só no questionário — num relatório espremeriam a 1ª coluna e
+   pintariam a última sem motivo. */
+.questionario td:first-child { width: 7%; font-weight: 600; font-variant-numeric: tabular-nums; }
+.questionario th:last-child, .questionario td:last-child { width: 30%; background: #fafbfc; }
+.questionario td:nth-child(3) { width: 15%; color: var(--suave); font-size: 8.2pt; }
+
+/* --------------------------------------------------------------- destaques */
+
+.bloqueia {
+  display: inline-block;
+  background: var(--alerta);
+  color: #fff;
+  font-size: 6.8pt;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  padding: 0.4mm 1.4mm;
+  border-radius: 2px;
+  margin-right: 1.2mm;
+  vertical-align: 1px;
+}
+
+blockquote {
+  margin: 0 0 3mm;
+  padding: 2.5mm 3mm;
+  background: var(--fundo-alerta);
+  border-left: 3px solid var(--alerta);
+}
+blockquote p:last-child { margin-bottom: 0; }
+
+/* O `---` do Markdown separa as seções na fonte, mas no PDF a borda de `h2` já
+   faz esse trabalho: manter os dois empilha traços. */
+hr { display: none; }
+hr + h2 { margin-top: 7mm; }
+
+ul { margin: 0 0 3mm; padding-left: 5mm; }
+li { margin-bottom: 1.2mm; }
+
+.rodape {
+  margin-top: 8mm;
+  padding-top: 3mm;
+  border-top: 1px solid var(--linha);
+  font-size: 7.6pt;
+  color: var(--suave);
+}
+
+/* ---------------------------------------------------------------- impressão */
+
+/* Token longo — URL, nome de secret, identificador — não pode ultrapassar a
+   largura da A4 e sumir na borda do papel. `anywhere` só no `code`, onde o
+   token não tem espaço por onde quebrar; em texto corrido ele partiria
+   palavra no meio, inclusive em cabeçalho de tabela. `break-word` quebra
+   apenas a palavra que sozinha não caberia na linha. */
+code { overflow-wrap: anywhere; }
+td, th, .id-valor { overflow-wrap: break-word; }
+
+/* Nenhuma hifenização automática: em documento contratual, palavra partida
+   por hífen inventado atrapalha a leitura e a busca no PDF. */
+* { hyphens: none; }
+
+/* Título distribui o texto entre as linhas em vez de deixar uma palavra órfã
+   na última — vale para o título do documento e para os de seção. */
+h1, h2, h3 { text-wrap: balance; }
+
+/* ------------------------------------------------------------------ links */
+
+/* Link com a cor da casa, não o azul padrão do navegador. O BlueDot puro
+   (#00ade8) não passa 4,5:1 sobre branco em texto corrido; o tom escuro dele
+   passa, e o sublinhado fica claro o bastante para não pesar na linha. */
+a {
+  color: var(--link);
+  text-decoration: underline;
+  text-decoration-color: rgba(0, 122, 163, 0.35);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.18em;
+}
+a:hover { text-decoration-color: currentColor; }
+a:focus-visible { outline: 2px solid var(--ness); outline-offset: 2px; border-radius: 2px; }
+
+::selection { background: rgba(0, 173, 232, 0.18); color: var(--tinta); }
+
+/* Lista com uma pendência por linha: o espaço entre itens é o que deixa o
+   olho contar quantas são. */
+li + li { margin-top: 1.2mm; }
+
+/* ----------------------------------------------------------------- em tela */
+
+/* Só a versão de tela: no PDF a margem é da @page. Em tela o documento se
+   apresenta como folha sobre fundo, que é como ele será lido e impresso.
+   Fica DEPOIS das regras-base de propósito: antes delas, o `body { margin: 0;
+   font-size: 9.4pt }` vencia pela ordem, a folha encostava à esquerda e o corpo
+   saía menor do que o previsto. */
+@media screen {
+  html { background: var(--zebra); }
+  body {
+    max-width: 940px;
+    margin: 0 auto;
+    padding: 56px 56px 72px;
+    font-size: 15px;
+    background: #fff;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04),
+                0 10px 15px -3px rgba(15, 23, 42, 0.06);
+  }
+  table { font-size: 14px; }
+  code { font-size: 13px; }
+}
+
+/* Folha estreita (celular): a margem da folha encolhe junto, e a tabela rola
+   dentro dela em vez de empurrar a página para o lado. */
+@media screen and (max-width: 640px) {
+  body { padding: 28px 18px 40px; font-size: 15px; }
+  table { display: block; overflow-x: auto; }
+}
+
+@media print {
+  /* Uma linha solta no pé ou no topo da página é o defeito mais visível de um
+     documento impresso. Três linhas é o mínimo que se lê como parágrafo. */
+  p, li { orphans: 3; widows: 3; }
+  h1, h2, h3 { break-after: avoid; break-inside: avoid; }
+  /* Título de seção seguido de tabela: os dois andam juntos ou nenhum anda. */
+  h2 + table, h3 + table, h2 + p, h3 + p { break-before: avoid; }
+  table, blockquote { break-inside: auto; }
+  /* Link impresso vira texto: sublinhado só polui o papel. */
+  a { text-decoration: none; color: var(--tinta); }
+}
+</style></head><body class='relatorio'><p class="marca">ness<span>.</span></p><h1>Dossiê de homologação da Onda 2</h1><section class='identificacao'><div class='id-rotulo'>Documento</div><div class='id-valor'>Dossiê de homologação</div><div class='id-rotulo'>Referência</div><div class='id-valor'>REL-2026-11-19-D · AlupData Fase 1</div><div class='id-rotulo'>Data de emissão</div><div class='id-valor'>19 de novembro de 2026</div><div class='id-rotulo'>Emitente</div><div class='id-valor'>ness. Processos e Tecnologia Ltda.</div><div class='id-rotulo'>Destinatário</div><div class='id-valor'>Alup — Leonardo Guiel Marques, Taina Ulhoa Mota, Mauricio Cardoso e Saulo Rodrigues</div><div class='id-rotulo'>Contrato</div><div class='id-valor'>CPS-01025/2026 — AlupData Fase 1: DataLake</div><div class='id-rotulo'>Marco em jogo</div><div class='id-valor'>Onda 2 — aceite (marco 3)</div><div class='id-rotulo'>Responsável técnico</div><div class='id-valor'>Ricardo Esper</div><div class='id-rotulo'>Classificação</div><div class='id-valor'>Confidencial — uso restrito das partes</div></section>
+<p>As Ondas 0 e 1 foram aceitas por escrito em 05/10/2026 e faturadas (marcos 1 e 2).
+Este dossiê reúne a evidência da Onda 2, cuja janela contratual terminou em 13/11,
+fonte por fonte, <strong>dizendo o que está pronto e o que não está</strong>. Os números são de
+19/11/2026, lidos pela conferência de cargas (workflow <em>Conferir cargas</em>) em dev e hml.</p>
+<h2>Resumo</h2>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Onda</strong></td>
+<td>2, APIs com credenciais (janela de 19/10 a 13/11)</td>
+</tr>
+<tr>
+<td><strong>Marco</strong></td>
+<td>3, R$ 28.160,00</td>
+</tr>
+<tr>
+<td><strong>Entregue</strong></td>
+<td>2.1 CCEE agente credenciado, 2.2 BBCE, 2.3 Hubspot e 2.5 Gold de preço e posição, em dev e hml</td>
+</tr>
+<tr>
+<td><strong>Fora do escopo</strong></td>
+<td>2.4 TempoOK, por retorno da Alupar de 20/10, validado em 23/10</td>
+</tr>
+<tr>
+<td><strong>Ressalva</strong></td>
+<td>cadastro de pontos da CCEE negado ao perfil 6166 (erro <code>4001</code>, #462); a medição não é afetada</td>
+</tr>
+<tr>
+<td><strong>Verificação</strong></td>
+<td>64 fontes registradas, todas com os 7 componentes de arquivo; 2.293 testes aprovados; cobertura de 96%</td>
+</tr>
+</tbody>
+</table>
+<h2>1. Escopo: o contrato e as mudanças de curso</h2>
+<p>O contrato prevê para a Onda 2 as fontes CCEE (agente credenciado), BBCE, Hubspot e TempoOK, mais as tabelas Gold de
+preço e posição comercial. Três mudanças de curso alteram o que se mede:</p>
+<ul>
+<li><strong>TempoOK saiu do escopo</strong> (retorno da Alupar de 20/10, validado em 23/10); as 14,4 h já executadas ficam contabilizadas.</li>
+<li><strong>A CCEE passou a entrar por SOAP</strong>, com usuário dedicado, senha e certificado, e não por token (retorno de 20/10; reunião de 06/11).</li>
+<li><strong>O cadastro de pontos de medição da CCEE depende de permissão da Alupar</strong> ao perfil 6166 (erro <code>4001</code>, #462). É uma
+  dependência da contratante (cláusula 3ª), não um componente a construir; o conector trata o erro como <code>SEM_PERMISSAO</code>.</li>
+</ul>
+<p>As credenciais da ONS (IPDO editável e ACOMPH) pertencem à Onda 1 e seguem registradas lá.</p>
+<h2>2. Resumo por item</h2>
+<table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Fonte</th>
+<th>Situação em 19/11</th>
+<th>Evidência</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2.1</td>
+<td>CCEE agente credenciado</td>
+<td><strong>entregue</strong>: leitura real em 09/11 e medição carregada em dev e hml. Ressalva: cadastro de pontos aguarda a permissão da Alupar</td>
+<td>§3.1</td>
+</tr>
+<tr>
+<td>2.2</td>
+<td>BBCE</td>
+<td><strong>entregue</strong>: carga real e agendamento em dev e hml</td>
+<td>§3.2</td>
+</tr>
+<tr>
+<td>2.3</td>
+<td>Hubspot</td>
+<td><strong>entregue</strong>: carga real em 22/10 nos dois ambientes; agendamento criado em 19/11 (#482)</td>
+<td>§3.3</td>
+</tr>
+<tr>
+<td>2.4</td>
+<td>TempoOK</td>
+<td><strong>fora do escopo</strong>, com horas contabilizadas</td>
+<td>—</td>
+</tr>
+<tr>
+<td>2.5</td>
+<td>Gold de preço e posição comercial</td>
+<td><strong>entregue</strong> para BBCE e Hubspot</td>
+<td>§3.2, §3.3</td>
+</tr>
+</tbody>
+</table>
+<p>Credenciais: Hubspot gravada em 20/10, BBCE em uso em 28/10 e CCEE em 09/11.</p>
+<h2>3. Fontes</h2>
+<h3>3.1 CCEE — agente credenciado (2.1)</h3>
+<p>Leitura real em 09/11 com o usuário dedicado (24 medidas de um ponto, produção da CCEE) e medição carregada em dev e hml.
+O cadastro de pontos (<code>ccee_pi_ponto_medicao</code>) segue sem sucesso em hml: <code>Fault Server.4001</code>, perfil sem permissão (#462).
+Fica registrado como dependência da Alupar, sem prejuízo da entrega da medição.</p>
+<h3>3.2 BBCE (2.2)</h3>
+<table>
+<thead>
+<tr>
+<th>Medida</th>
+<th style="text-align: right;">dev</th>
+<th style="text-align: right;">hml</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Linhas na Silver <code>bbce_curva_forward</code> (27/10 a 17/11)</td>
+<td style="text-align: right;">3.548</td>
+<td style="text-align: right;">3.040</td>
+</tr>
+<tr>
+<td>Linhas na Gold <code>curva_forward_vigente</code></td>
+<td style="text-align: right;">253</td>
+<td style="text-align: right;">253</td>
+</tr>
+<tr>
+<td>Última execução (18/11)</td>
+<td style="text-align: right;"><code>SUCESSO</code>: 1.524 extraídas, 6 inválidas, 1.518 carregadas</td>
+<td style="text-align: right;">igual</td>
+</tr>
+</tbody>
+</table>
+<h3>3.3 Hubspot (2.3)</h3>
+<p>Carga real em 22/10 nos dois ambientes. A Silver recusa negócio fora da regra e o envia à quarentena: hoje há 1
+(fechamento anterior à criação), à espera de correção na origem. O agendamento estava fora por um registro antigo
+("sem credencial") e foi corrigido no #482, aplicado em dev e hml em 19/11; a primeira execução agendada foi observada em 24/11 e confirma o componente.
+Conferido em 19/11 nos dois ambientes: Silver <code>hubspot_negocios</code> com 208 negócios (criados de 20 a 21/10), Gold <code>funil_comercial</code> com 7 linhas e 1 negócio em quarentena.</p>
+<h2>4. O que fecha depois da emissão</h2>
+<table>
+<thead>
+<tr>
+<th>Pendência</th>
+<th>Quem</th>
+<th>Efeito</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Permissão do perfil 6166 para o cadastro de pontos da CCEE (#462)</td>
+<td>Alupar</td>
+<td>complementa o item 2.1; não bloqueia a medição</td>
+</tr>
+<tr>
+<td>Correção do negócio em quarentena</td>
+<td>Alupar</td>
+<td>a carga seguinte o traz de volta</td>
+</tr>
+</tbody>
+</table>
+<p>Prazos e efeitos da cláusula 3ª ficam registrados como fato, sem decisão neste documento.</p><section class='assinatura'><p class=local-data>19 de novembro de 2026</p><div class='linha-assinatura'></div><p class='assina-nome'>Ricardo Esper</p><p class='assina-org'>ness. Processos e Tecnologia Ltda.</p></section><p class="rodape">ness. Processos e Tecnologia Ltda. · CNPJ 72.027.097/0001-37 · Contrato CPS-01025/2026 — AlupData Fase 1: DataLake</p></body></html>

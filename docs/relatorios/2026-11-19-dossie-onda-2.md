@@ -19,6 +19,17 @@ Este dossiê reúne a evidência da Onda 2, cuja janela contratual terminou em 1
 fonte por fonte, **dizendo o que está pronto e o que não está**. Os números são de
 19/11/2026, lidos pela conferência de cargas (workflow *Conferir cargas*) em dev e hml.
 
+## Resumo
+
+| | |
+|---|---|
+| **Onda** | 2, APIs com credenciais (janela de 19/10 a 13/11) |
+| **Marco** | 3, R$ 28.160,00 |
+| **Entregue** | 2.1 CCEE agente credenciado, 2.2 BBCE, 2.3 Hubspot e 2.5 Gold de preço e posição, em dev e hml |
+| **Fora do escopo** | 2.4 TempoOK, por retorno da Alupar de 20/10, validado em 23/10 |
+| **Ressalva** | cadastro de pontos da CCEE negado ao perfil 6166 (erro `4001`, #462); a medição não é afetada |
+| **Verificação** | 64 fontes registradas, todas com os 7 componentes de arquivo; 2.293 testes aprovados; cobertura de 96% |
+
 ## 1. Escopo: o contrato e as mudanças de curso
 
 O contrato prevê para a Onda 2 as fontes CCEE (agente credenciado), BBCE, Hubspot e TempoOK, mais as tabelas Gold de
@@ -63,7 +74,7 @@ Fica registrado como dependência da Alupar, sem prejuízo da entrega da mediç�
 
 Carga real em 22/10 nos dois ambientes. A Silver recusa negócio fora da regra e o envia à quarentena: hoje há 1
 (fechamento anterior à criação), à espera de correção na origem. O agendamento estava fora por um registro antigo
-("sem credencial") e foi corrigido no #482, aplicado em dev e hml em 19/11; a primeira execução agendada confirma o componente.
+("sem credencial") e foi corrigido no #482, aplicado em dev e hml em 19/11; a primeira execução agendada foi observada em 24/11 e confirma o componente.
 Conferido em 19/11 nos dois ambientes: Silver `hubspot_negocios` com 208 negócios (criados de 20 a 21/10), Gold `funil_comercial` com 7 linhas e 1 negócio em quarentena.
 
 ## 4. O que fecha depois da emissão
@@ -71,8 +82,6 @@ Conferido em 19/11 nos dois ambientes: Silver `hubspot_negocios` com 208 negóci
 | Pendência | Quem | Efeito |
 |---|---|---|
 | Permissão do perfil 6166 para o cadastro de pontos da CCEE (#462) | Alupar | complementa o item 2.1; não bloqueia a medição |
-| Agendamento do Hubspot (#482) e primeira execução agendada | ness. | fecha o componente de agendamento do item 2.3 |
-| Contagem de linhas do Hubspot na Silver e na Gold | ness. | preenche a §3.3 |
 | Correção do negócio em quarentena | Alupar | a carga seguinte o traz de volta |
 
 Prazos e efeitos da cláusula 3ª ficam registrados como fato, sem decisão neste documento.

@@ -25,7 +25,7 @@ testes, agendamento e dicionário com linhagem.
 | 0 | Fundação e arquitetura | 31/08 a 11/09 | **Aprovada** (05/10) e faturada |
 | 1 | Inteligência de mercado: APIs públicas | 14/09 a 16/10 | **Aprovada** (05/10) e faturada |
 | 2 | APIs com credenciais | 19/10 a 13/11 | **Entregue** em dev e hml; dossiê em revisão; BBCE, Hubspot e Gold de preço e posição entregues, CCEE com a ressalva do cadastro de pontos (#462); TempoOK fora do escopo |
-| 3 | Sistemas internos | 16/11 a 18/12 | **Em andamento**: MySQL Alup e Portal Alup conectam; Oracle FMB depende da rota de rede (DCIDE); MySQL Comercialização e RM/TOTVS dependem da Alupar |
+| 3 | Sistemas internos | 16/11 a 18/12 | **Em andamento**: MySQL Alup e MySQL Comercialização conectam (a primeira carga do Portal Alup ainda não foi feita); Oracle FMB depende da rota de rede (DCIDE); as tabelas do MySQL Comercialização e os endpoints do RM/TOTVS dependem da Alupar |
 | 4 | Planilhas, governança e handoff | 21/12 a 08/01/2027 | **Em andamento**: motor de planilhas pronto; leitor do Google Drive a escrever |
 
 | Medida | Valor |

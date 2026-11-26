@@ -1,5 +1,5 @@
 ---
-titulo: Dossiê de homologação — Onda 2 — 19/11/2026 (rascunho)
+titulo: Dossiê de homologação — Onda 2 — 19/11/2026
 documento: Dossiê de homologação
 referencia: REL-2026-11-19-D · AlupData Fase 1
 emitido_em: 19 de novembro de 2026

@@ -8,92 +8,112 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-:root{--cyan:#00ADE8;--cyan-d:#006E96;--cyan-n:#E5F6FD;--tinta:#0E1116;--grafite:#2B333B;--cinza:#5A6473;--linha:#C7D2DE;--fio:#E4E8EC;--nevoa:#EEF3F8;--branco:#fff}
+:root{--cyan:#00ADE8;--cyan-d:#006E96;--cyan-n:#E5F6FD;--cyan-b:#9ED9F2;--tinta:#0E1116;--grafite:#2B333B;--cinza:#5A6473;--linha:#C7D2DE;--fio:#E4E8EC;--nevoa:#EEF3F8;--branco:#fff}
 *{box-sizing:border-box;margin:0;-webkit-print-color-adjust:exact;print-color-adjust:exact}
 @page{size:A4;margin:0}
-html{background:#E3E8EE}
+html{background:#DDE3EA}
 body{font-family:Montserrat,"Segoe UI",system-ui,sans-serif;color:var(--grafite);font-size:9.5pt;line-height:1.5;font-variant-numeric:tabular-nums}
 ::selection{background:var(--cyan);color:var(--tinta)}
 
-.page{width:210mm;height:297mm;margin:8mm auto;background:var(--branco);padding:14mm 16mm 12mm;display:flex;flex-direction:column;overflow:hidden;break-after:page;break-inside:avoid;position:relative}
+.page{width:210mm;height:297mm;margin:8mm auto;background:var(--branco);display:flex;flex-direction:column;overflow:hidden;break-after:page;break-inside:avoid;position:relative}
 .page:last-of-type{break-after:auto}
 @media print{html{background:#fff}.page{margin:0}}
 
-.ph{display:flex;justify-content:space-between;align-items:center;padding-bottom:3.2mm;border-bottom:1px solid var(--fio);font-size:9pt;color:var(--cinza)}
-.ph img{height:6mm;display:block}
-.pf{margin-top:auto;display:flex;justify-content:space-between;padding-top:3mm;border-top:1px solid var(--fio);font-size:9pt;color:var(--cinza)}
-.pb{flex:1;display:flex;flex-direction:column;gap:6.5mm;padding-top:7mm;min-height:0}
+/* faixa de abertura de cada página */
+.band{background:var(--tinta);color:#fff;padding:11mm 16mm 9mm;display:flex;flex-direction:column;gap:6.5mm}
+.band .top{display:flex;justify-content:space-between;align-items:center;font-size:9pt;color:#9AA6B4}
+.band .top img{height:6.5mm;display:block}
+.band .rule{width:14mm;height:3px;background:var(--cyan)}
+.band h2{font-weight:600;font-size:20pt;line-height:1.14;letter-spacing:-.015em;color:#fff;max-width:26em;text-wrap:balance}
+.band .lead{font-size:10.5pt;line-height:1.5;color:#C9D3DE;max-width:64ch;margin-top:-2mm}
+.body{flex:1;padding:8mm 16mm 0;display:flex;flex-direction:column;gap:7mm;min-height:0}
+.foot{margin:0 16mm 10mm;padding-top:3mm;border-top:1px solid var(--fio);display:flex;justify-content:space-between;font-size:9pt;color:var(--cinza)}
 
-h2{font-weight:600;font-size:17pt;line-height:1.15;letter-spacing:-.01em;color:var(--tinta);text-wrap:balance}
-h2 .n{color:var(--cyan-d);margin-right:2.5mm}
-h3{font-weight:600;font-size:10.5pt;color:var(--tinta);margin-bottom:2mm}
+h3{font-weight:600;font-size:11pt;color:var(--tinta);letter-spacing:-.005em;margin-bottom:2.5mm}
 p{max-width:72ch;text-wrap:pretty}
-.lead{font-size:10.5pt;color:var(--grafite)}
 .mut{color:var(--cinza)}
 b,strong{font-weight:600;color:var(--tinta)}
-code{overflow-wrap:anywhere;font-family:"JetBrains Mono",Consolas,monospace;font-size:8.8pt;background:var(--nevoa);padding:.2mm 1.2mm;border-radius:1mm;color:var(--tinta)}
+code{overflow-wrap:anywhere;font-family:"JetBrains Mono",Consolas,monospace;font-size:9pt;background:var(--nevoa);padding:.2mm 1.2mm;border-radius:1mm;color:var(--tinta)}
 
 /* capa */
-.cover{background:var(--tinta);color:#fff;padding:18mm 20mm 14mm}
-.cover .ph{border-color:#2B333B;color:#9AA6B4}
-.cover .ph img{height:8mm}
-.cover .mid{flex:1;display:flex;flex-direction:column;justify-content:center;gap:7mm}
-.cover .rule{width:26mm;height:3px;background:var(--cyan)}
-.cover h1{font-weight:600;font-size:34pt;line-height:1.08;letter-spacing:-.02em;color:#fff;max-width:14ch;text-wrap:balance}
-.cover .sub{font-size:12pt;color:#C9D3DE;max-width:44ch}
-.cover dl{display:grid;grid-template-columns:34mm 1fr;gap:2.4mm 6mm;font-size:9.5pt;margin-top:4mm;max-width:150mm}
+.cover{background:var(--tinta);color:#fff}
+.cover .in{flex:1;padding:14mm 20mm 0;display:flex;flex-direction:column}
+.cover .top{display:flex;justify-content:space-between;align-items:center;font-size:9pt;color:#9AA6B4;padding-bottom:4mm;border-bottom:1px solid #2B333B}
+.cover .top img{height:8mm;display:block}
+.cover .tit{margin-top:30mm;display:flex;flex-direction:column;gap:3mm}
+.cover .rule{width:26mm;height:3px;background:var(--cyan);margin-bottom:6mm}
+.cover .doc{font-weight:500;font-size:17pt;color:#C9D3DE;letter-spacing:-.005em}
+.cover .onda{font-weight:600;font-size:76pt;line-height:.95;letter-spacing:-.035em;color:#fff}
+.cover .sub{font-size:11.5pt;color:#C9D3DE;max-width:40ch;margin-top:3mm}
+.cover .motif{margin:8mm -20mm 0;height:70mm}
+.cover .motif svg{width:100%;height:100%;display:block}
+.cover dl{display:grid;grid-template-columns:30mm 1fr 30mm 1fr;gap:2.2mm 5mm;font-size:9pt;padding:6mm 0 7mm;border-top:1px solid #2B333B}
 .cover dt{color:#9AA6B4}
 .cover dd{color:#fff}
-.cover .pf{border-color:#2B333B;color:#9AA6B4}
+.cover .foot{margin:0 20mm 10mm;border-color:#2B333B;color:#9AA6B4}
 
-/* chips */
+/* marcas de situação */
 .chip{display:inline-flex;align-items:center;gap:1.6mm;font-weight:600;font-size:9pt;line-height:1;padding:1.3mm 2.8mm 1.3mm 2.2mm;border-radius:99px;border:1px solid transparent;white-space:nowrap}
 .chip svg{width:3.2mm;height:3.2mm;flex:none}
-.ok{background:var(--cyan-n);color:#004A66;border-color:#9ED9F2}
+.ok{background:var(--cyan-n);color:#004A66;border-color:var(--cyan-b)}
 .ress{background:#fff;color:var(--tinta);border-color:var(--grafite)}
 .fora{background:var(--nevoa);color:var(--cinza);border-color:var(--linha)}
 
-/* tabelas */
-table{border-collapse:collapse;width:100%}
-th{background:var(--tinta);color:#fff;font-weight:600;font-size:9pt;text-align:left;padding:2.4mm 3mm}
-td{padding:2.6mm 3mm;border-bottom:1px solid var(--fio);vertical-align:top;font-size:9.5pt}
-td.num,th.num{text-align:right;white-space:nowrap}
-tr{break-inside:avoid}
+/* escala dos cinco itens */
+.scale{display:grid;grid-template-columns:repeat(5,1fr);gap:2.4mm}
+.seg .bar{height:9mm;border-radius:1.6mm;background:var(--cyan);position:relative}
+.seg .bar.fora{background:#fff;border:1.5px dashed var(--cinza)}
+.seg .bar .m{position:absolute;right:2mm;top:50%;transform:translateY(-50%);width:4.6mm;height:4.6mm}
+.seg .it{font-weight:600;color:var(--tinta);font-size:11pt;margin-top:2.4mm;line-height:1.1}
+.seg .nm{font-size:9pt;color:var(--cinza);line-height:1.35;margin-top:.8mm}
+.legend{display:flex;gap:7mm;font-size:9pt;color:var(--cinza);align-items:center}
+.legend i{display:inline-block;width:6mm;height:3mm;border-radius:.8mm;background:var(--cyan);margin-right:2mm;vertical-align:-.4mm}
+.legend i.f{background:#fff;border:1.5px dashed var(--cinza)}
 
-/* quadro de fatos */
-.fatos{display:grid;grid-template-columns:34mm 1fr;border-top:1px solid var(--tinta)}
-.fatos>*{padding:2.6mm 0;border-bottom:1px solid var(--fio)}
-.fatos dt{font-weight:600;color:var(--tinta)}
+/* livro de itens */
+.led{border-collapse:collapse;width:100%}
+.led td{padding:3.2mm 2mm;border-top:1px solid var(--fio);vertical-align:top;font-size:9.6pt}
+.led tr:last-child td{border-bottom:1px solid var(--fio)}
+.led .ic{width:7mm;padding-left:0}
+.led .ic svg{width:5mm;height:5mm;display:block;margin-top:.3mm}
+.led .nm{width:52mm}
+.led .pg{width:20mm;text-align:right;color:var(--cinza);white-space:nowrap}
+.led tr{break-inside:avoid}
 
-/* fluxo de mudanças de curso */
-.flow3{display:grid;grid-template-columns:1fr 7mm 1fr 7mm 1fr;align-items:stretch;row-gap:3.5mm}
-.flow3 .hd{font-weight:600;font-size:9pt;color:var(--cinza);padding-bottom:1mm;border-bottom:1px solid var(--linha)}
-.box{border:1px solid var(--linha);border-radius:2.5mm;padding:3mm 3.4mm;background:#fff;font-size:9.3pt;line-height:1.45}
-.box b{display:block;margin-bottom:.8mm}
-.box.res{background:var(--cyan-n);border-color:#9ED9F2}
-.box.alt{background:var(--nevoa);border-color:var(--linha)}
-.arr{display:flex;align-items:center;justify-content:center}
-.arr svg{width:5mm;height:5mm}
+.tres{display:grid;grid-template-columns:repeat(3,1fr);gap:7mm}
+.tres>div{border-top:2px solid var(--tinta);padding-top:3mm}
+.tres p{font-size:9.4pt}
 
-/* linha do tempo */
-.tl{position:relative;display:grid;grid-template-columns:20mm 1fr;row-gap:0}
-.tl .d{font-weight:600;color:var(--tinta);padding:1.1mm 0;font-size:9.3pt}
-.tl .t{position:relative;padding:1.1mm 0 1.1mm 7mm;font-size:9.3pt;border-left:2px solid var(--linha);margin-left:0}
-.tl .t:before{content:"";position:absolute;left:-6px;top:2.3mm;width:10px;height:10px;border-radius:50%;background:#fff;border:2px solid var(--grafite)}
-.tl .t.k:before{background:var(--cyan);border-color:var(--cyan)}
-.tl .t.r:before{background:var(--tinta);border-color:var(--tinta)}
-.leg{display:flex;gap:6mm;font-size:9pt;color:var(--cinza);align-items:center}
-.leg i{display:inline-block;width:3mm;height:3mm;border-radius:50%;margin-right:1.6mm;vertical-align:-.4mm;border:2px solid var(--grafite);background:#fff}
-.leg i.k{background:var(--cyan);border-color:var(--cyan)}
-.leg i.r{background:var(--tinta);border-color:var(--tinta)}
+/* diagramas em svg */
+.dg{display:block;width:100%;height:auto}
+.dg text{font-family:Montserrat,"Segoe UI",sans-serif}
+.dg .nn{font-size:3.4px;font-weight:600;fill:#0E1116}
+.dg .ss{font-size:3.2px;fill:#5A6473}
+.dg .pl{font-size:3.2px;font-weight:600;fill:#0E1116}
 
-/* esteira bronze > silver > gold */
-.pipe{display:grid;grid-template-columns:24mm 4mm 41.5mm 4mm 21mm 4mm 27mm 4mm 1fr;align-items:center;row-gap:3mm}
-.pipe .col{font-weight:600;font-size:9pt;color:var(--cinza);padding-bottom:1mm;border-bottom:1px solid var(--linha)}
-.pipe .nd{border:1px solid var(--linha);border-radius:2.5mm;padding:2.4mm 2.8mm;font-size:9pt;line-height:1.35;height:100%}
+/* linha do tempo proporcional */
+.tlh{position:relative;height:72mm}
+.tlh .ax{position:absolute;left:0;right:0;top:39mm;height:2px;background:var(--linha)}
+.tlh .ev{position:absolute;width:0}
+.tlh .dot{position:absolute;left:-1.7mm;top:39mm;width:3.4mm;height:3.4mm;margin-top:-.7mm;border-radius:50%;background:#fff;border:2px solid var(--grafite)}
+.tlh .dot.k{background:var(--cyan);border-color:var(--cyan)}
+.tlh .dot.r{background:var(--tinta);border-color:var(--tinta)}
+.tlh .ln{position:absolute;left:-.5px;width:1px;background:var(--linha)}
+.tlh .lb{position:absolute;font-size:9pt;line-height:1.35;color:var(--grafite)}
+.tlh .lb b{display:block;font-size:9pt}
+.tlh .lb.r{text-align:right}
+
+/* esteira */
+.pipe{display:grid;grid-template-columns:21mm 4mm 43mm 4mm 19mm 4mm 31mm 4mm 1fr;align-items:center;row-gap:3mm}
+.chev{height:8mm;display:flex;align-items:center;padding:0 5mm 0 6mm;font-weight:600;font-size:9.5pt;color:var(--tinta);background:var(--nevoa);margin-right:-4mm;position:relative;clip-path:polygon(0 0,calc(100% - 3.5mm) 0,100% 50%,calc(100% - 3.5mm) 100%,0 100%,3.5mm 50%)}
+.chev.first{clip-path:polygon(0 0,calc(100% - 3.5mm) 0,100% 50%,calc(100% - 3.5mm) 100%,0 100%);padding-left:3mm}
+.chev.b{background:var(--fio)}
+.chev.s{background:var(--cyan-b)}
+.chev.g{background:var(--cyan);margin-right:0;clip-path:polygon(0 0,100% 0,100% 100%,0 100%,3.5mm 50%)}
+.pipe .nd{border:1px solid var(--linha);border-radius:2.5mm;padding:2.4mm 2.8mm;font-size:9pt;line-height:1.35;height:100%;background:#fff}
 .pipe .nd b{display:block;font-size:9pt}
-.pipe .nd.s{background:var(--cyan-n);border-color:#9ED9F2}
-.pipe .nd.q{background:#fff;border-style:dashed;border-color:var(--grafite)}
+.pipe .nd.s{background:var(--cyan-n);border-color:var(--cyan-b)}
+.pipe .nd.q{border-style:dashed;border-color:var(--grafite);background:#fff}
 .pipe .nd.w{grid-column:5/10}
 .pipe .nd.q{grid-column:7/10}
 .pipe .ar{display:flex;justify-content:center}
@@ -103,28 +123,52 @@ tr{break-inside:avoid}
 .pipe .down{grid-column:7;display:flex;justify-content:center}
 .pipe .down svg{width:4mm;height:5mm}
 
-/* esteira de verificação */
-.steps{display:grid;grid-template-columns:1fr 6mm 1fr 6mm 1fr 6mm 1fr;align-items:stretch}
+.camadas{display:grid;grid-template-columns:repeat(3,1fr);gap:6mm}
+.camadas>div{border-top:2px solid var(--tinta);padding-top:2.6mm}
+.camadas .t{font-weight:600;color:var(--tinta);font-size:10.5pt;margin-bottom:1mm}
+.camadas p{font-size:9.3pt}
 
-/* barras */
-.bars{display:grid;grid-template-columns:22mm 1fr 20mm;align-items:center;row-gap:2mm;column-gap:3mm;font-size:9.3pt}
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:0}
+.step{position:relative;padding:3mm 5mm 3mm 6mm;background:var(--nevoa);clip-path:polygon(0 0,calc(100% - 3.5mm) 0,100% 50%,calc(100% - 3.5mm) 100%,0 100%,3.5mm 50%);margin-right:-3mm;font-size:9pt;line-height:1.35;min-height:19mm}
+.step:first-child{clip-path:polygon(0 0,calc(100% - 3.5mm) 0,100% 50%,calc(100% - 3.5mm) 100%,0 100%);padding-left:3.5mm}
+.step:last-child{background:var(--cyan-n);margin-right:0;clip-path:polygon(0 0,100% 0,100% 100%,0 100%,3.5mm 50%)}
+.step b{display:block}
+
+/* painéis de evidência */
+.pn{border-top:2px solid var(--tinta);padding-top:3mm}
+.pn .hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:3.2mm}
+.pn .hd h3{margin:0;font-size:12pt}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:9mm}
+.bars{display:grid;grid-template-columns:19mm 1fr 15mm;align-items:center;row-gap:2mm;column-gap:3mm;font-size:9.3pt}
 .bars .l{color:var(--cinza)}
 .bars .v{text-align:right;font-weight:600;color:var(--tinta)}
 .tr{height:6mm;background:var(--nevoa);border-radius:1mm;position:relative}
 .tr i{position:absolute;left:0;top:0;bottom:0;background:var(--cyan);border-radius:1mm}
 .tr i.d{background:var(--grafite)}
-.two{display:grid;grid-template-columns:1fr 1fr;gap:9mm}
+.cap{font-size:9pt;color:var(--cinza);margin-bottom:2.4mm}
 
-/* checklist */
-.chk{list-style:none;padding:0;display:grid;gap:2.2mm}
-.chk li{display:grid;grid-template-columns:5mm 17mm 1fr;gap:2mm;align-items:start;font-size:9.4pt}
-.chk svg{width:4.4mm;height:4.4mm;margin-top:.5mm}
-.chk .dt{font-weight:600;color:var(--tinta)}
+/* trilho horizontal de marcos */
+.rail{display:grid;grid-template-columns:repeat(4,1fr);position:relative}
+.rail:before{content:"";position:absolute;left:3mm;right:0;top:2.5mm;height:2px;background:var(--linha)}
+.rail>div{position:relative;padding-top:7.5mm;padding-right:4mm;font-size:9.2pt;line-height:1.4}
+.rail .d{font-weight:600;color:var(--tinta);display:block}
+.rail svg{position:absolute;left:0;top:0;width:5.4mm;height:5.4mm;background:#fff}
 
-/* decisão da ressalva */
+/* decisão */
 .dec{display:grid;grid-template-columns:1fr 7mm 1fr 7mm 1fr;align-items:center;row-gap:3mm}
-.dec .split{grid-column:5;display:grid;gap:2.5mm}
-
+.box{border:1px solid var(--linha);border-radius:2.5mm;padding:3mm 3.4mm;background:#fff;font-size:9.3pt;line-height:1.45}
+.box b{display:block;margin-bottom:.8mm}
+.box.res{background:var(--cyan-n);border-color:var(--cyan-b)}
+.box.alt{background:var(--nevoa)}
+.arr{display:flex;align-items:center;justify-content:center}
+.arr svg{width:5mm;height:5mm}
+.split{display:grid;gap:2.5mm}
+.asks{display:grid;gap:3mm;counter-reset:q;padding:0}
+.asks li{list-style:none;display:grid;grid-template-columns:9mm 1fr;align-items:start;gap:2mm;font-size:9.8pt}
+.asks li:before{counter-increment:q;content:counter(q);width:7mm;height:7mm;border-radius:50%;background:var(--tinta);color:#fff;font-weight:600;font-size:9.5pt;display:flex;align-items:center;justify-content:center}
+table.p{border-collapse:collapse;width:100%}
+table.p th{background:var(--tinta);color:#fff;font-weight:600;font-size:9pt;text-align:left;padding:2.4mm 3mm}
+table.p td{padding:2.8mm 3mm;border-bottom:1px solid var(--fio);vertical-align:top;font-size:9.5pt}
 .note{background:var(--nevoa);border:1px solid var(--fio);border-radius:2.5mm;padding:3.4mm 4mm;font-size:9.4pt;max-width:none}
 </style>
 </head>
@@ -142,114 +186,153 @@ tr{break-inside:avoid}
 
 <!-- 1. CAPA -->
 <section class="page cover">
- <div class="ph"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjIwLjgiIGhlaWdodD0iNDAzLjIiIHZpZXdCb3g9IjAgMCAxMjIwLjgwIDQwMy4yMCI+CjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDQxLjIzMCwzMTguOTM4KSBzY2FsZSgwLjQ0MzYyLC0wLjQ0MzYyKSI+CjxwYXRoIHRyYW5zZm9ybT0idHJhbnNsYXRlKDAsMCkiIGQ9Ik01OTQgMzA1VjBINDk4VjI5NFE0OTggMzcxIDQ2MS4wIDQxMC4wUTQyNCA0NDkgMzU1IDQ0OVEyNzcgNDQ5IDIzMi4wIDQwMy41UTE4NyAzNTggMTg3IDI3M1YwSDkxVjUzMEgxODNWNDUwUTIxMiA0OTEgMjYxLjUgNTEzLjBRMzExIDUzNSAzNzQgNTM1UTQ3NSA1MzUgNTM0LjUgNDc2LjVRNTk0IDQxOCA1OTQgMzA1WiIgZmlsbD0iI0ZGRkZGRiIvPgo8cGF0aCB0cmFuc2Zvcm09InRyYW5zbGF0ZSg2ODEsMCkiIGQ9Ik01NjggMjMzSDEzOFExNDcgMTYzIDE5OS41IDEyMC41UTI1MiA3OCAzMzAgNzhRNDI1IDc4IDQ4MyAxNDJMNTM2IDgwUTUwMCAzOCA0NDYuNSAxNi4wUTM5MyAtNiAzMjcgLTZRMjQzIC02IDE3OC4wIDI4LjVRMTEzIDYzIDc3LjUgMTI1LjBRNDIgMTg3IDQyIDI2NVE0MiAzNDIgNzYuNSA0MDQuMFExMTEgNDY2IDE3MS41IDUwMC41UTIzMiA1MzUgMzA4IDUzNVEzODQgNTM1IDQ0My41IDUwMC41UTUwMyA0NjYgNTM2LjUgNDA0LjBRNTcwIDM0MiA1NzAgMjYyUTU3MCAyNTEgNTY4IDIzM1pNMTM4IDMwMkg0NzhRNDcwIDM2OSA0MjMuNSA0MTEuNVEzNzcgNDU0IDMwOCA0NTRRMjM5IDQ1NCAxOTIuNSA0MTIuMFExNDYgMzcwIDEzOCAzMDJaIiBmaWxsPSIjRkZGRkZGIi8+CjxwYXRoIHRyYW5zZm9ybT0idHJhbnNsYXRlKDEyOTMsMCkiIGQ9Ik0yNCA1NiA2NCAxMzJROTkgMTA3IDE0OS4wIDkyLjBRMTk5IDc3IDI1MCA3N1EzNzYgNzcgMzc2IDE0OVEzNzYgMTczIDM1OS4wIDE4Ny4wUTM0MiAyMDEgMzE2LjUgMjA3LjVRMjkxIDIxNCAyNDQgMjIyUTE4MCAyMzIgMTM5LjUgMjQ1LjBROTkgMjU4IDcwLjAgMjg5LjBRNDEgMzIwIDQxIDM3NlE0MSA0NDggMTAxLjAgNDkxLjVRMTYxIDUzNSAyNjIgNTM1UTMxNSA1MzUgMzY4LjAgNTIyLjBRNDIxIDUwOSA0NTUgNDg3TDQxNCA0MTFRMzQ5IDQ1MyAyNjEgNDUzUTIwMCA0NTMgMTY4LjAgNDMzLjBRMTM2IDQxMyAxMzYgMzgwUTEzNiAzNTQgMTU0LjAgMzM5LjBRMTcyIDMyNCAxOTguNSAzMTcuMFEyMjUgMzEwIDI3MyAzMDFRMzM3IDI5MCAzNzYuNSAyNzcuNVE0MTYgMjY1IDQ0NC4wIDIzNS4wUTQ3MiAyMDUgNDcyIDE1MVE0NzIgNzkgNDEwLjUgMzYuNVEzNDkgLTYgMjQzIC02UTE3OCAtNiAxMTguMCAxMS41UTU4IDI5IDI0IDU2WiIgZmlsbD0iI0ZGRkZGRiIvPgo8cGF0aCB0cmFuc2Zvcm09InRyYW5zbGF0ZSgxNzk0LDApIiBkPSJNMjQgNTYgNjQgMTMyUTk5IDEwNyAxNDkuMCA5Mi4wUTE5OSA3NyAyNTAgNzdRMzc2IDc3IDM3NiAxNDlRMzc2IDE3MyAzNTkuMCAxODcuMFEzNDIgMjAxIDMxNi41IDIwNy41UTI5MSAyMTQgMjQ0IDIyMlExODAgMjMyIDEzOS41IDI0NS4wUTk5IDI1OCA3MC4wIDI4OS4wUTQxIDMyMCA0MSAzNzZRNDEgNDQ4IDEwMS4wIDQ5MS41UTE2MSA1MzUgMjYyIDUzNVEzMTUgNTM1IDM2OC4wIDUyMi4wUTQyMSA1MDkgNDU1IDQ4N0w0MTQgNDExUTM0OSA0NTMgMjYxIDQ1M1EyMDAgNDUzIDE2OC4wIDQzMy4wUTEzNiA0MTMgMTM2IDM4MFExMzYgMzU0IDE1NC4wIDMzOS4wUTE3MiAzMjQgMTk4LjUgMzE3LjBRMjI1IDMxMCAyNzMgMzAxUTMzNyAyOTAgMzc2LjUgMjc3LjVRNDE2IDI2NSA0NDQuMCAyMzUuMFE0NzIgMjA1IDQ3MiAxNTFRNDcyIDc5IDQxMC41IDM2LjVRMzQ5IC02IDI0MyAtNlExNzggLTYgMTE4LjAgMTEuNVE1OCAyOSAyNCA1NloiIGZpbGw9IiNGRkZGRkYiLz4KPHBhdGggdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMjI5NSwwKSIgZD0iTTQ2IDYzUTQ2IDkyIDY2LjAgMTExLjVRODYgMTMxIDExNCAxMzFRMTQyIDEzMSAxNjEuMCAxMTIuMFExODAgOTMgMTgwIDYzUTE4MCAzMyAxNjAuNSAxMy41UTE0MSAtNiAxMTQgLTZRODYgLTYgNjYuMCAxMy41UTQ2IDMzIDQ2IDYzWiIgZmlsbD0iIzAwQURFOCIvPgo8L2c+PC9zdmc+" alt="ness."><span>AlupData Fase 1 · CPS-01025/2026</span></div>
- <div class="mid">
-  <div class="rule"></div>
-  <h1>Dossiê de homologação da Onda 2</h1>
-  <p class="sub">A evidência fonte por fonte, dizendo o que está pronto e o que não está.</p>
+ <div class="in">
+  <div class="top"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjIwLjgiIGhlaWdodD0iNDAzLjIiIHZpZXdCb3g9IjAgMCAxMjIwLjgwIDQwMy4yMCI+CjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDQxLjIzMCwzMTguOTM4KSBzY2FsZSgwLjQ0MzYyLC0wLjQ0MzYyKSI+CjxwYXRoIHRyYW5zZm9ybT0idHJhbnNsYXRlKDAsMCkiIGQ9Ik01OTQgMzA1VjBINDk4VjI5NFE0OTggMzcxIDQ2MS4wIDQxMC4wUTQyNCA0NDkgMzU1IDQ0OVEyNzcgNDQ5IDIzMi4wIDQwMy41UTE4NyAzNTggMTg3IDI3M1YwSDkxVjUzMEgxODNWNDUwUTIxMiA0OTEgMjYxLjUgNTEzLjBRMzExIDUzNSAzNzQgNTM1UTQ3NSA1MzUgNTM0LjUgNDc2LjVRNTk0IDQxOCA1OTQgMzA1WiIgZmlsbD0iI0ZGRkZGRiIvPgo8cGF0aCB0cmFuc2Zvcm09InRyYW5zbGF0ZSg2ODEsMCkiIGQ9Ik01NjggMjMzSDEzOFExNDcgMTYzIDE5OS41IDEyMC41UTI1MiA3OCAzMzAgNzhRNDI1IDc4IDQ4MyAxNDJMNTM2IDgwUTUwMCAzOCA0NDYuNSAxNi4wUTM5MyAtNiAzMjcgLTZRMjQzIC02IDE3OC4wIDI4LjVRMTEzIDYzIDc3LjUgMTI1LjBRNDIgMTg3IDQyIDI2NVE0MiAzNDIgNzYuNSA0MDQuMFExMTEgNDY2IDE3MS41IDUwMC41UTIzMiA1MzUgMzA4IDUzNVEzODQgNTM1IDQ0My41IDUwMC41UTUwMyA0NjYgNTM2LjUgNDA0LjBRNTcwIDM0MiA1NzAgMjYyUTU3MCAyNTEgNTY4IDIzM1pNMTM4IDMwMkg0NzhRNDcwIDM2OSA0MjMuNSA0MTEuNVEzNzcgNDU0IDMwOCA0NTRRMjM5IDQ1NCAxOTIuNSA0MTIuMFExNDYgMzcwIDEzOCAzMDJaIiBmaWxsPSIjRkZGRkZGIi8+CjxwYXRoIHRyYW5zZm9ybT0idHJhbnNsYXRlKDEyOTMsMCkiIGQ9Ik0yNCA1NiA2NCAxMzJROTkgMTA3IDE0OS4wIDkyLjBRMTk5IDc3IDI1MCA3N1EzNzYgNzcgMzc2IDE0OVEzNzYgMTczIDM1OS4wIDE4Ny4wUTM0MiAyMDEgMzE2LjUgMjA3LjVRMjkxIDIxNCAyNDQgMjIyUTE4MCAyMzIgMTM5LjUgMjQ1LjBROTkgMjU4IDcwLjAgMjg5LjBRNDEgMzIwIDQxIDM3NlE0MSA0NDggMTAxLjAgNDkxLjVRMTYxIDUzNSAyNjIgNTM1UTMxNSA1MzUgMzY4LjAgNTIyLjBRNDIxIDUwOSA0NTUgNDg3TDQxNCA0MTFRMzQ5IDQ1MyAyNjEgNDUzUTIwMCA0NTMgMTY4LjAgNDMzLjBRMTM2IDQxMyAxMzYgMzgwUTEzNiAzNTQgMTU0LjAgMzM5LjBRMTcyIDMyNCAxOTguNSAzMTcuMFEyMjUgMzEwIDI3MyAzMDFRMzM3IDI5MCAzNzYuNSAyNzcuNVE0MTYgMjY1IDQ0NC4wIDIzNS4wUTQ3MiAyMDUgNDcyIDE1MVE0NzIgNzkgNDEwLjUgMzYuNVEzNDkgLTYgMjQzIC02UTE3OCAtNiAxMTguMCAxMS41UTU4IDI5IDI0IDU2WiIgZmlsbD0iI0ZGRkZGRiIvPgo8cGF0aCB0cmFuc2Zvcm09InRyYW5zbGF0ZSgxNzk0LDApIiBkPSJNMjQgNTYgNjQgMTMyUTk5IDEwNyAxNDkuMCA5Mi4wUTE5OSA3NyAyNTAgNzdRMzc2IDc3IDM3NiAxNDlRMzc2IDE3MyAzNTkuMCAxODcuMFEzNDIgMjAxIDMxNi41IDIwNy41UTI5MSAyMTQgMjQ0IDIyMlExODAgMjMyIDEzOS41IDI0NS4wUTk5IDI1OCA3MC4wIDI4OS4wUTQxIDMyMCA0MSAzNzZRNDEgNDQ4IDEwMS4wIDQ5MS41UTE2MSA1MzUgMjYyIDUzNVEzMTUgNTM1IDM2OC4wIDUyMi4wUTQyMSA1MDkgNDU1IDQ4N0w0MTQgNDExUTM0OSA0NTMgMjYxIDQ1M1EyMDAgNDUzIDE2OC4wIDQzMy4wUTEzNiA0MTMgMTM2IDM4MFExMzYgMzU0IDE1NC4wIDMzOS4wUTE3MiAzMjQgMTk4LjUgMzE3LjBRMjI1IDMxMCAyNzMgMzAxUTMzNyAyOTAgMzc2LjUgMjc3LjVRNDE2IDI2NSA0NDQuMCAyMzUuMFE0NzIgMjA1IDQ3MiAxNTFRNDcyIDc5IDQxMC41IDM2LjVRMzQ5IC02IDI0MyAtNlExNzggLTYgMTE4LjAgMTEuNVE1OCAyOSAyNCA1NloiIGZpbGw9IiNGRkZGRkYiLz4KPHBhdGggdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMjI5NSwwKSIgZD0iTTQ2IDYzUTQ2IDkyIDY2LjAgMTExLjVRODYgMTMxIDExNCAxMzFRMTQyIDEzMSAxNjEuMCAxMTIuMFExODAgOTMgMTgwIDYzUTE4MCAzMyAxNjAuNSAxMy41UTE0MSAtNiAxMTQgLTZRODYgLTYgNjYuMCAxMy41UTQ2IDMzIDQ2IDYzWiIgZmlsbD0iIzAwQURFOCIvPgo8L2c+PC9zdmc+" alt="ness."><span>AlupData Fase 1 · CPS-01025/2026</span></div>
+  <div class="tit">
+   <div class="rule"></div>
+   <div class="doc">Dossiê de homologação</div>
+   <div class="onda">Onda 2</div>
+   <p class="sub">A evidência fonte por fonte, dizendo o que está pronto e o que não está.</p>
+  </div>
+  <div class="motif">
+   <svg viewBox="0 0 210 70" preserveAspectRatio="none" aria-hidden="true">
+    <g fill="none" stroke="#2B333B" stroke-width=".5">
+     <path d="M0 6 C70 6 110 35 170 35"/><path d="M0 14 C70 14 110 35 170 35"/><path d="M0 22 C70 22 110 35 170 35"/>
+     <path d="M0 30 C70 30 110 35 170 35"/><path d="M0 40 C70 40 110 35 170 35"/><path d="M0 48 C70 48 110 35 170 35"/>
+     <path d="M0 56 C70 56 110 35 170 35"/><path d="M0 64 C70 64 110 35 170 35"/>
+    </g>
+    <path d="M0 30 C70 30 110 35 170 35 L210 35" fill="none" stroke="#00ADE8" stroke-width=".9"/>
+    <path d="M0 40 C70 40 110 35 170 35" fill="none" stroke="#00ADE8" stroke-width=".9"/>
+    <path d="M0 22 C70 22 110 35 170 35" fill="none" stroke="#00ADE8" stroke-width=".9"/>
+    <circle cx="170" cy="35" r="2.2" fill="#00ADE8"/>
+   </svg>
+  </div>
   <dl>
    <dt>Marco</dt><dd>3, Onda 2 · R$ 28.160,00</dd>
+   <dt>Referência</dt><dd>REL-2026-11-19-D</dd>
    <dt>Destinatário</dt><dd>Alup: Leonardo Guiel Marques, Taina Ulhoa Mota, Mauricio Cardoso e Saulo Rodrigues</dd>
+   <dt>Emissão</dt><dd>19 de novembro de 2026</dd>
    <dt>Emitente</dt><dd>ness. Processos e Tecnologia Ltda.</dd>
    <dt>Responsável técnico</dt><dd>Ricardo Esper</dd>
-   <dt>Referência</dt><dd>REL-2026-11-19-D</dd>
-   <dt>Emissão</dt><dd>19 de novembro de 2026; conferência de cargas lida em dev e hml</dd>
   </dl>
  </div>
- <div class="pf"><span>Confidencial: uso restrito das partes</span><span>1 / 6</span></div>
+ <div class="foot"><span>Confidencial: uso restrito das partes</span><span>1 / 6</span></div>
 </section>
 
-<!-- 2. RESUMO -->
+<!-- 2. VEREDITO -->
 <section class="page">
- <div class="ph"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjIwLjgiIGhlaWdodD0iNDAzLjIiIHZpZXdCb3g9IjAgMCAxMjIwLjgwIDQwMy4yMCI+CjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDQxLjIzMCwzMTguOTM4KSBzY2FsZSgwLjQ0MzYyLC0wLjQ0MzYyKSI+CjxwYXRoIHRyYW5zZm9ybT0idHJhbnNsYXRlKDAsMCkiIGQ9Ik01OTQgMzA1VjBINDk4VjI5NFE0OTggMzcxIDQ2MS4wIDQxMC4wUTQyNCA0NDkgMzU1IDQ0OVEyNzcgNDQ5IDIzMi4wIDQwMy41UTE4NyAzNTggMTg3IDI3M1YwSDkxVjUzMEgxODNWNDUwUTIxMiA0OTEgMjYxLjUgNTEzLjBRMzExIDUzNSAzNzQgNTM1UTQ3NSA1MzUgNTM0LjUgNDc2LjVRNTk0IDQxOCA1OTQgMzA1WiIgZmlsbD0iIzAwMDAwMCIvPgo8cGF0aCB0cmFuc2Zvcm09InRyYW5zbGF0ZSg2ODEsMCkiIGQ9Ik01NjggMjMzSDEzOFExNDcgMTYzIDE5OS41IDEyMC41UTI1MiA3OCAzMzAgNzhRNDI1IDc4IDQ4MyAxNDJMNTM2IDgwUTUwMCAzOCA0NDYuNSAxNi4wUTM5MyAtNiAzMjcgLTZRMjQzIC02IDE3OC4wIDI4LjVRMTEzIDYzIDc3LjUgMTI1LjBRNDIgMTg3IDQyIDI2NVE0MiAzNDIgNzYuNSA0MDQuMFExMTEgNDY2IDE3MS41IDUwMC41UTIzMiA1MzUgMzA4IDUzNVEzODQgNTM1IDQ0My41IDUwMC41UTUwMyA0NjYgNTM2LjUgNDA0LjBRNTcwIDM0MiA1NzAgMjYyUTU3MCAyNTEgNTY4IDIzM1pNMTM4IDMwMkg0NzhRNDcwIDM2OSA0MjMuNSA0MTEuNVEzNzcgNDU0IDMwOCA0NTRRMjM5IDQ1NCAxOTIuNSA0MTIuMFExNDYgMzcwIDEzOCAzMDJaIiBmaWxsPSIjMDAwMDAwIi8+CjxwYXRoIHRyYW5zZm9ybT0idHJhbnNsYXRlKDEyOTMsMCkiIGQ9Ik0yNCA1NiA2NCAxMzJROTkgMTA3IDE0OS4wIDkyLjBRMTk5IDc3IDI1MCA3N1EzNzYgNzcgMzc2IDE0OVEzNzYgMTczIDM1OS4wIDE4Ny4wUTM0MiAyMDEgMzE2LjUgMjA3LjVRMjkxIDIxNCAyNDQgMjIyUTE4MCAyMzIgMTM5LjUgMjQ1LjBROTkgMjU4IDcwLjAgMjg5LjBRNDEgMzIwIDQxIDM3NlE0MSA0NDggMTAxLjAgNDkxLjVRMTYxIDUzNSAyNjIgNTM1UTMxNSA1MzUgMzY4LjAgNTIyLjBRNDIxIDUwOSA0NTUgNDg3TDQxNCA0MTFRMzQ5IDQ1MyAyNjEgNDUzUTIwMCA0NTMgMTY4LjAgNDMzLjBRMTM2IDQxMyAxMzYgMzgwUTEzNiAzNTQgMTU0LjAgMzM5LjBRMTcyIDMyNCAxOTguNSAzMTcuMFEyMjUgMzEwIDI3MyAzMDFRMzM3IDI5MCAzNzYuNSAyNzcuNVE0MTYgMjY1IDQ0NC4wIDIzNS4wUTQ3MiAyMDUgNDcyIDE1MVE0NzIgNzkgNDEwLjUgMzYuNVEzNDkgLTYgMjQzIC02UTE3OCAtNiAxMTguMCAxMS41UTU4IDI5IDI0IDU2WiIgZmlsbD0iIzAwMDAwMCIvPgo8cGF0aCB0cmFuc2Zvcm09InRyYW5zbGF0ZSgxNzk0LDApIiBkPSJNMjQgNTYgNjQgMTMyUTk5IDEwNyAxNDkuMCA5Mi4wUTE5OSA3NyAyNTAgNzdRMzc2IDc3IDM3NiAxNDlRMzc2IDE3MyAzNTkuMCAxODcuMFEzNDIgMjAxIDMxNi41IDIwNy41UTI5MSAyMTQgMjQ0IDIyMlExODAgMjMyIDEzOS41IDI0NS4wUTk5IDI1OCA3MC4wIDI4OS4wUTQxIDMyMCA0MSAzNzZRNDEgNDQ4IDEwMS4wIDQ5MS41UTE2MSA1MzUgMjYyIDUzNVEzMTUgNTM1IDM2OC4wIDUyMi4wUTQyMSA1MDkgNDU1IDQ4N0w0MTQgNDExUTM0OSA0NTMgMjYxIDQ1M1EyMDAgNDUzIDE2OC4wIDQzMy4wUTEzNiA0MTMgMTM2IDM4MFExMzYgMzU0IDE1NC4wIDMzOS4wUTE3MiAzMjQgMTk4LjUgMzE3LjBRMjI1IDMxMCAyNzMgMzAxUTMzNyAyOTAgMzc2LjUgMjc3LjVRNDE2IDI2NSA0NDQuMCAyMzUuMFE0NzIgMjA1IDQ3MiAxNTFRNDcyIDc5IDQxMC41IDM2LjVRMzQ5IC02IDI0MyAtNlExNzggLTYgMTE4LjAgMTEuNVE1OCAyOSAyNCA1NloiIGZpbGw9IiMwMDAwMDAiLz4KPHBhdGggdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMjI5NSwwKSIgZD0iTTQ2IDYzUTQ2IDkyIDY2LjAgMTExLjVRODYgMTMxIDExNCAxMzFRMTQyIDEzMSAxNjEuMCAxMTIuMFExODAgOTMgMTgwIDYzUTE4MCAzMyAxNjAuNSAxMy41UTE0MSAtNiAxMTQgLTZRODYgLTYgNjYuMCAxMy41UTQ2IDMzIDQ2IDYzWiIgZmlsbD0iIzAwQURFOCIvPgo8L2c+PC9zdmc+" alt="ness."><span>Dossiê de homologação · Onda 2</span></div>
- <div class="pb">
-  <h2><span class="n">1</span>Resumo: o que está pronto e o que não está</h2>
-  <p class="lead">As Ondas 0 e 1 foram aceitas por escrito em 05/10/2026 e faturadas (marcos 1 e 2). A janela da Onda 2 terminou em 13/11. Três das quatro fontes previstas estão entregues em dev e hml, uma saiu do escopo e uma ressalva depende da Alupar.</p>
-
+ <div class="band">
+  <div class="top"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjIwLjgiIGhlaWdodD0iNDAzLjIiIHZpZXdCb3g9IjAgMCAxMjIwLjgwIDQwMy4yMCI+CjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDQxLjIzMCwzMTguOTM4KSBzY2FsZSgwLjQ0MzYyLC0wLjQ0MzYyKSI+CjxwYXRoIHRyYW5zZm9ybT0idHJhbnNsYXRlKDAsMCkiIGQ9Ik01OTQgMzA1VjBINDk4VjI5NFE0OTggMzcxIDQ2MS4wIDQxMC4wUTQyNCA0NDkgMzU1IDQ0OVEyNzcgNDQ5IDIzMi4wIDQwMy41UTE4NyAzNTggMTg3IDI3M1YwSDkxVjUzMEgxODNWNDUwUTIxMiA0OTEgMjYxLjUgNTEzLjBRMzExIDUzNSAzNzQgNTM1UTQ3NSA1MzUgNTM0LjUgNDc2LjVRNTk0IDQxOCA1OTQgMzA1WiIgZmlsbD0iI0ZGRkZGRiIvPgo8cGF0aCB0cmFuc2Zvcm09InRyYW5zbGF0ZSg2ODEsMCkiIGQ9Ik01NjggMjMzSDEzOFExNDcgMTYzIDE5OS41IDEyMC41UTI1MiA3OCAzMzAgNzhRNDI1IDc4IDQ4MyAxNDJMNTM2IDgwUTUwMCAzOCA0NDYuNSAxNi4wUTM5MyAtNiAzMjcgLTZRMjQzIC02IDE3OC4wIDI4LjVRMTEzIDYzIDc3LjUgMTI1LjBRNDIgMTg3IDQyIDI2NVE0MiAzNDIgNzYuNSA0MDQuMFExMTEgNDY2IDE3MS41IDUwMC41UTIzMiA1MzUgMzA4IDUzNVEzODQgNTM1IDQ0My41IDUwMC41UTUwMyA0NjYgNTM2LjUgNDA0LjBRNTcwIDM0MiA1NzAgMjYyUTU3MCAyNTEgNTY4IDIzM1pNMTM4IDMwMkg0NzhRNDcwIDM2OSA0MjMuNSA0MTEuNVEzNzcgNDU0IDMwOCA0NTRRMjM5IDQ1NCAxOTIuNSA0MTIuMFExNDYgMzcwIDEzOCAzMDJaIiBmaWxsPSIjRkZGRkZGIi8+CjxwYXRoIHRyYW5zZm9ybT0idHJhbnNsYXRlKDEyOTMsMCkiIGQ9Ik0yNCA1NiA2NCAxMzJROTkgMTA3IDE0OS4wIDkyLjBRMTk5IDc3IDI1MCA3N1EzNzYgNzcgMzc2IDE0OVEzNzYgMTczIDM1OS4wIDE4Ny4wUTM0MiAyMDEgMzE2LjUgMjA3LjVRMjkxIDIxNCAyNDQgMjIyUTE4MCAyMzIgMTM5LjUgMjQ1LjBROTkgMjU4IDcwLjAgMjg5LjBRNDEgMzIwIDQxIDM3NlE0MSA0NDggMTAxLjAgNDkxLjVRMTYxIDUzNSAyNjIgNTM1UTMxNSA1MzUgMzY4LjAgNTIyLjBRNDIxIDUwOSA0NTUgNDg3TDQxNCA0MTFRMzQ5IDQ1MyAyNjEgNDUzUTIwMCA0NTMgMTY4LjAgNDMzLjBRMTM2IDQxMyAxMzYgMzgwUTEzNiAzNTQgMTU0LjAgMzM5LjBRMTcyIDMyNCAxOTguNSAzMTcuMFEyMjUgMzEwIDI3MyAzMDFRMzM3IDI5MCAzNzYuNSAyNzcuNVE0MTYgMjY1IDQ0NC4wIDIzNS4wUTQ3MiAyMDUgNDcyIDE1MVE0NzIgNzkgNDEwLjUgMzYuNVEzNDkgLTYgMjQzIC02UTE3OCAtNiAxMTguMCAxMS41UTU4IDI5IDI0IDU2WiIgZmlsbD0iI0ZGRkZGRiIvPgo8cGF0aCB0cmFuc2Zvcm09InRyYW5zbGF0ZSgxNzk0LDApIiBkPSJNMjQgNTYgNjQgMTMyUTk5IDEwNyAxNDkuMCA5Mi4wUTE5OSA3NyAyNTAgNzdRMzc2IDc3IDM3NiAxNDlRMzc2IDE3MyAzNTkuMCAxODcuMFEzNDIgMjAxIDMxNi41IDIwNy41UTI5MSAyMTQgMjQ0IDIyMlExODAgMjMyIDEzOS41IDI0NS4wUTk5IDI1OCA3MC4wIDI4OS4wUTQxIDMyMCA0MSAzNzZRNDEgNDQ4IDEwMS4wIDQ5MS41UTE2MSA1MzUgMjYyIDUzNVEzMTUgNTM1IDM2OC4wIDUyMi4wUTQyMSA1MDkgNDU1IDQ4N0w0MTQgNDExUTM0OSA0NTMgMjYxIDQ1M1EyMDAgNDUzIDE2OC4wIDQzMy4wUTEzNiA0MTMgMTM2IDM4MFExMzYgMzU0IDE1NC4wIDMzOS4wUTE3MiAzMjQgMTk4LjUgMzE3LjBRMjI1IDMxMCAyNzMgMzAxUTMzNyAyOTAgMzc2LjUgMjc3LjVRNDE2IDI2NSA0NDQuMCAyMzUuMFE0NzIgMjA1IDQ3MiAxNTFRNDcyIDc5IDQxMC41IDM2LjVRMzQ5IC02IDI0MyAtNlExNzggLTYgMTE4LjAgMTEuNVE1OCAyOSAyNCA1NloiIGZpbGw9IiNGRkZGRkYiLz4KPHBhdGggdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMjI5NSwwKSIgZD0iTTQ2IDYzUTQ2IDkyIDY2LjAgMTExLjVRODYgMTMxIDExNCAxMzFRMTQyIDEzMSAxNjEuMCAxMTIuMFExODAgOTMgMTgwIDYzUTE4MCAzMyAxNjAuNSAxMy41UTE0MSAtNiAxMTQgLTZRODYgLTYgNjYuMCAxMy41UTQ2IDMzIDQ2IDYzWiIgZmlsbD0iIzAwQURFOCIvPgo8L2c+PC9zdmc+" alt="ness."><span>Dossiê de homologação · Onda 2</span></div>
+  <div class="rule"></div>
+  <h2>Três fontes entregues, uma fora do escopo e uma ressalva que depende da Alupar</h2>
+  <p class="lead">As Ondas 0 e 1 foram aceitas por escrito em 05/10/2026 e faturadas (marcos 1 e 2). A janela da Onda 2 terminou em 13/11. Os números abaixo são de 19/11, lidos em dev e hml.</p>
+ </div>
+ <div class="body">
   <div>
-   <h3>Situação por item, em 19/11</h3>
-   <table>
-    <tr><th style="width:11mm">Item</th><th style="width:38mm">Fonte</th><th>Situação</th><th style="width:22mm">Evidência</th></tr>
-    <tr><td>2.1</td><td><b>CCEE</b> agente credenciado</td><td><span class="chip ok"><svg><use href="#i-ok"/></svg>Entregue</span> <span class="chip ress"><svg><use href="#i-ress"/></svg>Com ressalva</span><br><span class="mut">Leitura real em 09/11 e medição carregada em dev e hml. O cadastro de pontos aguarda a permissão da Alupar.</span></td><td>página 5</td></tr>
-    <tr><td>2.2</td><td><b>BBCE</b></td><td><span class="chip ok"><svg><use href="#i-ok"/></svg>Entregue</span><br><span class="mut">Carga real e agendamento em dev e hml.</span></td><td>página 5</td></tr>
-    <tr><td>2.3</td><td><b>Hubspot</b></td><td><span class="chip ok"><svg><use href="#i-ok"/></svg>Entregue</span><br><span class="mut">Carga real em 22/10 nos dois ambientes; agendamento criado em 19/11 (#482).</span></td><td>página 5</td></tr>
-    <tr><td>2.4</td><td><b>TempoOK</b></td><td><span class="chip fora"><svg><use href="#i-fora"/></svg>Fora do escopo</span><br><span class="mut">Com as horas executadas contabilizadas.</span></td><td>página 3</td></tr>
-    <tr><td>2.5</td><td><b>Gold</b> de preço e posição comercial</td><td><span class="chip ok"><svg><use href="#i-ok"/></svg>Entregue</span><br><span class="mut">Para BBCE e Hubspot.</span></td><td>páginas 4 e 5</td></tr>
-   </table>
+   <h3>Os cinco itens da onda</h3>
+   <div class="scale">
+    <div class="seg"><div class="bar"><svg class="m"><use href="#i-ress"/></svg></div><div class="it">2.1</div><div class="nm">CCEE agente credenciado</div></div>
+    <div class="seg"><div class="bar"></div><div class="it">2.2</div><div class="nm">BBCE</div></div>
+    <div class="seg"><div class="bar"></div><div class="it">2.3</div><div class="nm">Hubspot</div></div>
+    <div class="seg"><div class="bar fora"></div><div class="it">2.4</div><div class="nm">TempoOK</div></div>
+    <div class="seg"><div class="bar"></div><div class="it">2.5</div><div class="nm">Gold de preço e posição</div></div>
+   </div>
+   <div class="legend" style="margin-top:3.5mm"><span><i></i>entregue em dev e hml</span><span><i class="f"></i>fora do escopo</span><span><svg style="width:4mm;height:4mm;vertical-align:-.8mm;margin-right:1.4mm"><use href="#i-ress"/></svg>com ressalva</span></div>
   </div>
+
+  <table class="led">
+   <tr><td class="ic"><svg><use href="#i-ress"/></svg></td><td class="nm"><b>2.1 CCEE</b><br><span class="mut">agente credenciado</span></td><td>Leitura real em 09/11 e medição carregada em dev e hml. O cadastro de pontos aguarda a permissão da Alupar.</td><td class="pg">página 5</td></tr>
+   <tr><td class="ic"><svg><use href="#i-ok"/></svg></td><td class="nm"><b>2.2 BBCE</b></td><td>Carga real e agendamento em dev e hml.</td><td class="pg">página 5</td></tr>
+   <tr><td class="ic"><svg><use href="#i-ok"/></svg></td><td class="nm"><b>2.3 Hubspot</b></td><td>Carga real em 22/10 nos dois ambientes; agendamento criado em 19/11 (#482).</td><td class="pg">página 5</td></tr>
+   <tr><td class="ic"><svg><use href="#i-fora"/></svg></td><td class="nm"><b>2.4 TempoOK</b></td><td>Fora do escopo, com as horas executadas contabilizadas.</td><td class="pg">página 3</td></tr>
+   <tr><td class="ic"><svg><use href="#i-ok"/></svg></td><td class="nm"><b>2.5 Gold</b><br><span class="mut">preço e posição comercial</span></td><td>Entregue para BBCE e Hubspot.</td><td class="pg">páginas 4 e 5</td></tr>
+  </table>
 
   <div>
    <h3>Verificação</h3>
-   <dl class="fatos">
-    <dt>Componentes</dt><dd>64 fontes registradas, todas com os 7 componentes de arquivo da cláusula 2ª (conector, Bronze, Silver, Gold, testes, agendamento e documentação com linhagem).</dd>
-    <dt>Testes</dt><dd>2.293 aprovados e 607 ignorados por desenho; cobertura de linhas de 96%.</dd>
-    <dt>Credenciais</dt><dd>Hubspot gravada em 20/10, BBCE em uso em 28/10 e CCEE em 09/11.</dd>
-   </dl>
+   <div class="tres">
+    <div><b>Componentes</b><p>64 fontes registradas, todas com os 7 componentes de arquivo da cláusula 2ª.</p></div>
+    <div><b>Testes</b><p>2.293 aprovados e 607 ignorados por desenho; cobertura de linhas de 96%.</p></div>
+    <div><b>Credenciais</b><p>Hubspot gravada em 20/10, BBCE em uso em 28/10 e CCEE em 09/11.</p></div>
+   </div>
   </div>
  </div>
- <div class="pf"><span>Confidencial: uso restrito das partes · REL-2026-11-19-D</span><span>2 / 6</span></div>
+ <div class="foot"><span>Confidencial: uso restrito das partes · REL-2026-11-19-D</span><span>2 / 6</span></div>
 </section>
 
-<!-- 3. ESCOPO E LINHA DO TEMPO -->
+<!-- 3. ESCOPO -->
 <section class="page">
- <div class="ph"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjIwLjgiIGhlaWdodD0iNDAzLjIiIHZpZXdCb3g9IjAgMCAxMjIwLjgwIDQwMy4yMCI+CjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDQxLjIzMCwzMTguOTM4KSBzY2FsZSgwLjQ0MzYyLC0wLjQ0MzYyKSI+CjxwYXRoIHRyYW5zZm9ybT0idHJhbnNsYXRlKDAsMCkiIGQ9Ik01OTQgMzA1VjBINDk4VjI5NFE0OTggMzcxIDQ2MS4wIDQxMC4wUTQyNCA0NDkgMzU1IDQ0OVEyNzcgNDQ5IDIzMi4wIDQwMy41UTE4NyAzNTggMTg3IDI3M1YwSDkxVjUzMEgxODNWNDUwUTIxMiA0OTEgMjYxLjUgNTEzLjBRMzExIDUzNSAzNzQgNTM1UTQ3NSA1MzUgNTM0LjUgNDc2LjVRNTk0IDQxOCA1OTQgMzA1WiIgZmlsbD0iIzAwMDAwMCIvPgo8cGF0aCB0cmFuc2Zvcm09InRyYW5zbGF0ZSg2ODEsMCkiIGQ9Ik01NjggMjMzSDEzOFExNDcgMTYzIDE5OS41IDEyMC41UTI1MiA3OCAzMzAgNzhRNDI1IDc4IDQ4MyAxNDJMNTM2IDgwUTUwMCAzOCA0NDYuNSAxNi4wUTM5MyAtNiAzMjcgLTZRMjQzIC02IDE3OC4wIDI4LjVRMTEzIDYzIDc3LjUgMTI1LjBRNDIgMTg3IDQyIDI2NVE0MiAzNDIgNzYuNSA0MDQuMFExMTEgNDY2IDE3MS41IDUwMC41UTIzMiA1MzUgMzA4IDUzNVEzODQgNTM1IDQ0My41IDUwMC41UTUwMyA0NjYgNTM2LjUgNDA0LjBRNTcwIDM0MiA1NzAgMjYyUTU3MCAyNTEgNTY4IDIzM1pNMTM4IDMwMkg0NzhRNDcwIDM2OSA0MjMuNSA0MTEuNVEzNzcgNDU0IDMwOCA0NTRRMjM5IDQ1NCAxOTIuNSA0MTIuMFExNDYgMzcwIDEzOCAzMDJaIiBmaWxsPSIjMDAwMDAwIi8+CjxwYXRoIHRyYW5zZm9ybT0idHJhbnNsYXRlKDEyOTMsMCkiIGQ9Ik0yNCA1NiA2NCAxMzJROTkgMTA3IDE0OS4wIDkyLjBRMTk5IDc3IDI1MCA3N1EzNzYgNzcgMzc2IDE0OVEzNzYgMTczIDM1OS4wIDE4Ny4wUTM0MiAyMDEgMzE2LjUgMjA3LjVRMjkxIDIxNCAyNDQgMjIyUTE4MCAyMzIgMTM5LjUgMjQ1LjBROTkgMjU4IDcwLjAgMjg5LjBRNDEgMzIwIDQxIDM3NlE0MSA0NDggMTAxLjAgNDkxLjVRMTYxIDUzNSAyNjIgNTM1UTMxNSA1MzUgMzY4LjAgNTIyLjBRNDIxIDUwOSA0NTUgNDg3TDQxNCA0MTFRMzQ5IDQ1MyAyNjEgNDUzUTIwMCA0NTMgMTY4LjAgNDMzLjBRMTM2IDQxMyAxMzYgMzgwUTEzNiAzNTQgMTU0LjAgMzM5LjBRMTcyIDMyNCAxOTguNSAzMTcuMFEyMjUgMzEwIDI3MyAzMDFRMzM3IDI5MCAzNzYuNSAyNzcuNVE0MTYgMjY1IDQ0NC4wIDIzNS4wUTQ3MiAyMDUgNDcyIDE1MVE0NzIgNzkgNDEwLjUgMzYuNVEzNDkgLTYgMjQzIC02UTE3OCAtNiAxMTguMCAxMS41UTU4IDI5IDI0IDU2WiIgZmlsbD0iIzAwMDAwMCIvPgo8cGF0aCB0cmFuc2Zvcm09InRyYW5zbGF0ZSgxNzk0LDApIiBkPSJNMjQgNTYgNjQgMTMyUTk5IDEwNyAxNDkuMCA5Mi4wUTE5OSA3NyAyNTAgNzdRMzc2IDc3IDM3NiAxNDlRMzc2IDE3MyAzNTkuMCAxODcuMFEzNDIgMjAxIDMxNi41IDIwNy41UTI5MSAyMTQgMjQ0IDIyMlExODAgMjMyIDEzOS41IDI0NS4wUTk5IDI1OCA3MC4wIDI4OS4wUTQxIDMyMCA0MSAzNzZRNDEgNDQ4IDEwMS4wIDQ5MS41UTE2MSA1MzUgMjYyIDUzNVEzMTUgNTM1IDM2OC4wIDUyMi4wUTQyMSA1MDkgNDU1IDQ4N0w0MTQgNDExUTM0OSA0NTMgMjYxIDQ1M1EyMDAgNDUzIDE2OC4wIDQzMy4wUTEzNiA0MTMgMTM2IDM4MFExMzYgMzU0IDE1NC4wIDMzOS4wUTE3MiAzMjQgMTk4LjUgMzE3LjBRMjI1IDMxMCAyNzMgMzAxUTMzNyAyOTAgMzc2LjUgMjc3LjVRNDE2IDI2NSA0NDQuMCAyMzUuMFE0NzIgMjA1IDQ3MiAxNTFRNDcyIDc5IDQxMC41IDM2LjVRMzQ5IC02IDI0MyAtNlExNzggLTYgMTE4LjAgMTEuNVE1OCAyOSAyNCA1NloiIGZpbGw9IiMwMDAwMDAiLz4KPHBhdGggdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMjI5NSwwKSIgZD0iTTQ2IDYzUTQ2IDkyIDY2LjAgMTExLjVRODYgMTMxIDExNCAxMzFRMTQyIDEzMSAxNjEuMCAxMTIuMFExODAgOTMgMTgwIDYzUTE4MCAzMyAxNjAuNSAxMy41UTE0MSAtNiAxMTQgLTZRODYgLTYgNjYuMCAxMy41UTQ2IDMzIDQ2IDYzWiIgZmlsbD0iIzAwQURFOCIvPgo8L2c+PC9zdmc+" alt="ness."><span>Dossiê de homologação · Onda 2</span></div>
- <div class="pb">
-  <h2><span class="n">2</span>Escopo: o contrato e as três mudanças de curso</h2>
-  <p>O contrato prevê para a Onda 2 as fontes CCEE (agente credenciado), BBCE, Hubspot e TempoOK, mais as tabelas Gold de preço e posição comercial. Três mudanças de curso alteram o que se mede.</p>
-
-  <div class="flow3">
-   <div class="hd">O que o contrato previa</div><div></div><div class="hd">O que mudou</div><div></div><div class="hd">Como fica a medição</div>
-
-   <div class="box"><b>TempoOK</b>Uma das quatro fontes da Onda 2.</div>
-   <div class="arr"><svg><use href="#i-seta"/></svg></div>
-   <div class="box alt"><b>Retorno da Alupar, 20/10</b>Validado em 23/10.</div>
-   <div class="arr"><svg><use href="#i-seta"/></svg></div>
-   <div class="box res"><b>Fora do escopo</b>As 14,4 h já executadas ficam contabilizadas.</div>
-
-   <div class="box"><b>CCEE por token</b>Acesso à API do agente credenciado.</div>
-   <div class="arr"><svg><use href="#i-seta"/></svg></div>
-   <div class="box alt"><b>Retorno de 20/10 e reunião de 06/11</b>Entrada por SOAP.</div>
-   <div class="arr"><svg><use href="#i-seta"/></svg></div>
-   <div class="box res"><b>SOAP</b>Usuário dedicado, senha e certificado. Leitura real em 09/11.</div>
-
-   <div class="box"><b>Cadastro de pontos da CCEE</b>Parte do item 2.1.</div>
-   <div class="arr"><svg><use href="#i-seta"/></svg></div>
-   <div class="box alt"><b>Permissão do perfil 6166</b>Erro <code>4001</code>, issue #462.</div>
-   <div class="arr"><svg><use href="#i-seta"/></svg></div>
-   <div class="box res"><b>Dependência da contratante</b>Cláusula 3ª. O conector trata o erro como <code>SEM_PERMISSAO</code>.</div>
-  </div>
-
-  <p class="mut">As credenciais da ONS (IPDO editável e ACOMPH) pertencem à Onda 1 e seguem registradas lá.</p>
+ <div class="band">
+  <div class="top"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjIwLjgiIGhlaWdodD0iNDAzLjIiIHZpZXdCb3g9IjAgMCAxMjIwLjgwIDQwMy4yMCI+CjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDQxLjIzMCwzMTguOTM4KSBzY2FsZSgwLjQ0MzYyLC0wLjQ0MzYyKSI+CjxwYXRoIHRyYW5zZm9ybT0idHJhbnNsYXRlKDAsMCkiIGQ9Ik01OTQgMzA1VjBINDk4VjI5NFE0OTggMzcxIDQ2MS4wIDQxMC4wUTQyNCA0NDkgMzU1IDQ0OVEyNzcgNDQ5IDIzMi4wIDQwMy41UTE4NyAzNTggMTg3IDI3M1YwSDkxVjUzMEgxODNWNDUwUTIxMiA0OTEgMjYxLjUgNTEzLjBRMzExIDUzNSAzNzQgNTM1UTQ3NSA1MzUgNTM0LjUgNDc2LjVRNTk0IDQxOCA1OTQgMzA1WiIgZmlsbD0iI0ZGRkZGRiIvPgo8cGF0aCB0cmFuc2Zvcm09InRyYW5zbGF0ZSg2ODEsMCkiIGQ9Ik01NjggMjMzSDEzOFExNDcgMTYzIDE5OS41IDEyMC41UTI1MiA3OCAzMzAgNzhRNDI1IDc4IDQ4MyAxNDJMNTM2IDgwUTUwMCAzOCA0NDYuNSAxNi4wUTM5MyAtNiAzMjcgLTZRMjQzIC02IDE3OC4wIDI4LjVRMTEzIDYzIDc3LjUgMTI1LjBRNDIgMTg3IDQyIDI2NVE0MiAzNDIgNzYuNSA0MDQuMFExMTEgNDY2IDE3MS41IDUwMC41UTIzMiA1MzUgMzA4IDUzNVEzODQgNTM1IDQ0My41IDUwMC41UTUwMyA0NjYgNTM2LjUgNDA0LjBRNTcwIDM0MiA1NzAgMjYyUTU3MCAyNTEgNTY4IDIzM1pNMTM4IDMwMkg0NzhRNDcwIDM2OSA0MjMuNSA0MTEuNVEzNzcgNDU0IDMwOCA0NTRRMjM5IDQ1NCAxOTIuNSA0MTIuMFExNDYgMzcwIDEzOCAzMDJaIiBmaWxsPSIjRkZGRkZGIi8+CjxwYXRoIHRyYW5zZm9ybT0idHJhbnNsYXRlKDEyOTMsMCkiIGQ9Ik0yNCA1NiA2NCAxMzJROTkgMTA3IDE0OS4wIDkyLjBRMTk5IDc3IDI1MCA3N1EzNzYgNzcgMzc2IDE0OVEzNzYgMTczIDM1OS4wIDE4Ny4wUTM0MiAyMDEgMzE2LjUgMjA3LjVRMjkxIDIxNCAyNDQgMjIyUTE4MCAyMzIgMTM5LjUgMjQ1LjBROTkgMjU4IDcwLjAgMjg5LjBRNDEgMzIwIDQxIDM3NlE0MSA0NDggMTAxLjAgNDkxLjVRMTYxIDUzNSAyNjIgNTM1UTMxNSA1MzUgMzY4LjAgNTIyLjBRNDIxIDUwOSA0NTUgNDg3TDQxNCA0MTFRMzQ5IDQ1MyAyNjEgNDUzUTIwMCA0NTMgMTY4LjAgNDMzLjBRMTM2IDQxMyAxMzYgMzgwUTEzNiAzNTQgMTU0LjAgMzM5LjBRMTcyIDMyNCAxOTguNSAzMTcuMFEyMjUgMzEwIDI3MyAzMDFRMzM3IDI5MCAzNzYuNSAyNzcuNVE0MTYgMjY1IDQ0NC4wIDIzNS4wUTQ3MiAyMDUgNDcyIDE1MVE0NzIgNzkgNDEwLjUgMzYuNVEzNDkgLTYgMjQzIC02UTE3OCAtNiAxMTguMCAxMS41UTU4IDI5IDI0IDU2WiIgZmlsbD0iI0ZGRkZGRiIvPgo8cGF0aCB0cmFuc2Zvcm09InRyYW5zbGF0ZSgxNzk0LDApIiBkPSJNMjQgNTYgNjQgMTMyUTk5IDEwNyAxNDkuMCA5Mi4wUTE5OSA3NyAyNTAgNzdRMzc2IDc3IDM3NiAxNDlRMzc2IDE3MyAzNTkuMCAxODcuMFEzNDIgMjAxIDMxNi41IDIwNy41UTI5MSAyMTQgMjQ0IDIyMlExODAgMjMyIDEzOS41IDI0NS4wUTk5IDI1OCA3MC4wIDI4OS4wUTQxIDMyMCA0MSAzNzZRNDEgNDQ4IDEwMS4wIDQ5MS41UTE2MSA1MzUgMjYyIDUzNVEzMTUgNTM1IDM2OC4wIDUyMi4wUTQyMSA1MDkgNDU1IDQ4N0w0MTQgNDExUTM0OSA0NTMgMjYxIDQ1M1EyMDAgNDUzIDE2OC4wIDQzMy4wUTEzNiA0MTMgMTM2IDM4MFExMzYgMzU0IDE1NC4wIDMzOS4wUTE3MiAzMjQgMTk4LjUgMzE3LjBRMjI1IDMxMCAyNzMgMzAxUTMzNyAyOTAgMzc2LjUgMjc3LjVRNDE2IDI2NSA0NDQuMCAyMzUuMFE0NzIgMjA1IDQ3MiAxNTFRNDcyIDc5IDQxMC41IDM2LjVRMzQ5IC02IDI0MyAtNlExNzggLTYgMTE4LjAgMTEuNVE1OCAyOSAyNCA1NloiIGZpbGw9IiNGRkZGRkYiLz4KPHBhdGggdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMjI5NSwwKSIgZD0iTTQ2IDYzUTQ2IDkyIDY2LjAgMTExLjVRODYgMTMxIDExNCAxMzFRMTQyIDEzMSAxNjEuMCAxMTIuMFExODAgOTMgMTgwIDYzUTE4MCAzMyAxNjAuNSAxMy41UTE0MSAtNiAxMTQgLTZRODYgLTYgNjYuMCAxMy41UTQ2IDMzIDQ2IDYzWiIgZmlsbD0iIzAwQURFOCIvPgo8L2c+PC9zdmc+" alt="ness."><span>Dossiê de homologação · Onda 2</span></div>
+  <div class="rule"></div>
+  <h2>O contrato previa quatro fontes; três mudanças de curso definem o que se mede</h2>
+  <p class="lead">O contrato prevê para a Onda 2 as fontes CCEE (agente credenciado), BBCE, Hubspot e TempoOK, mais as tabelas Gold de preço e posição comercial.</p>
+ </div>
+ <div class="body">
+  <svg class="dg" viewBox="0 0 178 96" aria-label="Do contrato ao resultado de cada fonte">
+   <defs>
+    <marker id="aC" viewBox="0 0 6 6" refX="5" refY="3" markerWidth="4" markerHeight="4" orient="auto"><path d="M0 0L6 3L0 6z" fill="#00ADE8"/></marker>
+    <marker id="aG" viewBox="0 0 6 6" refX="5" refY="3" markerWidth="4" markerHeight="4" orient="auto"><path d="M0 0L6 3L0 6z" fill="#5A6473"/></marker>
+   </defs>
+   <g>
+    <rect x="0" y="2" width="42" height="13" rx="2" fill="#fff" stroke="#C7D2DE"/><text class="nn" x="3" y="7.6">CCEE</text><text class="ss" x="3" y="11.8">credenciado · 2.1</text>
+    <rect x="0" y="22" width="42" height="13" rx="2" fill="#fff" stroke="#C7D2DE"/><text class="nn" x="3" y="27.6">BBCE</text><text class="ss" x="3" y="31.8">item 2.2</text>
+    <rect x="0" y="39" width="42" height="13" rx="2" fill="#fff" stroke="#C7D2DE"/><text class="nn" x="3" y="44.6">Hubspot</text><text class="ss" x="3" y="48.8">item 2.3</text>
+    <rect x="0" y="56" width="42" height="13" rx="2" fill="#fff" stroke="#C7D2DE"/><text class="nn" x="3" y="61.6">Gold</text><text class="ss" x="3" y="65.8">preço e posição · 2.5</text>
+    <rect x="0" y="79" width="42" height="13" rx="2" fill="#fff" stroke="#C7D2DE"/><text class="nn" x="3" y="84.6">TempoOK</text><text class="ss" x="3" y="88.8">item 2.4</text>
+   </g>
+   <g fill="none" stroke-width="1.1">
+    <path d="M42 8.5 C85 8.5 85 29 128 29" stroke="#00ADE8" marker-end="url(#aC)"/>
+    <path d="M42 8.5 L128 8.5" stroke="#2B333B" stroke-dasharray="2 1.4" marker-end="url(#aG)"/>
+    <path d="M42 28.5 C85 28.5 85 35 128 35" stroke="#00ADE8" marker-end="url(#aC)"/>
+    <path d="M42 45.5 C85 45.5 85 41 128 41" stroke="#00ADE8" marker-end="url(#aC)"/>
+    <path d="M42 62.5 C85 62.5 85 47 128 47" stroke="#00ADE8" marker-end="url(#aC)"/>
+    <path d="M42 85.5 L128 85.5" stroke="#5A6473" stroke-dasharray="2 1.4" marker-end="url(#aG)"/>
+   </g>
+   <g>
+    <rect x="66" y="14.4" width="40" height="6.6" rx="3.3" fill="#fff" stroke="#00ADE8"/><text class="pl" x="86" y="18.8" text-anchor="middle">token vira SOAP</text>
+    <rect x="90" y="5.2" width="36" height="6.6" rx="3.3" fill="#fff" stroke="#2B333B"/><text class="pl" x="108" y="9.6" text-anchor="middle">erro 4001 · #462</text>
+    <rect x="56" y="82.2" width="62" height="6.6" rx="3.3" fill="#fff" stroke="#5A6473"/><text class="pl" x="87" y="86.6" text-anchor="middle">retorno 20/10 · validado 23/10</text>
+   </g>
+   <g>
+    <rect x="128" y="0" width="50" height="17" rx="2" fill="#EEF3F8" stroke="#2B333B" stroke-dasharray="2 1.4"/><text class="nn" x="131" y="6.4">Dependência da Alupar</text><text class="ss" x="131" y="10.8">cadastro de pontos</text><text class="ss" x="131" y="14.4">cláusula 3ª</text>
+    <rect x="128" y="22" width="50" height="38" rx="2" fill="#E5F6FD" stroke="#9ED9F2"/><text class="nn" x="131" y="28.4">Entregue</text>
+    <text class="ss" x="131" y="34.4">CCEE: medição</text><text class="ss" x="131" y="39.4">BBCE</text><text class="ss" x="131" y="44.4">Hubspot</text><text class="ss" x="131" y="49.4">Gold de preço e posição</text>
+    <rect x="128" y="77" width="50" height="17" rx="2" fill="#EEF3F8" stroke="#C7D2DE"/><text class="nn" x="131" y="83.4">Fora do escopo</text><text class="ss" x="131" y="88.2">14,4 h contabilizadas</text>
+   </g>
+  </svg>
 
   <div>
    <h3>Linha do tempo da onda</h3>
-   <div class="tl">
-    <div class="d">19/10</div><div class="t">Início da janela da Onda 2</div>
-    <div class="d">20/10</div><div class="t k">Retorno da Alupar: TempoOK fora do escopo e CCEE por SOAP. Credencial do Hubspot gravada.</div>
-    <div class="d">22/10</div><div class="t">Hubspot: carga real em dev e hml</div>
-    <div class="d">23/10</div><div class="t">Saída do TempoOK validada</div>
-    <div class="d">28/10</div><div class="t">BBCE em uso com a credencial</div>
-    <div class="d">06/11</div><div class="t">Reunião sobre a entrada da CCEE por SOAP</div>
-    <div class="d">09/11</div><div class="t k">CCEE: primeira leitura real (24 medidas de um ponto)</div>
-    <div class="d">13/11</div><div class="t r">Fim da janela contratual da Onda 2</div>
-    <div class="d">19/11</div><div class="t k">Agendamento do Hubspot (#482) aplicado em dev e hml; conferência de cargas</div>
-    <div class="d">24/11</div><div class="t k">Primeira execução agendada do Hubspot observada</div>
+   <div class="tlh">
+    <div class="ax"></div>
+    <div class="ev" style="left:0mm"><i class="dot"></i><i class="ln" style="top:17mm;height:22.5mm"></i><div class="lb" style="left:0;top:5mm;width:30mm"><b>19/10</b>Início da janela</div></div>
+    <div class="ev" style="left:4.9mm"><i class="dot k"></i><i class="ln" style="top:42mm;height:5mm"></i><div class="lb" style="left:0;top:47mm;width:33mm"><b>20/10</b>Retorno da Alupar: TempoOK fora do escopo e CCEE por SOAP</div></div>
+    <div class="ev" style="left:14.8mm"><i class="dot"></i><i class="ln" style="top:31mm;height:8.5mm"></i><div class="lb" style="left:0;top:17mm;width:27mm"><b>22/10</b>Hubspot: carga real</div></div>
+    <div class="ev" style="left:44.5mm"><i class="dot"></i><i class="ln" style="top:20mm;height:19.5mm"></i><div class="lb" style="left:0;top:5mm;width:30mm"><b>28/10</b>BBCE em uso com a credencial</div></div>
+    <div class="ev" style="left:89mm"><i class="dot"></i><i class="ln" style="top:42mm;height:15mm"></i><div class="lb" style="left:0;top:57mm;width:30mm"><b>06/11</b>Reunião sobre a CCEE por SOAP</div></div>
+    <div class="ev" style="left:103.8mm"><i class="dot k"></i><i class="ln" style="top:20mm;height:19.5mm"></i><div class="lb" style="left:0;top:5mm;width:32mm"><b>09/11</b>CCEE: primeira leitura real, 24 medidas</div></div>
+    <div class="ev" style="left:123.6mm"><i class="dot r"></i><i class="ln" style="top:42mm;height:5mm"></i><div class="lb" style="left:0;top:47mm;width:30mm"><b>13/11</b>Fim da janela contratual</div></div>
+    <div class="ev" style="left:153.3mm"><i class="dot k"></i><i class="ln" style="top:34mm;height:5.5mm"></i><div class="lb r" style="right:0;top:20mm;width:34mm"><b>19/11</b>Agendamento do Hubspot (#482) e conferência</div></div>
+    <div class="ev" style="left:178mm"><i class="dot k"></i><i class="ln" style="top:42mm;height:15mm"></i><div class="lb r" style="right:0;top:57mm;width:32mm"><b>24/11</b>1ª execução agendada do Hubspot</div></div>
    </div>
-   <div class="leg" style="margin-top:3mm"><span><i></i>marco da onda</span><span><i class="k"></i>entrega ou decisão</span><span><i class="r"></i>fim da janela</span></div>
+   <div class="legend" style="margin-top:2mm"><span><svg viewBox="0 0 16 16" style="width:3.4mm;height:3.4mm;vertical-align:-.6mm;margin-right:1.4mm"><circle cx="8" cy="8" r="6" fill="#fff" stroke="#2B333B" stroke-width="2"/></svg>marco</span><span><svg viewBox="0 0 16 16" style="width:3.4mm;height:3.4mm;vertical-align:-.6mm;margin-right:1.4mm"><circle cx="8" cy="8" r="7" fill="#00ADE8"/></svg>entrega ou decisão</span><span><svg viewBox="0 0 16 16" style="width:3.4mm;height:3.4mm;vertical-align:-.6mm;margin-right:1.4mm"><circle cx="8" cy="8" r="7" fill="#0E1116"/></svg>fim da janela</span></div>
   </div>
  </div>
- <div class="pf"><span>Confidencial: uso restrito das partes · REL-2026-11-19-D</span><span>3 / 6</span></div>
+ <div class="foot"><span>Confidencial: uso restrito das partes · REL-2026-11-19-D</span><span>3 / 6</span></div>
 </section>
 
-<!-- 4. ESTEIRA E VERIFICAÇÃO -->
+<!-- 4. ESTEIRA -->
 <section class="page">
- <div class="ph"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjIwLjgiIGhlaWdodD0iNDAzLjIiIHZpZXdCb3g9IjAgMCAxMjIwLjgwIDQwMy4yMCI+CjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDQxLjIzMCwzMTguOTM4KSBzY2FsZSgwLjQ0MzYyLC0wLjQ0MzYyKSI+CjxwYXRoIHRyYW5zZm9ybT0idHJhbnNsYXRlKDAsMCkiIGQ9Ik01OTQgMzA1VjBINDk4VjI5NFE0OTggMzcxIDQ2MS4wIDQxMC4wUTQyNCA0NDkgMzU1IDQ0OVEyNzcgNDQ5IDIzMi4wIDQwMy41UTE4NyAzNTggMTg3IDI3M1YwSDkxVjUzMEgxODNWNDUwUTIxMiA0OTEgMjYxLjUgNTEzLjBRMzExIDUzNSAzNzQgNTM1UTQ3NSA1MzUgNTM0LjUgNDc2LjVRNTk0IDQxOCA1OTQgMzA1WiIgZmlsbD0iIzAwMDAwMCIvPgo8cGF0aCB0cmFuc2Zvcm09InRyYW5zbGF0ZSg2ODEsMCkiIGQ9Ik01NjggMjMzSDEzOFExNDcgMTYzIDE5OS41IDEyMC41UTI1MiA3OCAzMzAgNzhRNDI1IDc4IDQ4MyAxNDJMNTM2IDgwUTUwMCAzOCA0NDYuNSAxNi4wUTM5MyAtNiAzMjcgLTZRMjQzIC02IDE3OC4wIDI4LjVRMTEzIDYzIDc3LjUgMTI1LjBRNDIgMTg3IDQyIDI2NVE0MiAzNDIgNzYuNSA0MDQuMFExMTEgNDY2IDE3MS41IDUwMC41UTIzMiA1MzUgMzA4IDUzNVEzODQgNTM1IDQ0My41IDUwMC41UTUwMyA0NjYgNTM2LjUgNDA0LjBRNTcwIDM0MiA1NzAgMjYyUTU3MCAyNTEgNTY4IDIzM1pNMTM4IDMwMkg0NzhRNDcwIDM2OSA0MjMuNSA0MTEuNVEzNzcgNDU0IDMwOCA0NTRRMjM5IDQ1NCAxOTIuNSA0MTIuMFExNDYgMzcwIDEzOCAzMDJaIiBmaWxsPSIjMDAwMDAwIi8+CjxwYXRoIHRyYW5zZm9ybT0idHJhbnNsYXRlKDEyOTMsMCkiIGQ9Ik0yNCA1NiA2NCAxMzJROTkgMTA3IDE0OS4wIDkyLjBRMTk5IDc3IDI1MCA3N1EzNzYgNzcgMzc2IDE0OVEzNzYgMTczIDM1OS4wIDE4Ny4wUTM0MiAyMDEgMzE2LjUgMjA3LjVRMjkxIDIxNCAyNDQgMjIyUTE4MCAyMzIgMTM5LjUgMjQ1LjBROTkgMjU4IDcwLjAgMjg5LjBRNDEgMzIwIDQxIDM3NlE0MSA0NDggMTAxLjAgNDkxLjVRMTYxIDUzNSAyNjIgNTM1UTMxNSA1MzUgMzY4LjAgNTIyLjBRNDIxIDUwOSA0NTUgNDg3TDQxNCA0MTFRMzQ5IDQ1MyAyNjEgNDUzUTIwMCA0NTMgMTY4LjAgNDMzLjBRMTM2IDQxMyAxMzYgMzgwUTEzNiAzNTQgMTU0LjAgMzM5LjBRMTcyIDMyNCAxOTguNSAzMTcuMFEyMjUgMzEwIDI3MyAzMDFRMzM3IDI5MCAzNzYuNSAyNzcuNVE0MTYgMjY1IDQ0NC4wIDIzNS4wUTQ3MiAyMDUgNDcyIDE1MVE0NzIgNzkgNDEwLjUgMzYuNVEzNDkgLTYgMjQzIC02UTE3OCAtNiAxMTguMCAxMS41UTU4IDI5IDI0IDU2WiIgZmlsbD0iIzAwMDAwMCIvPgo8cGF0aCB0cmFuc2Zvcm09InRyYW5zbGF0ZSgxNzk0LDApIiBkPSJNMjQgNTYgNjQgMTMyUTk5IDEwNyAxNDkuMCA5Mi4wUTE5OSA3NyAyNTAgNzdRMzc2IDc3IDM3NiAxNDlRMzc2IDE3MyAzNTkuMCAxODcuMFEzNDIgMjAxIDMxNi41IDIwNy41UTI5MSAyMTQgMjQ0IDIyMlExODAgMjMyIDEzOS41IDI0NS4wUTk5IDI1OCA3MC4wIDI4OS4wUTQxIDMyMCA0MSAzNzZRNDEgNDQ4IDEwMS4wIDQ5MS41UTE2MSA1MzUgMjYyIDUzNVEzMTUgNTM1IDM2OC4wIDUyMi4wUTQyMSA1MDkgNDU1IDQ4N0w0MTQgNDExUTM0OSA0NTMgMjYxIDQ1M1EyMDAgNDUzIDE2OC4wIDQzMy4wUTEzNiA0MTMgMTM2IDM4MFExMzYgMzU0IDE1NC4wIDMzOS4wUTE3MiAzMjQgMTk4LjUgMzE3LjBRMjI1IDMxMCAyNzMgMzAxUTMzNyAyOTAgMzc2LjUgMjc3LjVRNDE2IDI2NSA0NDQuMCAyMzUuMFE0NzIgMjA1IDQ3MiAxNTFRNDcyIDc5IDQxMC41IDM2LjVRMzQ5IC02IDI0MyAtNlExNzggLTYgMTE4LjAgMTEuNVE1OCAyOSAyNCA1NloiIGZpbGw9IiMwMDAwMDAiLz4KPHBhdGggdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMjI5NSwwKSIgZD0iTTQ2IDYzUTQ2IDkyIDY2LjAgMTExLjVRODYgMTMxIDExNCAxMzFRMTQyIDEzMSAxNjEuMCAxMTIuMFExODAgOTMgMTgwIDYzUTE4MCAzMyAxNjAuNSAxMy41UTE0MSAtNiAxMTQgLTZRODYgLTYgNjYuMCAxMy41UTQ2IDMzIDQ2IDYzWiIgZmlsbD0iIzAwQURFOCIvPgo8L2c+PC9zdmc+" alt="ness."><span>Dossiê de homologação · Onda 2</span></div>
- <div class="pb">
-  <h2><span class="n">3</span>Como o dado chega: da origem ao Gold</h2>
-  <p>Cada fonte percorre a mesma esteira. A Bronze guarda o dado como veio, sempre acrescentando. A Silver tipa, deduplica e recusa o que foge da regra. A Gold aplica a regra de negócio.</p>
-
+ <div class="band">
+  <div class="top"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjIwLjgiIGhlaWdodD0iNDAzLjIiIHZpZXdCb3g9IjAgMCAxMjIwLjgwIDQwMy4yMCI+CjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDQxLjIzMCwzMTguOTM4KSBzY2FsZSgwLjQ0MzYyLC0wLjQ0MzYyKSI+CjxwYXRoIHRyYW5zZm9ybT0idHJhbnNsYXRlKDAsMCkiIGQ9Ik01OTQgMzA1VjBINDk4VjI5NFE0OTggMzcxIDQ2MS4wIDQxMC4wUTQyNCA0NDkgMzU1IDQ0OVEyNzcgNDQ5IDIzMi4wIDQwMy41UTE4NyAzNTggMTg3IDI3M1YwSDkxVjUzMEgxODNWNDUwUTIxMiA0OTEgMjYxLjUgNTEzLjBRMzExIDUzNSAzNzQgNTM1UTQ3NSA1MzUgNTM0LjUgNDc2LjVRNTk0IDQxOCA1OTQgMzA1WiIgZmlsbD0iI0ZGRkZGRiIvPgo8cGF0aCB0cmFuc2Zvcm09InRyYW5zbGF0ZSg2ODEsMCkiIGQ9Ik01NjggMjMzSDEzOFExNDcgMTYzIDE5OS41IDEyMC41UTI1MiA3OCAzMzAgNzhRNDI1IDc4IDQ4MyAxNDJMNTM2IDgwUTUwMCAzOCA0NDYuNSAxNi4wUTM5MyAtNiAzMjcgLTZRMjQzIC02IDE3OC4wIDI4LjVRMTEzIDYzIDc3LjUgMTI1LjBRNDIgMTg3IDQyIDI2NVE0MiAzNDIgNzYuNSA0MDQuMFExMTEgNDY2IDE3MS41IDUwMC41UTIzMiA1MzUgMzA4IDUzNVEzODQgNTM1IDQ0My41IDUwMC41UTUwMyA0NjYgNTM2LjUgNDA0LjBRNTcwIDM0MiA1NzAgMjYyUTU3MCAyNTEgNTY4IDIzM1pNMTM4IDMwMkg0NzhRNDcwIDM2OSA0MjMuNSA0MTEuNVEzNzcgNDU0IDMwOCA0NTRRMjM5IDQ1NCAxOTIuNSA0MTIuMFExNDYgMzcwIDEzOCAzMDJaIiBmaWxsPSIjRkZGRkZGIi8+CjxwYXRoIHRyYW5zZm9ybT0idHJhbnNsYXRlKDEyOTMsMCkiIGQ9Ik0yNCA1NiA2NCAxMzJROTkgMTA3IDE0OS4wIDkyLjBRMTk5IDc3IDI1MCA3N1EzNzYgNzcgMzc2IDE0OVEzNzYgMTczIDM1OS4wIDE4Ny4wUTM0MiAyMDEgMzE2LjUgMjA3LjVRMjkxIDIxNCAyNDQgMjIyUTE4MCAyMzIgMTM5LjUgMjQ1LjBROTkgMjU4IDcwLjAgMjg5LjBRNDEgMzIwIDQxIDM3NlE0MSA0NDggMTAxLjAgNDkxLjVRMTYxIDUzNSAyNjIgNTM1UTMxNSA1MzUgMzY4LjAgNTIyLjBRNDIxIDUwOSA0NTUgNDg3TDQxNCA0MTFRMzQ5IDQ1MyAyNjEgNDUzUTIwMCA0NTMgMTY4LjAgNDMzLjBRMTM2IDQxMyAxMzYgMzgwUTEzNiAzNTQgMTU0LjAgMzM5LjBRMTcyIDMyNCAxOTguNSAzMTcuMFEyMjUgMzEwIDI3MyAzMDFRMzM3IDI5MCAzNzYuNSAyNzcuNVE0MTYgMjY1IDQ0NC4wIDIzNS4wUTQ3MiAyMDUgNDcyIDE1MVE0NzIgNzkgNDEwLjUgMzYuNVEzNDkgLTYgMjQzIC02UTE3OCAtNiAxMTguMCAxMS41UTU4IDI5IDI0IDU2WiIgZmlsbD0iI0ZGRkZGRiIvPgo8cGF0aCB0cmFuc2Zvcm09InRyYW5zbGF0ZSgxNzk0LDApIiBkPSJNMjQgNTYgNjQgMTMyUTk5IDEwNyAxNDkuMCA5Mi4wUTE5OSA3NyAyNTAgNzdRMzc2IDc3IDM3NiAxNDlRMzc2IDE3MyAzNTkuMCAxODcuMFEzNDIgMjAxIDMxNi41IDIwNy41UTI5MSAyMTQgMjQ0IDIyMlExODAgMjMyIDEzOS41IDI0NS4wUTk5IDI1OCA3MC4wIDI4OS4wUTQxIDMyMCA0MSAzNzZRNDEgNDQ4IDEwMS4wIDQ5MS41UTE2MSA1MzUgMjYyIDUzNVEzMTUgNTM1IDM2OC4wIDUyMi4wUTQyMSA1MDkgNDU1IDQ4N0w0MTQgNDExUTM0OSA0NTMgMjYxIDQ1M1EyMDAgNDUzIDE2OC4wIDQzMy4wUTEzNiA0MTMgMTM2IDM4MFExMzYgMzU0IDE1NC4wIDMzOS4wUTE3MiAzMjQgMTk4LjUgMzE3LjBRMjI1IDMxMCAyNzMgMzAxUTMzNyAyOTAgMzc2LjUgMjc3LjVRNDE2IDI2NSA0NDQuMCAyMzUuMFE0NzIgMjA1IDQ3MiAxNTFRNDcyIDc5IDQxMC41IDM2LjVRMzQ5IC02IDI0MyAtNlExNzggLTYgMTE4LjAgMTEuNVE1OCAyOSAyNCA1NloiIGZpbGw9IiNGRkZGRkYiLz4KPHBhdGggdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMjI5NSwwKSIgZD0iTTQ2IDYzUTQ2IDkyIDY2LjAgMTExLjVRODYgMTMxIDExNCAxMzFRMTQyIDEzMSAxNjEuMCAxMTIuMFExODAgOTMgMTgwIDYzUTE4MCAzMyAxNjAuNSAxMy41UTE0MSAtNiAxMTQgLTZRODYgLTYgNjYuMCAxMy41UTQ2IDMzIDQ2IDYzWiIgZmlsbD0iIzAwQURFOCIvPgo8L2c+PC9zdmc+" alt="ness."><span>Dossiê de homologação · Onda 2</span></div>
+  <div class="rule"></div>
+  <h2>Cada fonte percorre a mesma esteira, da origem ao Gold</h2>
+  <p class="lead">A Bronze guarda o dado como veio, sempre acrescentando. A Silver tipa, deduplica e recusa o que foge da regra. A Gold aplica a regra de negócio.</p>
+ </div>
+ <div class="body">
   <div class="pipe">
-   <div class="col">Origem</div><div></div><div class="col">Conector</div><div></div><div class="col">Bronze</div><div></div><div class="col">Silver</div><div></div><div class="col">Gold</div>
+   <div class="chev first">Origem</div><div></div><div class="chev">Conector</div><div></div><div class="chev b">Bronze</div><div></div><div class="chev s">Silver</div><div></div><div class="chev g">Gold</div>
 
    <div class="org">CCEE<br><span class="mut" style="font-weight:400">SOAP, usuário dedicado</span></div>
    <div class="ar"><svg><use href="#i-seta"/></svg></div>
@@ -287,88 +370,98 @@ tr{break-inside:avoid}
    <div class="nd q"><b>Quarentena: 1 negócio</b>Fechamento anterior à criação; aguarda correção na origem.</div>
   </div>
 
+  <div class="camadas">
+   <div><div class="t">Bronze</div><p>Dado como veio da origem, só acrescentado, particionado e clusterizado.</p></div>
+   <div><div class="t">Silver</div><p>Tipada e deduplicada, com a chave de deduplicação protegida por asserção.</p></div>
+   <div><div class="t">Gold</div><p>Regra de negócio e indicador consolidado, recarregada inteira a cada execução.</p></div>
+  </div>
+
   <div>
    <h3>Como conferimos os números</h3>
    <div class="steps">
-    <div class="box"><b>Conferência de cargas</b>Workflow <i>Conferir cargas</i>, de leitura.</div>
-    <div class="arr"><svg><use href="#i-seta"/></svg></div>
-    <div class="box"><b>BigQuery</b>Leitura em dev e hml, sem alterar dado.</div>
-    <div class="arr"><svg><use href="#i-seta"/></svg></div>
-    <div class="box"><b>Contagens</b>Silver e Gold de cada fonte.</div>
-    <div class="arr"><svg><use href="#i-seta"/></svg></div>
-    <div class="box res"><b>Este dossiê</b>Números de 19/11/2026.</div>
+    <div class="step"><b>Conferência de cargas</b>Workflow <i>Conferir cargas</i>, de leitura.</div>
+    <div class="step"><b>BigQuery</b>Leitura em dev e hml, sem alterar dado.</div>
+    <div class="step"><b>Contagens</b>Silver e Gold de cada fonte.</div>
+    <div class="step"><b>Este dossiê</b>Números de 19/11/2026.</div>
    </div>
   </div>
  </div>
- <div class="pf"><span>Confidencial: uso restrito das partes · REL-2026-11-19-D</span><span>4 / 6</span></div>
+ <div class="foot"><span>Confidencial: uso restrito das partes · REL-2026-11-19-D</span><span>4 / 6</span></div>
 </section>
 
 <!-- 5. EVIDÊNCIAS -->
 <section class="page">
- <div class="ph"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjIwLjgiIGhlaWdodD0iNDAzLjIiIHZpZXdCb3g9IjAgMCAxMjIwLjgwIDQwMy4yMCI+CjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDQxLjIzMCwzMTguOTM4KSBzY2FsZSgwLjQ0MzYyLC0wLjQ0MzYyKSI+CjxwYXRoIHRyYW5zZm9ybT0idHJhbnNsYXRlKDAsMCkiIGQ9Ik01OTQgMzA1VjBINDk4VjI5NFE0OTggMzcxIDQ2MS4wIDQxMC4wUTQyNCA0NDkgMzU1IDQ0OVEyNzcgNDQ5IDIzMi4wIDQwMy41UTE4NyAzNTggMTg3IDI3M1YwSDkxVjUzMEgxODNWNDUwUTIxMiA0OTEgMjYxLjUgNTEzLjBRMzExIDUzNSAzNzQgNTM1UTQ3NSA1MzUgNTM0LjUgNDc2LjVRNTk0IDQxOCA1OTQgMzA1WiIgZmlsbD0iIzAwMDAwMCIvPgo8cGF0aCB0cmFuc2Zvcm09InRyYW5zbGF0ZSg2ODEsMCkiIGQ9Ik01NjggMjMzSDEzOFExNDcgMTYzIDE5OS41IDEyMC41UTI1MiA3OCAzMzAgNzhRNDI1IDc4IDQ4MyAxNDJMNTM2IDgwUTUwMCAzOCA0NDYuNSAxNi4wUTM5MyAtNiAzMjcgLTZRMjQzIC02IDE3OC4wIDI4LjVRMTEzIDYzIDc3LjUgMTI1LjBRNDIgMTg3IDQyIDI2NVE0MiAzNDIgNzYuNSA0MDQuMFExMTEgNDY2IDE3MS41IDUwMC41UTIzMiA1MzUgMzA4IDUzNVEzODQgNTM1IDQ0My41IDUwMC41UTUwMyA0NjYgNTM2LjUgNDA0LjBRNTcwIDM0MiA1NzAgMjYyUTU3MCAyNTEgNTY4IDIzM1pNMTM4IDMwMkg0NzhRNDcwIDM2OSA0MjMuNSA0MTEuNVEzNzcgNDU0IDMwOCA0NTRRMjM5IDQ1NCAxOTIuNSA0MTIuMFExNDYgMzcwIDEzOCAzMDJaIiBmaWxsPSIjMDAwMDAwIi8+CjxwYXRoIHRyYW5zZm9ybT0idHJhbnNsYXRlKDEyOTMsMCkiIGQ9Ik0yNCA1NiA2NCAxMzJROTkgMTA3IDE0OS4wIDkyLjBRMTk5IDc3IDI1MCA3N1EzNzYgNzcgMzc2IDE0OVEzNzYgMTczIDM1OS4wIDE4Ny4wUTM0MiAyMDEgMzE2LjUgMjA3LjVRMjkxIDIxNCAyNDQgMjIyUTE4MCAyMzIgMTM5LjUgMjQ1LjBROTkgMjU4IDcwLjAgMjg5LjBRNDEgMzIwIDQxIDM3NlE0MSA0NDggMTAxLjAgNDkxLjVRMTYxIDUzNSAyNjIgNTM1UTMxNSA1MzUgMzY4LjAgNTIyLjBRNDIxIDUwOSA0NTUgNDg3TDQxNCA0MTFRMzQ5IDQ1MyAyNjEgNDUzUTIwMCA0NTMgMTY4LjAgNDMzLjBRMTM2IDQxMyAxMzYgMzgwUTEzNiAzNTQgMTU0LjAgMzM5LjBRMTcyIDMyNCAxOTguNSAzMTcuMFEyMjUgMzEwIDI3MyAzMDFRMzM3IDI5MCAzNzYuNSAyNzcuNVE0MTYgMjY1IDQ0NC4wIDIzNS4wUTQ3MiAyMDUgNDcyIDE1MVE0NzIgNzkgNDEwLjUgMzYuNVEzNDkgLTYgMjQzIC02UTE3OCAtNiAxMTguMCAxMS41UTU4IDI5IDI0IDU2WiIgZmlsbD0iIzAwMDAwMCIvPgo8cGF0aCB0cmFuc2Zvcm09InRyYW5zbGF0ZSgxNzk0LDApIiBkPSJNMjQgNTYgNjQgMTMyUTk5IDEwNyAxNDkuMCA5Mi4wUTE5OSA3NyAyNTAgNzdRMzc2IDc3IDM3NiAxNDlRMzc2IDE3MyAzNTkuMCAxODcuMFEzNDIgMjAxIDMxNi41IDIwNy41UTI5MSAyMTQgMjQ0IDIyMlExODAgMjMyIDEzOS41IDI0NS4wUTk5IDI1OCA3MC4wIDI4OS4wUTQxIDMyMCA0MSAzNzZRNDEgNDQ4IDEwMS4wIDQ5MS41UTE2MSA1MzUgMjYyIDUzNVEzMTUgNTM1IDM2OC4wIDUyMi4wUTQyMSA1MDkgNDU1IDQ4N0w0MTQgNDExUTM0OSA0NTMgMjYxIDQ1M1EyMDAgNDUzIDE2OC4wIDQzMy4wUTEzNiA0MTMgMTM2IDM4MFExMzYgMzU0IDE1NC4wIDMzOS4wUTE3MiAzMjQgMTk4LjUgMzE3LjBRMjI1IDMxMCAyNzMgMzAxUTMzNyAyOTAgMzc2LjUgMjc3LjVRNDE2IDI2NSA0NDQuMCAyMzUuMFE0NzIgMjA1IDQ3MiAxNTFRNDcyIDc5IDQxMC41IDM2LjVRMzQ5IC02IDI0MyAtNlExNzggLTYgMTE4LjAgMTEuNVE1OCAyOSAyNCA1NloiIGZpbGw9IiMwMDAwMDAiLz4KPHBhdGggdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMjI5NSwwKSIgZD0iTTQ2IDYzUTQ2IDkyIDY2LjAgMTExLjVRODYgMTMxIDExNCAxMzFRMTQyIDEzMSAxNjEuMCAxMTIuMFExODAgOTMgMTgwIDYzUTE4MCAzMyAxNjAuNSAxMy41UTE0MSAtNiAxMTQgLTZRODYgLTYgNjYuMCAxMy41UTQ2IDMzIDQ2IDYzWiIgZmlsbD0iIzAwQURFOCIvPgo8L2c+PC9zdmc+" alt="ness."><span>Dossiê de homologação · Onda 2</span></div>
- <div class="pb">
-  <h2><span class="n">4</span>Evidências por fonte</h2>
-
-  <div>
-   <h3>BBCE: dev e hml carregam o mesmo dado</h3>
+ <div class="band">
+  <div class="top"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjIwLjgiIGhlaWdodD0iNDAzLjIiIHZpZXdCb3g9IjAgMCAxMjIwLjgwIDQwMy4yMCI+CjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDQxLjIzMCwzMTguOTM4KSBzY2FsZSgwLjQ0MzYyLC0wLjQ0MzYyKSI+CjxwYXRoIHRyYW5zZm9ybT0idHJhbnNsYXRlKDAsMCkiIGQ9Ik01OTQgMzA1VjBINDk4VjI5NFE0OTggMzcxIDQ2MS4wIDQxMC4wUTQyNCA0NDkgMzU1IDQ0OVEyNzcgNDQ5IDIzMi4wIDQwMy41UTE4NyAzNTggMTg3IDI3M1YwSDkxVjUzMEgxODNWNDUwUTIxMiA0OTEgMjYxLjUgNTEzLjBRMzExIDUzNSAzNzQgNTM1UTQ3NSA1MzUgNTM0LjUgNDc2LjVRNTk0IDQxOCA1OTQgMzA1WiIgZmlsbD0iI0ZGRkZGRiIvPgo8cGF0aCB0cmFuc2Zvcm09InRyYW5zbGF0ZSg2ODEsMCkiIGQ9Ik01NjggMjMzSDEzOFExNDcgMTYzIDE5OS41IDEyMC41UTI1MiA3OCAzMzAgNzhRNDI1IDc4IDQ4MyAxNDJMNTM2IDgwUTUwMCAzOCA0NDYuNSAxNi4wUTM5MyAtNiAzMjcgLTZRMjQzIC02IDE3OC4wIDI4LjVRMTEzIDYzIDc3LjUgMTI1LjBRNDIgMTg3IDQyIDI2NVE0MiAzNDIgNzYuNSA0MDQuMFExMTEgNDY2IDE3MS41IDUwMC41UTIzMiA1MzUgMzA4IDUzNVEzODQgNTM1IDQ0My41IDUwMC41UTUwMyA0NjYgNTM2LjUgNDA0LjBRNTcwIDM0MiA1NzAgMjYyUTU3MCAyNTEgNTY4IDIzM1pNMTM4IDMwMkg0NzhRNDcwIDM2OSA0MjMuNSA0MTEuNVEzNzcgNDU0IDMwOCA0NTRRMjM5IDQ1NCAxOTIuNSA0MTIuMFExNDYgMzcwIDEzOCAzMDJaIiBmaWxsPSIjRkZGRkZGIi8+CjxwYXRoIHRyYW5zZm9ybT0idHJhbnNsYXRlKDEyOTMsMCkiIGQ9Ik0yNCA1NiA2NCAxMzJROTkgMTA3IDE0OS4wIDkyLjBRMTk5IDc3IDI1MCA3N1EzNzYgNzcgMzc2IDE0OVEzNzYgMTczIDM1OS4wIDE4Ny4wUTM0MiAyMDEgMzE2LjUgMjA3LjVRMjkxIDIxNCAyNDQgMjIyUTE4MCAyMzIgMTM5LjUgMjQ1LjBROTkgMjU4IDcwLjAgMjg5LjBRNDEgMzIwIDQxIDM3NlE0MSA0NDggMTAxLjAgNDkxLjVRMTYxIDUzNSAyNjIgNTM1UTMxNSA1MzUgMzY4LjAgNTIyLjBRNDIxIDUwOSA0NTUgNDg3TDQxNCA0MTFRMzQ5IDQ1MyAyNjEgNDUzUTIwMCA0NTMgMTY4LjAgNDMzLjBRMTM2IDQxMyAxMzYgMzgwUTEzNiAzNTQgMTU0LjAgMzM5LjBRMTcyIDMyNCAxOTguNSAzMTcuMFEyMjUgMzEwIDI3MyAzMDFRMzM3IDI5MCAzNzYuNSAyNzcuNVE0MTYgMjY1IDQ0NC4wIDIzNS4wUTQ3MiAyMDUgNDcyIDE1MVE0NzIgNzkgNDEwLjUgMzYuNVEzNDkgLTYgMjQzIC02UTE3OCAtNiAxMTguMCAxMS41UTU4IDI5IDI0IDU2WiIgZmlsbD0iI0ZGRkZGRiIvPgo8cGF0aCB0cmFuc2Zvcm09InRyYW5zbGF0ZSgxNzk0LDApIiBkPSJNMjQgNTYgNjQgMTMyUTk5IDEwNyAxNDkuMCA5Mi4wUTE5OSA3NyAyNTAgNzdRMzc2IDc3IDM3NiAxNDlRMzc2IDE3MyAzNTkuMCAxODcuMFEzNDIgMjAxIDMxNi41IDIwNy41UTI5MSAyMTQgMjQ0IDIyMlExODAgMjMyIDEzOS41IDI0NS4wUTk5IDI1OCA3MC4wIDI4OS4wUTQxIDMyMCA0MSAzNzZRNDEgNDQ4IDEwMS4wIDQ5MS41UTE2MSA1MzUgMjYyIDUzNVEzMTUgNTM1IDM2OC4wIDUyMi4wUTQyMSA1MDkgNDU1IDQ4N0w0MTQgNDExUTM0OSA0NTMgMjYxIDQ1M1EyMDAgNDUzIDE2OC4wIDQzMy4wUTEzNiA0MTMgMTM2IDM4MFExMzYgMzU0IDE1NC4wIDMzOS4wUTE3MiAzMjQgMTk4LjUgMzE3LjBRMjI1IDMxMCAyNzMgMzAxUTMzNyAyOTAgMzc2LjUgMjc3LjVRNDE2IDI2NSA0NDQuMCAyMzUuMFE0NzIgMjA1IDQ3MiAxNTFRNDcyIDc5IDQxMC41IDM2LjVRMzQ5IC02IDI0MyAtNlExNzggLTYgMTE4LjAgMTEuNVE1OCAyOSAyNCA1NloiIGZpbGw9IiNGRkZGRkYiLz4KPHBhdGggdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMjI5NSwwKSIgZD0iTTQ2IDYzUTQ2IDkyIDY2LjAgMTExLjVRODYgMTMxIDExNCAxMzFRMTQyIDEzMSAxNjEuMCAxMTIuMFExODAgOTMgMTgwIDYzUTE4MCAzMyAxNjAuNSAxMy41UTE0MSAtNiAxMTQgLTZRODYgLTYgNjYuMCAxMy41UTQ2IDMzIDQ2IDYzWiIgZmlsbD0iIzAwQURFOCIvPgo8L2c+PC9zdmc+" alt="ness."><span>Dossiê de homologação · Onda 2</span></div>
+  <div class="rule"></div>
+  <h2>Os números fecham: dev e hml carregam o mesmo dado</h2>
+  <p class="lead">Contagens lidas pela conferência de cargas em 19/11/2026, fonte por fonte.</p>
+ </div>
+ <div class="body">
+  <div class="pn">
+   <div class="hd"><h3>BBCE</h3><span class="chip ok"><svg><use href="#i-ok"/></svg>Entregue</span></div>
    <div class="two">
     <div>
-     <p class="mut" style="margin-bottom:2.5mm">Linhas na Silver <code>bbce_curva_forward</code> (27/10 a 17/11)</p>
+     <div class="cap">Linhas na Silver <code>bbce_curva_forward</code>, de 27/10 a 17/11</div>
      <div class="bars">
       <span class="l">dev</span><div class="tr"><i class="d" style="width:100%"></i></div><span class="v">3.548</span>
       <span class="l">hml</span><div class="tr"><i style="width:85.7%"></i></div><span class="v">3.040</span>
      </div>
-     <p class="mut" style="margin:4mm 0 2.5mm">Linhas na Gold <code>curva_forward_vigente</code></p>
+     <div class="cap" style="margin-top:4mm">Linhas na Gold <code>curva_forward_vigente</code></div>
      <div class="bars">
       <span class="l">dev</span><div class="tr"><i class="d" style="width:100%"></i></div><span class="v">253</span>
       <span class="l">hml</span><div class="tr"><i style="width:100%"></i></div><span class="v">253</span>
      </div>
     </div>
     <div>
-     <p class="mut" style="margin-bottom:2.5mm">Última execução (18/11): <b>SUCESSO</b>, igual nos dois ambientes</p>
+     <div class="cap">Última execução, 18/11: <b>SUCESSO</b>, igual nos dois ambientes</div>
      <div class="bars">
       <span class="l">extraídas</span><div class="tr"><i class="d" style="width:100%"></i></div><span class="v">1.524</span>
       <span class="l">inválidas</span><div class="tr"><i class="d" style="width:.4%;min-width:1px"></i></div><span class="v">6</span>
       <span class="l">carregadas</span><div class="tr"><i style="width:99.6%"></i></div><span class="v">1.518</span>
      </div>
-     <p class="mut" style="margin-top:3mm">O registro inválido é descartado com log e contado, nunca some em silêncio.</p>
+     <p class="mut" style="margin-top:3.5mm;font-size:9.2pt">O registro inválido é descartado com log e contado, nunca some em silêncio.</p>
     </div>
    </div>
   </div>
 
-  <div>
-   <h3>Hubspot: da carga real ao agendamento</h3>
-   <ul class="chk">
-    <li><svg><use href="#i-ok"/></svg><span class="dt">22/10</span><span>Carga real nos dois ambientes. A Silver recusa negócio fora da regra e o envia à quarentena: hoje há 1 (fechamento anterior à criação), à espera de correção na origem.</span></li>
-    <li><svg><use href="#i-ok"/></svg><span class="dt">19/11</span><span>Agendamento corrigido no #482: o job estava de fora por um registro antigo de &ldquo;sem credencial&rdquo;. Aplicado em dev e hml.</span></li>
-    <li><svg><use href="#i-ok"/></svg><span class="dt">19/11</span><span>Conferido nos dois ambientes: Silver <code>hubspot_negocios</code> com 208 negócios (criados de 20 a 21/10) e Gold <code>funil_comercial</code> com 7 linhas.</span></li>
-    <li><svg><use href="#i-ok"/></svg><span class="dt">24/11</span><span>Primeira execução agendada observada, o que confirma o componente de agendamento.</span></li>
-   </ul>
+  <div class="pn">
+   <div class="hd"><h3>Hubspot</h3><span class="chip ok"><svg><use href="#i-ok"/></svg>Entregue</span></div>
+   <div class="rail">
+    <div><svg><use href="#i-ok"/></svg><span class="d">22/10</span>Carga real nos dois ambientes.</div>
+    <div><svg><use href="#i-ok"/></svg><span class="d">19/11</span>Agendamento corrigido no #482 e aplicado em dev e hml.</div>
+    <div><svg><use href="#i-ok"/></svg><span class="d">19/11</span>Conferido: 208 negócios na Silver e 7 linhas na Gold.</div>
+    <div><svg><use href="#i-ok"/></svg><span class="d">24/11</span>Primeira execução agendada observada.</div>
+   </div>
+   <p class="mut" style="margin-top:3mm;font-size:9.2pt">O job estava de fora por um registro antigo de &ldquo;sem credencial&rdquo;. A Silver recusa negócio fora da regra e o envia à quarentena: hoje há 1 (fechamento anterior à criação), à espera de correção na origem.</p>
   </div>
 
-  <div>
-   <h3>CCEE agente credenciado</h3>
-   <ul class="chk">
-    <li><svg><use href="#i-ok"/></svg><span class="dt">09/11</span><span>Leitura real com o usuário dedicado: 24 medidas de um ponto, na produção da CCEE. Medição carregada em dev e hml.</span></li>
-    <li><svg><use href="#i-ress"/></svg><span class="dt">hml</span><span>Cadastro de pontos sem sucesso: <code>Fault Server.4001</code>, perfil sem permissão (#462). Registrado como dependência da Alupar, sem prejuízo da entrega da medição.</span></li>
-   </ul>
+  <div class="pn">
+   <div class="hd"><h3>CCEE agente credenciado</h3><span><span class="chip ok"><svg><use href="#i-ok"/></svg>Entregue</span> <span class="chip ress"><svg><use href="#i-ress"/></svg>Com ressalva</span></span></div>
+   <div class="rail" style="grid-template-columns:repeat(2,1fr)">
+    <div><svg><use href="#i-ok"/></svg><span class="d">09/11</span>Leitura real com o usuário dedicado: 24 medidas de um ponto, na produção da CCEE. Medição carregada em dev e hml.</div>
+    <div><svg><use href="#i-ress"/></svg><span class="d">hml</span>Cadastro de pontos sem sucesso: <code>Fault Server.4001</code>, perfil sem permissão (#462). Dependência da Alupar, sem prejuízo da medição.</div>
+   </div>
   </div>
  </div>
- <div class="pf"><span>Confidencial: uso restrito das partes · REL-2026-11-19-D</span><span>5 / 6</span></div>
+ <div class="foot"><span>Confidencial: uso restrito das partes · REL-2026-11-19-D</span><span>5 / 6</span></div>
 </section>
 
-<!-- 6. RESSALVA E PENDÊNCIAS -->
+<!-- 6. RESSALVA -->
 <section class="page">
- <div class="ph"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjIwLjgiIGhlaWdodD0iNDAzLjIiIHZpZXdCb3g9IjAgMCAxMjIwLjgwIDQwMy4yMCI+CjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDQxLjIzMCwzMTguOTM4KSBzY2FsZSgwLjQ0MzYyLC0wLjQ0MzYyKSI+CjxwYXRoIHRyYW5zZm9ybT0idHJhbnNsYXRlKDAsMCkiIGQ9Ik01OTQgMzA1VjBINDk4VjI5NFE0OTggMzcxIDQ2MS4wIDQxMC4wUTQyNCA0NDkgMzU1IDQ0OVEyNzcgNDQ5IDIzMi4wIDQwMy41UTE4NyAzNTggMTg3IDI3M1YwSDkxVjUzMEgxODNWNDUwUTIxMiA0OTEgMjYxLjUgNTEzLjBRMzExIDUzNSAzNzQgNTM1UTQ3NSA1MzUgNTM0LjUgNDc2LjVRNTk0IDQxOCA1OTQgMzA1WiIgZmlsbD0iIzAwMDAwMCIvPgo8cGF0aCB0cmFuc2Zvcm09InRyYW5zbGF0ZSg2ODEsMCkiIGQ9Ik01NjggMjMzSDEzOFExNDcgMTYzIDE5OS41IDEyMC41UTI1MiA3OCAzMzAgNzhRNDI1IDc4IDQ4MyAxNDJMNTM2IDgwUTUwMCAzOCA0NDYuNSAxNi4wUTM5MyAtNiAzMjcgLTZRMjQzIC02IDE3OC4wIDI4LjVRMTEzIDYzIDc3LjUgMTI1LjBRNDIgMTg3IDQyIDI2NVE0MiAzNDIgNzYuNSA0MDQuMFExMTEgNDY2IDE3MS41IDUwMC41UTIzMiA1MzUgMzA4IDUzNVEzODQgNTM1IDQ0My41IDUwMC41UTUwMyA0NjYgNTM2LjUgNDA0LjBRNTcwIDM0MiA1NzAgMjYyUTU3MCAyNTEgNTY4IDIzM1pNMTM4IDMwMkg0NzhRNDcwIDM2OSA0MjMuNSA0MTEuNVEzNzcgNDU0IDMwOCA0NTRRMjM5IDQ1NCAxOTIuNSA0MTIuMFExNDYgMzcwIDEzOCAzMDJaIiBmaWxsPSIjMDAwMDAwIi8+CjxwYXRoIHRyYW5zZm9ybT0idHJhbnNsYXRlKDEyOTMsMCkiIGQ9Ik0yNCA1NiA2NCAxMzJROTkgMTA3IDE0OS4wIDkyLjBRMTk5IDc3IDI1MCA3N1EzNzYgNzcgMzc2IDE0OVEzNzYgMTczIDM1OS4wIDE4Ny4wUTM0MiAyMDEgMzE2LjUgMjA3LjVRMjkxIDIxNCAyNDQgMjIyUTE4MCAyMzIgMTM5LjUgMjQ1LjBROTkgMjU4IDcwLjAgMjg5LjBRNDEgMzIwIDQxIDM3NlE0MSA0NDggMTAxLjAgNDkxLjVRMTYxIDUzNSAyNjIgNTM1UTMxNSA1MzUgMzY4LjAgNTIyLjBRNDIxIDUwOSA0NTUgNDg3TDQxNCA0MTFRMzQ5IDQ1MyAyNjEgNDUzUTIwMCA0NTMgMTY4LjAgNDMzLjBRMTM2IDQxMyAxMzYgMzgwUTEzNiAzNTQgMTU0LjAgMzM5LjBRMTcyIDMyNCAxOTguNSAzMTcuMFEyMjUgMzEwIDI3MyAzMDFRMzM3IDI5MCAzNzYuNSAyNzcuNVE0MTYgMjY1IDQ0NC4wIDIzNS4wUTQ3MiAyMDUgNDcyIDE1MVE0NzIgNzkgNDEwLjUgMzYuNVEzNDkgLTYgMjQzIC02UTE3OCAtNiAxMTguMCAxMS41UTU4IDI5IDI0IDU2WiIgZmlsbD0iIzAwMDAwMCIvPgo8cGF0aCB0cmFuc2Zvcm09InRyYW5zbGF0ZSgxNzk0LDApIiBkPSJNMjQgNTYgNjQgMTMyUTk5IDEwNyAxNDkuMCA5Mi4wUTE5OSA3NyAyNTAgNzdRMzc2IDc3IDM3NiAxNDlRMzc2IDE3MyAzNTkuMCAxODcuMFEzNDIgMjAxIDMxNi41IDIwNy41UTI5MSAyMTQgMjQ0IDIyMlExODAgMjMyIDEzOS41IDI0NS4wUTk5IDI1OCA3MC4wIDI4OS4wUTQxIDMyMCA0MSAzNzZRNDEgNDQ4IDEwMS4wIDQ5MS41UTE2MSA1MzUgMjYyIDUzNVEzMTUgNTM1IDM2OC4wIDUyMi4wUTQyMSA1MDkgNDU1IDQ4N0w0MTQgNDExUTM0OSA0NTMgMjYxIDQ1M1EyMDAgNDUzIDE2OC4wIDQzMy4wUTEzNiA0MTMgMTM2IDM4MFExMzYgMzU0IDE1NC4wIDMzOS4wUTE3MiAzMjQgMTk4LjUgMzE3LjBRMjI1IDMxMCAyNzMgMzAxUTMzNyAyOTAgMzc2LjUgMjc3LjVRNDE2IDI2NSA0NDQuMCAyMzUuMFE0NzIgMjA1IDQ3MiAxNTFRNDcyIDc5IDQxMC41IDM2LjVRMzQ5IC02IDI0MyAtNlExNzggLTYgMTE4LjAgMTEuNVE1OCAyOSAyNCA1NloiIGZpbGw9IiMwMDAwMDAiLz4KPHBhdGggdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMjI5NSwwKSIgZD0iTTQ2IDYzUTQ2IDkyIDY2LjAgMTExLjVRODYgMTMxIDExNCAxMzFRMTQyIDEzMSAxNjEuMCAxMTIuMFExODAgOTMgMTgwIDYzUTE4MCAzMyAxNjAuNSAxMy41UTE0MSAtNiAxMTQgLTZRODYgLTYgNjYuMCAxMy41UTQ2IDMzIDQ2IDYzWiIgZmlsbD0iIzAwQURFOCIvPgo8L2c+PC9zdmc+" alt="ness."><span>Dossiê de homologação · Onda 2</span></div>
- <div class="pb">
-  <h2><span class="n">5</span>A ressalva da CCEE e o que fecha depois</h2>
-
+ <div class="band">
+  <div class="top"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjIwLjgiIGhlaWdodD0iNDAzLjIiIHZpZXdCb3g9IjAgMCAxMjIwLjgwIDQwMy4yMCI+CjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDQxLjIzMCwzMTguOTM4KSBzY2FsZSgwLjQ0MzYyLC0wLjQ0MzYyKSI+CjxwYXRoIHRyYW5zZm9ybT0idHJhbnNsYXRlKDAsMCkiIGQ9Ik01OTQgMzA1VjBINDk4VjI5NFE0OTggMzcxIDQ2MS4wIDQxMC4wUTQyNCA0NDkgMzU1IDQ0OVEyNzcgNDQ5IDIzMi4wIDQwMy41UTE4NyAzNTggMTg3IDI3M1YwSDkxVjUzMEgxODNWNDUwUTIxMiA0OTEgMjYxLjUgNTEzLjBRMzExIDUzNSAzNzQgNTM1UTQ3NSA1MzUgNTM0LjUgNDc2LjVRNTk0IDQxOCA1OTQgMzA1WiIgZmlsbD0iI0ZGRkZGRiIvPgo8cGF0aCB0cmFuc2Zvcm09InRyYW5zbGF0ZSg2ODEsMCkiIGQ9Ik01NjggMjMzSDEzOFExNDcgMTYzIDE5OS41IDEyMC41UTI1MiA3OCAzMzAgNzhRNDI1IDc4IDQ4MyAxNDJMNTM2IDgwUTUwMCAzOCA0NDYuNSAxNi4wUTM5MyAtNiAzMjcgLTZRMjQzIC02IDE3OC4wIDI4LjVRMTEzIDYzIDc3LjUgMTI1LjBRNDIgMTg3IDQyIDI2NVE0MiAzNDIgNzYuNSA0MDQuMFExMTEgNDY2IDE3MS41IDUwMC41UTIzMiA1MzUgMzA4IDUzNVEzODQgNTM1IDQ0My41IDUwMC41UTUwMyA0NjYgNTM2LjUgNDA0LjBRNTcwIDM0MiA1NzAgMjYyUTU3MCAyNTEgNTY4IDIzM1pNMTM4IDMwMkg0NzhRNDcwIDM2OSA0MjMuNSA0MTEuNVEzNzcgNDU0IDMwOCA0NTRRMjM5IDQ1NCAxOTIuNSA0MTIuMFExNDYgMzcwIDEzOCAzMDJaIiBmaWxsPSIjRkZGRkZGIi8+CjxwYXRoIHRyYW5zZm9ybT0idHJhbnNsYXRlKDEyOTMsMCkiIGQ9Ik0yNCA1NiA2NCAxMzJROTkgMTA3IDE0OS4wIDkyLjBRMTk5IDc3IDI1MCA3N1EzNzYgNzcgMzc2IDE0OVEzNzYgMTczIDM1OS4wIDE4Ny4wUTM0MiAyMDEgMzE2LjUgMjA3LjVRMjkxIDIxNCAyNDQgMjIyUTE4MCAyMzIgMTM5LjUgMjQ1LjBROTkgMjU4IDcwLjAgMjg5LjBRNDEgMzIwIDQxIDM3NlE0MSA0NDggMTAxLjAgNDkxLjVRMTYxIDUzNSAyNjIgNTM1UTMxNSA1MzUgMzY4LjAgNTIyLjBRNDIxIDUwOSA0NTUgNDg3TDQxNCA0MTFRMzQ5IDQ1MyAyNjEgNDUzUTIwMCA0NTMgMTY4LjAgNDMzLjBRMTM2IDQxMyAxMzYgMzgwUTEzNiAzNTQgMTU0LjAgMzM5LjBRMTcyIDMyNCAxOTguNSAzMTcuMFEyMjUgMzEwIDI3MyAzMDFRMzM3IDI5MCAzNzYuNSAyNzcuNVE0MTYgMjY1IDQ0NC4wIDIzNS4wUTQ3MiAyMDUgNDcyIDE1MVE0NzIgNzkgNDEwLjUgMzYuNVEzNDkgLTYgMjQzIC02UTE3OCAtNiAxMTguMCAxMS41UTU4IDI5IDI0IDU2WiIgZmlsbD0iI0ZGRkZGRiIvPgo8cGF0aCB0cmFuc2Zvcm09InRyYW5zbGF0ZSgxNzk0LDApIiBkPSJNMjQgNTYgNjQgMTMyUTk5IDEwNyAxNDkuMCA5Mi4wUTE5OSA3NyAyNTAgNzdRMzc2IDc3IDM3NiAxNDlRMzc2IDE3MyAzNTkuMCAxODcuMFEzNDIgMjAxIDMxNi41IDIwNy41UTI5MSAyMTQgMjQ0IDIyMlExODAgMjMyIDEzOS41IDI0NS4wUTk5IDI1OCA3MC4wIDI4OS4wUTQxIDMyMCA0MSAzNzZRNDEgNDQ4IDEwMS4wIDQ5MS41UTE2MSA1MzUgMjYyIDUzNVEzMTUgNTM1IDM2OC4wIDUyMi4wUTQyMSA1MDkgNDU1IDQ4N0w0MTQgNDExUTM0OSA0NTMgMjYxIDQ1M1EyMDAgNDUzIDE2OC4wIDQzMy4wUTEzNiA0MTMgMTM2IDM4MFExMzYgMzU0IDE1NC4wIDMzOS4wUTE3MiAzMjQgMTk4LjUgMzE3LjBRMjI1IDMxMCAyNzMgMzAxUTMzNyAyOTAgMzc2LjUgMjc3LjVRNDE2IDI2NSA0NDQuMCAyMzUuMFE0NzIgMjA1IDQ3MiAxNTFRNDcyIDc5IDQxMC41IDM2LjVRMzQ5IC02IDI0MyAtNlExNzggLTYgMTE4LjAgMTEuNVE1OCAyOSAyNCA1NloiIGZpbGw9IiNGRkZGRkYiLz4KPHBhdGggdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMjI5NSwwKSIgZD0iTTQ2IDYzUTQ2IDkyIDY2LjAgMTExLjVRODYgMTMxIDExNCAxMzFRMTQyIDEzMSAxNjEuMCAxMTIuMFExODAgOTMgMTgwIDYzUTE4MCAzMyAxNjAuNSAxMy41UTE0MSAtNiAxMTQgLTZRODYgLTYgNjYuMCAxMy41UTQ2IDMzIDQ2IDYzWiIgZmlsbD0iIzAwQURFOCIvPgo8L2c+PC9zdmc+" alt="ness."><span>Dossiê de homologação · Onda 2</span></div>
+  <div class="rule"></div>
+  <h2>Uma ressalva, três pedidos à Alupar e duas pendências</h2>
+  <p class="lead">A autenticação na CCEE é válida; a diferença é de permissão do perfil no serviço de cadastro. É dependência da contratante, e não um componente a construir.</p>
+ </div>
+ <div class="body">
   <div>
    <h3>O que acontece com o cadastro de pontos</h3>
    <div class="dec">
     <div class="box"><b>O conector consulta</b>o cadastro de pontos de medição da CCEE.</div>
     <div class="arr"><svg><use href="#i-seta"/></svg></div>
-    <div class="box alt"><b>A CCEE responde <code>4001</code></b>A autenticação é válida; falta permissão do perfil 6166.</div>
+    <div class="box alt"><b>A CCEE responde <code>4001</code></b>Falta permissão ao perfil 6166. O conector registra <code>SEM_PERMISSAO</code>.</div>
     <div class="arr"><svg><use href="#i-seta"/></svg></div>
     <div class="split">
      <div class="box res"><b>A medição segue</b>com o ponto de teste já validado.</div>
@@ -379,16 +472,16 @@ tr{break-inside:avoid}
 
   <div>
    <h3>O que pedimos à Alupar (#462)</h3>
-   <ul class="chk" style="gap:2.6mm">
-    <li style="grid-template-columns:5mm 1fr"><svg><use href="#i-ress"/></svg><span>A <b>lista dos pontos de medição</b> que a Alupar consulta hoje na CCEE (códigos dos pontos).</span></li>
-    <li style="grid-template-columns:5mm 1fr"><svg><use href="#i-ress"/></svg><span>Se a Alupar usa o serviço de <b>cadastro de pontos</b> e, em caso positivo, com qual perfil de agente.</span></li>
-    <li style="grid-template-columns:5mm 1fr"><svg><use href="#i-ress"/></svg><span>Se o perfil <b>6166 vale para todos esses pontos</b>; se não, o perfil de cada um.</span></li>
+   <ul class="asks">
+    <li><span>A <b>lista dos pontos de medição</b> que a Alupar consulta hoje na CCEE, com os códigos dos pontos.</span></li>
+    <li><span>Se a Alupar usa o serviço de <b>cadastro de pontos</b> e, em caso positivo, com qual perfil de agente.</span></li>
+    <li><span>Se o perfil <b>6166 vale para todos esses pontos</b>; se não, o perfil de cada um.</span></li>
    </ul>
   </div>
 
   <div>
    <h3>O que fecha depois da emissão</h3>
-   <table>
+   <table class="p">
     <tr><th>Pendência</th><th style="width:24mm">Quem</th><th style="width:62mm">Efeito</th></tr>
     <tr><td>Permissão do perfil 6166 para o cadastro de pontos da CCEE (#462)</td><td>Alupar</td><td>Complementa o item 2.1; não bloqueia a medição.</td></tr>
     <tr><td>Correção do negócio em quarentena no Hubspot</td><td>Alupar</td><td>A carga seguinte o traz de volta.</td></tr>
@@ -397,7 +490,7 @@ tr{break-inside:avoid}
 
   <p class="note">Prazos e efeitos da cláusula 3ª ficam registrados como fato, sem decisão neste documento.</p>
  </div>
- <div class="pf"><span>Confidencial: uso restrito das partes · REL-2026-11-19-D</span><span>6 / 6</span></div>
+ <div class="foot"><span>Confidencial: uso restrito das partes · REL-2026-11-19-D</span><span>6 / 6</span></div>
 </section>
 
 </body>

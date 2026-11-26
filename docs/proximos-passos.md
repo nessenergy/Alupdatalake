@@ -1,7 +1,7 @@
 # Próximos passos — fila de execução
 
 Documento **vivo**: é para riscar linha, não para arquivar. Atualizado em
-**2026-11-25** (Onda 2 entregue; Painel corrigido; item 26 com 3 meses em dev e 1 em hml; prod pronta para o bootstrap).
+**2026-11-26** (Onda 2 entregue; dossiê mesclado; Painel corrigido; item 26 com 3 meses em dev e 1 em hml; prod pronta para o bootstrap).
 
 Ele existe para responder uma pergunta que os outros três não respondem em uma
 tela: **qual é a próxima ação, de quem é, e qual comando a executa.**
@@ -17,20 +17,24 @@ Quando um item fecha, sai da fila ativa; os registros datados abaixo são
 históricos. As ações externas da seção 2 ficam com a coordenação da ness.,
 em acompanhamento com a Alup; sua execução não é presumida por esta revisão.
 
-> **Quadro de 22/10/2026.** O que está de fato aberto hoje, em ordem. O restante desta fila é histórico e foi superado em parte; o estado
+> **Quadro de 26/11/2026.** O que está de fato aberto hoje, em ordem. O restante desta fila é histórico e foi superado em parte; o estado
 > atual está em [`status.md`](status.md) e em [`visao-consolidada.md`](visao-consolidada.md).
 >
 > | # | Item | Dono |
 > |---|---|---|
-> | 1 | ~~BBCE: exemplo de chamada da consulta de curvas~~ resolvido em 28/10 (`Bearer <idToken>`, #434); resta conferir a Silver e a Gold | Ricardo |
-> | 2 | ~~Confirmar por escrito que o TempoOK saiu do escopo~~: dispensado, a saída está validada (23/10/2026) | Gabriel |
-> | 3 | ONS: gravar as credenciais (IPDO editável e ACOMPH, área autenticada). ~~CCEE: credenciais gravadas e primeira leitura feita em 09/11 (24 medidas, usuário `ace`)~~; uso do `ace` confirmado pelo Gabriel em 09/11; resta saber se o perfil `6166` vale para todos os pontos (#462) | Alupar, Ricardo |
-> | 4 | Colunas das 7 tabelas do MySQL Alup (duas serão renomeadas) e do outro banco, para os conectores da Onda 3 | Alupar |
-> | 5 | Caminho de rede até o Oracle FMB via DCIDE (IP privado, VPC, aceite da sub-rede) | Thiago, Alupar |
-> | 6 | RM/TOTVS: a Alupar não tem endpoints e precisa dos dados de faturamento de varejistas e atacadistas; perguntar à DCIDE | Ricardo |
-> | 7 | Pasta do Drive e planilhas modelo; escrever o leitor do Drive | Alupar, ness. |
-> | 8 | Reaplicar o bootstrap em dev (Cloud Build) e hml (log do contêiner) | Ricardo |
-> | 9 | Decidir a produção, o item 2.1 (CCEE credenciado) e os decks DECOMP e NEWAVE | Ricardo |
+> | 1 | **Aceite da Onda 2** (marco 3, R$ 28.160,00): dossiê mesclado em 26/11 (#491, ainda "rascunho" no título); falta o Gabriel validar e, então, o pedido de aceite ao Eduardo Pires | Gabriel, Ricardo |
+> | 2 | **Ressalva da CCEE** (item 2.1): cadastro de pontos negado ao perfil `6166` (erro `4001`, #462); decidir se o aceite segue com a ressalva registrada | Ricardo; permissão é da Alupar |
+> | 3 | Hubspot: 1 negócio em quarentena (fechamento anterior à criação), à espera de correção na origem | Alupar |
+> | 4 | **Onda 3:** e-mail ao Leonardo em rascunho no Outlook; MySQL Alup e MySQL Comercialização conectam, mas a primeira carga do Portal Alup não foi feita e há 8 perguntas em aberto (`docs/superpowers/specs/2026-11-10-mysql-alup-onda3-design.md`); colunas das tabelas do MySQL Comercialização | Ricardo, Gabriel, Alupar |
+> | 5 | Oracle FMB: caminho de rede via DCIDE (G6, L1 a L6) e credencial (N3). RM/TOTVS: a Alupar não tem os endpoints | Alupar, DCIDE |
+> | 6 | ANEEL (`aneel_siga`, `aneel_tarifas`) sem carga desde 09/11: a origem derruba a conexão; rodar de novo quando estabilizar | ness. |
+> | 7 | Item 26 (`consumo_horario_perfil_agente`): replay de julho em hml com o parser corrigido, Dataform e conferência, e a resposta da Alupar sobre a granularidade | ness., Alupar |
+> | 8 | Decidir a produção ([runbook](runbook/bootstrap-producao.md)), os decks DECOMP e NEWAVE e o orçamento por ambiente (#87) | Ricardo |
+> | 9 | CI/CD fora do GitHub Actions (ADR 030): tarefas 0 a 7 feitas; faltam a semana em paralelo (8) e desligar o Actions (9), que dependem de D1 a D4 do plano | Ricardo, dono da organização |
+> | 10 | ONS: gravar as credenciais da área autenticada (IPDO editável e ACOMPH); mantido do quadro de 22/10, não reconferido em 26/11 | Alupar, Ricardo |
+>
+> Saíram do quadro, por resolvidos: BBCE (carga real e agendamento em dev e hml), TempoOK (fora do escopo, validado em 23/10), credenciais e primeira leitura da CCEE (09/11), agendamento do Hubspot (#482, primeira execução agendada em 24/11) e a correção do Painel (#487).
+
 ---
 
 ## 1. O que está travando tudo

@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AlupData: relatório semanal 20 a 27/11</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--cyan:#00ADE8;--cyan-d:#0090C4;--cyan-n:#E5F6FD;--tinta:#0E1116;--grafite:#2B333B;--cinza:#5A6473;--linha:#E4E8EC;--nevoa:#EEF3F8;--branco:#fff}
+*{box-sizing:border-box;margin:0}
+html{scroll-snap-type:y mandatory;scroll-behavior:smooth}
+body{font-family:Montserrat,system-ui,sans-serif;color:var(--grafite);background:var(--branco);line-height:1.5}
+.slide{min-height:100vh;height:100vh;scroll-snap-align:start;padding:clamp(28px,6vh,72px) clamp(24px,6vw,96px);display:flex;flex-direction:column;position:relative;overflow:hidden}
+.slide.dark{background:var(--tinta);color:#fff}
+.top{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--cinza);padding-bottom:14px;border-bottom:1px solid var(--linha)}
+.dark .num{color:var(--cyan)}
+.dark .top{border-color:#2B333B;color:#9aa6b4}
+.top img{height:26px}
+.body{flex:1;display:flex;flex-direction:column;justify-content:center;gap:clamp(18px,3.5vh,36px);padding:clamp(12px,3vh,32px) 0}
+.num{color:#006E96;font-weight:600;font-size:clamp(18px,1.8vw,24px);letter-spacing:.04em}
+h1{font-weight:600;font-size:clamp(34px,5.4vw,68px);line-height:1.08;letter-spacing:-.02em;color:#fff}
+h2{font-weight:600;font-size:clamp(26px,3.4vw,44px);line-height:1.12;letter-spacing:-.015em;color:var(--tinta);max-width:22ch}
+.rule{width:56px;height:3px;background:var(--cyan)}
+.lead{font-size:clamp(15px,1.7vw,21px);max-width:60ch}
+.dark .lead{color:#c9d3de}
+.sub{font-weight:500;color:#006E96;font-size:clamp(14px,1.3vw,17px);margin-bottom:10px}
+.sub:before{content:"▸ ";color:var(--cyan)}
+.grid{display:grid;gap:clamp(16px,2.5vw,36px)}
+.g4{grid-template-columns:repeat(4,1fr)}.g2{grid-template-columns:1fr 1fr}
+.stat{border-top:1px solid var(--linha);padding-top:14px}
+.stat b{display:block;font-weight:600;font-size:clamp(28px,4vw,52px);letter-spacing:-.02em;color:var(--tinta);line-height:1.05}
+.stat span{font-size:clamp(12px,1.1vw,14px);color:var(--cinza)}
+ul.l{list-style:none;padding:0;display:grid;gap:12px;font-size:clamp(14px,1.5vw,19px)}
+ul.l li{padding-left:20px;position:relative}
+ul.l li:before{content:"";position:absolute;left:0;top:.7em;width:8px;height:2px;background:var(--cyan)}
+.callout{background:var(--cyan-n);border-left:4px solid var(--cyan);padding:18px 22px;font-size:clamp(14px,1.4vw,18px);color:var(--tinta)}
+table{border-collapse:collapse;width:100%;font-size:clamp(13px,1.3vw,17px)}
+th{background:var(--tinta);color:#fff;font-weight:500;text-align:left;padding:12px 16px}
+td{padding:12px 16px;border-bottom:1px solid var(--linha)}
+td.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.bar{height:22px;background:var(--nevoa);position:relative}
+.bar i{position:absolute;top:0;bottom:0;left:0;background:var(--cyan)}
+.cap{display:flex;justify-content:space-between;font-size:clamp(12px,1.1vw,14px);color:var(--cinza);margin-top:8px}
+.foot{display:flex;justify-content:space-between;font-size:13px;color:var(--cinza)}
+.dark .foot{color:#9aa6b4}
+nav{position:fixed;right:18px;bottom:14px;font-size:13px;color:var(--cinza);z-index:9}
+@media(max-width:820px){.g4,.g2{grid-template-columns:1fr 1fr}.slide{height:auto;min-height:100vh}html{scroll-snap-type:none}}
+@media(max-width:520px){.g4,.g2{grid-template-columns:1fr}}
+@media print{@page{size:A4 landscape;margin:0}.slide{height:100vh;break-after:page}html{scroll-snap-type:none}nav{display:none}*{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+</style>
+</head>
+<body>
+
+<section class="slide dark">
+ <div class="top"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjIwLjgiIGhlaWdodD0iNDAzLjIiIHZpZXdCb3g9IjAgMCAxMjIwLjgwIDQwMy4yMCI+CjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDQxLjIzMCwzMTguOTM4KSBzY2FsZSgwLjQ0MzYyLC0wLjQ0MzYyKSI+CjxwYXRoIHRyYW5zZm9ybT0idHJhbnNsYXRlKDAsMCkiIGQ9Ik01OTQgMzA1VjBINDk4VjI5NFE0OTggMzcxIDQ2MS4wIDQxMC4wUTQyNCA0NDkgMzU1IDQ0OVEyNzcgNDQ5IDIzMi4wIDQwMy41UTE4NyAzNTggMTg3IDI3M1YwSDkxVjUzMEgxODNWNDUwUTIxMiA0OTEgMjYxLjUgNTEzLjBRMzExIDUzNSAzNzQgNTM1UTQ3NSA1MzUgNTM0LjUgNDc2LjVRNTk0IDQxOCA1OTQgMzA1WiIgZmlsbD0iI0ZGRkZGRiIvPgo8cGF0aCB0cmFuc2Zvcm09InRyYW5zbGF0ZSg2ODEsMCkiIGQ9Ik01NjggMjMzSDEzOFExNDcgMTYzIDE5OS41IDEyMC41UTI1MiA3OCAzMzAgNzhRNDI1IDc4IDQ4MyAxNDJMNTM2IDgwUTUwMCAzOCA0NDYuNSAxNi4wUTM5MyAtNiAzMjcgLTZRMjQzIC02IDE3OC4wIDI4LjVRMTEzIDYzIDc3LjUgMTI1LjBRNDIgMTg3IDQyIDI2NVE0MiAzNDIgNzYuNSA0MDQuMFExMTEgNDY2IDE3MS41IDUwMC41UTIzMiA1MzUgMzA4IDUzNVEzODQgNTM1IDQ0My41IDUwMC41UTUwMyA0NjYgNTM2LjUgNDA0LjBRNTcwIDM0MiA1NzAgMjYyUTU3MCAyNTEgNTY4IDIzM1pNMTM4IDMwMkg0NzhRNDcwIDM2OSA0MjMuNSA0MTEuNVEzNzcgNDU0IDMwOCA0NTRRMjM5IDQ1NCAxOTIuNSA0MTIuMFExNDYgMzcwIDEzOCAzMDJaIiBmaWxsPSIjRkZGRkZGIi8+CjxwYXRoIHRyYW5zZm9ybT0idHJhbnNsYXRlKDEyOTMsMCkiIGQ9Ik0yNCA1NiA2NCAxMzJROTkgMTA3IDE0OS4wIDkyLjBRMTk5IDc3IDI1MCA3N1EzNzYgNzcgMzc2IDE0OVEzNzYgMTczIDM1OS4wIDE4Ny4wUTM0MiAyMDEgMzE2LjUgMjA3LjVRMjkxIDIxNCAyNDQgMjIyUTE4MCAyMzIgMTM5LjUgMjQ1LjBROTkgMjU4IDcwLjAgMjg5LjBRNDEgMzIwIDQxIDM3NlE0MSA0NDggMTAxLjAgNDkxLjVRMTYxIDUzNSAyNjIgNTM1UTMxNSA1MzUgMzY4LjAgNTIyLjBRNDIxIDUwOSA0NTUgNDg3TDQxNCA0MTFRMzQ5IDQ1MyAyNjEgNDUzUTIwMCA0NTMgMTY4LjAgNDMzLjBRMTM2IDQxMyAxMzYgMzgwUTEzNiAzNTQgMTU0LjAgMzM5LjBRMTcyIDMyNCAxOTguNSAzMTcuMFEyMjUgMzEwIDI3MyAzMDFRMzM3IDI5MCAzNzYuNSAyNzcuNVE0MTYgMjY1IDQ0NC4wIDIzNS4wUTQ3MiAyMDUgNDcyIDE1MVE0NzIgNzkgNDEwLjUgMzYuNVEzNDkgLTYgMjQzIC02UTE3OCAtNiAxMTguMCAxMS41UTU4IDI5IDI0IDU2WiIgZmlsbD0iI0ZGRkZGRiIvPgo8cGF0aCB0cmFuc2Zvcm09InRyYW5zbGF0ZSgxNzk0LDApIiBkPSJNMjQgNTYgNjQgMTMyUTk5IDEwNyAxNDkuMCA5Mi4wUTE5OSA3NyAyNTAgNzdRMzc2IDc3IDM3NiAxNDlRMzc2IDE3MyAzNTkuMCAxODcuMFEzNDIgMjAxIDMxNi41IDIwNy41UTI5MSAyMTQgMjQ0IDIyMlExODAgMjMyIDEzOS41IDI0NS4wUTk5IDI1OCA3MC4wIDI4OS4wUTQxIDMyMCA0MSAzNzZRNDEgNDQ4IDEwMS4wIDQ5MS41UTE2MSA1MzUgMjYyIDUzNVEzMTUgNTM1IDM2OC4wIDUyMi4wUTQyMSA1MDkgNDU1IDQ4N0w0MTQgNDExUTM0OSA0NTMgMjYxIDQ1M1EyMDAgNDUzIDE2OC4wIDQzMy4wUTEzNiA0MTMgMTM2IDM4MFExMzYgMzU0IDE1NC4wIDMzOS4wUTE3MiAzMjQgMTk4LjUgMzE3LjBRMjI1IDMxMCAyNzMgMzAxUTMzNyAyOTAgMzc2LjUgMjc3LjVRNDE2IDI2NSA0NDQuMCAyMzUuMFE0NzIgMjA1IDQ3MiAxNTFRNDcyIDc5IDQxMC41IDM2LjVRMzQ5IC02IDI0MyAtNlExNzggLTYgMTE4LjAgMTEuNVE1OCAyOSAyNCA1NloiIGZpbGw9IiNGRkZGRkYiLz4KPHBhdGggdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMjI5NSwwKSIgZD0iTTQ2IDYzUTQ2IDkyIDY2LjAgMTExLjVRODYgMTMxIDExNCAxMzFRMTQyIDEzMSAxNjEuMCAxMTIuMFExODAgOTMgMTgwIDYzUTE4MCAzMyAxNjAuNSAxMy41UTE0MSAtNiAxMTQgLTZRODYgLTYgNjYuMCAxMy41UTQ2IDMzIDQ2IDYzWiIgZmlsbD0iIzAwQURFOCIvPgo8L2c+PC9zdmc+" alt="ness."><span>AlupData · CPS-01025/2026</span></div>
+ <div class="body">
+  <div class="rule"></div>
+  <h1>Relatório semanal</h1>
+  <p class="lead">20 a 27 de novembro de 2026 · dia 88 de 130</p>
+ </div>
+ <div class="foot"><span>Documento confidencial</span><span>ness. Processos e Tecnologia</span></div>
+</section>
+
+<section class="slide">
+ <div class="top"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjIwLjgiIGhlaWdodD0iNDAzLjIiIHZpZXdCb3g9IjAgMCAxMjIwLjgwIDQwMy4yMCI+CjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDQxLjIzMCwzMTguOTM4KSBzY2FsZSgwLjQ0MzYyLC0wLjQ0MzYyKSI+CjxwYXRoIHRyYW5zZm9ybT0idHJhbnNsYXRlKDAsMCkiIGQ9Ik01OTQgMzA1VjBINDk4VjI5NFE0OTggMzcxIDQ2MS4wIDQxMC4wUTQyNCA0NDkgMzU1IDQ0OVEyNzcgNDQ5IDIzMi4wIDQwMy41UTE4NyAzNTggMTg3IDI3M1YwSDkxVjUzMEgxODNWNDUwUTIxMiA0OTEgMjYxLjUgNTEzLjBRMzExIDUzNSAzNzQgNTM1UTQ3NSA1MzUgNTM0LjUgNDc2LjVRNTk0IDQxOCA1OTQgMzA1WiIgZmlsbD0iIzAwMDAwMCIvPgo8cGF0aCB0cmFuc2Zvcm09InRyYW5zbGF0ZSg2ODEsMCkiIGQ9Ik01NjggMjMzSDEzOFExNDcgMTYzIDE5OS41IDEyMC41UTI1MiA3OCAzMzAgNzhRNDI1IDc4IDQ4MyAxNDJMNTM2IDgwUTUwMCAzOCA0NDYuNSAxNi4wUTM5MyAtNiAzMjcgLTZRMjQzIC02IDE3OC4wIDI4LjVRMTEzIDYzIDc3LjUgMTI1LjBRNDIgMTg3IDQyIDI2NVE0MiAzNDIgNzYuNSA0MDQuMFExMTEgNDY2IDE3MS41IDUwMC41UTIzMiA1MzUgMzA4IDUzNVEzODQgNTM1IDQ0My41IDUwMC41UTUwMyA0NjYgNTM2LjUgNDA0LjBRNTcwIDM0MiA1NzAgMjYyUTU3MCAyNTEgNTY4IDIzM1pNMTM4IDMwMkg0NzhRNDcwIDM2OSA0MjMuNSA0MTEuNVEzNzcgNDU0IDMwOCA0NTRRMjM5IDQ1NCAxOTIuNSA0MTIuMFExNDYgMzcwIDEzOCAzMDJaIiBmaWxsPSIjMDAwMDAwIi8+CjxwYXRoIHRyYW5zZm9ybT0idHJhbnNsYXRlKDEyOTMsMCkiIGQ9Ik0yNCA1NiA2NCAxMzJROTkgMTA3IDE0OS4wIDkyLjBRMTk5IDc3IDI1MCA3N1EzNzYgNzcgMzc2IDE0OVEzNzYgMTczIDM1OS4wIDE4Ny4wUTM0MiAyMDEgMzE2LjUgMjA3LjVRMjkxIDIxNCAyNDQgMjIyUTE4MCAyMzIgMTM5LjUgMjQ1LjBROTkgMjU4IDcwLjAgMjg5LjBRNDEgMzIwIDQxIDM3NlE0MSA0NDggMTAxLjAgNDkxLjVRMTYxIDUzNSAyNjIgNTM1UTMxNSA1MzUgMzY4LjAgNTIyLjBRNDIxIDUwOSA0NTUgNDg3TDQxNCA0MTFRMzQ5IDQ1MyAyNjEgNDUzUTIwMCA0NTMgMTY4LjAgNDMzLjBRMTM2IDQxMyAxMzYgMzgwUTEzNiAzNTQgMTU0LjAgMzM5LjBRMTcyIDMyNCAxOTguNSAzMTcuMFEyMjUgMzEwIDI3MyAzMDFRMzM3IDI5MCAzNzYuNSAyNzcuNVE0MTYgMjY1IDQ0NC4wIDIzNS4wUTQ3MiAyMDUgNDcyIDE1MVE0NzIgNzkgNDEwLjUgMzYuNVEzNDkgLTYgMjQzIC02UTE3OCAtNiAxMTguMCAxMS41UTU4IDI5IDI0IDU2WiIgZmlsbD0iIzAwMDAwMCIvPgo8cGF0aCB0cmFuc2Zvcm09InRyYW5zbGF0ZSgxNzk0LDApIiBkPSJNMjQgNTYgNjQgMTMyUTk5IDEwNyAxNDkuMCA5Mi4wUTE5OSA3NyAyNTAgNzdRMzc2IDc3IDM3NiAxNDlRMzc2IDE3MyAzNTkuMCAxODcuMFEzNDIgMjAxIDMxNi41IDIwNy41UTI5MSAyMTQgMjQ0IDIyMlExODAgMjMyIDEzOS41IDI0NS4wUTk5IDI1OCA3MC4wIDI4OS4wUTQxIDMyMCA0MSAzNzZRNDEgNDQ4IDEwMS4wIDQ5MS41UTE2MSA1MzUgMjYyIDUzNVEzMTUgNTM1IDM2OC4wIDUyMi4wUTQyMSA1MDkgNDU1IDQ4N0w0MTQgNDExUTM0OSA0NTMgMjYxIDQ1M1EyMDAgNDUzIDE2OC4wIDQzMy4wUTEzNiA0MTMgMTM2IDM4MFExMzYgMzU0IDE1NC4wIDMzOS4wUTE3MiAzMjQgMTk4LjUgMzE3LjBRMjI1IDMxMCAyNzMgMzAxUTMzNyAyOTAgMzc2LjUgMjc3LjVRNDE2IDI2NSA0NDQuMCAyMzUuMFE0NzIgMjA1IDQ3MiAxNTFRNDcyIDc5IDQxMC41IDM2LjVRMzQ5IC02IDI0MyAtNlExNzggLTYgMTE4LjAgMTEuNVE1OCAyOSAyNCA1NloiIGZpbGw9IiMwMDAwMDAiLz4KPHBhdGggdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMjI5NSwwKSIgZD0iTTQ2IDYzUTQ2IDkyIDY2LjAgMTExLjVRODYgMTMxIDExNCAxMzFRMTQyIDEzMSAxNjEuMCAxMTIuMFExODAgOTMgMTgwIDYzUTE4MCAzMyAxNjAuNSAxMy41UTE0MSAtNiAxMTQgLTZRODYgLTYgNjYuMCAxMy41UTQ2IDMzIDQ2IDYzWiIgZmlsbD0iIzAwQURFOCIvPgo8L2c+PC9zdmc+" alt="ness."><span>Relatório semanal · 27/11</span></div>
+ <div class="body">
+  <div><span class="num">01</span><h2>A semana em números</h2></div>
+  <div class="grid g4">
+   <div class="stat"><b>69,7%</b><span>das 580 h entregues, com 67,7% do prazo decorrido</span></div>
+   <div class="stat"><b>162 h</b><span>do Aditivo 01 entregues (itens 1 a 25)</span></div>
+   <div class="stat"><b>64</b><span>fontes registradas, todas com os 7 componentes</span></div>
+   <div class="stat"><b>36,2%</b><span>do contrato faturado (Ondas 0 e 1)</span></div>
+  </div>
+  <p class="lead">Dossiê da Onda 2 validado, ligação à pasta de planilhas do Drive preparada e previsão de finalização atualizada.</p>
+ </div>
+</section>
+
+<section class="slide">
+ <div class="top"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjIwLjgiIGhlaWdodD0iNDAzLjIiIHZpZXdCb3g9IjAgMCAxMjIwLjgwIDQwMy4yMCI+CjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDQxLjIzMCwzMTguOTM4KSBzY2FsZSgwLjQ0MzYyLC0wLjQ0MzYyKSI+CjxwYXRoIHRyYW5zZm9ybT0idHJhbnNsYXRlKDAsMCkiIGQ9Ik01OTQgMzA1VjBINDk4VjI5NFE0OTggMzcxIDQ2MS4wIDQxMC4wUTQyNCA0NDkgMzU1IDQ0OVEyNzcgNDQ5IDIzMi4wIDQwMy41UTE4NyAzNTggMTg3IDI3M1YwSDkxVjUzMEgxODNWNDUwUTIxMiA0OTEgMjYxLjUgNTEzLjBRMzExIDUzNSAzNzQgNTM1UTQ3NSA1MzUgNTM0LjUgNDc2LjVRNTk0IDQxOCA1OTQgMzA1WiIgZmlsbD0iIzAwMDAwMCIvPgo8cGF0aCB0cmFuc2Zvcm09InRyYW5zbGF0ZSg2ODEsMCkiIGQ9Ik01NjggMjMzSDEzOFExNDcgMTYzIDE5OS41IDEyMC41UTI1MiA3OCAzMzAgNzhRNDI1IDc4IDQ4MyAxNDJMNTM2IDgwUTUwMCAzOCA0NDYuNSAxNi4wUTM5MyAtNiAzMjcgLTZRMjQzIC02IDE3OC4wIDI4LjVRMTEzIDYzIDc3LjUgMTI1LjBRNDIgMTg3IDQyIDI2NVE0MiAzNDIgNzYuNSA0MDQuMFExMTEgNDY2IDE3MS41IDUwMC41UTIzMiA1MzUgMzA4IDUzNVEzODQgNTM1IDQ0My41IDUwMC41UTUwMyA0NjYgNTM2LjUgNDA0LjBRNTcwIDM0MiA1NzAgMjYyUTU3MCAyNTEgNTY4IDIzM1pNMTM4IDMwMkg0NzhRNDcwIDM2OSA0MjMuNSA0MTEuNVEzNzcgNDU0IDMwOCA0NTRRMjM5IDQ1NCAxOTIuNSA0MTIuMFExNDYgMzcwIDEzOCAzMDJaIiBmaWxsPSIjMDAwMDAwIi8+CjxwYXRoIHRyYW5zZm9ybT0idHJhbnNsYXRlKDEyOTMsMCkiIGQ9Ik0yNCA1NiA2NCAxMzJROTkgMTA3IDE0OS4wIDkyLjBRMTk5IDc3IDI1MCA3N1EzNzYgNzcgMzc2IDE0OVEzNzYgMTczIDM1OS4wIDE4Ny4wUTM0MiAyMDEgMzE2LjUgMjA3LjVRMjkxIDIxNCAyNDQgMjIyUTE4MCAyMzIgMTM5LjUgMjQ1LjBROTkgMjU4IDcwLjAgMjg5LjBRNDEgMzIwIDQxIDM3NlE0MSA0NDggMTAxLjAgNDkxLjVRMTYxIDUzNSAyNjIgNTM1UTMxNSA1MzUgMzY4LjAgNTIyLjBRNDIxIDUwOSA0NTUgNDg3TDQxNCA0MTFRMzQ5IDQ1MyAyNjEgNDUzUTIwMCA0NTMgMTY4LjAgNDMzLjBRMTM2IDQxMyAxMzYgMzgwUTEzNiAzNTQgMTU0LjAgMzM5LjBRMTcyIDMyNCAxOTguNSAzMTcuMFEyMjUgMzEwIDI3MyAzMDFRMzM3IDI5MCAzNzYuNSAyNzcuNVE0MTYgMjY1IDQ0NC4wIDIzNS4wUTQ3MiAyMDUgNDcyIDE1MVE0NzIgNzkgNDEwLjUgMzYuNVEzNDkgLTYgMjQzIC02UTE3OCAtNiAxMTguMCAxMS41UTU4IDI5IDI0IDU2WiIgZmlsbD0iIzAwMDAwMCIvPgo8cGF0aCB0cmFuc2Zvcm09InRyYW5zbGF0ZSgxNzk0LDApIiBkPSJNMjQgNTYgNjQgMTMyUTk5IDEwNyAxNDkuMCA5Mi4wUTE5OSA3NyAyNTAgNzdRMzc2IDc3IDM3NiAxNDlRMzc2IDE3MyAzNTkuMCAxODcuMFEzNDIgMjAxIDMxNi41IDIwNy41UTI5MSAyMTQgMjQ0IDIyMlExODAgMjMyIDEzOS41IDI0NS4wUTk5IDI1OCA3MC4wIDI4OS4wUTQxIDMyMCA0MSAzNzZRNDEgNDQ4IDEwMS4wIDQ5MS41UTE2MSA1MzUgMjYyIDUzNVEzMTUgNTM1IDM2OC4wIDUyMi4wUTQyMSA1MDkgNDU1IDQ4N0w0MTQgNDExUTM0OSA0NTMgMjYxIDQ1M1EyMDAgNDUzIDE2OC4wIDQzMy4wUTEzNiA0MTMgMTM2IDM4MFExMzYgMzU0IDE1NC4wIDMzOS4wUTE3MiAzMjQgMTk4LjUgMzE3LjBRMjI1IDMxMCAyNzMgMzAxUTMzNyAyOTAgMzc2LjUgMjc3LjVRNDE2IDI2NSA0NDQuMCAyMzUuMFE0NzIgMjA1IDQ3MiAxNTFRNDcyIDc5IDQxMC41IDM2LjVRMzQ5IC02IDI0MyAtNlExNzggLTYgMTE4LjAgMTEuNVE1OCAyOSAyNCA1NloiIGZpbGw9IiMwMDAwMDAiLz4KPHBhdGggdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMjI5NSwwKSIgZD0iTTQ2IDYzUTQ2IDkyIDY2LjAgMTExLjVRODYgMTMxIDExNCAxMzFRMTQyIDEzMSAxNjEuMCAxMTIuMFExODAgOTMgMTgwIDYzUTE4MCAzMyAxNjAuNSAxMy41UTE0MSAtNiAxMTQgLTZRODYgLTYgNjYuMCAxMy41UTQ2IDMzIDQ2IDYzWiIgZmlsbD0iIzAwQURFOCIvPgo8L2c+PC9zdmc+" alt="ness."><span>Relatório semanal · 27/11</span></div>
+ <div class="body">
+  <div><span class="num">02</span><h2>Previsão de finalização</h2></div>
+  <p class="lead">Término contratual em 08/01/2027, mantido se os insumos da Onda 3 chegarem até 03/12. Cada dia útil de atraso no insumo desloca o término em um dia útil.</p>
+  <table>
+   <tr><th>Insumos da Onda 3 chegam</th><th style="text-align:right">Conclusão estimada</th></tr>
+   <tr><td>até 30/11</td><td class="n">05/01/2027</td></tr>
+   <tr><td>até 03/12</td><td class="n">08/01/2027 (data do contrato)</td></tr>
+   <tr><td>até 11/12</td><td class="n">18/01/2027</td></tr>
+   <tr><td>até 18/12</td><td class="n">25/01/2027</td></tr>
+  </table>
+  <p class="sub">Base: 404 de 580 h entregues, ritmo médio de 6,6 h por dia útil e 166 h restantes (117,5 h da Onda 3 e 48,5 h da Onda 4). A Onda 4 já tem 54% pronto antes da janela. Estimativa por ritmo médio, sem o recesso de fim de ano.</p>
+ </div>
+</section>
+
+<section class="slide">
+ <div class="top"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjIwLjgiIGhlaWdodD0iNDAzLjIiIHZpZXdCb3g9IjAgMCAxMjIwLjgwIDQwMy4yMCI+CjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDQxLjIzMCwzMTguOTM4KSBzY2FsZSgwLjQ0MzYyLC0wLjQ0MzYyKSI+CjxwYXRoIHRyYW5zZm9ybT0idHJhbnNsYXRlKDAsMCkiIGQ9Ik01OTQgMzA1VjBINDk4VjI5NFE0OTggMzcxIDQ2MS4wIDQxMC4wUTQyNCA0NDkgMzU1IDQ0OVEyNzcgNDQ5IDIzMi4wIDQwMy41UTE4NyAzNTggMTg3IDI3M1YwSDkxVjUzMEgxODNWNDUwUTIxMiA0OTEgMjYxLjUgNTEzLjBRMzExIDUzNSAzNzQgNTM1UTQ3NSA1MzUgNTM0LjUgNDc2LjVRNTk0IDQxOCA1OTQgMzA1WiIgZmlsbD0iIzAwMDAwMCIvPgo8cGF0aCB0cmFuc2Zvcm09InRyYW5zbGF0ZSg2ODEsMCkiIGQ9Ik01NjggMjMzSDEzOFExNDcgMTYzIDE5OS41IDEyMC41UTI1MiA3OCAzMzAgNzhRNDI1IDc4IDQ4MyAxNDJMNTM2IDgwUTUwMCAzOCA0NDYuNSAxNi4wUTM5MyAtNiAzMjcgLTZRMjQzIC02IDE3OC4wIDI4LjVRMTEzIDYzIDc3LjUgMTI1LjBRNDIgMTg3IDQyIDI2NVE0MiAzNDIgNzYuNSA0MDQuMFExMTEgNDY2IDE3MS41IDUwMC41UTIzMiA1MzUgMzA4IDUzNVEzODQgNTM1IDQ0My41IDUwMC41UTUwMyA0NjYgNTM2LjUgNDA0LjBRNTcwIDM0MiA1NzAgMjYyUTU3MCAyNTEgNTY4IDIzM1pNMTM4IDMwMkg0NzhRNDcwIDM2OSA0MjMuNSA0MTEuNVEzNzcgNDU0IDMwOCA0NTRRMjM5IDQ1NCAxOTIuNSA0MTIuMFExNDYgMzcwIDEzOCAzMDJaIiBmaWxsPSIjMDAwMDAwIi8+CjxwYXRoIHRyYW5zZm9ybT0idHJhbnNsYXRlKDEyOTMsMCkiIGQ9Ik0yNCA1NiA2NCAxMzJROTkgMTA3IDE0OS4wIDkyLjBRMTk5IDc3IDI1MCA3N1EzNzYgNzcgMzc2IDE0OVEzNzYgMTczIDM1OS4wIDE4Ny4wUTM0MiAyMDEgMzE2LjUgMjA3LjVRMjkxIDIxNCAyNDQgMjIyUTE4MCAyMzIgMTM5LjUgMjQ1LjBROTkgMjU4IDcwLjAgMjg5LjBRNDEgMzIwIDQxIDM3NlE0MSA0NDggMTAxLjAgNDkxLjVRMTYxIDUzNSAyNjIgNTM1UTMxNSA1MzUgMzY4LjAgNTIyLjBRNDIxIDUwOSA0NTUgNDg3TDQxNCA0MTFRMzQ5IDQ1MyAyNjEgNDUzUTIwMCA0NTMgMTY4LjAgNDMzLjBRMTM2IDQxMyAxMzYgMzgwUTEzNiAzNTQgMTU0LjAgMzM5LjBRMTcyIDMyNCAxOTguNSAzMTcuMFEyMjUgMzEwIDI3MyAzMDFRMzM3IDI5MCAzNzYuNSAyNzcuNVE0MTYgMjY1IDQ0NC4wIDIzNS4wUTQ3MiAyMDUgNDcyIDE1MVE0NzIgNzkgNDEwLjUgMzYuNVEzNDkgLTYgMjQzIC02UTE3OCAtNiAxMTguMCAxMS41UTU4IDI5IDI0IDU2WiIgZmlsbD0iIzAwMDAwMCIvPgo8cGF0aCB0cmFuc2Zvcm09InRyYW5zbGF0ZSgxNzk0LDApIiBkPSJNMjQgNTYgNjQgMTMyUTk5IDEwNyAxNDkuMCA5Mi4wUTE5OSA3NyAyNTAgNzdRMzc2IDc3IDM3NiAxNDlRMzc2IDE3MyAzNTkuMCAxODcuMFEzNDIgMjAxIDMxNi41IDIwNy41UTI5MSAyMTQgMjQ0IDIyMlExODAgMjMyIDEzOS41IDI0NS4wUTk5IDI1OCA3MC4wIDI4OS4wUTQxIDMyMCA0MSAzNzZRNDEgNDQ4IDEwMS4wIDQ5MS41UTE2MSA1MzUgMjYyIDUzNVEzMTUgNTM1IDM2OC4wIDUyMi4wUTQyMSA1MDkgNDU1IDQ4N0w0MTQgNDExUTM0OSA0NTMgMjYxIDQ1M1EyMDAgNDUzIDE2OC4wIDQzMy4wUTEzNiA0MTMgMTM2IDM4MFExMzYgMzU0IDE1NC4wIDMzOS4wUTE3MiAzMjQgMTk4LjUgMzE3LjBRMjI1IDMxMCAyNzMgMzAxUTMzNyAyOTAgMzc2LjUgMjc3LjVRNDE2IDI2NSA0NDQuMCAyMzUuMFE0NzIgMjA1IDQ3MiAxNTFRNDcyIDc5IDQxMC41IDM2LjVRMzQ5IC02IDI0MyAtNlExNzggLTYgMTE4LjAgMTEuNVE1OCAyOSAyNCA1NloiIGZpbGw9IiMwMDAwMDAiLz4KPHBhdGggdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMjI5NSwwKSIgZD0iTTQ2IDYzUTQ2IDkyIDY2LjAgMTExLjVRODYgMTMxIDExNCAxMzFRMTQyIDEzMSAxNjEuMCAxMTIuMFExODAgOTMgMTgwIDYzUTE4MCAzMyAxNjAuNSAxMy41UTE0MSAtNiAxMTQgLTZRODYgLTYgNjYuMCAxMy41UTQ2IDMzIDQ2IDYzWiIgZmlsbD0iIzAwQURFOCIvPgo8L2c+PC9zdmc+" alt="ness."><span>Relatório semanal · 27/11</span></div>
+ <div class="body">
+  <div><span class="num">03</span><h2>Insumos que condicionam a previsão</h2></div>
+  <table>
+   <tr><th>Fonte</th><th>O que falta</th><th>De quem</th><th>Prazo contratual</th></tr>
+   <tr><td>Oracle FMB</td><td>Rota de rede (DCIDE) e credencial somente leitura</td><td>Alupar</td><td>16/11/2026</td></tr>
+   <tr><td>MySQL Comercialização</td><td>Lista das tabelas</td><td>Alupar</td><td>16/11/2026</td></tr>
+   <tr><td>RM/TOTVS</td><td>Endpoints e dados de faturamento</td><td>Alupar</td><td>16/11/2026</td></tr>
+   <tr><td>Portal Alup</td><td>Credenciais para a primeira carga real</td><td>Alupar</td><td>16/11/2026</td></tr>
+   <tr><td>Planilhas</td><td>Templates e arquivos de exemplo, com a pasta do Drive compartilhada</td><td>Alupar</td><td>21/12/2026</td></tr>
+   <tr><td>CCEE, cadastro de pontos</td><td>Permissão do perfil 6166 (erro 4001, #462)</td><td>Alupar</td><td>—</td></tr>
+  </table>
+  <p class="lead">Os prazos são os da cláusula 3ª. Este quadro registra o estado, sem decisão.</p>
+ </div>
+</section>
+
+<section class="slide">
+ <div class="top"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjIwLjgiIGhlaWdodD0iNDAzLjIiIHZpZXdCb3g9IjAgMCAxMjIwLjgwIDQwMy4yMCI+CjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDQxLjIzMCwzMTguOTM4KSBzY2FsZSgwLjQ0MzYyLC0wLjQ0MzYyKSI+CjxwYXRoIHRyYW5zZm9ybT0idHJhbnNsYXRlKDAsMCkiIGQ9Ik01OTQgMzA1VjBINDk4VjI5NFE0OTggMzcxIDQ2MS4wIDQxMC4wUTQyNCA0NDkgMzU1IDQ0OVEyNzcgNDQ5IDIzMi4wIDQwMy41UTE4NyAzNTggMTg3IDI3M1YwSDkxVjUzMEgxODNWNDUwUTIxMiA0OTEgMjYxLjUgNTEzLjBRMzExIDUzNSAzNzQgNTM1UTQ3NSA1MzUgNTM0LjUgNDc2LjVRNTk0IDQxOCA1OTQgMzA1WiIgZmlsbD0iIzAwMDAwMCIvPgo8cGF0aCB0cmFuc2Zvcm09InRyYW5zbGF0ZSg2ODEsMCkiIGQ9Ik01NjggMjMzSDEzOFExNDcgMTYzIDE5OS41IDEyMC41UTI1MiA3OCAzMzAgNzhRNDI1IDc4IDQ4MyAxNDJMNTM2IDgwUTUwMCAzOCA0NDYuNSAxNi4wUTM5MyAtNiAzMjcgLTZRMjQzIC02IDE3OC4wIDI4LjVRMTEzIDYzIDc3LjUgMTI1LjBRNDIgMTg3IDQyIDI2NVE0MiAzNDIgNzYuNSA0MDQuMFExMTEgNDY2IDE3MS41IDUwMC41UTIzMiA1MzUgMzA4IDUzNVEzODQgNTM1IDQ0My41IDUwMC41UTUwMyA0NjYgNTM2LjUgNDA0LjBRNTcwIDM0MiA1NzAgMjYyUTU3MCAyNTEgNTY4IDIzM1pNMTM4IDMwMkg0NzhRNDcwIDM2OSA0MjMuNSA0MTEuNVEzNzcgNDU0IDMwOCA0NTRRMjM5IDQ1NCAxOTIuNSA0MTIuMFExNDYgMzcwIDEzOCAzMDJaIiBmaWxsPSIjMDAwMDAwIi8+CjxwYXRoIHRyYW5zZm9ybT0idHJhbnNsYXRlKDEyOTMsMCkiIGQ9Ik0yNCA1NiA2NCAxMzJROTkgMTA3IDE0OS4wIDkyLjBRMTk5IDc3IDI1MCA3N1EzNzYgNzcgMzc2IDE0OVEzNzYgMTczIDM1OS4wIDE4Ny4wUTM0MiAyMDEgMzE2LjUgMjA3LjVRMjkxIDIxNCAyNDQgMjIyUTE4MCAyMzIgMTM5LjUgMjQ1LjBROTkgMjU4IDcwLjAgMjg5LjBRNDEgMzIwIDQxIDM3NlE0MSA0NDggMTAxLjAgNDkxLjVRMTYxIDUzNSAyNjIgNTM1UTMxNSA1MzUgMzY4LjAgNTIyLjBRNDIxIDUwOSA0NTUgNDg3TDQxNCA0MTFRMzQ5IDQ1MyAyNjEgNDUzUTIwMCA0NTMgMTY4LjAgNDMzLjBRMTM2IDQxMyAxMzYgMzgwUTEzNiAzNTQgMTU0LjAgMzM5LjBRMTcyIDMyNCAxOTguNSAzMTcuMFEyMjUgMzEwIDI3MyAzMDFRMzM3IDI5MCAzNzYuNSAyNzcuNVE0MTYgMjY1IDQ0NC4wIDIzNS4wUTQ3MiAyMDUgNDcyIDE1MVE0NzIgNzkgNDEwLjUgMzYuNVEzNDkgLTYgMjQzIC02UTE3OCAtNiAxMTguMCAxMS41UTU4IDI5IDI0IDU2WiIgZmlsbD0iIzAwMDAwMCIvPgo8cGF0aCB0cmFuc2Zvcm09InRyYW5zbGF0ZSgxNzk0LDApIiBkPSJNMjQgNTYgNjQgMTMyUTk5IDEwNyAxNDkuMCA5Mi4wUTE5OSA3NyAyNTAgNzdRMzc2IDc3IDM3NiAxNDlRMzc2IDE3MyAzNTkuMCAxODcuMFEzNDIgMjAxIDMxNi41IDIwNy41UTI5MSAyMTQgMjQ0IDIyMlExODAgMjMyIDEzOS41IDI0NS4wUTk5IDI1OCA3MC4wIDI4OS4wUTQxIDMyMCA0MSAzNzZRNDEgNDQ4IDEwMS4wIDQ5MS41UTE2MSA1MzUgMjYyIDUzNVEzMTUgNTM1IDM2OC4wIDUyMi4wUTQyMSA1MDkgNDU1IDQ4N0w0MTQgNDExUTM0OSA0NTMgMjYxIDQ1M1EyMDAgNDUzIDE2OC4wIDQzMy4wUTEzNiA0MTMgMTM2IDM4MFExMzYgMzU0IDE1NC4wIDMzOS4wUTE3MiAzMjQgMTk4LjUgMzE3LjBRMjI1IDMxMCAyNzMgMzAxUTMzNyAyOTAgMzc2LjUgMjc3LjVRNDE2IDI2NSA0NDQuMCAyMzUuMFE0NzIgMjA1IDQ3MiAxNTFRNDcyIDc5IDQxMC41IDM2LjVRMzQ5IC02IDI0MyAtNlExNzggLTYgMTE4LjAgMTEuNVE1OCAyOSAyNCA1NloiIGZpbGw9IiMwMDAwMDAiLz4KPHBhdGggdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMjI5NSwwKSIgZD0iTTQ2IDYzUTQ2IDkyIDY2LjAgMTExLjVRODYgMTMxIDExNCAxMzFRMTQyIDEzMSAxNjEuMCAxMTIuMFExODAgOTMgMTgwIDYzUTE4MCAzMyAxNjAuNSAxMy41UTE0MSAtNiAxMTQgLTZRODYgLTYgNjYuMCAxMy41UTQ2IDMzIDQ2IDYzWiIgZmlsbD0iIzAwQURFOCIvPgo8L2c+PC9zdmc+" alt="ness."><span>Relatório semanal · 27/11</span></div>
+ <div class="body">
+  <div><span class="num">04</span><h2>Onda 2 e canal das planilhas</h2></div>
+  <div class="grid g2">
+   <div><p class="sub">Onda 2</p><ul class="l"><li>Dossiê de homologação validado.</li><li>Entregues: CCEE medição, BBCE, Hubspot e Gold de preço e posição. TempoOK fora do escopo (20/10).</li><li>Ressalva registrada: cadastro de pontos da CCEE (erro 4001, perfil 6166, #462).</li><li>Marco 3 (R$ 28.160,00) pronto para aprovação.</li></ul></div>
+   <div><p class="sub">Pasta de planilhas no Drive</p><ul class="l"><li>O datalake lê a pasta com a conta de serviço das ingestões, sem chave e só com leitura.</li><li>Pedido à Alupar: compartilhar a pasta com a conta, como Leitor.</li><li>A planilha GSF recebida servirá de primeiro template.</li></ul></div>
+  </div>
+ </div>
+</section>
+
+<section class="slide">
+ <div class="top"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjIwLjgiIGhlaWdodD0iNDAzLjIiIHZpZXdCb3g9IjAgMCAxMjIwLjgwIDQwMy4yMCI+CjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDQxLjIzMCwzMTguOTM4KSBzY2FsZSgwLjQ0MzYyLC0wLjQ0MzYyKSI+CjxwYXRoIHRyYW5zZm9ybT0idHJhbnNsYXRlKDAsMCkiIGQ9Ik01OTQgMzA1VjBINDk4VjI5NFE0OTggMzcxIDQ2MS4wIDQxMC4wUTQyNCA0NDkgMzU1IDQ0OVEyNzcgNDQ5IDIzMi4wIDQwMy41UTE4NyAzNTggMTg3IDI3M1YwSDkxVjUzMEgxODNWNDUwUTIxMiA0OTEgMjYxLjUgNTEzLjBRMzExIDUzNSAzNzQgNTM1UTQ3NSA1MzUgNTM0LjUgNDc2LjVRNTk0IDQxOCA1OTQgMzA1WiIgZmlsbD0iIzAwMDAwMCIvPgo8cGF0aCB0cmFuc2Zvcm09InRyYW5zbGF0ZSg2ODEsMCkiIGQ9Ik01NjggMjMzSDEzOFExNDcgMTYzIDE5OS41IDEyMC41UTI1MiA3OCAzMzAgNzhRNDI1IDc4IDQ4MyAxNDJMNTM2IDgwUTUwMCAzOCA0NDYuNSAxNi4wUTM5MyAtNiAzMjcgLTZRMjQzIC02IDE3OC4wIDI4LjVRMTEzIDYzIDc3LjUgMTI1LjBRNDIgMTg3IDQyIDI2NVE0MiAzNDIgNzYuNSA0MDQuMFExMTEgNDY2IDE3MS41IDUwMC41UTIzMiA1MzUgMzA4IDUzNVEzODQgNTM1IDQ0My41IDUwMC41UTUwMyA0NjYgNTM2LjUgNDA0LjBRNTcwIDM0MiA1NzAgMjYyUTU3MCAyNTEgNTY4IDIzM1pNMTM4IDMwMkg0NzhRNDcwIDM2OSA0MjMuNSA0MTEuNVEzNzcgNDU0IDMwOCA0NTRRMjM5IDQ1NCAxOTIuNSA0MTIuMFExNDYgMzcwIDEzOCAzMDJaIiBmaWxsPSIjMDAwMDAwIi8+CjxwYXRoIHRyYW5zZm9ybT0idHJhbnNsYXRlKDEyOTMsMCkiIGQ9Ik0yNCA1NiA2NCAxMzJROTkgMTA3IDE0OS4wIDkyLjBRMTk5IDc3IDI1MCA3N1EzNzYgNzcgMzc2IDE0OVEzNzYgMTczIDM1OS4wIDE4Ny4wUTM0MiAyMDEgMzE2LjUgMjA3LjVRMjkxIDIxNCAyNDQgMjIyUTE4MCAyMzIgMTM5LjUgMjQ1LjBROTkgMjU4IDcwLjAgMjg5LjBRNDEgMzIwIDQxIDM3NlE0MSA0NDggMTAxLjAgNDkxLjVRMTYxIDUzNSAyNjIgNTM1UTMxNSA1MzUgMzY4LjAgNTIyLjBRNDIxIDUwOSA0NTUgNDg3TDQxNCA0MTFRMzQ5IDQ1MyAyNjEgNDUzUTIwMCA0NTMgMTY4LjAgNDMzLjBRMTM2IDQxMyAxMzYgMzgwUTEzNiAzNTQgMTU0LjAgMzM5LjBRMTcyIDMyNCAxOTguNSAzMTcuMFEyMjUgMzEwIDI3MyAzMDFRMzM3IDI5MCAzNzYuNSAyNzcuNVE0MTYgMjY1IDQ0NC4wIDIzNS4wUTQ3MiAyMDUgNDcyIDE1MVE0NzIgNzkgNDEwLjUgMzYuNVEzNDkgLTYgMjQzIC02UTE3OCAtNiAxMTguMCAxMS41UTU4IDI5IDI0IDU2WiIgZmlsbD0iIzAwMDAwMCIvPgo8cGF0aCB0cmFuc2Zvcm09InRyYW5zbGF0ZSgxNzk0LDApIiBkPSJNMjQgNTYgNjQgMTMyUTk5IDEwNyAxNDkuMCA5Mi4wUTE5OSA3NyAyNTAgNzdRMzc2IDc3IDM3NiAxNDlRMzc2IDE3MyAzNTkuMCAxODcuMFEzNDIgMjAxIDMxNi41IDIwNy41UTI5MSAyMTQgMjQ0IDIyMlExODAgMjMyIDEzOS41IDI0NS4wUTk5IDI1OCA3MC4wIDI4OS4wUTQxIDMyMCA0MSAzNzZRNDEgNDQ4IDEwMS4wIDQ5MS41UTE2MSA1MzUgMjYyIDUzNVEzMTUgNTM1IDM2OC4wIDUyMi4wUTQyMSA1MDkgNDU1IDQ4N0w0MTQgNDExUTM0OSA0NTMgMjYxIDQ1M1EyMDAgNDUzIDE2OC4wIDQzMy4wUTEzNiA0MTMgMTM2IDM4MFExMzYgMzU0IDE1NC4wIDMzOS4wUTE3MiAzMjQgMTk4LjUgMzE3LjBRMjI1IDMxMCAyNzMgMzAxUTMzNyAyOTAgMzc2LjUgMjc3LjVRNDE2IDI2NSA0NDQuMCAyMzUuMFE0NzIgMjA1IDQ3MiAxNTFRNDcyIDc5IDQxMC41IDM2LjVRMzQ5IC02IDI0MyAtNlExNzggLTYgMTE4LjAgMTEuNVE1OCAyOSAyNCA1NloiIGZpbGw9IiMwMDAwMDAiLz4KPHBhdGggdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMjI5NSwwKSIgZD0iTTQ2IDYzUTQ2IDkyIDY2LjAgMTExLjVRODYgMTMxIDExNCAxMzFRMTQyIDEzMSAxNjEuMCAxMTIuMFExODAgOTMgMTgwIDYzUTE4MCAzMyAxNjAuNSAxMy41UTE0MSAtNiAxMTQgLTZRODYgLTYgNjYuMCAxMy41UTQ2IDMzIDQ2IDYzWiIgZmlsbD0iIzAwQURFOCIvPgo8L2c+PC9zdmc+" alt="ness."><span>Relatório semanal · 27/11</span></div>
+ <div class="body">
+  <div><span class="num">05</span><h2>Faturamento</h2></div>
+  <div>
+   <div class="bar"><i style="width:36.2%"></i></div>
+   <div class="cap"><span>Faturado R$ 53.760,00 (36,2%)</span><span>Total R$ 148.480,00</span></div>
+  </div>
+  <table>
+   <tr><th>Marco</th><th>Onda</th><th style="text-align:right">Valor</th><th>Situação</th></tr>
+   <tr><td>1</td><td>Onda 0</td><td class="n">R$ 23.040,00</td><td>Aprovado e faturado</td></tr>
+   <tr><td>2</td><td>Onda 1</td><td class="n">R$ 30.720,00</td><td>Aprovado e faturado</td></tr>
+   <tr><td>3</td><td>Onda 2</td><td class="n">R$ 28.160,00</td><td>Pronto para aprovação</td></tr>
+   <tr><td>4</td><td>Onda 3</td><td class="n">R$ 39.680,00</td><td>Prazo de 18/12/2026</td></tr>
+   <tr><td>5</td><td>Onda 4</td><td class="n">R$ 26.880,00</td><td>Prazo de 08/01/2027</td></tr>
+  </table>
+  <p class="lead">Restam R$ 94.720,00 nos marcos 3 a 5.</p>
+ </div>
+</section>
+
+<section class="slide">
+ <div class="top"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjIwLjgiIGhlaWdodD0iNDAzLjIiIHZpZXdCb3g9IjAgMCAxMjIwLjgwIDQwMy4yMCI+CjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDQxLjIzMCwzMTguOTM4KSBzY2FsZSgwLjQ0MzYyLC0wLjQ0MzYyKSI+CjxwYXRoIHRyYW5zZm9ybT0idHJhbnNsYXRlKDAsMCkiIGQ9Ik01OTQgMzA1VjBINDk4VjI5NFE0OTggMzcxIDQ2MS4wIDQxMC4wUTQyNCA0NDkgMzU1IDQ0OVEyNzcgNDQ5IDIzMi4wIDQwMy41UTE4NyAzNTggMTg3IDI3M1YwSDkxVjUzMEgxODNWNDUwUTIxMiA0OTEgMjYxLjUgNTEzLjBRMzExIDUzNSAzNzQgNTM1UTQ3NSA1MzUgNTM0LjUgNDc2LjVRNTk0IDQxOCA1OTQgMzA1WiIgZmlsbD0iIzAwMDAwMCIvPgo8cGF0aCB0cmFuc2Zvcm09InRyYW5zbGF0ZSg2ODEsMCkiIGQ9Ik01NjggMjMzSDEzOFExNDcgMTYzIDE5OS41IDEyMC41UTI1MiA3OCAzMzAgNzhRNDI1IDc4IDQ4MyAxNDJMNTM2IDgwUTUwMCAzOCA0NDYuNSAxNi4wUTM5MyAtNiAzMjcgLTZRMjQzIC02IDE3OC4wIDI4LjVRMTEzIDYzIDc3LjUgMTI1LjBRNDIgMTg3IDQyIDI2NVE0MiAzNDIgNzYuNSA0MDQuMFExMTEgNDY2IDE3MS41IDUwMC41UTIzMiA1MzUgMzA4IDUzNVEzODQgNTM1IDQ0My41IDUwMC41UTUwMyA0NjYgNTM2LjUgNDA0LjBRNTcwIDM0MiA1NzAgMjYyUTU3MCAyNTEgNTY4IDIzM1pNMTM4IDMwMkg0NzhRNDcwIDM2OSA0MjMuNSA0MTEuNVEzNzcgNDU0IDMwOCA0NTRRMjM5IDQ1NCAxOTIuNSA0MTIuMFExNDYgMzcwIDEzOCAzMDJaIiBmaWxsPSIjMDAwMDAwIi8+CjxwYXRoIHRyYW5zZm9ybT0idHJhbnNsYXRlKDEyOTMsMCkiIGQ9Ik0yNCA1NiA2NCAxMzJROTkgMTA3IDE0OS4wIDkyLjBRMTk5IDc3IDI1MCA3N1EzNzYgNzcgMzc2IDE0OVEzNzYgMTczIDM1OS4wIDE4Ny4wUTM0MiAyMDEgMzE2LjUgMjA3LjVRMjkxIDIxNCAyNDQgMjIyUTE4MCAyMzIgMTM5LjUgMjQ1LjBROTkgMjU4IDcwLjAgMjg5LjBRNDEgMzIwIDQxIDM3NlE0MSA0NDggMTAxLjAgNDkxLjVRMTYxIDUzNSAyNjIgNTM1UTMxNSA1MzUgMzY4LjAgNTIyLjBRNDIxIDUwOSA0NTUgNDg3TDQxNCA0MTFRMzQ5IDQ1MyAyNjEgNDUzUTIwMCA0NTMgMTY4LjAgNDMzLjBRMTM2IDQxMyAxMzYgMzgwUTEzNiAzNTQgMTU0LjAgMzM5LjBRMTcyIDMyNCAxOTguNSAzMTcuMFEyMjUgMzEwIDI3MyAzMDFRMzM3IDI5MCAzNzYuNSAyNzcuNVE0MTYgMjY1IDQ0NC4wIDIzNS4wUTQ3MiAyMDUgNDcyIDE1MVE0NzIgNzkgNDEwLjUgMzYuNVEzNDkgLTYgMjQzIC02UTE3OCAtNiAxMTguMCAxMS41UTU4IDI5IDI0IDU2WiIgZmlsbD0iIzAwMDAwMCIvPgo8cGF0aCB0cmFuc2Zvcm09InRyYW5zbGF0ZSgxNzk0LDApIiBkPSJNMjQgNTYgNjQgMTMyUTk5IDEwNyAxNDkuMCA5Mi4wUTE5OSA3NyAyNTAgNzdRMzc2IDc3IDM3NiAxNDlRMzc2IDE3MyAzNTkuMCAxODcuMFEzNDIgMjAxIDMxNi41IDIwNy41UTI5MSAyMTQgMjQ0IDIyMlExODAgMjMyIDEzOS41IDI0NS4wUTk5IDI1OCA3MC4wIDI4OS4wUTQxIDMyMCA0MSAzNzZRNDEgNDQ4IDEwMS4wIDQ5MS41UTE2MSA1MzUgMjYyIDUzNVEzMTUgNTM1IDM2OC4wIDUyMi4wUTQyMSA1MDkgNDU1IDQ4N0w0MTQgNDExUTM0OSA0NTMgMjYxIDQ1M1EyMDAgNDUzIDE2OC4wIDQzMy4wUTEzNiA0MTMgMTM2IDM4MFExMzYgMzU0IDE1NC4wIDMzOS4wUTE3MiAzMjQgMTk4LjUgMzE3LjBRMjI1IDMxMCAyNzMgMzAxUTMzNyAyOTAgMzc2LjUgMjc3LjVRNDE2IDI2NSA0NDQuMCAyMzUuMFE0NzIgMjA1IDQ3MiAxNTFRNDcyIDc5IDQxMC41IDM2LjVRMzQ5IC02IDI0MyAtNlExNzggLTYgMTE4LjAgMTEuNVE1OCAyOSAyNCA1NloiIGZpbGw9IiMwMDAwMDAiLz4KPHBhdGggdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMjI5NSwwKSIgZD0iTTQ2IDYzUTQ2IDkyIDY2LjAgMTExLjVRODYgMTMxIDExNCAxMzFRMTQyIDEzMSAxNjEuMCAxMTIuMFExODAgOTMgMTgwIDYzUTE4MCAzMyAxNjAuNSAxMy41UTE0MSAtNiAxMTQgLTZRODYgLTYgNjYuMCAxMy41UTQ2IDMzIDQ2IDYzWiIgZmlsbD0iIzAwQURFOCIvPgo8L2c+PC9zdmc+" alt="ness."><span>Relatório semanal · 27/11</span></div>
+ <div class="body">
+  <div><span class="num">06</span><h2>Próximos passos</h2></div>
+  <div class="grid g2">
+   <div><p class="sub">ness.</p><ul class="l"><li>Fechar o aceite do marco 3 com a Alupar.</li><li>Preparar o template da planilha GSF e o teste de leitura da pasta do Drive.</li><li>Primeira carga do Portal Alup assim que a credencial chegar.</li><li>Reexecutar a ANEEL quando a origem voltar a responder (sem carga desde 09/11).</li></ul></div>
+   <div><p class="sub">Alupar</p><ul class="l"><li>Compartilhar a pasta do Drive com a conta de serviço das ingestões.</li><li>Rota de rede do Oracle FMB e tabelas do MySQL Comercialização.</li><li>Endpoints do RM/TOTVS.</li><li>Datas para a reunião de acompanhamento, que será remarcada.</li></ul></div>
+  </div>
+ </div>
+</section>
+
+<nav id="n"></nav>
+<script>
+const s=[...document.querySelectorAll('.slide')],n=document.getElementById('n');
+const cur=()=>Math.round(scrollY/innerHeight);
+const go=i=>s[Math.max(0,Math.min(s.length-1,i))].scrollIntoView();
+addEventListener('keydown',e=>{if(['ArrowRight','ArrowDown','PageDown',' '].includes(e.key)){e.preventDefault();go(cur()+1)}if(['ArrowLeft','ArrowUp','PageUp'].includes(e.key)){e.preventDefault();go(cur()-1)}});
+const up=()=>n.textContent=(cur()+1)+' / '+s.length;addEventListener('scroll',up);up();
+</script>
+</body>
+</html>

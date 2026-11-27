@@ -253,6 +253,17 @@ variable "conectores_rede_interna" {
   }
 }
 
+variable "drive_pasta_id" {
+  description = "Id da pasta do Google Drive compartilhada pela Alupar com a SA das ingestões (configuração, não segredo). Vazio: sem job `teste-drive`"
+  type        = string
+  default     = ""
+
+  validation {
+    condition     = can(regex("^[A-Za-z0-9_-]*$", var.drive_pasta_id))
+    error_message = "O id da pasta do Drive só tem letras, números, hífen e sublinhado."
+  }
+}
+
 variable "fontes_teste_conexao" {
   description = "Fontes com job `teste-conexao-<fonte>`, que abre a DSN do Secret Manager e roda SELECT 1"
   type        = list(string)

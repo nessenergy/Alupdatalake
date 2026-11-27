@@ -21,6 +21,7 @@ import sys
 from src.conectores.ccee_pi_sessao import testar_cadastro, testar_ccee
 from src.core.banco import esquema, testar_conexao
 from src.core.config import get_settings
+from src.core.drive import testar_drive
 from src.core.execucao import Janela
 from src.core.observabilidade import configurar_logging
 from src.core.registry import listar, obter
@@ -50,6 +51,7 @@ def _parser() -> argparse.ArgumentParser:
 
     teste = sub.add_parser("testar-conexao", help="abre conexão com a DSN da fonte e roda SELECT 1")
     teste.add_argument("fonte", help="fonte do secret alupdata-<fonte>-dsn, como fmb ou comercializacao")
+    sub.add_parser("testar-drive", help="lista a pasta do Drive configurada (DRIVE_PASTA_ID), sem baixar nada")
     ccee = sub.add_parser(
         "testar-ccee", help="uma chamada de leitura à CCEE (listarMedida) para provar credencial e certificado"
     )
@@ -85,6 +87,11 @@ def main(argv: list[str] | None = None) -> int:
 
     if args.comando == "testar-conexao":
         ok, mensagem = testar_conexao(args.fonte)
+        print(mensagem)
+        return 0 if ok else 1
+
+    if args.comando == "testar-drive":
+        ok, mensagem = testar_drive()
         print(mensagem)
         return 0 if ok else 1
 

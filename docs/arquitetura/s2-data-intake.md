@@ -113,5 +113,8 @@ estiverem prontas (resposta de 27/10/2026). `src/core/drive.py` lista e baixa o 
 - o id da pasta é validado antes de entrar na consulta, e o nome do arquivo nunca escapa do diretório de destino;
 - Google Sheets nativo é exportado para xlsx, que é o que `ler_tabela()` lê.
 
-O leitor ainda não está ligado a nenhum conector: falta a pasta, o id dela (configuração, não segredo) e as planilhas
-modelo para fixar os templates. O teste de integração contra a pasta real fica para quando ela existir.
+A pasta foi informada em 27/11/2026 e o id dela está em `drive_pasta_id` (`dev.tfvars`, variável `DRIVE_PASTA_ID` no
+job). A credencial é a conta de serviço `alupdata-ingestao` do projeto da Alupar, **sem chave**: a Alupar só precisa
+compartilhar a pasta com o e-mail dela, como Leitor (passo em [`acoes-humanas.md`](../acoes-humanas.md), seção 2c).
+`alupdata testar-drive` lista os nomes dos arquivos, sem baixar nada, e o job `teste-drive` o roda de dentro do
+projeto. O leitor continua sem conector ligado: falta o template de cada planilha, que sai do exemplo real.

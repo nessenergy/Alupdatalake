@@ -272,6 +272,21 @@ agendamento das 08h grava sozinho.
 
 ---
 
+## 2c. Ligar o datalake à pasta do Drive (canal das planilhas)
+
+O datalake lê a pasta com a identidade da conta de serviço `alupdata-ingestao`, que já existe no projeto da Alupar.
+**Não se cria chave JSON**: o código usa as credenciais do próprio job e só pede leitura (`drive.readonly`).
+
+1. **Ativar a API do Drive** (quem tem Owner): `drive.googleapis.com` entrou na lista do bootstrap; reaplicar o
+   bootstrap em dev (e em hml e prod, quando a pasta valer para eles).
+2. **Compartilhar a pasta** (quem é dono dela, na Alupar): no Drive, *Compartilhar*, colar
+   `alupdata-ingestao@alupar-dev-alupdata.iam.gserviceaccount.com` e escolher **Leitor**. Sem notificação por
+   e-mail. Se a política de compartilhamento do Workspace bloquear contas fora do domínio, a saída é pôr a conta na
+   unidade compartilhada, também como Leitora.
+3. **Provar a ligação**: depois do deploy, executar o job `teste-drive` pelo console (*Executar*). O log mostra
+   `drive: N arquivo(s) na pasta` com os nomes. `404` quer dizer pasta não compartilhada com a conta; `403`, API do
+   Drive desligada.
+
 ## 3. Pedidos à Alup que continuam abertos
 
 Nenhum destes é comando: é conversa, com prazo e efeito contratual. A cobrança

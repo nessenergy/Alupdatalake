@@ -230,6 +230,7 @@ module "scheduler" {
   rede_interna            = var.rede_interna
   conectores_rede_interna = var.conectores_rede_interna
   fontes_teste_conexao    = var.fontes_teste_conexao
+  drive_pasta_id          = var.drive_pasta_id
 }
 
 # Portal atrás do IAP (R01). Sobe com a imagem publicada, que é a mesma da CLI;

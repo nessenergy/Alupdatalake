@@ -36,6 +36,12 @@ class Settings(BaseSettings):
         default=1000, description="Linhas por fetchmany; também é o arraysize pago em round-trip sob VPN"
     )
 
+    drive_pasta_id: str = Field(
+        default="",
+        description="Id da pasta do Google Drive que a Alupar compartilha com a conta do job (canal das planilhas, "
+        "src/core/drive.py). Configuração, não segredo: sem o compartilhamento, o id não abre nada",
+    )
+
     dry_run: bool = Field(default=False, description="Extrai e valida sem gravar em GCS/BigQuery")
 
     reler_meses_carregados: bool = Field(

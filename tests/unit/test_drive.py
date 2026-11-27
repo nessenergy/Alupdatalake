@@ -23,6 +23,9 @@ from src.core.drive import (
     baixar,
     listar_pasta,
 )
+from src.core.drive import (
+    testar_drive as provar_drive,
+)
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -140,3 +143,64 @@ def test_erro_da_api_nao_vira_arquivo_vazio(tmp_path: Path) -> None:
         baixar(sessao, ArquivoDrive("a1", "prc.csv", "text/csv", datetime.now(UTC)), tmp_path, TOKEN)
 
     assert not (tmp_path / "prc.csv").exists()
+
+
+class _SessaoQueFalha:
+    def __init__(self, status: int) -> None:
+        self.status = status
+
+    def get(self, *args: Any, **kwargs: Any):
+        import requests
+
+        resposta = requests.Response()
+        resposta.status_code = self.status
+        raise requests.HTTPError(response=resposta)
+
+
+def test_testar_drive_lista_nomes_sem_baixar_nada() -> None:
+    sessao = _Sessao([_Resposta({"files": [_arquivo("a1", "GSF_template.xlsx"), _arquivo("a2", "outra.csv")]})])
+
+    ok, mensagem = provar_drive(PASTA, sessao=sessao, token=TOKEN)
+
+    assert ok
+    assert "2 arquivo(s)" in mensagem
+    assert "GSF_template.xlsx" in mensagem
+    assert len(sessao.chamadas) == 1  # só a listagem; nenhum download
+
+
+def test_testar_drive_sem_id_configurado_diz_qual_variavel_falta(monkeypatch) -> None:
+    monkeypatch.setattr(
+        "src.core.drive.get_settings", lambda: type("S", (), {"drive_pasta_id": "", "http_timeout": 5})()
+    )
+
+    ok, mensagem = provar_drive(sessao=_Sessao([]), token=TOKEN)
+
+    assert not ok
+    assert "DRIVE_PASTA_ID" in mensagem
+
+
+def test_testar_drive_pasta_vazia_nao_e_erro_mas_avisa() -> None:
+    ok, mensagem = provar_drive(PASTA, sessao=_Sessao([_Resposta({"files": []})]), token=TOKEN)
+
+    assert ok
+    assert "0 arquivo(s)" in mensagem
+
+
+@pytest.mark.parametrize(
+    ("status", "dica"),
+    [(404, "compartilhada"), (403, "API do Drive")],
+)
+def test_testar_drive_traduz_o_erro_da_api_na_causa_provavel(status: int, dica: str) -> None:
+    ok, mensagem = provar_drive(PASTA, sessao=_SessaoQueFalha(status), token=TOKEN)
+
+    assert not ok
+    assert str(status) in mensagem
+    assert dica in mensagem
+
+
+def test_testar_drive_nome_com_quebra_de_linha_nao_forja_linha_de_log() -> None:
+    sessao = _Sessao([_Resposta({"files": [_arquivo("a1", "x.csv\nok: falso")]})])
+
+    _, mensagem = provar_drive(PASTA, sessao=sessao, token=TOKEN)
+
+    assert mensagem.count("\n") == 1  # cabeçalho + uma linha de arquivo

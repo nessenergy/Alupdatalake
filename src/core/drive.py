@@ -16,13 +16,12 @@ from typing import TYPE_CHECKING, Any
 
 import google.auth
 import google.auth.transport.requests
+import requests
 
 from src.core.config import get_settings
 
 if TYPE_CHECKING:
     from pathlib import Path
-
-    import requests
 
 API = "https://www.googleapis.com/drive/v3"
 ESCOPO_LEITURA = "https://www.googleapis.com/auth/drive.readonly"
@@ -120,3 +119,37 @@ def baixar(sessao: requests.Session, arquivo: ArquivoDrive, destino: Path, token
     caminho = destino / nome
     caminho.write_bytes(resposta.content)
     return caminho
+
+
+_CAUSA_PROVAVEL = {
+    404: "a pasta não existe ou não foi compartilhada com a conta do job (compartilhe como Leitor)",
+    403: "a API do Drive não está ativada no projeto, ou a conta do job não tem acesso à pasta",
+}
+
+
+def testar_drive(
+    pasta_id: str | None = None, *, sessao: requests.Session | None = None, token: str | None = None
+) -> tuple[bool, str]:
+    """Prova a ligação do datalake com a pasta: lista os nomes, sem baixar nada.
+
+    É o equivalente de `testar-conexao` para o Drive. A mensagem diz a causa provável da falha e nunca leva o token.
+    """
+    pasta = pasta_id if pasta_id is not None else get_settings().drive_pasta_id
+    if not pasta:
+        return False, "drive: DRIVE_PASTA_ID não está configurado neste ambiente"
+    try:
+        arquivos = listar_pasta(sessao or requests.Session(), pasta, token or token_de_leitura())
+    except DriveInvalidoError as erro:
+        return False, f"drive: {erro}"
+    except requests.HTTPError as erro:
+        status = erro.response.status_code if erro.response is not None else 0
+        causa = _CAUSA_PROVAVEL.get(status, "resposta inesperada da API do Drive")
+        return False, f"drive: a API respondeu {status}; {causa}"
+    except Exception as erro:  # noqa: BLE001 - qualquer outra falha (credencial, rede) é o diagnóstico, sem o detalhe
+        return False, f"drive: falha ao consultar a pasta ({type(erro).__name__})"
+    linhas = [f"drive: {len(arquivos)} arquivo(s) na pasta"]
+    # Nome vem de uma pessoa: escapado, para uma quebra de linha não forjar outra linha de log.
+    linhas += [
+        f"- {a.nome.encode('unicode_escape').decode()} | {a.mime_type} | {a.modificado_em:%Y-%m-%d}" for a in arquivos
+    ]
+    return True, "\n".join(linhas)

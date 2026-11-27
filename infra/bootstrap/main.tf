@@ -57,6 +57,7 @@ locals {
     "dataform.googleapis.com",    # ADR 012
     "datalineage.googleapis.com", # ADR 013
     "dataplex.googleapis.com",    # Knowledge Catalog, ADR 014
+    "drive.googleapis.com",       # leitura da pasta de planilhas da Alupar, src/core/drive.py
     "iam.googleapis.com",
     "iamcredentials.googleapis.com", # WIF: token de curta duração da SA de deploy
     "iap.googleapis.com",            # Portal

@@ -525,6 +525,12 @@ variable "conectores_rede_interna" {
   default     = []
 }
 
+variable "drive_pasta_id" {
+  description = "Id da pasta do Google Drive que a Alupar compartilha com a SA das ingestões (canal das planilhas). Vazio: nenhum job `teste-drive`"
+  type        = string
+  default     = ""
+}
+
 variable "fontes_teste_conexao" {
   description = "Fontes com um job `testar-conexao`, que abre a DSN e roda SELECT 1 de dentro da rede"
   type        = list(string)
@@ -637,6 +643,44 @@ resource "google_cloud_run_v2_job" "teste_conexao" {
         env {
           name  = "GCP_PROJECT_ID"
           value = var.project_id
+        }
+      }
+    }
+  }
+
+  labels = {
+    projeto  = "alupdata"
+    ambiente = var.environment
+  }
+}
+
+# O datalake alcança a pasta do Drive? Lista os nomes dos arquivos com a identidade
+# da SA das ingestões (sem chave) e não baixa nada. Roda à mão; o Drive é API
+# pública, então não precisa da sub-rede da Onda 3.
+resource "google_cloud_run_v2_job" "teste_drive" {
+  count = var.drive_pasta_id == "" ? 0 : 1
+
+  name     = "teste-drive"
+  project  = var.project_id
+  location = var.region
+
+  template {
+    template {
+      service_account = var.service_account_email
+      max_retries     = 0
+      timeout         = "120s"
+
+      containers {
+        image = var.imagem
+        args  = ["testar-drive"]
+
+        env {
+          name  = "GCP_PROJECT_ID"
+          value = var.project_id
+        }
+        env {
+          name  = "DRIVE_PASTA_ID"
+          value = var.drive_pasta_id
         }
       }
     }

@@ -101,6 +101,16 @@ def test_testar_conexao_devolve_o_codigo_e_imprime(monkeypatch, capsys, resultad
     assert resultado[1] in capsys.readouterr().out
 
 
+@pytest.mark.parametrize(
+    ("resultado", "codigo"), [((True, "drive: 2 arquivo(s) na pasta"), 0), ((False, "drive: 404"), 1)]
+)
+def test_testar_drive_devolve_o_codigo_e_imprime(monkeypatch, capsys, resultado, codigo):
+    monkeypatch.setattr("src.cli.testar_drive", lambda: resultado)
+
+    assert main(["testar-drive"]) == codigo
+    assert resultado[1] in capsys.readouterr().out
+
+
 @pytest.mark.parametrize(("resultado", "codigo"), [((True, "ccee: ok, 3 medidas"), 0), ((False, "ccee: falha X"), 1)])
 def test_testar_ccee_devolve_o_codigo_e_imprime(monkeypatch, capsys, resultado, codigo):
     monkeypatch.setattr("src.cli.testar_ccee", lambda ponto, dia, piloto=False: resultado)

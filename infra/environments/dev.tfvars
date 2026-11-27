@@ -63,3 +63,6 @@ conectores_rede_interna = [
 ]
 # Credenciais do DB Alup e do DB Comercialização chegaram em 19/10; os dois jobs mostram se a DSN e o acesso funcionam.
 fontes_teste_conexao = ["fmb", "portal-alup", "comercializacao"]
+
+# Pasta do Drive que a Alupar compartilha com alupdata-ingestao (canal das planilhas, src/core/drive.py)
+drive_pasta_id = "1rKyY-VAJL030y3ts-ByePUiK-E8S3d0L"
